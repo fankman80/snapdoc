@@ -95,21 +95,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _pinSize = "64";
-    public string PinSize
-    {
-        get => _pinSize;
-        set
-        {
-            if (_pinSize != value)
-            {
-                _pinSize = Math.Round(Convert.ToDouble(value),0).ToString();
-                OnPropertyChanged(nameof(PinSize));
-            }
-        }
-    }
-
-    private string _pinScaleLimit = "1";
+    private string _pinScaleLimit = "0,5";
     public string PinScaleLimit
     {
         get => _pinScaleLimit;
@@ -196,6 +182,19 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
+    private string _isPinIconExport = "true";
+    public string IsPinIconExport
+    {
+        get => _isPinIconExport;
+        set
+        {
+            if (_isPinIconExport != value)
+            {
+                _isPinIconExport = value;
+                OnPropertyChanged(nameof(IsPinIconExport));
+            }
+        }
+    }
     private string _imageExportSize = "40";
     public string ImageExportSize
     {

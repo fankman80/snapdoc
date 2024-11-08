@@ -7,6 +7,7 @@ using System.Windows.Input;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Alerts;
 using System.Threading;
+using System.Globalization;
 
 namespace bsm24;
 
@@ -37,7 +38,12 @@ public partial class AppShell : Shell
             await new LoadDataToView().ResetApp();
 
             GlobalJson.CreateNewFile(filePath);
-
+            GlobalJson.Data.client_name = "";
+            GlobalJson.Data.object_address = "";
+            GlobalJson.Data.working_title = "";
+            GlobalJson.Data.object_name = "";
+            GlobalJson.Data.creation_date = DateTime.Parse(DateTime.Now.Date.ToString("d", new CultureInfo("de-DE"))).ToString();
+            GlobalJson.Data.project_manager = "";
             GlobalJson.Data.projectPath = Path.Combine(result);
             GlobalJson.Data.jsonFile = Path.Combine(result, result + ".json");
             GlobalJson.Data.planPath = Path.Combine(result, "plans");

@@ -6,6 +6,7 @@ using MR.Gestures;
 using bsm24.Services;
 using System.Management.Automation.Remoting;
 using OpenXmlPowerTools;
+using System.Globalization;
 
 namespace bsm24.Views;
 
@@ -149,15 +150,14 @@ public partial class NewPage : IQueryAttributable
             AnchorX = GlobalJson.Data.plans[PlanId].pins[pinId].anchor.X,
             AnchorY = GlobalJson.Data.plans[PlanId].pins[pinId].anchor.Y,
             TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
-            TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height)
+            TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
         };
 
         var scaleLimit = Convert.ToDouble(SettingsService.Instance.PinScaleLimit);
         if (scaleLimit < 1) smallImage.Scale = scaleLimit;
 
-        smallImage.BindingContext = SettingsService.Instance;
-        smallImage.SetBinding(WidthRequestProperty, new Binding("PinSize"));
-        smallImage.SetBinding(HeightRequestProperty, new Binding("PinSize"));
+        //smallImage.BindingContext = SettingsService.Instance;
+        //smallImage.SetBinding(ScaleProperty, new Binding("PinSize"));
 
         smallImage.Down += (s, e) =>
         {
@@ -396,5 +396,31 @@ public partial class NewPage : IQueryAttributable
                 GlobalJson.SaveToFile();
                 break;
         }
+    }
+}
+
+public class PinSizeWithFactorConverter : IValueConverter
+{
+    // Dynamischer Faktor, den du im Converter ändern kannst
+    public double AdditionalFactor { get; set; } = 1.0;
+
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is double pinSize)
+        {
+            // PinSize mit dem zusätzlichen Faktor multiplizieren oder addieren
+            return pinSize * AdditionalFactor;
+        }
+        return value;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        // Falls du bidirektionale Bindungen verwenden möchtest
+        if (value is double newValue)
+        {
+            return newValue / AdditionalFactor;
+        }
+        return value;
     }
 }

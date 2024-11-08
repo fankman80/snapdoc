@@ -23,11 +23,6 @@
            VerticalOptions="Center">
 
         <VerticalStackLayout Spacing="16">
-            <Label Text="{Binding PinSize, StringFormat='Pin Size: {0:0.##}'}" />
-            <Slider Maximum="128"
-                    Minimum="1"   
-                    Value="{Binding PinSize}"/>
-
             <Label Text="{Binding PinScaleLimit, StringFormat='Max Pin Scale Limit: {0:0.##}'}" />
             <Slider Maximum="2"
                     Minimum="0.01"

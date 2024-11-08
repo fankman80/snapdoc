@@ -21,25 +21,14 @@ public partial class ProjectDetails : UraniumContentPage
         base.OnAppearing();
 
         if (GlobalJson.Data.pdf == null)
-        {
             isPdfExist = false;
-        }
-
 
         client_name.Text = GlobalJson.Data.client_name;
         object_address.Text = GlobalJson.Data.object_address;
         working_title.Text = GlobalJson.Data.working_title;
         object_name.Text = GlobalJson.Data.object_name;
         project_manager.Text = GlobalJson.Data.project_manager;
-
-        if (GlobalJson.Data.creation_date == null)
-        {
-            creation_date.Date = DateTime.Parse(DateTime.Now.Date.ToString("d", new CultureInfo("de-DE")));
-        }
-        else
-        {
-            creation_date.Date = DateTime.Parse(GlobalJson.Data.creation_date);
-        }
+        creation_date.Date = DateTime.Parse(GlobalJson.Data.creation_date);
 
         HeaderUpdate();
     }

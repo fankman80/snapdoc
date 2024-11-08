@@ -40,9 +40,7 @@ public partial class OpenProject : UraniumContentPage
                 string thumbImg = "banner_thumbnail.png";
 
                 if (File.Exists(Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg")))
-                {
                     thumbImg = Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg");
-                }
 
                 foundFiles.Add(new FileItem
                 {
@@ -82,12 +80,11 @@ public partial class OpenProject : UraniumContentPage
                     await new LoadDataToView().ResetApp();
                     GlobalJson.LoadFromFile(item.FilePath);
                     await new LoadDataToView().LoadData(new FileResult(item.FilePath));
-                    HeaderUpdate();  // UI-Aktualisierung
+                    OpenProject.HeaderUpdate();  // UI-Aktualisierung
                     await Shell.Current.GoToAsync("//project_details");
                 });
             }
         });
-
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
     }
@@ -125,7 +122,7 @@ public partial class OpenProject : UraniumContentPage
         }
     }
 
-    private void HeaderUpdate()
+    private static void HeaderUpdate()
     {
         // aktualisiere den Header Text
         Services.SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.object_name;
@@ -133,12 +130,8 @@ public partial class OpenProject : UraniumContentPage
 
         // aktualisiere das Thumbnail Bild
         if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg")))
-        {
             Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg");
-        }
         else
-        {
             Services.SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
-        }
     }
 }

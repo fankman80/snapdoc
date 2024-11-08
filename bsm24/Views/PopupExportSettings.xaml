@@ -43,6 +43,9 @@
 
                 <Label Text="Export Images:" Grid.Column="0" Grid.Row="2"/>
                 <Switch x:Name="isImageExport" IsToggled="{Binding IsImageExport}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="2"/>
+
+                <Label Text="Show Pin-Icons:" Grid.Column="0" Grid.Row="3"/>
+                <Switch x:Name="isPinIconExport" IsToggled="{Binding IsPinIconExport}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="3"/>
             </Grid>
             <Label Text="{Binding ImageExportSize, StringFormat='Image Size: {0:0.##} mm'}"/>
             <Slider Maximum="160"
