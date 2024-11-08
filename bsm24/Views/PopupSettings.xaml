@@ -23,12 +23,12 @@
            VerticalOptions="Center">
 
         <VerticalStackLayout Spacing="16">
-            <Label Text="{Binding PinScaleLimit, StringFormat='Max Pin Scale Limit: {0:0.##}'}" />
+            <Label Text="{Binding PinScaleLimit, StringFormat='Limit Pinskalierung: {0:0.##}'}" />
             <Slider Maximum="2"
                     Minimum="0.01"
                     Value="{Binding PinScaleLimit}"/>
 
-            <Label Text="{Binding PdfQuality, StringFormat='PDF-Quality: {0:0.##}'}" />
+            <Label Text="{Binding PdfQuality, StringFormat='PDF-Qualität: {0:0.##}'}" />
             <Slider Maximum="800"
                     Minimum="100"
                     Value="{Binding PdfQuality}"/>
@@ -38,13 +38,13 @@
                     <ColumnDefinition Width="2*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Label Text="Lock Plan Rotate" Grid.Column="0" Grid.Row="0"/>
+                <Label Text="Sperre Planrotation" Grid.Column="0" Grid.Row="0"/>
                 <Switch x:Name="isPlanRotateLocked" IsToggled="{Binding IsPlanRotateLocked}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="0"/>
             </Grid>
             
             <Picker
                   VerticalOptions="Center"
-                  Title="Theme:"
+                  Title="Thema:"
                   ItemsSource="{Binding Source={x:Static models:Theme.AvailableThemes}}"
                   ItemDisplayBinding="{Binding DisplayName}"
                   SelectedItem="{Binding Path=Theme, Source={x:Static services:SettingsService.Instance}}"/>
@@ -58,7 +58,7 @@
                     Text="OK"
                     Clicked="OnOkClicked" />
                 <Button Grid.Column="1"
-                    Text="Export Settings"
+                    Text="Export Einstellungen"
                     Clicked="OnExportSettingsClicked" />                
             </Grid>
         </VerticalStackLayout>
