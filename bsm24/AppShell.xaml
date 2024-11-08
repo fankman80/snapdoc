@@ -71,29 +71,29 @@
                     ContentTemplate="{DataTemplate views:HomeScreen}"
                     FlyoutItemIsVisible="False" />
 
-    <MenuItem Text="New Project"
+    <MenuItem Text="Neues Projekt"
               Clicked="OnNewClicked"
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Add_box}}"/>
 
-    <ShellContent Route="open_project"
+    <ShellContent Route="Projekt öffnen"
                   Title="Open Project"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
 
-    <ShellContent Route="project_details"
+    <ShellContent Route="Projekt Daten"
                   Title="Project Details"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Home_work}}"
                   ContentTemplate="{DataTemplate views:ProjectDetails}" />
 
-    <MenuItem Text="Settings"
+    <MenuItem Text="Einstellungen"
               Clicked="OnSettingsClicked"
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Settings}}"/>
 
-    <MenuItem Text="Export Report"
+    <MenuItem Text="Bericht exportieren"
               Clicked="OnExportClicked"
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.File_download}}"/>
 
-    <MenuItem Text="Share Report"
+    <MenuItem Text="Bericht teilen"
               Clicked="OnShareClicked"
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Share}}"/>
 
