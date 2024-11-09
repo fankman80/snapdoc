@@ -48,10 +48,10 @@ public partial class ImageViewPage : IQueryAttributable
             ImgSource = value4 as string;
 
             String imgPath;
-            if (GlobalJson.Data.plans[PlanId].pins[PinId].images[ImgSource].hasOverlay)
-                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
+                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
             else
-                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
+                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, ImgSource);
 
             // Lade die Metadaten aus dem Bild
             var directories = ImageMetadataReader.ReadMetadata(imgPath);
@@ -141,8 +141,8 @@ public partial class ImageViewPage : IQueryAttributable
         PenSizeSlider.IsVisible = false;
         ColorPicker.IsVisible = false;
 
-        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
-        var origPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, ImgSource);
+        var origPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
 
         if (isCleared)
         {
@@ -161,7 +161,7 @@ public partial class ImageViewPage : IQueryAttributable
     private void EraseClicked(object sender, EventArgs e)
     {
         isCleared = true;
-        ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+        ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
         DrawView.Clear();
     }
 
@@ -184,15 +184,15 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (result != null)
         {
-            string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, GlobalJson.Data.plans[PlanId].pins[PinId].images[ImgSource].file);
+            string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file))
                 File.Delete(file);
 
-            file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.thumbnailPath, GlobalJson.Data.plans[PlanId].pins[PinId].images[ImgSource].file);
+            file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file))
                 File.Delete(file);
 
-            GlobalJson.Data.plans[PlanId].pins[PinId].images.Remove(ImgSource);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
 
             // save data to file
             GlobalJson.SaveToFile();

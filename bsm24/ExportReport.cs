@@ -13,12 +13,12 @@ public partial class ExportReport
     {
         var placeholders = new Dictionary<string, string>
         {
-            {"${client_name}", GlobalJson.Data.client_name},
-            {"${object_address}", GlobalJson.Data.object_address},
-            {"${working_title}", GlobalJson.Data.working_title},
-            {"${object_name}", GlobalJson.Data.object_name},
-            {"${creation_date}", GlobalJson.Data.creation_date},
-            {"${project_manager}", GlobalJson.Data.project_manager},
+            {"${client_name}", GlobalJson.Data.Client_name},
+            {"${object_address}", GlobalJson.Data.Object_address},
+            {"${working_title}", GlobalJson.Data.Working_title},
+            {"${object_name}", GlobalJson.Data.Object_name},
+            {"${creation_date}", GlobalJson.Data.Creation_date},
+            {"${project_manager}", GlobalJson.Data.Project_manager},
             {"${plan_indexes}", "${plan_indexes}"}, //bereinige splitted runs
             {"${plan_images}", "${plan_images}"} //bereinige splitted runs
         };
@@ -51,11 +51,11 @@ public partial class ExportReport
                 if (table != null)
                 {
                     int i = 1;
-                    foreach (var plan in GlobalJson.Data.plans)
+                    foreach (var plan in GlobalJson.Data.Plans)
                     {
-                        if (GlobalJson.Data.plans[plan.Key].pins != null)
+                        if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                         {
-                            foreach (var pin in GlobalJson.Data.plans[plan.Key].pins)
+                            foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
                             {
                                 D.TableRow newRow = new();
 
@@ -63,22 +63,22 @@ public partial class ExportReport
                                 D.TableCell newCell1 = new(new D.Paragraph(new D.Run(new D.Text(i.ToString()))));
 
                                 // Cell 2
-                                D.TableCell newCell2 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.plans[plan.Key].name))));
+                                D.TableCell newCell2 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.Plans[plan.Key].Name))));
 
                                 // Cell 3
                                 D.TableCell newCell3 = new();
-                                if (GlobalJson.Data.plans[plan.Key].pins != null)
+                                if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                                 {
                                     D.Paragraph paragraph = new();
                                     if (SettingsService.Instance.IsImageExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         // add Pictures
-                                        foreach (var img in GlobalJson.Data.plans[plan.Key].pins[pin.Key].images)
+                                        foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos)
                                         {
-                                            var imgName = GlobalJson.Data.plans[plan.Key].pins[pin.Key].images[img.Key].file;
-                                            var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, imgName);
+                                            var imgName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos[img.Key].File;
+                                            var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, imgName);
                                             var overlayFile = Path.GetFileNameWithoutExtension(imgName) + ".png";
-                                            var overlayDrawingPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imageOverlayPath, overlayFile);                        
+                                            var overlayDrawingPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImageOverlayPath, overlayFile);                        
                                             var _img = await XmlImage.GenerateImage(mainPart,
                                                                                     new FileResult(imgPath),
                                                                                     Double.Parse(SettingsService.Instance.ImageExportScale),
@@ -91,10 +91,10 @@ public partial class ExportReport
                                     if (SettingsService.Instance.IsPosImageExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
                                     {
                                         // add Part of Plan Image
-                                        var planName = GlobalJson.Data.plans[plan.Key].file;
-                                        var planPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.planPath, planName);
-                                        var pinPos = GlobalJson.Data.plans[plan.Key].pins[pin.Key].pos;
-                                        var pinImage = GlobalJson.Data.plans[plan.Key].pins[pin.Key].pinIcon;
+                                        var planName = GlobalJson.Data.Plans[plan.Key].File;
+                                        var planPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, planName);
+                                        var pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
+                                        var pinImage = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
                                     
                                         // Pin-Icon ein/ausblenden
                                         var pinList = new List<(string, SKPoint, string, SKPoint)>();
@@ -105,8 +105,8 @@ public partial class ExportReport
                                                 (pinImage,
                                                 new SKPoint(0.5f, 0.5f),
                                                 "",
-                                                new SKPoint((float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].anchor.X,
-                                                (float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].anchor.Y))
+                                                new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X,
+                                                (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y))
                                             ];
                                         }
                                         else
@@ -127,10 +127,10 @@ public partial class ExportReport
                                 }
 
                                 // Cell 4
-                                D.TableCell newCell4 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.plans[plan.Key].pins[pin.Key].infoTxt))));
+                                D.TableCell newCell4 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].InfoTxt))));
 
                                 // Cell 5
-                                D.TableCell newCell5 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.plans[plan.Key].pins[pin.Key].pinTxt))));
+                                D.TableCell newCell5 = new(new D.Paragraph(new D.Run(new D.Text(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinTxt))));
 
                                 // Füge die Zellen zur Zeile hinzu
                                 newRow.Append(newCell1);
@@ -164,9 +164,9 @@ public partial class ExportReport
                                 if (text.Text.Contains("${plan_indexes}"))
                                 {
                                     text.Text = ""; // Lösche den Platzhaltertext
-                                    foreach (var plan in GlobalJson.Data.plans)
+                                    foreach (var plan in GlobalJson.Data.Plans)
                                     {
-                                        run.Append(new D.Text("- " + GlobalJson.Data.plans[plan.Key].name));
+                                        run.Append(new D.Text("- " + GlobalJson.Data.Plans[plan.Key].Name));
                                         run.Append(new D.Break());
                                     }
                                 }
@@ -186,21 +186,21 @@ public partial class ExportReport
                                 {
                                     int i = 1;
                                     text.Text = ""; // Lösche den Platzhaltertext
-                                    foreach (var plan in GlobalJson.Data.plans)
+                                    foreach (var plan in GlobalJson.Data.Plans)
                                     {
-                                        var imgName = GlobalJson.Data.plans[plan.Key].file;
-                                        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.planPath, imgName);
+                                        var imgName = GlobalJson.Data.Plans[plan.Key].File;
+                                        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, imgName);
 
                                         // generate Pin-Image-List
                                         var pinList = new List<(string, SKPoint, string, SKPoint)>();
-                                        if (GlobalJson.Data.plans[plan.Key].pins != null)
+                                        if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                                         {
-                                            foreach (var pin in GlobalJson.Data.plans[plan.Key].pins)
+                                            foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
                                             {
-                                                pinList.Add((GlobalJson.Data.plans[plan.Key].pins[pin.Key].pinIcon,
-                                                            new SKPoint((float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].pos.X, (float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].pos.Y),
+                                                pinList.Add((GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon,
+                                                            new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos.X, (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos.Y),
                                                             "    Pos. " + i.ToString(),
-                                                            new SKPoint((float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].anchor.X, (float)GlobalJson.Data.plans[plan.Key].pins[pin.Key].anchor.Y)));
+                                                            new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X, (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y)));
                                                 i += 1;
                                             }
                                         }
@@ -220,10 +220,10 @@ public partial class ExportReport
                                         runProperties.Append(fontSize);
                                         run.PrependChild(runProperties); // weise Schrift-Property zu
 
-                                        run.Append(new D.Text(GlobalJson.Data.plans[plan.Key].name));
+                                        run.Append(new D.Text(GlobalJson.Data.Plans[plan.Key].Name));
                                         run.Append(new D.Break());
                                         run.Append(_img);
-                                        if (i > GlobalJson.Data.plans.Count) run.Append(new Break() { Type = BreakValues.Page });  // letzter Seitenumbruch nicht einfügen
+                                        if (i > GlobalJson.Data.Plans.Count) run.Append(new Break() { Type = BreakValues.Page });  // letzter Seitenumbruch nicht einfügen
                                     }
                                 }
                             }

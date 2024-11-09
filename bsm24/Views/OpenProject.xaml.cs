@@ -125,12 +125,12 @@ public partial class OpenProject : UraniumContentPage
     private static void HeaderUpdate()
     {
         // aktualisiere den Header Text
-        Services.SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.object_name;
-        Services.SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.client_name;
+        Services.SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name;
+        Services.SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name;
 
         // aktualisiere das Thumbnail Bild
-        if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg")))
-            Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg");
+        if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg")))
+            Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
         else
             Services.SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
     }

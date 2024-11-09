@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
 using Mopups.Services;
@@ -29,7 +30,7 @@ public partial class NewPage : IQueryAttributable
         InitializeComponent();
         BindingContext = new TransformViewModel();
         PlanId = planId;
-        PageTitle = GlobalJson.Data.plans[PlanId].name;
+        PageTitle = GlobalJson.Data.Plans[PlanId].Name;
         OnPropertyChanged(nameof(PageTitle));
     }
 
@@ -43,10 +44,10 @@ public partial class NewPage : IQueryAttributable
                 .FirstOrDefault(i => i.AutomationId == PinUpdate);
             if (image != null)
             {
-                image.AnchorX = GlobalJson.Data.plans[PlanId].pins[PinUpdate].anchor.X;
-                image.AnchorY = GlobalJson.Data.plans[PlanId].pins[PinUpdate].anchor.Y;
-                image.Source = GlobalJson.Data.plans[PlanId].pins[PinUpdate].pinIcon;  // Bildquelle ändern
-                if (GlobalJson.Data.plans[PlanId].pins[PinUpdate].isLocked == true)
+                image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
+                image.AnchorY = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.Y;
+                image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;  // Bildquelle ändern
+                if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
                     image.Opacity = .3;
                 else
                     image.Opacity = 1;
@@ -63,22 +64,22 @@ public partial class NewPage : IQueryAttributable
             PlanContainer.Remove(image);
 
             // delete all images
-            foreach (var del_image in GlobalJson.Data.plans[PlanId].pins[PinDelete].images)
+            foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos)
             {
                 string file;
 
-                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, GlobalJson.Data.plans[PlanId].pins[PinDelete].images[del_image.Key].file);
+                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
                 if (File.Exists(file))
                     File.Delete(file);
 
-                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.thumbnailPath, GlobalJson.Data.plans[PlanId].pins[PinDelete].images[del_image.Key].file);
+                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
                 if (File.Exists(file))
                     File.Delete(file);
             }
 
             // remove pin from database
-            var plan = GlobalJson.Data.plans[PlanId];
-            plan.pins.Remove(PinDelete);
+            var plan = GlobalJson.Data.Plans[PlanId];
+            plan.Pins.Remove(PinDelete);
 
             // save data to file
             GlobalJson.SaveToFile();
@@ -87,7 +88,7 @@ public partial class NewPage : IQueryAttributable
 
     private void AddPlan()
     {
-        PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.planPath, GlobalJson.Data.plans[PlanId].file);
+        PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
 
         if (BindingContext is TransformViewModel viewModel)
         {
@@ -110,7 +111,7 @@ public partial class NewPage : IQueryAttributable
                         if (1 / PlanContainer.Scale < scaleLimit)
                             img.Scale = scale;
 
-                        if (!GlobalJson.Data.plans[PlanId].pins[img.AutomationId].isLockRotate)
+                        if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
                             img.Rotation = PlanContainer.Rotation * -1;
                     }
                 }
@@ -121,11 +122,11 @@ public partial class NewPage : IQueryAttributable
     private void AddPins()
     {
         // Load all Pins at first page opening
-        if (GlobalJson.Data.plans[PlanId].pins == null) return;
+        if (GlobalJson.Data.Plans[PlanId].Pins == null) return;
 
-        foreach (var pinId in GlobalJson.Data.plans[PlanId].pins.Keys)
+        foreach (var pinId in GlobalJson.Data.Plans[PlanId].Pins.Keys)
         {
-            var pinIcon = GlobalJson.Data.plans[PlanId].pins[pinId].pinIcon;
+            var pinIcon = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon;
             AddPin(pinId, pinIcon);
         }
     }
@@ -133,20 +134,20 @@ public partial class NewPage : IQueryAttributable
     private void AddPin(string pinId, string pinIcon)
     {
         var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
-        Point _originAnchor = GlobalJson.Data.plans[PlanId].pins[pinId].anchor;
-        Point _originPos = GlobalJson.Data.plans[PlanId].pins[pinId].pos;
-        Size _planSize = GlobalJson.Data.plans[PlanId].imageSize;
-        Size _pinSize = GlobalJson.Data.plans[PlanId].pins[pinId].size;
+        Point _originAnchor = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor;
+        Point _originPos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
+        Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
+        Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size;
 
         // berechne Anchor-Koordinaten
         var smallImage = new MR.Gestures.Image
         {
             Source = pinIcon,
             AutomationId = pinId,
-            WidthRequest = GlobalJson.Data.plans[PlanId].pins[pinId].size.Width,
-            HeightRequest = GlobalJson.Data.plans[PlanId].pins[pinId].size.Height,
-            AnchorX = GlobalJson.Data.plans[PlanId].pins[pinId].anchor.X,
-            AnchorY = GlobalJson.Data.plans[PlanId].pins[pinId].anchor.Y,
+            WidthRequest = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Width,
+            HeightRequest = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Height,
+            AnchorX = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor.X,
+            AnchorY = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor.Y,
             TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
             TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
         };
@@ -159,25 +160,25 @@ public partial class NewPage : IQueryAttributable
 
         smallImage.Down += (s, e) =>
         {
-            if (GlobalJson.Data.plans[PlanId].pins[pinId].isLocked == true) return;
+            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true) return;
             planPanContainer.IsPanningEnabled = false;
             activePin = smallImage;
         };
 
         smallImage.Up += (s, e) =>
         {
-            if (GlobalJson.Data.plans[PlanId].pins[pinId].isLocked == true) return;
+            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true) return;
             planPanContainer.IsPanningEnabled = true;
             activePin = null;
 
-            var x = smallImage.TranslationX / GlobalJson.Data.plans[PlanId].imageSize.Width * densityX;
-            var y = smallImage.TranslationY / GlobalJson.Data.plans[PlanId].imageSize.Height * densityY;
+            var x = smallImage.TranslationX / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX;
+            var y = smallImage.TranslationY / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY;
 
             var _pin = (s as MR.Gestures.Image);
-            var dx = (_pin.AnchorX * _pin.Width) / GlobalJson.Data.plans[PlanId].imageSize.Width * densityX;
-            var dy = (_pin.AnchorY * _pin.Height) / GlobalJson.Data.plans[PlanId].imageSize.Height * densityY;
+            var dx = (_pin.AnchorX * _pin.Width) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX;
+            var dy = (_pin.AnchorY * _pin.Height) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY;
 
-            GlobalJson.Data.plans[PlanId].pins[pinId].pos = new Point(x + dx, y + dy);
+            GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos = new Point(x + dx, y + dy);
             GlobalJson.SaveToFile();
         };
 
@@ -189,7 +190,7 @@ public partial class NewPage : IQueryAttributable
         PlanContainer.Children.Add(smallImage);
 
         // set transparency
-        if (GlobalJson.Data.plans[PlanId].pins[pinId].isLocked == true)
+        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true)
             smallImage.Opacity = .3;
         else
             smallImage.Opacity = 1;
@@ -198,10 +199,10 @@ public partial class NewPage : IQueryAttributable
     private void AdjustImagePosition(MR.Gestures.Image image)
     {
         // Hole die Ankerpunkte, Positionen und Bildgröße wie in deinem Loaded-Handler
-        Point _originAnchor = GlobalJson.Data.plans[PlanId].pins[image.AutomationId].anchor;
-        Point _originPos = GlobalJson.Data.plans[PlanId].pins[image.AutomationId].pos;
-        Size _planSize = GlobalJson.Data.plans[PlanId].imageSize;
-        Size _pinSize = GlobalJson.Data.plans[PlanId].pins[image.AutomationId].size;
+        Point _originAnchor = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Anchor;
+        Point _originPos = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Pos;
+        Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
+        Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Size;
 
         // Setze die Ankerpunkte und die Übersetzungen (Translation)
         image.AnchorX = _originAnchor.X;
@@ -234,8 +235,8 @@ public partial class NewPage : IQueryAttributable
                 if (PlanImage.Width > 0 && PlanImage.Height > 0)
                 {
                     // Größe des Bildes ist korrekt gesetzt
-                    densityX = GlobalJson.Data.plans[PlanId].imageSize.Width / PlanImage.Width;
-                    densityY = GlobalJson.Data.plans[PlanId].imageSize.Height / PlanImage.Height;
+                    densityX = GlobalJson.Data.Plans[PlanId].ImageSize.Width / PlanImage.Width;
+                    densityY = GlobalJson.Data.Plans[PlanId].ImageSize.Height / PlanImage.Height;
 
                     // Entferne das Event-Handler, damit es nicht mehr ausgelöst wird
                     PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
@@ -316,27 +317,27 @@ public partial class NewPage : IQueryAttributable
 
             Pin newPinData = new()
             {
-                pos = pos,
-                anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).anchor,
-                size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).size,
-                isLocked = false,
-                isLockRotate = false,
-                infoTxt = "",
-                pinTxt = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).imageName,
-                pinIcon = newPin,
-                images = []
+                Pos = pos,
+                Anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).anchor,
+                Size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).size,
+                IsLocked = false,
+                IsLockRotate = false,
+                InfoTxt = "",
+                PinTxt = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).imageName,
+                PinIcon = newPin,
+                Fotos = []
             };
 
             // Sicherstellen, dass der Plan existiert
-            if (GlobalJson.Data.plans.TryGetValue(PlanId, out Plan value))
+            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan value))
             {
                 var plan = value;
 
                 // Überprüfen, ob die Pins-Struktur initialisiert ist
-                plan.pins ??= [];
+                plan.Pins ??= [];
 
                 // Neuen Pin hinzufügen
-                plan.pins[currentDateTime] = newPinData;
+                plan.Pins[currentDateTime] = newPinData;
 
                 // save data to file
                 GlobalJson.SaveToFile();
@@ -344,13 +345,13 @@ public partial class NewPage : IQueryAttributable
             else
                 Console.WriteLine($"Plan mit ID {PlanId} existiert nicht.");
 
-            AddPin(currentDateTime, newPinData.pinIcon);
+            AddPin(currentDateTime, newPinData.PinIcon);
         };
     }
 
     private async void OnEditButtonClicked(object sender, EventArgs e)
     {
-        var popup1 = new PopupEditPlan(GlobalJson.Data.plans[PlanId].name);
+        var popup1 = new PopupEditPlan(GlobalJson.Data.Plans[PlanId].Name);
         await MopupService.Instance.PushAsync(popup1);
         var result = await popup1.PopupDismissedTask; //Item1=String Item2=Rotation Integer
 
@@ -370,11 +371,11 @@ public partial class NewPage : IQueryAttributable
                     if (shellItem != null)
                         (Application.Current.MainPage as AppShell).Items.Remove(shellItem);
 
-                    string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.planPath, GlobalJson.Data.plans[PlanId].file);
+                    string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
                     if (File.Exists(file))
                         File.Delete(file);
 
-                    GlobalJson.Data.plans.Remove(PlanId);
+                    GlobalJson.Data.Plans.Remove(PlanId);
 
                     // save data to file
                     GlobalJson.SaveToFile();
@@ -388,7 +389,7 @@ public partial class NewPage : IQueryAttributable
                 // ändert Titel vom View
                 Title = result;
 
-                GlobalJson.Data.plans[PlanId].name = result;
+                GlobalJson.Data.Plans[PlanId].Name = result;
 
                 // save data to file
                 GlobalJson.SaveToFile();

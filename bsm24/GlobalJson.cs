@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using bsm24.Models;
 using System.Text.Json;
 
 namespace bsm24;

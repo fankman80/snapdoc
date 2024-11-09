@@ -62,12 +62,12 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         var tappedImage = sender as CachedImage;
         var fileName = ((FileImageSource)tappedImage.Source).File;
 
-        GlobalJson.Data.plans[PlanId].pins[PinId].pinIcon = fileName;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
 
         // suche Pin-Daten
-        GlobalJson.Data.plans[PlanId].pins[PinId].pinTxt = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).imageName;
-        GlobalJson.Data.plans[PlanId].pins[PinId].anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).anchor;
-        GlobalJson.Data.plans[PlanId].pins[PinId].size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).size;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).imageName;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).anchor;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(fileName, StringComparison.OrdinalIgnoreCase)).size;
 
         // save data to file
         GlobalJson.SaveToFile();

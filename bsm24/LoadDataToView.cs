@@ -10,11 +10,11 @@ public partial class LoadDataToView
     {
         if (path != null && !string.IsNullOrEmpty(path.FullPath))
         {
-            if (GlobalJson.Data.plans != null)
+            if (GlobalJson.Data.Plans != null)
             {
-                foreach (var plan in GlobalJson.Data.plans)
+                foreach (var plan in GlobalJson.Data.Plans)
                 {
-                    string planTitle = GlobalJson.Data.plans[plan.Key].name;
+                    string planTitle = GlobalJson.Data.Plans[plan.Key].Name;
                     string planId = plan.Key;
 
                     // Define the new page
@@ -64,19 +64,19 @@ public partial class LoadDataToView
         }
 
         // Reset Datenbank
-        GlobalJson.Data.client_name = null;
-        GlobalJson.Data.object_address = null;
-        GlobalJson.Data.working_title = null;
-        GlobalJson.Data.object_name = null;
-        GlobalJson.Data.creation_date = null;
-        GlobalJson.Data.project_manager = null;
-        GlobalJson.Data.pdf = null;
-        GlobalJson.Data.plans = null;
-        GlobalJson.Data.planPath = null;
-        GlobalJson.Data.imagePath = null;
-        GlobalJson.Data.thumbnailPath = null;
-        GlobalJson.Data.projectPath = null;
-        GlobalJson.Data.jsonFile = null;
+        GlobalJson.Data.Client_name = null;
+        GlobalJson.Data.Object_address = null;
+        GlobalJson.Data.Working_title = null;
+        GlobalJson.Data.Object_name = null;
+        GlobalJson.Data.Creation_date = null;
+        GlobalJson.Data.Project_manager = null;
+        GlobalJson.Data.PlanPdf = null;
+        GlobalJson.Data.Plans = null;
+        GlobalJson.Data.PlanPath = null;
+        GlobalJson.Data.ImagePath = null;
+        GlobalJson.Data.ThumbnailPath = null;
+        GlobalJson.Data.ProjectPath = null;
+        GlobalJson.Data.JsonFile = null;
     }
 }
 public class FileItem

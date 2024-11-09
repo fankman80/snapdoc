@@ -1,4 +1,5 @@
-﻿using FFImageLoading.Maui;
+﻿using bsm24.Models;
+using FFImageLoading.Maui;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
@@ -53,21 +54,21 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         Images.Clear(); // lösche Einträge in Images
 
         // lese neue Bilder ein
-        foreach (var img in GlobalJson.Data.plans[PlanId].pins[PinId].images)
+        foreach (var img in GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos)
         {
-            string imgPath = GlobalJson.Data.plans[PlanId].pins[PinId].images[img.Key].file;
-            Images.Add(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.thumbnailPath, imgPath));
+            string imgPath = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[img.Key].File;
+            Images.Add(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, imgPath));
         }
 
         ImageGallery.ItemsSource = null; // Temporär die ItemsSource auf null setzen
         ImageGallery.ItemsSource = Images; // Dann wieder auf die Collection setzen
 
         // read data
-        PinTxt.Text = GlobalJson.Data.plans[PlanId].pins[PinId].pinTxt;
-        PinInfo.Text = GlobalJson.Data.plans[PlanId].pins[PinId].infoTxt;
-        PinImage.Source = GlobalJson.Data.plans[PlanId].pins[PinId].pinIcon;
-        LockSwitch.IsToggled = GlobalJson.Data.plans[PlanId].pins[PinId].isLocked;
-        LockRotate.IsToggled = GlobalJson.Data.plans[PlanId].pins[PinId].isLockRotate;
+        PinTxt.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt;
+        PinInfo.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].InfoTxt;
+        PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+        LockSwitch.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
+        LockRotate.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -98,12 +99,12 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private async void OnOkayClick(object sender, EventArgs e)
     {
         // write data
-        GlobalJson.Data.plans[PlanId].pins[PinId].anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).anchor;
-        GlobalJson.Data.plans[PlanId].pins[PinId].size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).size;
-        GlobalJson.Data.plans[PlanId].pins[PinId].pinTxt = PinTxt.Text;
-        GlobalJson.Data.plans[PlanId].pins[PinId].infoTxt = PinInfo.Text;
-        GlobalJson.Data.plans[PlanId].pins[PinId].isLocked = LockSwitch.IsToggled;
-        GlobalJson.Data.plans[PlanId].pins[PinId].isLockRotate = LockRotate.IsToggled;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).anchor;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = Settings.pinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).size;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt = PinTxt.Text;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].InfoTxt = PinInfo.Text;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = LockRotate.IsToggled;
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -113,19 +114,19 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void TakePhoto(object sender, EventArgs e)
     {
-        FileResult path = await CapturePicture.Capture(GlobalJson.Data.imagePath, GlobalJson.Data.thumbnailPath);
+        FileResult path = await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ThumbnailPath);
 
         Images.Add(path.FullPath);
 
-        Image newImageData = new()
+        Foto newImageData = new()
         {
-            isChecked = false,
-            file = path.FileName
+            IsChecked = false,
+            File = path.FileName
         };
 
         // Neues Image hinzufügen
-        var pin = GlobalJson.Data.plans[PlanId].pins[PinId];
-        pin.images[path.FileName] = newImageData;
+        var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
+        pin.Fotos[path.FileName] = newImageData;
 
         // save data to file
         GlobalJson.SaveToFile();

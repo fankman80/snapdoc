@@ -38,18 +38,18 @@ public partial class AppShell : Shell
             await new LoadDataToView().ResetApp();
 
             GlobalJson.CreateNewFile(filePath);
-            GlobalJson.Data.client_name = "";
-            GlobalJson.Data.object_address = "";
-            GlobalJson.Data.working_title = "";
-            GlobalJson.Data.object_name = "";
-            GlobalJson.Data.creation_date = DateTime.Parse(DateTime.Now.Date.ToString("d", new CultureInfo("de-DE"))).ToString();
-            GlobalJson.Data.project_manager = "";
-            GlobalJson.Data.projectPath = Path.Combine(result);
-            GlobalJson.Data.jsonFile = Path.Combine(result, result + ".json");
-            GlobalJson.Data.planPath = Path.Combine(result, "plans");
-            GlobalJson.Data.imagePath = Path.Combine(result, "images");
-            GlobalJson.Data.imageOverlayPath = Path.Combine(result, "images", "originals");
-            GlobalJson.Data.thumbnailPath = Path.Combine(result, "thumbnails");
+            GlobalJson.Data.Client_name = "";
+            GlobalJson.Data.Object_address = "";
+            GlobalJson.Data.Working_title = "";
+            GlobalJson.Data.Object_name = "";
+            GlobalJson.Data.Creation_date = DateTime.Parse(DateTime.Now.Date.ToString("d", new CultureInfo("de-DE"))).ToString();
+            GlobalJson.Data.Project_manager = "";
+            GlobalJson.Data.ProjectPath = Path.Combine(result);
+            GlobalJson.Data.JsonFile = Path.Combine(result, result + ".json");
+            GlobalJson.Data.PlanPath = Path.Combine(result, "plans");
+            GlobalJson.Data.ImagePath = Path.Combine(result, "images");
+            GlobalJson.Data.ImageOverlayPath = Path.Combine(result, "images", "originals");
+            GlobalJson.Data.ThumbnailPath = Path.Combine(result, "thumbnails");
 
             // save data to file
             GlobalJson.SaveToFile();
@@ -71,7 +71,7 @@ public partial class AppShell : Shell
 
     private async void OnShareClicked(object sender, EventArgs e)
     {
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, GlobalJson.Data.projectPath + ".docx");
+        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         await ExportReport.DocX("template.docx", outputPath);
 
         CancellationToken cancellationToken = new();
@@ -89,12 +89,12 @@ public partial class AppShell : Shell
 
     private async void OnExportClicked(object sender, EventArgs e)
     { 
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, GlobalJson.Data.projectPath + ".docx");
+        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         await ExportReport.DocX("template.docx", outputPath);
 
         CancellationToken cancellationToken = new();
         var saveStream = File.Open(outputPath, FileMode.Open);
-        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.projectPath + ".docx", saveStream, cancellationToken);
+        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream, cancellationToken);
         if (fileSaveResult.IsSuccessful)
             await Toast.Make($"Bericht wurde gespeichert: {fileSaveResult.FilePath}").Show(cancellationToken);
         else

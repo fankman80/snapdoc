@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using bsm24.Models;
 using PDFtoImage;
 using SkiaSharp;
 using System.Globalization;
@@ -20,34 +21,34 @@ public partial class ProjectDetails : UraniumContentPage
     {
         base.OnAppearing();
 
-        if (GlobalJson.Data.pdf == null)
+        if (GlobalJson.Data.PlanPdf == null)
             isPdfExist = false;
 
-        client_name.Text = GlobalJson.Data.client_name;
-        object_address.Text = GlobalJson.Data.object_address;
-        working_title.Text = GlobalJson.Data.working_title;
-        object_name.Text = GlobalJson.Data.object_name;
-        project_manager.Text = GlobalJson.Data.project_manager;
-        creation_date.Date = DateTime.Parse(GlobalJson.Data.creation_date);
+        client_name.Text = GlobalJson.Data.Client_name;
+        object_address.Text = GlobalJson.Data.Object_address;
+        working_title.Text = GlobalJson.Data.Working_title;
+        object_name.Text = GlobalJson.Data.Object_name;
+        project_manager.Text = GlobalJson.Data.Project_manager;
+        creation_date.Date = DateTime.Parse(GlobalJson.Data.Creation_date);
 
         HeaderUpdate();
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
     {
-        GlobalJson.Data.client_name = client_name.Text;
-        GlobalJson.Data.object_address = object_address.Text;
-        GlobalJson.Data.working_title = working_title.Text;
-        GlobalJson.Data.object_name = object_name.Text;
-        GlobalJson.Data.project_manager = project_manager.Text;
-        GlobalJson.Data.creation_date = creation_date.Date.Value.ToString("d");
+        GlobalJson.Data.Client_name = client_name.Text;
+        GlobalJson.Data.Object_address = object_address.Text;
+        GlobalJson.Data.Working_title = working_title.Text;
+        GlobalJson.Data.Object_name = object_name.Text;
+        GlobalJson.Data.Project_manager = project_manager.Text;
+        GlobalJson.Data.Creation_date = creation_date.Date.Value.ToString("d");
 
         // save data to file
         GlobalJson.SaveToFile();
 
         if (!isPdfExist)
         {
-            await new LoadDataToView().LoadData(new FileResult(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.jsonFile)));
+            await new LoadDataToView().LoadData(new FileResult(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.JsonFile)));
             isPdfExist = true;
         }
 
@@ -83,7 +84,7 @@ public partial class ProjectDetails : UraniumContentPage
 
     private async void OnThumbCaptureClicked(object sender, EventArgs e)
     {
-        _ = await CapturePicture.Capture(null, GlobalJson.Data.projectPath, "title_thumbnail.jpg");
+        _ = await CapturePicture.Capture(null, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
 
         HeaderUpdate();
     }
@@ -102,7 +103,7 @@ public partial class ProjectDetails : UraniumContentPage
 
             for (int i = 0; i < pagecount; i++)
             {
-                string imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.planPath, "plan_" + i + ".jpg");
+                string imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, "plan_" + i + ".jpg");
                 Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: 300));
 
                 // Bildgrösse auslesen
@@ -112,21 +113,21 @@ public partial class ProjectDetails : UraniumContentPage
 
                 Plan plan = new()
                 {
-                    name = "Plan " + i,
-                    file = "plan_" + i + ".jpg",
-                    imageSize = _imgSize
+                    Name = "Plan " + i,
+                    File = "plan_" + i + ".jpg",
+                    ImageSize = _imgSize
                 };
 
                 // Überprüfen, ob die Plans-Struktur initialisiert ist
-                root.plans ??= [];
-                root.plans["plan_" + i] = plan;
+                root.Plans ??= [];
+                root.Plans["plan_" + i] = plan;
                 GlobalJson.SaveToFile();
             }
 
-            GlobalJson.Data.pdf = new Pdf
+            GlobalJson.Data.PlanPdf = new Pdf
             {
-                file = result.FileName,
-                pos = new Point(0, 0)
+                File = result.FileName,
+                Pos = new Point(0, 0)
             };
         });
 
@@ -137,13 +138,13 @@ public partial class ProjectDetails : UraniumContentPage
     private static void HeaderUpdate()
     {
         // aktualisiere den Header Text
-        Services.SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.object_name;
-        Services.SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.client_name;
+        Services.SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name;
+        Services.SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name;
 
         // aktualisiere das Thumbnail Bild
-        if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg")))
+        if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg")))
         {
-            Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.projectPath, "title_thumbnail.jpg");
+            Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
         }
         else
         {

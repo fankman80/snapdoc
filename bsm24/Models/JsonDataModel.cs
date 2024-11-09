@@ -1,60 +1,63 @@
 ﻿#nullable disable
 
-public class JsonDataModel
+namespace bsm24.Models
 {
-    public string client_name { get; set; }
-    public string object_address { get; set; }
-    public string working_title { get; set; }
-    public string object_name { get; set; }
-    public string creation_date { get; set; }
-    public string project_manager { get; set; }
-    public Pdf pdf { get; set; }
-    public Dictionary<string, Plan> plans { get; set; }
-    public string planPath { get; set; }
-    public string imagePath { get; set; }
-    public string imageOverlayPath { get; set; }
-    public string thumbnailPath { get; set; }
-    public string projectPath { get; set; }
-    public string jsonFile { get; set; }
-}
+    public class JsonDataModel
+    {
+        public string Client_name { get; set; }
+        public string Object_address { get; set; }
+        public string Working_title { get; set; }
+        public string Object_name { get; set; }
+        public string Creation_date { get; set; }
+        public string Project_manager { get; set; }
+        public Pdf PlanPdf { get; set; }
+        public Dictionary<string, Plan> Plans { get; set; }
+        public string PlanPath { get; set; }
+        public string ImagePath { get; set; }
+        public string ImageOverlayPath { get; set; }
+        public string ThumbnailPath { get; set; }
+        public string ProjectPath { get; set; }
+        public string JsonFile { get; set; }
+    }
 
-public class Pdf
-{
-    public string file { get; set; }
-    public Point pos { get; set; }
-    public int rotation { get; set; }
-}
+    public class Pdf
+    {
+        public string File { get; set; }
+        public Point Pos { get; set; }
+        public int Rotation { get; set; }
+    }
 
-public class Plan
-{
-    public string name { get; set; }
-    public string file { get; set; }
-    public Size imageSize { get; set; }
-    public Dictionary<string, Pin> pins { get; set; }
-}
+    public class Plan
+    {
+        public string Name { get; set; }
+        public string File { get; set; }
+        public Size ImageSize { get; set; }
+        public Dictionary<string, Pin> Pins { get; set; }
+    }
 
-public class Pin
-{
-    public Point pos { get; set; }
-    public Point anchor { get; set; }
-    public Size size { get; set; }
-    public bool isLocked { get; set; }
-    public bool isLockRotate { get; set; }
-    public string infoTxt { get; set; }
-    public string pinTxt { get; set; }
-    public string pinIcon { get; set; }
-    public Dictionary<string, Image> images { get; set; }
-}
+    public class Pin
+    {
+        public Point Pos { get; set; }
+        public Point Anchor { get; set; }
+        public Size Size { get; set; }
+        public bool IsLocked { get; set; }
+        public bool IsLockRotate { get; set; }
+        public string InfoTxt { get; set; }
+        public string PinTxt { get; set; }
+        public string PinIcon { get; set; }
+        public Dictionary<string, Foto> Fotos { get; set; }
+    }
 
-public class Image
-{
-    public string file { get; set; }
-    public bool hasOverlay { get; set; }
-    public bool isChecked { get; set; }
-}
+    public class Foto
+    {
+        public string File { get; set; }
+        public bool HasOverlay { get; set; }
+        public bool IsChecked { get; set; }
+    }
 
-public class Position
-{
-    public float X { get; set; }
-    public float Y { get; set; }
+    public class Position
+    {
+        public float X { get; set; }
+        public float Y { get; set; }
+    }
 }
