@@ -1,15 +1,14 @@
 ﻿#nullable disable
 
+using bsm24.ViewModels;
+using CommunityToolkit.Maui.Core.Views;
+using CommunityToolkit.Maui.Views;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
-using System.Globalization;
-using bsm24.ViewModels;
-using MR.Gestures;
 using Mopups.Services;
-using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Maui.Core.Views;
-using System.IO;
+using MR.Gestures;
 using SkiaSharp;
+using System.Globalization;
 
 namespace bsm24.Views;
 
@@ -47,9 +46,12 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource = value4 as string;
-            
-            var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
-            var imgOrigPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+
+            String imgPath;
+            if (GlobalJson.Data.plans[PlanId].pins[PinId].images[ImgSource].hasOverlay)
+                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+            else
+                imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
 
             // Lade die Metadaten aus dem Bild
             var directories = ImageMetadataReader.ReadMetadata(imgPath);
@@ -67,7 +69,7 @@ public partial class ImageViewPage : IQueryAttributable
                     // Formatierte Ausgabe im europäischen Format
                     string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                     this.Title = formattedDate;
-                } 
+                }
             }
             ImageView.Source = imgPath;
         }
@@ -139,22 +141,27 @@ public partial class ImageViewPage : IQueryAttributable
         PenSizeSlider.IsVisible = false;
         ColorPicker.IsVisible = false;
 
-        var overlayPath = Path.ChangeExtension(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imageOverlayPath, ImgSource), ".png");
-        
+        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
+        var origPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
+
         if (isCleared)
         {
-            if (File.Exists(overlayPath))
-                File.Delete(overlayPath);
+            if (File.Exists(imgPath))
+                File.Delete(imgPath);
+            File.Move(origPath, imgPath);
         }
         else
         {
-            _ = SaveDrawingView(overlayPath);
+            if (!File.Exists(origPath))
+                File.Copy(imgPath, origPath);
+            _ = SaveDrawingView(imgPath);
         }
     }
 
     private void EraseClicked(object sender, EventArgs e)
     {
         isCleared = true;
+        ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
         DrawView.Clear();
     }
 
@@ -220,23 +227,19 @@ public partial class ImageViewPage : IQueryAttributable
             using var dwStream = new SKManagedStream(draw_stream);
             using var dwBitmap = SKBitmap.Decode(dwStream);
 
+            using var origStream = File.OpenRead(filePath);
+            using var origBitmap = SKBitmap.Decode(origStream);
+
             // Zuschneiden (crop) mit SKBitmap
             using var croppedBitmap = new SKBitmap((int)DrawView.Width, (int)DrawView.Height);
             using var canvas = new SKCanvas(croppedBitmap);
-
-            // Hintergrundbild verwenden falls vorhanden
-            if (OverlayView.Source != null)
-            {
-                using var bgStream = File.OpenRead(((FileImageSource)OverlayView.Source).File);
-                using var bgBitmap = SKBitmap.Decode(bgStream);
-                canvas.DrawBitmap(bgBitmap, new SKPoint(0,0));
-            }
 
             var sourceRect = new SKRect((dwBitmap.Width - (int)DrawView.Width) / 2,
                                         (dwBitmap.Height - (int)DrawView.Height) / 2,
                                         (dwBitmap.Width - (int)DrawView.Width) / 2 + (int)DrawView.Width,
                                         (dwBitmap.Height - (int)DrawView.Height) / 2 + (int)DrawView.Height);
             var destRect = new SKRect(0, 0, (int)DrawView.Width, (int)DrawView.Height);
+            canvas.DrawBitmap(origBitmap, sourceRect, destRect);
             canvas.DrawBitmap(dwBitmap, sourceRect, destRect);
             canvas.Flush();
 

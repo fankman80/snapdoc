@@ -48,7 +48,7 @@ public partial class AppShell : Shell
             GlobalJson.Data.jsonFile = Path.Combine(result, result + ".json");
             GlobalJson.Data.planPath = Path.Combine(result, "plans");
             GlobalJson.Data.imagePath = Path.Combine(result, "images");
-            GlobalJson.Data.imageOverlayPath = Path.Combine(result, "images", "overlays");
+            GlobalJson.Data.imageOverlayPath = Path.Combine(result, "images", "originals");
             GlobalJson.Data.thumbnailPath = Path.Combine(result, "thumbnails");
 
             // save data to file
@@ -78,11 +78,11 @@ public partial class AppShell : Shell
         try
         {
             await ShareFileAsync(outputPath);
-            await Toast.Make($"File is exported").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde geteilt").Show(cancellationToken);
         }
         catch
         {
-            await Toast.Make($"File is not exported").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde nicht geteilt").Show(cancellationToken);
         }
         File.Delete(outputPath);
     }
@@ -96,9 +96,9 @@ public partial class AppShell : Shell
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.projectPath + ".docx", saveStream, cancellationToken);
         if (fileSaveResult.IsSuccessful)
-            await Toast.Make($"File is saved: {fileSaveResult.FilePath}").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde gespeichert: {fileSaveResult.FilePath}").Show(cancellationToken);
         else
-            await Toast.Make($"File is not saved, {fileSaveResult.Exception.Message}").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde nicht gespeichert: {fileSaveResult.Exception.Message}").Show(cancellationToken);
         saveStream.Close();
         File.Delete(outputPath);
     }

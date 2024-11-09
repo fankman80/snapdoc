@@ -29,7 +29,7 @@
 			    MouseMovedCommand="{Binding MouseMovedCommand}"
 			    MouseExitedCommand="{Binding MouseExitedCommand}"
 			    ScrollWheelChangedCommand="{Binding ScrollWheelChangedCommand}"-->
-
+    
     <ContentPage.ToolbarItems>
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Edit}}" 

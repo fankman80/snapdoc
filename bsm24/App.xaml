@@ -32,6 +32,11 @@
                 <Setter Property="Shell.UnselectedColor"
                     Value="#95FFFFFF" />
             </Style>
+            <Style TargetType="Label" x:Key="HeaderLabelStyle">
+                <Setter Property="FontSize" Value="24" />
+                <Setter Property="FontAttributes" Value="Bold" />
+                <Setter Property="HorizontalOptions" Value="Center" />
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

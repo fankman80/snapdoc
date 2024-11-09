@@ -1,12 +1,12 @@
 ﻿#nullable disable
 
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using D = DocumentFormat.OpenXml.Wordprocessing;
+using SkiaSharp;
 using A = DocumentFormat.OpenXml.Drawing;
+using D = DocumentFormat.OpenXml.Wordprocessing;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
-using DocumentFormat.OpenXml;
-using SkiaSharp;
 using Size = Microsoft.Maui.Graphics.Size;
 
 namespace bsm24;
@@ -22,10 +22,10 @@ public partial class XmlImage
                                                 double heightMilimeters = 0,
                                                 int imageQuality = 90,
                                                 List<(string, SKPoint, string, SKPoint)> overlayImages = null)
-                                                // Item1 = Image
-                                                // Item2 = Position
-                                                // Item3 = Text
-                                                // Item4 = Anchor
+    // Item1 = Image
+    // Item2 = Position
+    // Item3 = Text
+    // Item4 = Anchor
     {
         Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, "imagecache"));
         var originalStream = File.OpenRead(imagePath.FullPath);
@@ -81,7 +81,7 @@ public partial class XmlImage
                                             (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item4.Y));
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
                     canvas.DrawBitmap(overlay, _pos);
-                    canvas.DrawText(overlayImage.Item3, _pos, SKTextAlign.Left, font, paint);                  
+                    canvas.DrawText(overlayImage.Item3, _pos, SKTextAlign.Left, font, paint);
                 }
                 skBitmap = combinedBitmap;
             }

@@ -80,7 +80,7 @@ public static class GlobalJson
                 {
                     Directory.CreateDirectory(directoryPath);
                     Directory.CreateDirectory(Path.Combine(directoryPath, "images"));
-                    Directory.CreateDirectory(Path.Combine(directoryPath, "images", "overlays"));
+                    Directory.CreateDirectory(Path.Combine(directoryPath, "images", "originals"));
                     Directory.CreateDirectory(Path.Combine(directoryPath, "plans"));
                     Directory.CreateDirectory(Path.Combine(directoryPath, "thumbnails"));
                 }

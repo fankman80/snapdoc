@@ -10,7 +10,7 @@
        x:Name="shell"
        FlyoutBackgroundImageAspect="AspectFill"
        FlyoutHeaderBehavior="CollapseOnScroll">
-
+    
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
             <Grid BackgroundColor="Gray">
@@ -75,13 +75,13 @@
               Clicked="OnNewClicked"
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Add_box}}"/>
 
-    <ShellContent Route="Projekt öffnen"
-                  Title="Open Project"
+    <ShellContent Route="open_project"
+                  Title="Projekt öffnen"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
 
-    <ShellContent Route="Projekt Daten"
-                  Title="Project Details"
+    <ShellContent Route="project_details"
+                  Title="Projekt Details"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Home_work}}"
                   ContentTemplate="{DataTemplate views:ProjectDetails}" />
 

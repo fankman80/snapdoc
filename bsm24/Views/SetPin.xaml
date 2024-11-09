@@ -7,7 +7,7 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
              xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              x:Class="bsm24.Views.SetPin"
-             Title="Set Pin">
+             Title="Pin bearbeiten">
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
