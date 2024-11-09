@@ -47,11 +47,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource = value4 as string;
-
-            var overlayPath = Path.ChangeExtension(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imageOverlayPath, ImgSource), ".png");
-            if (File.Exists(overlayPath))
-                OverlayView.Source = overlayPath;
-
+            
             var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
 
             // Lade die Metadaten aus dem Bild
