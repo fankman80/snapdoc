@@ -7,7 +7,7 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
              xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              x:Class="bsm24.Views.IconGallery"
-             Title="Icon Gallery">
+             Title="Pin auswählen">
 
     <CollectionView x:Name="ImageGallery"
                 ItemsSource="{Binding Images}"

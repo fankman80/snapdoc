@@ -59,7 +59,7 @@ public partial class OpenProject : UraniumContentPage
 
         // Liste der JSON-Dateien dem ListView zuweisen
         fileListView.ItemsSource = foundFiles;
-        fileListView.Footer = foundFiles.Count + " Projects";
+        fileListView.Footer = foundFiles.Count + " Projekte";
     }
 
     private async void OnProjectClicked(object sender, EventArgs e)
@@ -103,7 +103,7 @@ public partial class OpenProject : UraniumContentPage
                 tmp_list.Remove(item);
                 fileListView.ItemsSource = null;
                 fileListView.ItemsSource = tmp_list;
-                fileListView.Footer = tmp_list.Count + " Projects";
+                fileListView.Footer = tmp_list.Count + " Projekte";
 
                 // Rekursives Löschen von Dateien in allen Unterverzeichnissen
                 string[] files = Directory.GetFiles(Path.GetDirectoryName(item.FilePath), "*", SearchOption.AllDirectories);

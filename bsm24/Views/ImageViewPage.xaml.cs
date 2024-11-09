@@ -1,15 +1,14 @@
 ﻿#nullable disable
 
+using bsm24.ViewModels;
+using CommunityToolkit.Maui.Core.Views;
+using CommunityToolkit.Maui.Views;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
-using System.Globalization;
-using bsm24.ViewModels;
-using MR.Gestures;
 using Mopups.Services;
-using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Maui.Core.Views;
-using System.IO;
+using MR.Gestures;
 using SkiaSharp;
+using System.Globalization;
 
 namespace bsm24.Views;
 
@@ -47,7 +46,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource = value4 as string;
-            
+
             var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, ImgSource);
             var imgOrigPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imagePath, "originals", ImgSource);
 
@@ -67,7 +66,7 @@ public partial class ImageViewPage : IQueryAttributable
                     // Formatierte Ausgabe im europäischen Format
                     string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                     this.Title = formattedDate;
-                } 
+                }
             }
             ImageView.Source = imgPath;
         }
@@ -140,7 +139,7 @@ public partial class ImageViewPage : IQueryAttributable
         ColorPicker.IsVisible = false;
 
         var overlayPath = Path.ChangeExtension(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.imageOverlayPath, ImgSource), ".png");
-        
+
         if (isCleared)
         {
             if (File.Exists(overlayPath))
@@ -223,14 +222,6 @@ public partial class ImageViewPage : IQueryAttributable
             // Zuschneiden (crop) mit SKBitmap
             using var croppedBitmap = new SKBitmap((int)DrawView.Width, (int)DrawView.Height);
             using var canvas = new SKCanvas(croppedBitmap);
-
-            // Hintergrundbild verwenden falls vorhanden
-            if (OverlayView.Source != null)
-            {
-                using var bgStream = File.OpenRead(((FileImageSource)OverlayView.Source).File);
-                using var bgBitmap = SKBitmap.Decode(bgStream);
-                canvas.DrawBitmap(bgBitmap, new SKPoint(0,0));
-            }
 
             var sourceRect = new SKRect((dwBitmap.Width - (int)DrawView.Width) / 2,
                                         (dwBitmap.Height - (int)DrawView.Height) / 2,

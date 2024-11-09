@@ -1,7 +1,7 @@
 ﻿#nullable disable
 
-using System.ComponentModel;
 using bsm24.Models;
+using System.ComponentModel;
 
 namespace bsm24.Services;
 public partial class SettingsService : INotifyPropertyChanged

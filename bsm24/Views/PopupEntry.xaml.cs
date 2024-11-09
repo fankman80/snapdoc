@@ -12,7 +12,7 @@ TaskCompletionSource<string> _taskCompletionSource;
 public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
 public string ReturnValue { get; set; }
 
-    public PopupEntry(string title, string okText = "Ok", string cancelText = "Cancel")
+    public PopupEntry(string title, string okText = "Ok", string cancelText = "Abbrechen")
 	{
 		InitializeComponent();
         titleText.Text = title;

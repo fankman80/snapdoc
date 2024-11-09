@@ -1,11 +1,9 @@
 ﻿#nullable disable
 
-using Mopups.Services;
-using bsm24.ViewModels;
-using MR.Gestures;
 using bsm24.Services;
-using System.Management.Automation.Remoting;
-using OpenXmlPowerTools;
+using bsm24.ViewModels;
+using Mopups.Services;
+using MR.Gestures;
 using System.Globalization;
 
 namespace bsm24.Views;
@@ -391,7 +389,7 @@ public partial class NewPage : IQueryAttributable
                 Title = result;
 
                 GlobalJson.Data.plans[PlanId].name = result;
-                
+
                 // save data to file
                 GlobalJson.SaveToFile();
                 break;

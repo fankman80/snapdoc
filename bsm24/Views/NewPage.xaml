@@ -33,7 +33,7 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Edit}}" 
-            Text="Edit"
+            Text="Plan bearbeiten"
             Clicked="OnEditButtonClicked"/>
     </ContentPage.ToolbarItems>
 
