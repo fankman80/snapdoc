@@ -16,11 +16,12 @@
              BackgroundColor="#60000000"
              Title="Settings">
 
-    <Frame CornerRadius="20"
-           BackgroundColor="White"
-           WidthRequest="300"
-           HorizontalOptions="Center"
-           VerticalOptions="Center">
+    <Border
+        StrokeShape="RoundRectangle 20,20,20,20"
+        BackgroundColor="White"
+        WidthRequest="300"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
 
         <VerticalStackLayout Spacing="10">
             <Label Text="{Binding PinScaleLimit, StringFormat='Pingrösse limitieren: {0:0.##}'}" />
@@ -62,6 +63,6 @@
                     Clicked="OnExportSettingsClicked" />                
             </Grid>
         </VerticalStackLayout>
-    </Frame>
+    </Border>
 
 </Mopups:PopupPage>

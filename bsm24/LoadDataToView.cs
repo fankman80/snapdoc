@@ -37,7 +37,7 @@ public partial class LoadDataToView
                     Routing.RegisterRoute(planId, typeof(Views.NewPage));
 
                     // Add the new FlyoutItem to the AppShell
-                    (Application.Current.MainPage as AppShell).Items.Add(newFlyoutItem);
+                    (Application.Current.Windows[0].Page as AppShell).Items.Add(newFlyoutItem);
                 }
             }
         }
@@ -49,7 +49,7 @@ public partial class LoadDataToView
         var itemsToRemove = new List<ShellItem>();
 
         // Alle ShellItems durchlaufen und zu entfernende Items sammeln
-        foreach (var shellitem in (Application.Current.MainPage as AppShell).Items)
+        foreach (var shellitem in (Application.Current.Windows[0].Page as AppShell).Items)
         {
             if (shellitem.AutomationId != null)
             {
@@ -60,7 +60,7 @@ public partial class LoadDataToView
         // Jetzt die gesammelten Items entfernen, nachdem die Iteration abgeschlossen ist
         foreach (var shellitem in itemsToRemove)
         {
-            (Application.Current.MainPage as AppShell).Items.Remove(shellitem);
+            (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellitem);
         }
 
         // Reset Datenbank

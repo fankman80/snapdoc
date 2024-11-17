@@ -14,11 +14,12 @@
              BackgroundColor="#60000000"
              Title="Edit Plan">
 
-    <Frame CornerRadius="20"
-           BackgroundColor="White"
-           WidthRequest="300"
-           HorizontalOptions="Center"
-           VerticalOptions="Center">
+    <Border
+        StrokeShape="RoundRectangle 20,20,20,20"
+        BackgroundColor="White"
+        WidthRequest="300"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
 
         <VerticalStackLayout Spacing="16">
             <Label
@@ -39,6 +40,6 @@
                     Clicked="OnDeleteClicked" />
             </Grid>
         </VerticalStackLayout>
-    </Frame>
+    </Border>
 
 </Mopups:PopupPage>

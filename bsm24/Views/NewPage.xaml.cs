@@ -3,8 +3,10 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
+using Microsoft.Maui.Controls;
 using Mopups.Services;
 using MR.Gestures;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace bsm24.Views;
@@ -99,6 +101,7 @@ public partial class NewPage : IQueryAttributable
 
         PlanContainer.PropertyChanged += (s, e) =>
         {
+            this.Title = Math.Round(PlanContainer.TranslationX,0).ToString() + "/" + Math.Round(PlanContainer.TranslationY,0).ToString() + " --- " + Math.Round(PlanContainer.AnchorX,2).ToString() + "/" + Math.Round(PlanContainer.AnchorY,2).ToString();
             if (e.PropertyName == "Scale")
             {
                 var scale = 1 / PlanContainer.Scale;
@@ -269,8 +272,13 @@ public partial class NewPage : IQueryAttributable
 
     public void OnRotated(object sender, RotateEventArgs e)
     {
-        var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
-        planPanContainer.IsPanningEnabled = true;
+        if (e.NumberOfTouches == 0)
+        {
+            var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
+            planPanContainer.AnchorX = 0.5;
+            planPanContainer.AnchorY = 0.5;
+            planPanContainer.IsPanningEnabled = true;
+        }
     }
 
     public void OnDown(object sender, DownUpEventArgs e)
@@ -314,7 +322,21 @@ public partial class NewPage : IQueryAttributable
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string newPin = "a_pin_red.png";
 
-            var pos = new Point(0.5, 0.5);
+            var scaleSpeed = 1 / PlanContainer.Scale;
+            var screenCenter = new Point(this.Width / 2, this.Height / 2);
+            var planCenter = new Point(PlanContainer.TranslationX + (PlanContainer.Width / 2) , PlanContainer.TranslationY + (PlanContainer.Height / 2));
+
+            var _x = screenCenter.X - planCenter.X;
+            var _y = screenCenter.Y - planCenter.Y;
+
+            double angle = PlanContainer.Rotation * Math.PI / 180.0;
+            var _a = Math.Sin(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y) * scaleSpeed;
+            var _b = -Math.Cos(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y) * scaleSpeed;
+
+            var a = _a + (PlanContainer.Width / 2);
+            var b = _b + (PlanContainer.Height / 2);
+
+            var pos = new Point(1 / PlanContainer.Width * a, 1 / PlanContainer.Height * b);
 
             Pin newPinData = new()
             {
@@ -368,9 +390,9 @@ public partial class NewPage : IQueryAttributable
                 if (result2 != null)
                 {
                     // löscht das dazugehörige Menü-Item
-                    var shellItem = (Application.Current.MainPage as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
+                    var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
                     if (shellItem != null)
-                        (Application.Current.MainPage as AppShell).Items.Remove(shellItem);
+                        (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
 
                     string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
                     if (File.Exists(file))
@@ -385,7 +407,7 @@ public partial class NewPage : IQueryAttributable
 
             default:
                 // ändert das dazugehörige Menü-Item
-                (Application.Current.MainPage as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result;
+                (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result;
 
                 // ändert Titel vom View
                 Title = result;
