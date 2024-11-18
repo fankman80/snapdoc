@@ -9,7 +9,26 @@
        x:Class="bsm24.AppShell"
        x:Name="shell"
        FlyoutBackgroundImageAspect="AspectFill"
-       FlyoutHeaderBehavior="CollapseOnScroll">
+       FlyoutHeaderBehavior="CollapseOnScroll"
+       Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
+
+    <Shell.Resources>
+        <Style TargetType="HorizontalStackLayout" ApplyToDerivedTypes="True" CanCascade="True">
+            <Setter Property="VisualStateManager.VisualStateGroups">
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CommonStates">
+                        <VisualState x:Name="Normal" />
+                        <VisualState x:Name="Selected">
+                            <VisualState.Setters>
+                                <Setter Property="BackgroundColor"
+                                        Value="{AppThemeBinding Light=#30000000, Dark=#30ffffff}" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </Setter>
+        </Style>
+    </Shell.Resources>
     
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
@@ -66,36 +85,36 @@
             </StackLayout>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>
-
+  
     <ShellContent Route="homescreen"
                     ContentTemplate="{DataTemplate views:HomeScreen}"
                     FlyoutItemIsVisible="False" />
 
     <MenuItem Text="Neues Projekt"
               Clicked="OnNewClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Add_box}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Add_box}}"/>
 
     <ShellContent Route="open_project"
                   Title="Projekt öffnen"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Open_in_new}}"
+                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
 
     <ShellContent Route="project_details"
                   Title="Projekt Details"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Home_work}}"
+                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Home_work}}"
                   ContentTemplate="{DataTemplate views:ProjectDetails}" />
 
     <MenuItem Text="Einstellungen"
               Clicked="OnSettingsClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Settings}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Settings}}"/>
 
     <MenuItem Text="Bericht exportieren"
               Clicked="OnExportClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.File_download}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.File_download}}"/>
 
     <MenuItem Text="Bericht teilen"
               Clicked="OnShareClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Share}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Share}}"/>
 
     <MenuItem>
         <Shell.MenuItemTemplate>

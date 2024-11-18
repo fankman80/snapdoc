@@ -6,7 +6,7 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
-             xmlns:models="clr-namespace:bsm24.Models"
+             xmlns:vm="clr-namespace:bsm24.ViewModels"
              xmlns:services="clr-namespace:bsm24.Services"
              x:Class="bsm24.Views.PopupSettings"
              BackgroundClicked="PopupPage_BackgroundClicked"
@@ -43,6 +43,10 @@
                 <Label Text="Pläne rotieren" Grid.Column="0" Grid.Row="0"/>
                 <Switch x:Name="isPlanRotateLocked" IsToggled="{Binding IsPlanRotateLocked}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="0"/>
             </Grid>
+
+            <Picker Title="Theme:"
+                ItemsSource="{Binding AppThemeList}"
+                SelectedItem="{Binding SelectedTheme}"/>
            
             <Grid>
                 <Grid.ColumnDefinitions>

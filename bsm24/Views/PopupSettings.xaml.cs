@@ -2,7 +2,6 @@
 
 using Mopups.Pages;
 using Mopups.Services;
-using bsm24.Services;
 
 namespace bsm24.Views;
 

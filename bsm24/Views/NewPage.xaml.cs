@@ -102,7 +102,7 @@ public partial class NewPage : IQueryAttributable
             var _scale = PlanContainer.Scale;
             Point screenCenter = new(this.Width / 2, this.Height / 2);
             Point planPos = new(PlanContainer.TranslationX, PlanContainer.TranslationY);
-            Point anchorDif = new Point((0.5 - PlanContainer.AnchorX) * PlanContainer.Width * _scale, (0.5 - PlanContainer.AnchorY) * PlanContainer.Height * _scale);
+            Point anchorDif = new((0.5 - PlanContainer.AnchorX) * PlanContainer.Width * _scale, (0.5 - PlanContainer.AnchorY) * PlanContainer.Height * _scale);
             Point planAnchor = new(PlanContainer.Width * PlanContainer.AnchorX, PlanContainer.Height * PlanContainer.AnchorY);
 
             double scaledX = (screenCenter.X - planPos.X - planAnchor.X - anchorDif.X) / _scale;
@@ -334,7 +334,7 @@ public partial class NewPage : IQueryAttributable
             var _scale = PlanContainer.Scale;
             Point screenCenter = new(this.Width / 2, this.Height / 2);
             Point planPos = new(PlanContainer.TranslationX, PlanContainer.TranslationY);
-            Point anchorDif = new Point((0.5 - PlanContainer.AnchorX) * PlanContainer.Width * _scale, (0.5 - PlanContainer.AnchorY) * PlanContainer.Height * _scale);
+            Point anchorDif = new((0.5 - PlanContainer.AnchorX) * PlanContainer.Width * _scale, (0.5 - PlanContainer.AnchorY) * PlanContainer.Height * _scale);
             Point planAnchor = new(PlanContainer.Width * PlanContainer.AnchorX, PlanContainer.Height * PlanContainer.AnchorY);
             double _x = (screenCenter.X - planPos.X - planAnchor.X - anchorDif.X) / _scale;
             double _y = (screenCenter.Y - planPos.Y - planAnchor.Y - anchorDif.Y) / _scale;

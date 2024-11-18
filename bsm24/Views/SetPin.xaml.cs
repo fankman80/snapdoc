@@ -31,13 +31,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("planId", out object value1))
-        {
             PlanId = value1 as string;
-        }
         if (query.TryGetValue("pinId", out object value2))
-        {
             PinId = value2 as string;
-        }
         if (query.TryGetValue("pinIcon", out object value3))
         {
             PinIcon = value3 as string;
@@ -82,13 +78,11 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void OnDeleteClick(object sender, EventArgs e)
     {
-        var popup = new PopupDualResponse("Really delete this Pin?");
+        var popup = new PopupDualResponse("Wollen Sie diesen Pin wirklich löschen?");
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
         if (result != null)
-        {
             await Shell.Current.GoToAsync($"..?pinDelete={PinId}");
-        }
     }
 
     private async void OnPinSelectClick(object sender, EventArgs e)

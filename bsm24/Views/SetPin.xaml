@@ -46,12 +46,12 @@
                 x:Name="PinTxt"
                 MaxLength="50"
                 Title="Bezeichnung"
-                Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Push_pin}}"/>
+                Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Push_pin}}"/>
 
             <material:EditorField
                 x:Name="PinInfo"
                 Title="Beschreibung"
-                Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Info}}" />
+                Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Info}}" />
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -68,7 +68,7 @@
                     <Label Text="Rotation sperren:" VerticalTextAlignment="Start" />
                     <Switch x:Name="LockRotate" HorizontalOptions="Start" />
                 </VerticalStackLayout>
-                
+
                 <ImageButton Grid.Column="2"
                              x:Name="PinImage"
                              Source="{Binding}"                               
@@ -77,11 +77,9 @@
                              WidthRequest="80"
                              HeightRequest="80"
                              CornerRadius="10"
-                             Padding="10"
-                             BorderWidth="1"
+                             BorderWidth="2"
                              BorderColor="LightGrey"
-                             Clicked="OnPinSelectClick">
-                </ImageButton>
+                             Clicked="OnPinSelectClick"/>
             </Grid>
         
             <Grid>

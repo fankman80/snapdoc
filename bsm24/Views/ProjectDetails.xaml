@@ -6,7 +6,7 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
-             xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+             xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"  
              x:Class="bsm24.Views.ProjectDetails"
              Title="Projekt Details">
 
@@ -29,39 +29,39 @@
                         Text=""
                         Title="Kunde/Bauherrschaft"
                         AllowClear="True"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Person}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Person}}" />
 
                     <material:TextField
                         x:Name="object_name"
                         Text=""
                         Title="Objektbezeichnung"
                         AllowClear="True"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Home_work}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Home_work}}" />
 
                     <material:EditorField
                         x:Name="object_address"
                         Text=""
                         Title="Adresse"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Home}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Home}}" />
 
                     <material:TextField
                         x:Name="working_title"
                         Text=""
                         Title="Projektvorgang"
                         AllowClear="True"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Work_outline}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Work_outline}}" />
 
                     <material:TextField
                         x:Name="project_manager"
                         Text=""
                         Title="Projektleiter"
                         AllowClear="True"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Badge}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Badge}}" />
 
                     <material:DatePickerField
                         x:Name="creation_date"
                         Title="Datum"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Calendar_month}}" />
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Calendar_month}}" />
 
                     <Grid>
                         <Grid.ColumnDefinitions>

@@ -113,7 +113,7 @@ public partial class OpenProject : UraniumContentPage
                 // Rekursives Löschen von Verzeichnissen
                 string[] directories = Directory.GetDirectories(Path.GetDirectoryName(item.FilePath), "*", SearchOption.AllDirectories);
                 foreach (var directory in directories)
-                    Directory.Delete(directory);
+                    Directory.Delete(directory, true);
 
                 // Root-Verzeichnis löschen
                 Directory.Delete(Path.GetDirectoryName(item.FilePath));
