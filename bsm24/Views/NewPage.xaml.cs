@@ -3,10 +3,8 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
-using Microsoft.Maui.Controls;
 using Mopups.Services;
 using MR.Gestures;
-using System.Diagnostics;
 using System.Globalization;
 
 namespace bsm24.Views;
@@ -101,7 +99,19 @@ public partial class NewPage : IQueryAttributable
 
         PlanContainer.PropertyChanged += (s, e) =>
         {
-            this.Title = Math.Round(PlanContainer.TranslationX,0).ToString() + "/" + Math.Round(PlanContainer.TranslationY,0).ToString() + " --- " + Math.Round(PlanContainer.AnchorX,2).ToString() + "/" + Math.Round(PlanContainer.AnchorY,2).ToString();
+            var scaleSpeed = 1 / PlanContainer.Scale;
+            Point screenCenter = new(this.Width / 2, this.Height / 2);
+            Point planCenter = new(PlanContainer.Width / 2, PlanContainer.Height / 2);
+            var _x =  planCenter.X - screenCenter.X;
+            var _y =  planCenter.Y - screenCenter.Y;
+            var a = (PlanContainer.Width / 2) + (_x * scaleSpeed);
+            var b = (PlanContainer.Height / 2) + (_y * scaleSpeed);
+
+            this.Title = Math.Round(a, 0).ToString() + "/" + 
+                         Math.Round(b, 0).ToString() + " <-> " +
+                         Math.Round(PlanContainer.AnchorX, 2).ToString() + "/" +
+                         Math.Round(PlanContainer.AnchorY, 2).ToString();
+            
             if (e.PropertyName == "Scale")
             {
                 var scale = 1 / PlanContainer.Scale;
@@ -323,20 +333,20 @@ public partial class NewPage : IQueryAttributable
             string newPin = "a_pin_red.png";
 
             var scaleSpeed = 1 / PlanContainer.Scale;
-            var screenCenter = new Point(this.Width / 2, this.Height / 2);
-            var planCenter = new Point(PlanContainer.TranslationX + (PlanContainer.Width / 2) , PlanContainer.TranslationY + (PlanContainer.Height / 2));
+            Point screenCenter = new(this.Width / 2, this.Height / 2);
+            Point planCenter = new(PlanContainer.TranslationX + (PlanContainer.Width / 2), PlanContainer.TranslationY + (PlanContainer.Height / 2));
 
             var _x = screenCenter.X - planCenter.X;
             var _y = screenCenter.Y - planCenter.Y;
 
-            double angle = PlanContainer.Rotation * Math.PI / 180.0;
-            var _a = Math.Sin(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y) * scaleSpeed;
-            var _b = -Math.Cos(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y) * scaleSpeed;
+            //double angle = PlanContainer.Rotation * Math.PI / 180.0;
+            //var _a = Math.Sin(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y);
+            //var _b = -Math.Cos(Math.Atan(_x / _y) - angle) * Math.Sqrt(_x*_x + _y*_y);
 
-            var a = _a + (PlanContainer.Width / 2);
-            var b = _b + (PlanContainer.Height / 2);
+            var a = (PlanContainer.Width / 2) + (_x * scaleSpeed);
+            var b = (PlanContainer.Height / 2) + (_y * scaleSpeed);
 
-            var pos = new Point(1 / PlanContainer.Width * a, 1 / PlanContainer.Height * b);
+            Point pos = new(1 / PlanContainer.Width * a, 1 / PlanContainer.Height * b);
 
             Pin newPinData = new()
             {
