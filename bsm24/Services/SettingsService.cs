@@ -299,22 +299,22 @@ public partial class SettingsService : INotifyPropertyChanged
 
                     case "Gras":
                         // Setze die Secondary-Farben
-                        App.Current.Resources["Primary"] = Color.FromArgb("#73b572");
-                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#32a852");
+                        App.Current.Resources["Primary"] = Color.FromArgb("#32a852");
+                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#73b572");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
                         break;
 
                     case "Ozean":
                         // Setze die Secondary-Farben
-                        App.Current.Resources["Primary"] = Color.FromArgb("#7286b5");
-                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#32a852");
+                        App.Current.Resources["Primary"] = Color.FromArgb("#5e75ad");
+                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#9caedb");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
                         break;
 
                     case "Feuer":
                         // Setze die Secondary-Farben
-                        App.Current.Resources["Primary"] = Color.FromArgb("#eb873b");
-                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#32a852");
+                        App.Current.Resources["Primary"] = Color.FromArgb("#e07a2d");
+                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#edba93");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
                         break;
 
@@ -368,7 +368,7 @@ public partial class SettingsService : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler PropertyChanged;
 
-    protected virtual void OnPropertyChanged(string propertyName = null)
+    protected virtual void OnPropertyChanged(string propertyName)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }

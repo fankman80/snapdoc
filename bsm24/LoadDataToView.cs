@@ -30,7 +30,7 @@ public partial class LoadDataToView
                         Icon = new FontImageSource
                         {
                             FontFamily = "MaterialOutlined",
-                            Glyph = UraniumUI.Icons.MaterialIcons.MaterialOutlined.Layers,
+                            Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Layers,
                             Color = (Color)Application.Current.Resources["Primary"] // Primärfarbe aus den Ressourcen
                         },
                         Items =

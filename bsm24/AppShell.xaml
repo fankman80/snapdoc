@@ -5,11 +5,11 @@
        xmlns:views="clr-namespace:bsm24.Views"
        xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
        xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-       xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons" 
+       xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols" 
        x:Class="bsm24.AppShell"
        x:Name="shell"
        FlyoutBackgroundImageAspect="AspectFill"
-       FlyoutHeaderBehavior="CollapseOnScroll"
+       FlyoutHeaderBehavior="Fixed"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
     <Shell.FlyoutHeaderTemplate>
@@ -52,7 +52,7 @@
         <DataTemplate>
             <StackLayout>
                 <Label Text="" 
-                       FontSize="8"/>
+                       FontSize="4"/>
                 <Label Text="BSM24 Beta"
                        TextColor="{AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontAttributes="Bold"
@@ -63,7 +63,7 @@
                        FontSize="12"
                        HorizontalOptions="Center" />
                 <Label Text="" 
-                       FontSize="8"/>
+                       FontSize="4"/>
             </StackLayout>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>
@@ -74,29 +74,29 @@
 
     <MenuItem Text="Neues Projekt"
               Clicked="OnNewClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Add_box}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Add_box}}"/>
 
     <ShellContent Route="open_project"
                   Title="Projekt öffnen"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Open_in_new}}"
+                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
 
     <ShellContent Route="project_details"
                   Title="Projekt Details"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Home_work}}"
+                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Home_work}}"
                   ContentTemplate="{DataTemplate views:ProjectDetails}" />
 
     <MenuItem Text="Einstellungen"
               Clicked="OnSettingsClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Settings}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"/>
 
     <MenuItem Text="Bericht exportieren"
               Clicked="OnExportClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.File_download}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Download}}"/>
 
     <MenuItem Text="Bericht teilen"
               Clicked="OnShareClicked"
-              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Share}}"/>
+              IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Share}}"/>
 
     <MenuItem>
         <Shell.MenuItemTemplate>

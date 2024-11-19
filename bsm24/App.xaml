@@ -11,13 +11,21 @@
             </ResourceDictionary.MergedDictionaries>
             <Style TargetType="StackLayout">
                 <Setter Property="Spacing"
-                        Value="6" />
+                        Value="12" />
+            </Style>
+            <Style TargetType="VerticalStackLayout">
+                <Setter Property="Spacing"
+                        Value="12" />
+            </Style>
+            <Style TargetType="HorizontalStackLayout">
+                <Setter Property="Spacing"
+                        Value="12" />
             </Style>
             <Style TargetType="Grid">
                 <Setter Property="RowSpacing"
-                        Value="6" />
+                        Value="8" />
                 <Setter Property="ColumnSpacing"
-                        Value="6" />
+                        Value="12" />
             </Style>
             <Style TargetType="local:AppShell">
                 <Setter Property="Shell.BackgroundColor"

@@ -51,6 +51,8 @@ public partial class ProjectDetails : UraniumContentPage
             isPdfExist = true;
         }
 
+        HeaderUpdate();
+
         await Shell.Current.GoToAsync("//homescreen");
     }
 
@@ -142,12 +144,8 @@ public partial class ProjectDetails : UraniumContentPage
 
         // aktualisiere das Thumbnail Bild
         if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg")))
-        {
             Services.SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
-        }
         else
-        {
             Services.SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
-        }
     }
 }

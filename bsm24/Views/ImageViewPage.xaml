@@ -3,7 +3,7 @@
 				xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 				xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
-                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
+                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
 				xmlns:views="clr-namespace:bsm24.Views"
 				BackgroundColor="Black"
 				x:Class="bsm24.Views.ImageViewPage"
@@ -11,7 +11,7 @@
     
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Delete}}" 
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Delete}}" 
             Text="Delete"          
             Clicked="OnDeleteButtonClicked"/>
     </ContentPage.ToolbarItems>
@@ -85,7 +85,7 @@
                 Clicked="ColorButtonClicked"/>
         </VerticalStackLayout>        
         
-        <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Clear}}"
+        <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
                 AbsoluteLayout.LayoutBounds="0,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 BackgroundColor="{DynamicResource Primary}"
@@ -97,7 +97,7 @@
                 IsVisible="False"
                 Clicked="EraseClicked"/>
 
-        <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Draw}}"
+        <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 BackgroundColor="{DynamicResource Primary}"
@@ -109,7 +109,7 @@
                 IsVisible="True"
                 Clicked="DrawClicked"/>
 
-        <Button x:Name="CheckBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Check}}"
+        <Button x:Name="CheckBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 BackgroundColor="{DynamicResource Primary}"

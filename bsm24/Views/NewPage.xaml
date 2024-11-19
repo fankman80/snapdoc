@@ -4,7 +4,7 @@
                 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
+                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                 xmlns:pc="clr-namespace:bsm24.ViewModels"
                 BackgroundColor="Grey"
                 Title="{Binding PageTitle}"
@@ -31,7 +31,7 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Edit}}" 
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Edit}}" 
             Text="Plan bearbeiten"
             Clicked="OnEditButtonClicked"/>
     </ContentPage.ToolbarItems>
@@ -57,7 +57,7 @@
                 <mr:Image x:Name="PlanImage"/>
             </AbsoluteLayout>
         </mr:ContentView>
-        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialRegular.Add_location_alt}}"
+        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
             BackgroundColor="{DynamicResource Primary}"
             TextColor="{DynamicResource PrimaryDarkText}"                
             Margin="20"

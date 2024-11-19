@@ -5,7 +5,7 @@
              xmlns:Animations="clr-namespace:Mopups.Animations;assembly=Mopups"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:services="clr-namespace:bsm24.Services"
              x:Class="bsm24.Views.PopupSettings"
              BackgroundClicked="PopupPage_BackgroundClicked"
@@ -23,15 +23,19 @@
         HorizontalOptions="Center"
         VerticalOptions="Center">
 
-        <VerticalStackLayout Spacing="10">
+        <VerticalStackLayout>
             <Label Text="{Binding PinScaleLimit, StringFormat='Pingrösse limitieren: {0:0.##}'}" />
             <Slider Maximum="2"
                     Minimum="0.01"
+                    ThumbColor="{DynamicResource Primary}"
+                    MinimumTrackColor="{DynamicResource Primary}"
                     Value="{Binding PinScaleLimit}"/>
 
             <Label Text="{Binding PdfQuality, StringFormat='PDF-Qualität: {0:0.##}'}" />
             <Slider Maximum="800"
                     Minimum="100"
+                    ThumbColor="{DynamicResource Primary}"
+                    MinimumTrackColor="{DynamicResource Primary}"
                     Value="{Binding PdfQuality}"/>
 
             <Grid>
@@ -40,22 +44,27 @@
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
                 <Label Text="Pläne rotieren" Grid.Column="0" Grid.Row="0"/>
-                <Switch x:Name="isPlanRotateLocked" IsToggled="{Binding IsPlanRotateLocked}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="0"/>
+                <Switch x:Name="isPlanRotateLocked" Grid.Row="0"
+                        ThumbColor="{DynamicResource Primary}"
+                        IsToggled="{Binding IsPlanRotateLocked}"
+                        HorizontalOptions="Start" Grid.Column="1"/>
             </Grid>
 
-            <Picker
+            <material:PickerField
                 x:Name="darkModePicker"
                 Title="Dark-Mode:"
+                AccentColor="{DynamicResource Primary}"
                 ItemsSource="{Binding DarkMode}"
                 SelectedItem="{Binding SelectedDarkMode}">
-            </Picker>            
-            
-            <Picker
+            </material:PickerField>
+
+            <material:PickerField
                 x:Name="colorThemePicker"
                 Title="UI-Thema:"
+                AccentColor="{DynamicResource Primary}"
                 ItemsSource="{Binding Themes}"
                 SelectedItem="{Binding SelectedTheme}">
-            </Picker>
+            </material:PickerField>
             
             <Grid>
                 <Grid.ColumnDefinitions>
