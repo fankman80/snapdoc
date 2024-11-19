@@ -44,10 +44,14 @@
                 <Switch x:Name="isPlanRotateLocked" IsToggled="{Binding IsPlanRotateLocked}" HorizontalOptions="Start" Grid.Column="1" Grid.Row="0"/>
             </Grid>
 
-            <Picker Title="Theme:"
-                ItemsSource="{Binding AppThemeList}"
-                SelectedItem="{Binding SelectedTheme}"/>
-           
+            <Picker x:Name="themePicker" Title="Select Theme" SelectedIndexChanged="OnThemePickerChanged">
+                <Picker.Items>
+                    <x:String>Light</x:String>
+                    <x:String>Dark</x:String>
+                    <x:String>System Default</x:String>
+                </Picker.Items>
+            </Picker>
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

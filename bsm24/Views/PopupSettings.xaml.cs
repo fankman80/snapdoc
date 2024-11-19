@@ -50,4 +50,50 @@ public partial class PopupSettings : PopupPage
 
         }
     }
+    private void OnThemePickerChanged(object sender, EventArgs e)
+    {
+        var picker = (Picker)sender;
+        string selectedTheme = picker.SelectedItem.ToString();
+
+        switch (selectedTheme)
+        {
+            case "Light":
+                App.Current.UserAppTheme = AppTheme.Light; // Setze auf helles Theme
+                break;
+            case "Dark":
+                App.Current.UserAppTheme = AppTheme.Dark; // Setze auf dunkles Theme
+                break;
+            case "System Default":
+                App.Current.UserAppTheme = AppTheme.Unspecified; // Verwende das systemweite Theme
+                break;
+        }
+    }
+
+    private void OnColorSchemeChanged(object sender, EventArgs e)
+    {
+        var picker = (Picker)sender;
+        string selectedScheme = picker.SelectedItem.ToString();
+
+        // Dynamische Farbwerte basierend auf der Auswahl des Benutzers ‰ndern
+        switch (selectedScheme)
+        {
+            case "Blue-Orange":
+                Application.Current.Resources["PrimaryColor"] = Color.FromArgb("#2196F3"); // Blau
+                Application.Current.Resources["SecondaryColor"] = Color.FromArgb("#FF5722"); // Orange
+                Application.Current.Resources["BackgroundColor"] = Color.FromArgb("#FFFFFF"); // Weiﬂ
+                break;
+
+            case "Green-Purple":
+                Application.Current.Resources["PrimaryColor"] = Color.FromArgb("#4CAF50"); // Gr¸n
+                Application.Current.Resources["SecondaryColor"] = Color.FromArgb("#9C27B0"); // Lila
+                Application.Current.Resources["BackgroundColor"] = Color.FromArgb("#FFFFFF"); // Weiﬂ
+                break;
+
+            case "Red-Yellow":
+                Application.Current.Resources["PrimaryColor"] = Color.FromArgb("#F44336"); // Rot
+                Application.Current.Resources["SecondaryColor"] = Color.FromArgb("#FFEB3B"); // Gelb
+                Application.Current.Resources["BackgroundColor"] = Color.FromArgb("#FFFFFF"); // Weiﬂ
+                break;
+        }
+    }
 }

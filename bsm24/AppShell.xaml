@@ -12,24 +12,6 @@
        FlyoutHeaderBehavior="CollapseOnScroll"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
-    <Shell.Resources>
-        <Style TargetType="HorizontalStackLayout" ApplyToDerivedTypes="True" CanCascade="True">
-            <Setter Property="VisualStateManager.VisualStateGroups">
-                <VisualStateGroupList>
-                    <VisualStateGroup x:Name="CommonStates">
-                        <VisualState x:Name="Normal" />
-                        <VisualState x:Name="Selected">
-                            <VisualState.Setters>
-                                <Setter Property="BackgroundColor"
-                                        Value="{AppThemeBinding Light=#30000000, Dark=#30ffffff}" />
-                            </VisualState.Setters>
-                        </VisualState>
-                    </VisualStateGroup>
-                </VisualStateGroupList>
-            </Setter>
-        </Style>
-    </Shell.Resources>
-    
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
             <Grid BackgroundColor="Gray">
@@ -72,7 +54,7 @@
                 <Label Text="" 
                        FontSize="8"/>
                 <Label Text="BSM24 Beta"
-                       TextColor="DarkRed"
+                       TextColor="{AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                        FontAttributes="Bold"
                        FontSize="12"
                        HorizontalOptions="Center" />
@@ -119,7 +101,7 @@
     <MenuItem>
         <Shell.MenuItemTemplate>
             <DataTemplate>
-                <Label HeightRequest="1.4" Margin="16,0,16,0" BackgroundColor="DarkRed"></Label>
+                <Label HeightRequest="1.4" Margin="16,0,16,0" BackgroundColor="{AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}"></Label>
             </DataTemplate>
         </Shell.MenuItemTemplate>
     </MenuItem>

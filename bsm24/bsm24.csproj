@@ -161,9 +161,6 @@
 	  <MauiXaml Update="AppShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Resources\Styles\Override.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\PopupDualResponse.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>

@@ -12,7 +12,7 @@ namespace bsm24.Views;
 [QueryProperty(nameof(PinUpdate), "pinUpdate")]
 [QueryProperty(nameof(PinDelete), "pinDelete")]
 
-public partial class NewPage : IQueryAttributable
+public partial class NewPage: IQueryAttributable
 {
     public string PinUpdate { get; set; }
     public string PlanId { get; set; }

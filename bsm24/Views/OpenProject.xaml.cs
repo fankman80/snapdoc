@@ -80,7 +80,7 @@ public partial class OpenProject : UraniumContentPage
                     LoadDataToView.ResetApp();
                     GlobalJson.LoadFromFile(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
-                    OpenProject.HeaderUpdate();  // UI-Aktualisierung
+                    HeaderUpdate();  // UI-Aktualisierung
                     await Shell.Current.GoToAsync("//project_details");
                 });
             }
@@ -118,7 +118,6 @@ public partial class OpenProject : UraniumContentPage
                 // Root-Verzeichnis löschen
                 Directory.Delete(Path.GetDirectoryName(item.FilePath));
             }
-
         }
     }
 

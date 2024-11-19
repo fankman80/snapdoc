@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:bsm24.Views"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialIcons;assembly=UraniumUI.Icons.MaterialIcons"
              xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              x:Class="bsm24.Views.OpenProject"
@@ -29,7 +28,7 @@
                             <Label Grid.Column="1"
                                     Grid.Row="0"
                                     VerticalTextAlignment="End"
-                                    TextColor="DarkRed"
+                                    TextColor="{AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                                     FontSize="14"
                                     Text="{Binding FileName}"/>
                             <Label Grid.Column="1"
@@ -44,16 +43,16 @@
                                     Background="Transparent"
                                     Clicked="OnProjectClicked"/>
                             <ffimageloading:CachedImage Grid.Column="0"
-                                                            Grid.RowSpan="2"
-                                                            Source="{Binding ImagePath}"
-                                                            CacheType="Memory"
-                                                            Aspect="AspectFill"/>
+                                                        Grid.RowSpan="2"
+                                                        Source="{Binding ImagePath}"
+                                                        CacheType="Memory"
+                                                        Aspect="AspectFill"/>
                             <Button Grid.Column="2"
                                     Grid.RowSpan="2"
-                                    BorderColor="Black"
+                                    BorderColor="{AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}"
                                     BorderWidth="1"
                                     Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static m:MaterialRegular.Edit}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {StaticResource Primary}, Dark={StaticResource PrimaryDark}}, Glyph={x:Static m:MaterialRegular.Edit}}"
                                     Clicked="OnDeleteClicked"/>
                         </Grid>
                     </DataTemplate>

@@ -10,8 +10,8 @@
              Title="Pin auswählen">
 
     <CollectionView x:Name="ImageGallery"
-                ItemsSource="{Binding Images}"
-                VerticalOptions="FillAndExpand">
+                    ItemsSource="{Binding Images}"
+                    VerticalOptions="FillAndExpand">
         <CollectionView.ItemsLayout>
             <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
         </CollectionView.ItemsLayout>

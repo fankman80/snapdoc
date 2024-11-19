@@ -1,7 +1,5 @@
 ﻿#nullable disable
 
-using UraniumUI.Icons.MaterialIcons;
-
 namespace bsm24;
 
 public partial class LoadDataToView
@@ -29,9 +27,19 @@ public partial class LoadDataToView
                     {
                         Title = planTitle,
                         AutomationId = planId,
-                        Icon = new FontImageSource { FontFamily = "MaterialOutlined", Color = Colors.Black, Glyph = MaterialTwoTone.Layers },
-                        Items = { new ShellContent { Content = newPage } }
+                        Icon = new FontImageSource
+                        {
+                            FontFamily = "MaterialOutlined",
+                            Glyph = UraniumUI.Icons.MaterialIcons.MaterialOutlined.Layers,
+                            Color = (Color)Application.Current.Resources["Primary"] // Primärfarbe aus den Ressourcen
+                        },
+                        Items =
+                        {
+                            new ShellContent { Content = newPage }
+                        }
                     };
+
+                    newFlyoutItem.Icon.SetAppThemeColor(FontImageSource.ColorProperty, (Color)Application.Current.Resources["Primary"], (Color)Application.Current.Resources["PrimaryDark"]);
 
                     // Register the route
                     Routing.RegisterRoute(planId, typeof(Views.NewPage));

@@ -10,8 +10,7 @@
                 Title="{Binding PageTitle}"
                 x:Class="bsm24.Views.NewPage">
 
-    <!--
-                DownCommand="{Binding DownCommand}"
+            <!--DownCommand="{Binding DownCommand}"
 			    UpCommand="{Binding UpCommand}"
 			    TappingCommand="{Binding TappingCommand}"
 			    TappedCommand="{Binding TappedCommand}"
