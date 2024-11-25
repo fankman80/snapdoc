@@ -22,7 +22,6 @@
         <mr:ContentView
             PanningCommand="{Binding PanningCommand}"
             PinchingCommand="{Binding PinchingCommand}"
-            Pinching="OnPinching"
             DoubleTapped="OnDoubleTapped">
 
             <AbsoluteLayout
@@ -35,11 +34,11 @@
                 <ff:CachedImage x:Name="ImageView" />
 
                 <mct:DrawingView
-                        x:Name="DrawView"
-                        BackgroundColor="Transparent"
-                        IsMultiLineModeEnabled="True"
-                        DrawingLineStarted="OnDrawing"
-                        LineColor="#FF0000"/>
+                    x:Name="DrawView"
+                    BackgroundColor="Transparent"
+                    IsMultiLineModeEnabled="True"
+                    DrawingLineStarted="OnDrawing"
+                    LineColor="#FF0000"/>
             </AbsoluteLayout>
         </mr:ContentView>
         

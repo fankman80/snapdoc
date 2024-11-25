@@ -6,7 +6,6 @@ using CommunityToolkit.Maui.Views;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using Mopups.Services;
-using MR.Gestures;
 using SkiaSharp;
 using System.Globalization;
 
@@ -68,13 +67,6 @@ public partial class ImageViewPage : IQueryAttributable
             }
             ImageView.Source = imgPath;
         }
-    }
-
-    public void OnPinching(object sender, PinchEventArgs e)
-    {
-        var imageView = (TransformViewModel)ImageView.BindingContext;
-        imageView.AnchorX = 1 / ImageView.Width * (e.Center.X - ImageView.TranslationX);
-        imageView.AnchorY = 1 / ImageView.Height * (e.Center.Y - ImageView.TranslationY);
     }
 
     public void OnDoubleTapped(object sender, EventArgs e)

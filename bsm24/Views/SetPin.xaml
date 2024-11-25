@@ -28,8 +28,8 @@
                         <StackLayout>
                             <views:SquareView>
                                 <ff:CachedImage Source="{Binding .}"
-                                       Aspect="AspectFill"
-                                       Margin="0,0,10,10">
+                                                Aspect="AspectFill"
+                                                Margin="0,0,10,10">
                                     <ff:CachedImage.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />
                                     </ff:CachedImage.GestureRecognizers>
@@ -88,6 +88,7 @@
                              CornerRadius="10"
                              BorderWidth="2"
                              BorderColor="LightGrey"
+                             Background="White"
                              Clicked="OnPinSelectClick"/>
             </Grid>
         

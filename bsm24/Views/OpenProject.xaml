@@ -10,16 +10,16 @@
              Title="Projekt laden">
 
     <Grid>
-        <StackLayout Margin="16">
+        <StackLayout Margin="16,0,16,0">
             <CollectionView x:Name="fileListView"
-                                ItemsLayout="VerticalGrid, 1"
-                                VerticalOptions="FillAndExpand">
+                            ItemsLayout="VerticalGrid, 1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">
                         <Grid Padding="0, 6, 0, 6">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="60" />
                                 <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="60" />
                                 <ColumnDefinition Width="60" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
@@ -49,10 +49,19 @@
                                     Aspect="AspectFill"/>
                             <Button Grid.Column="2"
                                     Grid.RowSpan="2"
-                                    BorderColor="{AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    BorderWidth="1"
+                                    Padding="0"
+                                    WidthRequest="50"
+                                    HeightRequest="50"
                                     Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Save}}"
+                                    Clicked="OnSaveClicked"/>
+                            <Button Grid.Column="3"
+                                    Grid.RowSpan="2"
+                                    Padding="0"
+                                    WidthRequest="50"
+                                    HeightRequest="50"
+                                    Background="Transparent"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
                                     Clicked="OnDeleteClicked"/>
                         </Grid>
                     </DataTemplate>

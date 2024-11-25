@@ -88,6 +88,10 @@ public partial class OpenProject : UraniumContentPage
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
     }
+    private void OnSaveClicked(object sender, EventArgs e)
+    {
+
+    }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
