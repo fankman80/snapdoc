@@ -16,13 +16,12 @@ public class Helper
             shellContent.FlyoutItemIsVisible = isVisible;
     }
 
-    public static void AddMenuItemAtPosition(string title, string glyph, string methodName)
+    public static void AddMenuItem(string title, string glyph, string methodName)
     {
-        // Erstelle das neue MenuItem
         var newMenuItem = new MenuItem
         {
             Text = title,
-            //AutomationId = "999",
+            AutomationId = "990",
             IconImageSource = new FontImageSource
             {
                 FontFamily = "MaterialOutlined",
@@ -35,17 +34,19 @@ public class Helper
 
         if (Application.Current.Windows[0].Page is AppShell appShell)
         {
-            // Verwende Reflection, um die Methode aus appShell zu finden und aufzurufen
             var methodInfo = appShell.GetType().GetMethod(methodName, BindingFlags.NonPublic | BindingFlags.Public | BindingFlags.Instance);
-
             if (methodInfo != null)
                 newMenuItem.Clicked += (s, e) => methodInfo.Invoke(appShell, [s, e]);
             else
                 Console.WriteLine($"Methode '{methodName}' wurde nicht gefunden.");
         }
 
-        // Füge das neue MenuItem hinzu
         if (Shell.Current.Items is IList<ShellItem> shellItems)
             shellItems.Add(newMenuItem);
+    }
+
+    public static void AddDivider()
+    {
+        //
     }
 }

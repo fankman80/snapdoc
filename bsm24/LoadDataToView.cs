@@ -38,7 +38,7 @@ public partial class LoadDataToView
                         Items =
                         {
                             new ShellContent { Content = newPage }
-                        }
+                        },
                     };
 
                     // Register the route
@@ -85,6 +85,7 @@ public partial class LoadDataToView
         GlobalJson.Data.JsonFile = null;
     }
 }
+
 public class FileItem
 {
     public string FileName { get; set; }

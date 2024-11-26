@@ -57,13 +57,20 @@ public partial class PopupSettings : PopupPage
         // Hole die AppShell
         var appShell = (AppShell)Application.Current.Windows[0].Page;
 
-        // Durchlaufe die FlyoutItems und aktualisiere die Icon-Farbe
         foreach (var item in appShell.Items)
         {
+            // Überprüfen und aktualisieren des `Icon`
             if (item is FlyoutItem flyoutItem && flyoutItem.Icon is FontImageSource fontIcon)
             {
-                // Aktualisiere die Farbe des Icons basierend auf dem aktuellen Theme
                 fontIcon.Color = (Color)(Application.Current.RequestedTheme == AppTheme.Dark
+                                ? Application.Current.Resources["PrimaryDark"]
+                                : Application.Current.Resources["Primary"]);
+            }
+
+            // Überprüfen und aktualisieren des `FlyoutIcon`
+            if (item is BaseShellItem baseShellItem && baseShellItem.FlyoutIcon is FontImageSource flyoutFontIcon)
+            {
+                flyoutFontIcon.Color = (Color)(Application.Current.RequestedTheme == AppTheme.Dark
                                 ? Application.Current.Resources["PrimaryDark"]
                                 : Application.Current.Resources["Primary"]);
             }

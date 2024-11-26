@@ -29,7 +29,7 @@
             </Style>
             <Style TargetType="local:AppShell">
                 <Setter Property="Shell.BackgroundColor"
-                    Value="{DynamicResource PrimaryBackgroundDark}" />
+                    Value="{DynamicResource SecondaryBackgroundDark}" />
                 <Setter Property="Shell.ForegroundColor"
                     Value="White" />
                 <Setter Property="Shell.TitleColor"

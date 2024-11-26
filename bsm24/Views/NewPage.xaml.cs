@@ -379,8 +379,6 @@ public partial class NewPage: IQueryAttributable
     private void OnMouseMoved(object sender, MouseEventArgs e)
     {
         mousePos = e.Center;
-
-        this.Title = mousePos.ToString();
     }
 
     private void OnMouseScroll(object sender, ScrollWheelEventArgs e)

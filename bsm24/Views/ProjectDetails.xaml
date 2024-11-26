@@ -8,7 +8,8 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:services="clr-namespace:bsm24.Services"
-             Shell.TitleColor="{DynamicResource PrimaryDark}"                            
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.ProjectDetails"
              Title="Projekt Details">
 

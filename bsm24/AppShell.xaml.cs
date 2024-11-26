@@ -37,6 +37,11 @@ public partial class AppShell : Shell
 
             LoadDataToView.ResetApp();
 
+            Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
+            Helper.AddMenuItem("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
+            Helper.AddMenuItem("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
+            Helper.AddDivider();
+
             GlobalJson.CreateNewFile(filePath);
             GlobalJson.Data.Client_name = "";
             GlobalJson.Data.Object_address = "";
@@ -96,9 +101,9 @@ public partial class AppShell : Shell
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream, cancellationToken);
         if (fileSaveResult.IsSuccessful)
-            await Toast.Make($"Bericht wurde gespeichert: {fileSaveResult.FilePath}").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde gespeichert").Show(cancellationToken);
         else
-            await Toast.Make($"Bericht wurde nicht gespeichert: {fileSaveResult.Exception.Message}").Show(cancellationToken);
+            await Toast.Make($"Bericht wurde nicht gespeichert").Show(cancellationToken);
         saveStream.Close();
         File.Delete(outputPath);
     }

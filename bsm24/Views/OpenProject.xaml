@@ -7,6 +7,7 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:local="clr-namespace:bsm24"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.OpenProject"
              Title="Projekt laden">
 

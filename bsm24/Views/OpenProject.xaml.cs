@@ -76,12 +76,14 @@ public partial class OpenProject : UraniumContentPage
                 // Alle UI-Änderungen im Haupt-Thread
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    Helper.AddMenuItemAtPosition("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
-                    Helper.AddMenuItemAtPosition("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
-                    Helper.AddMenuItemAtPosition("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
-
                     // Daten laden und verarbeiten (nicht UI-bezogen)
                     LoadDataToView.ResetApp();
+
+                    Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
+                    Helper.AddMenuItem("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
+                    Helper.AddMenuItem("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
+                    Helper.AddDivider();
+
                     GlobalJson.LoadFromFile(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
                     HeaderUpdate();  // UI-Aktualisierung

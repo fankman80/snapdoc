@@ -10,7 +10,7 @@
        xmlns:services="clr-namespace:bsm24.Services"
        x:Class="bsm24.AppShell"
        x:Name="shell"
-       FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+       FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        FlyoutBackgroundImageAspect="AspectFill"
        FlyoutHeaderBehavior="Fixed"
@@ -18,7 +18,7 @@
 
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate x:DataType="services:SettingsService">
-            <Grid BackgroundColor="{DynamicResource PrimaryBackgroundDark}">
+            <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="*" />
@@ -90,12 +90,15 @@
                   FlyoutItemIsVisible="False"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Home_work}}"
                   ContentTemplate="{DataTemplate views:ProjectDetails}" />
-
-    <MenuItem>
+    
+    <!-- <MenuItem>
         <Shell.MenuItemTemplate>
             <DataTemplate>
-                <Label HeightRequest="1.4" Margin="16,0,16,0" BackgroundColor="{AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"></Label>
+                <BoxView HeightRequest="1.4" 
+                     Margin="16,0,16,0" 
+                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
             </DataTemplate>
         </Shell.MenuItemTemplate>
-    </MenuItem>
+    </MenuItem> -->
+    
 </Shell>
