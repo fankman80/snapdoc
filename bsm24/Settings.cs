@@ -19,7 +19,7 @@ public static class Settings
     ("a_pin_yellow.png", "", new Point(0.0625, 0.9375), new Size(64,64)),
     ("blitzleuchte.png", "Blitzleuchte", new Point(0.5, 0.5), new Size(64,64)),
     ("blitzleuchte_evakuierungsanlage.png", "Blitzleuchte Evakuierungsanlage", new Point(0.5, 0.5), new Size(64,64)),
-    ("brandfallgesteuert.png", "Brandmeldezentrale", new Point(0.5, 0.5), new Size(64,64)),
+    ("brandfallgesteuert.png", "Brandfallgesteuert", new Point(0.5, 0.5), new Size(64,64)),
     ("brandmeldeanlage_bedienstelle.png", "Brandmeldeanlage Bedienstelle", new Point(0.5, 0.5), new Size(64,64)),
     ("brandmeldezentrale.png", "Brandmeldezentrale", new Point(0.5, 0.5), new Size(64,64)),
     ("druckentlastungsoeffnung.png", "Druckentlastungsöffnung", new Point(0.0, 0.5), new Size(64,64)),
