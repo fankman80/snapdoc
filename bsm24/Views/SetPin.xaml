@@ -46,6 +46,7 @@
         <StackLayout Grid.Row="1" Spacing="16" x:DataType="x:AppThemeBindingExtension">
             <material:TextField
                 x:Name="PinTxt"
+                TextColor="{AppThemeBinding {DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                 BorderColor="{AppThemeBinding {DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"
                 AccentColor="{DynamicResource Primary}"
                 Title="Bezeichnung"
@@ -53,6 +54,7 @@
 
             <material:EditorField
                 x:Name="PinInfo"
+                TextColor="{AppThemeBinding {DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                 BorderColor="{AppThemeBinding {DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"
                 AccentColor="{DynamicResource Primary}"
                 Title="Beschreibung"
