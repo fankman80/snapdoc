@@ -5,6 +5,7 @@
        xmlns:views="clr-namespace:bsm24.Views"
        xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
        xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+       xmlns:mct="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
        xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
        xmlns:services="clr-namespace:bsm24.Services"
@@ -55,23 +56,24 @@
     <Shell.FlyoutFooterTemplate>
         <DataTemplate>
             <StackLayout x:DataType="sys:DateTime">
-                <Label Text="" 
-                       FontSize="4"/>
                 <Label Text="BSM24 Beta"
+                       Margin="0,8,0,0"
                        TextColor="{AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontAttributes="Bold"
                        FontSize="12"
                        HorizontalOptions="Center" />
                 <Label Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0: dd. MMMM yyyy}'}"
+                       Margin="0,0,0,10"
                        TextColor="DarkGrey"
                        FontSize="12"
                        HorizontalOptions="Center" />
-                <Label Text="" 
-                       FontSize="4"/>
+ 
             </StackLayout>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>
-  
+
+
+
     <ShellContent Route="homescreen"
                   ContentTemplate="{DataTemplate views:HomeScreen}"
                   FlyoutItemIsVisible="False" />
@@ -85,12 +87,6 @@
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
 
-    <ShellContent Route="project_details"
-                  Title="Projekt Details"
-                  FlyoutItemIsVisible="False"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Home_work}}"
-                  ContentTemplate="{DataTemplate views:ProjectDetails}" />
-    
     <!-- <MenuItem>
         <Shell.MenuItemTemplate>
             <DataTemplate>

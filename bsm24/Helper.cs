@@ -1,6 +1,7 @@
 ﻿
 #nullable disable
 
+using SixLabors.Fonts;
 using System.Reflection;
 
 namespace bsm24;
@@ -47,6 +48,13 @@ public class Helper
 
     public static void AddDivider()
     {
-        //
+        var menuItem = new MenuItem
+        {
+            Text = "----------- Pläne -----------", // Placeholder-Text (wird nicht wirklich verwendet)
+            IsEnabled = false // Deaktiviert, damit es keine Interaktivität hat
+        };
+
+        if (Shell.Current.Items is IList<ShellItem> shellItems)
+            shellItems.Add(menuItem);
     }
 }

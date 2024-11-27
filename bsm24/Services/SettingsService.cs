@@ -11,9 +11,9 @@ public partial class SettingsService : INotifyPropertyChanged
     private SettingsService()
     {
         ImageQuality = "300";
-        Themes = ["Lachs", "Gras", "Ozean", "Feuer", "Lady"];
+        Themes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Barbie"];
         DarkMode = ["Light", "Dark", "System Default"];
-        SelectedTheme = Themes[3]; // Standardauswahl
+        SelectedTheme = Themes[0]; // Standardauswahl
         SelectedDarkMode = DarkMode[0]; // Standardauswahl
     }
 
@@ -291,19 +291,27 @@ public partial class SettingsService : INotifyPropertyChanged
                 // Logik für das Anwenden der Farben basierend auf der Auswahl
                 switch (_selectedTheme)
                 {
+                    case "EBBE":
+                        App.Current.Resources["Primary"] = Color.FromArgb("#000000");
+                        App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
+                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#ededed");
+                        App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryBackgroundDark"] = Color.FromArgb("#404040");
+                        App.Current.Resources["SecondaryBackgroundDark"] = Color.FromArgb("#404040");
+                        break;
+
                     case "Lachs":
-                        // Setze die Primary-Farben
                         App.Current.Resources["Primary"] = Color.FromArgb("#9c4e38");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#c9a59b");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
-                        App.Current.Resources["PrimaryBackgroundDark"] = Color.FromArgb("#212121");
+                        App.Current.Resources["PrimaryBackgroundDark"] = Color.FromArgb("#404040");
                         App.Current.Resources["SecondaryBackgroundDark"] = Color.FromArgb("#404040");
                         break;
 
                     case "Gras":
-                        // Setze die Secondary-Farben
                         App.Current.Resources["Primary"] = Color.FromArgb("#32a852");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#73b572");
@@ -314,7 +322,6 @@ public partial class SettingsService : INotifyPropertyChanged
                         break;
 
                     case "Ozean":
-                        // Setze die Secondary-Farben
                         App.Current.Resources["Primary"] = Color.FromArgb("#5e75ad");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#9caedb");
@@ -325,7 +332,6 @@ public partial class SettingsService : INotifyPropertyChanged
                         break;
 
                     case "Feuer":
-                        // Setze die Secondary-Farben
                         App.Current.Resources["Primary"] = Color.FromArgb("#e07a2d");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#edba93");
@@ -335,8 +341,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryBackgroundDark"] = Color.FromArgb("#404040");
                         break;
 
-                    case "Lady":
-                        // Setze die Secondary-Farben
+                    case "Barbie":
                         App.Current.Resources["Primary"] = Color.FromArgb("#fc03df");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#f2a7ea");

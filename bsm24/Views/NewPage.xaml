@@ -34,7 +34,7 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit}}" 
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 
             Text="Plan bearbeiten"            
             Clicked="OnEditButtonClicked"/>
     </ContentPage.ToolbarItems>

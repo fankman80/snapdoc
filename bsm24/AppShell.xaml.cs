@@ -24,6 +24,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("icongallery", typeof(IconGallery));
         Routing.RegisterRoute("setpin", typeof(SetPin));
         Routing.RegisterRoute("imageview", typeof(ImageViewPage));
+        Routing.RegisterRoute("project_details", typeof(ProjectDetails));
     }
 
     private async void OnNewClicked(object sender, EventArgs e)
@@ -37,7 +38,7 @@ public partial class AppShell : Shell
 
             LoadDataToView.ResetApp();
 
-            Helper.AddMenuItem("Projekt-Daten", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
+            Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
             Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
             Helper.AddMenuItem("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
             Helper.AddMenuItem("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
@@ -60,13 +61,14 @@ public partial class AppShell : Shell
             // save data to file
             GlobalJson.SaveToFile();
 
-            await Shell.Current.GoToAsync("//project_details");
+            await Shell.Current.GoToAsync("project_details");
         }
     }
 
     private async void OnProjectDetailsClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("//project_details");
+        await Shell.Current.GoToAsync("project_details");
+        Shell.Current.FlyoutIsPresented = false;
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)

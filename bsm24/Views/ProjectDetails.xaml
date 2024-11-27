@@ -72,51 +72,45 @@
                         Title="Projektleiter"
                         Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Badge}}" />
 
-
                     <Grid RowSpacing="16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="130" />
                         </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
 
-                        <material:DatePickerField Grid.Column="0" Grid.Row="0"
-                        x:Name="creation_date"
-                        TextColor="{AppThemeBinding {DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        BorderColor="{AppThemeBinding {DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"
-                        AccentColor="{DynamicResource Primary}"
-                        Title="Datum"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Calendar_month}}" />
+                        <VerticalStackLayout Grid.Column="0">
+                            <material:DatePickerField x:Name="creation_date"
+                                    TextColor="{AppThemeBinding {DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    BorderColor="{AppThemeBinding {DynamicResource Secondary}, Dark={DynamicResource SecondaryDark}}"
+                                    AccentColor="{DynamicResource Primary}"
+                                    Title="Datum"
+                                    AllowClear="False"
+                                    Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Calendar_month}}" />
 
-                        <Button Grid.Column="0" Grid.Row="1"
-                                Text="Add PDF"
-                                BackgroundColor="{DynamicResource Primary}"
-                                TextColor="{DynamicResource PrimaryDarkText}"                                
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
-                                Clicked="OnAddPdfClicked"/>
-
-                        <Border Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-                                StrokeThickness="0"
-                                StrokeShape="RoundRectangle 8,8,8,8" >
-                            <ff:CachedImage x:Name="titleThumbnail" Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill">
-                                <ff:CachedImage.HeightRequest>
-                                    <OnIdiom x:TypeArguments="x:Double" Desktop="100" Phone="100" Tablet="100"/>
-                                </ff:CachedImage.HeightRequest>
-                                <ff:CachedImage.WidthRequest>
-                                    <OnIdiom x:TypeArguments="x:Double" Desktop="100" Phone="100" Tablet="100"/>
-                                </ff:CachedImage.WidthRequest>
-                            </ff:CachedImage>
+                            <Button Text="Add PDF"
+                                    BackgroundColor="{DynamicResource Primary}"
+                                    TextColor="{DynamicResource PrimaryDarkText}"                                
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
+                                    Clicked="OnAddPdfClicked"/>
+                        </VerticalStackLayout>
+                        
+                        <Border Grid.Column="1"
+                                Margin="0,4,0,0"
+                                Stroke="Grey"
+                                StrokeThickness="1"
+                                BackgroundColor="White"
+                                HeightRequest="130"
+                                WidthRequest="130"
+                                StrokeShape="RoundRectangle 10">
+                                <ImageButton Source="{Binding FlyoutHeaderImage}"
+                                             Aspect="AspectFill"
+                                             Clicked="OnThumbCaptureClicked"/>
                         </Border>
+                        <Image Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
+                               WidthRequest="60"
+                               HeightRequest="60"
+                               Source="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"/>
 
-                        <Button Grid.Column="1" Grid.Row="0" Grid.RowSpan="2"
-                                Background="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=50, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"  
-                                WidthRequest="100"
-                                HeightRequest="100"
-                                Clicked="OnThumbCaptureClicked"/>
                     </Grid>
                 </VerticalStackLayout>
             </ScrollView>

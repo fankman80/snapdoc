@@ -27,51 +27,50 @@
         <VerticalStackLayout x:DataType="services:SettingsService">
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="2*" />
-                    <ColumnDefinition Width="1*" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
-                </Grid.RowDefinitions>                
-                
-                <Label Text="Exportiere Pläne:" Grid.Column="0" Grid.Row="0"/>
-                <Switch x:Name="isPlanExport"
-                        ThumbColor="{DynamicResource Primary}"
-                        OnColor="{DynamicResource PrimaryDark}"
-                        IsToggled="{Binding IsPlanExport}"
-                        HorizontalOptions="Start"
-                        Grid.Column="1"
-                        Grid.Row="0"/>
+                </Grid.RowDefinitions>
 
-                <Label Text="Positionsbilder:"  Grid.Column="0" Grid.Row="1"/>
-                <Switch x:Name="isPosImageExport"
-                        ThumbColor="{DynamicResource Primary}"
-                        OnColor="{DynamicResource PrimaryDark}"
-                        IsToggled="{Binding IsPosImageExport}"
-                        HorizontalOptions="Start"
-                        Grid.Column="1"
-                        Grid.Row="1"/>
+                <Label Text="Exportiere Pläne:" Grid.Column="0" Grid.Row="0" VerticalOptions="StartAndExpand"/>
+                <Label Text="Positionsbilder:"  Grid.Column="0" Grid.Row="1" VerticalOptions="StartAndExpand"/>
+                <Label Text="Exportiere Fotos:" Grid.Column="0" Grid.Row="2" VerticalOptions="StartAndExpand"/>
+                <Label Text="Exportiere Pin-Icons:" Grid.Column="0" Grid.Row="3" VerticalOptions="StartAndExpand"/>
 
-                <Label Text="Exportiere Fotos:" Grid.Column="0" Grid.Row="2"/>
-                <Switch x:Name="isImageExport"
+                <Switch Grid.Column="1" Grid.Row="0"
+                        x:Name="isPlanExport"
+                        Margin="0,-10,0,0"                       
                         ThumbColor="{DynamicResource Primary}"
                         OnColor="{DynamicResource PrimaryDark}"
-                        IsToggled="{Binding IsImageExport}"
-                        HorizontalOptions="Start"
-                        Grid.Column="1"
-                        Grid.Row="2"/>
+                        IsToggled="{Binding IsPlanExport}"/>
 
-                <Label Text="Exportiere Pin-Icons:" Grid.Column="0" Grid.Row="3"/>
-                <Switch x:Name="isPinIconExport"
+                <Switch Grid.Column="1" Grid.Row="1"
+                        x:Name="isPosImageExport"
+                        Margin="0,-10,0,0"                      
                         ThumbColor="{DynamicResource Primary}"
                         OnColor="{DynamicResource PrimaryDark}"
-                        IsToggled="{Binding IsPinIconExport}"
-                        HorizontalOptions="Start"
-                        Grid.Column="1"
-                        Grid.Row="3"/>
+                        IsToggled="{Binding IsPosImageExport}"/>
+
+                <Switch Grid.Column="1" Grid.Row="2"
+                        x:Name="isImageExport"
+                        Margin="0,-10,0,0"
+
+                        ThumbColor="{DynamicResource Primary}"
+                        OnColor="{DynamicResource PrimaryDark}"
+                        IsToggled="{Binding IsImageExport}"/>
+
+                <Switch Grid.Column="1" Grid.Row="3"
+                        x:Name="isPinIconExport"
+                        Margin="0,-10,0,0"
+                        VerticalOptions="Start"
+                        ThumbColor="{DynamicResource Primary}"
+                        OnColor="{DynamicResource PrimaryDark}"
+                        IsToggled="{Binding IsPinIconExport}"/>
             </Grid>
             <Label Text="{Binding ImageExportSize, StringFormat='Fotogrösse: {0:0.##} mm'}"/>
             <Slider Maximum="160"
@@ -105,7 +104,7 @@
                     MaximumTrackColor="{DynamicResource PrimaryDark}"
                     Value="{Binding ImageExportScale}"/>
             
-            <Label Text="{Binding PosImageExportSize, StringFormat='Positionsbilder Ausschnittsgrösse: {0:0.##} Points'}" />
+            <Label Text="{Binding PosImageExportSize, StringFormat='Positionsbilder Ausschnittsgrösse: {0:0.##} Pixel'}" />
             <Slider Maximum="1000"
                     Minimum="100"
                     ThumbColor="{DynamicResource Primary}"

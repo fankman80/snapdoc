@@ -55,7 +55,7 @@
                                     WidthRequest="40"
                                     HeightRequest="40"
                                     Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Save}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding {DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
                                     Clicked="OnSaveClicked"/>
                             <Button Grid.Column="3"
                                     Grid.RowSpan="2"

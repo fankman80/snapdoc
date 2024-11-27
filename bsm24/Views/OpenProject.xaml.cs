@@ -85,7 +85,7 @@ public partial class OpenProject : UraniumContentPage
                     // Daten laden und verarbeiten (nicht UI-bezogen)
                     LoadDataToView.ResetApp();
 
-                    Helper.AddMenuItem("Projekt-Daten", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
+                    Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
                     Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
                     Helper.AddMenuItem("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
                     Helper.AddMenuItem("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
@@ -95,7 +95,8 @@ public partial class OpenProject : UraniumContentPage
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
                     HeaderUpdate();  // UI-Aktualisierung
 
-                    await Shell.Current.GoToAsync("//project_details");
+                    await Shell.Current.GoToAsync("project_details");
+                    Shell.Current.FlyoutIsPresented = false;
                 });
             }
         });
