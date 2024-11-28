@@ -54,21 +54,39 @@
     </Shell.FlyoutHeaderTemplate>
 
     <Shell.FlyoutFooterTemplate>
-        <DataTemplate>
-            <StackLayout x:DataType="sys:DateTime">
-                <Label Text="BSM24 Beta"
+        <DataTemplate x:DataType="sys:DateTime">
+            <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="40" />
+                </Grid.ColumnDefinitions>
+                
+                <Label Grid.Row="0" Grid.Column="1"
                        Margin="0,8,0,0"
+                       Text="BSM24 Beta" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontAttributes="Bold"
                        FontSize="12"
                        HorizontalOptions="Center" />
-                <Label Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0: dd. MMMM yyyy}'}"
-                       Margin="0,0,0,10"
+                <Label Grid.Row="1" Grid.Column="1"
+                       Margin="0,0,0,8"
+                       Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0: dd. MMMM yyyy}'}"
                        TextColor="DarkGrey"
                        FontSize="12"
                        HorizontalOptions="Center" />
 
-            </StackLayout>
+                <ImageButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
+                             Margin="0,0,12,0"
+                             Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"
+                             VerticalOptions="Center"
+                             BackgroundColor="Transparent"
+                             Clicked="OnSettingsClicked"/>
+            </Grid>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>
 

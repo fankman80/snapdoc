@@ -1,7 +1,9 @@
 #nullable disable
 
+using CommunityToolkit.Maui.Storage;
 using Mopups.Pages;
 using Mopups.Services;
+using CommunityToolkit.Maui.Alerts;
 
 namespace bsm24.Views;
 
@@ -34,7 +36,72 @@ public partial class PopupExportSettings : PopupPage
         await MopupService.Instance.PopAsync();
     }
 
-    private async void OnOkClicked(object sender, EventArgs e)
+    private async void OnShareClicked(object sender, EventArgs e)
+    {
+        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
+
+        busyOverlay.IsVisible = true;
+        activityIndicator.IsRunning = true;
+        busyText.Text = "Projekt wird geteilt...";
+        // Hintergrundoperation (nicht UI-Operationen)
+        await Task.Run(async () =>
+        {
+            await ExportReport.DocX("template.docx", outputPath);
+        });
+        activityIndicator.IsRunning = false;
+        busyOverlay.IsVisible = false;
+
+        CancellationToken cancellationToken = new();
+        try
+        {
+            await ShareFileAsync(outputPath);
+            await Toast.Make($"Bericht wurde geteilt").Show(cancellationToken);
+        }
+        catch
+        {
+            await Toast.Make($"Bericht wurde nicht geteilt").Show(cancellationToken);
+        }
+        File.Delete(outputPath);
+    }
+
+    private async void OnSaveClicked(object sender, EventArgs e)
+    {
+        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
+
+
+        busyOverlay.IsVisible = true;
+        activityIndicator.IsRunning = true;
+        busyText.Text = "Projekt wird gespeichert...";
+        // Hintergrundoperation (nicht UI-Operationen)
+        await Task.Run(async () =>
+        {
+            await ExportReport.DocX("template.docx", outputPath);
+        });
+        activityIndicator.IsRunning = false;
+        busyOverlay.IsVisible = false;
+
+        CancellationToken cancellationToken = new();
+        var saveStream = File.Open(outputPath, FileMode.Open);
+        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream, cancellationToken);
+        if (fileSaveResult.IsSuccessful)
+            await Toast.Make($"Bericht wurde gespeichert").Show(cancellationToken);
+        else
+            await Toast.Make($"Bericht wurde nicht gespeichert").Show(cancellationToken);
+        saveStream.Close();
+        File.Delete(outputPath);
+    }
+
+    private static async Task ShareFileAsync(string filePath)
+    {
+        var file = new ShareFile(filePath);
+        await Share.RequestAsync(new ShareFileRequest
+        {
+            File = file,
+            Title = "Teilen"
+        });
+    }
+
+    private async void OnCancelClicked(object sender, EventArgs e)
     {
         ReturnValue = null;
         await MopupService.Instance.PopAsync();

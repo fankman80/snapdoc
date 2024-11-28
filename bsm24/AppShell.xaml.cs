@@ -3,11 +3,8 @@
 using bsm24.Services;
 using bsm24.Views;
 using Mopups.Services;
-using System.Windows.Input;
-using CommunityToolkit.Maui.Storage;
-using CommunityToolkit.Maui.Alerts;
-using System.Threading;
 using System.Globalization;
+using System.Windows.Input;
 
 namespace bsm24;
 
@@ -40,8 +37,6 @@ public partial class AppShell : Shell
 
             Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
             Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
-            Helper.AddMenuItem("Bericht teilen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Share, "OnShareClicked");
-            Helper.AddMenuItem("Einstellungen", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Settings, "OnSettingsClicked");
             Helper.AddDivider();     
 
             GlobalJson.CreateNewFile(filePath);
@@ -84,47 +79,15 @@ public partial class AppShell : Shell
         }
     }
 
-    private async void OnShareClicked(object sender, EventArgs e)
-    {
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        await ExportReport.DocX("template.docx", outputPath);
-
-        CancellationToken cancellationToken = new();
-        try
-        {
-            await ShareFileAsync(outputPath);
-            await Toast.Make($"Bericht wurde geteilt").Show(cancellationToken);
-        }
-        catch
-        {
-            await Toast.Make($"Bericht wurde nicht geteilt").Show(cancellationToken);
-        }
-        File.Delete(outputPath);
-    }
-
     public async void OnExportClicked(object sender, EventArgs e)
-    { 
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        await ExportReport.DocX("template.docx", outputPath);
-
-        CancellationToken cancellationToken = new();
-        var saveStream = File.Open(outputPath, FileMode.Open);
-        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream, cancellationToken);
-        if (fileSaveResult.IsSuccessful)
-            await Toast.Make($"Bericht wurde gespeichert").Show(cancellationToken);
-        else
-            await Toast.Make($"Bericht wurde nicht gespeichert").Show(cancellationToken);
-        saveStream.Close();
-        File.Delete(outputPath);
-    }
-
-    private static async Task ShareFileAsync(string filePath)
     {
-        var file = new ShareFile(filePath);
-        await Share.RequestAsync(new ShareFileRequest
+        // Show Settings Page
+        var popup = new PopupExportSettings();
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+        if (result != null)
         {
-            File = file,
-            Title = "Teilen"
-        });
+
+        }
     }
 }

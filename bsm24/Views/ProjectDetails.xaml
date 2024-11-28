@@ -19,7 +19,6 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />
@@ -125,7 +124,7 @@
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
                 BackgroundColor="Black"
-                Opacity="0.5"
+                Opacity="0.7"
                 IsVisible="False"
                 VerticalOptions="FillAndExpand"
                 HorizontalOptions="FillAndExpand"

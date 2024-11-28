@@ -3,12 +3,9 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
-using Codeuctivity.OpenXmlPowerTools;
-using DocumentFormat.OpenXml.Presentation;
 using Mopups.Services;
 using MR.Gestures;
 using System.Globalization;
-using System.Threading;
 
 namespace bsm24.Views;
 

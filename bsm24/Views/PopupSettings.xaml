@@ -45,7 +45,7 @@
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Label Text="Pläne rotieren:" Grid.Column="0" Grid.Row="0" VerticalOptions="StartAndExpand"/>
+                <Label Text="Planrotation sperren:" Grid.Column="0" Grid.Row="0" VerticalOptions="StartAndExpand"/>
                 <Switch Grid.Column="1" Grid.Row="0"
                         x:Name="isPlanRotateLocked"
                         Margin="0,-10,0,0" 
@@ -83,11 +83,6 @@
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                   
                     Clicked="OnOkClicked" />
-                <Button Grid.Column="1"
-                    Text="Export Einstellungen"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                 
-                    Clicked="OnExportSettingsClicked" />                
             </Grid>
         </VerticalStackLayout>
     </Border>

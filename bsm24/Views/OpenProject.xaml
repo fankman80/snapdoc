@@ -51,17 +51,13 @@
                                     Aspect="AspectFill"/>
                             <Button Grid.Column="2"
                                     Grid.RowSpan="2"
-                                    Padding="0"
-                                    WidthRequest="40"
-                                    HeightRequest="40"
+                                    Padding="8"
                                     Background="Transparent"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
                                     Clicked="OnSaveClicked"/>
                             <Button Grid.Column="3"
                                     Grid.RowSpan="2"
-                                    Padding="0"
-                                    WidthRequest="40"
-                                    HeightRequest="40"
+                                    Padding="8"
                                     Background="Transparent"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
                                     Clicked="OnDeleteClicked"/>
@@ -74,7 +70,7 @@
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
                 BackgroundColor="Black"
-                Opacity="0.5"
+                Opacity="0.7"
                 IsVisible="False"
                 VerticalOptions="FillAndExpand"
                 HorizontalOptions="FillAndExpand"

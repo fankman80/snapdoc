@@ -40,18 +40,6 @@ public partial class PopupSettings : PopupPage
         await MopupService.Instance.PopAsync();
     }
 
-    private async void OnExportSettingsClicked(object sender, EventArgs e)
-    {
-        // Show Settings Page
-        var popup = new PopupExportSettings();
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
-        if (result != null)
-        {
-
-        }
-    }
-
     private void OnSelectedValueChanged(object sender, EventArgs e)
     {
         // Hole die AppShell
