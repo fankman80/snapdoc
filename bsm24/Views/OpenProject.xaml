@@ -9,7 +9,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.OpenProject"
-             Title="Projekt laden">
+             Title="Projektliste">
 
     <Grid>
         <StackLayout Margin="16,0,16,0">

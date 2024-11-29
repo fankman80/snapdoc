@@ -7,7 +7,7 @@
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                 xmlns:pc="clr-namespace:bsm24.ViewModels"
-                BackgroundColor="Grey"
+                BackgroundColor="DimGrey"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="bsm24.Views.NewPage"
                 x:DataType="views:NewPage"

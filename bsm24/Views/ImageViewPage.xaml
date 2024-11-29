@@ -7,7 +7,7 @@
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
 				xmlns:views="clr-namespace:bsm24.Views"
                 xmlns:pc="clr-namespace:bsm24.ViewModels"
-				BackgroundColor="Black"
+				BackgroundColor="DimGrey"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
 				x:Class="bsm24.Views.ImageViewPage"
 				Title="">

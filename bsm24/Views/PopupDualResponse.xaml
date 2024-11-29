@@ -35,16 +35,16 @@
                 </Grid.ColumnDefinitions>
                  <Button Grid.Column="0"
                     x:Name="cancelButtonText"
-                    Text="Cancel"
+                    Text="Abbrechen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                     Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                     x:Name="okButtonText"
                     Text="Ok"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    BackgroundColor="Red"
                     Clicked="OnOkClicked" />
+                <!--</Button>TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}" -->
             </Grid>
         </VerticalStackLayout>
     </Border>

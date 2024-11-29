@@ -81,7 +81,7 @@
                        HorizontalOptions="Center" />
 
                 <ImageButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                             Margin="0,0,12,0"
+                             Margin="-10,5,0,0"
                              Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"
                              VerticalOptions="Center"
                              BackgroundColor="Transparent"
@@ -99,19 +99,7 @@
               IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Add_box}}"/>
 
     <ShellContent Route="open_project"
-                  Title="Projekt öffnen"
+                  Title="Projektliste"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}" />
-    
-    <!-- <MenuItem>
-        <Shell.MenuItemTemplate>
-            <DataTemplate>
-                <BoxView HeightRequest="1.4" 
-                     Margin="16,0,16,0" 
-                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
-            </DataTemplate>
-        </Shell.MenuItemTemplate>
-    </MenuItem> -->
-
-    <!-- Overlay für Busy-Indikator -->
 </Shell>
