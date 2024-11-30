@@ -59,6 +59,7 @@
 				AnchorX="{Binding AnchorX}"
 				AnchorY="{Binding AnchorY}">
                 <mr:Image x:Name="PlanImage" MouseMoved="OnMouseMoved"/>
+                <!--<mr:Image x:Name="testIcon" Source="crosshair.png" Scale="0.5" AutomationId="skip"/>-->
             </AbsoluteLayout>
         </mr:ContentView>
         <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"

@@ -23,6 +23,7 @@
         <mr:ContentView
             PanningCommand="{Binding PanningCommand}"
             PinchingCommand="{Binding PinchingCommand}"
+            Panning="OnPanning"
             DoubleTapped="OnDoubleTapped">
 
             <AbsoluteLayout

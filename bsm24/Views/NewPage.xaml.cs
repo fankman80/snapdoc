@@ -5,6 +5,7 @@ using bsm24.Services;
 using bsm24.ViewModels;
 using Mopups.Services;
 using MR.Gestures;
+using System.Diagnostics;
 using System.Globalization;
 
 namespace bsm24.Views;
@@ -110,6 +111,7 @@ public partial class NewPage: IQueryAttributable
                     if (img.AutomationId != null)
                     {
                         // this may cause performance issues !!!
+                        //if (img.AutomationId == "skip") return;
                         if (1 / PlanContainer.Scale < scaleLimit)
                             img.Scale = scale;
 
@@ -266,8 +268,8 @@ public partial class NewPage: IQueryAttributable
 
     public void OnRotating(object sender, RotateEventArgs e)
     {
-        var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
-        planPanContainer.IsPanningEnabled = false;
+        //var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
+        //planPanContainer.IsPanningEnabled = false;
     }
 
     public void OnRotated(object sender, RotateEventArgs e)
@@ -283,35 +285,39 @@ public partial class NewPage: IQueryAttributable
 
     public void OnDown(object sender, DownUpEventArgs e)
     {
-        if (e.NumberOfTouches == 2)
-        {
-            var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
-            planPanContainer.IsPanningEnabled = false;
+        //if (e.NumberOfTouches == 2)
+        //{
+            //var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
+            //planPanContainer.IsPanningEnabled = false;
 
             // Korrektur für rotierte Pläne einbauen...
-            planPanContainer.AnchorX = 1 / (PlanContainer.Width * PlanContainer.Scale) * (e.Center.X - PlanContainer.TranslationX);
-            planPanContainer.AnchorY = 1 / (PlanContainer.Height * PlanContainer.Scale) * (e.Center.Y - PlanContainer.TranslationY);
-        }
+            //planPanContainer.AnchorX = 1 / PlanContainer.Width * (e.Center.X - PlanContainer.TranslationX);
+            //planPanContainer.AnchorY = 1 / PlanContainer.Height * (e.Center.Y - PlanContainer.TranslationY);
+        //}
     }
 
     public void OnPanning(object sender, PanEventArgs e)
     {
+        // TEST-ICON as Crosshair-Center
+        //testIcon.AnchorX = 0.5;
+        //testIcon.AnchorY = 0.5;
+        //testIcon.TranslationX = (this.Width / 2) - PlanContainer.TranslationX-32;
+        //testIcon.TranslationY = (this.Height / 2) - PlanContainer.TranslationY-32;
+
         if (activePin != null)
         {
-            // Skalierungsfaktor
             var scaleSpeed = 1 / PlanContainer.Scale;
-
-            // Winkel in Radiant
             double angle = PlanContainer.Rotation * Math.PI / 180.0;
-
-            // Berechnung der Delta-Werte basierend auf Rotation mit Spiegelung
             double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
             double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
 
-            // Skalierung anwenden
             activePin.TranslationX += deltaX * scaleSpeed;
             activePin.TranslationY += deltaY * scaleSpeed;
         }
+
+        var planPanContainer = (TransformViewModel)PlanContainer.BindingContext;
+        planPanContainer.AnchorX = 1 / PlanContainer.Width * ((this.Width / 2) - PlanContainer.TranslationX);
+        planPanContainer.AnchorY = 1 / PlanContainer.Height * ((this.Height / 2) - PlanContainer.TranslationY);
     }
 
     private void SetPinClicked(object sender, EventArgs e)
@@ -321,27 +327,9 @@ public partial class NewPage: IQueryAttributable
         {
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string newPin = "a_pin_red.png";
-
-            var _scale = PlanContainer.Scale;
-            Point screenCenter = new(this.Width / 2, this.Height / 2);
-            Point planPos = new(PlanContainer.TranslationX, PlanContainer.TranslationY);
-            Point anchorDif = new((0.5 - PlanContainer.AnchorX) * PlanContainer.Width * _scale, (0.5 - PlanContainer.AnchorY) * PlanContainer.Height * _scale);
-            Point planAnchor = new(PlanContainer.Width * PlanContainer.AnchorX, PlanContainer.Height * PlanContainer.AnchorY);
-            double _x = (screenCenter.X - planPos.X - planAnchor.X - anchorDif.X) / _scale;
-            double _y = (screenCenter.Y - planPos.Y - planAnchor.Y - anchorDif.Y) / _scale;
-
-            // Berechnung des Rotationswinkels in Radiant (für die Umrechnung)
-            double angleInRadians = PlanContainer.Rotation * Math.PI / 180;
-
-            // Wende die Rotation auf den Punkt (_x, _y) an, um ihn in den gedrehten Raum zu bringen
-            double rotatedX = _x * Math.Cos(angleInRadians) - -_y * Math.Sin(angleInRadians);
-            double rotatedY = -_x * Math.Sin(angleInRadians) + _y * Math.Cos(angleInRadians);
-
-            Point pos = new(0.5 + (1 / PlanContainer.Width * rotatedX), 0.5 + (1 / PlanContainer.Height * rotatedY));
-
             Pin newPinData = new()
             {
-                Pos = pos,
+                Pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY),
                 Anchor = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).anchor,
                 Size = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).size,
                 IsLocked = false,

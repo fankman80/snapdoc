@@ -6,6 +6,7 @@ using CommunityToolkit.Maui.Views;
 using MetadataExtractor;
 using MetadataExtractor.Formats.Exif;
 using Mopups.Services;
+using MR.Gestures;
 using SkiaSharp;
 using System.Globalization;
 
@@ -72,6 +73,13 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnDoubleTapped(object sender, EventArgs e)
     {
         ImageFit();
+    }
+
+    public void OnPanning(object sender, PanEventArgs e)
+    {
+        var imageView = (TransformViewModel)ImageView.BindingContext;
+        imageView.AnchorX = 1 / ImageView.Width * ((this.Width / 2) - ImageView.TranslationX);
+        imageView.AnchorY = 1 / ImageView.Height * ((this.Height / 2) - ImageView.TranslationY);
     }
 
     private void ImageFit()
