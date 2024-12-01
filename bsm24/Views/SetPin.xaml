@@ -7,7 +7,6 @@
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-             NavigationPage.HasBackButton = false
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:DataType="views:SetPin"                            
              x:Class="bsm24.Views.SetPin"
