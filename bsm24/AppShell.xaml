@@ -66,7 +66,7 @@
                     <ColumnDefinition Width="40" />
                 </Grid.ColumnDefinitions>
                 <HorizontalStacklayout Grid.Row="0" Grid.Column="1" Margin="0,8,0,0">
-                    <Label Text="BSM24 Beta" 
+                    <Label Text="BSM24" 
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontAttributes="Bold"
                            FontSize="12"
