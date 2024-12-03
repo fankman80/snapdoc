@@ -68,8 +68,6 @@ public partial class LoadPDFPages : UraniumContentPage
             });
 
             fileListView.ItemsSource = pdfImages;
-            fileListView.Footer = pdfImages.Count + " Seite(n)";
-
             activityIndicator.IsRunning = false;
             busyOverlay.IsVisible = false;
         }
