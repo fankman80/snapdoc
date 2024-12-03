@@ -15,11 +15,38 @@
     <Grid>
         <Grid>
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             
-            <Grid Grid.Row="0" Margin="0,16,16,0">
+            <ScrollView Grid.Row="0">
+                <CollectionView x:Name="fileListView">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ImageItem">
+                            <Border Stroke="Gray"
+                                    StrokeThickness="0"
+                                    Padding="16">
+                                <Grid>
+                                    <ff:CachedImage Source="{Binding ImagePath}"
+                                                    Aspect="AspectFill"
+                                                    CacheType="Memory"/>
+                                    <CheckBox IsChecked="{Binding IsChecked}"
+                                              Color="{DynamicResource Primary}"
+                                              VerticalOptions="End"
+                                              HorizontalOptions="End"
+                                              Margin="8"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+        </Grid>
+
+            <Grid Grid.Row="1" Margin="0,16,16,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -46,33 +73,6 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Splitscreen_landscape}}"
                         Clicked="OnChangeRowsClicked"/>
             </Grid>
-
-            <ScrollView Grid.Row="1">
-                <CollectionView x:Name="fileListView">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="local:ImageItem">
-                            <Border Stroke="Gray"
-                                    StrokeThickness="0"
-                                    Padding="16">
-                                <Grid>
-                                    <ff:CachedImage Source="{Binding ImagePath}"
-                                                    Aspect="AspectFill"
-                                                    CacheType="Memory"/>
-                                    <CheckBox IsChecked="{Binding IsChecked}"
-                                              Color="{DynamicResource Primary}"
-                                              VerticalOptions="End"
-                                              HorizontalOptions="End"
-                                              Margin="8"/>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </ScrollView>
-        </Grid>
 
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
