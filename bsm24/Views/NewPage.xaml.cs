@@ -107,7 +107,6 @@ public partial class NewPage: IQueryAttributable
                     if (img.AutomationId != null)
                     {
                         // this may cause performance issues !!!
-                        //if (img.AutomationId == "skip") return;
                         if (1 / PlanContainer.Scale < scaleLimit)
                             img.Scale = scale;
 
@@ -263,13 +262,6 @@ public partial class NewPage: IQueryAttributable
 
     public void OnPanning(object sender, PanEventArgs e)
     {
-        // TEST-ICON as Crosshair-Center
-        //testIcon.AnchorX = 0.5;
-        //testIcon.AnchorY = 0.5;
-        //testIcon.TranslationX = (this.Width / 2) - PlanContainer.TranslationX-32;
-        //testIcon.TranslationY = (this.Height / 2) - PlanContainer.TranslationY-32;
-
-
         var scaleSpeed = 1 / PlanContainer.Scale;
         double angle = PlanContainer.Rotation * Math.PI / 180.0;
         double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
@@ -337,15 +329,18 @@ public partial class NewPage: IQueryAttributable
         mousePos = e.Center;
     }
 
-    private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
+    private async void OnMouseScroll(object sender, ScrollWheelEventArgs e)
     {
-        double zoomFactor = e.ScrollDelta.Y > 0 ? 1.1 : 0.9; // Sanfter Zoom
-        double newScale = PlanContainer.Scale * zoomFactor;
-        newScale = Math.Max(0.1, Math.Min(newScale, 10));
+        double zoomFactor = e.ScrollDelta.Y > 0 ? 1.4 : 0.6;
+        double targetScale = PlanContainer.Scale * zoomFactor;
+        //targetScale = Math.Max(0.1, Math.Min(targetScale, 10)); // Begrenze den Skalierungsbereich
 
-        planContainer.AnchorX = mousePos.X / PlanContainer.Width;
-        planContainer.AnchorY = mousePos.Y / PlanContainer.Height;
-        planContainer.Scale = newScale;
+        planContainer.AnchorX = 1 / PlanContainer.Width * (mousePos.X - PlanContainer.TranslationX);
+        planContainer.AnchorY = 1 / PlanContainer.Height * (mousePos.Y - PlanContainer.TranslationY);
+
+        await PlanContainer.ScaleTo(targetScale, 60, Easing.Linear);
+
+        planContainer.Scale = targetScale;
     }
 
     private async void OnEditButtonClicked(object sender, EventArgs e)

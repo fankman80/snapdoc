@@ -3,7 +3,6 @@
 using bsm24.Models;
 using PDFtoImage;
 using SkiaSharp;
-using System.Globalization;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;

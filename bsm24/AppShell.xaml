@@ -61,12 +61,12 @@
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="40" />
+                    <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
                 <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" HorizontalOptions="Center">
-                    <Label Text="BSM24" 
+                    <Label Text="BSM 24" 
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontAttributes="Bold"
                            FontSize="12"
@@ -84,8 +84,8 @@
                        VerticalTextAlignment="Center"/>
                 
                 <ImageButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                             Margin="0,5,12,0"
                              Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"
+                             HorizontalOptions="End"
                              VerticalOptions="Center"
                              BackgroundColor="Transparent"
                              Clicked="OnSettingsClicked"/>

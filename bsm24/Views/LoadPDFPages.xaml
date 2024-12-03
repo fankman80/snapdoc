@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui" 
+             xmlns:views="clr-namespace:bsm24.Views"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:local="clr-namespace:bsm24"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             x:Class="bsm24.Views.LoadPDFPages"
+             Title="PDF Seiten hinzufügen">
+
+    <Grid>
+        <StackLayout Margin="16,0,16,0">
+            <CollectionView x:Name="fileListView" ItemsLayout="VerticalGrid, 2">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:FileItem">
+                        <ff:CachedImage Grid.Column="0"
+                                    Grid.RowSpan="2"
+                                    Source="{Binding ImagePath}"
+                                    Aspect="AspectFill"/>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </StackLayout>
+        
+        <!-- Overlay für Busy-Indikator -->
+        <Grid x:Name="busyOverlay"
+                BackgroundColor="Black"
+                Opacity="0.7"
+                IsVisible="False"
+                VerticalOptions="FillAndExpand"
+                HorizontalOptions="FillAndExpand"
+                ZIndex="10">
+            <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
+                <ActivityIndicator x:Name="activityIndicator"
+                                    IsRunning="True"
+                                    VerticalOptions="Center"
+                                    HorizontalOptions="Center"
+                                    Color="White" />
+                <Label x:Name="busyText"
+                       Text="Bitte warten..."
+                       TextColor="White"
+                       FontSize="Medium"
+                       HorizontalOptions="Center" />
+            </StackLayout>
+        </Grid>
+    </Grid>
+</uranium:UraniumContentPage>

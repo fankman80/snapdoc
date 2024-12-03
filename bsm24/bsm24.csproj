@@ -161,6 +161,9 @@
 	  <MauiXaml Update="AppShell.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
+	  <MauiXaml Update="Views\LoadPDFPages.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\PopupDualResponse.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -200,6 +203,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Views\LoadPDFPages.xaml.cs">
+	    <DependentUpon>LoadPDFPages.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PopupDualResponse.xaml.cs">
 	    <DependentUpon>PopupDualResponse.xaml</DependentUpon>
 	  </Compile>

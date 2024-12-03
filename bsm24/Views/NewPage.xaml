@@ -47,6 +47,7 @@
             Pinching="OnPinching"
             Pinched="OnPinched"
             DoubleTapped="OnDoubleTapped"
+            MouseMoved="OnMouseMoved"
             ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="PlanContainer"
                 Scale="{Binding Scale}"
@@ -55,7 +56,7 @@
 				TranslationY="{Binding TranslationY}"
 				AnchorX="{Binding AnchorX}"
 				AnchorY="{Binding AnchorY}">
-                <mr:Image x:Name="PlanImage" MouseMoved="OnMouseMoved"/>
+                <mr:Image x:Name="PlanImage"/>
                 <!--<mr:Image x:Name="testIcon" Source="crosshair.png" Scale="0.5" AutomationId="skip"/>-->
             </AbsoluteLayout>
         </mr:ContentView>
