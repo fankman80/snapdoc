@@ -5,24 +5,75 @@
              xmlns:views="clr-namespace:bsm24.Views"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-             xmlns:local="clr-namespace:bsm24"
+             xmlns:local="clr-namespace:bsm24.Views"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             BackgroundColor="DimGrey"
+             x:DataType="views:LoadPDFPages"
              x:Class="bsm24.Views.LoadPDFPages"
              Title="PDF Seiten hinzufügen">
 
     <Grid>
-        <StackLayout Margin="16,0,16,0">
-            <CollectionView x:Name="fileListView" ItemsLayout="VerticalGrid, 2">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:FileItem">
-                        <ff:CachedImage Source="{Binding ImagePath}"
-                                        Aspect="AspectFill"/>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </StackLayout>
-        
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            
+            <Grid Grid.Row="0" Margin="0,16,16,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="60" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60" />
+                </Grid.RowDefinitions>
+                <Button Grid.Column="1"
+                        Text="Abbrechen"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Clicked="OnCancelClicked"/>
+                <Button Grid.Column="2"
+                        Text="Seiten hinzufügen"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Clicked="OnPagesAddClicked"/>
+                <Button Grid.Column="3"
+                        x:Name="btnRows"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Splitscreen_landscape}}"
+                        Clicked="OnChangeRowsClicked"/>
+            </Grid>
+
+            <ScrollView Grid.Row="1">
+                <CollectionView x:Name="fileListView">
+                    <CollectionView.ItemsLayout>
+                        <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                    </CollectionView.ItemsLayout>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:ImageItem">
+                            <Border Stroke="Gray"
+                                    StrokeThickness="0"
+                                    Padding="16">
+                                <Grid>
+                                    <ff:CachedImage Source="{Binding ImagePath}"
+                                                    Aspect="AspectFill"
+                                                    CacheType="Memory"/>
+                                    <CheckBox IsChecked="{Binding IsChecked}"
+                                              Color="{DynamicResource Primary}"
+                                              VerticalOptions="End"
+                                              HorizontalOptions="End"
+                                              Margin="8"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </ScrollView>
+        </Grid>
+
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
                 BackgroundColor="Black"

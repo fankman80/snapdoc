@@ -1,17 +1,25 @@
 ﻿#nullable disable
 
+using bsm24.Models;
+using Microsoft.Maui.Storage;
 using PDFtoImage;
 using SkiaSharp;
-using System.Globalization;
 using UraniumUI.Pages;
-
 
 namespace bsm24.Views;
 public partial class LoadPDFPages : UraniumContentPage
 {
+    FileResult result;
+    public int DynamicSpan { get; set; } = 2; // Standardwert
+    public int DynamicSize { get; set; }
+    public int MinSize = 2;
+
     public LoadPDFPages()
     {
         InitializeComponent();
+        UpdateSpan();
+        SizeChanged += OnSizeChanged;
+        BindingContext = this;
     }
 
     protected override void OnAppearing()
@@ -22,47 +30,51 @@ public partial class LoadPDFPages : UraniumContentPage
 
     private async void LoadPDFImages()
     {
-        List<FileItem> pdfImages = [];
-        var result = await PickPdfFileAsync();
-
-        busyOverlay.IsVisible = true;
-        activityIndicator.IsRunning = true;
-        busyText.Text = "PDF wird konvertiert...";
-
-        await Task.Run(() =>
+        result = await PickPdfFileAsync();
+        if (result != null)
         {
-            var root = GlobalJson.Data;
-            byte[] bytearray = File.ReadAllBytes(result.FullPath);
-            int pagecount = Conversion.GetPageCount(bytearray);
+            List<ImageItem> pdfImages = [];
+            busyOverlay.IsVisible = true;
+            activityIndicator.IsRunning = true;
+            busyText.Text = "PDF wird konvertiert...";
 
-            var cacheDir = Path.Combine(FileSystem.AppDataDirectory, "cache");
-            if (!Directory.Exists(cacheDir))
+            await Task.Run(() =>
             {
-                Directory.CreateDirectory(cacheDir);
-            }
+                byte[] bytearray = File.ReadAllBytes(result.FullPath);
+                int pagecount = Conversion.GetPageCount(bytearray);
 
-            for (int i = 0; i < pagecount; i++)
-            {
-                string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
-                Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: 300));
-
-                // Bildgrösse auslesen
-                var stream = File.OpenRead(imgPath);
-                var skBitmap = SKBitmap.Decode(stream);
-                Size _imgSize = new(skBitmap.Width, skBitmap.Height);
-
-                pdfImages.Add(new FileItem
+                var cacheDir = Path.Combine(FileSystem.AppDataDirectory, "cache");
+                if (!Directory.Exists(cacheDir))
                 {
-                    ImagePath = imgPath,
-                });
-            }
+                    Directory.CreateDirectory(cacheDir);
+                }
+
+                for (int i = 0; i < pagecount; i++)
+                {
+                    string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
+                    Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: 300));
+
+                    // Bildgrösse auslesen
+                    var stream = File.OpenRead(imgPath);
+                    var skBitmap = SKBitmap.Decode(stream);
+                    Size _imgSize = new(skBitmap.Width, skBitmap.Height);
+
+                    pdfImages.Add(new ImageItem
+                    {
+                        ImagePath = imgPath,
+                        IsChecked = true,
+                    });
+                }
+            });
 
             fileListView.ItemsSource = pdfImages;
             fileListView.Footer = pdfImages.Count + " Seite(n)";
-        });
 
-        activityIndicator.IsRunning = false;
-        busyOverlay.IsVisible = false;
+            activityIndicator.IsRunning = false;
+            busyOverlay.IsVisible = false;
+        }
+        else
+            await Shell.Current.GoToAsync("..");
     }
 
     public static async Task<FileResult> PickPdfFileAsync()
@@ -87,48 +99,130 @@ public partial class LoadPDFPages : UraniumContentPage
         return null; // Kein PDF ausgewählt
     }
 
-    private void AddPdfImages()
+    private void OnCancelClicked(object sender, EventArgs e)
     {
-        // Hauptverzeichnis, in dem die Suche beginnen soll (z.B. das App-Datenverzeichnis)
-        string rootDirectory = FileSystem.AppDataDirectory;
-
-        // Liste zum Speichern der gefundenen Dateien
-        List<FileItem> foundFiles = [];
-
-        string searchPattern = "*.json"; // Alle JSON-Dateien suchen
-
-        // Alle Unterverzeichnisse und das Hauptverzeichnis durchsuchen
-        try
+        var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
+        foreach (var cacheFile in cacheFiles)
         {
-            // Rekursive Suche in allen Unterverzeichnissen
-            string[] files = Directory.GetFiles(rootDirectory, searchPattern, SearchOption.AllDirectories);
-
-            // Gefundene Dateien zur Liste hinzufügen
-            foreach (var file in files)
-            {
-                string thumbImg = "banner_thumbnail.png";
-
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg")))
-                    thumbImg = Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg");
-
-                foundFiles.Add(new FileItem
-                {
-                    FileName = Path.GetFileNameWithoutExtension(file),
-                    FilePath = file,
-                    FileDate = "Geändert am:\n" + File.GetLastWriteTime(file).Date.ToString("d", new CultureInfo("de-DE")),
-                    ImagePath = thumbImg
-                });
-            }
+            File.Delete(cacheFile);
         }
-        catch (Exception ex)
-        {
-            // Fehlerbehandlung, z.B. falls keine Zugriffsrechte auf bestimmte Verzeichnisse vorhanden sind
-            Console.WriteLine("Fehler beim Durchsuchen der Verzeichnisse: " + ex.Message);
-        }
-
-        // Liste der JSON-Dateien dem ListView zuweisen
-        fileListView.ItemsSource = foundFiles;
-        fileListView.Footer = foundFiles.Count + " Projekte";
+        Shell.Current.GoToAsync("..");
     }
 
+    private void OnPagesAddClicked(object sender, EventArgs e)
+    {
+        AddPdfImages();
+    }
+
+    private void OnChangeRowsClicked(object sender, EventArgs e)
+    {
+        if (MinSize == 1)
+        {
+            MinSize = 2;
+            btnRows.ImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Splitscreen_landscape,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        else
+        {
+            MinSize = 1;
+            DynamicSpan = 1;
+            btnRows.ImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Splitscreen_portrait,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        UpdateSpan();
+    }
+
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        UpdateSpan();
+    }
+
+    private void UpdateSpan()
+    {
+        if (MinSize != 1)
+        {
+            double screenWidth = this.Width;
+            double imageWidth = Settings.PlanPreviewSize; // Mindestbreite in Pixeln
+            DynamicSpan = Math.Max(MinSize, (int)(screenWidth / imageWidth));
+            DynamicSize = (int)(screenWidth / DynamicSpan);
+        }
+        OnPropertyChanged(nameof(DynamicSpan));
+        OnPropertyChanged(nameof(DynamicSize));
+    }
+
+    private void AddPdfImages()
+    {
+        string imageDirectory = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath);
+        int i = 0;
+
+        // Überprüfen, ob Plans null ist, und es gegebenenfalls initialisieren
+        GlobalJson.Data.Plans ??= [];  // Initialisiere Plans, wenn es null ist
+
+        foreach (var item in fileListView.ItemsSource.Cast<ImageItem>())
+        {
+            if (item.IsChecked)
+            {
+                string sourceFilePath = item.ImagePath;
+                string fileName = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i + ".jpg";
+                string destinationFilePath = Path.Combine(imageDirectory, fileName);
+                string planSourceName = "plan_" + i + ".jpg";
+
+                // Bildgrösse auslesen
+                var stream = File.OpenRead(Path.Combine(Settings.CacheDirectory, planSourceName));
+                var skBitmap = SKBitmap.Decode(stream);
+                Size _imgSize = new(skBitmap.Width, skBitmap.Height);
+
+                // Schleife, bis ein einzigartiger Name gefunden wird
+                string planName;
+                int j=0;
+                do
+                {
+                    planName = "Plan " + j;
+                    j++;
+                }
+                while (GlobalJson.Data.Plans.Values.Any(p => p.Name == planName));
+
+                Plan plan = new()
+                {
+                    Name = planName,
+                    File = fileName,
+                    ImageSize = _imgSize
+                };
+
+                // Überprüfen, ob die Plans-Struktur initialisiert ist
+                GlobalJson.Data.Plans ??= [];
+                GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
+
+                File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
+                i += 1;
+            }
+        }
+
+        GlobalJson.Data.PlanPdf = new Pdf
+        {
+            File = result.FileName,
+        };
+
+        GlobalJson.SaveToFile();
+
+        var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
+        foreach (var cacheFile in cacheFiles)
+        {
+            File.Delete(cacheFile);
+        }
+
+        Shell.Current.GoToAsync("..");
+    }
 }

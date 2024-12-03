@@ -51,7 +51,8 @@ public partial class LoadDataToView
         }
     }
 
-    public static void ResetApp()
+
+    public static void ResetFlyoutItems()
     {
         // Liste für zu entfernende ShellItems erstellen
         var itemsToRemove = new List<ShellItem>();
@@ -69,6 +70,13 @@ public partial class LoadDataToView
             (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellitem);
         }
 
+        Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
+        Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
+        Helper.AddDivider();
+    }
+
+    public static void ResetData()
+    {
         // Reset Datenbank
         GlobalJson.Data.Client_name = null;
         GlobalJson.Data.Object_address = null;

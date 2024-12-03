@@ -167,7 +167,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private void UpdateSpan()
     {
         double screenWidth = this.Width;
-        double imageWidth = Settings.ThumbSize; // Mindestbreite in Pixeln
+        double imageWidth = Settings.PlanPreviewSize; // Mindestbreite in Pixeln
         DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
         DynamicSize = (int)(screenWidth / DynamicSpan);
         OnPropertyChanged(nameof(DynamicSpan));

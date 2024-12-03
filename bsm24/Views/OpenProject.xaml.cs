@@ -81,11 +81,8 @@ public partial class OpenProject : UraniumContentPage
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
                     // Daten laden und verarbeiten (nicht UI-bezogen)
-                    LoadDataToView.ResetApp();
-
-                    Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
-                    Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
-                    Helper.AddDivider();
+                    LoadDataToView.ResetFlyoutItems();
+                    LoadDataToView.ResetData();
 
                     GlobalJson.LoadFromFile(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));

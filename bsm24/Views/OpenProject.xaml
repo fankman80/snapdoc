@@ -12,53 +12,55 @@
              Title="Projektliste">
 
     <Grid>
-        <StackLayout Margin="16,0,16,0">
-            <CollectionView x:Name="fileListView" ItemsLayout="VerticalGrid, 1">
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:FileItem">
-                        <Grid Padding="0, 6, 0, 6">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="66" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="40" />
-                                <ColumnDefinition Width="40" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="25" />
-                                <RowDefinition Height="35" />
-                            </Grid.RowDefinitions>
-                            <Label Grid.Column="1" Grid.Row="0"
-                                   VerticalTextAlignment="End"
-                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                   FontSize="14"
-                                   Text="{Binding FileName}"/>
-                            <Label Grid.Column="1" Grid.Row="1"
-                                   FontSize="12"
-                                   Text="{Binding FileDate}"/>
-                            <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
-                                    BorderColor="Transparent"
-                                    BorderWidth="0"
-                                    Background="Transparent"
-                                    Clicked="OnProjectClicked"/>
-                            <ff:CachedImage Grid.Column="0" Grid.RowSpan="2"
-                                    Source="{Binding ImagePath}"
-                                    Aspect="AspectFill"/>
-                            <Button Grid.Column="2" Grid.RowSpan="2"
-                                    Padding="8"
-                                    Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
-                                    Clicked="OnSaveClicked"/>
-                            <Button Grid.Column="3" Grid.RowSpan="2"
-                                    Padding="8"
-                                    Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
-                                    Clicked="OnDeleteClicked"/>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-        </StackLayout>
-        
+        <ScrollView>
+            <StackLayout Margin="16,0,16,0">
+                <CollectionView x:Name="fileListView" ItemsLayout="VerticalGrid, 1">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate x:DataType="local:FileItem">
+                            <Grid Padding="0, 6, 0, 6">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="66" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="40" />
+                                    <ColumnDefinition Width="40" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="25" />
+                                    <RowDefinition Height="35" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="1" Grid.Row="0"
+                                       VerticalTextAlignment="End"
+                                       TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                       FontSize="14"
+                                       Text="{Binding FileName}"/>
+                                <Label Grid.Column="1" Grid.Row="1"
+                                       FontSize="12"
+                                       Text="{Binding FileDate}"/>
+                                <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                                        BorderColor="Transparent"
+                                        BorderWidth="0"
+                                        Background="Transparent"
+                                        Clicked="OnProjectClicked"/>
+                                <ff:CachedImage Grid.Column="0" Grid.RowSpan="2"
+                                        Source="{Binding ImagePath}"
+                                        Aspect="AspectFill"/>
+                                <Button Grid.Column="2" Grid.RowSpan="2"
+                                        Padding="8"
+                                        Background="Transparent"
+                                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
+                                        Clicked="OnSaveClicked"/>
+                                <Button Grid.Column="3" Grid.RowSpan="2"
+                                        Padding="8"
+                                        Background="Transparent"
+                                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                        Clicked="OnDeleteClicked"/>
+                            </Grid>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </StackLayout>
+        </ScrollView>
+
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
                 BackgroundColor="Black"

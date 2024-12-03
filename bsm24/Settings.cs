@@ -3,11 +3,16 @@ namespace bsm24;
 
 public static class Settings
 {
+    public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
     public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
-
+    public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
     public static (string fileName, string imageName, Point anchor, Size size, bool isLockRotate)[] PinData { get => pinData; set => pinData = value; }
 
     private static int thumbSize = 150;
+
+    private static int planPreviewSize = 250;
+
+    private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
 
     //Icon-Name / Description / Anchor / Size / Lock Rotate
     private static (string fileName, string imageName, Point anchor, Size size, bool isLockRotate)[] pinData =

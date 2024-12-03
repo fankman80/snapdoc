@@ -12,11 +12,8 @@ public partial class App : Application
     {
         InitializeComponent();
 
-        // Setze die Kultur der Anwendung auf Deutsch (Deutschland)
         System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
         System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
-
-        //MainPage = UraniumServiceProvider.Current.GetRequiredService<AppShell>();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

@@ -44,11 +44,8 @@ public partial class AppShell : Shell
 
             string filePath = Path.Combine(FileSystem.AppDataDirectory, result, result + ".json");
 
-            LoadDataToView.ResetApp();
-
-            Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
-            Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
-            Helper.AddDivider();     
+            LoadDataToView.ResetFlyoutItems();
+            LoadDataToView.ResetData();
 
             GlobalJson.CreateNewFile(filePath);
             GlobalJson.Data.Client_name = "";

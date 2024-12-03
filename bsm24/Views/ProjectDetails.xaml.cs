@@ -1,28 +1,22 @@
 ﻿#nullable disable
 
-using bsm24.Models;
-using PDFtoImage;
-using SkiaSharp;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;
 
 public partial class ProjectDetails : UraniumContentPage
 {
-    private Boolean isPdfExist = true;
+    bool isPdfChanged = false;
 
     public ProjectDetails()
     {
         InitializeComponent();
-
+        isPdfChanged = false;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
-        if (GlobalJson.Data.PlanPdf == null)
-            isPdfExist = false;
 
         client_name.Text = GlobalJson.Data.Client_name;
         object_address.Text = GlobalJson.Data.Object_address;
@@ -31,7 +25,9 @@ public partial class ProjectDetails : UraniumContentPage
         project_manager.Text = GlobalJson.Data.Project_manager;
         creation_date.Date = GlobalJson.Data.Creation_date;
 
-    HeaderUpdate();
+        HeaderUpdate();
+        
+
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
@@ -46,10 +42,10 @@ public partial class ProjectDetails : UraniumContentPage
         // save data to file
         GlobalJson.SaveToFile();
 
-        if (!isPdfExist)
+        if (isPdfChanged)
         {
+            LoadDataToView.ResetFlyoutItems();
             LoadDataToView.LoadData(new FileResult(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.JsonFile)));
-            isPdfExist = true;
         }
 
         HeaderUpdate();
@@ -62,28 +58,6 @@ public partial class ProjectDetails : UraniumContentPage
 #if ANDROID
         Shell.Current.FlyoutIsPresented = true;
 #endif
-    }
-
-    public static async Task<FileResult> PickPdfFileAsync()
-    {
-        try
-        {
-            // Öffne den FilePicker nur für PDF-Dateien
-            var fileResult = await FilePicker.Default.PickAsync(new PickOptions
-            {
-                PickerTitle = "Bitte wähle eine PDF-Datei aus",
-                FileTypes = FilePickerFileType.Pdf // Nur PDF-Dateien anzeigen
-            });
-
-            if (fileResult != null)
-                return fileResult;
-        }
-        catch (Exception ex)
-        {
-            // Fehlerbehandlung (z.B. wenn der Benutzer den Picker abbricht)
-            Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
-        }
-        return null; // Kein PDF ausgewählt
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -100,55 +74,19 @@ public partial class ProjectDetails : UraniumContentPage
 
     private async void OnAddPdfClicked(object sender, EventArgs e)
     {
+        GlobalJson.Data.Client_name = client_name.Text;
+        GlobalJson.Data.Object_address = object_address.Text;
+        GlobalJson.Data.Working_title = working_title.Text;
+        GlobalJson.Data.Object_name = object_name.Text;
+        GlobalJson.Data.Project_manager = project_manager.Text;
+        GlobalJson.Data.Creation_date = creation_date.Date.Value;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
         await Shell.Current.GoToAsync("loadPdfImages");
-    }
 
-    private async void OnAddPdfClicked_bak(object sender, EventArgs e)
-    {
-        var result = await PickPdfFileAsync();
-
-        busyOverlay.IsVisible = true;
-        activityIndicator.IsRunning = true;
-        busyText.Text = "PDF wird konvertiert...";
-
-        await Task.Run(() =>
-        {
-            var root = GlobalJson.Data;
-            byte[] bytearray = File.ReadAllBytes(result.FullPath);
-            int pagecount = Conversion.GetPageCount(bytearray);
-
-            for (int i = 0; i < pagecount; i++)
-            {
-                string imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, "plan_" + i + ".jpg");
-                Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: 300));
-
-                // Bildgrösse auslesen
-                var stream = File.OpenRead(imgPath);
-                var skBitmap = SKBitmap.Decode(stream);
-                Size _imgSize = new(skBitmap.Width, skBitmap.Height);
-
-                Plan plan = new()
-                {
-                    Name = "Plan " + i,
-                    File = "plan_" + i + ".jpg",
-                    ImageSize = _imgSize
-                };
-
-                // Überprüfen, ob die Plans-Struktur initialisiert ist
-                root.Plans ??= [];
-                root.Plans["plan_" + i] = plan;
-                GlobalJson.SaveToFile();
-            }
-
-            GlobalJson.Data.PlanPdf = new Pdf
-            {
-                File = result.FileName,
-            };
-            return Task.CompletedTask;
-        });
-
-        activityIndicator.IsRunning = false;
-        busyOverlay.IsVisible = false;
+        isPdfChanged = true;
     }
 
     private static void HeaderUpdate()
