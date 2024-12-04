@@ -92,7 +92,7 @@ public partial class TransformViewModel : CustomEventArgsViewModel
     {
         base.OnRotating(e);
 
-        if (SettingsService.Instance.IsPlanRotateLocked == "True")
+        if (SettingsService.Instance.IsPlanRotateLocked)
         {
             return;   // rotating nur, wenn rotating aktiviert ist
         }

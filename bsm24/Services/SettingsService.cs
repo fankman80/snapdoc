@@ -8,25 +8,14 @@ public partial class SettingsService : INotifyPropertyChanged
     private static SettingsService _instance;
     public static SettingsService Instance => _instance ??= new SettingsService();
 
+
+
     private SettingsService()
     {
-        ImageQuality = "300";
         Themes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Flower", "Barbie"];
         DarkMode = ["Light", "Dark"];
         SelectedTheme = Themes[0]; // Standardauswahl
         SelectedDarkMode = DarkMode[0]; // Standardauswahl
-    }
-
-    private string _imageQuality;
-    public string ImageQuality
-    {
-        get => _imageQuality;
-        set
-        {
-            if (_imageQuality == value) return;
-            _imageQuality = value;
-            OnPropertyChanged(_imageQuality);
-        }
     }
 
     private string _flyoutHeaderTitle = "";
@@ -71,8 +60,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _isPlanRotateLocked = "false";
-    public string IsPlanRotateLocked
+    private bool _isPlanRotateLocked = false;
+    public bool IsPlanRotateLocked
     {
         get => _isPlanRotateLocked;
         set
@@ -86,35 +75,35 @@ public partial class SettingsService : INotifyPropertyChanged
     }
 
 #if WINDOWS
-    private string _pinScaleLimit = "0,8";
+    private double _pinScaleLimit = 0.8;
 #endif
 
 #if ANDROID
-    private string _pinScaleLimit = "0,5";
+    private double _pinScaleLimit = 0.5;
 #endif
 
-    public string PinScaleLimit
+    public double PinScaleLimit
     {
         get => _pinScaleLimit;
         set
         {
             if (_pinScaleLimit != value)
             {
-                _pinScaleLimit = Math.Round(Convert.ToDouble(value), 1).ToString();
+                _pinScaleLimit = Math.Round(value, 1);
                 OnPropertyChanged(nameof(PinScaleLimit));
             }
         }
     }
 
-    private string _pdfQuality = "300";
-    public string PdfQuality
+    private int _pdfQuality = 300;
+    public int PdfQuality
     {
         get => _pdfQuality;
         set
         {
             if (_pdfQuality != value)
             {
-                _pdfQuality = Math.Round(Convert.ToDouble(value), 0).ToString();
+                _pdfQuality = value;
                 OnPropertyChanged(nameof(PdfQuality));
             }
         }
@@ -123,22 +112,22 @@ public partial class SettingsService : INotifyPropertyChanged
     #region
     // Export Settings
 
-    private string _imageExportQuality = "90";
-    public string ImageExportQuality
+    private int _imageExportQuality = 90;
+    public int ImageExportQuality
     {
         get => _imageExportQuality;
         set
         {
             if (_imageExportQuality != value)
             {
-                _imageExportQuality = Math.Round(Convert.ToDouble(value), 0).ToString();
+                _imageExportQuality = value;
                 OnPropertyChanged(nameof(ImageExportQuality));
             }
         }
     }
 
-    private string _isPlanExport = "true";
-    public string IsPlanExport
+    private bool _isPlanExport = true;
+    public bool IsPlanExport
     {
         get => _isPlanExport;
         set
@@ -151,8 +140,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _isPosImageExport = "true";
-    public string IsPosImageExport
+    private bool _isPosImageExport = true;
+    public bool IsPosImageExport
     {
         get => _isPosImageExport;
         set
@@ -165,8 +154,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _isImageExport = "true";
-    public string IsImageExport
+    private bool _isImageExport = true;
+    public bool IsImageExport
     {
         get => _isImageExport;
         set
@@ -179,8 +168,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _isPinIconExport = "true";
-    public string IsPinIconExport
+    private bool _isPinIconExport = true;
+    public bool IsPinIconExport
     {
         get => _isPinIconExport;
         set
@@ -193,71 +182,71 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _imageExportSize = "40";
-    public string ImageExportSize
+    private int _imageExportSize = 40;
+    public int ImageExportSize
     {
         get => _imageExportSize;
         set
         {
             if (_imageExportSize != value)
             {
-                _imageExportSize = Math.Round(Convert.ToDouble(value), 0).ToString();
+                _imageExportSize = value;
                 OnPropertyChanged(nameof(ImageExportSize));
             }
         }
     }
 
-    private string _planExportSize = "140";
-    public string PlanExportSize
+    private int _planExportSize = 140;
+    public int PlanExportSize
     {
         get => _planExportSize;
         set
         {
             if (_planExportSize != value)
             {
-                _planExportSize = Math.Round(Convert.ToDouble(value), 0).ToString();
+                _planExportSize = value;
                 OnPropertyChanged(nameof(PlanExportSize));
             }
         }
     }
 
-    private string _imageExportScale = "0,1";
-    public string ImageExportScale
+    private double _imageExportScale = 0.1;
+    public double ImageExportScale
     {
         get => _imageExportScale;
         set
         {
             if (_imageExportScale != value)
             {
-                _imageExportScale = Math.Round(Convert.ToDouble(value), 2).ToString();
+                _imageExportScale = Math.Round(value, 2);
                 OnPropertyChanged(nameof(ImageExportScale));
             }
         }
     }
 
-    private string _posImageExportSize = "600";
-    public string PosImageExportSize
+    private int _posImageExportSize = 600;
+    public int PosImageExportSize
     {
         get => _posImageExportSize;
         set
         {
             if (_posImageExportSize != value)
             {
-                _posImageExportSize = Math.Round(Convert.ToDouble(value), 0).ToString();
+                _posImageExportSize = value;
                 OnPropertyChanged(nameof(PosImageExportSize));
             }
         }
     }
 
-    private string _posImageExportScale = "0,5";
-    public string PosImageExportScale
+    private double _posImageExportScale = 0.5;
+    public double PosImageExportScale
     {
         get => _posImageExportScale;
         set
         {
             if (_posImageExportScale != value)
             {
-                _posImageExportScale = Math.Round(Convert.ToDouble(value), 2).ToString();
+                _posImageExportScale = Math.Round(value, 2);
                 OnPropertyChanged(nameof(PosImageExportScale));
             }
         }

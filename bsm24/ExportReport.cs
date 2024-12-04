@@ -72,7 +72,7 @@ public partial class ExportReport
                                 if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                                 {
                                     D.Paragraph paragraph = new();
-                                    if (SettingsService.Instance.IsImageExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                                    if (SettingsService.Instance.IsImageExport)
                                     {
                                         // add Pictures
                                         foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos)
@@ -85,15 +85,15 @@ public partial class ExportReport
                                                 var overlayDrawingPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImageOverlayPath, overlayFile);
                                                 var _img = await XmlImage.GenerateImage(mainPart,
                                                                                         new FileResult(imgPath),
-                                                                                        Double.Parse(SettingsService.Instance.ImageExportScale),
-                                                                                        widthMilimeters: Int32.Parse(SettingsService.Instance.ImageExportSize),
-                                                                                        imageQuality: Int32.Parse(SettingsService.Instance.ImageExportQuality));
+                                                                                        SettingsService.Instance.ImageExportScale,
+                                                                                        widthMilimeters: SettingsService.Instance.ImageExportSize,
+                                                                                        imageQuality: SettingsService.Instance.ImageExportQuality);
                                                 paragraph.Append(new D.Run(_img));
                                             }
                                         }
                                     }
 
-                                    if (SettingsService.Instance.IsPosImageExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                                    if (SettingsService.Instance.IsPosImageExport)
                                     {
                                         // add Part of Plan Image
                                         var planName = GlobalJson.Data.Plans[plan.Key].File;
@@ -103,7 +103,7 @@ public partial class ExportReport
 
                                         // Pin-Icon ein/ausblenden
                                         var pinList = new List<(string, SKPoint, string, SKPoint)>();
-                                        if (SettingsService.Instance.IsPinIconExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                                        if (SettingsService.Instance.IsPinIconExport)
                                         {
                                             pinList =
                                             [
@@ -121,12 +121,12 @@ public partial class ExportReport
 
                                         var _imgPlan = await XmlImage.GenerateImage(mainPart,
                                                                                     new FileResult(planPath),
-                                                                                    Double.Parse(SettingsService.Instance.PosImageExportScale),
+                                                                                    SettingsService.Instance.PosImageExportScale,
                                                                                     new SKPoint((float)pinPos.X,
                                                                                     (float)pinPos.Y),
-                                                                                    new SKSize(Int32.Parse(SettingsService.Instance.PosImageExportSize), Int32.Parse(SettingsService.Instance.PosImageExportSize)),
-                                                                                    widthMilimeters: Int32.Parse(SettingsService.Instance.ImageExportSize),
-                                                                                    imageQuality: Int32.Parse(SettingsService.Instance.ImageExportQuality),
+                                                                                    new SKSize(SettingsService.Instance.PosImageExportSize, SettingsService.Instance.PosImageExportSize),
+                                                                                    widthMilimeters: SettingsService.Instance.ImageExportSize,
+                                                                                    imageQuality: SettingsService.Instance.ImageExportQuality,
                                                                                     overlayImages: pinList);
                                         paragraph.Append(new D.Run(_imgPlan));
                                     }
@@ -158,7 +158,7 @@ public partial class ExportReport
                 }
 
                 // Insert Plans
-                if (SettingsService.Instance.IsPlanExport.Equals("true", StringComparison.CurrentCultureIgnoreCase))
+                if (SettingsService.Instance.IsPlanExport)
                 {
                     // create Plan Index
                     if (mainPart?.Document?.Body != null)
@@ -224,8 +224,8 @@ public partial class ExportReport
                                             var _img = await XmlImage.GenerateImage(mainPart,
                                                                                     new FileResult(imgPath),
                                                                                     0.5,
-                                                                                    heightMilimeters: Int32.Parse(SettingsService.Instance.PlanExportSize),
-                                                                                    imageQuality: Int32.Parse(SettingsService.Instance.ImageExportQuality),
+                                                                                    heightMilimeters: SettingsService.Instance.PlanExportSize,
+                                                                                    imageQuality: SettingsService.Instance.ImageExportQuality,
                                                                                     overlayImages: pinList);
 
                                             var runProperties = new D.RunProperties(); // definiere Schriftgrösse

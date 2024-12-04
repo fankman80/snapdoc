@@ -1,7 +1,7 @@
 ﻿#nullable disable
 
 using bsm24.Models;
-using Microsoft.Maui.Storage;
+using bsm24.Services;
 using PDFtoImage;
 using SkiaSharp;
 using UraniumUI.Pages;
@@ -52,7 +52,7 @@ public partial class LoadPDFPages : UraniumContentPage
                 for (int i = 0; i < pagecount; i++)
                 {
                     string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
-                    Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: 300));
+                    Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: SettingsService.Instance.PdfQuality));
 
                     // Bildgrösse auslesen
                     var stream = File.OpenRead(imgPath);

@@ -61,6 +61,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Remove="Models\ImageQuality.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 	  <None Remove="FodyWeavers.xml" />
 	  <None Remove="FodyWeavers.xsd" />
 	  <None Remove="Resources\AppIcon\icon1.png" />

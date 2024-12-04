@@ -101,7 +101,7 @@ public partial class NewPage: IQueryAttributable
             if (e.PropertyName == "Scale")
             {
                 var scale = 1 / PlanContainer.Scale;
-                var scaleLimit = Convert.ToDouble(SettingsService.Instance.PinScaleLimit);
+                var scaleLimit = SettingsService.Instance.PinScaleLimit;
                 foreach (MR.Gestures.Image img in PlanContainer.Children.Cast<MR.Gestures.Image>())
                 {
                     if (img.AutomationId != null)
@@ -150,7 +150,7 @@ public partial class NewPage: IQueryAttributable
             TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
         };
 
-        var scaleLimit = Convert.ToDouble(SettingsService.Instance.PinScaleLimit);
+        var scaleLimit = SettingsService.Instance.PinScaleLimit;
         if (scaleLimit < 1) smallImage.Scale = scaleLimit;
 
         smallImage.Down += (s, e) =>
