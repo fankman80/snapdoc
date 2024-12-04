@@ -26,8 +26,6 @@ public partial class ProjectDetails : UraniumContentPage
         creation_date.Date = GlobalJson.Data.Creation_date;
 
         HeaderUpdate();
-        
-
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)

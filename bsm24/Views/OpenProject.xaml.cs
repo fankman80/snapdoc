@@ -108,11 +108,11 @@ public partial class OpenProject : UraniumContentPage
         {
             var button = sender as Button;
             if (button.BindingContext is FileItem item)
-            { 
+            {
                 string sourceDirectory = Path.GetDirectoryName(item.FilePath); // Pfad zum zu zippenden Ordner
                 string outputPath = Path.Combine(FileSystem.AppDataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
-                    
-                    
+
+
                 busyOverlay.IsVisible = true;
                 activityIndicator.IsRunning = true;
                 busyText.Text = "Daten werden komprimiert...";
@@ -194,7 +194,7 @@ public partial class OpenProject : UraniumContentPage
     }
 
 
-private async void OnDeleteClicked(object sender, EventArgs e)
+    private async void OnDeleteClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse("Wollen Sie dieses Projekt wirklich löschen?");
         await MopupService.Instance.PushAsync(popup);

@@ -3,7 +3,6 @@
 using bsm24.Services;
 using bsm24.Views;
 using Mopups.Services;
-using System.Globalization;
 using System.Windows.Input;
 
 namespace bsm24;

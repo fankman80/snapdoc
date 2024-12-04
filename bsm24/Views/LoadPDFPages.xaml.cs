@@ -184,7 +184,7 @@ public partial class LoadPDFPages : UraniumContentPage
 
                 // Schleife, bis ein einzigartiger Name gefunden wird
                 string planName;
-                int j=0;
+                int j = 0;
                 do
                 {
                     planName = "Plan " + j;

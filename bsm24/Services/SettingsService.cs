@@ -8,8 +8,6 @@ public partial class SettingsService : INotifyPropertyChanged
     private static SettingsService _instance;
     public static SettingsService Instance => _instance ??= new SettingsService();
 
-
-
     private SettingsService()
     {
         Themes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Flower", "Barbie"];

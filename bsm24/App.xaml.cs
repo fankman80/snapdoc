@@ -1,5 +1,4 @@
-﻿using bsm24.Services;
-using UraniumUI;
+﻿using UraniumUI;
 #if WINDOWS
 using Microsoft.UI.Windowing;
 #endif
