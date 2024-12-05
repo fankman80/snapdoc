@@ -3,6 +3,7 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
+using Microsoft.Maui.Storage;
 using Mopups.Services;
 using MR.Gestures;
 using System.Diagnostics;
@@ -289,15 +290,16 @@ public partial class NewPage: IQueryAttributable
         {
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string newPin = "a_pin_red.png";
+            var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(newPin, StringComparison.OrdinalIgnoreCase));
             Pin newPinData = new()
             {
                 Pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY),
-                Anchor = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).anchor,
-                Size = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).size,
+                Anchor = iconItem.AnchorPoint,
+                Size = iconItem.IconSize,
                 IsLocked = false,
-                IsLockRotate = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).isLockRotate,
+                IsLockRotate = iconItem.IsRotationLocked,
                 InfoTxt = "",
-                PinTxt = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(newPin, StringComparison.OrdinalIgnoreCase)).imageName,
+                PinTxt = iconItem.DisplayName,
                 PinIcon = newPin,
                 Fotos = []
             };

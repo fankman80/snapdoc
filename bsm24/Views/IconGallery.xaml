@@ -6,29 +6,41 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"            
+             xmlns:local="clr-namespace:bsm24"  
              x:Class="bsm24.Views.IconGallery"
              x:DataType="views:IconGallery"
              BackgroundColor="White"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Title="Pin auswählen">
 
-    <CollectionView x:Name="ImageGallery"
-                    ItemsSource="{Binding Images}"
-                    VerticalOptions="FillAndExpand">
-        <CollectionView.ItemsLayout>
-            <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
-        </CollectionView.ItemsLayout>
-        <CollectionView.ItemTemplate>
-            <DataTemplate x:DataType="x:String">
-                <ff:CachedImage Source="{Binding .}"
-                        Aspect="AspectFit"
-                        Margin="0,0,10,10">
-                    <ff:CachedImage.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnImageTapped" />
-                    </ff:CachedImage.GestureRecognizers>
-                </ff:CachedImage>
-            </DataTemplate>
-        </CollectionView.ItemTemplate>
-    </CollectionView>
-
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            x:Name="btnRows"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Splitscreen_landscape}}"
+            Text="Liste"
+            Clicked="OnChangeRowsClicked"/>
+    </ContentPage.ToolbarItems>
+    <ScrollView>
+        <CollectionView x:Name="IconCollectionView"
+                        ItemsSource="{Binding Icons}"
+                        SelectionMode="Single">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:IconItem">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="64" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <Image Grid.Column="0" Source="{Binding FileName}" Aspect="AspectFill" HeightRequest="64" WidthRequest="64" />
+                        <Label Grid.Column="1" Text="{Binding DisplayName}"
+                               IsVisible="{Binding IsListMode}"
+                               VerticalOptions="Center" Margin="16,0,0,0"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </ScrollView>
 </uranium:UraniumContentPage>

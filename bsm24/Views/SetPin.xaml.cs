@@ -117,8 +117,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private async void OnOkayClick(object sender, EventArgs e)
     {
         // write data
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).anchor;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = Settings.PinData.FirstOrDefault(item => item.fileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase)).size;
+        var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase));
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt = PinTxt.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].InfoTxt = PinInfo.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;

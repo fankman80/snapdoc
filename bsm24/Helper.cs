@@ -1,7 +1,6 @@
 ﻿
 #nullable disable
 
-using SixLabors.Fonts;
 using System.Reflection;
 
 namespace bsm24;
