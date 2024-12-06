@@ -26,33 +26,31 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
-            <ScrollView Grid.Row="0">
-                <CollectionView x:Name="fileListView">
-                    <CollectionView.ItemsLayout>
-                        <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
-                    </CollectionView.ItemsLayout>
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="local:ImageItem">
-                            <Border Stroke="Gray"
-                                    StrokeThickness="0"
-                                    Padding="16">
-                                <Grid>
-                                    <ff:CachedImage Source="{Binding ImagePath}"
-                                                    Aspect="AspectFill"
-                                                    CacheType="Memory"/>
-                                    <CheckBox IsChecked="{Binding IsChecked}"
-                                                Color="{DynamicResource Primary}"
-                                                VerticalOptions="End"
-                                                HorizontalOptions="End"
-                                                Margin="8"/>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </ScrollView>
-    
+
+            <CollectionView x:Name="fileListView" Grid.Row="0">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:ImageItem">
+                        <Border Stroke="Gray"
+                                StrokeThickness="0"
+                                Padding="16">
+                            <Grid>
+                                <ff:CachedImage Source="{Binding ImagePath}"
+                                                CacheType="Memory"
+                                                Aspect="AspectFill"/>
+                                <CheckBox IsChecked="{Binding IsChecked}"
+                                        Color="{DynamicResource Primary}"
+                                        VerticalOptions="End"
+                                        HorizontalOptions="End"
+                                        Margin="8"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
             <Grid Grid.Row="1" Margin="0,6,16,16">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -74,6 +72,7 @@
                         Clicked="OnPagesAddClicked"/>
             </Grid>
         </Grid>
+        
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
                 BackgroundColor="Black"

@@ -7,5 +7,4 @@ public class IconItem(string fileName, string displayName, Point anchorPoint, Si
     public Point AnchorPoint { get; set; } = anchorPoint;
     public Size IconSize { get; set; } = iconSize;
     public bool IsRotationLocked { get; set; } = isRotationLocked;
-    public bool IsListMode { get; set; } = true;
 }

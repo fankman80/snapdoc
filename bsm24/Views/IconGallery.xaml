@@ -56,7 +56,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </Grid>
+        </Grid>            
 
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"

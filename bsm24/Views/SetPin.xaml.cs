@@ -1,10 +1,10 @@
-﻿using bsm24.Models;
+﻿#nullable disable
+
+using bsm24.Models;
 using FFImageLoading.Maui;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
-
-#nullable disable
 
 namespace bsm24.Views;
 

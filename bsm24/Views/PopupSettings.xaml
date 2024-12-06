@@ -26,7 +26,7 @@
         <VerticalStackLayout x:DataType="services:SettingsService">
             <Label Text="{Binding PinScaleLimit, StringFormat='Pingrösse limitieren: {0:0.##}'}" />
             <Slider Maximum="2"
-                    Minimum="0.01"
+                    Minimum="0.1"
                     ThumbColor="{DynamicResource Primary}"
                     MinimumTrackColor="{DynamicResource Primary}"
                     MaximumTrackColor="{DynamicResource PrimaryDark}"

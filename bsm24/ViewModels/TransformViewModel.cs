@@ -81,11 +81,11 @@ public partial class TransformViewModel : CustomEventArgsViewModel
 
         if (!IsPinchingEnabled) return;
         var newScale = Scale * e.DeltaScale;
-        Scale = Math.Min(5, Math.Max(0.1, newScale));
+        Scale = Math.Min(10, Math.Max(0.05, newScale));
         var newScaleX = ScaleX * e.DeltaScaleX;
-        ScaleX = Math.Min(5, Math.Max(0.1, newScaleX));
+        ScaleX = Math.Min(10, Math.Max(0.05, newScaleX));
         var newScaleY = ScaleY * e.DeltaScaleY;
-        ScaleY = Math.Min(5, Math.Max(0.1, newScaleY));
+        ScaleY = Math.Min(10, Math.Max(0.05, newScaleY));
     }
 
     protected override void OnRotating(RotateEventArgs e)
