@@ -1,8 +1,7 @@
-﻿using System.Collections.ObjectModel;
-using UraniumUI.Pages;
-using FFImageLoading.Maui;
+﻿#nullable disable
 
-#nullable disable
+using System.Collections.ObjectModel;
+using UraniumUI.Pages;
 
 namespace bsm24.Views;
 
@@ -15,18 +14,16 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     public Command<IconItem> IconTappedCommand { get; }
     public string PlanId { get; set; }
     public string PinId { get; set; }
-    public int DynamicSpan { get; set; }
-    public int MinSize;
-    public bool IsListMode { get; set; }
+    public int DynamicSpan { get; set; } = 1;
+    public int MinSize { get; set; } = 1;
+    public bool IsListMode { get; set; } = true;
 
     public IconGallery()
     {
         InitializeComponent();
         SizeChanged += OnSizeChanged;
         Icons = new ObservableCollection<IconItem>(Settings.PinData);
-        IconTappedCommand = new Command<IconItem>(OnIconTapped);
         BindingContext = this;
-        OnChangeRowsClicked(null,null);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -37,15 +34,16 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             PinId = value2 as string;
     }
 
+
     private void OnSizeChanged(object sender, EventArgs e)
     {
         UpdateSpan();
     }
 
-    private async void OnIconTapped(IconItem tappedIcon)
+    private async void OnIconClicked(object sender, EventArgs e)
     {
-        var tappedImage = tappedIcon; //sender as CachedImage;
-        var fileName = tappedImage.FileName;
+        var button = sender as Button;
+        var fileName = button.AutomationId;
 
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
 
@@ -77,7 +75,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                 Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
                 Color = Application.Current.RequestedTheme == AppTheme.Dark
                         ? (Color)Application.Current.Resources["Primary"]
-                        : (Color)Application.Current.Resources["PrimaryDark"]   
+                        : (Color)Application.Current.Resources["PrimaryDark"]
             };
             IsListMode = false;
         }
@@ -99,15 +97,25 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         UpdateSpan();
     }
 
-    private void UpdateSpan()
+    private async void UpdateSpan()
     {
-        if (btnRows.Text == "Raster")
+        busyOverlay.IsVisible = true;
+        activityIndicator.IsRunning = true;
+        busyText.Text = "Icons werden geladen...";
+
+        await Task.Run(() =>
         {
-            double screenWidth = this.Width;
-            double imageWidth = 64; // Mindestbreite in Pixeln
-            DynamicSpan = Math.Max(MinSize, (int)(screenWidth / imageWidth));
-        }
-        OnPropertyChanged(nameof(DynamicSpan));
-        OnPropertyChanged(nameof(IsListMode));
+            if (btnRows.Text == "Raster")
+            {
+                double screenWidth = this.Width;
+                double imageWidth = 76; // Mindestbreite in Pixeln
+                DynamicSpan = Math.Max(MinSize, (int)(screenWidth / imageWidth));
+            }
+            OnPropertyChanged(nameof(DynamicSpan));
+            OnPropertyChanged(nameof(IsListMode));
+        });
+
+        activityIndicator.IsRunning = false;
+        busyOverlay.IsVisible = false;
     }
 }
