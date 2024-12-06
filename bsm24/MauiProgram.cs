@@ -4,7 +4,6 @@ using Mopups.Hosting;
 using MR.Gestures;
 using UraniumUI;
 using CommunityToolkit.Maui.Storage;
-
 using FFImageLoading.Maui;
 
 namespace bsm24;
