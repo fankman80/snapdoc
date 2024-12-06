@@ -24,10 +24,10 @@ public partial class LoadPDFPages : UraniumContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        LoadPDFImages();
+        LoadPreviewPDFImages();
     }
 
-    private async void LoadPDFImages()
+    private async void LoadPreviewPDFImages()
     {
         result = await PickPdfFileAsync();
         if (result != null)
@@ -35,7 +35,7 @@ public partial class LoadPDFPages : UraniumContentPage
             List<ImageItem> pdfImages = [];
             busyOverlay.IsVisible = true;
             activityIndicator.IsRunning = true;
-            busyText.Text = "PDF wird konvertiert...";
+            busyText.Text = "Lade PDF Seiten...";
 
             await Task.Run(() =>
             {
@@ -51,16 +51,17 @@ public partial class LoadPDFPages : UraniumContentPage
                 for (int i = 0; i < pagecount; i++)
                 {
                     string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
-                    Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(Dpi: SettingsService.Instance.PdfQuality));
+                    string previewPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "preview_" + i + ".jpg");
+                    Conversion.SaveJpeg(previewPath, bytearray, i, options: new RenderOptions(Dpi: 50));
 
-                    // Bildgrösse auslesen
-                    var stream = File.OpenRead(imgPath);
+                    var stream = File.OpenRead(previewPath);
                     var skBitmap = SKBitmap.Decode(stream);
                     Size _imgSize = new(skBitmap.Width, skBitmap.Height);
 
                     pdfImages.Add(new ImageItem
                     {
                         ImagePath = imgPath,
+                        PreviewPath = previewPath,
                         IsChecked = true,
                     });
                 }
@@ -72,6 +73,42 @@ public partial class LoadPDFPages : UraniumContentPage
         }
         else
             await Shell.Current.GoToAsync("..");
+    }
+
+    private async Task LoadPDFImages()
+    {
+        List<ImageItem> pdfImages = [];
+        busyOverlay.IsVisible = true;
+        activityIndicator.IsRunning = true;
+        busyText.Text = "PDF wird konvertiert...";
+
+        await Task.Run(() =>
+        {
+            byte[] bytearray = File.ReadAllBytes(result.FullPath);
+            int pagecount = Conversion.GetPageCount(bytearray);
+
+            var cacheDir = Path.Combine(FileSystem.AppDataDirectory, "cache");
+            if (!Directory.Exists(cacheDir))
+            {
+                Directory.CreateDirectory(cacheDir);
+            }
+
+            for (int i = 0; i < pagecount; i++)
+            {
+                string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
+                string previewImgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "preview_" + i + ".jpg");
+                Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(SettingsService.Instance.PdfQuality));
+
+                var stream = File.OpenRead(imgPath);
+                var skBitmap = SKBitmap.Decode(stream);
+                Size _imgSize = new(skBitmap.Width, skBitmap.Height);
+                if (File.Exists(previewImgPath))
+                    File.Delete(previewImgPath);
+            }
+        });
+
+        activityIndicator.IsRunning = false;
+        busyOverlay.IsVisible = false;
     }
 
     public static async Task<FileResult> PickPdfFileAsync()
@@ -146,8 +183,10 @@ public partial class LoadPDFPages : UraniumContentPage
         UpdateSpan();
     }
 
-    private void AddPdfImages()
+    private async void AddPdfImages()
     {
+        await LoadPDFImages(); //generiere High-Res Images
+        
         string imageDirectory = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath);
         int i = 0;
 
@@ -163,7 +202,6 @@ public partial class LoadPDFPages : UraniumContentPage
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string planSourceName = "plan_" + i + ".jpg";
 
-                // Bildgrösse auslesen
                 var stream = File.OpenRead(Path.Combine(Settings.CacheDirectory, planSourceName));
                 var skBitmap = SKBitmap.Decode(stream);
                 Size _imgSize = new(skBitmap.Width, skBitmap.Height);
@@ -207,8 +245,7 @@ public partial class LoadPDFPages : UraniumContentPage
             File.Delete(cacheFile);
         }
 
-
-        Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync("..");
     }
 
     private void UpdateSpan()

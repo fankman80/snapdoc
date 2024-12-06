@@ -37,7 +37,7 @@
                                 StrokeThickness="0"
                                 Padding="16">
                             <Grid>
-                                <ff:CachedImage Source="{Binding ImagePath}"
+                                <ff:CachedImage Source="{Binding PreviewPath}"
                                                 CacheType="Memory"
                                                 Aspect="AspectFill"/>
                                 <CheckBox IsChecked="{Binding IsChecked}"

@@ -6,7 +6,8 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"            
-             xmlns:local="clr-namespace:bsm24"  
+             xmlns:local="clr-namespace:bsm24"
+             x:Name="IconGalleryPage"
              x:Class="bsm24.Views.IconGallery"
              x:DataType="views:IconGallery"
              BackgroundColor="White"
@@ -24,10 +25,10 @@
     <Grid>
         <Grid Margin="10">
             <CollectionView x:Name="IconCollectionView"
-                            ItemsSource="{Binding Icons, Mode=OneWay}"
+                            ItemsSource="{Binding Icons}"
                             SelectionMode="Single">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan, Mode=OneWay}" />
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate>
@@ -37,18 +38,18 @@
                                 <ColumnDefinition Width="*" />
                             </Grid.ColumnDefinitions>
                             <ff:CachedImage Grid.Column="0"
-                                            Source="{Binding FileName, Mode=OneWay}"
+                                            Source="{Binding FileName}"
                                             CacheType="Memory"
                                             Aspect="AspectFill"
                                             Margin="6,6,6,6"/>
-                            <Label Grid.Column="1" Text="{Binding DisplayName, Mode=OneWay}"
+                            <Label Grid.Column="1" Text="{Binding DisplayName}"
                                    IsVisible="{Binding IsListMode}"
                                    VerticalOptions="Center"
                                    Margin="16,0,0,0"
                                    LineBreakMode="WordWrap"
                                    HorizontalOptions="FillAndExpand"/>
                             <Button Grid.ColumnSpan="2"
-                                    AutomationId = "{Binding FileName, Mode=OneWay}"
+                                    AutomationId = "{Binding FileName}"
                                     Background="Transparent"
                                     Clicked="OnIconClicked"
                                     HorizontalOptions="FillAndExpand"/>
@@ -60,23 +61,23 @@
 
         <!-- Overlay für Busy-Indikator -->
         <Grid x:Name="busyOverlay"
-                BackgroundColor="Black"
-                Opacity="0.7"
-                IsVisible="False"
-                VerticalOptions="FillAndExpand"
-                HorizontalOptions="FillAndExpand"
-                ZIndex="10">
+              BackgroundColor="Black"
+              Opacity="0.7"
+              IsVisible="False"
+              VerticalOptions="FillAndExpand"
+              HorizontalOptions="FillAndExpand"
+              ZIndex="10">
             <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
                 <ActivityIndicator x:Name="activityIndicator"
-                                    IsRunning="True"
-                                    VerticalOptions="Center"
-                                    HorizontalOptions="Center"
-                                    Color="White" />
+                                   IsRunning="True"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center"
+                                   Color="White" />
                 <Label x:Name="busyText"
-                        Text="Bitte warten..."
-                        TextColor="White"
-                        FontSize="Medium"
-                        HorizontalOptions="Center" />
+                       Text="Bitte warten..."
+                       TextColor="White"
+                       FontSize="Medium"
+                       HorizontalOptions="Center" />
             </StackLayout>
         </Grid>
     </Grid>

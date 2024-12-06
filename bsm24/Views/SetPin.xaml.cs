@@ -179,6 +179,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 public class ImageItem
 {
     public string ImagePath { get; set; }
+    public string PreviewPath { get; set; }
     public bool IsChecked { get; set; }
     public DateTime DateTime { get; set; }
 }

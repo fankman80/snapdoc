@@ -77,7 +77,7 @@ public partial class SettingsService : INotifyPropertyChanged
 #endif
 
 #if ANDROID
-    private double _pinScaleLimit = 0.5;
+    private double _pinScaleLimit = 0.3;
 #endif
 
     public double PinScaleLimit
@@ -101,7 +101,7 @@ public partial class SettingsService : INotifyPropertyChanged
         {
             if (_pdfQuality != value)
             {
-                _pdfQuality = value;
+                _pdfQuality = (int)(value / 50) * 50; ;
                 OnPropertyChanged(nameof(PdfQuality));
             }
         }
