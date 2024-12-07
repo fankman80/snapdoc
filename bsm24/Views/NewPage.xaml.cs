@@ -349,7 +349,7 @@ public partial class NewPage: IQueryAttributable
     {
         var popup1 = new PopupEditPlan(GlobalJson.Data.Plans[PlanId].Name);
         await MopupService.Instance.PushAsync(popup1);
-        var result = await popup1.PopupDismissedTask; //Item1=String Item2=Rotation Integer
+        var result = await popup1.PopupDismissedTask;
 
         switch (result)
         {
