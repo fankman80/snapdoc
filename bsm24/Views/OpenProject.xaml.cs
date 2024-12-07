@@ -227,9 +227,9 @@ public partial class OpenProject : UraniumContentPage
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        var popup1 = new PopupEditPlan(GlobalJson.Data.Plans[PlanId].Name);
-        await MopupService.Instance.PushAsync(popup1);
-        var result = await popup1.PopupDismissedTask; //Item1=String Item2=Rotation Integer
+        var popup= new PopupEntry(GlobalJson.Data.Plans[PlanId].Name);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
     }
 
     private static void HeaderUpdate()
