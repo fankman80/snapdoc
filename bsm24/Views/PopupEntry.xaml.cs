@@ -7,14 +7,13 @@ namespace bsm24.Views;
 
 public partial class PopupEntry : PopupPage
 {
-
-TaskCompletionSource<string> _taskCompletionSource;
-public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
-public string ReturnValue { get; set; }
+    TaskCompletionSource<string> _taskCompletionSource;
+    public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
+    public string ReturnValue { get; set; }
 
     public PopupEntry(string title, string okText = "Ok", string cancelText = "Abbrechen")
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         titleText.Text = title;
         okButtonText.Text = okText;
         cancelButtonText.Text = cancelText;
