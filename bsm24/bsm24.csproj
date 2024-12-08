@@ -180,9 +180,6 @@
 	  <MauiXaml Update="Views\PopupEntry.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupEditPlan.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
 	  <MauiXaml Update="Views\OpenProject.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
@@ -221,9 +218,6 @@
 	  </Compile>
 	  <Compile Update="Views\PopupEntry.xaml.cs">
 	    <DependentUpon>PopupEntry.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupEditPlan.xaml.cs">
-	    <DependentUpon>PopupEditPlan.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\HomeScreen.xaml.cs">
 	    <DependentUpon>HomeScreen.xaml</DependentUpon>

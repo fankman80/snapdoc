@@ -35,8 +35,12 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 
-            Text="Plan bearbeiten"            
-            Clicked="OnEditButtonClicked"/>
+            Text="Umbenennen"            
+            Clicked="OnEditClick"/>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}" 
+            Text="Löschen"            
+            Clicked="OnDeleteClick"/>
     </ContentPage.ToolbarItems>
 
     <AbsoluteLayout IsClippedToBounds="True" x:DataType="pc:TransformViewModel">

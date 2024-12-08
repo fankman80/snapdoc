@@ -3,11 +3,8 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
-using Microsoft.Maui.Storage;
 using Mopups.Services;
 using MR.Gestures;
-using System.Diagnostics;
-using System.Globalization;
 
 namespace bsm24.Views;
 
@@ -345,51 +342,47 @@ public partial class NewPage: IQueryAttributable
         planContainer.Scale = targetScale;
     }
 
-    private async void OnEditButtonClicked(object sender, EventArgs e)
+    private async void OnEditClick(object sender, EventArgs e)
     {
-        var popup1 = new PopupEditPlan(GlobalJson.Data.Plans[PlanId].Name);
-        await MopupService.Instance.PushAsync(popup1);
-        var result = await popup1.PopupDismissedTask;
+        var popup = new PopupEntry(title: "Plan umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Name);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
 
-        switch (result)
+        if (result != null)
         {
-            case null:
-                break;
+            // ändert das dazugehörige Menü-Item
+            (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result;
 
-            case "Delete":
-                var popup2 = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?");
-                await MopupService.Instance.PushAsync(popup2);
-                var result2 = await popup2.PopupDismissedTask;
-                if (result2 != null)
-                {
-                    // löscht das dazugehörige Menü-Item
-                    var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
-                    if (shellItem != null)
-                        (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
+            // ändert Titel vom View
+            Title = result;
 
-                    string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-                    if (File.Exists(file))
-                        File.Delete(file);
+            GlobalJson.Data.Plans[PlanId].Name = result;
 
-                    GlobalJson.Data.Plans.Remove(PlanId);
+            // save data to file
+            GlobalJson.SaveToFile();
+        }
+    }
 
-                    // save data to file
-                    GlobalJson.SaveToFile();
-                }
-                break;
+    private async void OnDeleteClick(object sender, EventArgs e)
+    {
+        var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+        if (result != null)
+        {
+            // löscht das dazugehörige Menü-Item
+            var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
+            if (shellItem != null)
+                (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
 
-            default:
-                // ändert das dazugehörige Menü-Item
-                (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result;
+            string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+            if (File.Exists(file))
+                File.Delete(file);
 
-                // ändert Titel vom View
-                Title = result;
+            GlobalJson.Data.Plans.Remove(PlanId);
 
-                GlobalJson.Data.Plans[PlanId].Name = result;
-
-                // save data to file
-                GlobalJson.SaveToFile();
-                break;
+            // save data to file
+            GlobalJson.SaveToFile();
         }
     }
 

@@ -11,12 +11,13 @@ public partial class PopupEntry : PopupPage
     public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
 
-    public PopupEntry(string title, string okText = "Ok", string cancelText = "Abbrechen")
+    public PopupEntry(string title, string inputTxt = "", string okText = "Ok", string cancelText = "Abbrechen")
     {
         InitializeComponent();
         titleText.Text = title;
         okButtonText.Text = okText;
         cancelButtonText.Text = cancelText;
+        text_entry.Text = inputTxt;
     }
 
     protected override void OnAppearing()

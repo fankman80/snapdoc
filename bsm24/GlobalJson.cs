@@ -16,6 +16,11 @@ public static class GlobalJson
         set => _userData = value;
     }
 
+    public static void UpdateFilePath(string filePath)
+    {
+        _filePath = filePath;
+    }
+
     public static JsonSerializerOptions GetOptions()
     {
         return new() { WriteIndented = true };
