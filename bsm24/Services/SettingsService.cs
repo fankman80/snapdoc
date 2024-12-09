@@ -124,6 +124,35 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
+    private int _planLabelSize = 64;
+    public int PlanLabelSize
+    {
+        get => _planLabelSize;
+        set
+        {
+            if (_planLabelSize != value)
+            {
+                _planLabelSize = value;
+                OnPropertyChanged(nameof(PlanLabelSize));
+            }
+        }
+    }
+
+
+    private string _planLabelPrefix = "Pos. ";
+    public string PlanLabelPrefix
+    {
+        get => _planLabelPrefix;
+        set
+        {
+            if (_planLabelPrefix != value)
+            {
+                _planLabelPrefix = value;
+                OnPropertyChanged(nameof(PlanLabelPrefix));
+            }
+        }
+    }
+
     private bool _isPlanExport = true;
     public bool IsPlanExport
     {
@@ -222,7 +251,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _posImageExportSize = 600;
+    private int _posImageExportSize = 40;
     public int PosImageExportSize
     {
         get => _posImageExportSize;
@@ -232,6 +261,34 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _posImageExportSize = value;
                 OnPropertyChanged(nameof(PosImageExportSize));
+            }
+        }
+    }
+
+    private int _pinPosExportSize = 30;
+    public int PinPosExportSize
+    {
+        get => _pinPosExportSize;
+        set
+        {
+            if (_pinPosExportSize != value)
+            {
+                _pinPosExportSize = value;
+                OnPropertyChanged(nameof(PinPosExportSize));
+            }
+        }
+    }
+
+    private int _pinPosCropExportSize = 400;
+    public int PinPosCropExportSize
+    {
+        get => _pinPosCropExportSize;
+        set
+        {
+            if (_pinPosCropExportSize != value)
+            {
+                _pinPosCropExportSize = value;
+                OnPropertyChanged(nameof(PinPosCropExportSize));
             }
         }
     }

@@ -95,6 +95,11 @@ public partial class PopupExportSettings : PopupPage
         await MopupService.Instance.PopAsync();
     }
 
+    private void OnColorPickClicked(object sender, EventArgs e)
+    {
+
+    }
+
     private static async Task ShareFileAsync(string filePath)
     {
         var file = new ShareFile(filePath);

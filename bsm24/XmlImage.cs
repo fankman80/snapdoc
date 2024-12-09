@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using bsm24.Services;
 using Codeuctivity.OpenXmlPowerTools;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
@@ -54,7 +55,7 @@ public partial class XmlImage
         {
             // Font definition
             var typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold);
-            var font = new SKFont { Size = 96.0f, Edging = SKFontEdging.Antialias, Typeface = typeface };
+            var font = new SKFont { Size = SettingsService.Instance.PlanLabelSize, Edging = SKFontEdging.Antialias, Typeface = typeface };
             var paint = new SKPaint { Color = new SKColor(255, 0, 0) };
 
             foreach ((string, SKPoint, string, SKPoint) overlayImage in overlayImages.Select(v => v))
@@ -84,7 +85,7 @@ public partial class XmlImage
                                             (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item4.Y));
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
                     canvas.DrawBitmap(overlay, _pos);
-                    canvas.DrawText(overlayImage.Item3, _pos, SKTextAlign.Left, font, paint);
+                    canvas.DrawText(overlayImage.Item3, new SKPoint(_pos.X + overlay.Width, _pos.Y), SKTextAlign.Left, font, paint);
                 }
                 skBitmap = combinedBitmap;
             }
