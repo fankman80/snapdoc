@@ -16,9 +16,10 @@
              BackgroundColor="#60000000"
              Title="Export Settings">
 
-    <Grid VerticalOptions="FillAndExpand" HorizontalOptions="FillAndExpand">
+    <Grid>
         <Border
             StrokeShape="RoundRectangle 20,20,20,20"
+            Margin="0,60,0,60"
             Padding="16,16,16,16"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
