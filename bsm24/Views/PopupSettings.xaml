@@ -64,26 +64,26 @@
 
             <material:PickerField
                 x:Name="colorThemePicker"
-                Title="UI-Thema:"
+                Title="Farbthema:"
                 AccentColor="{DynamicResource Primary}"
                 TitleColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                 ItemsSource="{Binding Themes}"
                 SelectedItem="{Binding SelectedTheme}"
                 BindingContextChanged="OnSelectedValueChanged">
             </material:PickerField>
-            
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
-                    Text="OK"                        
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                   
-                    Clicked="OnOkClicked" />
+                        Text="OK"
+                        MinimumWidthRequest="100"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                   
+                        Clicked="OnOkClicked" />
             </Grid>
         </VerticalStackLayout>
     </Border>
-
 </Mopups:PopupPage>

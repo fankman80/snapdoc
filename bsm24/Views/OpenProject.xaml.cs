@@ -186,7 +186,14 @@ public partial class OpenProject : UraniumContentPage
             using var zipOutputStream = new ZipOutputStream(fsOut);
             zipOutputStream.SetLevel(9); // Set compression level (0-9)
 
-            OpenProject.CompressFolder(sourceDirectory, zipOutputStream, sourceDirectory.Length + 1);
+            // Name des Ordners, der gezippt wird
+            string folderName = Path.GetFileName(sourceDirectory);
+
+            // Übergeordnetes Verzeichnis bestimmen, um den Ordner selbst in das Zip einzuschließen
+            string baseDirectory = Path.GetDirectoryName(sourceDirectory) ?? "";
+
+            // Den Ordner und dessen Inhalte komprimieren
+            OpenProject.CompressFolder(sourceDirectory, zipOutputStream, baseDirectory.Length + 1);
 
             zipOutputStream.Finish();
         }

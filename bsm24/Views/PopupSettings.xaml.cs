@@ -37,7 +37,6 @@ public partial class PopupSettings : PopupPage
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        ReturnValue = null;
         SettingsService.Instance.SaveSettings();
         await MopupService.Instance.PopAsync();
     }

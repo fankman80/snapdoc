@@ -52,21 +52,21 @@
 
                             <Switch Grid.Column="1" Grid.Row="0"
                                     x:Name="isPlanExport"
-                                    Margin="0,-10,0,0"                       
+                                    Margin="0,-8,0,0"                       
                                     ThumbColor="{DynamicResource Primary}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsPlanExport}"/>
 
                             <Switch Grid.Column="1" Grid.Row="1"
                                     x:Name="isPosImageExport"
-                                    Margin="0,-10,0,0"                      
+                                    Margin="0,-8,0,0"                      
                                     ThumbColor="{DynamicResource Primary}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsPosImageExport}"/>
 
                             <Switch Grid.Column="1" Grid.Row="2"
                                     x:Name="isImageExport"
-                                    Margin="0,-10,0,0"
+                                    Margin="0,-8,0,0"
 
                                     ThumbColor="{DynamicResource Primary}"
                                     OnColor="{DynamicResource Secondary}"
@@ -74,7 +74,7 @@
 
                             <Switch Grid.Column="1" Grid.Row="3"
                                     x:Name="isPinIconExport"
-                                    Margin="0,-10,0,0"
+                                    Margin="0,-8,0,0"
                                     VerticalOptions="Start"
                                     ThumbColor="{DynamicResource Primary}"
                                     OnColor="{DynamicResource Secondary}"
@@ -174,16 +174,19 @@
                         <ColumnDefinition Width="*" />
                     </Grid.ColumnDefinitions>
                     <Button Grid.Column="0"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Close}}"
                         Clicked="OnCancelClicked" />
                     <Button Grid.Column="1"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Share}}"
                         Clicked="OnShareClicked" />
                     <Button Grid.Column="2"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Save}}"
