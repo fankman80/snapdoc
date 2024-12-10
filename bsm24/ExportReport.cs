@@ -9,33 +9,33 @@ namespace bsm24;
 
 public partial class ExportReport
 {
-    private static readonly Dictionary<string, string> placeholders_single = new()
-    {
-        {"${client_name}", GlobalJson.Data.Client_name},
-        {"${object_address}", GlobalJson.Data.Object_address},
-        {"${working_title}", GlobalJson.Data.Working_title},
-        {"${object_name}", GlobalJson.Data.Object_name},
-        {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
-        {"${project_manager}", GlobalJson.Data.Project_manager},
-    };
-    private static readonly Dictionary<string, string> placeholders_lists = new()
-    {
-        {"${plan_indexes}", "${plan_indexes}"}, //bereinige splitted runs
-        {"${plan_images}", "${plan_images}"},   //bereinige splitted runs  
-        {"${title_image}", "${title_image}"},   //bereinige splitted runs
-    };
-    private static readonly Dictionary<string, string> placeholders_table = new()
-    {
-        {"${pin_nr}", "${pin_nr}"},             //bereinige splitted runs
-        {"${pin_planName}", "${pin_planName}"}, //bereinige splitted runs
-        {"${pin_posImage}", "${pin_posImage}"}, //bereinige splitted runs
-        {"${pin_fotoList}", "${pin_fotoList}"}, //bereinige splitted runs
-        {"${pin_info}", "${pin_info}"},         //bereinige splitted runs
-        {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
-    };
-
     public static async Task DocX(string templateDoc, string savePath)
     {
+        Dictionary<string, string> placeholders_single = new()
+        {
+            {"${client_name}", GlobalJson.Data.Client_name},
+            {"${object_address}", GlobalJson.Data.Object_address},
+            {"${working_title}", GlobalJson.Data.Working_title},
+            {"${object_name}", GlobalJson.Data.Object_name},
+            {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
+            {"${project_manager}", GlobalJson.Data.Project_manager},
+        };
+        Dictionary<string, string> placeholders_lists = new()
+        {
+            {"${plan_indexes}", "${plan_indexes}"}, //bereinige splitted runs
+            {"${plan_images}", "${plan_images}"},   //bereinige splitted runs  
+            {"${title_image}", "${title_image}"},   //bereinige splitted runs
+        };
+        Dictionary<string, string> placeholders_table = new()
+        {
+            {"${pin_nr}", "${pin_nr}"},             //bereinige splitted runs
+            {"${pin_planName}", "${pin_planName}"}, //bereinige splitted runs
+            {"${pin_posImage}", "${pin_posImage}"}, //bereinige splitted runs
+            {"${pin_fotoList}", "${pin_fotoList}"}, //bereinige splitted runs
+            {"${pin_info}", "${pin_info}"},         //bereinige splitted runs
+            {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
+        };
+
         // Eine Kopie der Vorlage im MemoryStream öffnen, um das Original nicht zu verändern
         using MemoryStream memoryStream = new();
 
@@ -84,7 +84,7 @@ public partial class ExportReport
             {
                 if (table != null)
                 {
-                    List<(int, string)> columnList = SearchTableColumns(table); // Suche SpaltenNummern
+                    List<(int, string)> columnList = SearchTableColumns(table, placeholders_table); // Suche SpaltenNummern
                     int i = 1;
                     foreach (var plan in GlobalJson.Data.Plans)
                     {
@@ -322,7 +322,7 @@ public partial class ExportReport
         memoryStream.CopyTo(outputFileStream);
     }
 
-    private static List<(int, string)> SearchTableColumns(D.Table table)
+    private static List<(int, string)> SearchTableColumns(D.Table table, Dictionary<string, string> placeholders_table)
     {
         List<(int, string)> columnList = [];
 

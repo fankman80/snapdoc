@@ -1,4 +1,5 @@
 ﻿using UraniumUI;
+using bsm24.Services;
 #if WINDOWS
 using Microsoft.UI.Windowing;
 #endif
@@ -13,6 +14,8 @@ public partial class App : Application
 
         System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
         System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
+
+        SettingsService.Instance.LoadSettings();
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

@@ -1,12 +1,16 @@
 ﻿#nullable disable
 
+using bsm24.Models;
 using System.ComponentModel;
+using System.Text.Json;
 
 namespace bsm24.Services;
 public partial class SettingsService : INotifyPropertyChanged
 {
     private static SettingsService _instance;
     public static SettingsService Instance => _instance ??= new SettingsService();
+    
+    private const string SettingsFileName = "appsettings.ini";
 
     private SettingsService()
     {
@@ -463,6 +467,43 @@ public partial class SettingsService : INotifyPropertyChanged
     }
     #endregion
 
+    public void SaveSettings()
+    {
+        var settings = new SettingsModel
+        {
+            PinScaleLimit = this.PinScaleLimit,
+            IsPlanRotateLocked = this.IsPlanRotateLocked,
+            PdfQuality = this.PdfQuality,
+            SelectedTheme = this.SelectedTheme,
+            SelectedDarkMode = this.SelectedDarkMode
+        };
+
+        var json = JsonSerializer.Serialize(settings, GetOptions());
+        File.WriteAllText(Path.Combine(FileSystem.AppDataDirectory, SettingsFileName), json);
+    }
+
+    public void LoadSettings()
+    {
+        var filePath = Path.Combine(FileSystem.AppDataDirectory, SettingsFileName);
+        if (File.Exists(filePath))
+        {
+            var json = File.ReadAllText(filePath);
+            var settings = JsonSerializer.Deserialize<SettingsModel>(json);
+            if (settings != null)
+            {
+                this.PinScaleLimit = settings.PinScaleLimit;
+                this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
+                this.PdfQuality = settings.PdfQuality;
+                this.SelectedTheme = settings.SelectedTheme;
+                this.SelectedDarkMode = settings.SelectedDarkMode;
+            }
+        }
+    }
+
+    public static JsonSerializerOptions GetOptions()
+    {
+        return new() { WriteIndented = true };
+    }
 
     public event PropertyChangedEventHandler PropertyChanged;
 

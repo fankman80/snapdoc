@@ -8,9 +8,8 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:services="clr-namespace:bsm24.Services"
              x:Class="bsm24.Views.PopupSettings"
-             BackgroundClicked="PopupPage_BackgroundClicked"
              BackgroundInputTransparent="False"
-             CloseWhenBackgroundIsClicked="True"
+             CloseWhenBackgroundIsClicked="False"
              HasSystemPadding="False"
              BackgroundColor="#60000000"
              Title="Settings">
