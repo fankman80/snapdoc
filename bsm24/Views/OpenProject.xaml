@@ -11,8 +11,19 @@
              x:Class="bsm24.Views.OpenProject"
              Title="Projektliste">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Upload_file}}" 
+            Text="Importieren"            
+            Clicked="OnUploadClicked"/>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add_box}}" 
+            Text="Neu"            
+            Clicked="OnNewClicked"/>        
+    </ContentPage.ToolbarItems>
+
     <Grid>
-        <Grid Margin="16,0,16,0">
+        <Grid Margin="16,0,16,16">
             <CollectionView x:Name="fileListView" ItemsLayout="VerticalGrid, 1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">

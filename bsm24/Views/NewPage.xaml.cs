@@ -332,7 +332,6 @@ public partial class NewPage: IQueryAttributable
     {
         double zoomFactor = e.ScrollDelta.Y > 0 ? 1.4 : 0.6;
         double targetScale = PlanContainer.Scale * zoomFactor;
-        //targetScale = Math.Max(0.1, Math.Min(targetScale, 10)); // Begrenze den Skalierungsbereich
 
         planContainer.AnchorX = 1 / PlanContainer.Width * (mousePos.X - PlanContainer.TranslationX);
         planContainer.AnchorY = 1 / PlanContainer.Height * (mousePos.Y - PlanContainer.TranslationY);

@@ -3,6 +3,8 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
 using ICSharpCode.SharpZipLib.Zip;
+using MetadataExtractor.Util;
+using Microsoft.Maui.Storage;
 using Mopups.Services;
 using System.Globalization;
 using UraniumUI.Pages;
@@ -66,6 +68,74 @@ public partial class OpenProject : UraniumContentPage
         fileListView.Footer = foundFiles.Count + " Projekt(e)";
     }
 
+    private async void OnNewClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupEntry(title: "Neues Projekt eröffnen...", okText: "Erstellen");
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+        if (result != null)
+        {
+            string projectPath = result + "_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string filePath = Path.Combine(FileSystem.AppDataDirectory, projectPath, result + ".json");
+
+            LoadDataToView.ResetFlyoutItems();
+            LoadDataToView.ResetData();
+
+            GlobalJson.CreateNewFile(filePath);
+            GlobalJson.Data.Client_name = "";
+            GlobalJson.Data.Object_address = "";
+            GlobalJson.Data.Working_title = "";
+            GlobalJson.Data.Object_name = "";
+            GlobalJson.Data.Creation_date = DateTime.Now;
+            GlobalJson.Data.Project_manager = "";
+            GlobalJson.Data.ProjectPath = Path.Combine(projectPath);
+            GlobalJson.Data.JsonFile = Path.Combine(projectPath, result + ".json");
+            GlobalJson.Data.PlanPath = Path.Combine(projectPath, "plans");
+            GlobalJson.Data.ImagePath = Path.Combine(projectPath, "images");
+            GlobalJson.Data.ImageOverlayPath = Path.Combine(projectPath, "images", "originals");
+            GlobalJson.Data.ThumbnailPath = Path.Combine(projectPath, "thumbnails");
+
+            // save data to file
+            GlobalJson.SaveToFile();
+
+            await Shell.Current.GoToAsync("project_details");
+#if ANDROID
+            Shell.Current.FlyoutIsPresented = false;
+#endif
+        }
+    }
+
+    private async void OnUploadClicked(object sender, EventArgs e)
+    {
+        try
+        {
+            // Öffne den FilePicker nur für PDF-Dateien
+            var fileResult = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = "Bitte wähle eine Zip-Datei aus"
+            });
+
+            var targetDirectory = FileSystem.AppDataDirectory;
+            if (fileResult != null)
+            {
+                busyOverlay.IsVisible = true;
+                activityIndicator.IsRunning = true;
+                busyText.Text = "Projekt wird importiert...";
+                // Hintergrundoperation (nicht UI-Operationen)
+                await Task.Run(() => { UnzipToDirectory(fileResult.FullPath, targetDirectory); });
+                activityIndicator.IsRunning = false;
+                busyOverlay.IsVisible = false;
+                
+                LoadJsonFiles();
+            }
+        }
+        catch (Exception ex)
+        {
+            // Fehlerbehandlung (z.B. wenn der Benutzer den Picker abbricht)
+            Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
+        }  
+    }
+
     private async void OnProjectClicked(object sender, EventArgs e)
     {
         busyOverlay.IsVisible = true;
@@ -99,7 +169,6 @@ public partial class OpenProject : UraniumContentPage
         busyOverlay.IsVisible = false;
     }
 
-
     public static void ZipDirectory(string sourceDirectory, string zipFilePath)
     {
         try
@@ -108,14 +177,43 @@ public partial class OpenProject : UraniumContentPage
             using var zipOutputStream = new ZipOutputStream(fsOut);
             zipOutputStream.SetLevel(9); // Set compression level (0-9)
 
-            // Use recursive method to compress folder
-            OpenProject.CompressFolder(sourceDirectory, zipOutputStream, sourceDirectory.Length + 1);
+            string folderName = Path.GetFileName(sourceDirectory);
+            string baseDirectory = Path.GetDirectoryName(sourceDirectory) ?? "";
+
+            OpenProject.CompressFolder(sourceDirectory, zipOutputStream, baseDirectory.Length + 1);
 
             zipOutputStream.Finish();
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error zipping directory: {ex.Message}");
+        }
+    }
+
+    public static void UnzipToDirectory(string zipFilePath, string targetDirectory)
+    {
+        try
+        {
+            using var fsInput = File.OpenRead(zipFilePath);
+            using var zipInputStream = new ZipInputStream(fsInput);
+
+            ZipEntry entry;
+
+            while ((entry = zipInputStream.GetNextEntry()) != null)
+            {
+                string filePath = Path.Combine(targetDirectory, entry.Name);
+                var directoryName = Path.GetDirectoryName(filePath);
+
+                if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName))
+                    Directory.CreateDirectory(directoryName);
+
+                using var fileStream = File.Create(filePath);
+                zipInputStream.CopyTo(fileStream);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error unzipping file: {ex.Message}");
         }
     }
 
@@ -226,7 +324,6 @@ public partial class OpenProject : UraniumContentPage
 
                 activityIndicator.IsRunning = false;
                 busyOverlay.IsVisible = false;
-
 
                 CancellationToken cancellationToken = new();
                 var saveStream = File.Open(outputPath, FileMode.Open);
