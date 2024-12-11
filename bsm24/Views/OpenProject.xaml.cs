@@ -15,6 +15,7 @@ public partial class OpenProject : UraniumContentPage
     public OpenProject()
     {
         InitializeComponent();
+        BindingContext = this;
     }
 
     protected override void OnAppearing()
