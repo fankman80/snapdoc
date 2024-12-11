@@ -7,9 +7,8 @@ using System.Text.Json;
 namespace bsm24.Services;
 public partial class SettingsService : INotifyPropertyChanged
 {
-    private static SettingsService _instance;
-    public static SettingsService Instance => _instance ??= new SettingsService();
-    
+    public static SettingsService Instance { get; } = new SettingsService();
+
     private const string SettingsFileName = "appsettings.ini";
 
     private SettingsService()

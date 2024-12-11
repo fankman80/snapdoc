@@ -81,13 +81,12 @@ public partial class ProjectDetails : UraniumContentPage
                 FileTypes = FilePickerFileType.Jpeg
             });
             
-            string sourceFilePath = fileResult.FullPath;
-            var destinationPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "title_thumbnail.jpg");
-            var destinationThumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
-
-
             if (fileResult != null)
             {
+                string sourceFilePath = fileResult.FullPath;
+                var destinationPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "title_thumbnail.jpg");
+                var destinationThumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
+
                 if (File.Exists(destinationPath))
                     File.Delete(destinationPath);
                 if (File.Exists(destinationThumbPath))
@@ -140,6 +139,5 @@ public partial class ProjectDetails : UraniumContentPage
             SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
         else
             SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
-
     }
 }
