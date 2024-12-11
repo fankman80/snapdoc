@@ -6,7 +6,6 @@ using ICSharpCode.SharpZipLib.Zip;
 using Mopups.Services;
 using System.Globalization;
 using UraniumUI.Pages;
-using bsm24.Services;
 
 namespace bsm24.Views;
 public partial class OpenProject : UraniumContentPage
@@ -14,7 +13,6 @@ public partial class OpenProject : UraniumContentPage
     public OpenProject()
     {
         InitializeComponent();
-        BindingContext = this;
     }
 
     protected override void OnAppearing()
@@ -164,7 +162,7 @@ public partial class OpenProject : UraniumContentPage
 
                     GlobalJson.LoadFromFile(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
-                    HeaderUpdate();  // UI-Aktualisierung
+                    Helper.HeaderUpdate();  // UI-Aktualisierung
 
                     await Shell.Current.GoToAsync("project_details");
 #if ANDROID
@@ -307,7 +305,7 @@ public partial class OpenProject : UraniumContentPage
                     LoadDataToView.ResetData();
                     GlobalJson.LoadFromFile(newFilePath);
                     LoadDataToView.LoadData(new FileResult(newFilePath));
-                    HeaderUpdate();  // UI-Aktualisierung
+                    Helper.HeaderUpdate();  // UI-Aktualisierung
                 }
                 LoadJsonFiles();
             }

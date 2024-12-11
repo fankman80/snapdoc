@@ -36,22 +36,11 @@ public partial class AppShell : Shell
     {
         var popup = new PopupSettings();
         await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
-        if (result != null)
-        {
-
-        }
     }
 
     public async void OnExportClicked(object sender, EventArgs e)
     {
-        // Show Settings Page
         var popup = new PopupExportSettings();
         await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
-        if (result != null)
-        {
-
-        }
     }
 }

@@ -40,8 +40,9 @@ public class Pin
     public Size Size { get; set; }
     public bool IsLocked { get; set; }
     public bool IsLockRotate { get; set; }
-    public string InfoTxt { get; set; }
-    public string PinTxt { get; set; }
+    public string PinName { get; set; }
+    public string PinDesc { get; set; }
+    public string PinLocation { get; set; }
     public string PinIcon { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
 }

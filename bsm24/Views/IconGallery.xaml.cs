@@ -51,7 +51,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
         if (iconItem != null)
         {
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt = iconItem.DisplayName;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;

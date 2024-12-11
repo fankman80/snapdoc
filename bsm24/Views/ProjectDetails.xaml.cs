@@ -1,7 +1,6 @@
 ﻿#nullable disable
 
 using UraniumUI.Pages;
-using bsm24.Services;
 
 namespace bsm24.Views;
 
@@ -13,7 +12,6 @@ public partial class ProjectDetails : UraniumContentPage
     {
         InitializeComponent();
         isPdfChanged = false;
-        BindingContext = this;
     }
 
     protected override void OnAppearing()
@@ -27,7 +25,7 @@ public partial class ProjectDetails : UraniumContentPage
         project_manager.Text = GlobalJson.Data.Project_manager;
         creation_date.Date = GlobalJson.Data.Creation_date;
 
-        HeaderUpdate();
+        Helper.HeaderUpdate();
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
@@ -48,7 +46,7 @@ public partial class ProjectDetails : UraniumContentPage
             LoadDataToView.LoadData(new FileResult(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.JsonFile)));
         }
 
-        HeaderUpdate();
+        Helper.HeaderUpdate();
 
         // Entferne die aktuelle Seite aus dem Stack
         var currentPage = Shell.Current.CurrentPage;
@@ -69,7 +67,7 @@ public partial class ProjectDetails : UraniumContentPage
     {
         await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
 
-        HeaderUpdate();
+        Helper.HeaderUpdate();
     }
 
     private async void OnTitleOpenClicked(object sender, EventArgs e)
@@ -101,7 +99,7 @@ public partial class ProjectDetails : UraniumContentPage
 
                 Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
-                HeaderUpdate();
+                Helper.HeaderUpdate();
             }
         }
         catch (Exception ex)

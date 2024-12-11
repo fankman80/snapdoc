@@ -28,7 +28,7 @@
                     <RowDefinition Height="70" />
                     <RowDefinition Height="30" />
                 </Grid.RowDefinitions>
-                <ff:CachedImage Grid.Column="0"
+                <Image Grid.Column="0"
                        Grid.RowSpan="2"
                        Aspect="AspectFill"
                        Source="{Binding FlyoutHeaderImage}"/>

@@ -67,8 +67,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         ImageGallery.ItemsSource = Images; // Dann wieder auf die Collection setzen
 
         // read data
-        PinTxt.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt;
-        PinInfo.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].InfoTxt;
+        this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
+        PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
+        PinLocation.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation;
         PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
         LockSwitch.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
         LockRotate.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
@@ -90,6 +91,22 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         var result = await popup.PopupDismissedTask;
         if (result != null)
             await Shell.Current.GoToAsync($"..?pinDelete={PinId}");
+    }
+
+    private async void OnEditClick(object sender, EventArgs e)
+    {
+        var popup = new PopupEntry(title: "Pin umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+
+        if (result != null)
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = result;
+            this.Title = result;
+
+            // save data to file
+            GlobalJson.SaveToFile();
+        }
     }
 
     private async void OnPinSelectClick(object sender, EventArgs e)
@@ -120,8 +137,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase));
         GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinTxt = PinTxt.Text;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].InfoTxt = PinInfo.Text;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = this.Title;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = LockRotate.IsToggled;
 

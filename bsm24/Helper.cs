@@ -2,6 +2,7 @@
 #nullable disable
 
 using System.Reflection;
+using bsm24.Services;
 
 namespace bsm24;
 
@@ -63,7 +64,6 @@ public class Helper
         // aktualisiere den Header Text
         SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name;
         SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name;
-
         SettingsService.Instance.FlyoutHeaderImage = null;
 
         // aktualisiere das Thumbnail Bild

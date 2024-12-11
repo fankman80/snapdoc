@@ -295,8 +295,9 @@ public partial class NewPage: IQueryAttributable
                 Size = iconItem.IconSize,
                 IsLocked = false,
                 IsLockRotate = iconItem.IsRotationLocked,
-                InfoTxt = "",
-                PinTxt = iconItem.DisplayName,
+                PinName = iconItem.DisplayName,
+                PinDesc = "",
+                PinLocation = "",
                 PinIcon = newPin,
                 Fotos = []
             };
