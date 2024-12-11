@@ -13,6 +13,7 @@ public partial class ProjectDetails : UraniumContentPage
     {
         InitializeComponent();
         isPdfChanged = false;
+        BindingContext = this;
     }
 
     protected override void OnAppearing()
