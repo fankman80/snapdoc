@@ -230,7 +230,7 @@ public partial class ExportReport
                                 if (text.Text.Contains("${title_image"))
                                 {
                                     text.Text = ""; // Lösche den Platzhaltertext
-                                    var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "title_thumbnail.jpg");
+                                    var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                                     if (File.Exists(imgPath))
                                     {
                                         var _img = await XmlImage.GenerateImage(mainPart,

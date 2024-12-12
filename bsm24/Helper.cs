@@ -64,12 +64,11 @@ public class Helper
         // aktualisiere den Header Text
         SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name;
         SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name;
-        SettingsService.Instance.FlyoutHeaderImage = null;
 
         // aktualisiere das Thumbnail Bild
-        if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg")))
-            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
-        else
+        if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
             SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
+        else
+            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
     }
 }

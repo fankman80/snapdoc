@@ -65,9 +65,19 @@ public partial class ProjectDetails : UraniumContentPage
 
     private async void OnTitleCaptureClicked(object sender, EventArgs e)
     {
-        await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
+        string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 
-        Helper.HeaderUpdate();
+        var result = await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ProjectPath, thumbFileName);
+        if (result != null)
+        {
+            if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
+                File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
+            if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
+                File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+            GlobalJson.Data.TitleImage = thumbFileName;
+            GlobalJson.SaveToFile();
+            Helper.HeaderUpdate();
+        }
     }
 
     private async void OnTitleOpenClicked(object sender, EventArgs e)
@@ -82,9 +92,10 @@ public partial class ProjectDetails : UraniumContentPage
             
             if (fileResult != null)
             {
+                string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
                 string sourceFilePath = fileResult.FullPath;
-                var destinationPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "title_thumbnail.jpg");
-                var destinationThumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, "title_thumbnail.jpg");
+                var destinationPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, thumbFileName);
+                var destinationThumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, thumbFileName);
 
                 if (File.Exists(destinationPath))
                     File.Delete(destinationPath);
@@ -99,6 +110,12 @@ public partial class ProjectDetails : UraniumContentPage
 
                 Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
+                if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
+                    File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
+                if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
+                    File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+                GlobalJson.Data.TitleImage = thumbFileName;
+                GlobalJson.SaveToFile();
                 Helper.HeaderUpdate();
             }
         }

@@ -40,10 +40,10 @@ public partial class OpenProject : UraniumContentPage
             // Gefundene Dateien zur Liste hinzufügen
             foreach (var file in files)
             {
-                string thumbImg = "banner_thumbnail.png";
+                string[] _thumbImg = Directory.GetFiles(Path.GetDirectoryName(file), "title_*.jpg", SearchOption.AllDirectories);
+                string thumbImg = _thumbImg.FirstOrDefault();
 
-                if (File.Exists(Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg")))
-                    thumbImg = Path.Combine(Path.GetDirectoryName(file), "title_thumbnail.jpg");
+                thumbImg ??= "banner_thumbnail.png";
 
                 foundFiles.Add(new FileItem
                 {
@@ -100,6 +100,7 @@ public partial class OpenProject : UraniumContentPage
             GlobalJson.Data.ImagePath = Path.Combine(result, "images");
             GlobalJson.Data.ImageOverlayPath = Path.Combine(result, "images", "originals");
             GlobalJson.Data.ThumbnailPath = Path.Combine(result, "thumbnails");
+            GlobalJson.Data.TitleImage = "banner_thumbnail.png";
 
             // save data to file
             GlobalJson.SaveToFile();

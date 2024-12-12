@@ -146,6 +146,7 @@ public partial class NewPage: IQueryAttributable
             AnchorY = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor.Y,
             TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
             TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
+            Rotation = PlanContainer.Rotation * -1
         };
 
         var scaleLimit = SettingsService.Instance.PinScaleLimit;
