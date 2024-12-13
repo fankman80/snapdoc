@@ -212,19 +212,41 @@ public partial class OpenProject : UraniumContentPage
 
             while ((entry = zipInputStream.GetNextEntry()) != null)
             {
-                string filePath = Path.Combine(targetDirectory, entry.Name);
-                var directoryName = Path.GetDirectoryName(filePath);
+                // Normalisieren der Pfade, Schrägstriche am Ende entfernen
+                string entryName = entry.Name.TrimEnd('/'); // Entfernt nur den Schrägstrich am Ende
+                string filePath = Path.Combine(targetDirectory, entryName);
 
-                if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName))
-                    Directory.CreateDirectory(directoryName);
+                // Überprüfen, ob das Entry ein Verzeichnis ist
+                if (entry.IsDirectory)
+                {
+                    // Falls es sich um ein Verzeichnis handelt, sicherstellen, dass das Verzeichnis existiert
+                    if (!Directory.Exists(filePath))
+                    {
+                        Console.WriteLine($"Creating directory: {filePath}");
+                        Directory.CreateDirectory(filePath);
+                    }
+                }
+                else
+                {
+                    // Falls es eine Datei ist, das Verzeichnis extrahieren und die Datei erstellen
+                    var directoryName = Path.GetDirectoryName(filePath);
+                    if (!string.IsNullOrEmpty(directoryName) && !Directory.Exists(directoryName))
+                    {
+                        Console.WriteLine($"Creating directory for file: {directoryName}");
+                        Directory.CreateDirectory(directoryName);
+                    }
 
-                using var fileStream = File.Create(filePath);
-                zipInputStream.CopyTo(fileStream);
+                    // Datei entpacken
+                    Console.WriteLine($"Extracting file: {filePath}");
+                    using var fileStream = File.Create(filePath);
+                    zipInputStream.CopyTo(fileStream);
+                }
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error unzipping file: {ex.Message}");
+            Console.WriteLine(ex.StackTrace);
         }
     }
 

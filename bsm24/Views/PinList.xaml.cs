@@ -26,7 +26,7 @@ public partial class PinList : UraniumContentPage
         UpdateSpan();
     }
 
-    private async void LoadPins()
+    private void LoadPins()
     {
         int pincounter = 0;
 
@@ -48,14 +48,9 @@ public partial class PinList : UraniumContentPage
                         SelfId = pin.Key
                     });
                     pincounter++;
-                }
-                pinListView.ItemsSource = pinItems;
+                }     
             }
-            else
-            {
-                var popup = new PopupAlert("Keine Pins vorhanden!");
-                await MopupService.Instance.PushAsync(popup);
-            }
+            pinListView.ItemsSource = pinItems;
         }
         pinListView.Footer = "Pins: " + pincounter;
     }
