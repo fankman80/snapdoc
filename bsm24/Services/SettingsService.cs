@@ -358,6 +358,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#ededed");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#949494");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -370,6 +371,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#9c4e38");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#e6c3ba");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#9c4e38");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#e6c3ba");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -382,6 +384,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#32a852");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#c1e8c1");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#32a852");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#c1e8c1");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -394,6 +397,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#5e75ad");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#c7d3f2");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#5e75ad");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#c7d3f2");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -406,6 +410,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#e07a2d");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#f2cdb1");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#e07a2d");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#f2cdb1");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -418,6 +423,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#9f4bcc");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#e5befa");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#9f4bcc");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#e5befa");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
@@ -430,6 +436,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#fc03df");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#eed5f2");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#fc03df");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["Secondary"] = Color.FromArgb("#eed5f2");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
