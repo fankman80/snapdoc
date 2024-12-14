@@ -99,12 +99,12 @@
                 <Switch Grid.Column="1" Grid.Row="0"
                         x:Name="LockSwitch"
                         Margin="0,-8,0,0"
-                        ThumbColor="{DynamicResource Primary}"
+                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
                 <Switch Grid.Column="1" Grid.Row="1"
                         x:Name="LockRotate"
                         Margin="0,-8,0,0"                       
-                        ThumbColor="{DynamicResource Primary}"
+                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
 
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"

@@ -53,14 +53,14 @@
                             <Switch Grid.Column="1" Grid.Row="0"
                                     x:Name="isPlanExport"
                                     Margin="0,-8,0,0"                       
-                                    ThumbColor="{DynamicResource Primary}"
+                                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsPlanExport}"/>
 
                             <Switch Grid.Column="1" Grid.Row="1"
                                     x:Name="isPosImageExport"
                                     Margin="0,-8,0,0"                      
-                                    ThumbColor="{DynamicResource Primary}"
+                                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsPosImageExport}"/>
 
@@ -68,7 +68,7 @@
                                     x:Name="isImageExport"
                                     Margin="0,-8,0,0"
 
-                                    ThumbColor="{DynamicResource Primary}"
+                                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsImageExport}"/>
 
@@ -76,7 +76,7 @@
                                     x:Name="isPinIconExport"
                                     Margin="0,-8,0,0"
                                     VerticalOptions="Start"
-                                    ThumbColor="{DynamicResource Primary}"
+                                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     OnColor="{DynamicResource Secondary}"
                                     IsToggled="{Binding IsPinIconExport}"/>
                         </Grid>

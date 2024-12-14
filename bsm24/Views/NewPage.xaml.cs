@@ -8,9 +8,6 @@ using MR.Gestures;
 
 namespace bsm24.Views;
 
-[QueryProperty(nameof(PinUpdate), "pinUpdate")]
-[QueryProperty(nameof(PinDelete), "pinDelete")]
-
 public partial class NewPage : IQueryAttributable
 {
     public string PinUpdate { get; set; }
@@ -41,7 +38,6 @@ public partial class NewPage : IQueryAttributable
         if (isFirstLoad)
         {
             AddPlan();
-            // Verfolge Änderungen an den Eigenschaften Width und Height des PlanImage
             PlanImage.PropertyChanged += PlanImage_PropertyChanged;
         }
     }
@@ -60,8 +56,6 @@ public partial class NewPage : IQueryAttributable
                 image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
                 image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
                 image.AnchorY = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.Y;
-                image.Size = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Size;
-                image.Scale = 1 / PlanContainer.Scale;
                 if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
                     image.Opacity = .3;
                 else
@@ -160,8 +154,12 @@ public partial class NewPage : IQueryAttributable
             Rotation = PlanContainer.Rotation * -1
         };
 
-        var scaleLimit = SettingsService.Instance.PinScaleLimit;
-        if (scaleLimit < 1) smallImage.Scale = scaleLimit;
+        var scale = 1 / PlanContainer.Scale;
+        var scaleLimit = SettingsService.Instance.PinScaleLimit / 100;
+        if (scale < scaleLimit)
+            smallImage.Scale = scale;
+        else
+            smallImage.Scale = 1;
 
         smallImage.Down += (s, e) =>
         {
@@ -189,7 +187,8 @@ public partial class NewPage : IQueryAttributable
 
         smallImage.Tapping += async (s, e) =>
         {
-            await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={pinId}&pinIcon={pinIcon}");
+            var _pinIcon = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon;
+            await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={pinId}&pinIcon={_pinIcon}");
         };
 
         PlanContainer.Children.Add(smallImage);

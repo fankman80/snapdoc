@@ -5,9 +5,6 @@ using UraniumUI.Pages;
 
 namespace bsm24.Views;
 
-[QueryProperty(nameof(PlanId), "planId")]
-[QueryProperty(nameof(PinId), "pinId")]
-
 public partial class IconGallery : UraniumContentPage, IQueryAttributable
 {
     public ObservableCollection<IconItem> Icons { get; set; }

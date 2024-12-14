@@ -76,21 +76,21 @@ public partial class SettingsService : INotifyPropertyChanged
     }
 
 #if WINDOWS
-    private int _pinScaleLimit = 80;
+    private double _pinScaleLimit = 100;
 #endif
 
 #if ANDROID
-    private int _pinScaleLimit = 30;
+    private double _pinScaleLimit = 50;
 #endif
 
-    public int PinScaleLimit
+    public double PinScaleLimit
     {
         get => _pinScaleLimit;
         set
         {
             if (_pinScaleLimit != value)
             {
-                _pinScaleLimit = value;
+                _pinScaleLimit = Math.Round(value, 0);
                 OnPropertyChanged(nameof(PinScaleLimit));
             }
         }

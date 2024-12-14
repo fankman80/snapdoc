@@ -8,10 +8,6 @@ using UraniumUI.Pages;
 
 namespace bsm24.Views;
 
-[QueryProperty(nameof(PlanId), "planId")]
-[QueryProperty(nameof(PinId), "pinId")]
-[QueryProperty(nameof(PinIcon), "pinIcon")]
-
 public partial class SetPin : UraniumContentPage, IQueryAttributable
 {
     public ObservableCollection<ImageItem> Images { get; set; }

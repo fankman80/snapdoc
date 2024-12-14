@@ -9,11 +9,6 @@ using SkiaSharp;
 
 namespace bsm24.Views;
 
-[QueryProperty(nameof(PlanId), "planId")]
-[QueryProperty(nameof(PinId), "pinId")]
-[QueryProperty(nameof(PinIcon), "pinIcon")]
-[QueryProperty(nameof(ImgSource), "imgSource")]
-
 public partial class ImageViewPage : IQueryAttributable
 {
     public string PlanId { get; set; }
@@ -30,6 +25,25 @@ public partial class ImageViewPage : IQueryAttributable
         InitializeComponent();
         BindingContext = new TransformViewModel();
         imageViewContainer = (TransformViewModel)ImageViewContainer.BindingContext;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        ImageViewContainer.PropertyChanged += ImageView_PropertyChanged;
+    }
+
+    private void ImageView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ImageViewContainer.Width) || e.PropertyName == nameof(ImageViewContainer.Height))
+        {
+            if (ImageViewContainer.Width > 0 && ImageViewContainer.Height > 0)
+            {
+                ImageViewContainer.PropertyChanged -= ImageView_PropertyChanged;
+                ImageFit();
+            }   
+        }
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
