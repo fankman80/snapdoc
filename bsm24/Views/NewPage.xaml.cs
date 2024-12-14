@@ -57,9 +57,11 @@ public partial class NewPage : IQueryAttributable
                 .FirstOrDefault(i => i.AutomationId == PinUpdate);
             if (image != null)
             {
+                image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
                 image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
                 image.AnchorY = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.Y;
-                image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
+                image.Size = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Size;
+                image.Scale = 1 / PlanContainer.Scale;
                 if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
                     image.Opacity = .3;
                 else
