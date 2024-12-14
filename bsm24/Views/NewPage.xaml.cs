@@ -159,7 +159,7 @@ public partial class NewPage : IQueryAttributable
         if (scale < scaleLimit)
             smallImage.Scale = scale;
         else
-            smallImage.Scale = 1;
+            smallImage.Scale = PlanContainer.Scale;
 
         smallImage.Down += (s, e) =>
         {
