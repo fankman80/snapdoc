@@ -110,7 +110,7 @@ public partial class NewPage : IQueryAttributable
             if (e.PropertyName == "Scale")
             {
                 var scale = 1 / PlanContainer.Scale;
-                var scaleLimit = SettingsService.Instance.PinScaleLimit;
+                var scaleLimit = SettingsService.Instance.PinScaleLimit / 100;
                 foreach (MR.Gestures.Image img in PlanContainer.Children.Cast<MR.Gestures.Image>())
                 {
                     if (img.AutomationId != null)
