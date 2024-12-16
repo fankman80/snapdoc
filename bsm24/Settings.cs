@@ -80,7 +80,7 @@ public static class Settings
         new("unterflurhydrant.png", "Unterflurhyfrand", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(0,50,204)),
         new("ventilator_rda_sla.png", "Ventilator Rauchschutz-Druckanlage", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(220,220,50)),
         new("ventilator_rwa.png", "Ventilator Rauch- und Wärmeabzug", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(220,220,50)),
-        new("wasserloeschposten.png", "Wasserlöschposten", new Point(0.5, 0.5), new Size(155,64), true, new SKColor(0,50,204)),
+        new("wasserloeschposten.png", "Wasserlöschposten", new Point(0.5, 0.5), new Size(118,64), true, new SKColor(0,50,204)),
         new("wechselrichter_pv.png", "Wechselrichter PV-Anlage", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(255,0,0)),
         new("zugang_spa_z.png", "Zugang SPA-Z", new Point(1.0, 0.5), new Size(89,64), true, new SKColor(0,50,204)),
         new("zuluft_absaugung_maschinell.png", "Zuluft / Absaugung maschinell", new Point(1.0, 0.5), new Size(141,64), true, new SKColor(220,220,50)),
