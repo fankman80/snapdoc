@@ -85,7 +85,8 @@ public partial class XmlImage
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
                     canvas.DrawBitmap(overlay, _pos);
 
-                    var textPos = new SKPoint(_pos.X + overlay.Width + Settings.PinTextPadding, _pos.Y - Settings.PinTextPadding); // Position des Textes
+                    var textPos = new SKPoint(_pos.X + overlay.Width + Settings.PinTextPadding + Settings.PinTextDistance,
+					      _pos.Y - Settings.PinTextPadding + Settings.PinTextDistance); // Position des Textes
                     var textWidth = font.MeasureText(overlayImage.Item3); // Breite des Textes
                     var fontMetrics = font.Metrics;
                     var textHeight = fontMetrics.Descent - fontMetrics.Ascent; // Höhe des Textes
