@@ -406,8 +406,8 @@ public partial class NewPage : IQueryAttributable
 
     private void ImageFit()
     {
-        planContainer.Scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
         planContainer.Rotation = 0;
+        planContainer.Scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
         planContainer.TranslationX = (this.Width - PlanContainer.Width) / 2;
         planContainer.TranslationY = (this.Height - PlanContainer.Height) / 2;
         planContainer.AnchorX = 1 / PlanContainer.Width * ((this.Width / 2) - PlanContainer.TranslationX);

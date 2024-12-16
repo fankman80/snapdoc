@@ -18,11 +18,11 @@
         <Grid>
             <CollectionView x:Name="pinListView" SelectionMode="Single" Margin="10">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="4"/>
+                    <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="models:Pin">
-                        <Grid>
+                        <Grid RowSpacing="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="64" />
                                 <ColumnDefinition Width="Auto" />
@@ -31,37 +31,45 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="Auto"/>
-                                <RowDefinition Height="*"/>
-                                <RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
                             
                             <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                                   TextDecorations="Underline"
-                                   Margin="6,6,6,0"
+                                   Margin="10,6,6,0"
                                    Text="{Binding OnPlanName}"/>
 
                             <Label Grid.Column="2" Grid.Row="0" Grid.ColumnSpan="2"
-                                   TextDecorations="Underline"
-                                   Margin="6,6,6,0"
-                                   Text="{Binding PinLocation}"/>
-                            
-                            <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="3"
                                    Margin="0,6,6,0"
+                                   Text="{Binding PinLocation}"/>
+
+                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
+                                   Margin="10,6,6,0"
                                    LineBreakMode="TailTruncation"
                                    Text="{Binding PinName}"/>
 
-                            <ff:CachedImage Grid.Column="0" Grid.Row="1" Grid.RowSpan="2"
-                                            Source="{Binding PinIcon}"
-                                            CacheType="Memory"
-                                            Aspect="AspectFit"
-                                            Margin="10"/>
+                            <BoxView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4"
+                                     Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"
+                                     HeightRequest="1"
+                                     HorizontalOptions="FillAndExpand"
+                                     Margin="6"/>
 
-                            <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3"
-                                   Margin="0,6,6,0"
-                                   LineBreakMode="TailTruncation"
+                            <ff:CachedImage Grid.Column="0" Grid.Row="3"
+                                    VerticalOptions="Start"
+                                    Source="{Binding PinIcon}"
+                                    CacheType="Memory"
+                                    Aspect="AspectFit"
+                                    Margin="16,20,6,0"/>
+
+                            <Label Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
+                                   MaxLines="4"
+                                   LineBreakMode="WordWrap"
+                                   MinimumHeightRequest="100"
+                                   Margin="0,6,6,6"
                                    Text="{Binding PinDesc}"/>
-                            
-                            <Button Grid.ColumnSpan="4" Grid.RowSpan="3"
+
+                            <Button Grid.ColumnSpan="4" Grid.RowSpan="4"
                                     ClassId="{Binding SelfId}"
                                     BorderWidth="1"
                                     BorderColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"

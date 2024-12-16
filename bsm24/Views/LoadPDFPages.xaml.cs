@@ -42,14 +42,13 @@ public partial class LoadPDFPages : UraniumContentPage
                 byte[] bytearray = File.ReadAllBytes(result.FullPath);
                 int pagecount = Conversion.GetPageCount(bytearray);
 
-                var cacheDir = Path.Combine(FileSystem.AppDataDirectory, "cache");
-                if (!Directory.Exists(cacheDir))
-                    Directory.CreateDirectory(cacheDir);
+                if (!Directory.Exists(Settings.CacheDirectory))
+                    Directory.CreateDirectory(Settings.CacheDirectory);
 
                 for (int i = 0; i < pagecount; i++)
                 {
-                    string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
-                    string previewPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "preview_" + i + ".jpg");
+                    string imgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
+                    string previewPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
                     Conversion.SaveJpeg(previewPath, bytearray, i, options: new RenderOptions(Dpi: 50));
 
                     var stream = File.OpenRead(previewPath);
@@ -85,14 +84,13 @@ public partial class LoadPDFPages : UraniumContentPage
             byte[] bytearray = File.ReadAllBytes(result.FullPath);
             int pagecount = Conversion.GetPageCount(bytearray);
 
-            var cacheDir = Path.Combine(FileSystem.AppDataDirectory, "cache");
-            if (!Directory.Exists(cacheDir))
-                Directory.CreateDirectory(cacheDir);
+            if (!Directory.Exists(Settings.CacheDirectory))
+                Directory.CreateDirectory(Settings.CacheDirectory);
 
             for (int i = 0; i < pagecount; i++)
             {
-                string imgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "plan_" + i + ".jpg");
-                string previewImgPath = Path.Combine(FileSystem.AppDataDirectory, cacheDir, "preview_" + i + ".jpg");
+                string imgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
+                string previewImgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
                 Conversion.SaveJpeg(imgPath, bytearray, i, options: new RenderOptions(SettingsService.Instance.PdfQuality));
 
                 var stream = File.OpenRead(imgPath);
