@@ -5,6 +5,7 @@ namespace bsm24;
 
 public static class Settings
 {
+    public static double MinPinScaleLimit { get => minPinScaleLimit; set => minPinScaleLimit = value; }
     public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
     public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
     public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
@@ -13,7 +14,7 @@ public static class Settings
     public static IconItem[] PinData { get => pinData; set => pinData = value; }
 
 
-
+    private static double minPinScaleLimit = 0.3;
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
     private static int thumbSize = 150;
     private static int planPreviewSize = 250;
@@ -21,12 +22,12 @@ public static class Settings
     private static int pinTextPadding = 6;
     private static IconItem[] pinData =
     [
-        new("a_pin_blue.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(0,50,204)),
-        new("a_pin_green.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(0,153,0)),
-        new("a_pin_grey.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(112,112,112)),
-        new("a_pin_pink.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(252,2,202)),
-        new("a_pin_red.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(255,0,0)),
-        new("a_pin_yellow.png", "", new Point(0.0625, 0.9375), new Size(64,64), false, new SKColor(220,220,50)),
+        new("a_pin_blue.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(0,50,204)),  // PinSet1 Anchor Point(0.0625, 0.9375)
+        new("a_pin_green.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(0,153,0)),
+        new("a_pin_grey.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(112,112,112)),
+        new("a_pin_pink.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(252,2,202)),
+        new("a_pin_red.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(255,0,0)),
+        new("a_pin_yellow.png", "", new Point(0.297, 0.97), new Size(64,64), false, new SKColor(220,220,50)),
         new("blitzleuchte.png", "Blitzleuchte", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(255,0,0)),
         new("blitzleuchte_evakuierungsanlage.png", "Blitzleuchte Evakuierungsanlage", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(0,153,0)),
         new("brandfallgesteuert.png", "Brandfallgesteuert", new Point(0.5, 0.5), new Size(64,64), true, new SKColor(255,0,0)),
