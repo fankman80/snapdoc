@@ -9,10 +9,17 @@
     Shell.TitleColor="{DynamicResource PrimaryDark}"
     BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
     xmlns:local="clr-namespace:bsm24"
-    xmlns:models="clr-namespace:bsm24.Models" 
+    xmlns:models="clr-namespace:bsm24.Models"
+    xmlns:services="clr-namespace:bsm24.Services"
     x:Name="PinListPage"
     x:Class="bsm24.Views.PinList"
     Title="Pin Liste">
+
+    <uranium:UraniumContentPage.Resources>
+        <ResourceDictionary>
+            <services:BooleanInverterConverter x:Key="BooleanInverterConverter" />
+        </ResourceDictionary>
+    </uranium:UraniumContentPage.Resources>
 
     <Grid>
         <Grid>
@@ -35,7 +42,8 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-                            
+
+
                             <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                                    Margin="10,6,6,0"
                                    Text="{Binding OnPlanName}"/>
@@ -44,13 +52,13 @@
                                    Margin="0,6,6,0"
                                    Text="{Binding PinLocation}"/>
 
-                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
+                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
                                    Margin="10,6,6,0"
                                    LineBreakMode="TailTruncation"
                                    Text="{Binding PinName}"/>
 
                             <BoxView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4"
-                                     Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"
+                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      HeightRequest="1"
                                      HorizontalOptions="FillAndExpand"
                                      Margin="6"/>
@@ -69,13 +77,23 @@
                                    Margin="0,6,6,6"
                                    Text="{Binding PinDesc}"/>
 
+                            <Border Grid.ColumnSpan="4" Grid.RowSpan="4"
+                                    IsVisible="{Binding AllowExport, Converter={StaticResource BooleanInverterConverter}}"
+                                    Opacity="0.5"
+                                    BackgroundColor="LightGray"/>
+
                             <Button Grid.ColumnSpan="4" Grid.RowSpan="4"
                                     ClassId="{Binding SelfId}"
                                     BorderWidth="1"
-                                    BorderColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"
+                                    BorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     AutomationId = "{Binding OnPlanId}"
                                     Background="Transparent"
                                     Clicked="OnPinClicked"/>
+
+                            <CheckBox Grid.Column="4" Grid.Row="0"  Grid.RowSpan="2"
+                                      HorizontalOptions="End"
+                                      IsChecked="{Binding AllowExport}"
+                                      Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"/>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

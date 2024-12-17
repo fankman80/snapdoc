@@ -92,25 +92,32 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
 
-                <Label Text="Pin sperren:" Grid.Column="0" Grid.Row="0" VerticalOptions="Start"/>
-                
-                <Label Text="Rotation sperren:" Grid.Column="0" Grid.Row="1" VerticalOptions="Start"/>
+                <Label Text="Pin exportieren:" Grid.Column="0" Grid.Row="0" VerticalOptions="Start"/>
+                <Label Text="Pin sperren:" Grid.Column="0" Grid.Row="1" VerticalOptions="Start"/>
+                <Label Text="Rotation sperren:" Grid.Column="0" Grid.Row="2" VerticalOptions="Start"/>
 
                 <Switch Grid.Column="1" Grid.Row="0"
+                        x:Name="AllowExport"
+                        Margin="0,-8,0,0"
+                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        OnColor="{DynamicResource Secondary}"/>                
+                
+                <Switch Grid.Column="1" Grid.Row="1"
                         x:Name="LockSwitch"
                         Margin="0,-8,0,0"
                         ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
                 
-                <Switch Grid.Column="1" Grid.Row="1"
+                <Switch Grid.Column="1" Grid.Row="2"
                         x:Name="LockRotate"
                         Margin="0,-8,0,0"                       
                         ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
 
-                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="2"
+                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="3"
                         Padding="0,20,0,0"
                         HeightRequest="80"
                         WidthRequest="46"
@@ -127,7 +134,7 @@
                        Text="100%"
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"/>                
 
-                <Border Grid.Column="3" Grid.Row="0"  Grid.RowSpan="2"
+                <Border Grid.Column="3" Grid.Row="0"  Grid.RowSpan="3"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="White"

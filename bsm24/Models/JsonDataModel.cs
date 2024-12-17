@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using SkiaSharp;
+using System.ComponentModel;
 
 namespace bsm24.Models;
 
@@ -35,8 +36,10 @@ public class Plan
     public Dictionary<string, Pin> Pins { get; set; }
 }
 
-public class Pin
+public partial class Pin : INotifyPropertyChanged
 {
+    private bool _allowExport;
+
     public Point Pos { get; set; }
     public Point Anchor { get; set; }
     public Size Size { get; set; }
@@ -52,6 +55,25 @@ public class Pin
     public string SelfId { get; set; }
     public SKColor PinColor { get; set; }
     public double PinScale { get; set; }
+    public bool AllowExport
+    {
+        get => _allowExport;
+        set
+        {
+            if (_allowExport != value)
+            {
+                _allowExport = value;
+                OnPropertyChanged(nameof(AllowExport));
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
 }
 
 public class Foto

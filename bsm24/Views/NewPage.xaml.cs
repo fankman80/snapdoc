@@ -303,7 +303,8 @@ public partial class NewPage : IQueryAttributable
                 PinIcon = newPin,
                 Fotos = [],
                 PinColor = SKColors.Red,
-                PinScale = iconItem.IconScale
+                PinScale = iconItem.IconScale,
+                AllowExport = true,
             };
 
             // Sicherstellen, dass der Plan existiert

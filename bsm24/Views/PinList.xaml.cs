@@ -2,6 +2,7 @@
 
 using bsm24.Models;
 using Mopups.Services;
+using System.ComponentModel;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;
@@ -37,7 +38,7 @@ public partial class PinList : UraniumContentPage
             {
                 foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
                 {
-                    pinItems.Add(new Pin
+                    var newPin = new Pin
                     {
                         PinDesc = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc,
                         PinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon,
@@ -45,14 +46,32 @@ public partial class PinList : UraniumContentPage
                         PinLocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation,
                         OnPlanName = GlobalJson.Data.Plans[plan.Key].Name,
                         OnPlanId = plan.Key,
-                        SelfId = pin.Key
-                    });
+                        SelfId = pin.Key,
+                        AllowExport = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport,
+                    };
+
+                    newPin.PropertyChanged += Pin_PropertyChanged;
+                    pinItems.Add(newPin);
                     pincounter++;
                 }     
             }
             pinListView.ItemsSource = pinItems;
         }
         pinListView.Footer = "Pins: " + pincounter;
+    }
+
+    private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Pin.AllowExport))
+        {
+            var pin = (Pin)sender;
+
+            GlobalJson.Data.Plans[pin.OnPlanId].Pins[pin.SelfId].AllowExport = pin.AllowExport;
+
+            // save data to file
+            GlobalJson.SaveToFile();
+            
+        }
     }
 
     private async void OnPinClicked(object sender, EventArgs e)

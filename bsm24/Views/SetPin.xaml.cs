@@ -69,6 +69,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
         LockSwitch.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
         LockRotate.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
+        AllowExport.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         SizePercentText.Text = Math.Round(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale * 100, 0).ToString() + "%";
     }
 
@@ -139,6 +140,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = LockRotate.IsToggled;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport = AllowExport.IsToggled;
 
         // save data to file
         GlobalJson.SaveToFile();
