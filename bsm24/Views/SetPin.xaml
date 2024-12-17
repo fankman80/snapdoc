@@ -85,9 +85,9 @@
             <Grid ColumnSpacing="10" RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
@@ -117,29 +117,25 @@
                         ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
 
-                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="3"
+                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="2"
                         Padding="0,20,0,0"
-                        HeightRequest="80"
-                        WidthRequest="46"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
                         Clicked="OnResizeClicked"/>
-                
-                <Label Grid.Column="2" Grid.Row="0"
+
+                <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                       x:Name="SizePercentText"                       
                        InputTransparent="True"
-                       x:Name="SizePercentText"
-                       Padding="0,8,0,0"
+                       Padding="0,10,0,0"
                        HorizontalTextAlignment="Center"
                        Text="100%"
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"/>                
 
-                <Border Grid.Column="3" Grid.Row="0"  Grid.RowSpan="3"
+                <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="White"
-                        HeightRequest="80"
-                        WidthRequest="80"
                         HorizontalOptions="End"
                         VerticalOptions="Center"
                         StrokeShape="RoundRectangle 10">

@@ -70,7 +70,6 @@ public partial class PinList : UraniumContentPage
 
             // save data to file
             GlobalJson.SaveToFile();
-            
         }
     }
 
@@ -85,10 +84,6 @@ public partial class PinList : UraniumContentPage
             Title = GlobalJson.Data.Plans[planId].Name,
             AutomationId = planId
         };
-
-        // Entferne die aktuelle Seite aus dem Stack
-        var currentPage = Shell.Current.CurrentPage;
-        Shell.Current.Navigation.RemovePage(currentPage);
 
         await Shell.Current.Navigation.PushAsync(newPage);
     }
