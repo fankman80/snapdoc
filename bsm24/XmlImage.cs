@@ -91,29 +91,32 @@ public partial class XmlImage
                     var fontMetrics = font.Metrics;
                     var textHeight = fontMetrics.Descent - fontMetrics.Ascent; // Höhe des Textes
 
-                    using (var backgroundPaint = new SKPaint { Color = SKColors.White }) // weisser Hintergrund
+                    if (overlayImage.Item3 != "")
                     {
-                        var backgroundRect = new SKRect(
-                            textPos.X - Settings.PinTextPadding + 1,
-                            textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding + 1,
-                            textPos.X + textWidth + Settings.PinTextPadding - 1,
-                            textPos.Y + fontMetrics.Descent + Settings.PinTextPadding - 1);
-                        canvas.DrawRect(backgroundRect, backgroundPaint);
-                    }
+                        using (var backgroundPaint = new SKPaint { Color = SKColors.White }) // weisser Hintergrund
+                        {
+                            var backgroundRect = new SKRect(
+                                textPos.X - Settings.PinTextPadding + 1,
+                                textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding + 1,
+                                textPos.X + textWidth + Settings.PinTextPadding - 1,
+                                textPos.Y + fontMetrics.Descent + Settings.PinTextPadding - 1);
+                            canvas.DrawRect(backgroundRect, backgroundPaint);
+                        }
 
-                    using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5, Style = SKPaintStyle.Stroke, StrokeWidth = 2 }) // Rahmen
-                    {
-                        var backgroundRect = new SKRect(
-                            textPos.X - Settings.PinTextPadding,
-                            textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding,
-                            textPos.X + textWidth + Settings.PinTextPadding,
-                            textPos.Y + fontMetrics.Descent + Settings.PinTextPadding);
-                        canvas.DrawRect(backgroundRect, backgroundPaint);
-                    }
+                        using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5, Style = SKPaintStyle.Stroke, StrokeWidth = 2 }) // Rahmen
+                        {
+                            var backgroundRect = new SKRect(
+                                textPos.X - Settings.PinTextPadding,
+                                textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding,
+                                textPos.X + textWidth + Settings.PinTextPadding,
+                                textPos.Y + fontMetrics.Descent + Settings.PinTextPadding);
+                            canvas.DrawRect(backgroundRect, backgroundPaint);
+                        }
 
-                    using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5 }) // Text
-                    {
-                        canvas.DrawText(overlayImage.Item3, textPos, SKTextAlign.Left, font, backgroundPaint);
+                        using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5 }) // Text
+                        {
+                            canvas.DrawText(overlayImage.Item3, textPos, SKTextAlign.Left, font, backgroundPaint);
+                        }
                     }
                 }
 
