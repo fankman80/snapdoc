@@ -23,13 +23,21 @@
         VerticalOptions="Center">
 
         <VerticalStackLayout x:DataType="services:SettingsService">
-            <Label Text="{Binding PinScaleLimit, StringFormat='Pingrösse limitieren: {0:0.##}%'}" />
-            <Slider Maximum="200"
+            <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
+            <Slider Maximum="100"
                     Minimum="1"
                     ThumbColor="{DynamicResource Primary}"
                     MinimumTrackColor="{DynamicResource Primary}"
                     MaximumTrackColor="{DynamicResource PrimaryDark}"
-                    Value="{Binding PinScaleLimit}"/>
+                    Value="{Binding PinMinScaleLimit}"/>            
+            
+            <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
+            <Slider Maximum="100"
+                    Minimum="1"
+                    ThumbColor="{DynamicResource Primary}"
+                    MinimumTrackColor="{DynamicResource Primary}"
+                    MaximumTrackColor="{DynamicResource PrimaryDark}"
+                    Value="{Binding PinMaxScaleLimit}"/>
 
             <Label Text="{Binding PdfQuality, StringFormat='PDF-Qualität: {0:0.##}'}" />
             <Slider Maximum="800"

@@ -2,7 +2,8 @@
 
 internal class SettingsModel
 {
-    public double PinScaleLimit { get; set; }
+    public double PinMinScaleLimit { get; set; }
+    public double PinMaxScaleLimit { get; set; }
     public bool IsPlanRotateLocked { get; set; }
     public int PdfQuality { get; set; }
     public string? SelectedTheme { get; set; }

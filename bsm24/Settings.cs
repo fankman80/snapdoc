@@ -4,7 +4,6 @@ namespace bsm24;
 
 public static class Settings
 {
-    public static double MinPinScaleLimit { get => minPinScaleLimit; set => minPinScaleLimit = value; }
     public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
     public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
     public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
@@ -14,7 +13,6 @@ public static class Settings
     public static IconItem[] PinData { get => pinData; set => pinData = value; }
 
 
-    private static double minPinScaleLimit = 0.3;
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
     private static int thumbSize = 150;
     private static int planPreviewSize = 250;

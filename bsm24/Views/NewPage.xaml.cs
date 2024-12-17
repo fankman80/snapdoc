@@ -107,16 +107,14 @@ public partial class NewPage : IQueryAttributable
             if (e.PropertyName == "Scale")
             {
                 var scale = 1 / PlanContainer.Scale;
+                var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
                 foreach (MR.Gestures.Image img in PlanContainer.Children.Cast<MR.Gestures.Image>())
                 {
                     if (img.AutomationId != null)
                     {
                         // this may cause performance issues !!!
-                        var scaleLimit = SettingsService.Instance.PinScaleLimit / 100 * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
-                        if (scale < scaleLimit)
-                            img.Scale = scale;
-                        else if (scale < Settings.MinPinScaleLimit)
-                            img.Scale = Settings.MinPinScaleLimit;
+                        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+                            img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
                         if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
                             img.Rotation = PlanContainer.Rotation * -1;
@@ -415,10 +413,10 @@ public partial class NewPage : IQueryAttributable
     private double PinScaling(string pinId)
     {
         var scale = 1 / planContainer.Scale;
-        var scaleLimit = SettingsService.Instance.PinScaleLimit / 100 * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
-        if (scale < scaleLimit)
-            return 1 / planContainer.Scale;
+        var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
+        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+            return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
         else
-            return scaleLimit;
+            return scaleLimit * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
     }
 }

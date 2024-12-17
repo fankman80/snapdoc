@@ -190,7 +190,8 @@ public partial class OpenProject : UraniumContentPage
             // Den Ordner und dessen Inhalte komprimieren
             OpenProject.CompressFolder(sourceDirectory, zipOutputStream, baseDirectory.Length + 1);
 
-            zipOutputStream.Finish();
+            zipOutputStream.Flush();  // Sicherstellen, dass alle Daten geschrieben sind
+            zipOutputStream.Close();  // Schließe den Stream und beende die Komprimierung
         }
         catch (Exception ex)
         {
@@ -267,10 +268,14 @@ public partial class OpenProject : UraniumContentPage
 
             zipStream.PutNextEntry(newEntry);
 
-            // Write the file to the zip stream
-            using (var fileStream = File.OpenRead(filename))
+            try
             {
-                fileStream.CopyTo(zipStream);
+                using var fileStream = new FileStream(filename, FileMode.Open, FileAccess.Read, FileShare.Read, bufferSize: 81920);
+                fileStream.CopyTo(zipStream); // Write the file to the zip stream
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine($"Error reading file {filename}: {ex.Message}");
             }
 
             zipStream.CloseEntry();
@@ -281,6 +286,15 @@ public partial class OpenProject : UraniumContentPage
         foreach (var folder in folders)
         {
             OpenProject.CompressFolder(folder, zipStream, folderOffset);
+        }
+
+        // Handle empty directories (optional)
+        if (files.Length == 0 && folders.Length == 0)
+        {
+            string entryName = path[folderOffset..] + "/";
+            var emptyDirEntry = new ZipEntry(ZipEntry.CleanName(entryName));
+            zipStream.PutNextEntry(emptyDirEntry);
+            zipStream.CloseEntry();
         }
     }
 

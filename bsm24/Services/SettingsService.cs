@@ -76,22 +76,43 @@ public partial class SettingsService : INotifyPropertyChanged
     }
 
 #if WINDOWS
-    private double _pinScaleLimit = 100;
+    private double _pinMinScaleLimit = 20;
 #endif
 
 #if ANDROID
-    private double _pinScaleLimit = 50;
+    private double _pinMinScaleLimit = 20;
 #endif
 
-    public double PinScaleLimit
+    public double PinMinScaleLimit
     {
-        get => _pinScaleLimit;
+        get => _pinMinScaleLimit;
         set
         {
-            if (_pinScaleLimit != value)
+            if (_pinMinScaleLimit != value)
             {
-                _pinScaleLimit = Math.Round(value, 0);
-                OnPropertyChanged(nameof(PinScaleLimit));
+                _pinMinScaleLimit = Math.Min(Math.Round(value,0), PinMaxScaleLimit);
+                OnPropertyChanged(nameof(PinMinScaleLimit));
+            }
+        }
+    }
+
+#if WINDOWS
+    private double _pinMaxScaleLimit = 100;
+#endif
+
+#if ANDROID
+    private double _pinMaxScaleLimit = 50;
+#endif
+
+    public double PinMaxScaleLimit
+    {
+        get => _pinMaxScaleLimit;
+        set
+        {
+            if (_pinMaxScaleLimit != value)
+            {
+                _pinMaxScaleLimit = Math.Max(Math.Round(value,0), PinMinScaleLimit);
+                OnPropertyChanged(nameof(PinMaxScaleLimit));
             }
         }
     }
@@ -491,7 +512,8 @@ public partial class SettingsService : INotifyPropertyChanged
     {
         var settings = new SettingsModel
         {
-            PinScaleLimit = this.PinScaleLimit,
+            PinMinScaleLimit = this.PinMinScaleLimit,
+            PinMaxScaleLimit = this.PinMaxScaleLimit,
             IsPlanRotateLocked = this.IsPlanRotateLocked,
             PdfQuality = this.PdfQuality,
             SelectedTheme = this.SelectedTheme,
@@ -511,7 +533,8 @@ public partial class SettingsService : INotifyPropertyChanged
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
             if (settings != null)
             {
-                this.PinScaleLimit = settings.PinScaleLimit;
+                this.PinMinScaleLimit = settings.PinMinScaleLimit;
+                this.PinMaxScaleLimit = settings.PinMaxScaleLimit;
                 this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
                 this.PdfQuality = settings.PdfQuality;
                 this.SelectedTheme = settings.SelectedTheme;
