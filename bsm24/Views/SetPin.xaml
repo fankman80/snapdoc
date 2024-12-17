@@ -96,7 +96,7 @@
                 </Grid.RowDefinitions>
 
                 <Label Text="Pin exportieren:" Grid.Column="0" Grid.Row="0" VerticalOptions="Start"/>
-                <Label Text="Pin sperren:" Grid.Column="0" Grid.Row="1" VerticalOptions="Start"/>
+                <Label Text="Position sperren:" Grid.Column="0" Grid.Row="1" VerticalOptions="Start"/>
                 <Label Text="Rotation sperren:" Grid.Column="0" Grid.Row="2" VerticalOptions="Start"/>
 
                 <Switch Grid.Column="1" Grid.Row="0"
