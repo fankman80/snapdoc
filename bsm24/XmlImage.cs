@@ -22,7 +22,7 @@ public partial class XmlImage
                                                 double widthMilimeters = 0,
                                                 double heightMilimeters = 0,
                                                 int imageQuality = 90,
-                                                List<(string, SKPoint, string, SKPoint, SKColor)> overlayImages = null)
+                                                List<(string, SKPoint, SKPoint, SKColor)> overlayImages = null)
     // Item1 = Image
     // Item2 = Position
     // Item3 = Text
@@ -51,11 +51,7 @@ public partial class XmlImage
         // Add Overlay-Image
         if (overlayImages != null)
         {
-            // Font definition
-            var typeface = SKTypeface.FromFamilyName("Arial", SKFontStyle.Bold);
-            var font = new SKFont { Size = SettingsService.Instance.PlanLabelSize, Edging = SKFontEdging.Antialias, Typeface = typeface };
-
-            foreach ((string, SKPoint, string, SKPoint, SKColor) overlayImage in overlayImages.Select(v => v))
+            foreach ((string, SKPoint, SKPoint, SKColor) overlayImage in overlayImages.Select(v => v))
             {
                 var stream = await LoadImageStreamAsync(overlayImage.Item1);
                 var skStream = new SKManagedStream(stream);
@@ -79,45 +75,11 @@ public partial class XmlImage
                 using (SKCanvas canvas = new(combinedBitmap))
                 {
                     var _pos = new SKPoint(
-                        (skBitmap.Width * overlayImage.Item2.X) - (overlay.Width * overlayImage.Item4.X),
-                        (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item4.Y));
+                        (skBitmap.Width * overlayImage.Item2.X) - (overlay.Width * overlayImage.Item3.X),
+                        (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item3.Y));
 
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
                     canvas.DrawBitmap(overlay, _pos);
-
-                    var textPos = new SKPoint(_pos.X + overlay.Width + Settings.PinTextPadding + Settings.PinTextDistance,
-					      _pos.Y - Settings.PinTextPadding + Settings.PinTextDistance); // Position des Textes
-                    var textWidth = font.MeasureText(overlayImage.Item3); // Breite des Textes
-                    var fontMetrics = font.Metrics;
-                    var textHeight = fontMetrics.Descent - fontMetrics.Ascent; // Höhe des Textes
-
-                    if (overlayImage.Item3 != "")
-                    {
-                        using (var backgroundPaint = new SKPaint { Color = SKColors.White }) // weisser Hintergrund
-                        {
-                            var backgroundRect = new SKRect(
-                                textPos.X - Settings.PinTextPadding + 1,
-                                textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding + 1,
-                                textPos.X + textWidth + Settings.PinTextPadding - 1,
-                                textPos.Y + fontMetrics.Descent + Settings.PinTextPadding - 1);
-                            canvas.DrawRect(backgroundRect, backgroundPaint);
-                        }
-
-                        using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5, Style = SKPaintStyle.Stroke, StrokeWidth = 2 }) // Rahmen
-                        {
-                            var backgroundRect = new SKRect(
-                                textPos.X - Settings.PinTextPadding,
-                                textPos.Y + fontMetrics.Ascent - Settings.PinTextPadding,
-                                textPos.X + textWidth + Settings.PinTextPadding,
-                                textPos.Y + fontMetrics.Descent + Settings.PinTextPadding);
-                            canvas.DrawRect(backgroundRect, backgroundPaint);
-                        }
-
-                        using (var backgroundPaint = new SKPaint { Color = overlayImage.Item5 }) // Text
-                        {
-                            canvas.DrawText(overlayImage.Item3, textPos, SKTextAlign.Left, font, backgroundPaint);
-                        }
-                    }
                 }
 
                 skBitmap = combinedBitmap;

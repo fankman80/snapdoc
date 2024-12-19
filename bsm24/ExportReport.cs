@@ -145,12 +145,11 @@ public partial class ExportReport
                                                             var pinImage = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
 
                                                             // Pin-Icon ein/ausblenden
-                                                            var pinList = new List<(string, SKPoint, string, SKPoint, SKColor)>();
+                                                            var pinList = new List<(string, SKPoint, SKPoint, SKColor)>();
                                                             if (SettingsService.Instance.IsPinIconExport)
                                                             {
                                                                 pinList = [(pinImage,
                                                                         new SKPoint(0.5f, 0.5f),
-                                                                        "",
                                                                         new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X,
                                                                                     (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y),
                                                                                     GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor)];
@@ -309,6 +308,7 @@ public partial class ExportReport
                                     {
                                         int i = 1;
                                         text.Remove(); // Lösche den Platzhaltertext
+
                                         foreach (var plan in GlobalJson.Data.Plans)
                                         {
                                             var runProperties = new RunProperties(); // definiere Schriftgrösse
@@ -318,9 +318,9 @@ public partial class ExportReport
                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
 
                                             runProperties.Append(fontSize);
-                                            run.PrependChild(runProperties); // weise Schrift-Property zu
+                                            run.PrependChild(runProperties);
                                             run.Append(new Text(GlobalJson.Data.Plans[plan.Key].Name));
-                                            //run.Append(new Break() { Type = BreakValues.Column });
+
                                             run.Append(GetImageElement(mainPart, planImage, new Size(200, 200 * planSize.Height / planSize.Width), new Point(0, 0)));
 
                                             if (GlobalJson.Data.Plans[plan.Key].Pins != null)
@@ -338,13 +338,27 @@ public partial class ExportReport
                                                                                   (pinPos.Y * 200 * planSize.Height / planSize.Width) - (pinAnchor.Y * pinSize.Height / 20));
                                                         run.Append(GetImageElement(mainPart, pinImage, new Size(pinSize.Width / 20, pinSize.Height / 20), posOnPlan));
 
-                                                        run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(), posOnPlan, 12, pinColor.ToString()[3..]));
-
+                                                        run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
+                                                                                          new Point(posOnPlan.X + (pinSize.Width / 20), posOnPlan.Y - pinSize.Height / 20),
+                                                                                          SettingsService.Instance.PlanLabelFontSize,
+                                                                                          pinColor.ToString()[3..]));
                                                         i += 1;
                                                     }
                                                 }
                                             }
-                                            if (i < GlobalJson.Data.Plans.Count - 1) run.Append(new Break() { Type = BreakValues.Page });  // letzter Seitenumbruch nicht einfügen
+
+                                            // Erstelle einen neuen Paragraph und Run für den nächsten Plan auf der neuen Seite
+                                            var pageBreakParagraph = new Paragraph(new Run(new Break() { Type = BreakValues.Page }));
+                                            mainPart.Document.Body.AppendChild(pageBreakParagraph);
+
+                                            // Füge einen neuen Paragraph und Run für den nächsten Plan hinzu
+                                            var nextPlanParagraph = new Paragraph();
+                                            var nextPlanRun = new Run();
+                                            mainPart.Document.Body.AppendChild(nextPlanParagraph);
+                                            nextPlanParagraph.Append(nextPlanRun);
+
+                                            // Setze den `run` auf den neu erstellten `nextPlanRun`, um den nächsten Plan einzufügen
+                                            run = nextPlanRun;
                                         }
                                     }
                                 }
@@ -604,42 +618,85 @@ public partial class ExportReport
 
     private static Picture CreateTextBoxWithShape(string text, Point coordinateMM, double fontSizePt, string fontColorHex)
     {
-        double xCoordinatePt = coordinateMM.X * 2.83465;
-        double yCoordinatePt = coordinateMM.Y * 2.83465;
+        double xCoordinatePt = coordinateMM.X * 3.7795; // * 2.83465  f=1.333333 ?;
+        double yCoordinatePt = coordinateMM.Y * 3.7795; // * 2.83465  f=1.333333 ?;
+        double textWidthPt = GetTextWidthInPoints(text, "Arial", fontSizePt, 96) * 2;
 
+        // Erstelle die Shape mit Positionierung
         Picture picture1 = new();
 
         Shape shape1 = new()
         {
             Id = "TextBoxShape",
-            Style = $"position:absolute;margin-left:{xCoordinatePt}pt;margin-top:{yCoordinatePt}pt;mso-fit-shape-to-text:t;",
+            Style = $"position:absolute;margin-left:{xCoordinatePt}pt;margin-top:{yCoordinatePt}pt;width:{textWidthPt}pt;mso-fit-shape-to-text:t;mso-wrap-style:square;",
         };
 
         Fill fill1 = new() { Color = "#FFFFFF" };
         Stroke stroke1 = new() { Color = fontColorHex, Weight = "1pt" };
-        TextBox textBox1 = new() { Style = "mso-fit-shape-to-text:t" };
-        TextBoxContent textBoxContent1 = new();
-        Paragraph paragraph2 = new();
-        Run run2 = new();
 
-        RunProperties runProperties = new()
+        // Erstelle die TextBox
+        TextBox textBox1 = new()
         {
-            FontSize = new DocumentFormat.OpenXml.Wordprocessing.FontSize() { Val = fontSizePt.ToString() },
-            Color = new OXML.Wordprocessing.Color() { Val = fontColorHex } // Textfarbe im Hex-Format (z. B. "#FF5733")
+            Style = "mso-fit-shape-to-text:t;mso-wrap-style:square;",
+            Inset = "0pt, 0pt, 0pt, 0pt"
+        };
+        TextBoxContent textBoxContent1 = new();
+
+        Paragraph paragraph2 = new();
+        ParagraphProperties paragraphProperties = new();
+
+        Shading paragraphShading = new()
+        {
+            Fill = "FFFFFF",
+            Val = ShadingPatternValues.Clear
         };
 
-        Text text2 = new() { Text = text };
+        ParagraphBorders paragraphBorders = new()
+        {
+            TopBorder = new OXML.Wordprocessing.TopBorder() { Val = OXML.Wordprocessing.BorderValues.Single, Color = fontColorHex.Replace("#", ""), Size = 6U },  // Obere Linie
+            BottomBorder = new OXML.Wordprocessing.BottomBorder() { Val = OXML.Wordprocessing.BorderValues.Single, Color = fontColorHex.Replace("#", ""), Size = 6U },  // Untere Linie
+            LeftBorder = new OXML.Wordprocessing.LeftBorder() { Val = OXML.Wordprocessing.BorderValues.Single, Color = fontColorHex.Replace("#", ""), Size = 6U },  // Linke Linie
+            RightBorder = new OXML.Wordprocessing.RightBorder() { Val = OXML.Wordprocessing.BorderValues.Single, Color = fontColorHex.Replace("#", ""), Size = 6U }  // Rechte Linie
+        };
 
+        // Füge die Hintergrundfarbe und die Rahmen zu den Absatzeigenschaften hinzu
+        paragraphProperties.Append(paragraphShading);  // Hintergrundfarbe des Absatzes
+        paragraphProperties.Append(paragraphBorders);  // Rahmen um den Absatz
+
+        // Definiere den Text und seine Eigenschaften (Größe und Farbe)
+        Run run2 = new();
+        RunProperties runProperties = new()
+        {
+            FontSize = new DocumentFormat.OpenXml.Wordprocessing.FontSize() { Val = (fontSizePt * 2).ToString() },  // Schriftgröße
+            Color = new DocumentFormat.OpenXml.Wordprocessing.Color() { Val = fontColorHex.Replace("#", "") },  // Schriftfarbe
+            RunFonts = new DocumentFormat.OpenXml.Wordprocessing.RunFonts() { Ascii = "Arial" }  // Schriftart auf Arial setzen
+        };
+
+        // Füge den Textinhalt hinzu
+        DocumentFormat.OpenXml.Wordprocessing.Text text2 = new() { Text = text };
+
+        // Setze die Formatierungen auf den Text und füge ihn hinzu
         run2.Append(runProperties);
         run2.Append(text2);
+        paragraph2.Append(paragraphProperties);  // Füge die Absatz-Eigenschaften hinzu
         paragraph2.Append(run2);
         textBoxContent1.Append(paragraph2);
+
+        // Füge den Textinhalt zur TextBox hinzu
         textBox1.Append(textBoxContent1);
         shape1.Append(textBox1);
-        shape1.Append(fill1);
-        shape1.Append(stroke1);
+        shape1.Append(fill1);  // Hintergrundfarbe der Form
+        shape1.Append(stroke1);  // Rand der Form
         picture1.Append(shape1);
 
         return picture1;
+    }
+
+    public static double GetTextWidthInPoints(string text, string fontName, double fontSizePt, double dpi)
+    {
+        using SKFont font = new(SKTypeface.FromFamilyName(fontName), (float)fontSizePt);
+        float textWidthInPixels = font.MeasureText(text);
+        double textWidthInPoints = textWidthInPixels * 72 / dpi;
+        return textWidthInPoints;
     }
 }

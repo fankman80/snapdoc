@@ -148,16 +148,16 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _planLabelSize = 32;
-    public int PlanLabelSize
+    private int _planLabelFontSize = 4;
+    public int PlanLabelFontSize
     {
-        get => _planLabelSize;
+        get => _planLabelFontSize;
         set
         {
-            if (_planLabelSize != value)
+            if (_planLabelFontSize != value)
             {
-                _planLabelSize = value;
-                OnPropertyChanged(nameof(PlanLabelSize));
+                _planLabelFontSize = value;
+                OnPropertyChanged(nameof(PlanLabelFontSize));
             }
         }
     }
