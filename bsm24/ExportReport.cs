@@ -334,9 +334,12 @@ public partial class ExportReport
                                                         var pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                         var pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                         var pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                        var posOnPlan = new Point((pinPos.X * 200) - (pinAnchor.X * pinSize.Width / 20),
-                                                                                  (pinPos.Y * 200 * planSize.Height / planSize.Width) - (pinAnchor.Y * pinSize.Height / 20));
-                                                        run.Append(GetImageElement(mainPart, pinImage, new Size(pinSize.Width / 20, pinSize.Height / 20), posOnPlan));
+                                                        var scaledPinSize = GetAspectRatioSize(pinSize, SettingsService.Instance.PinSize);
+                                                        var posOnPlan = new Point((pinPos.X * 200) - (pinAnchor.X * scaledPinSize.Width),
+                                                                                  (pinPos.Y * 200 * planSize.Height / planSize.Width) - (pinAnchor.Y * scaledPinSize.Height));
+
+                                                        
+                                                        run.Append(GetImageElement(mainPart, pinImage, new Size(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
 
                                                         run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
                                                                                           new Point(posOnPlan.X + (pinSize.Width / 20), posOnPlan.Y - pinSize.Height / 20),
@@ -704,8 +707,22 @@ public partial class ExportReport
     {
         var ratio = Math.Max(inputSize.Width, inputSize.Height) /
                     Math.Min(inputSize.Width, inputSize.Height);
-        var w = 
-        return size
+        var w, h;
+        if (inputSize.Width > inputSize.Height)
+        {
+            w = maxLenght;
+            h = maxLenght * inputSize.Height / inputSize.Width;
+        }
+        else if (inputSize.Width < inputSize.Height)
+        {
+            w = maxLenght * inputSize.Width / inputSize.Height;
+            h = maxLenght;
+        }
+        else
+        {
+            w = maxLenght;
+            h = maxLenght;
+        }
+        return new Size(w, h);
     }
-    
 }
