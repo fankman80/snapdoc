@@ -316,12 +316,12 @@ public partial class ExportReport
                                             var imgName = GlobalJson.Data.Plans[plan.Key].File;
                                             var planImage = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, imgName);
                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
-
+                                            var scaledPlanSize = ScaleToFit(planSize, new Size(250, 140));
                                             runProperties.Append(fontSize);
                                             run.PrependChild(runProperties);
                                             run.Append(new Text(GlobalJson.Data.Plans[plan.Key].Name));
 
-                                            run.Append(GetImageElement(mainPart, planImage, new Size(200, 200 * planSize.Height / planSize.Width), new Point(0, 0)));
+                                            run.Append(GetImageElement(mainPart, planImage, scaledPlanSize, new Point(0, 0)));
 
                                             if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                                             {
@@ -334,15 +334,15 @@ public partial class ExportReport
                                                         var pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                         var pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                         var pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                        var scaledPinSize = GetAspectRatioSize(pinSize, SettingsService.Instance.PinSize);
-                                                        var posOnPlan = new Point((pinPos.X * 200) - (pinAnchor.X * scaledPinSize.Width),
-                                                                                  (pinPos.Y * 200 * planSize.Height / planSize.Width) - (pinAnchor.Y * scaledPinSize.Height));
+                                                        var scaledPinSize = ScaleToFit(pinSize, new Size(SettingsService.Instance.PinSize, SettingsService.Instance.PinSize));
+                                                        var posOnPlan = new Point((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
+                                                                                  (pinPos.Y * scaledPlabSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
 
                                                         
                                                         run.Append(GetImageElement(mainPart, pinImage, new Size(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
 
                                                         run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
-                                                                                          new Point(posOnPlan.X + (pinSize.Width / 20), posOnPlan.Y - pinSize.Height / 20),
+                                                                                          new Point(posOnPlan.X + (pinSize.Width / scaledPinSize.Width), posOnPlan.Y - pinSize.Height / scaledPinSize.Height),
                                                                                           SettingsService.Instance.PlanLabelFontSize,
                                                                                           pinColor.ToString()[3..]));
                                                         i += 1;
@@ -703,26 +703,22 @@ public partial class ExportReport
         return textWidthInPoints;
     }
 
-    private static Size GetAspectRatioSize(Size inputSize, double maxLenght)
-    {
-        var ratio = Math.Max(inputSize.Width, inputSize.Height) /
-                    Math.Min(inputSize.Width, inputSize.Height);
-        var w, h;
-        if (inputSize.Width > inputSize.Height)
-        {
-            w = maxLenght;
-            h = maxLenght * inputSize.Height / inputSize.Width;
-        }
-        else if (inputSize.Width < inputSize.Height)
-        {
-            w = maxLenght * inputSize.Width / inputSize.Height;
-            h = maxLenght;
-        }
-        else
-        {
-            w = maxLenght;
-            h = maxLenght;
-        }
-        return new Size(w, h);
-    }
+private Size ScaleToFit(Size originalSize, Size maxTargetSize)
+{
+    // Berechne die Skalierungsfaktoren für die Breite und Höhe
+    double widthScale = (double)maxTargetWidth / originalWidth;
+    double heightScale = (double)maxTargetHeight / originalHeight;
+
+    // Wähle den kleineren Skalierungsfaktor, um sicherzustellen, dass das Bild nicht größer als die Zielabmessungen wird
+    double scale = Math.Min(widthScale, heightScale);
+
+    // Berechne die neuen Abmessungen
+    int newWidth = (int)(originalWidth * scale);
+    int newHeight = (int)(originalHeight * scale);
+
+    // Rückgabe der skalierten Abmessungen
+    return (newWidth, newHeight);
+}
+    
+    
 }
