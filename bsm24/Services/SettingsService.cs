@@ -261,6 +261,20 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
+    private int _pinExportSize = 32;
+    public int PinExportSize
+    {
+        get => _pinExportSize;
+        set
+        {
+            if (_pinExportSize != value)
+            {
+                _pinExportSize = value;
+                OnPropertyChanged(nameof(PinExportSize));
+            }
+        }
+    }
+
     private int _titleExportSize = 100;
     public int TitleExportSize
     {
