@@ -10,6 +10,8 @@ using DocumentFormat.OpenXml.Vml.Office;
 using DocumentFormat.OpenXml.Vml.Wordprocessing;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml;
+using System.Text.RegularExpressions;
+using Microsoft.Maui;
 
 namespace bsm24;
 
@@ -29,7 +31,7 @@ public partial class ExportReport
         Dictionary<string, string> placeholders_lists = new()
         {
             {"${plan_indexes}", "${plan_indexes}"}, //bereinige splitted runs
-            {"${plan_images}", "${plan_images}"},   //bereinige splitted runs  
+            {"${plan_images/", "${plan_images/"},   //bereinige splitted runs  
             {"${title_image}", "${title_image}"},   //bereinige splitted runs
         };
         Dictionary<string, string> placeholders_table = new()
@@ -298,16 +300,20 @@ public partial class ExportReport
                     {
                         // add Plan Images
                         foreach (var paragraph in mainPart.Document.Body.Elements<Paragraph>())
-                        {
-                            var run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains("${plan_images}"));
-                            if (run != null)
+                        {                            
+                            if (paragraph.InnerText.Contains("${plan_images/"))
                             {
-                                foreach (var text in run.Elements<Text>())
+                                var planMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
+                                var replaceString = planMaxSize.Width.ToString() + "/" + planMaxSize.Height.ToString() + "}";
+                                foreach (var run in paragraph.Elements<Run>())
                                 {
-                                    if (text.Text.Contains("${plan_images}"))
+                                    if (run.InnerText.Contains(replaceString))                                    
+                                        run.Elements<Text>().FirstOrDefault(r => r.InnerText.Contains(replaceString)).Remove();                                                                            
+
+                                    if (run.InnerText.Contains("${plan_images/"))
                                     {
                                         int i = 1;
-                                        text.Remove(); // Lösche den Platzhaltertext
+                                        run.Elements<Text>().FirstOrDefault(r => r.InnerText.Contains("${plan_images/")).Remove();
 
                                         foreach (var plan in GlobalJson.Data.Plans)
                                         {
@@ -316,7 +322,8 @@ public partial class ExportReport
                                             var imgName = GlobalJson.Data.Plans[plan.Key].File;
                                             var planImage = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, imgName);
                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
-                                            var scaledPlanSize = ScaleToFit(planSize, new Size(250, 140));
+                                            var scaledPlanSize = ScaleToFit(planSize, planMaxSize);
+
                                             runProperties.Append(fontSize);
                                             run.PrependChild(runProperties);
                                             run.Append(new Text(GlobalJson.Data.Plans[plan.Key].Name));
@@ -334,15 +341,14 @@ public partial class ExportReport
                                                         var pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                         var pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                         var pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                        var scaledPinSize = ScaleToFit(pinSize, new Size(SettingsService.Instance.PinSize, SettingsService.Instance.PinSize));
+                                                        var scaledPinSize = ScaleToFit(pinSize, new Size(0, SettingsService.Instance.PinExportSize));
                                                         var posOnPlan = new Point((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
-                                                                                  (pinPos.Y * scaledPlabSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
+                                                                                  (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
 
-                                                        
                                                         run.Append(GetImageElement(mainPart, pinImage, new Size(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
 
                                                         run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
-                                                                                          new Point(posOnPlan.X + (pinSize.Width / scaledPinSize.Width), posOnPlan.Y - pinSize.Height / scaledPinSize.Height),
+                                                                                          new Point(posOnPlan.X + scaledPinSize.Width, posOnPlan.Y - scaledPinSize.Height),
                                                                                           SettingsService.Instance.PlanLabelFontSize,
                                                                                           pinColor.ToString()[3..]));
                                                         i += 1;
@@ -558,12 +564,12 @@ public partial class ExportReport
         return _drawing;
     }
 
-    public static long MillimetersToEMU(double millimeters)
+    private static long MillimetersToEMU(double millimeters)
     {
         return Convert.ToInt64(millimeters * 36000);
     }
 
-    public static List<string> GetUniquePinIcons(JsonDataModel jsonDataModel)
+    private static List<string> GetUniquePinIcons(JsonDataModel jsonDataModel)
     {
         // HashSet für einzigartige PinIcons
         HashSet<string> uniquePinIcons = [];
@@ -703,22 +709,39 @@ public partial class ExportReport
         return textWidthInPoints;
     }
 
-private Size ScaleToFit(Size originalSize, Size maxTargetSize)
-{
-    // Berechne die Skalierungsfaktoren für die Breite und Höhe
-    double widthScale = (double)maxTargetWidth / originalWidth;
-    double heightScale = (double)maxTargetHeight / originalHeight;
+    private static Size ScaleToFit(Size originalSize, Size maxTargetSize)
+    {
+        double widthScale = maxTargetSize.Width != 0 
+            ? (double)maxTargetSize.Width / originalSize.Width 
+            : double.PositiveInfinity;
 
-    // Wähle den kleineren Skalierungsfaktor, um sicherzustellen, dass das Bild nicht größer als die Zielabmessungen wird
-    double scale = Math.Min(widthScale, heightScale);
+        double heightScale = maxTargetSize.Height != 0 
+            ? (double)maxTargetSize.Height / originalSize.Height 
+            : double.PositiveInfinity;
 
-    // Berechne die neuen Abmessungen
-    int newWidth = (int)(originalWidth * scale);
-    int newHeight = (int)(originalHeight * scale);
+        double scale = Math.Min(widthScale, heightScale);
 
-    // Rückgabe der skalierten Abmessungen
-    return (newWidth, newHeight);
-}
+        int newWidth = (int)(originalSize.Width * scale);
+        int newHeight = (int)(originalSize.Height * scale);
+
+        return new Size(newWidth, newHeight);
+    }
     
-    
+    private static Size ExtractDimensions(string input)
+    {
+        // Regex für die Struktur ${plan_images/Wert1/Wert2}
+        var regex = new Regex(@"\$\{plan_images/(\d+)/(\d+)\}");
+        var match = regex.Match(input);
+
+        if (match.Success)
+        {
+            // Extrahiere die beiden Werte und konvertiere sie in Integer
+            int width = int.Parse(match.Groups[1].Value);
+            int height = int.Parse(match.Groups[2].Value);
+            return new Size(width, height);
+        }
+
+        // Gib null zurück, wenn kein Match gefunden wurde
+        return new Size(250, 140);
+    }
 }

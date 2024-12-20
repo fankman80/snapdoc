@@ -261,8 +261,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _pinExportSize = 32;
-    public int PinExportSize
+    private double _pinExportSize = 3.2;
+    public double PinExportSize
     {
         get => _pinExportSize;
         set

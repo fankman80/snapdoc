@@ -46,7 +46,7 @@ public partial class PopupExportSettings : PopupPage
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
-            await ExportReport.DocX("template.docx", outputPath);
+            await ExportReport.DocX("template_ebbe.docx", outputPath);
         });
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
@@ -77,7 +77,7 @@ public partial class PopupExportSettings : PopupPage
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
-            await ExportReport.DocX("template.docx", outputPath);
+            await ExportReport.DocX("template_ebbe.docx", outputPath);
         });
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
