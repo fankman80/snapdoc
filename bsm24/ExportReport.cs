@@ -43,12 +43,10 @@ public partial class ExportReport
             {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
             {"${pin_location}", "${pin_location}"}, //bereinige splitted runs
         };
-
-        // Extrahiere die einzigartigen PinIcons
-        //List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
-
+        
         // Kopiere die benötigten Icons aus den Ressourcen in den Cache
         var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "pincache");
+        List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
         if (!Directory.Exists(cacheDir))
             Directory.CreateDirectory(cacheDir);
         foreach (var icon in uniquePinIcons)
