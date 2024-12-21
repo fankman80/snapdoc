@@ -9,6 +9,8 @@ using System.Text.RegularExpressions;
 using C = Codeuctivity.OpenXmlPowerTools;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using OXML = DocumentFormat.OpenXml;
+using System.Reflection;
+using System.IO;
 
 namespace bsm24;
 
@@ -41,6 +43,18 @@ public partial class ExportReport
             {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
             {"${pin_location}", "${pin_location}"}, //bereinige splitted runs
         };
+
+        // Extrahiere die einzigartigen PinIcons
+        //List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
+
+        // Kopiere die benötigten Icons aus den Ressourcen in den Cache
+        var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "pincache");
+        if (!Directory.Exists(cacheDir))
+            Directory.CreateDirectory(cacheDir);
+        foreach (var icon in uniquePinIcons)
+        {
+            CopyImageToDirectoryAsync(icon, Path.Combine(cacheDir, icon));
+        }
 
         // Eine Kopie der Vorlage im MemoryStream öffnen, um das Original nicht zu verändern
         using MemoryStream memoryStream = new();
@@ -279,19 +293,6 @@ public partial class ExportReport
                             }
                         }
                     }
-
-                    // Extrahiere die einzigartigen PinIcons
-                    //List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
-
-                    var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "pincache");
-                    //if (!Directory.Exists(cacheDir))
-                    //    Directory.CreateDirectory(cacheDir);
-
-                    //foreach (var icon in uniquePinIcons)
-                    //{
-                    //File.Move(icon, Path.Combine(cacheDir, icon));
-                    //}
-
 
                     if (mainPart?.Document?.Body != null)
                     {
@@ -741,4 +742,37 @@ public partial class ExportReport
         }
         return new Size(250, 140);
     }
+
+public async Task CopyImageToDirectoryAsync(string icon, string destinationPath)
+{
+    // Zielpfad, wo das Bild gespeichert werden soll
+    string destinationFolder = FileSystem.AppDataDirectory;
+    string destinationFilePath = Path.Combine(destinationFolder, "myImage.png");
+
+    // Überprüfen, ob die Datei bereits existiert
+    if (File.Exists(destinationFilePath))
+    {
+        Console.WriteLine("Das Bild ist bereits vorhanden.");
+        return;
+    }
+
+    // Den Namen der Ressource festlegen (Namespace und Bildname beachten)
+    var assembly = Assembly.GetExecutingAssembly();
+    var resourceName = "DeinProjektNamespace.Resources.Images.myImage.png";
+
+    // Bild aus den eingebetteten Ressourcen laden
+    using Stream stream = assembly.GetManifestResourceStream(resourceName);
+
+    if (stream != null)
+    {
+        using FileStream fileStream = new FileStream(destinationFilePath, FileMode.Create, FileAccess.Write);
+        await stream.CopyToAsync(fileStream);
+        Console.WriteLine("Bild erfolgreich kopiert.");
+    }
+    else
+    {
+        Console.WriteLine("Bild konnte nicht gefunden werden.");
+    }
+}
+    
 }
