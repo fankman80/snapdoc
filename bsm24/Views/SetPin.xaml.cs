@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using bsm24.Models;
+using FFImageLoading.Extensions;
 using FFImageLoading.Maui;
 using Mopups.Services;
 using System.Collections.ObjectModel;
@@ -62,6 +63,25 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         ImageGallery.ItemsSource = null; // Temporär die ItemsSource auf null setzen
         ImageGallery.ItemsSource = Images; // Dann wieder auf die Collection setzen
 
+        priorityPicker.ItemsSource = Settings.PriorityItems.Keys.ToList();
+
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority != "" &
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority != null)
+        {
+            String fillColor = "#FFFFFF";
+            if (Settings.PriorityItems.TryGetValue(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority, out String color))
+                fillColor = color;
+            priorityPicker.BorderColor = Color.FromArgb(fillColor);
+            priorityPicker.AccentColor = Color.FromArgb(fillColor);
+            priorityPicker.TextColor = Color.FromArgb(fillColor);
+            priorityPicker.Icon = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Priority_high,
+                Color = Color.FromArgb(fillColor)
+            };
+        }
+
         // read data
         this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
         PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
@@ -71,6 +91,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         LockRotate.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
         AllowExport.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         SizePercentText.Text = Math.Round(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale * 100, 0).ToString() + "%";
+        priorityPicker.SelectedItem = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority;
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -141,6 +162,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = LockRotate.IsToggled;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport = AllowExport.IsToggled;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedItem.ToString();
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -198,11 +220,34 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private void UpdateSpan()
     {
         double screenWidth = this.Width;
-        double imageWidth = Settings.PlanPreviewSize; // Mindestbreite in Pixeln
+        double imageWidth = Settings.PlanPreviewSize;
         DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
         DynamicSize = (int)(screenWidth / DynamicSpan);
         OnPropertyChanged(nameof(DynamicSpan));
         OnPropertyChanged(nameof(DynamicSize));
+    }
+
+    private void OnSelectedValueChanged(object sender, EventArgs e)
+    {
+        if (sender is Picker picker)
+        {
+            var selectedValue = picker.SelectedItem;  // Dies ist das ausgewählte Item
+            if (selectedValue != null)
+            {
+                String fillColor = "#FFFFFF";
+                if (Settings.PriorityItems.TryGetValue(selectedValue.ToString(), out String color))
+                    fillColor = color;
+                priorityPicker.BorderColor = Color.FromArgb(fillColor);
+                priorityPicker.AccentColor = Color.FromArgb(fillColor);
+                priorityPicker.TextColor = Color.FromArgb(fillColor);
+                priorityPicker.Icon = new FontImageSource
+                {
+                    FontFamily = "MaterialOutlined",
+                    Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Priority_high,
+                    Color = Color.FromArgb(fillColor)
+                };
+            }
+        }
     }
 }
 

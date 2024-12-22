@@ -8,7 +8,8 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             xmlns:local="clr-namespace:bsm24.Views"                         
+             xmlns:local="clr-namespace:bsm24.Views"  
+             xmlns:services="clr-namespace:bsm24.Services"
              x:DataType="views:SetPin"
              x:Class="bsm24.Views.SetPin"
              Title="Pin bearbeiten">
@@ -85,11 +86,12 @@
             <Grid ColumnSpacing="10" RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="80" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
@@ -98,6 +100,7 @@
                 <Label Text="Pin exportieren:" Grid.Column="0" Grid.Row="0" VerticalOptions="Start"/>
                 <Label Text="Position sperren:" Grid.Column="0" Grid.Row="1" VerticalOptions="Start"/>
                 <Label Text="Rotation sperren:" Grid.Column="0" Grid.Row="2" VerticalOptions="Start"/>
+                <Label Text="Priorität:" Grid.Column="0" Grid.Row="3" VerticalOptions="Center"/>
 
                 <Switch Grid.Column="1" Grid.Row="0"
                         x:Name="AllowExport"
@@ -117,34 +120,43 @@
                         ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
 
-                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="2"
+                <Button Grid.Column="2"  Grid.Row="0" Grid.RowSpan="3"
+                        HeightRequest="80"
                         Padding="0,20,0,0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
                         Clicked="OnResizeClicked"/>
 
-                <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                <Label Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
                        x:Name="SizePercentText"                       
                        InputTransparent="True"
-                       Padding="0,10,0,0"
+                       Padding="0,24,0,0"
                        HorizontalTextAlignment="Center"
                        Text="100%"
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"/>                
 
-                <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="3"
+                        HeightRequest="80"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="White"
                         HorizontalOptions="End"
                         VerticalOptions="Center"
                         StrokeShape="RoundRectangle 10">
-                        <ImageButton Source="{Binding}"
+                    <ImageButton Source="{Binding}"
                                      x:Name="PinImage"
                                      Aspect="AspectFit"
                                      Clicked="OnPinSelectClick"
                                      Padding="8"/>
                 </Border>
+
+                <material:PickerField Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
+                        x:DataType="services:SettingsService"
+                        x:Name="priorityPicker"
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Priority_high}}"
+                        SelectedValueChanged="OnSelectedValueChanged">
+                </material:PickerField>
             </Grid>
         
             <Grid>

@@ -84,8 +84,8 @@
                         <Label Text="Pin-Icons / Prefix und Schriftgrösse:" Margin="0, 0, 0, -12"/>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="3*" />
-                                <ColumnDefinition Width="1*" />
+                                <ColumnDefinition Width="4*" />
+                                <ColumnDefinition Width="2*" />
                             </Grid.ColumnDefinitions>
  
                             <material:TextField Grid.Column="0"
@@ -94,6 +94,7 @@
                                 BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
                             <material:TextField Grid.Column="1"
+                                                HorizontalTextAlignment="Center"
                                 Text="{Binding PlanLabelFontSize}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"

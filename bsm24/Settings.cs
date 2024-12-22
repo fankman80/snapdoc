@@ -4,6 +4,7 @@ namespace bsm24;
 
 public static class Settings
 {
+    public static Dictionary<string, string> PriorityItems { get => priorityItems; set => priorityItems = value; }
     public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
     public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
     public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
@@ -12,7 +13,7 @@ public static class Settings
     public static int PinTextDistance { get => pinTextDistance; set => pinTextDistance = value; }
     public static IconItem[] PinData { get => pinData; set => pinData = value; }
 
-
+    
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
     private static int thumbSize = 150;
     private static int planPreviewSize = 250;
@@ -87,4 +88,11 @@ public static class Settings
         new("zuluft_abstroemung_natuerlich.png", "Zuluft / Abströmung natürlich", new Point(1.0, 0.5), new Size(141,64), true, new SKColor(217, 217, 20), 1.0),
         new("zusaetzlicher_zugang_feuerwehr.png", "Zusätzlicher Zugang Feuerwehr", new Point(1.0, 0.5), new Size(89,64), true, new SKColor(255,0,0), 1.0)
     ];
+    private static Dictionary<string, string> priorityItems = new()
+    {
+        { "", "#000000" },
+        { "Empfehlung", "#92D050" },
+        { "Wichtig", "#FFC000" },
+        { "Kritisch", "#FF0000" }
+    };
 }

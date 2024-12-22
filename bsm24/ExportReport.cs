@@ -1,21 +1,22 @@
-﻿using bsm24.Models;
+﻿#nullable disable
+
+using bsm24.Models;
 using bsm24.Services;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.Maui;
 using SkiaSharp;
 using System.Text.RegularExpressions;
-using C = Codeuctivity.OpenXmlPowerTools;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
 using OXML = DocumentFormat.OpenXml;
-using System.Reflection;
-using System.IO;
 
 namespace bsm24;
 
 public partial class ExportReport
 {
+    [GeneratedRegex(@"\$\{plan_images/(\d+)/(\d+)\}")]
+    public static partial Regex PlanImagesRegex();
+
     public static async Task DocX(string templateDoc, string savePath)
     {
         Dictionary<string, string> placeholders_single = new()
@@ -42,17 +43,14 @@ public partial class ExportReport
             {"${pin_name}", "${pin_name}"},         //bereinige splitted runs
             {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
             {"${pin_location}", "${pin_location}"}, //bereinige splitted runs
-        };
-        
+            {"${pin_priority}", "${pin_priority}"}, //bereinige splitted runs
+    };
+
         // Kopiere die benötigten Icons aus den Ressourcen in den Cache
-        var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "pincache");
+        var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache");
         List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
-        if (!Directory.Exists(cacheDir))
-            Directory.CreateDirectory(cacheDir);
         foreach (var icon in uniquePinIcons)
-        {
-            CopyImageToDirectoryAsync(icon, Path.Combine(cacheDir, icon));
-        }
+            await CopyImageToDirectoryAsync(cacheDir, icon);
 
         // Eine Kopie der Vorlage im MemoryStream öffnen, um das Original nicht zu verändern
         using MemoryStream memoryStream = new();
@@ -70,15 +68,15 @@ public partial class ExportReport
             // Platzhalter durch die entsprechenden Werte ersetzen
             foreach (var placeholder in placeholders_single)
                 if (placeholder.Value != "")
-                    C.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
+                    Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
             foreach (var placeholder in placeholders_lists)
                 if (placeholder.Value != "")
-                    C.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
+                    Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
             foreach (var placeholder in placeholders_table)
                 if (placeholder.Value != "")
-                    C.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
+                    Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
 
-            MainDocumentPart? mainPart = wordDoc.MainDocumentPart;
+            MainDocumentPart mainPart = wordDoc.MainDocumentPart;
 
             // suche Tabelle mit Namen "PinTable"
             string tableTitle = "Pin_Table";
@@ -168,7 +166,7 @@ public partial class ExportReport
                                                             else
                                                                 pinList = null;
 
-                                                            var _imgPlan = await XmlImage.GenerateImage(mainPart,
+                                                            var _imgPlan = XmlImage.GenerateImage(mainPart,
                                                                                                         new FileResult(planPath),
                                                                                                         SettingsService.Instance.PosImageExportScale,
                                                                                                         new SKPoint((float)pinPos.X,
@@ -195,7 +193,7 @@ public partial class ExportReport
                                                                     var imgPath = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, imgName);
                                                                     var overlayFile = System.IO.Path.GetFileNameWithoutExtension(imgName) + ".png";
                                                                     var overlayDrawingPath = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImageOverlayPath, overlayFile);
-                                                                    var _img = await XmlImage.GenerateImage(mainPart,
+                                                                    var _img = XmlImage.GenerateImage(mainPart,
                                                                                                             new FileResult(imgPath),
                                                                                                             SettingsService.Instance.ImageExportScale,
                                                                                                             widthMilimeters: SettingsService.Instance.ImageExportSize,
@@ -217,6 +215,19 @@ public partial class ExportReport
 
                                                     case "${pin_location}":
                                                         newParagraph.Append(new Run(new Text(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation)));
+                                                        break;
+
+                                                    case "${pin_priority}":
+                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority != "" &
+                                                            GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority != null)
+                                                        {
+                                                            String fillColor = "#FFFFFF";
+                                                            if (Settings.PriorityItems.TryGetValue(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority, out String color))
+                                                                fillColor = color;
+                                                            var cellColor = new TableCellProperties( new Shading() { Fill = fillColor.Replace("#","") });
+                                                            newTableCell.Append(cellColor);
+                                                        }
+                                                        newParagraph.Append(new Run(new Text(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority)));
                                                         break;
 
                                                     default:
@@ -252,7 +263,7 @@ public partial class ExportReport
                                     var imgPath = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                                     if (File.Exists(imgPath))
                                     {
-                                        var _img = await XmlImage.GenerateImage(mainPart,
+                                        var _img = XmlImage.GenerateImage(mainPart,
                                                                                 new FileResult(imgPath),
                                                                                 0.5,
                                                                                 heightMilimeters: SettingsService.Instance.TitleExportSize,
@@ -301,14 +312,11 @@ public partial class ExportReport
                             {
                                 var planMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
                                 var replaceText = "${plan_images/" + planMaxSize.Width.ToString() + "/" + planMaxSize.Height.ToString() + "}";
-
-                                string? fontSizeVal = "28";
+                                string fontSizeVal = "28";
                                 var firstRun = paragraph.Elements<Run>().FirstOrDefault();
                                 var existingFontSize = firstRun?.RunProperties?.FontSize;
                                 if (existingFontSize != null)
                                     fontSizeVal = existingFontSize.Val;
-
-                                //var _run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains(replaceText));
 
                                 int i = 1;
                                 foreach (var plan in GlobalJson.Data.Plans)
@@ -316,7 +324,6 @@ public partial class ExportReport
                                     // Erster Paragraph für den Plan-Namen
                                     var textParagraph = new Paragraph();
                                     var runProperties = new RunProperties(); // definiere Schriftgrösse
-
                                     var fontSize = new DocumentFormat.OpenXml.Wordprocessing.FontSize() { Val = fontSizeVal }; // 16pt Schriftgröße
                                     runProperties.Append(fontSize);
 
@@ -348,11 +355,11 @@ public partial class ExportReport
                                                 var pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                 var pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                 var pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                var scaledPinSize = ScaleToFit(pinSize, new Size(0, SettingsService.Instance.PinExportSize));
+                                                var scaledPinSize = ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize));
                                                 var posOnPlan = new Point((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
                                                                           (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
 
-                                                run.Append(GetImageElement(mainPart, pinImage, new Size(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
+                                                run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
 
                                                 run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
                                                                                     new Point(posOnPlan.X + scaledPinSize.Width, posOnPlan.Y - scaledPinSize.Height),
@@ -383,12 +390,22 @@ public partial class ExportReport
         using FileStream outputFileStream = new(savePath, FileMode.Create, FileAccess.Write);
         memoryStream.Position = 0; // Zurück zum Anfang des MemoryStreams, bevor du ihn schreibst
         memoryStream.CopyTo(outputFileStream);
+
+        // beende alle Streams
+        memoryStream.Close();
+        memoryStream.Dispose();
+        outputFileStream.Close();
+        outputFileStream.Dispose();
+
+        // lösche den Bild-Cache
+        if (Directory.Exists(cacheDir))
+            Directory.Delete(cacheDir, true);
     }
 
-    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, Size size, Point pos)
+    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos)
     {
         ImagePart imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
-        using (FileStream stream = new(imgPath, FileMode.Open))
+        using (FileStream stream = new(imgPath, FileMode.Open, FileAccess.Read, FileShare.Read))
         {
             imagePart.FeedData(stream);
         }
@@ -397,7 +414,7 @@ public partial class ExportReport
         return element;
     }
 
-    private static Drawing GetAnchorPicture(String imagePartId, Size size, Point pos, string name="")
+    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos)
     {
         Drawing _drawing = new();
         DW.Anchor _anchor = new()
@@ -486,7 +503,7 @@ public partial class ExportReport
         DW.DocProperties _dp = new()
         {
             Id = 1U,
-            Name = name
+            Name = "Picture"
         };
 
         OXML.Drawing.Graphic _g = new();
@@ -575,16 +592,21 @@ public partial class ExportReport
         HashSet<string> uniquePinIcons = [];
 
         // Durchlaufe alle Plans im JsonDataModel
-        foreach (var plan in jsonDataModel.Plans.Values)
+        if (jsonDataModel.Plans != null)
         {
-            // Durchlaufe alle Pins im Plan
-            foreach (var pin in plan.Pins.Values)
+            foreach (var plan in jsonDataModel.Plans.Values)
             {
-                if (!string.IsNullOrEmpty(pin.PinIcon))
-                    uniquePinIcons.Add(pin.PinIcon);
+                // Durchlaufe alle Pins im Plan
+                if (plan.Pins != null)
+                {
+                    foreach (var pin in plan.Pins.Values)
+                    {
+                        if (!string.IsNullOrEmpty(pin.PinIcon))
+                            uniquePinIcons.Add(pin.PinIcon);
+                    }
+                }
             }
         }
-
         // Rückgabe der eindeutigen PinIcons als Liste
         return [.. uniquePinIcons];
     }
@@ -709,14 +731,14 @@ public partial class ExportReport
         return textWidthInPoints;
     }
 
-    private static Size ScaleToFit(Size originalSize, Size maxTargetSize)
+    private static SizeF ScaleToFit(Size originalSize, SizeF maxTargetSize)
     {
-        double widthScale = maxTargetSize.Width != 0 
-            ? (double)maxTargetSize.Width / originalSize.Width 
+        double widthScale = maxTargetSize.Width != 0
+            ? (double)maxTargetSize.Width / originalSize.Width
             : double.PositiveInfinity;
 
-        double heightScale = maxTargetSize.Height != 0 
-            ? (double)maxTargetSize.Height / originalSize.Height 
+        double heightScale = maxTargetSize.Height != 0
+            ? (double)maxTargetSize.Height / originalSize.Height
             : double.PositiveInfinity;
 
         double scale = Math.Min(widthScale, heightScale);
@@ -724,53 +746,111 @@ public partial class ExportReport
         int newWidth = (int)(originalSize.Width * scale);
         int newHeight = (int)(originalSize.Height * scale);
 
-        return new Size(newWidth, newHeight);
+        return new SizeF(newWidth, newHeight);
     }
-    
-    private static Size ExtractDimensions(string input)
+
+    private static SizeF ExtractDimensions(string input)
     {
-        var regex = new Regex(@"\$\{plan_images/(\d+)/(\d+)\}");
+        var regex = PlanImagesRegex();
         var match = regex.Match(input);
 
         if (match.Success)
         {
             int width = int.Parse(match.Groups[1].Value);
             int height = int.Parse(match.Groups[2].Value);
-            return new Size(width, height);
+            return new SizeF(width, height);
         }
-        return new Size(250, 140);
+        return new SizeF(250, 140);
     }
 
-public async Task CopyImageToDirectoryAsync(string icon, string destinationPath)
-{
-    // Zielpfad, wo das Bild gespeichert werden soll
-    string destinationFolder = FileSystem.AppDataDirectory;
-    string destinationFilePath = Path.Combine(destinationFolder, "myImage.png");
-
-    // Überprüfen, ob die Datei bereits existiert
-    if (File.Exists(destinationFilePath))
+    public static async Task CopyImageToDirectoryAsync(string destinationPath, string icon)
     {
-        Console.WriteLine("Das Bild ist bereits vorhanden.");
-        return;
-    }
+        string destinationFilePath = System.IO.Path.Combine(destinationPath, icon);
 
-    // Den Namen der Ressource festlegen (Namespace und Bildname beachten)
-    var assembly = Assembly.GetExecutingAssembly();
-    var resourceName = "DeinProjektNamespace.Resources.Images.myImage.png";
+        if (!Directory.Exists(destinationPath))
+            Directory.CreateDirectory(destinationPath);
 
-    // Bild aus den eingebetteten Ressourcen laden
-    using Stream stream = assembly.GetManifestResourceStream(resourceName);
+        Stream stream = null;
 
-    if (stream != null)
-    {
-        using FileStream fileStream = new FileStream(destinationFilePath, FileMode.Create, FileAccess.Write);
-        await stream.CopyToAsync(fileStream);
-        Console.WriteLine("Bild erfolgreich kopiert.");
+        try
+        {
+            // Überprüfen, ob der Stream geöffnet werden kann
+            if (System.IO.Path.IsPathRooted(icon) && File.Exists(icon))
+            {
+                stream = File.OpenRead(icon);
+            }
+#if ANDROID
+        if (stream == null)
+        {
+            var context = Android.App.Application.Context;
+            var resources = context.Resources;
+
+            var resourceId = resources.GetIdentifier(System.IO.Path.GetFileNameWithoutExtension(icon), "drawable", context.PackageName);
+            if (resourceId > 0)
+            {
+                var imageUri = new Android.Net.Uri.Builder()
+                    .Scheme(Android.Content.ContentResolver.SchemeAndroidResource)
+                    .Authority(resources.GetResourcePackageName(resourceId))
+                    .AppendPath(resources.GetResourceTypeName(resourceId))
+                    .AppendPath(resources.GetResourceEntryName(resourceId))
+                    .Build();
+
+                stream = context.ContentResolver.OpenInputStream(imageUri);
+            }
+        }
+#elif WINDOWS
+            if (stream == null)
+            {
+                try
+                {
+                    var sf = await Windows.Storage.StorageFile.GetFileFromPathAsync(icon);
+                    if (sf is not null)
+                    {
+                        stream = await sf.OpenStreamForReadAsync();
+                    }
+                }
+                catch
+                {
+                }
+
+                if (stream == null && AppInfo.PackagingModel == AppPackagingModel.Packaged)
+                {
+                    var uri = new Uri("ms-appx:///" + icon);
+                    var sf = await Windows.Storage.StorageFile.GetFileFromApplicationUriAsync(uri);
+                    stream = await sf.OpenStreamForReadAsync();
+                }
+                else if (stream == null)
+                {
+                    var root = AppContext.BaseDirectory;
+                    icon = System.IO.Path.Combine(root, icon);
+                    if (File.Exists(icon))
+                        stream = File.OpenRead(icon);
+                }
+            }
+#elif IOS || MACCATALYST
+        if (stream == null)
+        {
+            var root = Foundation.NSBundle.MainBundle.BundlePath;
+#if MACCATALYST || MACOS
+            root = Path.Combine(root, "Contents", "Resources");
+#endif
+            icon = Path.Combine(root, icon);
+            if (File.Exists(icon))
+                stream = File.OpenRead(icon);
+        }
+#endif
+
+            if (stream == null)
+                throw new FileNotFoundException($"The file '{icon}' could not be found.");
+
+            // Kopiere den Stream in das Zielverzeichnis
+            using FileStream fileStream = new(destinationFilePath, FileMode.Create, FileAccess.Write);
+            await stream.CopyToAsync(fileStream);
+        }
+        finally
+        {
+            stream.Close();
+            stream.Dispose();
+        }
     }
-    else
-    {
-        Console.WriteLine("Bild konnte nicht gefunden werden.");
-    }
-}
-    
 }

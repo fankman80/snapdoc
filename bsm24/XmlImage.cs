@@ -14,7 +14,7 @@ namespace bsm24;
 
 public partial class XmlImage
 {
-    public static async Task<D.Drawing> GenerateImage(MainDocumentPart mainPart,
+    public static D.Drawing GenerateImage(MainDocumentPart mainPart,
                                                 FileResult imagePath,
                                                 double scaleFactor,
                                                 SKPoint? crop_center = null,
@@ -28,7 +28,6 @@ public partial class XmlImage
     // Item3 = Text
     // Item4 = Anchor
     {
-        Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, "imagecache"));
         var originalStream = File.OpenRead(imagePath.FullPath);
         var skBitmap = SKBitmap.Decode(originalStream);
         string newImagePath = Path.Combine(FileSystem.AppDataDirectory, "imagecache", imagePath.FileName);
@@ -53,7 +52,8 @@ public partial class XmlImage
         {
             foreach ((string, SKPoint, SKPoint, SKColor) overlayImage in overlayImages.Select(v => v))
             {
-                var stream = await LoadImageStreamAsync(overlayImage.Item1);
+                var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache", overlayImage.Item1);
+                var stream = File.OpenRead(cacheDir);
                 var skStream = new SKManagedStream(stream);
                 var overlay = SKBitmap.Decode(skStream);
 #if ANDROID
@@ -81,8 +81,9 @@ public partial class XmlImage
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
                     canvas.DrawBitmap(overlay, _pos);
                 }
-
                 skBitmap = combinedBitmap;
+                stream.Dispose();
+                skStream.Dispose();
             }
         }
 
@@ -128,9 +129,6 @@ public partial class XmlImage
 
         // Hole die Relationship ID des eingebetteten Bildes
         string relationshipId = mainPart.GetIdOfPart(planPart);
-
-        // lösche den Bild-Cache
-        Directory.Delete(Path.Combine(FileSystem.AppDataDirectory, "imagecache"), true);
 
         return AddImage(relationshipId, newImagePath, new Size(widthMilimeters, heightMilimeters));
     }
@@ -201,71 +199,5 @@ public partial class XmlImage
             });
 
         return element;
-    }
-
-    public static async Task<Stream> LoadImageStreamAsync(string file)
-    {
-        if (Path.IsPathRooted(file) && File.Exists(file))
-            return File.OpenRead(file);
-#if ANDROID
-        var context = Android.App.Application.Context;
-        var resources = context.Resources;
-
-        var resourceId = resources.GetIdentifier(Path.GetFileNameWithoutExtension(file), "drawable", context.PackageName);
-        if (resourceId > 0)
-        {
-            var imageUri = new Android.Net.Uri.Builder()
-                .Scheme(Android.Content.ContentResolver.SchemeAndroidResource)
-                .Authority(resources.GetResourcePackageName(resourceId))
-                .AppendPath(resources.GetResourceTypeName(resourceId))
-                .AppendPath(resources.GetResourceEntryName(resourceId))
-                .Build();
-
-            var stream = context.ContentResolver.OpenInputStream(imageUri);
-            if (stream is not null)
-                return stream;
-        }
-        await Task.CompletedTask;
-#elif WINDOWS
-        try
-        {
-            var sf = await Windows.Storage.StorageFile.GetFileFromPathAsync(file);
-            if (sf is not null)
-            {
-                var stream = await sf.OpenStreamForReadAsync();
-                if (stream is not null)
-                    return stream;
-            }
-        }
-        catch
-        {
-        }
-
-        if (AppInfo.PackagingModel == AppPackagingModel.Packaged)
-        {
-            var uri = new Uri("ms-appx:///" + file);
-            var sf = await Windows.Storage.StorageFile.GetFileFromApplicationUriAsync(uri);
-            var stream = await sf.OpenStreamForReadAsync();
-            if (stream is not null)
-                return stream;
-        }
-        else
-        {
-            var root = AppContext.BaseDirectory;
-            file = Path.Combine(root, file);
-            if (File.Exists(file))
-                return File.OpenRead(file);
-        }
-#elif IOS || MACCATALYST
-		var root = Foundation.NSBundle.MainBundle.BundlePath;
-#if MACCATALYST || MACOS
-		root = Path.Combine(root, "Contents", "Resources");
-#endif
-		file = Path.Combine(root, file);
-		if (File.Exists(file))
-			return File.OpenRead(file);
-        await Task.CompletedTask;
-#endif
-        return null;
     }
 }

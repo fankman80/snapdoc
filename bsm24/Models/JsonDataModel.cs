@@ -48,6 +48,7 @@ public partial class Pin : INotifyPropertyChanged
     public string PinName { get; set; }
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }
+    public string PinPriority { get; set; }
     public string PinIcon { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
     public string OnPlanName { get; set; }

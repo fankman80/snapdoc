@@ -360,8 +360,6 @@ public partial class SettingsService : INotifyPropertyChanged
     }
     #endregion
 
-
-    #region
     private List<string> _themes;
     public List<string> Themes
     {
@@ -520,7 +518,6 @@ public partial class SettingsService : INotifyPropertyChanged
             }
         }
     }
-    #endregion
 
     public void SaveSettings()
     {

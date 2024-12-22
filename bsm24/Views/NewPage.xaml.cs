@@ -308,6 +308,7 @@ public partial class NewPage : IQueryAttributable
                 IsLockRotate = iconItem.IsRotationLocked,
                 PinName = iconItem.DisplayName,
                 PinDesc = "",
+                PinPriority = "",
                 PinLocation = "",
                 PinIcon = newPin,
                 Fotos = [],
