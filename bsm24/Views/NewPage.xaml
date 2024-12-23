@@ -34,8 +34,9 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Contrast}}" 
-            Text="Graustufen"            
+            x:Name ="btnColorSwitch"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}" 
+            Text="Farben an"            
             Clicked="OnGrayscaleClick"/>
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 

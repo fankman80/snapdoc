@@ -33,6 +33,7 @@ public class Plan
     public string Name { get; set; }
     public string File { get; set; }
     public Size ImageSize { get; set; }
+    public bool IsGrayscale { get; set; }
     public Dictionary<string, Pin> Pins { get; set; }
 }
 

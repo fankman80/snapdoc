@@ -213,7 +213,8 @@ public partial class LoadPDFPages : UraniumContentPage
                 {
                     Name = planName,
                     File = fileName,
-                    ImageSize = _imgSize
+                    ImageSize = _imgSize,
+                    IsGrayscale = false,
                 };
 
                 // Überprüfen, ob die Plans-Struktur initialisiert ist

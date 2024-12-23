@@ -72,21 +72,20 @@ public class Helper
         else
             SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
     }
-    
-    public SKBitmap ConvertToGrayscale(SKBitmap originalBitmap)
+
+    public static SKBitmap ConvertToGrayscale(SKBitmap originalBitmap)
     {
         // Graustufen-ColorMatrix erstellen
-        float[] grayscaleMatrix = new float[]
-        {
-            0.3f, 0.3f, 0.3f, 0, 0,  // Rot-Kanal
-            0.59f, 0.59f, 0.59f, 0, 0,  // Grün-Kanal
-            0.11f, 0.11f, 0.11f, 0, 0,  // Blau-Kanal
-            0, 0, 0, 1, 0,  // Alpha-Kanal
-            0, 0, 0, 0, 1   // Offset
-        };
+        float[] grayscaleMatrix =
+        [
+            0.45f, 0.45f, 0.45f, 0, 0,   // Red: leicht angehoben
+            0.45f, 0.45f, 0.45f, 0, 0,   // Green: leicht angehoben
+            0.45f, 0.45f, 0.45f, 0, 0,   // Blue: leicht angehoben
+            0,     0,     0,     1, 0    // Alpha unverändert
+        ];
 
-         // ColorFilter erstellen
-         using var colorFilter = SKColorFilter.CreateColorMatrix(grayscaleMatrix);
+        // ColorFilter erstellen
+        using var colorFilter = SKColorFilter.CreateColorMatrix(grayscaleMatrix);
 
          // Neues Bitmap für Graustufenbild erstellen
          var grayBitmap = new SKBitmap(originalBitmap.Width, originalBitmap.Height);
@@ -105,7 +104,7 @@ public class Helper
         return grayBitmap;
     }
 
-    public ImageSource SKBitmapToImageSource(SKBitmap bitmap)
+    public static ImageSource SKBitmapToImageSource(SKBitmap bitmap)
     {
         using var image = SKImage.FromBitmap(bitmap);
         using var data = image.Encode(SKEncodedImageFormat.Png, 100); // Du kannst PNG oder JPEG verwenden

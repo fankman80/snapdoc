@@ -110,6 +110,7 @@ public partial class NewPage : IQueryAttributable
     private void AddPlan()
     {
         PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+        GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
 
         PlanContainer.PropertyChanged += (s, e) =>
         {
@@ -381,12 +382,54 @@ public partial class NewPage : IQueryAttributable
         planContainer.Scale = targetScale;
     }
 
-    private async void OnGrayscaleClick(object sender, EventArgs e)
+    private void OnGrayscaleClick(object sender, EventArgs e)
     {
-        using var originalStream = File.OpenRead(PlanImage.Source);
-        using var originalBitmap = SKBitmap.Decode(originalStream);
-        var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
-        PlanImage.Source = Helper.SKBitmapToImageSource(grayBitmap);
+        if (GlobalJson.Data.Plans[PlanId].IsGrayscale)
+        {
+            var colorImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+            PlanImage.Source = colorImagePath;
+
+            btnColorSwitch.Text = "Farben an";
+            btnColorSwitch.IconImageSource = new FontImageSource {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                ? (Color)Application.Current.Resources["Primary"]
+                : (Color)Application.Current.Resources["PrimaryDark"]};
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
+        }
+        else
+        {
+            using var originalStream = File.OpenRead(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
+            using var originalBitmap = SKBitmap.Decode(originalStream);
+            var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
+
+            var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache");
+            if (!Directory.Exists(cacheDir))
+                Directory.CreateDirectory(cacheDir);
+
+            string grayImagePath = Path.Combine(cacheDir, "grayscale_image.jpg");
+            using (SKImage image = SKImage.FromBitmap(grayBitmap))
+            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 90))
+            using (var fileStream = File.OpenWrite(grayImagePath))
+            {
+                data.SaveTo(fileStream);
+            }
+
+            PlanImage.Source = grayImagePath;
+
+            btnColorSwitch.Text = "Farben aus";
+            btnColorSwitch.IconImageSource = new FontImageSource {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors_off,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                ? (Color)Application.Current.Resources["Primary"]
+                : (Color)Application.Current.Resources["PrimaryDark"]};
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
+        }
+
+        // save data to file
+        GlobalJson.SaveToFile();
     }
 
     private async void OnEditClick(object sender, EventArgs e)

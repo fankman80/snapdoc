@@ -65,15 +65,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
         priorityPicker.ItemsSource = Settings.PriorityItems.Select(item => item.Key).ToList();
 
-        //if (GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority != 0 &
-        //    GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority != null)
-        //{
-        //
-        //    String fillColor = "#FFFFFF";
-        //    if (Settings.PriorityItems.TryGetValue(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority, out String color))
-        //        fillColor = color;
-        //}
-
         // read data
         this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
         PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
