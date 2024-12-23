@@ -6,7 +6,6 @@ using bsm24.ViewModels;
 using Mopups.Services;
 using MR.Gestures;
 using SkiaSharp;
-using Microsoft.Maui.Controls;
 
 #if WINDOWS
 using bsm24.Platforms.Windows;
@@ -109,8 +108,20 @@ public partial class NewPage : IQueryAttributable
 
     private void AddPlan()
     {
+        if (GlobalJson.Data.Plans[PlanId].IsGrayscale) // prüfe ob Pläne Grayscaled sind
+        {
+            btnColorSwitch.Text = "Farben aus";
+            btnColorSwitch.IconImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors_off,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                ? (Color)Application.Current.Resources["Primary"]
+                : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+
         PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-        GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
 
         PlanContainer.PropertyChanged += (s, e) =>
         {
@@ -210,13 +221,11 @@ public partial class NewPage : IQueryAttributable
 
     private void AdjustImagePosition(MR.Gestures.Image image)
     {
-        // Hole die Ankerpunkte, Positionen und Bildgröße wie in deinem Loaded-Handler
         Point _originAnchor = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Anchor;
         Point _originPos = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Pos;
         Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
         Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[image.AutomationId].Size;
 
-        // Setze die Ankerpunkte und die Übersetzungen (Translation)
         image.AnchorX = _originAnchor.X;
         image.AnchorY = _originAnchor.Y;
         image.WidthRequest = _pinSize.Width;
@@ -386,8 +395,9 @@ public partial class NewPage : IQueryAttributable
     {
         if (GlobalJson.Data.Plans[PlanId].IsGrayscale)
         {
-            var colorImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-            PlanImage.Source = colorImagePath;
+            var colorImageFile = GlobalJson.Data.Plans[PlanId].File.Replace("gs_", "");
+            GlobalJson.Data.Plans[PlanId].File = colorImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
 
             btnColorSwitch.Text = "Farben an";
             btnColorSwitch.IconImageSource = new FontImageSource {
@@ -396,27 +406,25 @@ public partial class NewPage : IQueryAttributable
                 Color = Application.Current.RequestedTheme == AppTheme.Dark
                 ? (Color)Application.Current.Resources["Primary"]
                 : (Color)Application.Current.Resources["PrimaryDark"]};
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
         }
         else
         {
             using var originalStream = File.OpenRead(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
             using var originalBitmap = SKBitmap.Decode(originalStream);
+
+            string grayImageFile = "gs_" + GlobalJson.Data.Plans[PlanId].File;
+            string grayImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, grayImageFile);
+            GlobalJson.Data.Plans[PlanId].File = grayImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
+
             var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
-
-            var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache");
-            if (!Directory.Exists(cacheDir))
-                Directory.CreateDirectory(cacheDir);
-
-            string grayImagePath = Path.Combine(cacheDir, "grayscale_image.jpg");
-            using (SKImage image = SKImage.FromBitmap(grayBitmap))
-            using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 90))
-            using (var fileStream = File.OpenWrite(grayImagePath))
+            if (!File.Exists(grayImagePath))
             {
+                using SKImage image = SKImage.FromBitmap(grayBitmap);
+                using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
+                using var fileStream = File.OpenWrite(grayImagePath);
                 data.SaveTo(fileStream);
             }
-
-            PlanImage.Source = grayImagePath;
 
             btnColorSwitch.Text = "Farben aus";
             btnColorSwitch.IconImageSource = new FontImageSource {
@@ -425,11 +433,12 @@ public partial class NewPage : IQueryAttributable
                 Color = Application.Current.RequestedTheme == AppTheme.Dark
                 ? (Color)Application.Current.Resources["Primary"]
                 : (Color)Application.Current.Resources["PrimaryDark"]};
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
         }
 
         // save data to file
         GlobalJson.SaveToFile();
+
+        PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
     }
 
     private async void OnEditClick(object sender, EventArgs e)
