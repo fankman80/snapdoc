@@ -179,11 +179,11 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void EraseClicked(object sender, EventArgs e)
     {
+        DrawView.Clear();
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
             ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            DrawView.Clear();
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             // save data to file
             GlobalJson.SaveToFile();
