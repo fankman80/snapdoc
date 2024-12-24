@@ -14,8 +14,8 @@ public partial class PopupSlider : PopupPage
     private readonly double ScaleValue;
 
     public PopupSlider(double scaleValue, string okText = "Ok")
-	{
-		InitializeComponent();
+    {
+	InitializeComponent();
         okButtonText.Text = okText;
         ScaleValue = scaleValue;
     }
