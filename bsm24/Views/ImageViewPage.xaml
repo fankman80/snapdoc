@@ -44,44 +44,44 @@
         
         <VerticalStackLayout
             x:Name="ColorPicker"
-            Spacing="20"
+            Spacing="15"
             IsVisible="False"
             AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
             AbsoluteLayout.LayoutFlags="PositionProportional"
-            Margin="0,0,30,120">
+            Margin="0,0,25,120">
 
             <Button
-                WidthRequest="40"
-                HeightRequest="40"
-                CornerRadius="10"
+                WidthRequest="30"
+                HeightRequest="30"
+                CornerRadius="15"
                 BackgroundColor="Red"
                 Clicked="ColorButtonClicked"/>
 
             <Button
-                WidthRequest="40"
-                HeightRequest="40"
-                CornerRadius="10"
+                WidthRequest="30"
+                HeightRequest="30"
+                CornerRadius="15"
                 BackgroundColor="Green"
                 Clicked="ColorButtonClicked"/>
 
             <Button
-                WidthRequest="40"
-                HeightRequest="40"
-                CornerRadius="10"
+                WidthRequest="30"
+                HeightRequest="30"
+                CornerRadius="15"
                 BackgroundColor="Yellow"
                 Clicked="ColorButtonClicked"/>
 
             <Button
-                WidthRequest="40"
-                HeightRequest="40"
-                CornerRadius="10"
+                WidthRequest="30"
+                HeightRequest="30"
+                CornerRadius="15"
                 BackgroundColor="Blue"
                 Clicked="ColorButtonClicked"/>
 
             <Button
-                WidthRequest="40"
-                HeightRequest="40"
-                CornerRadius="10"
+                WidthRequest="30"
+                HeightRequest="30"
+                CornerRadius="15"
                 BackgroundColor="DeepPink"
                 Clicked="ColorButtonClicked"/>
         </VerticalStackLayout>        
