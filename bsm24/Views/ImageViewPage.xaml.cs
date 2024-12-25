@@ -15,7 +15,8 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId { get; set; }
     public string PinIcon { get; set; }
     public string ImgSource { get; set; }
-    private int LineWidth = 15;
+    private int LineWidth { get; set; } = 15;
+    private Color SelectedColor { get; set; } = new Color(255, 0, 0);
     private bool isCleared = false;
 
     private readonly TransformViewModel imageViewContainer;
@@ -117,11 +118,15 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(LineWidth);
+        var popup = new PopupColorPicker(LineWidth, SelectedColor);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        DrawView.LineWidth = result;
+        SelectedColor = result.Item1;
+        LineWidth = result.Item2;
+
+        DrawView.LineColor = result.Item1;
+        DrawView.LineWidth = result.Item2;
     }
 
     private void DrawClicked(object sender, EventArgs e)
@@ -133,11 +138,10 @@ public partial class ImageViewPage : IQueryAttributable
 
         DrawView.InputTransparent = false;
 
+        PenSettingsBtn.IsVisible = true;
         CheckBtn.IsVisible = true;
         EraseBtn.IsVisible = true;
         DrawBtn.IsVisible = false;
-        PenSizeSlider.IsVisible = true;
-        ColorPicker.IsVisible = true;
     }
 
     private void CheckClicked(object sender, EventArgs e)
@@ -147,11 +151,10 @@ public partial class ImageViewPage : IQueryAttributable
 
         DrawView.InputTransparent = true;
 
+        PenSettingsBtn.IsVisible = false;
         CheckBtn.IsVisible = false;
         EraseBtn.IsVisible = false;
         DrawBtn.IsVisible = true;
-        PenSizeSlider.IsVisible = false;
-        ColorPicker.IsVisible = false;
 
         var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, ImgSource);
         var origPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
@@ -192,17 +195,6 @@ public partial class ImageViewPage : IQueryAttributable
             // save data to file
             GlobalJson.SaveToFile();
         }
-    }
-
-    private void OnSliderValueChanged(object sender, ValueChangedEventArgs e)
-    {
-        DrawView.LineWidth = (int)e.NewValue;
-    }
-
-    private void ColorButtonClicked(object sender, EventArgs e)
-    {
-        var button = (Microsoft.Maui.Controls.Button)sender;
-        DrawView.LineColor = button.BackgroundColor;
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)

@@ -12,8 +12,9 @@ public static class Settings
     public static int PinTextPadding { get => pinTextPadding; set => pinTextPadding = value; }
     public static int PinTextDistance { get => pinTextDistance; set => pinTextDistance = value; }
     public static IconItem[] PinData { get => pinData; set => pinData = value; }
+    public static Color[] ColorData { get => colorData; set => colorData = value; }
 
-    
+
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
     private static int thumbSize = 150;
     private static int planPreviewSize = 250;
@@ -88,6 +89,39 @@ public static class Settings
         new("zuluft_abstroemung_natuerlich.png", "Zuluft / Abströmung natürlich", new Point(1.0, 0.5), new Size(141,64), true, new SKColor(217, 217, 20), 1.0),
         new("zusaetzlicher_zugang_feuerwehr.png", "Zusätzlicher Zugang Feuerwehr", new Point(1.0, 0.5), new Size(89,64), true, new SKColor(255,0,0), 1.0)
     ];
+
+    private static Color[] colorData = [
+    new Color(128, 0, 0), new Color(153, 0, 0), new Color(178, 34, 34), new Color(204, 0, 0),
+    new Color(220, 20, 60), new Color(255, 0, 0), new Color(255, 99, 71), new Color(255, 127, 80),
+    
+    // Orangetöne (dunkel -> hell)
+    new Color(139, 69, 19), new Color(160, 82, 45), new Color(205, 133, 63), new Color(210, 105, 30),
+    new Color(244, 164, 96), new Color(255, 165, 0), new Color(255, 140, 0), new Color(255, 69, 0),
+    
+    // Gelbtöne (dunkel -> hell)
+    new Color(184, 134, 11), new Color(218, 165, 32), new Color(255, 215, 0), new Color(255, 223, 0),
+    new Color(255, 239, 0), new Color(255, 255, 0), new Color(255, 255, 102), new Color(255, 255, 153),
+    
+    // Grüntöne (dunkel -> hell)
+    new Color(0, 100, 0), new Color(34, 139, 34), new Color(46, 139, 87), new Color(60, 179, 113),
+    new Color(144, 238, 144), new Color(0, 255, 0), new Color(102, 255, 102), new Color(144, 238, 144),
+    
+    // Blautöne (dunkel -> hell)
+    new Color(0, 0, 139), new Color(0, 0, 205), new Color(0, 0, 255), new Color(65, 105, 225),
+    new Color(70, 130, 180), new Color(100, 149, 237), new Color(135, 206, 250), new Color(173, 216, 230),
+    
+    // Türkistöne (dunkel -> hell)
+    new Color(0, 139, 139), new Color(0, 206, 209), new Color(0, 255, 255), new Color(64, 224, 208),
+    new Color(127, 255, 212), new Color(175, 238, 238), new Color(224, 255, 255), new Color(240, 255, 255),
+    
+    // Lilatöne (dunkel -> hell)
+    new Color(75, 0, 130), new Color(106, 90, 205), new Color(123, 104, 238), new Color(147, 112, 219),
+    new Color(186, 85, 211), new Color(221, 160, 221), new Color(238, 130, 238), new Color(255, 182, 193),
+    
+    // Grautöne (dunkel -> hell)
+    new Color(47, 79, 79), new Color(105, 105, 105), new Color(119, 136, 153), new Color(128, 128, 128),
+    new Color(169, 169, 169), new Color(192, 192, 192), new Color(211, 211, 211), new Color(255, 255, 255)];
+
     private static List<PriorityItem> priorityItems =
     [
     new PriorityItem { Key = "", Color = "#000000" },

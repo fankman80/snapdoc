@@ -41,51 +41,7 @@
                     LineColor="#FF0000"/>
             </AbsoluteLayout>
         </mr:ContentView>
-        
-        <VerticalStackLayout
-            x:Name="ColorPicker"
-            Spacing="15"
-            IsVisible="False"
-            AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-            AbsoluteLayout.LayoutFlags="PositionProportional"
-            Margin="0,0,25,120">
-
-            <Button
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
-                BackgroundColor="Red"
-                Clicked="ColorButtonClicked"/>
-
-            <Button
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
-                BackgroundColor="Green"
-                Clicked="ColorButtonClicked"/>
-
-            <Button
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
-                BackgroundColor="Yellow"
-                Clicked="ColorButtonClicked"/>
-
-            <Button
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
-                BackgroundColor="Blue"
-                Clicked="ColorButtonClicked"/>
-
-            <Button
-                WidthRequest="30"
-                HeightRequest="30"
-                CornerRadius="15"
-                BackgroundColor="DeepPink"
-                Clicked="ColorButtonClicked"/>
-        </VerticalStackLayout>        
-        
+ 
         <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
                 AbsoluteLayout.LayoutBounds="0,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
@@ -107,7 +63,7 @@
                 WidthRequest="60"
                 HeightRequest="60"
                 CornerRadius="30"
-                IsVisible="True"
+                IsVisible="False"
                 Clicked="PenSettingsClicked"/>
 
         <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
@@ -133,17 +89,5 @@
                 CornerRadius="30"
                 IsVisible="False"
                 Clicked="CheckClicked"/>
-
-        <Slider x:Name="PenSizeSlider"
-                AbsoluteLayout.LayoutBounds="0,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
-                Margin="-120,0,0,280"
-                Minimum="5"
-                Maximum="40"
-                Value="15"
-                WidthRequest="360"
-                Rotation="270"
-                IsVisible="False"
-                ValueChanged="OnSliderValueChanged"/>
     </AbsoluteLayout>
 </mr:ContentPage>
