@@ -15,7 +15,7 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId { get; set; }
     public string PinIcon { get; set; }
     public string ImgSource { get; set; }
-
+    private int LineWidth = 15;
     private bool isCleared = false;
 
     private readonly TransformViewModel imageViewContainer;
@@ -32,7 +32,7 @@ public partial class ImageViewPage : IQueryAttributable
         base.OnAppearing();
 
         ImageViewContainer.PropertyChanged += ImageView_PropertyChanged;
-        DrawView.LineWidth = (int)e.Value;
+        DrawView.LineWidth = LineWidth;
     }
 
     private void ImageView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -117,7 +117,11 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void PenSettingsClicked(object sender, EventArgs e)
     {
-        
+        var popup = new PopupColorPicker(LineWidth);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+
+        DrawView.LineWidth = result;
     }
 
     private void DrawClicked(object sender, EventArgs e)
