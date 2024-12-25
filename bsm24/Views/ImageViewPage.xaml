@@ -98,6 +98,18 @@
                 IsVisible="False"
                 Clicked="EraseClicked"/>
 
+        <Button x:Name="PenSettingsBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Brush}}"
+                AbsoluteLayout.LayoutBounds="0.5,1,AutoSize,AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                BackgroundColor="{DynamicResource Primary}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Margin="0"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                IsVisible="False"
+                Clicked="PenSettingsClicked"/>
+
         <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
