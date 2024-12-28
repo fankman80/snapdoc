@@ -22,16 +22,15 @@ public partial class PopupSlider : PopupPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         sliderText.Text = "Skalierung: " + Math.Round(ScaleValue * 100, 0).ToString() + "%";
         PinSizeSlider.Value = ScaleValue * 100;
-
         _taskCompletionSource = new TaskCompletionSource<double>();
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+	ReturnValue = ScaleValue;
         _taskCompletionSource.SetResult(ReturnValue);
     }
 
