@@ -1,9 +1,10 @@
 #nullable disable
 
-using DocumentFormat.OpenXml.Drawing.Diagrams;
+using DocumentFormat.OpenXml.Presentation;
 using Mopups.Pages;
 using Mopups.Services;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace bsm24.Views;
 
@@ -14,31 +15,40 @@ public partial class PopupColorPicker : PopupPage
     public (Color, int) ReturnValue { get; set; }
     private int LineWidth { get; set; }
     private Color SelectedColor { get; set; }
-    public ObservableCollection<Color> Colors { get; set; }
+    public ObservableCollection<ColorItem> Colors { get; set; }
 
     public PopupColorPicker(int lineWidth, Color selectedColor, string okText = "Ok")
     {
-	InitializeComponent();
+	    InitializeComponent();
         okButtonText.Text = okText;
         LineWidth = lineWidth;
         SelectedColor = selectedColor;
-        Colors = new ObservableCollection<Color>(Settings.ColorData);
+        Colors = new ObservableCollection<ColorItem>(Settings.ColorData.Select(c => new ColorItem { BackgroundColor = c, StrokeColor = c }));
         BindingContext = this;
-    }
-
-    private void OnColorTapped(object sender, EventArgs e)
-    {
-        if (sender is Border border)
-            SelectedColor = border.BackgroundColor;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
+        foreach (var colorItem in Colors)
+            if (colorItem.BackgroundColor.Equals(SelectedColor))
+                colorItem.StrokeColor = Microsoft.Maui.Graphics.Colors.Black;
         sliderText.Text = "Pinselgrösse: " + LineWidth.ToString();
         LineWidthSlider.Value = LineWidth;
         _taskCompletionSource = new TaskCompletionSource<(Color, int)>();
+    }
+
+
+    private void OnColorTapped(object sender, EventArgs e)
+    {
+        if (sender is Border border && border.BindingContext is ColorItem selectedItem)
+        {
+            foreach (var item in Colors)
+                item.StrokeColor = item.BackgroundColor;
+            selectedItem.StrokeColor = Microsoft.Maui.Graphics.Colors.Black;
+            SelectedColor = selectedItem.BackgroundColor;
+        }
     }
 
     protected override void OnDisappearing()
@@ -72,3 +82,37 @@ public partial class PopupColorPicker : PopupPage
     }
 
 }
+
+public partial class ColorItem : INotifyPropertyChanged
+{
+    private Color backgroundcolor;
+    private Color strokecolor;
+
+    public Color BackgroundColor
+    {
+        get => backgroundcolor;
+        set
+        {
+            backgroundcolor = value;
+            OnPropertyChanged(nameof(BackgroundColor));
+        }
+    }
+
+    public Color StrokeColor
+    {
+        get => strokecolor;
+        set
+        {
+            strokecolor = value;
+            OnPropertyChanged(nameof(StrokeColor));
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged(string propertyName)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
+
+

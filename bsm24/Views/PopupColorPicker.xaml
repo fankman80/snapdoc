@@ -13,7 +13,7 @@
              HasSystemPadding="False"
              BackgroundColor="#60000000"
              Title="Color Picker">
-   
+
     <Border
         StrokeShape="RoundRectangle 20,20,20,20"
         Padding="16,16,16,16"
@@ -29,11 +29,12 @@
                     <GridItemsLayout Orientation="Vertical" Span="6"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="Color">
-                        <Border BackgroundColor="{Binding .}"
+                    <DataTemplate x:DataType="views:ColorItem">
+                        <Border BackgroundColor="{Binding BackgroundColor}"
                                 WidthRequest="45"
                                 HeightRequest="45"
-                                StrokeThickness="0">
+                                Stroke="{Binding StrokeColor}"
+                                StrokeThickness="6">
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnColorTapped" />
                             </Border.GestureRecognizers>

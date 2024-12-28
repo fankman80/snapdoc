@@ -92,7 +92,7 @@ public static class Settings
 
     private static Color[] colorData = [
     new Color(128, 0, 0), new Color(153, 0, 0), new Color(178, 34, 34), new Color(204, 0, 0),
-    new Color(220, 20, 60), new Color(255, 0, 0), new Color(255, 99, 71), new Color(255, 127, 80),
+    new Color(255, 0, 0), new Color(255, 99, 71), new Color(255, 127, 80),
     
     // Orangetöne (dunkel -> hell)
     new Color(139, 69, 19), new Color(160, 82, 45), new Color(205, 133, 63), new Color(210, 105, 30),
@@ -112,15 +112,15 @@ public static class Settings
     
     // Türkistöne (dunkel -> hell)
     new Color(0, 139, 139), new Color(0, 206, 209), new Color(0, 255, 255), new Color(64, 224, 208),
-    new Color(127, 255, 212), new Color(175, 238, 238), new Color(224, 255, 255), new Color(240, 255, 255),
+    new Color(127, 255, 212), new Color(175, 238, 238), new Color(224, 255, 255),
     
     // Lilatöne (dunkel -> hell)
     new Color(75, 0, 130), new Color(106, 90, 205), new Color(123, 104, 238), new Color(147, 112, 219),
     new Color(186, 85, 211), new Color(221, 160, 221), new Color(238, 130, 238), new Color(255, 182, 193),
     
     // Grautöne (dunkel -> hell)
-    new Color(47, 79, 79), new Color(105, 105, 105), new Color(119, 136, 153), new Color(128, 128, 128),
-    new Color(169, 169, 169), new Color(192, 192, 192), new Color(211, 211, 211), new Color(255, 255, 255)];
+    new Color(47, 79, 79), new Color(105, 105, 105), new Color(128, 128, 128),
+    new Color(169, 169, 169), new Color(192, 192, 192), new Color(255, 255, 255)];
 
     private static List<PriorityItem> priorityItems =
     [
