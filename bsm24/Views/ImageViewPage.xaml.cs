@@ -165,8 +165,9 @@ public partial class ImageViewPage : IQueryAttributable
             if (File.Exists(imgPath))
                 File.Delete(imgPath);
             File.Move(origPath, imgPath);
-
+            
             Thumbnail.Generate(imgPath, thumbPath);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
         }
         else
         {
@@ -191,7 +192,7 @@ public partial class ImageViewPage : IQueryAttributable
         {
             isCleared = true;
             ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
+            
             // save data to file
             GlobalJson.SaveToFile();
         }
