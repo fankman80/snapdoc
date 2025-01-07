@@ -2,11 +2,11 @@
 <mr:ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                 xmlns:views="clr-namespace:bsm24.Views"
-                xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
                 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+                xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
                 xmlns:pc="clr-namespace:bsm24.ViewModels"
                 BackgroundColor="DimGrey"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
@@ -66,7 +66,10 @@
 				TranslationY="{Binding TranslationY}"
 				AnchorX="{Binding AnchorX}"
 				AnchorY="{Binding AnchorY}">
-                <mr:Image x:Name="PlanImage"/>
+                <ff:CachedImageView x:Name="PlanImage"
+                                    DownsampleUseDipUnits="False"
+                                    DownsampleToViewSize="True"
+                                    FadeAnimationDuration="0"/>
                 <!--<mr:Image x:Name="testIcon" Source="crosshair.png" Scale="0.5" AutomationId="skip"/>-->
             </AbsoluteLayout>
         </mr:ContentView>
@@ -81,7 +84,7 @@
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="SetPinClicked"/>
         
-        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Screenshot_region}}"
+        <!--<Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Screenshot_region}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"                
                 Margin="0,0,100,20"
@@ -90,6 +93,6 @@
                 CornerRadius="30"
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
-            Clicked="SetRegionClicked"/>    
+            Clicked="SetRegionClicked"/>-->
     </AbsoluteLayout>
 </mr:ContentPage>

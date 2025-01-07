@@ -4,17 +4,14 @@ using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
 using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Views;
-using Microsoft.Maui.Layouts;
 using Mopups.Services;
 using MR.Gestures;
 using SkiaSharp;
-using System.Security.AccessControl;
 
 #if WINDOWS
 using bsm24.Platforms.Windows;
-# endif
+#endif
 
 namespace bsm24.Views;
 
@@ -125,6 +122,15 @@ public partial class NewPage : IQueryAttributable
                 ? (Color)Application.Current.Resources["Primary"]
                 : (Color)Application.Current.Resources["PrimaryDark"]
             };
+        }
+
+        PlanImage.WidthRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Width;
+        PlanImage.HeightRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Height;
+
+        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > 6000 | GlobalJson.Data.Plans[PlanId].ImageSize.Height > 6000)
+        {
+            PlanImage.DownsampleWidth = 6000;
+            PlanImage.DownsampleHeight = 6000;
         }
 
         PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
@@ -399,7 +405,7 @@ public partial class NewPage : IQueryAttributable
         }
         else
             shiftKeyDown =  false;
-# endif
+#endif
     }
 
     private async void OnMouseScroll(object sender, ScrollWheelEventArgs e)
