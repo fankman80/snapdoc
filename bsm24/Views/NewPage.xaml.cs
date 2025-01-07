@@ -126,13 +126,11 @@ public partial class NewPage : IQueryAttributable
 
         PlanImage.WidthRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Width;
         PlanImage.HeightRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Height;
+        PlanImage.DownsampleWidth = 8192;
+        PlanImage.DownsampleHeight = 8192;
 
-        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > 7000 | GlobalJson.Data.Plans[PlanId].ImageSize.Height > 7000)
-        {
-            PlanImage.DownsampleWidth = 7000;
-            PlanImage.DownsampleHeight = 7000;
+        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > 8192 | GlobalJson.Data.Plans[PlanId].ImageSize.Height > 8192)
             PlanImage.DownsampleToViewSize = true;
-        }
 
         PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
 

@@ -37,7 +37,11 @@
                                 StrokeThickness="0"
                                 Padding="16">
                             <Grid>
-                                <ff:CachedImage Source="{Binding PreviewPath}" CacheType="All" Aspect="AspectFill"/>
+                                <ff:CachedImage Source="{Binding PreviewPath}"
+                                                CacheType="All"
+                                                FadeAnimationEnabled ="False"
+                                                FadeAnimationForCachedImages ="False"
+                                                Aspect="AspectFill"/>
                                 <CheckBox IsChecked="{Binding IsChecked}"
                                           Color="{DynamicResource Primary}"
                                           VerticalOptions="End"

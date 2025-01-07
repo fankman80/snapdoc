@@ -45,6 +45,8 @@
                         <views:SquareView Margin="4">
                             <ff:CachedImage Source="{Binding ImagePath}"
                                             CacheType="All"
+                                            FadeAnimationEnabled ="False"
+                                            FadeAnimationForCachedImages ="False"
                                             Aspect="AspectFill">
                                 <ff:CachedImage.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnImageTapped" />
