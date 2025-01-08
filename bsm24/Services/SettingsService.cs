@@ -261,20 +261,6 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _planExportSize = 140;
-    public int PlanExportSize
-    {
-        get => _planExportSize;
-        set
-        {
-            if (_planExportSize != value)
-            {
-                _planExportSize = value;
-                OnPropertyChanged(nameof(PlanExportSize));
-            }
-        }
-    }
-
     private double _pinExportSize = 3.2;
     public double PinExportSize
     {

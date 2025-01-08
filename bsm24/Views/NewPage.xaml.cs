@@ -175,6 +175,8 @@ public partial class NewPage : IQueryAttributable
         Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
         Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size;
 
+
+
         // berechne Anchor-Koordinaten
         var smallImage = new MR.Gestures.Image
         {
@@ -186,7 +188,7 @@ public partial class NewPage : IQueryAttributable
             AnchorY = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor.Y,
             TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
             TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
-            Rotation = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation,
+            Rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation,
             Scale = PinScaling(pinId),
         };
 
@@ -330,7 +332,7 @@ public partial class NewPage : IQueryAttributable
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string newPin = "a_pin_red.png";
             var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(newPin, StringComparison.OrdinalIgnoreCase));
-            Double _rotation = planContainer.Rotation * -1;
+            Double _rotation = 0;
 
             if (customName != null)
             { 

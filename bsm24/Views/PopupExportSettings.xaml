@@ -153,14 +153,6 @@
                                 MaximumTrackColor="{DynamicResource PrimaryDark}"
                                 Value="{Binding PinPosCropExportSize}"/>
 
-                        <Label Text="{Binding PlanExportSize, StringFormat='Planhöhe: {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
-                        <Slider Maximum="300"
-                                Minimum="10"                        
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding PlanExportSize}"/>
-
                         <Label Text="{Binding ImageExportQuality, StringFormat='Bildqualität: {0:0.##}%'}" Margin="0, 0, 0, -12"/>
                         <Slider Maximum="100"
                                 Minimum="10"
