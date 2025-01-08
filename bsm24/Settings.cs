@@ -18,7 +18,7 @@ public static class Settings
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
     private static int thumbSize = 150;
     private static int planPreviewSize = 150;
-    private static double defaultPinZoom = 3;
+    private static double defaultPinZoom = 2;
     private static int pinTextPadding = 6;
     private static int pinTextDistance = 3;
     private static IconItem[] pinData =
