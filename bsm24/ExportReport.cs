@@ -657,8 +657,6 @@ public partial class ExportReport
         return columnList;
     }
 
-
-
     private static Picture CreateTextBoxWithShape(string text, Point coordinateMM, double fontSizePt, string fontColorHex)
     {
         double xCoordinatePt = coordinateMM.X * 3.7795; // * 2.83465  f=1.333333 ?;
@@ -738,7 +736,7 @@ public partial class ExportReport
     private static double GetTextWidthInPoints(string text, string fontName, double fontSizePt, double dpi)
     {
         using SKFont font = new(SKTypeface.FromFamilyName(fontName), (float)fontSizePt);
-        float textWidthInPixels = font.MeasureText(text);
+        float textWidthInPixels = font.MeasureText(text + " ");
         double textWidthInPoints = textWidthInPixels * 72 / dpi;
         return textWidthInPoints;
     }
