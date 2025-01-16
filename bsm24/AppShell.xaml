@@ -71,7 +71,7 @@
                            FontAttributes="Bold"
                            FontSize="12"
                            VerticalTextAlignment="Center"/>
-                    <Label Text=" V.0.9" 
+                    <Label Text="Version: 0.9"
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontSize="10"
                            VerticalTextAlignment="Center"/>

@@ -458,9 +458,7 @@ public partial class NewPage : IQueryAttributable
     {
         if (GlobalJson.Data.Plans[PlanId].IsGrayscale)
         {
-            var colorImageFile = GlobalJson.Data.Plans[PlanId].File.Replace("gs_", "");
-            GlobalJson.Data.Plans[PlanId].File = colorImageFile;
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
+            string colorImageFile = GlobalJson.Data.Plans[PlanId].File.Replace("gs_", "");
 
             btnColorSwitch.Text = "Farben an";
             btnColorSwitch.IconImageSource = new FontImageSource {
@@ -469,25 +467,28 @@ public partial class NewPage : IQueryAttributable
                 Color = Application.Current.RequestedTheme == AppTheme.Dark
                 ? (Color)Application.Current.Resources["Primary"]
                 : (Color)Application.Current.Resources["PrimaryDark"]};
+
+            GlobalJson.Data.Plans[PlanId].File = colorImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
         }
         else
         {
-            using var originalStream = File.OpenRead(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
-            using var originalBitmap = SKBitmap.Decode(originalStream);
-
             string grayImageFile = "gs_" + GlobalJson.Data.Plans[PlanId].File;
             string grayImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, grayImageFile);
-            GlobalJson.Data.Plans[PlanId].File = grayImageFile;
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
-
-            var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
+            
             if (!File.Exists(grayImagePath))
             {
+                using var originalStream = File.OpenRead(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
+                using var originalBitmap = SKBitmap.Decode(originalStream);
+                var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
                 using SKImage image = SKImage.FromBitmap(grayBitmap);
                 using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
                 using var fileStream = File.OpenWrite(grayImagePath);
                 data.SaveTo(fileStream);
             }
+
+            GlobalJson.Data.Plans[PlanId].File = grayImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
 
             btnColorSwitch.Text = "Farben aus";
             btnColorSwitch.IconImageSource = new FontImageSource {

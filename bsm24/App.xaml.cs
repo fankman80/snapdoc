@@ -11,15 +11,14 @@ public partial class App : Application
     public App()
     {
         InitializeComponent();
-
-        System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
-        System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
     }
 
     protected override void OnStart()
     {
         base.OnStart();
 
+        System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
+        System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
         SettingsService.Instance.LoadSettings();
     }
 
