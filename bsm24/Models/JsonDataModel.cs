@@ -53,7 +53,6 @@ public partial class Pin : INotifyPropertyChanged
     public int PinPriority { get; set; }
     public string PinIcon { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
-    public string OnPlanName { get; set; }
     public string OnPlanId { get; set; }
     public string SelfId { get; set; }
     public SKColor PinColor { get; set; }

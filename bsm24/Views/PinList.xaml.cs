@@ -1,7 +1,6 @@
 ﻿#nullable disable
 
 using bsm24.Models;
-using FFImageLoading;
 using System.ComponentModel;
 using UraniumUI.Pages;
 
@@ -31,20 +30,20 @@ public partial class PinList : UraniumContentPage
     {
         int pincounter = 0;
 
-        List<Pin> pinItems = [];
+        List<PinItem> pinItems = [];
         foreach (var plan in GlobalJson.Data.Plans)
         {
             if (GlobalJson.Data.Plans[plan.Key].Pins != null)
             {
                 foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
                 {
-                    var newPin = new Pin
+                    var newPin = new PinItem
                     {
                         PinDesc = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc,
                         PinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon,
                         PinName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName,
                         PinLocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation,
-                        OnPlanName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].OnPlanName,
+                        OnPlanName = GlobalJson.Data.Plans[plan.Key].Name,
                         OnPlanId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].OnPlanId,
                         SelfId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].SelfId,
                         AllowExport = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport,

@@ -28,7 +28,7 @@
                     <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="models:Pin">
+                    <DataTemplate x:DataType="local:PinItem">
                         <Grid RowSpacing="0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="64" />

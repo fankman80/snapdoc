@@ -44,7 +44,9 @@ public partial class ExportReport
             {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
             {"${pin_location}", "${pin_location}"}, //bereinige splitted runs
             {"${pin_priority}", "${pin_priority}"}, //bereinige splitted runs
-    };
+            {"${pin_geolocWGS84}", "${pin_geolocWGS84}"}, //bereinige splitted runs
+            {"${pin_geolocCH1903}", "${pin_geolocCH1903}"}, //bereinige splitted runs
+        };
 
         // Kopiere die benötigten Icons aus den Ressourcen in den Cache
         var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache");
@@ -229,6 +231,14 @@ public partial class ExportReport
                                                             newTableCell.Append(cellColor);
                                                         }
                                                         newParagraph.Append(new Run(new Text(Settings.PriorityItems[GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority].Key)));
+                                                        break;
+
+                                                    case "${pin_geolocWGS84}":
+                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.ToString();
+                                                        break;
+
+                                                    case "${pin_geolocCH1903}":
+                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.CH1903.ToString();
                                                         break;
                                                 }
                                                 if (!string.IsNullOrEmpty(text))

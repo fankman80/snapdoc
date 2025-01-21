@@ -378,7 +378,6 @@ public partial class NewPage : IQueryAttributable
                 PinLocation = "",
                 PinIcon = newPin,
                 Fotos = [],
-                OnPlanName = GlobalJson.Data.Plans[PlanId].Name,
                 OnPlanId = PlanId,
                 SelfId = currentDateTime,
                 PinColor = SKColors.Red,
