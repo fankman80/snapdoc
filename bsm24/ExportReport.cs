@@ -5,6 +5,7 @@ using bsm24.Services;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
+using D=DocumentFormat.OpenXml.Drawing;
 using SkiaSharp;
 using System.Text.RegularExpressions;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
