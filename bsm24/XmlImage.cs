@@ -21,11 +21,11 @@ public partial class XmlImage
                                             double widthMilimeters = 0,
                                             double heightMilimeters = 0,
                                             int imageQuality = 90,
-                                            List<(string, SKPoint, SKPoint, SKColor)> overlayImages = null)
+                                            List<(string, SKPoint, SKPoint, double)> overlayImages = null)
     // Item1 = Image
     // Item2 = Position
-    // Item3 = Text
-    // Item4 = Anchor
+    // Item3 = Anchor
+    // Item4 = Scale
     {
         var originalStream = File.OpenRead(imagePath.FullPath);
         var skBitmap = SKBitmap.Decode(originalStream);
@@ -49,7 +49,7 @@ public partial class XmlImage
         // Add Overlay-Image
         if (overlayImages != null)
         {
-            foreach ((string, SKPoint, SKPoint, SKColor) overlayImage in overlayImages.Select(v => v))
+            foreach ((string, SKPoint, SKPoint, double) overlayImage in overlayImages.Select(v => v))
             {
                 var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache", overlayImage.Item1);
                 var stream = File.OpenRead(cacheDir);
@@ -61,9 +61,10 @@ public partial class XmlImage
                     var _pos = new SKPoint(
                         (skBitmap.Width * overlayImage.Item2.X) - (overlay.Width * overlayImage.Item3.X),
                         (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item3.Y));
-
+                    SKRect destRect = new(_pos.X, _pos.Y, _pos.X + skBitmap.Width * overlayImage.Item4, _pos.Y + skBitmap.Height * overlayImage.Item4);
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
-                    canvas.DrawBitmap(overlay, _pos);
+                    //canvas.DrawBitmap(overlay, _pos);
+                    canvas.DrawBitmap(overlay, destRect);
                 }
                 skBitmap = combinedBitmap;
                 stream.Dispose();
