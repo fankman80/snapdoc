@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using bsm24.Services;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using SkiaSharp;
@@ -15,14 +14,14 @@ namespace bsm24;
 public partial class XmlImage
 {
     public static D.Drawing GenerateImage(MainDocumentPart mainPart,
-                                                FileResult imagePath,
-                                                double scaleFactor,
-                                                SKPoint? crop_center = null,
-                                                SKSize? crop_size = null,
-                                                double widthMilimeters = 0,
-                                                double heightMilimeters = 0,
-                                                int imageQuality = 90,
-                                                List<(string, SKPoint, SKPoint, SKColor)> overlayImages = null)
+                                            FileResult imagePath,
+                                            double scaleFactor,
+                                            SKPoint? crop_center = null,
+                                            SKSize? crop_size = null,
+                                            double widthMilimeters = 0,
+                                            double heightMilimeters = 0,
+                                            int imageQuality = 90,
+                                            List<(string, SKPoint, SKPoint, SKColor)> overlayImages = null)
     // Item1 = Image
     // Item2 = Position
     // Item3 = Text
@@ -56,21 +55,6 @@ public partial class XmlImage
                 var stream = File.OpenRead(cacheDir);
                 var skStream = new SKManagedStream(stream);
                 var overlay = SKBitmap.Decode(skStream);
-#if ANDROID
-                var context = Android.App.Application.Context;
-                var resources = context.Resources;
-                var resourceId = resources.GetIdentifier(Path.GetFileNameWithoutExtension(overlayImage.Item1), "drawable", context.PackageName);
-                if (resourceId != 0)  // Convert Android.Graphics.Bitmap to SKBitmap if resource is not Null
-                {
-                    var drawable = MainApplication.Current.GetDrawable(resourceId);
-                    Android.Graphics.Drawables.BitmapDrawable bitmapDrawable = (Android.Graphics.Drawables.BitmapDrawable)drawable;
-                    Android.Graphics.Bitmap androidBitmap = bitmapDrawable.Bitmap;
-                    overlay = new SKBitmap(androidBitmap.Width, androidBitmap.Height);
-                    int[] pixels = new int[androidBitmap.Width * androidBitmap.Height];
-                    androidBitmap.GetPixels(pixels, 0, androidBitmap.Width, 0, 0, androidBitmap.Width, androidBitmap.Height);
-                    overlay.Pixels = pixels.Select(p => new SKColor((uint)p)).ToArray();
-                }
-#endif
                 SKBitmap combinedBitmap = new(skBitmap.Width, skBitmap.Height);
                 using (SKCanvas canvas = new(combinedBitmap))
                 {
@@ -97,37 +81,22 @@ public partial class XmlImage
 
         // Berechne die neue Breite und Höhe in Milimeter
         if (widthMilimeters == 0)
-        {
             widthMilimeters = heightMilimeters * ((double)skBitmap.Width / skBitmap.Height);
-        }
         if (heightMilimeters == 0)
-        {
             heightMilimeters = widthMilimeters * ((double)skBitmap.Height / skBitmap.Width);
-        }
         if (heightMilimeters == 0 & widthMilimeters == 0)
         {
             widthMilimeters = 60;  // wenn beide Längen Null sind, nehme Standardwert
             heightMilimeters = widthMilimeters * ((double)skBitmap.Height / skBitmap.Width);
         }
 
-        // Speichere das verkleinerte Bild als JPEG
         var image = SKImage.FromBitmap(resizedBitmap);
-        var data = image.Encode(SKEncodedImageFormat.Jpeg, imageQuality);
-        var newStream = File.Create(newImagePath);
-        data.SaveTo(newStream);
-        newStream.Close();
-        originalStream.Close();
-
-        // Füge das Bild als ImagePart hinzu
+        var data = image.Encode(SKEncodedImageFormat.Jpeg, imageQuality); // imageQuality zwischen 0 und 100
         ImagePart planPart = mainPart.AddImagePart(ImagePartType.Jpeg);
-
-        // Lade das Bild vom Dateisystem und schreibe es in den ImagePart
-        using (FileStream stream = new(newImagePath, FileMode.Open))
+        using (Stream imagePartStream = planPart.GetStream())
         {
-            planPart.FeedData(stream);
+            data.SaveTo(imagePartStream);
         }
-
-        // Hole die Relationship ID des eingebetteten Bildes
         string relationshipId = mainPart.GetIdOfPart(planPart);
 
         return AddImage(relationshipId, newImagePath, new Size(widthMilimeters, heightMilimeters));

@@ -15,7 +15,9 @@ namespace bsm24;
 public partial class ExportReport
 {
     [GeneratedRegex(@"\$\{plan_images/(\d+)/(\d+)\}")]
-    public static partial Regex PlanImagesRegex();
+    private static partial Regex PlanImagesRegex();
+
+    private static readonly Dictionary<string, string> imageRelationshipIds = [];
 
     public static async Task DocX(string templateDoc, string savePath)
     {
@@ -164,21 +166,20 @@ public partial class ExportReport
                                                                 pinList = null;
 
                                                             var _imgPlan = XmlImage.GenerateImage(mainPart,
-                                                                                                        new FileResult(planPath),
-                                                                                                        SettingsService.Instance.PosImageExportScale,
-                                                                                                        new SKPoint((float)pinPos.X,
-                                                                                                        (float)pinPos.Y),
-                                                                                                        new SKSize(SettingsService.Instance.PinPosCropExportSize, SettingsService.Instance.PinPosCropExportSize),
-                                                                                                        widthMilimeters: SettingsService.Instance.PinPosExportSize,
-                                                                                                        imageQuality: SettingsService.Instance.ImageExportQuality,
-                                                                                                        overlayImages: pinList);
+                                                                                                new FileResult(planPath),
+                                                                                                SettingsService.Instance.PosImageExportScale,
+                                                                                                new SKPoint((float)pinPos.X,
+                                                                                                (float)pinPos.Y),
+                                                                                                new SKSize(SettingsService.Instance.PinPosCropExportSize, SettingsService.Instance.PinPosCropExportSize),
+                                                                                                widthMilimeters: SettingsService.Instance.PinPosExportSize,
+                                                                                                imageQuality: SettingsService.Instance.ImageExportQuality,
+                                                                                                overlayImages: pinList);
 
                                                             newParagraph.Append(new Run(_imgPlan));
                                                         }
                                                         break;
 
                                                     case "${pin_fotoList}":
-                                                        
                                                         if (SettingsService.Instance.IsImageExport)
                                                         {
                                                             Run newRun = new();
@@ -193,16 +194,16 @@ public partial class ExportReport
                                                                         if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos[img.Key].HasOverlay)
                                                                             imgPath = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", imgName);
                                                                     var _img = XmlImage.GenerateImage(mainPart,
-                                                                                                            new FileResult(imgPath),
-                                                                                                            SettingsService.Instance.ImageExportScale,
-                                                                                                            widthMilimeters: SettingsService.Instance.ImageExportSize,
-                                                                                                            imageQuality: SettingsService.Instance.ImageExportQuality);
+                                                                                                    new FileResult(imgPath),
+                                                                                                    SettingsService.Instance.ImageExportScale,
+                                                                                                    widthMilimeters: SettingsService.Instance.ImageExportSize,
+                                                                                                    imageQuality: SettingsService.Instance.ImageExportQuality);
+
                                                                     newRun.Append(_img);
                                                                 }
                                                             }
                                                             newParagraph.Append(newRun);
                                                         }
-                                                        
                                                         break;
 
                                                     case "${pin_name}":
@@ -410,15 +411,20 @@ public partial class ExportReport
         if (Directory.Exists(cacheDir))
             Directory.Delete(cacheDir, true);
     }
-
     private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos)
     {
-        ImagePart imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
-        using (FileStream stream = new(imgPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+        // Prüfen, ob das Bild bereits hinzugefügt wurde
+        if (!imageRelationshipIds.TryGetValue(imgPath, out string relationshipId))
         {
-            imagePart.FeedData(stream);
+            ImagePart imagePart = mainPart.AddImagePart(ImagePartType.Jpeg);
+            using (FileStream stream = new(imgPath, FileMode.Open, FileAccess.Read, FileShare.Read))
+            {
+                imagePart.FeedData(stream);
+            }
+            relationshipId = mainPart.GetIdOfPart(imagePart);
+            imageRelationshipIds[imgPath] = relationshipId;
         }
-        Drawing element = GetAnchorPicture(mainPart.GetIdOfPart(imagePart), size, pos);
+        Drawing element = GetAnchorPicture(relationshipId, size, pos);
 
         return element;
     }
