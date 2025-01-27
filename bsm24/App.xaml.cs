@@ -20,6 +20,9 @@ public partial class App : Application
         System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
         System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
         SettingsService.Instance.LoadSettings();
+
+        if (!Directory.Exists(Settings.TemplateDirectory))
+            Directory.CreateDirectory(Settings.TemplateDirectory);
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

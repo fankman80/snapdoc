@@ -35,12 +35,6 @@ public partial class PopupSettings : PopupPage
         _taskCompletionSource.SetResult(ReturnValue);
     }
 
-    //private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
-    //{
-        //ReturnValue = null;
-        //await MopupService.Instance.PopAsync();
-    //}
-
     private async void OnOkClicked(object sender, EventArgs e)
     {
         SettingsService.Instance.SaveSettings();

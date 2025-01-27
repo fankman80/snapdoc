@@ -6,6 +6,7 @@ public static class Settings
 {
     public static List<PriorityItem> PriorityItems { get => priorityItems; set => priorityItems = value; }
     public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
+    public static string TemplateDirectory { get => templateDirectory; set => templateDirectory = value; }
     public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
     public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
     public static double DefaultPinZoom { get => defaultPinZoom; set => defaultPinZoom = value; }
@@ -16,6 +17,7 @@ public static class Settings
 
 
     private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
+    private static string templateDirectory = Path.Combine(FileSystem.AppDataDirectory, "templates");
     private static int thumbSize = 150;
     private static int planPreviewSize = 150;
     private static double defaultPinZoom = 2;

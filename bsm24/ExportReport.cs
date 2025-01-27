@@ -57,7 +57,8 @@ public partial class ExportReport
             await CopyImageToDirectoryAsync(cacheDir, icon);
 
         using MemoryStream memoryStream = new();
-        using (Stream fileStream = await FileSystem.OpenAppPackageFileAsync(templateDoc))
+        //using (Stream fileStream = await FileSystem.OpenAppPackageFileAsync(templateDoc)) //open from Ressource-Package
+        using (Stream fileStream = new FileStream(templateDoc, FileMode.Open, FileAccess.Read))
         {
             fileStream.CopyTo(memoryStream);
         }

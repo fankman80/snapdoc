@@ -1,9 +1,10 @@
 #nullable disable
 
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
 using Mopups.Pages;
 using Mopups.Services;
-using CommunityToolkit.Maui.Alerts;
+using bsm24.Services;
 
 namespace bsm24.Views;
 
@@ -13,6 +14,10 @@ public partial class PopupExportSettings : PopupPage
     public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
 
+    private static readonly string[] iOSFileTypes = ["com.microsoft.word.doc", "org.openxmlformats.wordprocessingml.document"];
+    private static readonly string[] AndroidFileTypes = ["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
+    private static readonly string[] WinUIFileTypes = [".doc", ".docx"];
+
     public PopupExportSettings()
 	{
 		InitializeComponent();
@@ -21,6 +26,12 @@ public partial class PopupExportSettings : PopupPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
+        LoadDocuments();
+
+        if (SettingsService.Instance.SelectedTemplate == null)
+            SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.First();
+
         _taskCompletionSource = new TaskCompletionSource<string>();
     }
 
@@ -39,6 +50,7 @@ public partial class PopupExportSettings : PopupPage
     private async void OnShareClicked(object sender, EventArgs e)
     {
         string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
+        string templatePath = Path.Combine(FileSystem.AppDataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
         busyOverlay.IsVisible = true;
         activityIndicator.IsRunning = true;
@@ -46,7 +58,7 @@ public partial class PopupExportSettings : PopupPage
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
-            await ExportReport.DocX("template_ebbe.docx", outputPath);
+            await ExportReport.DocX(templatePath, outputPath);
         });
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
@@ -76,7 +88,7 @@ public partial class PopupExportSettings : PopupPage
     private async void OnSaveClicked(object sender, EventArgs e)
     {
         string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-
+        string templatePath = Path.Combine(FileSystem.AppDataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
         busyOverlay.IsVisible = true;
         activityIndicator.IsRunning = true;
@@ -84,7 +96,7 @@ public partial class PopupExportSettings : PopupPage
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
-            await ExportReport.DocX("template_ebbe.docx", outputPath);
+            await ExportReport.DocX(templatePath, outputPath);
         });
         activityIndicator.IsRunning = false;
         busyOverlay.IsVisible = false;
@@ -134,13 +146,57 @@ public partial class PopupExportSettings : PopupPage
         await MopupService.Instance.PopAsync();
     }
 
-    private async void OnTemplateManagerClicked(object sender, EventArgs e)
+    private static void LoadDocuments()
     {
-        var popup = new PopupTemplateManager();
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        SettingsService.Instance.Templates.Clear();
+        var files = Directory.GetFiles(Settings.TemplateDirectory, "*.docx");
+        foreach (var file in files)
+        {
+            SettingsService.Instance.Templates.Add(Path.GetFileName(file));
+        }
+    }
+
+    private async void OnAddDocument(object sender, EventArgs e)
+    {
+        var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
+        {
+            { DevicePlatform.iOS, iOSFileTypes },          // Verwende das readonly Array für iOS
+            { DevicePlatform.Android, AndroidFileTypes },  // Verwende das readonly Array für Android
+            { DevicePlatform.WinUI, WinUIFileTypes }       // Verwende das readonly Array für WinUI
+        });
+
+        var result = await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = "Wähle ein Word-Dokument",
+            FileTypes = customFileType
+        });
+
         if (result != null)
         {
+            var destinationPath = Path.Combine(Settings.TemplateDirectory, result.FileName);
+            using (var stream = await result.OpenReadAsync())
+            using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
+            {
+                await stream.CopyToAsync(fileStream);
+            }
+
+            SettingsService.Instance.Templates.Add(result.FileName);
+            LoadDocuments();
+            SettingsService.Instance.SelectedTemplate = result.FileName;
+        }
+    }
+
+    private void OnDeleteDocument(object sender, EventArgs e)
+    {
+        if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
+        {
+            var filePath = Path.Combine(Settings.TemplateDirectory, SettingsService.Instance.SelectedTemplate);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                SettingsService.Instance.Templates.Remove(SettingsService.Instance.SelectedTemplate);
+            }
         }
     }
 }

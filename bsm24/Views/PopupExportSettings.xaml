@@ -33,11 +33,30 @@
                 </Grid.RowDefinitions>
                 <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Always">
                     <VerticalStackLayout x:DataType="services:SettingsService">
-                        <Button
-                            Text="Template wählen"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                            Clicked="OnTemplateManagerClicked" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            
+                            <Picker Grid.Column="0" 
+                                    x:Name="templatePicker" 
+                                    ItemsSource="{Binding Templates}"
+                                    SelectedItem="{Binding SelectedTemplate, Mode=TwoWay}"/>
+
+                            <Button Grid.Column="1" 
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
+                                    Clicked="OnAddDocument" />
+                            <Button Grid.Column="2" 
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                    Clicked="OnDeleteDocument"/>
+                        </Grid>
+                        
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />
@@ -50,7 +69,6 @@
                                 <RowDefinition Height="*" />
                                 <RowDefinition Height="*" />
                             </Grid.RowDefinitions>
-
                             <Label Text="Exportiere Pläne:" Grid.Column="0" Grid.Row="0" VerticalOptions="StartAndExpand"/>
                             <Label Text="Exportiere Positionsbilder:"  Grid.Column="0" Grid.Row="1" VerticalOptions="StartAndExpand"/>
                             <Label Text="Exportiere Pin-Icons:" Grid.Column="0" Grid.Row="3" VerticalOptions="StartAndExpand"/>
@@ -103,7 +121,7 @@
                                 BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
                             <material:TextField Grid.Column="1"
-                                                HorizontalTextAlignment="Center"
+                                HorizontalTextAlignment="Center"
                                 Text="{Binding PlanLabelFontSize}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"

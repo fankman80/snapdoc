@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using bsm24.Models;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json;
 
@@ -515,6 +516,34 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.UserAppTheme = AppTheme.Dark; // Setze auf dunkles Theme
                         break;
                 }
+            }
+        }
+    }
+
+    private ObservableCollection<string> _templates = new();
+    public ObservableCollection<string> Templates
+    {
+        get => _templates;
+        set
+        {
+            if (_templates != value)
+            {
+                _templates = value;
+                OnPropertyChanged(nameof(Templates));
+            }
+        }
+    }
+
+    private string _selectedTemplate;
+    public string SelectedTemplate
+    {
+        get => _selectedTemplate;
+        set
+        {
+            if (_selectedTemplate != value)
+            {
+                _selectedTemplate = value;
+                OnPropertyChanged(nameof(SelectedTemplate));
             }
         }
     }
