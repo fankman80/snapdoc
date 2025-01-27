@@ -133,4 +133,14 @@ public partial class PopupExportSettings : PopupPage
         ReturnValue = null;
         await MopupService.Instance.PopAsync();
     }
+
+    private async void OnTemplateManagerClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupTemplateManager();
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+        if (result != null)
+        {
+        }
+    }
 }

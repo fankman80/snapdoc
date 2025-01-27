@@ -33,6 +33,11 @@
                 </Grid.RowDefinitions>
                 <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Always">
                     <VerticalStackLayout x:DataType="services:SettingsService">
+                        <Button
+                            Text="Template wählen"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                            Clicked="OnTemplateManagerClicked" />
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="4*" />

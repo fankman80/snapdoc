@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<Mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:Mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+             xmlns:Animations="clr-namespace:Mopups.Animations;assembly=Mopups"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"   
+             x:Class="bsm24.Views.PopupTemplateManager"
+             BackgroundClicked="PopupPage_BackgroundClicked"
+             BackgroundInputTransparent="False"
+             CloseWhenBackgroundIsClicked="True"
+             HasSystemPadding="False"
+             BackgroundColor="#60000000"
+             Title="Template Manager">
+
+    <Border
+        StrokeShape="RoundRectangle 20,20,20,20"
+        Padding="16,16,16,16"
+        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+        WidthRequest="300"
+        HorizontalOptions="Center"
+        VerticalOptions="Center">
+
+        <VerticalStackLayout>
+            <Label Text="Wähle eine Vorlage"/>
+
+            <Picker Title="Dokument auswählen"
+                ItemsSource="{Binding Documents}"
+                SelectedItem="{Binding SelectedDocument}"
+                HorizontalOptions="FillAndExpand"/>
+
+            <HorizontalStackLayout Spacing="10">
+                <Button Text="Hinzufügen" Clicked="OnAddDocument" />
+                <Button Text="Löschen" Clicked="OnDeleteDocument" />
+            </HorizontalStackLayout>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        x:Name="cancelButtonText"
+                        Text="Abbrechen"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                        Clicked="OnCancelClicked" />
+                <Button Grid.Column="1"
+                        x:Name="okButtonText"
+                        Text="Ok"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
+                        Clicked="OnOkClicked" />
+            </Grid>
+        </VerticalStackLayout>
+    </Border>
+
+</Mopups:PopupPage>
