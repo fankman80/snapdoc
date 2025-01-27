@@ -154,14 +154,14 @@ public partial class ExportReport
                                                             var pinImage = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
 
                                                             // Pin-Icon ein/ausblenden
-                                                            var pinList = new List<(string, SKPoint, SKPoint, SKColor)>();
+                                                            var pinList = new List<(string, SKPoint, SKPoint, float)>();
                                                             if (SettingsService.Instance.IsPinIconExport)
                                                             {
                                                                 pinList = [(pinImage,
                                                                         new SKPoint(0.5f, 0.5f),
                                                                         new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X,
                                                                                     (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y),
-                                                                                    GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)];
+                                                                                    (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)];
                                                             }
                                                             else
                                                                 pinList = null;
@@ -366,16 +366,16 @@ public partial class ExportReport
                                                 var pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                 var pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                 var pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                var scaledPinSize = ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize));
+                                                var scaledPinSize = ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize * (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
                                                 var posOnPlan = new Point((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
                                                                           (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
 
                                                 run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
 
                                                 run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
-                                                                                    new Point(posOnPlan.X + scaledPinSize.Width, posOnPlan.Y - scaledPinSize.Height),
-                                                                                    SettingsService.Instance.PlanLabelFontSize,
-                                                                                    pinColor.ToString()[3..]));
+                                                                                  new Point(posOnPlan.X + scaledPinSize.Width, posOnPlan.Y - scaledPinSize.Height),
+                                                                                  SettingsService.Instance.PlanLabelFontSize,
+                                                                                  pinColor.ToString()[3..]));
                                                 i += 1;
                                             }
                                         }
@@ -674,11 +674,10 @@ public partial class ExportReport
 
     private static Picture CreateTextBoxWithShape(string text, Point coordinateMM, double fontSizePt, string fontColorHex)
     {
-        double xCoordinatePt = coordinateMM.X * 3.7795; // * 2.83465  f=1.333333 ?;
-        double yCoordinatePt = coordinateMM.Y * 3.7795; // * 2.83465  f=1.333333 ?;
+        double xCoordinatePt = coordinateMM.X * 3.8; //3.7795;
+        double yCoordinatePt = coordinateMM.Y * 3.8; //3.7795;
         double textWidthPt = GetTextWidthInPoints(text, "Arial", fontSizePt, 96) * 2;
 
-        // Erstelle die Shape mit Positionierung
         Picture picture1 = new();
 
         Shape shape1 = new()
@@ -690,7 +689,6 @@ public partial class ExportReport
         Fill fill1 = new() { Color = "#FFFFFF" };
         Stroke stroke1 = new() { Color = fontColorHex, Weight = "1pt" };
 
-        // Erstelle die TextBox
         TextBox textBox1 = new()
         {
             Style = "mso-fit-shape-to-text:t;mso-wrap-style:square;",

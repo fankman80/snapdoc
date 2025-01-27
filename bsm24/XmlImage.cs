@@ -21,7 +21,7 @@ public partial class XmlImage
                                             double widthMilimeters = 0,
                                             double heightMilimeters = 0,
                                             int imageQuality = 90,
-                                            List<(string, SKPoint, SKPoint, double)> overlayImages = null)
+                                            List<(string, SKPoint, SKPoint, float)> overlayImages = null)
     // Item1 = Image
     // Item2 = Position
     // Item3 = Anchor
@@ -49,7 +49,7 @@ public partial class XmlImage
         // Add Overlay-Image
         if (overlayImages != null)
         {
-            foreach ((string, SKPoint, SKPoint, double) overlayImage in overlayImages.Select(v => v))
+            foreach ((string, SKPoint, SKPoint, float) overlayImage in overlayImages.Select(v => v))
             {
                 var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache", overlayImage.Item1);
                 var stream = File.OpenRead(cacheDir);
@@ -59,11 +59,10 @@ public partial class XmlImage
                 using (SKCanvas canvas = new(combinedBitmap))
                 {
                     var _pos = new SKPoint(
-                        (skBitmap.Width * overlayImage.Item2.X) - (overlay.Width * overlayImage.Item3.X),
-                        (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item3.Y));
-                    SKRect destRect = new(_pos.X, _pos.Y, _pos.X + skBitmap.Width * overlayImage.Item4, _pos.Y + skBitmap.Height * overlayImage.Item4);
+                        (skBitmap.Width * overlayImage.Item2.X) - (overlay.Width * overlayImage.Item4 * overlayImage.Item3.X),
+                        (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item4 * overlayImage.Item3.Y));
+                    SKRect destRect = new(_pos.X, _pos.Y, _pos.X + overlay.Width * overlayImage.Item4, _pos.Y + overlay.Height * overlayImage.Item4);
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
-                    //canvas.DrawBitmap(overlay, _pos);
                     canvas.DrawBitmap(overlay, destRect);
                 }
                 skBitmap = combinedBitmap;
@@ -87,7 +86,7 @@ public partial class XmlImage
             heightMilimeters = widthMilimeters * ((double)skBitmap.Height / skBitmap.Width);
         if (heightMilimeters == 0 & widthMilimeters == 0)
         {
-            widthMilimeters = 60;  // wenn beide Längen Null sind, nehme Standardwert
+            widthMilimeters = 60;
             heightMilimeters = widthMilimeters * ((double)skBitmap.Height / skBitmap.Width);
         }
 
