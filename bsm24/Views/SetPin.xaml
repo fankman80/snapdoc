@@ -80,17 +80,12 @@
                     Title="Raum/Ort"
                     Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
 
-                <Button
-                    Grid.Column="1"
-                    Padding="0"
-                    Margin="0,-2,0,2"
-                    WidthRequest="50"
-                    HeightRequest="50"
-                    HorizontalOptions="End"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.My_location}}"
-                    Clicked="ShowGeoLoc"/>
+                <Button Grid.Column="1"
+                        x:Name="GeoLocButton"
+                        HorizontalOptions="End"
+                        BackgroundColor="Transparent"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Not_listed_location}}"
+                        Clicked="ShowGeoLoc"/>
             </Grid>
             <material:EditorField
                 x:Name="PinDesc"
@@ -99,7 +94,6 @@
                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
                 Title="Beschreibung"
                 Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Description}}" />
-
 
             <Grid ColumnSpacing="10" RowSpacing="0">
                 <Grid.ColumnDefinitions>

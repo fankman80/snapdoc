@@ -166,17 +166,13 @@ public class Helper
 
     public static async Task CopyFileFromResourcesAsync(string fileName, string destinationPath)
     {
-        using (var stream = await FileSystem.OpenAppPackageFileAsync(fileName))
+        using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
+        if (stream == null)
         {
-            if (stream == null)
-            {
-                return;
-            }
-
-            using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
-            {
-                await stream.CopyToAsync(fileStream);
-            }
+            return;
         }
+
+        using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
+        await stream.CopyToAsync(fileStream);
     }
 }

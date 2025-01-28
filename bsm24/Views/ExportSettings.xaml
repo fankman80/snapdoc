@@ -44,22 +44,14 @@
                                 ItemsSource="{Binding Templates}"
                                 SelectedItem="{Binding SelectedTemplate}"/>
                         <Button Grid.Column="1"
-                                Margin="0,-2,0,2"
-                                WidthRequest="50"
-                                HeightRequest="50"
                                 HorizontalOptions="End"
-                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
+                                BackgroundColor="Transparent"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="2" 
-                                Margin="0,-2,0,2"
-                                WidthRequest="50"
-                                HeightRequest="50"
-                                HorizontalOptions="End"                                
-                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                HorizontalOptions="End"
+                                BackgroundColor="Transparent"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
 

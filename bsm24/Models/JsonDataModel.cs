@@ -92,67 +92,44 @@ public class Foto
 
 public class GeoLocData
 {
-    private Location _wsg84;
+    private readonly Location _wsg84;
+    public GeoLocData() { }
     public GeoLocData(Location wsg84)
     {
         _wsg84 = wsg84;
+        Initialize();
     }
-
-    public DateTimeOffset Timestamp
+    public DateTimeOffset Timestamp { get; set; }
+    public LocationWGS84 WGS84 { get; set; }
+    public LocationCH1903 CH1903 { get; set; }
+    private void Initialize()
     {
-        get
+        if (_wsg84 != null)
         {
-            return _wsg84.Timestamp;
-        }
-    }
-
-    public LocationWGS84 WGS84
-    {
-        get
-        {
-            return new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
-        }
-    }
-
-    public LocationCH1903 CH1903
-    {
-        get
-        {
-            if (_wsg84 != null)
-            {
-                Functions.LLtoSwissGrid(_wsg84.Latitude, _wsg84.Longitude, out double swissEasting, out double swissNorthing);
-                return new LocationCH1903(swissEasting, swissNorthing);
-            }
-            else
-                return null;
+            Timestamp = _wsg84.Timestamp;
+            WGS84 = new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
+            Functions.LLtoSwissGrid(_wsg84.Latitude, _wsg84.Longitude, out double swissEasting, out double swissNorthing);
+            CH1903 = new LocationCH1903(swissEasting, swissNorthing);
         }
     }
 }
 
-public class LocationCH1903
+public class LocationCH1903(double x, double y)
 {
-    public double X { get; set; }
-    public double Y { get; set; }
-    public LocationCH1903(double x, double y)
-    {
-        X = x;
-        Y = y;
-    }
+    public double X { get; set; } = x;
+    public double Y { get; set; } = y;
+
     public override string ToString()
     {
         return $"X: {X}, Y: {Y}";
     }
 }
 
-public class LocationWGS84
+public class LocationWGS84(double latitude, double longitude)
 {
-    public double Latitude { get; set; }
-    public double Longitude { get; set; }
-    public LocationWGS84(double latitude, double longitude)
-    {
-        Latitude = latitude;
-        Longitude = longitude;
-    }
+    public double Latitude { get; set; } = latitude;
+    public double Longitude { get; set; } = longitude;
+
     public override string ToString()
     {
         return $"Latitude: {Latitude}, Longitude: {Longitude}";

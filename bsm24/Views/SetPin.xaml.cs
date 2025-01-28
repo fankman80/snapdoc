@@ -74,6 +74,18 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         AllowExport.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         SizePercentText.Text = Math.Round(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale * 100, 0).ToString() + "%";
         priorityPicker.SelectedIndex = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority;
+
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
+        {
+            GeoLocButton.ImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
