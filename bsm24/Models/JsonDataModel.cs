@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using Codeuctivity.OpenXmlPowerTools;
+using DocumentFormat.OpenXml.InkML;
 using SkiaSharp;
 using System.ComponentModel;
 
@@ -91,16 +93,24 @@ public class Foto
 public class GeoLocData
 {
     private Location _wsg84;
+    public GeoLocData(Location wsg84)
+    {
+        _wsg84 = wsg84;
+    }
 
-    public Location WGS84
+    public DateTimeOffset Timestamp
     {
         get
         {
-            return _wsg84;
+            return _wsg84.Timestamp;
         }
-        set
+    }
+
+    public LocationWGS84 WGS84
+    {
+        get
         {
-            _wsg84 = value;
+            return new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
         }
     }
 
@@ -111,7 +121,7 @@ public class GeoLocData
             if (_wsg84 != null)
             {
                 Functions.LLtoSwissGrid(_wsg84.Latitude, _wsg84.Longitude, out double swissEasting, out double swissNorthing);
-                return new LocationCH1903(_wsg84.Timestamp, swissEasting, swissNorthing, (double)_wsg84.Altitude, (double)_wsg84.Accuracy);
+                return new LocationCH1903(swissEasting, swissNorthing);
             }
             else
                 return null;
@@ -119,25 +129,38 @@ public class GeoLocData
     }
 }
 
+public class LocationCH1903
+{
+    public double X { get; set; }
+    public double Y { get; set; }
+    public LocationCH1903(double x, double y)
+    {
+        X = x;
+        Y = y;
+    }
+    public override string ToString()
+    {
+        return $"X: {X}, Y: {Y}";
+    }
+}
+
+public class LocationWGS84
+{
+    public double Latitude { get; set; }
+    public double Longitude { get; set; }
+    public LocationWGS84(double latitude, double longitude)
+    {
+        Latitude = latitude;
+        Longitude = longitude;
+    }
+    public override string ToString()
+    {
+        return $"Latitude: {Latitude}, Longitude: {Longitude}";
+    }
+}
+
 public class Position
 {
     public float X { get; set; }
     public float Y { get; set; }
-}
-
-public class LocationCH1903
-{
-    public DateTimeOffset Timestamp { get; set; }
-    public double X { get; set; }
-    public double Y { get; set; }
-    public double Altitude { get; set; }
-    public double Accuracy { get; set; }
-    public LocationCH1903(DateTimeOffset timestamp, double x, double y, double altitude, double accuracy)
-    {
-        Timestamp = timestamp;
-        X = x;
-        Y = y;
-        Altitude = altitude;
-        Accuracy = accuracy;
-    }
 }

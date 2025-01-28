@@ -29,7 +29,7 @@ public static class GlobalJson
         {
             WriteIndented = true,
             Converters = { new SKColorConverter() },
-            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault  //Ignoriert "IsEmpty": false und "IsZero": false,
+            //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault  //Ignoriert "IsEmpty": false und "IsZero": false,
         };
     }
 

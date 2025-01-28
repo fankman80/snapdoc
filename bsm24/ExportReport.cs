@@ -229,11 +229,13 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_geolocWGS84}":
-                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.ToString();
+                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
+                                                            text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.ToString();
                                                         break;
 
                                                     case "${pin_geolocCH1903}":
-                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.CH1903.ToString();
+                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
+                                                            text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.CH1903.ToString();
                                                         break;
 
                                                     default:

@@ -351,6 +351,7 @@ public partial class NewPage : IQueryAttributable
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             string newPin = "a_pin_red.png";
             var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(newPin, StringComparison.OrdinalIgnoreCase));
+            var location = await Helper.GetCurrentLocationAsync();
             Double _rotation = 0;
 
             if (customName != null)
@@ -383,7 +384,7 @@ public partial class NewPage : IQueryAttributable
                 PinColor = SKColors.Red,
                 PinScale = iconItem.IconScale,
                 PinRotation = _rotation,
-                GeoLocation = new GeoLocData { WGS84 = await Helper.GetCurrentLocationAsync() },
+                GeoLocation = location != null ? new GeoLocData(location) : null,
                 AllowExport = true,
             };
 
