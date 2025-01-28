@@ -36,19 +36,17 @@
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-
                         <material:PickerField Grid.Column="0" 
-                                    Title="Êxport-Vorlage"
-                                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                                    x:Name="templatePicker" 
-                                    ItemsSource="{Binding Templates}"
-                                    SelectedItem="{Binding SelectedTemplate}"/>
-
+                                Title="Êxport-Vorlage"
+                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                x:Name="templatePicker" 
+                                ItemsSource="{Binding Templates}"
+                                SelectedItem="{Binding SelectedTemplate}"/>
                         <Button Grid.Column="1"
                                 Margin="0,-2,0,2"
-                                WidthRequest="54"
-                                HeightRequest="54"
+                                WidthRequest="50"
+                                HeightRequest="50"
                                 HorizontalOptions="End"
                                 BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
@@ -56,8 +54,8 @@
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="2" 
                                 Margin="0,-2,0,2"
-                                WidthRequest="54"
-                                HeightRequest="54"
+                                WidthRequest="50"
+                                HeightRequest="50"
                                 HorizontalOptions="End"                                
                                 BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
@@ -67,8 +65,8 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="4*" />
-                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="*" />
@@ -118,8 +116,8 @@
 
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="3*" />
-                            <ColumnDefinition Width="1*" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
 
                         <material:TextField Grid.Column="0"
@@ -137,7 +135,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
                     </Grid>
 
-                    <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon Grösse: {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                                 Minimum="1"
                                 ThumbColor="{DynamicResource Primary}"
@@ -145,7 +143,7 @@
                                 MaximumTrackColor="{DynamicResource PrimaryDark}"
                                 Value="{Binding PinExportSize}"/>
 
-                    <Label Text="{Binding ImageExportSize, StringFormat='Foto Breite: {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="160"
                                 Minimum="10"
                                 ThumbColor="{DynamicResource Primary}"
@@ -161,7 +159,7 @@
                                 MaximumTrackColor="{DynamicResource PrimaryDark}"
                                 Value="{Binding ImageExportScale}"/>
 
-                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder Breite + Höhe: {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="160"
                                 Minimum="10"
                                 ThumbColor="{DynamicResource Primary}"

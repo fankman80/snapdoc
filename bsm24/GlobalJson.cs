@@ -28,7 +28,8 @@ public static class GlobalJson
         return new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new SKColorConverter() }
+            Converters = { new SKColorConverter() },
+            DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault  //Ignoriert "IsEmpty": false und "IsZero": false,
         };
     }
 

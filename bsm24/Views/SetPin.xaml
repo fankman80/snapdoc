@@ -83,8 +83,8 @@
                 <Button
                     Grid.Column="1"
                     Margin="0,-2,0,2"
-                    WidthRequest="54"
-                    HeightRequest="54"
+                    WidthRequest="50"
+                    HeightRequest="50"
                     HorizontalOptions="End"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
