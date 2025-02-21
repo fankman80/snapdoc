@@ -53,7 +53,10 @@ public partial class ExportReport
         string cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache");
         List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
         foreach (string icon in uniquePinIcons)
-            await CopyImageToDirectoryAsync(cacheDir, icon);
+            if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
+                CopyImageToDirectory(cacheDir, icon);
+            else
+                await CopyImageToDirectoryAsync(cacheDir, icon);
 
         using MemoryStream memoryStream = new();
         using (Stream fileStream = new FileStream(templateDoc, FileMode.Open, FileAccess.Read))
@@ -785,6 +788,17 @@ public partial class ExportReport
             return new SizeF(width, height);
         }
         return new SizeF(250, 140);
+    }
+
+    public static void CopyImageToDirectory(string destinationPath, string icon)
+    {
+        string destinationFilePath = System.IO.Path.Combine(destinationPath, icon);
+        string sourceFilePath = System.IO.Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, icon);
+
+        if (!Directory.Exists(destinationPath))
+            Directory.CreateDirectory(destinationPath);
+
+        File.Copy(sourceFilePath, destinationFilePath);
     }
 
     public static async Task CopyImageToDirectoryAsync(string destinationPath, string icon)
