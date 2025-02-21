@@ -16,6 +16,11 @@
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
+            x:Name ="btnPlanFit"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Fit_screen}}" 
+            Text="Grösse anpassen"            
+            Clicked="ImageFit"/>
+        <ToolbarItem
             x:Name ="btnColorSwitch"
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}" 
             Text="Farben an"            
@@ -37,7 +42,6 @@
             Panning="OnPanning"
             Pinching="OnPinching"
             Pinched="OnPinched"
-            DoubleTapped="OnDoubleTapped"
             MouseMoved="OnMouseMoved"
             ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="PlanContainer"
@@ -56,7 +60,31 @@
                                     LoadingDelay="0"/>
             </AbsoluteLayout>
         </mr:ContentView>
-        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
+        
+        <Border x:Name="PinSizeBorder"
+            IsVisible="False"
+            BackgroundColor="{DynamicResource Primary}"
+            StrokeThickness="0"
+            HeightRequest="60"
+            AbsoluteLayout.LayoutBounds="0, 1, 1, AutoSize"
+            AbsoluteLayout.LayoutFlags="PositionProportional, WidthProportional"
+            Margin="20,0,20,20">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="30"/>
+            </Border.StrokeShape>
+            <Slider x:Name="PinSizeSlider"
+                    Maximum="360"
+                    Minimum="0"
+                    Value="0"
+                    ThumbColor="{DynamicResource PrimaryDarkText}"
+                    MinimumTrackColor="{DynamicResource PrimaryDarkText}"
+                    MaximumTrackColor="{DynamicResource PrimaryDarkText}"
+                    ValueChanged="OnSliderValueChanged"
+                    DragCompleted="OnSliderDragCompleted"/>
+        </Border>
+
+        <Button x:Name="SetPinBtn"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"                
                 Margin="0,0,20,20"
@@ -67,7 +95,8 @@
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="SetPinClicked"/>
 
-        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Screenshot_region}}"
+        <Button x:Name="DrawBtn"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Screenshot_region}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"                
                 Margin="0,0,100,20"
@@ -77,7 +106,7 @@
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="SetRegionClicked"/>
-        
+
         <Button x:Name="PenSettingsBtn"
                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Brush}}"
                 BackgroundColor="{DynamicResource Primary}"
@@ -89,6 +118,6 @@
                 AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 IsVisible="False"
-                Clicked="PenSettingsClicked"/>        
+                Clicked="PenSettingsClicked"/>
     </AbsoluteLayout>
 </mr:ContentPage>

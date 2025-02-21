@@ -86,6 +86,13 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
                         : (Color)Application.Current.Resources["Primary"]
             };
         }
+
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin)
+        {
+            PinImageContainer.IsVisible = false;
+            SizePercentButton.IsVisible = false;
+            SizePercentText.IsVisible = false;
+        }
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -125,6 +132,10 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
+
+        var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase));
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
     }
 
     private void OnCheckedChanged(object sender, CheckedChangedEventArgs e)
@@ -147,9 +158,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private async void OnOkayClick(object sender, EventArgs e)
     {
         // write data
-        var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase));
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = this.Title;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
@@ -161,7 +169,10 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
-        await Shell.Current.GoToAsync($"..?pinUpdate={PinId}");
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin)
+            await Shell.Current.GoToAsync($"..");
+        else
+            await Shell.Current.GoToAsync($"..?pinUpdate={PinId}");
     }
 
     private async void ShowGeoLoc(object sender, EventArgs e)

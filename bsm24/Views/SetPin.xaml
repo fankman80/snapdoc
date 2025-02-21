@@ -133,6 +133,7 @@
                         OnColor="{DynamicResource Secondary}"/>
                 
                 <Button Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
+                        x:Name="SizePercentButton"
                         VerticalOptions="Fill"                        
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
@@ -148,16 +149,17 @@
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"/>                  
 
                 <Border Grid.Column="3" Grid.Row="0" Grid.RowSpan="3"
+                        x:Name="PinImageContainer"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="White"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
-                    <ImageButton Source="{Binding}"
-                                     x:Name="PinImage"
-                                     Aspect="AspectFit"
-                                     Clicked="OnPinSelectClick"
-                                     Padding="12"/>
+                    <ImageButton x:Name="PinImage"
+                                 Source="{Binding}"                                
+                                 Aspect="AspectFit"
+                                 Clicked="OnPinSelectClick"
+                                 Padding="12"/>
                 </Border>
 
                 <Picker Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"

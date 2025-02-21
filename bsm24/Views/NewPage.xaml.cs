@@ -24,7 +24,7 @@ public partial class NewPage : IQueryAttributable
     public string PinDelete { get; set; }
     public string PageTitle { get; set; } = "";
     public string PinZoom;
-    private MR.Gestures.Image activePin;
+    private MR.Gestures.Image activePin = null;
     private double densityX, densityY;
     private bool isFirstLoad = true;
     private Point mousePos;
@@ -73,6 +73,9 @@ public partial class NewPage : IQueryAttributable
                 image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
                 image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
                 image.AnchorY = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.Y;
+                image.Rotation = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLockRotate ?
+                                 GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinRotation :
+                                 PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinRotation;
                 image.Scale = PinScaling(PinUpdate);
 
                 if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
@@ -204,9 +207,14 @@ public partial class NewPage : IQueryAttributable
         Point _originPos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
         Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
         Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size;
+        Double _rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation;
 
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin) // Add Path for Custom Pin-Image
+        {
             pinIcon = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, pinIcon);
+            _rotation = 0;
+        }
+
 
         // berechne Anchor-Koordinaten
         var smallImage = new MR.Gestures.Image
@@ -219,7 +227,7 @@ public partial class NewPage : IQueryAttributable
             AnchorY = GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor.Y,
             TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
             TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
-            Rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation,
+            Rotation = _rotation,
             Scale = PinScaling(pinId),
         };
 
@@ -228,7 +236,7 @@ public partial class NewPage : IQueryAttributable
             if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true) return;
             planContainer.IsPanningEnabled = false;
             activePin = smallImage;
-        };
+        };        
 
         smallImage.Up += (s, e) =>
         {
@@ -247,10 +255,22 @@ public partial class NewPage : IQueryAttributable
             GlobalJson.SaveToFile();
         };
 
-        smallImage.Tapping += async (s, e) =>
+        smallImage.Tapped += async (s, e) =>
         {
             var _pinIcon = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon;
             await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={pinId}&pinIcon={_pinIcon}");
+        };
+
+        smallImage.DoubleTapped += (s, e) =>
+        {
+            activePin = smallImage;
+
+            PinSizeSlider.Value = activePin.Rotation;
+            planContainer.IsPanningEnabled = false;
+
+            DrawBtn.IsVisible = false;
+            SetPinBtn.IsVisible = false;
+            PinSizeBorder.IsVisible = true;
         };
 
         PlanContainer.Children.Add(smallImage);
@@ -300,17 +320,12 @@ public partial class NewPage : IQueryAttributable
                     if (PinZoom != null)
                         ZoomToPin(PinZoom);
                     else
-                        ImageFit();
+                        ImageFit(null, null);
 
                     AddPins();
                 }
             }
         }
-    }
-
-    public void OnDoubleTapped(object sender, EventArgs e)
-    {
-        ImageFit();
     }
 
     public void OnPinching(object sender, PinchEventArgs e)
@@ -330,7 +345,7 @@ public partial class NewPage : IQueryAttributable
         double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
         double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
 
-        if (activePin != null)
+        if (activePin != null && PinSizeBorder.IsVisible == false)
         {
             activePin.TranslationX += deltaX * scaleSpeed;
             activePin.TranslationY += deltaY * scaleSpeed;
@@ -360,29 +375,27 @@ public partial class NewPage : IQueryAttributable
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage != null)
         {
-            string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            string newPin = "a_pin_red.png";
-            var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(newPin, StringComparison.OrdinalIgnoreCase));
+            string _newPin = "a_pin_red.png";
+            string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");            
+            var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
             var location = await Helper.GetCurrentLocationAsync();
 
-            Double _rotation = 0;
             Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);
-            Size _size = iconItem.IconSize;
-            bool _isCustomPin = false;
             Point _anchorPoint = iconItem.AnchorPoint;
+            Size _size = iconItem.IconSize;
             bool _isRotationLocked = iconItem.IsRotationLocked;
+            bool _isCustomPin = false;
             string _displayName = iconItem.DisplayName;
 
             if (customName != null)
             { 
-                newPin = customName;
-                _displayName = "";
-                _anchorPoint = new Point(0, 0);
-                _isRotationLocked = true;
-                _size = new Size(customPinSizeWidth, customPinSizeHeight);
                 _pos = new Point(customPinX, customPinY);
-                _rotation = planContainer.Rotation;
+                _anchorPoint = new Point(0, 0);
+                _size = new Size(customPinSizeWidth, customPinSizeHeight);
+                _isRotationLocked = true;
                 _isCustomPin = true;
+                _newPin = customName;
+                _displayName = "";;
             }
 
             Pin newPinData = new()
@@ -397,13 +410,13 @@ public partial class NewPage : IQueryAttributable
                 PinDesc = "",
                 PinPriority = 0,
                 PinLocation = "",
-                PinIcon = newPin,
+                PinIcon = _newPin,
                 Fotos = [],
                 OnPlanId = PlanId,
                 SelfId = currentDateTime,
                 PinColor = SKColors.Red,
                 PinScale = iconItem.IconScale,
-                PinRotation = _rotation,
+                PinRotation = 0,
                 GeoLocation = location != null ? new GeoLocData(location) : null,
                 AllowExport = true,
             };
@@ -579,7 +592,7 @@ public partial class NewPage : IQueryAttributable
         planContainer.Scale = Settings.DefaultPinZoom;
     }
 
-    private void ImageFit()
+    private void ImageFit(object sender, EventArgs e)
     {
         planContainer.Rotation = 0;
         planContainer.Scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
@@ -716,5 +729,27 @@ public partial class NewPage : IQueryAttributable
 
         drawingView.LineColor = result.Item1;
         drawingView.LineWidth = result.Item2;
+    }
+    private void OnSliderValueChanged(object sender, EventArgs e)
+    {
+        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+        activePin.Rotation = sliderValue;
+    }
+
+    private void OnSliderDragCompleted(object sender, EventArgs e)
+    {
+        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+
+        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
+        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        planContainer.IsPanningEnabled = true;
+        PinSizeBorder.IsVisible = false;
+        DrawBtn.IsVisible = true;
+        SetPinBtn.IsVisible = true;
+        activePin = null;
     }
 }
