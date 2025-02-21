@@ -147,7 +147,7 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_posImage}":
-                                                        if (SettingsService.Instance.IsPosImageExport)
+                                                        if (SettingsService.Instance.IsPosImageExport && !GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin)
                                                         {
                                                             // add Part of Plan Image
                                                             string planName = GlobalJson.Data.Plans[plan.Key].File;
