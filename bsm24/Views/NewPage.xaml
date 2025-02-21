@@ -73,6 +73,7 @@
                 <RoundRectangle CornerRadius="30"/>
             </Border.StrokeShape>
             <Slider x:Name="PinSizeSlider"
+                    Margin="15"
                     Maximum="360"
                     Minimum="0"
                     Value="0"
