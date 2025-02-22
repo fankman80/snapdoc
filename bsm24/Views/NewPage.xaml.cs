@@ -273,6 +273,11 @@ public partial class NewPage : IQueryAttributable
             PinSizeBorder.IsVisible = true;
         };
 
+        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].isCustomPin)
+            smallImage.zIndex = 5;
+        else
+            smallImage.zIndex = 100;
+
         PlanContainer.Children.Add(smallImage);
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
 
@@ -390,7 +395,7 @@ public partial class NewPage : IQueryAttributable
             if (customName != null)
             { 
                 _pos = new Point(customPinX, customPinY);
-                _anchorPoint = new Point(0, 0);
+                _anchorPoint = new Point(0.5, 0.5);
                 _size = new Size(customPinSizeWidth, customPinSizeHeight);
                 _isRotationLocked = true;
                 _isCustomPin = true;
