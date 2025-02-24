@@ -2,7 +2,6 @@
 
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
-using SkiaSharp;
 
 namespace bsm24.Views;
 
@@ -10,16 +9,16 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 {
     public ObservableCollection<IconItem> Icons { get; set; }
     public Command<IconItem> IconTappedCommand { get; }
-    public string PlanId { get; set; }
-    public string PinId { get; set; }
-    public int DynamicSpan { get; set; } = 1;
-    public int MinSize { get; set; } = 1;
+    public string PlanId;
+    public string PinId;
+    public int DynamicSpan;
+    public int MinSize;
 
     public IconGallery()
     {
         InitializeComponent();
         SizeChanged += OnSizeChanged;
-        Icons = new ObservableCollection<IconItem>(Settings.PinData);
+        Icons = [.. Settings.PinData];
         BindingContext = this;
     }
 

@@ -9,8 +9,8 @@ namespace bsm24.Views;
 public partial class PinList : UraniumContentPage
 {
     public Command<IconItem> IconTappedCommand { get; }
-    public int DynamicSpan { get; set; } = 1;
-    public int MinSize { get; set; } = 1;
+    public int DynamicSpan = 1;
+    public int MinSize = 1;
 
     public PinList()
     {

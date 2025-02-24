@@ -10,10 +10,8 @@ public partial class PopupDualResponse : PopupPage
     TaskCompletionSource<string> _taskCompletionSource;
     public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
-
     private int countdown = 5;
-
-    private string OkText;
+    private readonly string OkText;
 
     public PopupDualResponse(string title, string okText = "Ok", string cancelText = "Abbrechen", bool alert = false)
 	{

@@ -26,7 +26,7 @@ namespace bsm24
         public required string ThumbnailPath { get; set; }
     }
 
-    public class PinItem : INotifyPropertyChanged
+    public partial class PinItem : INotifyPropertyChanged
     {
         public required string PinDesc { get; set; }
         public required string PinIcon { get; set; }

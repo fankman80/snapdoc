@@ -112,7 +112,7 @@
                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Brush}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}" 
-                Margin="0,0,180,20"
+                Margin="0,0,20,20"
                 WidthRequest="60"
                 HeightRequest="60"
                 CornerRadius="30"

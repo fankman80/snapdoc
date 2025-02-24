@@ -42,16 +42,16 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2">
-                                <Label Margin="10,4,6,0"
+                            <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="0" Spacing="0">
+                                <Label Margin="10,4,0,0"
+                                       FontAttributes="Bold"
                                        FontSize="12"
                                        Text="{Binding OnPlanName}"/>
-                                <Label Margin="10,4,6,0"
+                                <Label Margin="0,4,0,0"
                                        FontSize="12"
-                                       Text=" / "/>
-                                <Label Margin="0,4,6,0"
+                                       Text="  /  "/>
+                                <Label Margin="0,4,0,0"
                                        FontSize="12"
-                                       LineBreakMode="TailTruncation"
                                        Text="{Binding PinLocation}"/>
                             </HorizontalStackLayout>
 
@@ -64,7 +64,6 @@
                             <BoxView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="3"
                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      HeightRequest="1"
-                                     HorizontalOptions="FillAndExpand"
                                      Margin="10,2,10,2"/>
 
                             <ff:CachedImage Grid.Column="0" Grid.Row="3"
@@ -110,8 +109,6 @@
               BackgroundColor="Black"
               Opacity="0.7"
               IsVisible="False"
-              VerticalOptions="FillAndExpand"
-              HorizontalOptions="FillAndExpand"
               ZIndex="10">
             <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
                 <ActivityIndicator x:Name="activityIndicator"

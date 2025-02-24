@@ -6,10 +6,10 @@ namespace bsm24.ViewModels;
 public partial class TransformViewModel : CustomEventArgsViewModel
 {
     #region Properties
-    public bool IsPanningEnabled { get; set; } = true;
-    public bool IsPinchingEnabled { get; set; } = true;
-
+    public bool IsPanningEnabled = true;
+    public bool IsPinchingEnabled = true;
     protected double anchorX = 0.5;
+
     public double AnchorX
     {
         get { return anchorX; }

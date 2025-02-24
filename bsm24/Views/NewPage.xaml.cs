@@ -19,10 +19,10 @@ namespace bsm24.Views;
 
 public partial class NewPage : IQueryAttributable
 {
-    public string PinUpdate { get; set; }
-    public string PlanId { get; set; }
-    public string PinDelete { get; set; }
     public string PageTitle { get; set; } = "";
+    public string PinUpdate;
+    public string PlanId;
+    public string PinDelete;
     public string PinZoom;
     private MR.Gestures.Image activePin = null;
     private double densityX, densityY;
@@ -31,8 +31,9 @@ public partial class NewPage : IQueryAttributable
     private readonly TransformViewModel planContainer;
     private DrawingView drawingView;
     private double minX, maxX, minY, maxY;  // Felder für die Grenzwerte
-    private int LineWidth { get; set; } = 15;
-    private Color SelectedColor { get; set; } = new Color(255, 0, 0);
+    private int lineWidth = 15;
+    private Color selectedColor = new(255, 0, 0);
+    bool isTappedHandled = false;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -87,40 +88,44 @@ public partial class NewPage : IQueryAttributable
         }
         if (query.TryGetValue("pinDelete", out object value2))
         {
-            // remove pin-icon on plan
             PinDelete = value2 as string;
-            var image = PlanContainer.Children
-                .OfType<MR.Gestures.Image>()
-                .FirstOrDefault(i => i.AutomationId == PinDelete);
-            PlanContainer.Remove(image);
 
-            // delete all images
-            foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos)
+            if (GlobalJson.Data.Plans[PlanId].Pins.TryGetValue(PinDelete, out var pin)) // check if pin exists
             {
-                string file;
-                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
-                if (File.Exists(file))
-                    File.Delete(file);
+                // remove pin-icon on plan
+                var image = PlanContainer.Children
+                    .OfType<MR.Gestures.Image>()
+                    .FirstOrDefault(i => i.AutomationId == PinDelete);
+                PlanContainer.Remove(image);
 
-                file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
-                if (File.Exists(file))
-                    File.Delete(file);
+                // delete all images
+                foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos)
+                {
+                    string file;
+                    file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
+                    if (File.Exists(file))
+                        File.Delete(file);
+
+                    file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
+                    if (File.Exists(file))
+                        File.Delete(file);
+                }
+
+                // remove custom pin image
+                if (GlobalJson.Data.Plans[PlanId].Pins[PinDelete].IsCustomPin)
+                {
+                    String file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].PinIcon);
+                    if (File.Exists(file))
+                        File.Delete(file);
+                }
+
+                // remove pin from database
+                var plan = GlobalJson.Data.Plans[PlanId];
+                plan.Pins.Remove(PinDelete);
+
+                // save data to file
+                GlobalJson.SaveToFile();
             }
-
-            // remove custom pin image
-            if (GlobalJson.Data.Plans[PlanId].Pins[PinDelete].IsCustomPin)
-            {
-                String file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].PinIcon);
-                if (File.Exists(file))
-                    File.Delete(file);
-            }
-
-            // remove pin from database
-            var plan = GlobalJson.Data.Plans[PlanId];
-            plan.Pins.Remove(PinDelete);
-
-            // save data to file
-            GlobalJson.SaveToFile();
         }
     }
 
@@ -215,7 +220,6 @@ public partial class NewPage : IQueryAttributable
             _rotation = 0;
         }
 
-
         // berechne Anchor-Koordinaten
         var smallImage = new MR.Gestures.Image
         {
@@ -258,8 +262,15 @@ public partial class NewPage : IQueryAttributable
 
         smallImage.Tapped += async (s, e) =>
         {
+            if (isTappedHandled)
+                return;
+
+            isTappedHandled = true;
+
             var _pinIcon = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon;
             await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={pinId}&pinIcon={_pinIcon}");
+
+            isTappedHandled = false;
         };
 
         smallImage.DoubleTapped += (s, e) =>
@@ -277,7 +288,7 @@ public partial class NewPage : IQueryAttributable
         // sort large custom pins on lower z-indexes
         // and small pins on higher z-indexes
         smallImage.ZIndex = 10000 - (int)((GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Width +
-                                               GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Height) / 2);
+                                           GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Height) / 2);
 
         PlanContainer.Children.Add(smallImage);
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
@@ -376,7 +387,7 @@ public partial class NewPage : IQueryAttributable
         AddDrawingView();
     }
 
-    private async void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0) 
+    private async void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null) 
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage != null)
@@ -385,7 +396,7 @@ public partial class NewPage : IQueryAttributable
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");            
             var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
             var location = await Helper.GetCurrentLocationAsync();
-
+            pinColor ??= SKColors.Red;
             Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);
             Point _anchorPoint = iconItem.AnchorPoint;
             Size _size = iconItem.IconSize;
@@ -401,7 +412,7 @@ public partial class NewPage : IQueryAttributable
                 _isRotationLocked = true;
                 _isCustomPin = true;
                 _newPin = customName;
-                _displayName = "";;
+                _displayName = "";
             }
 
             Pin newPinData = new()
@@ -420,7 +431,7 @@ public partial class NewPage : IQueryAttributable
                 Fotos = [],
                 OnPlanId = PlanId,
                 SelfId = currentDateTime,
-                PinColor = SKColors.Red,
+                PinColor = (SKColor)pinColor,
                 PinScale = iconItem.IconScale,
                 PinRotation = 0,
                 GeoLocation = location != null ? new GeoLocData(location) : null,
@@ -621,13 +632,15 @@ public partial class NewPage : IQueryAttributable
     private void AddDrawingView()
     {
         planContainer.IsPanningEnabled = false;
+        SetPinBtn.IsVisible = false;
+        DrawBtn.IsVisible = false;
 
         drawingView = new DrawingView
         {
             BackgroundColor = Colors.Transparent,
             IsMultiLineModeEnabled = true,
-            LineWidth = 10,
-            LineColor = Colors.Red,
+            LineWidth = lineWidth,
+            LineColor = selectedColor,
             InputTransparent = false,
             Scale = planContainer.Scale,
             AnchorX = planContainer.AnchorX,
@@ -648,8 +661,7 @@ public partial class NewPage : IQueryAttributable
         (this.Content as Microsoft.Maui.Controls.AbsoluteLayout)?.Children.Add(drawingView);
 
         PenSettingsBtn.IsVisible = true;
-        PenSettingsBtn.ZIndex = 9999;
-
+        PenSettingsBtn.ZIndex = 10000;
     }
     private void ResetLimits()
     {
@@ -717,25 +729,28 @@ public partial class NewPage : IQueryAttributable
                 imageData.SaveTo(fileStream);
             }
 
-            SetPin(customPinName, skBitmap_tmp.Width, skBitmap_tmp.Height, minX, minY);
+            SetPin(customPinName, skBitmap_tmp.Width, skBitmap_tmp.Height, minX, minY, new SKColor(drawingView.LineColor.ToUint()));
             RemoveDrawingView();
             planContainer.IsPanningEnabled = true;
             PenSettingsBtn.IsVisible = false;
+            SetPinBtn.IsVisible = true;
+            DrawBtn.IsVisible = true;
         }
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(LineWidth, SelectedColor);
+        var popup = new PopupColorPicker(lineWidth, selectedColor);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        SelectedColor = result.Item1;
-        LineWidth = result.Item2;
+        selectedColor = result.Item1;
+        lineWidth = result.Item2;
 
         drawingView.LineColor = result.Item1;
         drawingView.LineWidth = result.Item2;
     }
+
     private void OnSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;

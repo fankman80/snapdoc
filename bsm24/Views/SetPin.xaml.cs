@@ -11,11 +11,11 @@ namespace bsm24.Views;
 public partial class SetPin : UraniumContentPage, IQueryAttributable
 {
     public ObservableCollection<ImageItem> Images { get; set; }
-    public string PlanId { get; set; }
-    public string PinId { get; set; }
-    public string PinIcon { get; set; }
     public int DynamicSpan { get; set; } = 3; // Standardwert
-    public int DynamicSize { get; set; }
+    public int DynamicSize;
+    public string PlanId;
+    public string PinId;
+    public string PinIcon;
 
     public SetPin()
     {

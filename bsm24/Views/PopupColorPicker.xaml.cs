@@ -10,20 +10,20 @@ namespace bsm24.Views;
 public partial class PopupColorPicker : PopupPage
 {
     TaskCompletionSource<(Color, int)> _taskCompletionSource;
+    public ObservableCollection<ColorItem> Colors { get; set; }
     public Task<(Color, int)> PopupDismissedTask => _taskCompletionSource.Task;
     public (Color, int) ReturnValue { get; set; }
-    private int LineWidth { get; set; }
-    private Color SelectedColor { get; set; }
-    public ObservableCollection<ColorItem> Colors { get; set; }
     private Color borderColor = Microsoft.Maui.Graphics.Colors.Black;
+    private readonly int _lineWidth;
+    private Color _selectedColor;
 
     public PopupColorPicker(int lineWidth, Color selectedColor, string okText = "Ok")
     {
 	    InitializeComponent();
         okButtonText.Text = okText;
-        LineWidth = lineWidth;
-        SelectedColor = selectedColor;
-        Colors = new ObservableCollection<ColorItem>(Settings.ColorData.Select(c => new ColorItem { BackgroundColor = c, StrokeColor = popupBorder.BackgroundColor }));
+        _lineWidth = lineWidth;
+        _selectedColor = selectedColor;
+        Colors = [.. Settings.ColorData.Select(c => new ColorItem { BackgroundColor = c, StrokeColor = popupBorder.BackgroundColor })];
         BindingContext = this;
     }
 
@@ -38,11 +38,11 @@ public partial class PopupColorPicker : PopupPage
             borderColor = Microsoft.Maui.Graphics.Colors.White;
 
         foreach (var colorItem in Colors)
-            if (colorItem.BackgroundColor.Equals(SelectedColor))
+            if (colorItem.BackgroundColor.Equals(_selectedColor))
                 colorItem.StrokeColor = borderColor;
 
-        sliderText.Text = "Pinselgrösse: " + LineWidth.ToString();
-        LineWidthSlider.Value = LineWidth;
+        sliderText.Text = "Pinselgrösse: " + _lineWidth.ToString();
+        LineWidthSlider.Value = _lineWidth;
         _taskCompletionSource = new TaskCompletionSource<(Color, int)>();
     }
 
@@ -54,31 +54,31 @@ public partial class PopupColorPicker : PopupPage
             foreach (var item in Colors)
                 item.StrokeColor = popupBorder.BackgroundColor;
             selectedItem.StrokeColor = borderColor;
-            SelectedColor = selectedItem.BackgroundColor;
+            _selectedColor = selectedItem.BackgroundColor;
         }
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        _taskCompletionSource.SetResult((SelectedColor, (int)LineWidthSlider.Value));
+        _taskCompletionSource.SetResult((_selectedColor, (int)LineWidthSlider.Value));
     }
 
     private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
     {
-        ReturnValue = (SelectedColor, (int)LineWidthSlider.Value);
+        ReturnValue = (_selectedColor, (int)LineWidthSlider.Value);
         await MopupService.Instance.PopAsync();
     }
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        ReturnValue = (SelectedColor, (int)LineWidthSlider.Value);
+        ReturnValue = (_selectedColor, (int)LineWidthSlider.Value);
         await MopupService.Instance.PopAsync();
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        ReturnValue = (SelectedColor, (int)LineWidthSlider.Value);
+        ReturnValue = (_selectedColor, (int)LineWidthSlider.Value);
         await MopupService.Instance.PopAsync();
     }
 

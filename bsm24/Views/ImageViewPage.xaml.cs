@@ -1,9 +1,7 @@
 ﻿#nullable disable
 
 using bsm24.ViewModels;
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
-using CommunityToolkit.Maui.Views;
 using Mopups.Services;
 using MR.Gestures;
 using SkiaSharp;
@@ -12,14 +10,13 @@ namespace bsm24.Views;
 
 public partial class ImageViewPage : IQueryAttributable
 {
-    public string PlanId { get; set; }
-    public string PinId { get; set; }
-    public string PinIcon { get; set; }
-    public string ImgSource { get; set; }
-    private int LineWidth { get; set; } = 15;
-    private Color SelectedColor { get; set; } = new Color(255, 0, 0);
+    public string PlanId;
+    public string PinId;
+    public string PinIcon;
+    public string ImgSource;
+    private int lineWidth = 15;
+    private Color selectedColor = new(255, 0, 0);
     private bool isCleared = false;
-
     private readonly TransformViewModel imageViewContainer;
 
     public ImageViewPage()
@@ -34,7 +31,7 @@ public partial class ImageViewPage : IQueryAttributable
         base.OnAppearing();
 
         ImageViewContainer.PropertyChanged += ImageView_PropertyChanged;
-        DrawView.LineWidth = LineWidth;
+        DrawView.LineWidth = lineWidth;
     }
 
     private void ImageView_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -119,12 +116,12 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(LineWidth, SelectedColor);
+        var popup = new PopupColorPicker(lineWidth, selectedColor);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        SelectedColor = result.Item1;
-        LineWidth = result.Item2;
+        selectedColor = result.Item1;
+        lineWidth = result.Item2;
 
         DrawView.LineColor = result.Item1;
         DrawView.LineWidth = result.Item2;
