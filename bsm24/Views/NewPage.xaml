@@ -73,7 +73,7 @@
                 <RoundRectangle CornerRadius="30"/>
             </Border.StrokeShape>
             <Slider x:Name="PinSizeSlider"
-                    Margin="15"
+                    Margin="90,15,15,15"
                     Maximum="360"
                     Minimum="0"
                     Value="0"
@@ -83,7 +83,12 @@
                     ValueChanged="OnSliderValueChanged"
                     DragCompleted="OnSliderDragCompleted"/>
         </Border>
-
+        <Label Text="Drehen"
+               FontAttributes="Bold"
+               Margin="40,15,15,40"
+               TextColor="{DynamicResource PrimaryDarkText}"
+               AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+               AbsoluteLayout.LayoutFlags="PositionProportional"/>
         <Button x:Name="SetPinBtn"
                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
                 BackgroundColor="{DynamicResource Primary}"

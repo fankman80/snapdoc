@@ -47,9 +47,9 @@
                    HorizontalOptions="Start"
                    Text="Pinselgrösse: 15"/>
             <Slider x:Name="LineWidthSlider"
-                    Maximum="80"
-                    Minimum="5"
-                    Value="15"
+                    Maximum="60"
+                    Minimum="1"
+                    Value="14"
                     ThumbColor="{DynamicResource Primary}"
                     MinimumTrackColor="{DynamicResource Primary}"
                     MaximumTrackColor="{DynamicResource PrimaryDark}"

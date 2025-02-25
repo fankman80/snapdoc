@@ -10,8 +10,6 @@ using Mopups.Services;
 using MR.Gestures;
 using SkiaSharp;
 using Application = Microsoft.Maui.Controls.Application;
-using Codeuctivity.OpenXmlPowerTools;
-
 
 #if WINDOWS
 using bsm24.Platforms.Windows;
@@ -82,7 +80,7 @@ public partial class NewPage : IQueryAttributable
                 image.Scale = PinScaling(PinUpdate);
 
                 if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
-                    image.Opacity = .3;
+                    image.Opacity = .5;
                 else
                     image.Opacity = 1;
                 AdjustImagePosition(image);
@@ -297,7 +295,7 @@ public partial class NewPage : IQueryAttributable
 
         // set transparency
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true)
-            smallImage.Opacity = .3;
+            smallImage.Opacity = .5;
         else
             smallImage.Opacity = 1;
     }
@@ -646,7 +644,7 @@ public partial class NewPage : IQueryAttributable
         {
             BackgroundColor = Colors.Transparent,
             IsMultiLineModeEnabled = true,
-            LineWidth = lineWidth,
+            LineWidth = (int)(lineWidth / densityX),
             LineColor = selectedColor,
             InputTransparent = false,
             Scale = planContainer.Scale,
@@ -706,7 +704,7 @@ public partial class NewPage : IQueryAttributable
 
             await using var imageStream = await DrawingViewService.GetImageStream(
                                                 ImageLineOptions.JustLines(drawingView.Lines,
-                                                new Size(1, 1),
+                                                new Size(pinBound.Width, pinBound.Height),
                                                 Brush.Transparent));
             if (imageStream != null)
             {
@@ -718,7 +716,7 @@ public partial class NewPage : IQueryAttributable
                 memoryStream.Seek(0, SeekOrigin.Begin);
                 using var skBitmap = SKBitmap.Decode(memoryStream);
 
-                var resizedBitmap = new SKBitmap((int)(pinBound.Width + drawingView.LineWidth + 10), (int)(pinBound.Height + drawingView.LineWidth + 10));
+                var resizedBitmap = new SKBitmap(pinBound.Width + (int)(drawingView.LineWidth * densityX) + 10, pinBound.Height + (int)(drawingView.LineWidth * densityX) + 10);
                 var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
                 skBitmap.ScalePixels(resizedBitmap, samplingOptions);
 
@@ -734,6 +732,7 @@ public partial class NewPage : IQueryAttributable
                       new SKColor(drawingView.LineColor.ToUint()));
             }
         }
+
         RemoveDrawingView();
         planContainer.IsPanningEnabled = true;
         PenSettingsBtn.IsVisible = false;
@@ -752,7 +751,7 @@ public partial class NewPage : IQueryAttributable
         lineWidth = result.Item2;
 
         drawingView.LineColor = result.Item1;
-        drawingView.LineWidth = result.Item2;
+        drawingView.LineWidth = (int)(result.Item2 / densityX);
     }
 
     private void OnSliderValueChanged(object sender, EventArgs e)
