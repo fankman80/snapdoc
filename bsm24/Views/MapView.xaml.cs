@@ -18,7 +18,7 @@ public partial class MapView
     {
         base.OnAppearing();
 
-        ShowCurrentLocationOnMap();
+        //ShowCurrentLocationOnMap();
 
         Microsoft.Maui.Handlers.WebViewHandler.Mapper.AppendToMapping("MyCustomization", (handler, view) =>
         {
@@ -51,7 +51,15 @@ public partial class MapView
 
         GeoAdminWebView.Source = htmlSource;
 
-        SetMarkerPosition(7.299142, 47.070331);
+        GeoAdminWebView.Navigated += (s, e) =>
+        {
+            var longitude = 8.391505323137489;
+            var latitude = 46.99582639810278;
+            string script = $"setMarkerPosition({longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)});";
+            GeoAdminWebView.Eval(script);
+        };
+        //SetMarkerPosition(8.391505323137489, 46.99582639810278);
+
     }
 
     private static string LoadHtmlFromFile()
@@ -64,8 +72,12 @@ public partial class MapView
 
     private void SetMarkerPosition(double longitude, double latitude)
     {
-        string script = $"setMarkerPosition({longitude}, {latitude});";
-        GeoAdminWebView.Eval(script);
+        // Überprüfe, ob die WebView geladen ist
+        if (GeoAdminWebView != null)
+        {
+            string script = $"setMarkerPosition({longitude.ToString(System.Globalization.CultureInfo.InvariantCulture)}, {latitude.ToString(System.Globalization.CultureInfo.InvariantCulture)});";
+            GeoAdminWebView.Eval(script);
+        }
     }
 
     private async void ShowCurrentLocationOnMap()

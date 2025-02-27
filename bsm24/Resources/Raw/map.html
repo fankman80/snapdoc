@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>GeoAdmin Map</title>
+    <title>GeoAdmin Map with MapTiming</title>
     <style>
         #map {
             width: 100%;
@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
     <script>
         var marker;  // Globale Variable für den Marker
+        var mapReady = false;  // Karte ist anfangs noch nicht bereit
+        var pendingPosition = null;  // Position, die gesetzt werden soll, wenn die Karte bereit ist
 
         function initMap() {
             var wmsLayer = new ol.layer.Tile({
@@ -30,12 +32,29 @@
                 target: 'map',
                 layers: [wmsLayer],
                 view: new ol.View({
-                    center: ol.proj.fromLonLat([8.2319, 46.7986]),
+                    center: ol.proj.fromLonLat([7.3065627184882835, 47.074035319286246]),
                     zoom: 8
                 })
             });
 
-            // Erstelle das Icon für den Marker
+            console.log("Map has finished rendering.");
+            mapReady = true;  // Setze den Status auf „bereit“
+
+            // Wenn eine Position vor dem Laden der Karte übergeben wurde, setze sie jetzt
+            if (pendingPosition) {
+                setMarkerPosition(pendingPosition.lon, pendingPosition.lat);
+                pendingPosition = null;  // Lösche die gespeicherte Position
+            }
+        }
+
+        function setMarkerPosition(lon, lat) {
+            if (mapReady) {
+                console.log("setMarkerPosition called with coordinates: ", lon, lat);  // Debugging-Ausgabe
+                addMarker(lon, lat);
+            }
+        }
+
+        function addMarker(lon, lat) {
             var iconStyle = new ol.style.Style({
                 image: new ol.style.Icon({
                     src: 'https://openlayers.org/en/v6.5.0/examples/data/icon.png',
@@ -43,12 +62,10 @@
                 })
             });
 
-            // Erstelle den Marker mit einem benutzerdefinierten Icon
             var iconFeature = new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.fromLonLat([8.2319, 46.7986]))
+                geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat]))
             });
 
-            // Wende den Icon-Style auf den Marker an
             iconFeature.setStyle(iconStyle);
 
             var vectorSource = new ol.source.Vector({
@@ -59,17 +76,10 @@
                 source: vectorSource
             });
 
-            map.addLayer(vectorLayer);  // Füge die Layer der Karte hinzu
+            // Füge den Marker zur Karte hinzu
+            map.addLayer(vectorLayer);
 
-            marker = iconFeature;  // Speichere den Marker, damit wir später die Position ändern können
-        }
-
-        // Funktion zum Setzen der Marker-Position
-        function setMarkerPosition(lon, lat) {
-        var newPosition = ol.proj.fromLonLat([lon, lat]);  // Umrechnung von EPSG:4326 nach EPSG:3857
-            if (marker) {
-                marker.setGeometry(new ol.geom.Point(newPosition));  // Aktualisiere die Marker-Position
-            }
+            marker = iconFeature;  // Speichere den Marker, damit er später verändert werden kann
         }
     </script>
 </head>
