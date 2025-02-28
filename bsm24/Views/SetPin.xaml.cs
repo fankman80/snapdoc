@@ -177,7 +177,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void ShowGeoLoc(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("////map_view");
+        await Shell.Current.GoToAsync($"mapview?planId={PlanId}&pinId={PinId}");
     }
 
     private async void TakePhoto(object sender, EventArgs e)

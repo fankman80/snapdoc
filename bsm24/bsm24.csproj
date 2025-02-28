@@ -1,15 +1,14 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-windows10.0.26100.0;net9.0-android35.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-windows10.0.26100.0;net10.0-android35.0</TargetFrameworks>
 		<!-- Uncomment to also build the tizen app. You will need to install tizen by following this: https://github.com/Samsung/Tizen.NET -->
 		<!-- <TargetFrameworks>$(TargetFrameworks);net9.0-tizen</TargetFrameworks> -->
 
 		<!-- Note for MacCatalyst:
-		The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
-		When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
-		The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
-		either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
+	The default runtime is maccatalyst-x64, except in Release config, in which case the default is maccatalyst-x64;maccatalyst-arm64.
+	When specifying both architectures, use the plural <RuntimeIdentifiers> instead of the singular <RuntimeIdentifier>.
+	The Mac App Store will NOT accept apps with ONLY maccatalyst-arm64 indicated;
+	either BOTH runtimes must be indicated or ONLY macatalyst-x64. -->
 		<!-- For example: <RuntimeIdentifiers>maccatalyst-x64;maccatalyst-arm64</RuntimeIdentifiers> -->
 
 		<OutputType>Exe</OutputType>
@@ -53,7 +52,7 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
 		<AndroidKeyStore>True</AndroidKeyStore>
-		<AndroidSigningKeyStore>C:\Users\mfankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
 		<AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
@@ -62,13 +61,13 @@
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
 		<AndroidKeyStore>True</AndroidKeyStore>
-		<AndroidSigningKeyStore>C:\Users\mfankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
 		<AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
 		<AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\ic_background.png" ForegroundFile="Resources\AppIcon\ic_foreground.png" />
@@ -87,102 +86,102 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Remove="Models\ImageQuality.cs" />
+		<Compile Remove="Models\ImageQuality.cs" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiAsset Remove="Resources\Raw\map.html" />
+		<MauiAsset Remove="Resources\Raw\map.html" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Remove="FodyWeavers.xml" />
-	  <None Remove="FodyWeavers.xsd" />
-	  <None Remove="Resources\AppIcon\icon1.png" />
-	  <None Remove="Resources\Images\a_pin_blue.png" />
-	  <None Remove="Resources\Images\a_pin_green.png" />
-	  <None Remove="Resources\Images\a_pin_grey.png" />
-	  <None Remove="Resources\Images\a_pin_pink.png" />
-	  <None Remove="Resources\Images\a_pin_red.png" />
-	  <None Remove="Resources\Images\a_pin_yellow.png" />
-	  <None Remove="Resources\Images\banner.png" />
-	  <None Remove="Resources\Images\bg_image.png" />
-	  <None Remove="Resources\Images\blitzleuchte.png" />
-	  <None Remove="Resources\Images\blitzleuchte_evakuierungsanlage.png" />
-	  <None Remove="Resources\Images\brandfallgesteuert.png" />
-	  <None Remove="Resources\Images\brandmeldeanlage_bedienstelle.png" />
-	  <None Remove="Resources\Images\brandmeldezentrale.png" />
-	  <None Remove="Resources\Images\dotnet_bot.png" />
-	  <None Remove="Resources\Images\druckentlastungsoeffnung.png" />
-	  <None Remove="Resources\Images\einspeisestelle_trockensteigleitung.png" />
-	  <None Remove="Resources\Images\einzelrauchmelder.png" />
-	  <None Remove="Resources\Images\entnahmestelle_trockensteigleitung.png" />
-	  <None Remove="Resources\Images\entrauchung_mit_luefter_der_feuerwehr.png" />
-	  <None Remove="Resources\Images\evakuierungsanlage_bedienstelle.png" />
-	  <None Remove="Resources\Images\evakuierungsanlage_zentrale.png" />
-	  <None Remove="Resources\Images\ex_zone.png" />
-	  <None Remove="Resources\Images\feuerwehraufzug.png" />
-	  <None Remove="Resources\Images\grosser_ueberdruck.png" />
-	  <None Remove="Resources\Images\handfeuerloescher.png" />
-	  <None Remove="Resources\Images\handfeuerloescher_a_feste_nicht_schmelzende_stoffe.png" />
-	  <None Remove="Resources\Images\handfeuerloescher_b_fluessigkeiten_schmelzende_stoffe.png" />
-	  <None Remove="Resources\Images\handfeuerloescher_c_gase.png" />
-	  <None Remove="Resources\Images\handfeuerloescher_d_metalle.png" />
-	  <None Remove="Resources\Images\handfeuerloescher_f_fettbrand.png" />
-	  <None Remove="Resources\Images\handfeuermelder.png" />
-	  <None Remove="Resources\Images\hauptzugang_feuerwehr.png" />
-	  <None Remove="Resources\Images\innenhydrant.png" />
-	  <None Remove="Resources\Images\maschinelle_rauch_und_waermeabzugsanlage.png" />
-	  <None Remove="Resources\Images\mobiler_luefter_der_feuerwehr.png" />
-	  <None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_m2.png" />
-	  <None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_prozent.png" />
-	  <None Remove="Resources\Images\notausgang.png" />
-	  <None Remove="Resources\Images\notausgangsverschluss_sn_en_179.png" />
-	  <None Remove="Resources\Images\notoeffnungstaster.png" />
-	  <None Remove="Resources\Images\oeffnung_fuer_natuerliche_abstroemung.png" />
-	  <None Remove="Resources\Images\paniktuerverschluss_sn_en_1125.png" />
-	  <None Remove="Resources\Images\rauchschutz_druckanlage_bedienstelle.png" />
-	  <None Remove="Resources\Images\rauch_waermeabzugsanlage_bedienstelle.png" />
-	  <None Remove="Resources\Images\sammelplatz.png" />
-	  <None Remove="Resources\Images\schluesseldepot.png" />
-	  <None Remove="Resources\Images\selbstschliessend_mit_freilauftuerschliesser.png" />
-	  <None Remove="Resources\Images\selbstschliessend_ts.png" />
-	  <None Remove="Resources\Images\sicherheitsbeleuchtung.png" />
-	  <None Remove="Resources\Images\sicherheitsleuchte_tragbar.png" />
-	  <None Remove="Resources\Images\spezielle_loeschanlage.png" />
-	  <None Remove="Resources\Images\sprinklerzentrale.png" />
-	  <None Remove="Resources\Images\spuellueftung_bedienstelle.png" />
-	  <None Remove="Resources\Images\tuere_rauchdicht.png" />
-	  <None Remove="Resources\Images\ueberdruck.png" />
-	  <None Remove="Resources\Images\ueberflurhydrant.png" />
-	  <None Remove="Resources\Images\unterdruck.png" />
-	  <None Remove="Resources\Images\unterflurhydrant.png" />
-	  <None Remove="Resources\Images\ventilator_rda_sla.png" />
-	  <None Remove="Resources\Images\ventilator_rwa.png" />
-	  <None Remove="Resources\Images\wasserloeschposten.png" />
-	  <None Remove="Resources\Images\wechselrichter_pv.png" />
-	  <None Remove="Resources\Images\zugang_spa_z.png" />
-	  <None Remove="Resources\Images\zuluft_absaugung_maschinell.png" />
-	  <None Remove="Resources\Images\zuluft_abstroemung_natuerlich.png" />
-	  <None Remove="Resources\Images\zusaetzlicher_zugang_feuerwehr.png" />
-	  <None Remove="Resources\template.docx" />
+		<None Remove="FodyWeavers.xml" />
+		<None Remove="FodyWeavers.xsd" />
+		<None Remove="Resources\AppIcon\icon1.png" />
+		<None Remove="Resources\Images\a_pin_blue.png" />
+		<None Remove="Resources\Images\a_pin_green.png" />
+		<None Remove="Resources\Images\a_pin_grey.png" />
+		<None Remove="Resources\Images\a_pin_pink.png" />
+		<None Remove="Resources\Images\a_pin_red.png" />
+		<None Remove="Resources\Images\a_pin_yellow.png" />
+		<None Remove="Resources\Images\banner.png" />
+		<None Remove="Resources\Images\bg_image.png" />
+		<None Remove="Resources\Images\blitzleuchte.png" />
+		<None Remove="Resources\Images\blitzleuchte_evakuierungsanlage.png" />
+		<None Remove="Resources\Images\brandfallgesteuert.png" />
+		<None Remove="Resources\Images\brandmeldeanlage_bedienstelle.png" />
+		<None Remove="Resources\Images\brandmeldezentrale.png" />
+		<None Remove="Resources\Images\dotnet_bot.png" />
+		<None Remove="Resources\Images\druckentlastungsoeffnung.png" />
+		<None Remove="Resources\Images\einspeisestelle_trockensteigleitung.png" />
+		<None Remove="Resources\Images\einzelrauchmelder.png" />
+		<None Remove="Resources\Images\entnahmestelle_trockensteigleitung.png" />
+		<None Remove="Resources\Images\entrauchung_mit_luefter_der_feuerwehr.png" />
+		<None Remove="Resources\Images\evakuierungsanlage_bedienstelle.png" />
+		<None Remove="Resources\Images\evakuierungsanlage_zentrale.png" />
+		<None Remove="Resources\Images\ex_zone.png" />
+		<None Remove="Resources\Images\feuerwehraufzug.png" />
+		<None Remove="Resources\Images\grosser_ueberdruck.png" />
+		<None Remove="Resources\Images\handfeuerloescher.png" />
+		<None Remove="Resources\Images\handfeuerloescher_a_feste_nicht_schmelzende_stoffe.png" />
+		<None Remove="Resources\Images\handfeuerloescher_b_fluessigkeiten_schmelzende_stoffe.png" />
+		<None Remove="Resources\Images\handfeuerloescher_c_gase.png" />
+		<None Remove="Resources\Images\handfeuerloescher_d_metalle.png" />
+		<None Remove="Resources\Images\handfeuerloescher_f_fettbrand.png" />
+		<None Remove="Resources\Images\handfeuermelder.png" />
+		<None Remove="Resources\Images\hauptzugang_feuerwehr.png" />
+		<None Remove="Resources\Images\innenhydrant.png" />
+		<None Remove="Resources\Images\maschinelle_rauch_und_waermeabzugsanlage.png" />
+		<None Remove="Resources\Images\mobiler_luefter_der_feuerwehr.png" />
+		<None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_m2.png" />
+		<None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_prozent.png" />
+		<None Remove="Resources\Images\notausgang.png" />
+		<None Remove="Resources\Images\notausgangsverschluss_sn_en_179.png" />
+		<None Remove="Resources\Images\notoeffnungstaster.png" />
+		<None Remove="Resources\Images\oeffnung_fuer_natuerliche_abstroemung.png" />
+		<None Remove="Resources\Images\paniktuerverschluss_sn_en_1125.png" />
+		<None Remove="Resources\Images\rauchschutz_druckanlage_bedienstelle.png" />
+		<None Remove="Resources\Images\rauch_waermeabzugsanlage_bedienstelle.png" />
+		<None Remove="Resources\Images\sammelplatz.png" />
+		<None Remove="Resources\Images\schluesseldepot.png" />
+		<None Remove="Resources\Images\selbstschliessend_mit_freilauftuerschliesser.png" />
+		<None Remove="Resources\Images\selbstschliessend_ts.png" />
+		<None Remove="Resources\Images\sicherheitsbeleuchtung.png" />
+		<None Remove="Resources\Images\sicherheitsleuchte_tragbar.png" />
+		<None Remove="Resources\Images\spezielle_loeschanlage.png" />
+		<None Remove="Resources\Images\sprinklerzentrale.png" />
+		<None Remove="Resources\Images\spuellueftung_bedienstelle.png" />
+		<None Remove="Resources\Images\tuere_rauchdicht.png" />
+		<None Remove="Resources\Images\ueberdruck.png" />
+		<None Remove="Resources\Images\ueberflurhydrant.png" />
+		<None Remove="Resources\Images\unterdruck.png" />
+		<None Remove="Resources\Images\unterflurhydrant.png" />
+		<None Remove="Resources\Images\ventilator_rda_sla.png" />
+		<None Remove="Resources\Images\ventilator_rwa.png" />
+		<None Remove="Resources\Images\wasserloeschposten.png" />
+		<None Remove="Resources\Images\wechselrichter_pv.png" />
+		<None Remove="Resources\Images\zugang_spa_z.png" />
+		<None Remove="Resources\Images\zuluft_absaugung_maschinell.png" />
+		<None Remove="Resources\Images\zuluft_abstroemung_natuerlich.png" />
+		<None Remove="Resources\Images\zusaetzlicher_zugang_feuerwehr.png" />
+		<None Remove="Resources\template.docx" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="Resources\Raw\map.html" />
+		<EmbeddedResource Include="Resources\Raw\map.html" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
-		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="8.0.302" />
+		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="8.0.310" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="11.1.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="11.1.0" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.2.7" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.40" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.40" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.2" />
-		<PackageReference Include="Microsoft.Maui.Essentials" Version="9.0.40" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-preview.1.25122.6" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0-preview.1.25122.6" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-preview.1.25080.5" />
+		<PackageReference Include="Microsoft.Maui.Essentials" Version="10.0.0-preview.1.25122.6" />
 		<PackageReference Include="Mopups" Version="1.3.2" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="PDFtoImage" Version="5.0.0" />
@@ -192,106 +191,105 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="App.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="AppShell.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\MapView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\ExportSettings.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PinList.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\LoadPDFPages.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupSlider.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupAlert.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupDualResponse.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupSettings.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupEntry.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\OpenProject.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\ImageViewPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\IconGallery.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\HomeScreen.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\NewPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\ProjectDetails.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\SetPin.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+		<MauiXaml Update="App.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="AppShell.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\MapView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\ExportSettings.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PinList.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\LoadPDFPages.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupSlider.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupAlert.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupDualResponse.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupSettings.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupEntry.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\OpenProject.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\ImageViewPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\IconGallery.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\HomeScreen.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\NewPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\ProjectDetails.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\SetPin.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\MapView.xaml.cs">
-	    <DependentUpon>MapView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\ExportSettings.xaml.cs">
-	    <DependentUpon>ExportSettings.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PinList.xaml.cs">
-	    <DependentUpon>PinList.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\LoadPDFPages.xaml.cs">
-	    <DependentUpon>LoadPDFPages.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupSlider.xaml.cs">
-	    <DependentUpon>PopupSlider.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupAlert.xaml.cs">
-	    <DependentUpon>PopupAlert.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupDualResponse.xaml.cs">
-	    <DependentUpon>PopupDualResponse.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupSettings.xaml.cs">
-	    <DependentUpon>PopupSettings.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupEntry.xaml.cs">
-	    <DependentUpon>PopupEntry.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\HomeScreen.xaml.cs">
-	    <DependentUpon>HomeScreen.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\OpenProject.xaml.cs">
-	    <DependentUpon>OpenProject.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\ImageViewPage.xaml.cs">
-	    <DependentUpon>ImageViewPage.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\IconGallery.xaml.cs">
-	    <DependentUpon>IconGallery.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="Views\MapView.xaml.cs">
+			<DependentUpon>MapView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ExportSettings.xaml.cs">
+			<DependentUpon>ExportSettings.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PinList.xaml.cs">
+			<DependentUpon>PinList.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\LoadPDFPages.xaml.cs">
+			<DependentUpon>LoadPDFPages.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupSlider.xaml.cs">
+			<DependentUpon>PopupSlider.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupAlert.xaml.cs">
+			<DependentUpon>PopupAlert.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupDualResponse.xaml.cs">
+			<DependentUpon>PopupDualResponse.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupSettings.xaml.cs">
+			<DependentUpon>PopupSettings.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupEntry.xaml.cs">
+			<DependentUpon>PopupEntry.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\HomeScreen.xaml.cs">
+			<DependentUpon>HomeScreen.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\OpenProject.xaml.cs">
+			<DependentUpon>OpenProject.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\ImageViewPage.xaml.cs">
+			<DependentUpon>ImageViewPage.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\IconGallery.xaml.cs">
+			<DependentUpon>IconGallery.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\AppIcon\icon.png" ForegroundScale="0.66" />
+		<None Update="Resources\AppIcon\icon.png" ForegroundScale="0.66" />
 	</ItemGroup>
-
 </Project>

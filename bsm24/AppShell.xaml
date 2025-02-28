@@ -101,9 +101,4 @@
                   Title="Projektliste"
                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Open_in_new}}"
                   ContentTemplate="{DataTemplate views:OpenProject}"/>
-
-    <!--<ShellContent Route="map_view"
-                  Title="Geo Admin Map"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Map}}"
-                  ContentTemplate="{DataTemplate views:MapView}"/>-->
 </Shell>

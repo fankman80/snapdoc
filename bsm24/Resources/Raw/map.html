@@ -15,9 +15,11 @@
     <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
     <script>
-        var marker;  // Globale Variable für den Marker
+        var markers = [];  // Array für die Marker
         var mapReady = false;  // Karte ist anfangs noch nicht bereit
-        var pendingPosition = null;  // Position, die gesetzt werden soll, wenn die Karte bereit ist
+        var pendingPositions = [];  // Array für die Positionen, die gesetzt werden sollen, wenn die Karte bereit ist
+        var vectorSource;  // Globale Variable für die Vektorquelle
+        var vectorLayer;   // Globale Variable für den Vektor-Layer
 
         function initMap() {
             var wmsLayer = new ol.layer.Tile({
@@ -32,57 +34,65 @@
                 target: 'map',
                 layers: [wmsLayer],
                 view: new ol.View({
-                    center: ol.proj.fromLonLat([7.3065627184882835, 47.074035319286246]),
-                    zoom: 8
+                    center: ol.proj.fromLonLat([{center_koord}]),
+                    zoom: {zoom}
                 })
             });
 
-            console.log("Map has finished rendering.");
+            // Erstelle die Vektorquelle und den Vektorlayer nur einmal
+            vectorSource = new ol.source.Vector();
+
+            vectorLayer = new ol.layer.Vector({
+                source: vectorSource
+            });
+
+            map.addLayer(vectorLayer); // Füge den Vektorlayer zur Karte hinzu
             mapReady = true;  // Setze den Status auf „bereit“
 
-            // Wenn eine Position vor dem Laden der Karte übergeben wurde, setze sie jetzt
-            if (pendingPosition) {
-                setMarkerPosition(pendingPosition.lon, pendingPosition.lat);
-                pendingPosition = null;  // Lösche die gespeicherte Position
+
+            // Wenn Positionen vor dem Laden der Karte übergeben wurden, setze sie jetzt
+            if (pendingPositions.length > 0) {
+                pendingPositions.forEach(function (position) {
+                    setMarkerPosition(position.lon, position.lat);
+                });
+                pendingPositions = [];  // Lösche die gespeicherten Positionen
             }
         }
 
         function setMarkerPosition(lon, lat) {
             if (mapReady) {
-                console.log("setMarkerPosition called with coordinates: ", lon, lat);  // Debugging-Ausgabe
-                addMarker(lon, lat);
+                // Erstelle das Icon für den Marker
+                var iconStyle = new ol.style.Style({
+                    image: new ol.style.Icon({
+                        src: 'https://img.icons8.com/?size=50&id=13800&format=png&color=000000',
+                        scale: 1,  // Skaliere das Icon, wenn nötig
+                        anchor: [0.5, 1],  // Der Ankerpunkt ist die untere Mitte des Icons
+                        anchorXUnits: 'fraction',
+                        anchorYUnits: 'fraction'
+                    })
+                });
+
+                // Erstelle den Marker mit einem benutzerdefinierten Icon
+                var marker = new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat]))
+                });
+
+                // Wende den Icon-Style auf den Marker an
+                marker.setStyle(iconStyle);
+
+                // Füge den Marker zur Vektorquelle hinzu
+                vectorSource.addFeature(marker);
+                markers.push(marker);  // Füge den Marker zum Array der Marker hinzu
+            } else {
+                // Speichere die Position, wenn die Karte noch nicht bereit ist
+                pendingPositions.push({ lon: lon, lat: lat });
             }
         }
 
-        function addMarker(lon, lat) {
-            var iconStyle = new ol.style.Style({
-              image: new ol.style.Icon({
-                src: 'https://openlayers.org/en/v6.5.0/examples/data/icon.png',
-                scale: 1,
-                anchor: [0.5, 1],  // Der Ankerpunkt ist die untere Mitte des Icons
-                anchorXUnits: 'fraction',
-                vanchorYUnits: 'fraction'
-              })
+        function setMultipleMarkers(positions) {
+            positions.forEach(function (position) {
+                setMarkerPosition(position.lon, position.lat);
             });
-
-            var iconFeature = new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat]))
-            });
-
-            iconFeature.setStyle(iconStyle);
-
-            var vectorSource = new ol.source.Vector({
-                features: [iconFeature]
-            });
-
-            var vectorLayer = new ol.layer.Vector({
-                source: vectorSource
-            });
-
-            // Füge den Marker zur Karte hinzu
-            map.addLayer(vectorLayer);
-
-            marker = iconFeature;  // Speichere den Marker, damit er später verändert werden kann
         }
     </script>
 </head>

@@ -7,10 +7,9 @@
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
-                x:Class="bsm24.Views.MapView">
+                x:Class="bsm24.Views.MapView"
+                Title="Geo Admin Map">
 
-    <WebView x:Name="GeoAdminWebView"
-             VerticalOptions="FillAndExpand"
-             HorizontalOptions="FillAndExpand"/>
+    <WebView x:Name="GeoAdminWebView" />
     
 </ContentPage>
