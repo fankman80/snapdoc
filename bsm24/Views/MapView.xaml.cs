@@ -2,9 +2,9 @@
 
 #if ANDROID
 using Android.Webkit;
-using DocumentFormat.OpenXml.Bibliography;
-using Microsoft.Maui.Platform;
 #endif
+
+using Microsoft.Maui.Controls.PlatformConfiguration;
 
 namespace bsm24.Views;
 
@@ -37,7 +37,7 @@ public partial class MapView : IQueryAttributable
             handler.PlatformView.Settings.JavaScriptCanOpenWindowsAutomatically = true;
             handler.PlatformView.Settings.AllowContentAccess = true;
             handler.PlatformView.Settings.AllowFileAccess = true;
-            handler.PlatformView.SetWebChromeClient(new Android.Webkit.WebChromeClient());
+            handler.PlatformView.SetWebViewClient(new CustomWebViewClient());
 #endif
         });
 
@@ -99,6 +99,39 @@ public partial class MapView : IQueryAttributable
         };
     }
 
+#if ANDROID
+public class CustomWebViewClient : WebViewClient
+{
+    public override void OnPageFinished(Android.Webkit.WebView view, string url)
+    {
+        base.OnPageFinished(view, url);
+
+        // Führe die Logik aus, nachdem die Seite fertig geladen ist
+        string positionsJson = "[";
+        foreach (var plan in GlobalJson.Data.Plans)
+        {
+            if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+            {
+                foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                {
+                    if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
+                    {
+                        var lon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.Longitude;
+                        var lat = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.Latitude;
+                        positionsJson += $"{{ lon: {lon.ToString(System.Globalization.CultureInfo.InvariantCulture)}, lat: {lat.ToString(System.Globalization.CultureInfo.InvariantCulture)} }},";
+                    }
+                }
+            }
+        }
+        positionsJson = positionsJson.TrimEnd(',') + "]";
+
+        // Übergib das JavaScript Array an die Funktion 'setMultipleMarkers'
+        string script = $"setMultipleMarkers({positionsJson});";
+        view.EvaluateJavascript(script, null);
+    }
+}
+#endif
+
     private static string LoadHtmlFromFile(double lon, double lat, double zoom)
     {
         // Lade das HTML-Template
@@ -116,27 +149,3 @@ public partial class MapView : IQueryAttributable
         return htmlContent;
     }
 }
-
-#if ANDROID
-internal class MyWebChromeClient : WebChromeClient
-{
-    public static async Task<PermissionStatus> CheckAndRequestLocationPermission()
-    {
-        PermissionStatus status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-        if (status == PermissionStatus.Granted)
-            return status;
-        if (status == PermissionStatus.Denied && DeviceInfo.Platform == DevicePlatform.iOS)
-            return status;
-        if (Permissions.ShouldShowRationale<Permissions.LocationWhenInUse>())
-            // Prompt the user with additional information as to why the permission is needed
-        status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-        return status;
-    }
-
-    public override void OnGeolocationPermissionsShowPrompt(string origin, GeolocationPermissions.ICallback callback)
-    {
-        base.OnGeolocationPermissionsShowPrompt(origin, callback);
-        callback.Invoke(origin, true, false);
-    }
-}
-#endif

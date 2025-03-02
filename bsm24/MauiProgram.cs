@@ -34,6 +34,8 @@ public static class MauiProgram
         // Registriere den FileSaver
         builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
 
+
+
 #if WINDOWS
         // Place Windows Screen-Center
         builder.ConfigureLifecycleEvents(events =>
