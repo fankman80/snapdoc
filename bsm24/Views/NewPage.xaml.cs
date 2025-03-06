@@ -396,7 +396,7 @@ public partial class NewPage : IQueryAttributable
             string _newPin = "a_pin_red.png";
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
-            var location = await Helper.GetCurrentLocationAsync();
+            var location = await Helper.IsLocationEnabledAsync() ? await Helper.GetCurrentLocationAsync(10, 1) : null;
             pinColor ??= SKColors.Red;
             Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);
             Point _anchorPoint = iconItem.AnchorPoint;

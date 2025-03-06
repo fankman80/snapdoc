@@ -122,27 +122,64 @@ public class Helper
         return ImageSource.FromStream(() => stream);
     }
 
-    public static async Task<Location> GetCurrentLocationAsync()
+    public static async Task<Location> GetCurrentLocationAsync(double desiredAccuracy = 100, int maxTimeoutSeconds = 30)
+    {
+        Location bestLocation = null;
+        var startTime = DateTime.UtcNow;
+        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(maxTimeoutSeconds));
+
+        while (!cancellationTokenSource.IsCancellationRequested)
+        {
+            try
+            {
+                var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
+                var location = await Geolocation.Default.GetLocationAsync(request, cancellationTokenSource.Token);
+                if (location != null)
+                {
+                    bestLocation = location;
+
+                    if (location.Accuracy <= desiredAccuracy)
+                    {
+                        return location;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler bei Standortabfrage: {ex.Message}");
+            }
+
+            await Task.Delay(500);
+
+            if ((DateTime.UtcNow - startTime).TotalSeconds > maxTimeoutSeconds)
+                break;
+        }
+
+        return bestLocation;
+    }
+
+    public static async Task<bool> IsLocationEnabledAsync()
     {
         try
         {
-            //var location = await Geolocation.GetLastKnownLocationAsync();
-            //if (location != null)
-            //{
-            //    return location;
-            //}
-            var location = await Geolocation.GetLocationAsync(new GeolocationRequest
+            var location = await Geolocation.GetLastKnownLocationAsync();
+            if (location == null)
             {
-                DesiredAccuracy = GeolocationAccuracy.Best,
-                RequestFullAccuracy = true,
-                Timeout = TimeSpan.FromSeconds(10)
-            });
-            return location;
+                location = await Geolocation.GetLocationAsync(new GeolocationRequest
+                {
+                    DesiredAccuracy = GeolocationAccuracy.Medium,
+                    Timeout = TimeSpan.FromSeconds(10)
+                });
+            }
+            return true;
         }
-        catch (Exception ex)
+        catch (FeatureNotEnabledException)
         {
-            Console.WriteLine($"Unable to get location: {ex.Message}");
-            return null;
+            return false;
+        }
+        catch (Exception)
+        {
+            return false;
         }
     }
 

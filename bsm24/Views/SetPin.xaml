@@ -70,10 +70,9 @@
         </CollectionView>
 
         <StackLayout Grid.Row="1" Spacing="9" x:DataType="x:AppThemeBindingExtension">
-            <Grid ColumnDefinitions="*,Auto">
-                <material:EditorField
+            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto, Auto">
+                <material:EditorField Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
                     x:Name="PinLocation"
-                    Grid.Column="0"
                     HorizontalOptions="Fill"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
@@ -81,12 +80,15 @@
                     Title="Raum/Ort"
                     Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
 
-                <Button Grid.Column="1"
+                <Button Grid.Column="1" Grid.Row="0"
                         x:Name="GeoLocButton"
                         HorizontalOptions="End"
+                        Padding="5"
                         BackgroundColor="Transparent"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Not_listed_location}}"
                         Clicked="ShowGeoLoc"/>
+
+                <Label x:Name="PinAcc" Grid.Column="1" Grid.Row="1" Text="100m" FontSize="10" HorizontalTextAlignment="Center" Margin="0,-12,0,0"/>
             </Grid>
             <material:EditorField
                 x:Name="PinDesc"

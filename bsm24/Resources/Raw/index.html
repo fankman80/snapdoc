@@ -167,6 +167,16 @@
                 LAYERS: layer
             });
         }
+
+        function moveMarker(markerIndex, newLon, newLat) {
+            console.log("moveMarker ist verfügbar");
+            if (markers[markerIndex]) {
+                var newCoordinates = ol.proj.fromLonLat([newLon, newLat]);
+                markers[markerIndex].setGeometry(new ol.geom.Point(newCoordinates));
+                vectorSource.changed();  // Quelle aktualisieren
+                map.render();            // Karte neu rendern
+            }
+        }
     </script>
 </head>
 <body onload="initMap()">

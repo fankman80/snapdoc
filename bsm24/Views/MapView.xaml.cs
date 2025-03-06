@@ -15,6 +15,7 @@ public partial class MapView : IQueryAttributable
 {
     public string PlanId;
     public string PinId;
+    public static int activePin;
     public MapView()
     {
 #if ANDROID
@@ -57,9 +58,9 @@ public partial class MapView : IQueryAttributable
             }
             else
             {
-                var location = await Helper.GetCurrentLocationAsync();
-                if (location != null)
+                if (await Helper.IsLocationEnabledAsync())
                 {
+                    var location = await Helper.GetCurrentLocationAsync(20, 10);
                     lon = location.Longitude;
                     lat = location.Latitude;
                     zoom = 18;
@@ -74,9 +75,9 @@ public partial class MapView : IQueryAttributable
         }
         else
         {
-            var location = await Helper.GetCurrentLocationAsync();
-            if (location != null)
+            if (await Helper.IsLocationEnabledAsync())
             {
+                var location = await Helper.GetCurrentLocationAsync(20, 10);
                 lon = location.Longitude;
                 lat = location.Latitude;
                 zoom = 18;
@@ -96,12 +97,34 @@ public partial class MapView : IQueryAttributable
 
         GeoAdminWebView.Source = htmlSource;
 
+        if (PinId != null)
+        {
+            this.Dispatcher.StartTimer(TimeSpan.FromSeconds(2), () =>
+            {
+                Task.Run(async () =>
+                {
+                    var location = await Helper.GetCurrentLocationAsync(10, 30);
+                    if (location != null)
+                    {
+                        lon = location.Longitude;
+                        lat = location.Latitude;
+                        await GeoAdminWebView.EvaluateJavaScriptAsync($"moveMarker(1, {lon.ToString(CultureInfo.InvariantCulture)}, {lat.ToString(CultureInfo.InvariantCulture)});");
+                    }
+                });
+                return true;
+            });
+        }
+
 #if WINDOWS
         GeoAdminWebView.Navigated += (s, e) =>
         {
             GeoAdminWebView.EvaluateJavaScriptAsync(Generatescript());
         };
 #endif
+
+
+
+
     }
 
 
@@ -140,6 +163,7 @@ public partial class MapView : IQueryAttributable
 
     private static string Generatescript()
     {
+        activePin = -1;
         string positionsJson = "[";
         foreach (var plan in GlobalJson.Data.Plans)
         {
@@ -155,6 +179,7 @@ public partial class MapView : IQueryAttributable
                         var pinlocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation;
                         var pinname = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName;
                         positionsJson += $"{{ lon: {lon.ToString(CultureInfo.InvariantCulture)}, lat: {lat.ToString(CultureInfo.InvariantCulture)}, pinname: '{pinname}', pinlocation: '{pinlocation}', pindesc: '{pindesc}'}},";
+                        activePin++;
                     }
                 }
             }
@@ -164,22 +189,22 @@ public partial class MapView : IQueryAttributable
     }
     private async void SetPosClicked(object sender, EventArgs e)
     {
-        var location = await Helper.GetCurrentLocationAsync();
-        if (location == null)
-        {
-            var popup1 = new PopupAlert("Aktivieren Sie zuerst die Ortungsdienste, damit der Standort aktualisiert werden kann?");
-            await MopupService.Instance.PushAsync(popup1);            
-        }
-        else
+        if (await Helper.IsLocationEnabledAsync())
         {
             var popup = new PopupDualResponse("Sind Sie sicher dass Sie die Positionsdaten überschreiben wollen?");
             await MopupService.Instance.PushAsync(popup);
             var result = await popup.PopupDismissedTask;
             if (result != null)
             {
+                var location = await Helper.GetCurrentLocationAsync(10, 20);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation = new GeoLocData(location);
                 GeoAdminWebView.Reload();
-            }
+            }   
+        }
+        else
+        {
+            var popup1 = new PopupAlert("Aktivieren Sie zuerst die Ortungsdienste, damit der Standort aktualisiert werden kann?");
+            await MopupService.Instance.PushAsync(popup1);   
         }
     }
     private void OnMapLayerColorClicked(object sender, EventArgs e)

@@ -100,6 +100,7 @@ public class GeoLocData
         Initialize();
     }
     public DateTimeOffset Timestamp { get; set; }
+    public GeolocationAccuracy Accuracy { get; set; }
     public LocationWGS84 WGS84 { get; set; }
     public LocationCH1903 CH1903 { get; set; }
     private void Initialize()
@@ -107,6 +108,7 @@ public class GeoLocData
         if (_wsg84 != null)
         {
             Timestamp = _wsg84.Timestamp;
+            Accuracy = (GeolocationAccuracy)_wsg84.Accuracy;
             WGS84 = new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
             Functions.LLtoSwissGrid(_wsg84.Latitude, _wsg84.Longitude, out double swissEasting, out double swissNorthing);
             CH1903 = new LocationCH1903(swissEasting, swissNorthing);

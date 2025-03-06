@@ -183,7 +183,7 @@
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="8.0.314" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="11.1.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="11.1.0" />
-		<PackageReference Include="DocumentFormat.OpenXml" Version="3.2.0" />
+		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.2.7" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-preview.1.25122.6" />
