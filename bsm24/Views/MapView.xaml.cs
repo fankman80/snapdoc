@@ -15,7 +15,6 @@ public partial class MapView : IQueryAttributable
 {
     public string PlanId;
     public string PinId;
-    public static int activePin;
     public MapView()
     {
 #if ANDROID
@@ -141,7 +140,6 @@ public partial class MapView : IQueryAttributable
 
     private static string Generatescript()
     {
-        activePin = -1;
         string positionsJson = "[";
         foreach (var plan in GlobalJson.Data.Plans)
         {
@@ -157,7 +155,6 @@ public partial class MapView : IQueryAttributable
                         var pinlocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation;
                         var pinname = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName;
                         positionsJson += $"{{ lon: {lon.ToString(CultureInfo.InvariantCulture)}, lat: {lat.ToString(CultureInfo.InvariantCulture)}, pinname: '{pinname}', pinlocation: '{pinlocation}', pindesc: '{pindesc}'}},";
-                        activePin++;
                     }
                 }
             }
@@ -181,7 +178,7 @@ public partial class MapView : IQueryAttributable
                     busyOverlay.IsOverlayVisible = true;
                     busyOverlay.IsActivityRunning = true;
                     busyOverlay.BusyMessage = "";
-                    location = await Helper.GetCurrentLocationAsync(8, 10, data =>
+                    location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
                     {
                         this.Dispatcher.Dispatch(() =>
                         {

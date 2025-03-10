@@ -183,8 +183,8 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private double _gpsAccuracyLimit = 8;
-    public double GpsAccuracyLimit
+    private int _gpsAccuracyLimit = 8;
+    public int GpsAccuracyLimit
     {
         get => _gpsAccuracyLimit;
         set
@@ -624,7 +624,9 @@ public partial class SettingsService : INotifyPropertyChanged
             IsPlanRotateLocked = this.IsPlanRotateLocked,
             PdfQuality = this.PdfQuality,
             SelectedTheme = this.SelectedTheme,
-            SelectedDarkMode = this.SelectedDarkMode
+            SelectedDarkMode = this.SelectedDarkMode,
+            GpsTestTimer = this.GpsTestTimer,
+            GpsAccuracyLimit = this.GpsAccuracyLimit
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -648,6 +650,8 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.PdfQuality = settings.PdfQuality;
                 this.SelectedTheme = settings.SelectedTheme;
                 this.SelectedDarkMode = settings.SelectedDarkMode;
+                this.GpsTestTimer = settings.GpsTestTimer;
+                this.GpsAccuracyLimit = settings.GpsAccuracyLimit;
             }
         }
     }

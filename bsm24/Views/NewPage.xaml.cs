@@ -404,7 +404,7 @@ public partial class NewPage : IQueryAttributable
                 busyOverlay.IsOverlayVisible = true;
                 busyOverlay.IsActivityRunning = true;
                 busyOverlay.BusyMessage = "";
-                location = await Helper.GetCurrentLocationAsync(8, 10, data =>
+                location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
                 {
                     this.Dispatcher.Dispatch(() =>
                     {

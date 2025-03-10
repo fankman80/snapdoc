@@ -75,7 +75,7 @@ public class Helper
 
 #if WINDOWS
         // zwinge das UI zum Aktualisieren
-        var currentWindow = Application.Current.Windows.FirstOrDefault();
+        var currentWindow = Application.Current.Windows[0];
         if (currentWindow != null)
         {
             var currentWidth = currentWindow.Width;
@@ -121,7 +121,7 @@ public class Helper
         return ImageSource.FromStream(() => stream);
     }
 
-    public static async Task<Location> GetCurrentLocationAsync(double desiredAccuracy, int maxTimeoutSeconds, Action<(double accuracy, int remainingTime)> onUpdate)
+    public static async Task<Location> GetCurrentLocationAsync(double desiredAccuracy, int maxTimeoutSeconds, Action<(int accuracy, int remainingTime)> onUpdate)
     {
         Location bestLocation = null;
         var startTime = DateTime.UtcNow;
@@ -139,7 +139,7 @@ public class Helper
                     var elapsed = (DateTime.UtcNow - startTime).TotalSeconds;
                     var remainingTime = maxTimeoutSeconds - (int)elapsed;
 
-                    onUpdate((location.Accuracy ?? 9999, remainingTime));
+                    onUpdate(((int)Math.Round(location.Accuracy ?? 9999), remainingTime));
 
                     if (location.Accuracy.Value <= desiredAccuracy)
                         return location;

@@ -9,7 +9,7 @@
                 xmlns:local="clr-namespace:bsm24"   
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="bsm24.Views.MapView"
-                Title="Geo Admin Map">
+                Title="swisstopo Karte">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem x:Name ="SetPosBtn"

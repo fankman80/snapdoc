@@ -10,4 +10,6 @@ internal class SettingsModel
     public int PdfQuality { get; set; }
     public string? SelectedTheme { get; set; }
     public string? SelectedDarkMode { get; set; }
+    public int GpsTestTimer { get; set; }
+    public int GpsAccuracyLimit { get; set; }
 }

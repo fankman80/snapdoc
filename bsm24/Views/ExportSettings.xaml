@@ -67,11 +67,11 @@
                             <RowDefinition Height="*" />
                             <RowDefinition Height="*" />
                         </Grid.RowDefinitions>
-                        <Label Text="Exportiere Pläne:" Grid.Column="0" Grid.Row="0" VerticalOptions="StartAndExpand"/>
-                        <Label Text="Exportiere Positionsbilder:"  Grid.Column="0" Grid.Row="1" VerticalOptions="StartAndExpand"/>
-                        <Label Text="Exportiere Pin-Icons:" Grid.Column="0" Grid.Row="3" VerticalOptions="StartAndExpand"/>
-                        <Label Text="Exportiere Fotos:" Grid.Column="0" Grid.Row="2" VerticalOptions="StartAndExpand"/>
-                        <Label Text="Exportiere Foto-Overlays:" Grid.Column="0" Grid.Row="4" VerticalOptions="StartAndExpand"/>
+                        <Label Text="Exportiere Pläne:" Grid.Column="0" Grid.Row="0"/>
+                        <Label Text="Exportiere Positionsbilder:"  Grid.Column="0" Grid.Row="1"/>
+                        <Label Text="Exportiere Pin-Icons:" Grid.Column="0" Grid.Row="3"/>
+                        <Label Text="Exportiere Fotos:" Grid.Column="0" Grid.Row="2"/>
+                        <Label Text="Exportiere Foto-Overlays:" Grid.Column="0" Grid.Row="4"/>
 
                         <Switch Grid.Column="1" Grid.Row="0"
                                     Margin="0,-8,0,0"                       
