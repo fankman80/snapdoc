@@ -158,7 +158,6 @@ public class Helper
         return bestLocation;
     }
 
-
     public static async Task<bool> IsLocationEnabledAsync()
     {
         try

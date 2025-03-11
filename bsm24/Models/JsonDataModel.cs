@@ -108,7 +108,9 @@ public class GeoLocData
         if (_wsg84 != null)
         {
             Timestamp = _wsg84.Timestamp;
-            Accuracy = (GeolocationAccuracy)_wsg84.Accuracy;
+            Accuracy = _wsg84.Accuracy.HasValue
+                        ? (GeolocationAccuracy)_wsg84.Accuracy.Value
+                        : GeolocationAccuracy.Default;
             WGS84 = new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
             Functions.LLtoSwissGrid(_wsg84.Latitude, _wsg84.Longitude, out double swissEasting, out double swissNorthing);
             CH1903 = new LocationCH1903(swissEasting, swissNorthing);

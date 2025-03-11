@@ -9,6 +9,7 @@
        xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
        xmlns:services="clr-namespace:bsm24.Services"
+       xmlns:model="clr-namespace:bsm24.ViewModels"
        x:Class="bsm24.AppShell"
        x:Name="shell"
        FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
@@ -17,8 +18,12 @@
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"       
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
+    <Shell.BindingContext>
+        <model:MainShellViewModel/>
+    </Shell.BindingContext>
+
     <Shell.FlyoutHeaderTemplate>
-        <DataTemplate x:DataType="services:SettingsService">
+        <DataTemplate x:DataType="model:MainShellViewModel">
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" />
@@ -31,10 +36,10 @@
                 <Image Grid.Column="0"
                        Grid.RowSpan="2"
                        Aspect="AspectFill"
-                       Source="{Binding FlyoutHeaderImage}"/>
+                       Source="{Binding SettingsService.FlyoutHeaderImage}"/>
                 <Label Grid.Column="1"
                        Grid.Row="0"
-                       Text="{Binding FlyoutHeaderDesc}"
+                       Text="{Binding SettingsService.FlyoutHeaderDesc}"
                        LineBreakMode="WordWrap"
                        Padding="4,4,4,0"
                        FontSize="18"
@@ -43,7 +48,7 @@
                        HorizontalTextAlignment="Start"/>
                 <Label Grid.Column="1"
                        Grid.Row="1"
-                       Text="{Binding FlyoutHeaderTitle}"
+                       Text="{Binding SettingsService.FlyoutHeaderTitle}"
                        LineBreakMode="WordWrap"
                        Padding="4,0,4,0"
                        FontSize="14"
@@ -54,35 +59,42 @@
     </Shell.FlyoutHeaderTemplate>
 
     <Shell.FlyoutFooterTemplate>
-        <DataTemplate x:DataType="sys:DateTime">
+        <DataTemplate x:DataType="model:MainShellViewModel">
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="100" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
-                <HorizontalStackLayout Grid.Row="0" Grid.Column="1" Margin="0,8,0,0" HorizontalOptions="Center">
-                    <Label Text="BSM 24" 
-                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                           FontAttributes="Bold"
-                           FontSize="12"
-                           VerticalTextAlignment="Center"/>
-                    <Label Text="Version 1.0"
-                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                           FontSize="10"
-                           VerticalTextAlignment="Center"/>
-                </HorizontalStackLayout>
-                <Label Grid.Row="1" Grid.Column="1" HorizontalOptions="Center"
-                       Margin="0,0,0,8"
-                       Text="{Binding Source={x:Static sys:DateTime.Now}, StringFormat='{0: dd. MMMM yyyy}'}"
-                       TextColor="DarkGrey"
-                       FontSize="12" 
-                       VerticalTextAlignment="Center"/>
-                
+
+                <Button Grid.Row="0" Grid.Column="0" Grid.RowSpan="2"
+                        HeightRequest="12"
+                        Margin="10,0,10,0"
+                        FontSize="12"
+                        Text="{Binding GPSViewModel.GPSButtonText}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Command="{Binding GPSViewModel.ToggleGPSCommand}"/>
+
+                <Label Grid.Row="0" Grid.Column="1"
+                       Text="BSM 24" 
+                       TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                       FontAttributes="Bold"
+                       FontSize="12"
+                       VerticalOptions="End"
+                       HorizontalTextAlignment="Center"/>
+
+                <Label Grid.Row="1" Grid.Column="1"
+                       Text="Version 1.0"
+                       TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                       FontSize="10"
+                       VerticalOptions="Start"
+                       HorizontalTextAlignment="Center"/>
+
                 <ImageButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
                              Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"
                              HorizontalOptions="End"

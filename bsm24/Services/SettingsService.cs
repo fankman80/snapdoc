@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using bsm24.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -9,9 +8,7 @@ namespace bsm24.Services;
 public partial class SettingsService : INotifyPropertyChanged
 {
     public static SettingsService Instance { get; } = new SettingsService();
-
     private const string SettingsFileName = "appsettings.ini";
-
     private SettingsService()
     {
         Themes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Flower", "Barbie"];

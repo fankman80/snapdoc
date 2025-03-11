@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using bsm24.Services;
+using bsm24.ViewModels;
 using bsm24.Views;
 using Mopups.Services;
 using System.Windows.Input;
@@ -16,7 +17,6 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
-        BindingContext = SettingsService.Instance;
         Routing.RegisterRoute("icongallery", typeof(IconGallery));
         Routing.RegisterRoute("setpin", typeof(SetPin));
         Routing.RegisterRoute("imageview", typeof(ImageViewPage));

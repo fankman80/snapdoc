@@ -6,10 +6,15 @@
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+                xmlns:model="clr-namespace:bsm24.ViewModels"
                 xmlns:local="clr-namespace:bsm24"   
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="bsm24.Views.MapView"
                 Title="swisstopo Karte">
+
+    <ContentPage.BindingContext>
+        <model:MainShellViewModel/>
+    </ContentPage.BindingContext>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem x:Name ="SetPosBtn"

@@ -387,7 +387,7 @@ public partial class NewPage : IQueryAttributable
         AddDrawingView();
     }
 
-    private async void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null)
+    private void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null)
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage != null)
@@ -396,23 +396,15 @@ public partial class NewPage : IQueryAttributable
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
 
-            // Start GPS-Position Task
-            Location location = null;
-            if (await Helper.IsLocationEnabledAsync())
+            Location location = new();
+            if (GPSViewModel.Instance.IsRunning)
             {
-                busyOverlay.IsOverlayVisible = true;
-                busyOverlay.IsActivityRunning = true;
-                busyOverlay.BusyMessage = "Ermittle Standort";
-                location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
-                {
-                    this.Dispatcher.Dispatch(() =>
-                    {
-                        busyOverlay.BusyMessage = $"Ermittle Standort\nGenauigkeit: {(int)data.accuracy} Meter\nVerbleibende Zeit: {data.remainingTime} Sekunden";
-                    });
-                });
-                busyOverlay.IsActivityRunning = false;
-                busyOverlay.IsOverlayVisible = false;
+                location.Longitude = GPSViewModel.Instance.Lon;
+                location.Latitude = GPSViewModel.Instance.Lat;
+                location.Accuracy = GPSViewModel.Instance.Acc;
             }
+            else
+                location = null;
 
             pinColor ??= SKColors.Red;
             Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);

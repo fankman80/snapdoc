@@ -8,6 +8,7 @@ using bsm24.Models;
 using bsm24.Services;
 using Mopups.Services;
 using System.Globalization;
+using bsm24.ViewModels;
 
 namespace bsm24.Views;
 
@@ -40,7 +41,7 @@ public partial class MapView : IQueryAttributable
             PinId = value2 as string;
     }
 
-    protected async override void OnAppearing()
+    protected override void OnAppearing()
     {
         base.OnAppearing();
 
@@ -57,11 +58,14 @@ public partial class MapView : IQueryAttributable
             }
             else
             {
-                if (await Helper.IsLocationEnabledAsync())
+                //if (await Helper.IsLocationEnabledAsync())
+                if (GPSViewModel.Instance.IsRunning)
                 {
-                    var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
-                    lon = location.Longitude;
-                    lat = location.Latitude;
+                    //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
+                    //lon = location.Longitude;
+                    //lat = location.Latitude;
+                    lon = GPSViewModel.Instance.Lon;
+                    lat = GPSViewModel.Instance.Lat;
                     zoom = 18;
                 }
                 else
@@ -74,11 +78,14 @@ public partial class MapView : IQueryAttributable
         }
         else
         {
-            if (await Helper.IsLocationEnabledAsync())
+            //if (await Helper.IsLocationEnabledAsync())
+            if (GPSViewModel.Instance.IsRunning)
             {
-                var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
-                lon = location.Longitude;
-                lat = location.Latitude;
+                //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
+                //lon = location.Longitude;
+                //lat = location.Latitude;
+                lon = GPSViewModel.Instance.Lon;
+                lat = GPSViewModel.Instance.Lat;
                 zoom = 18;
             }
             else
@@ -171,23 +178,15 @@ public partial class MapView : IQueryAttributable
             var result = await popup.PopupDismissedTask;
             if (result != null)
             {
-                // Start GPS-Position Task
-                Location location = null;
-                if (await Helper.IsLocationEnabledAsync())
+                Location location = new();
+                if (GPSViewModel.Instance.IsRunning)
                 {
-                    busyOverlay.IsOverlayVisible = true;
-                    busyOverlay.IsActivityRunning = true;
-                    busyOverlay.BusyMessage = "Ermittle Standort";
-                    location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
-                    {
-                        this.Dispatcher.Dispatch(() =>
-                        {
-                            busyOverlay.BusyMessage = $"Ermittle Standort\nGenauigkeit: {(int)data.accuracy} Meter\nVerbleibende Zeit: {data.remainingTime} Sekunden";
-                        });
-                    });
-                    busyOverlay.IsActivityRunning = false;
-                    busyOverlay.IsOverlayVisible = false;
+                    location.Longitude = GPSViewModel.Instance.Lon;
+                    location.Latitude = GPSViewModel.Instance.Lat;
+                    location.Accuracy = GPSViewModel.Instance.Acc;
                 }
+                else
+                    location = null;
 
                 if (location != null)
                     GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation = new GeoLocData(location);

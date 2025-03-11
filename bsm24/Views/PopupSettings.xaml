@@ -14,14 +14,9 @@
              BackgroundColor="#60000000"
              Title="Settings">
 
-    <Mopups:PopupPage.Resources>
-        <ResourceDictionary>
-            <services:IntToBoolConverter x:Key="IntToBoolConverter" />
-        </ResourceDictionary>
-    </Mopups:PopupPage.Resources>
-
     <Border
         StrokeShape="RoundRectangle 20,20,20,20"
+        Margin="0,30,0,30"
         Padding="16,16,16,16"
         BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
         WidthRequest="300"
