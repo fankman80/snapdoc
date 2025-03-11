@@ -26,6 +26,7 @@ public partial class App : Application
         {
             Directory.CreateDirectory(Settings.TemplateDirectory);
             _ = Helper.CopyFileFromResourcesAsync("template_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx"));
+            _ = Helper.CopyFileFromResourcesAsync("template_location_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx"));
         }
     }
 

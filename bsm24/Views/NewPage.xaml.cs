@@ -182,7 +182,6 @@ public partial class NewPage : IQueryAttributable
                 {
                     if (img.AutomationId != null & GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsCustomPin != true)
                     {
-                        // this may cause performance issues !!!
                         if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
                             img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
@@ -403,7 +402,7 @@ public partial class NewPage : IQueryAttributable
             {
                 busyOverlay.IsOverlayVisible = true;
                 busyOverlay.IsActivityRunning = true;
-                busyOverlay.BusyMessage = "";
+                busyOverlay.BusyMessage = "Ermittle Standort";
                 location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
                 {
                     this.Dispatcher.Dispatch(() =>
@@ -644,12 +643,17 @@ public partial class NewPage : IQueryAttributable
 
     private double PinScaling(string pinId)
     {
-        var scale = 1 / planContainer.Scale;
-        var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
-        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
-            return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
+        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin != true)
+        {
+            var scale = 1 / planContainer.Scale;
+            var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
+            if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+                return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
+            else
+                return scaleLimit * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
+        }
         else
-            return scaleLimit * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
+            return 1;
     }
 
     private void AddDrawingView()
@@ -729,9 +733,9 @@ public partial class NewPage : IQueryAttributable
                 using var memoryStream = new MemoryStream();
                 await imageStream.CopyToAsync(memoryStream);
                 memoryStream.Seek(0, SeekOrigin.Begin);
-                using var skBitmap = SKBitmap.Decode(memoryStream);
-
-                var resizedBitmap = new SKBitmap(pinBound.Width + (int)(drawingView.LineWidth * densityX) + 10, pinBound.Height + (int)(drawingView.LineWidth * densityX) + 10);
+                using var _skBitmap = SKBitmap.Decode(memoryStream);
+                var skBitmap = CropBitmap(_skBitmap, 4);
+                var resizedBitmap = new SKBitmap(pinBound.Width + (int)drawingView.LineWidth, pinBound.Height + (int)drawingView.LineWidth);
                 var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
                 skBitmap.ScalePixels(resizedBitmap, samplingOptions);
 
@@ -755,6 +759,22 @@ public partial class NewPage : IQueryAttributable
         EraseBtn.IsVisible = false;
         SetPinBtn.IsVisible = true;
         DrawBtn.IsVisible = true;
+    }
+
+    public static SKBitmap CropBitmap(SKBitmap originalBitmap, int cropWidth)
+    {
+        int newWidth = originalBitmap.Width - (2 * cropWidth);
+        int newHeight = originalBitmap.Height - (2 * cropWidth);
+
+        if (newWidth <= 0 || newHeight <= 0)
+            throw new ArgumentException("Die neue Bildgröße ist ungültig.");
+
+        var croppedBitmap = new SKBitmap(newWidth, newHeight);
+        using (var canvas = new SKCanvas(croppedBitmap))
+        {
+            canvas.DrawBitmap(originalBitmap, new SKRect(-5, -5, originalBitmap.Width - 5, originalBitmap.Height - 5));
+        }
+        return croppedBitmap;
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)

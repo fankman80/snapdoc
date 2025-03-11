@@ -177,7 +177,7 @@ public partial class MapView : IQueryAttributable
                 {
                     busyOverlay.IsOverlayVisible = true;
                     busyOverlay.IsActivityRunning = true;
-                    busyOverlay.BusyMessage = "";
+                    busyOverlay.BusyMessage = "Ermittle Standort";
                     location = await Helper.GetCurrentLocationAsync(SettingsService.Instance.GpsAccuracyLimit, SettingsService.Instance.GpsTestTimer, data =>
                     {
                         this.Dispatcher.Dispatch(() =>
