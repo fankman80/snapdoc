@@ -77,7 +77,7 @@
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                     AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                    Title="Raum/Ort"
+                    Title="Standort"
                     Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
 
                 <Button Grid.Column="1" Grid.Row="0"
