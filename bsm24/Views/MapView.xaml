@@ -30,12 +30,12 @@
                          Padding="20"
                          AbsoluteLayout.LayoutBounds="0,1,AutoSize,AutoSize"
                          AbsoluteLayout.LayoutFlags="PositionProportional">
-                 
+                
                 <Border Grid.Column="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        Stroke="#4d4d4d"
-                        StrokeThickness="3"
+                        WidthRequest="80"
+                        HeightRequest="80"
+                        Stroke="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        StrokeThickness="1"
                         BackgroundColor="White"
                         StrokeShape="RoundRectangle 8">
                     <Image Source="mapcolorbtn.png"/>
@@ -43,15 +43,15 @@
                         <TapGestureRecognizer Tapped="OnMapLayerColorClicked"/>
                     </Border.GestureRecognizers>
                     <Border.Shadow>
-                        <Shadow Brush="Black" Opacity="0.5" Offset="3,3" Radius="6"/>
+                        <Shadow Brush="Black" Opacity="0.5" Offset="5,5" Radius="8"/>
                     </Border.Shadow>
                 </Border>
 
                 <Border Grid.Column="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        Stroke="#4d4d4d"
-                        StrokeThickness="3"
+                        WidthRequest="80"
+                        HeightRequest="80"
+                        Stroke="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        StrokeThickness="1"
                         BackgroundColor="White"
                         StrokeShape="RoundRectangle 8">
                     <Image Source="maprealbtn.png"/>
@@ -59,18 +59,24 @@
                         <TapGestureRecognizer Tapped="OnMapLayerRealClicked"/>
                     </Border.GestureRecognizers>
                     <Border.Shadow>
-                        <Shadow Brush="Black" Opacity="0.5" Offset="3,3" Radius="6"/>
+                        <Shadow Brush="Black" Opacity="0.5" Offset="5,5" Radius="8"/>
                     </Border.Shadow>
                 </Border>
             </StackLayout>
-            
-                <Button Text="Speichern"
-                        Margin="20"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                        AbsoluteLayout.LayoutFlags="PositionProportional"
-                        Clicked="GetCoordinatesClicked"/>  
+
+            <Button Text="Speichern"
+                    Margin="20"
+                    BorderColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    BorderWidth="1"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    Clicked="GetCoordinatesClicked">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Opacity="0.5" Offset="5,5" Radius="8"/>
+                </Button.Shadow>
+            </Button>
         </AbsoluteLayout>
 
         <!-- Overlay für Busy-Indikator -->

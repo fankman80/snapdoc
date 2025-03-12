@@ -42,14 +42,14 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="0" Spacing="0">
+                            <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Spacing="0">
                                 <Label Margin="10,4,0,0"
                                        FontAttributes="Bold"
                                        FontSize="12"
                                        Text="{Binding OnPlanName}"/>
-                                <Label Margin="0,4,0,0"
+                                <Label Margin="8,4,8,0"
                                        FontSize="12"
-                                       Text="  /  "/>
+                                       Text="/"/>
                                 <Label Margin="0,4,0,0"
                                        FontSize="12"
                                        Text="{Binding PinLocation}"/>

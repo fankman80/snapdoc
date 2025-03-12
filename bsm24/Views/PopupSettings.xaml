@@ -16,16 +16,19 @@
 
     <Mopups:PopupPage.Resources>
         <x:Static Member="services:SettingsService.Instance" x:Key="Settings" />
+        <ResourceDictionary>
+            <services:IntToBoolConverter x:Key="IntToBoolConverter" />
+        </ResourceDictionary>
     </Mopups:PopupPage.Resources>
 
     <Border x:DataType="services:SettingsService" BindingContext="{StaticResource Settings}"
-        StrokeShape="RoundRectangle 20,20,20,20"
-        Margin="0,30,0,30"
-        Padding="16,16,16,16"
-        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-        WidthRequest="300"
-        HorizontalOptions="Center"
-        VerticalOptions="Center">
+            StrokeShape="RoundRectangle 20,20,20,20"
+            Margin="0,30,0,30"
+            Padding="16,16,16,16"
+            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+            WidthRequest="300"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
         <ScrollView>
             <VerticalStackLayout Spacing="0">
                 <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
@@ -107,23 +110,23 @@
                     <Image Grid.Column="0" Grid.Row="1"
                            HorizontalOptions="Start"
                            WidthRequest="30"
-                           Source="{Binding Source={x:Static services:SettingsService.Instance}, Path=MapIcons[0]}"/>
+                           Source="{Binding MapIcons[0]}"/>
                     <Image Grid.Column="1" Grid.Row="1"
                            HorizontalOptions="Start"
                            WidthRequest="30"
-                           Source="{Binding Source={x:Static services:SettingsService.Instance}, Path=MapIcons[1]}"/>
+                           Source="{Binding MapIcons[1]}"/>
                     <Image Grid.Column="2" Grid.Row="1"
                            HorizontalOptions="Start"
                            WidthRequest="30"
-                           Source="{Binding Source={x:Static services:SettingsService.Instance}, Path=MapIcons[2]}"/>
+                           Source="{Binding MapIcons[2]}"/>
                     <Image Grid.Column="3" Grid.Row="1"
                            HorizontalOptions="Start"
                            WidthRequest="30"
-                           Source="{Binding Source={x:Static services:SettingsService.Instance}, Path=MapIcons[3]}"/>
+                           Source="{Binding MapIcons[3]}"/>
                     <Image Grid.Column="4" Grid.Row="1"
                            HorizontalOptions="Start"
                            WidthRequest="30"
-                           Source="{Binding Source={x:Static services:SettingsService.Instance}, Path=MapIcons[4]}"/>
+                           Source="{Binding MapIcons[4]}"/>
                 </Grid>
 
                 <Label Text="{Binding MapIconSize, StringFormat='Icongrösse: {0:0.##}%'}"/>
@@ -134,24 +137,6 @@
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"
                         Value="{Binding MapIconSize}"/>
-
-                <Label Text="{Binding GpsTestTimer, StringFormat='GPS Zeitlimite: {0:0.##} Sekunden'}"/>
-                <Slider Maximum="30"
-                        Minimum="1"
-                        Margin="0,0,0,10"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
-                        Value="{Binding GpsTestTimer}"/>
-
-                <Label Text="{Binding GpsAccuracyLimit, StringFormat='GPS Mindestgenauigkeit: {0:0.##} Meter'}" />
-                <Slider Maximum="50"
-                        Minimum="1"
-                        Margin="0,0,0,10"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
-                        Value="{Binding GpsAccuracyLimit}"/>
 
                 <Label Text="Farbthema:" />
                 <material:PickerField
