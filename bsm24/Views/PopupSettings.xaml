@@ -23,12 +23,12 @@
 
     <Border x:DataType="services:SettingsService" BindingContext="{StaticResource Settings}"
             StrokeShape="RoundRectangle 20,20,20,20"
-            Margin="0,30,0,30"
             Padding="16,16,16,16"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
             HorizontalOptions="Center"
             VerticalOptions="Center">
+
         <ScrollView>
             <VerticalStackLayout Spacing="0">
                 <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
