@@ -11,7 +11,7 @@ public partial class PopupIconEdit : PopupPage
     public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
 
-    public PopupIconEdit(string _iconName, string _iconImage, Point _anchor, double _scale, string okText = "Ok", string cancelText = "Abbrechen")
+    public PopupIconEdit(string _iconName, string _iconImage, Point _anchor, double _scale)
     {
         InitializeComponent();
         iconName.Text = _iconName;

@@ -42,7 +42,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android35.0|AnyCPU'">
-	  <AndroidSigningKeyStore>C:\Users\mfankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
+	  <AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
 	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	  <AndroidKeyStore>True</AndroidKeyStore>
 	  <AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
@@ -51,7 +51,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
-	  <AndroidSigningKeyStore>C:\Users\mfankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
+	  <AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\bsm24\bsm24.keystore</AndroidSigningKeyStore>
 	  <AndroidKeyStore>True</AndroidKeyStore>
 	  <AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 	  <AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>

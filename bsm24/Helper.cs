@@ -1,10 +1,11 @@
 ﻿
 #nullable disable
 
-using System.Reflection;
 using bsm24.Services;
 using SkiaSharp;
 using System.IO.Compression;
+using System.Reflection;
+using System.Xml.Linq;
 
 namespace bsm24;
 
@@ -208,5 +209,94 @@ public class Helper
 
         using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
         await stream.CopyToAsync(fileStream);
+    }
+
+    public static List<IconItem> LoadIconItems(string filePath)
+    {
+        var iconItems = new List<IconItem>();
+
+        try
+        {
+            XDocument doc = XDocument.Load(filePath);
+            foreach (var itemElement in doc.Descendants("Item"))
+            {
+                var iconItem = new IconItem(
+                    itemElement.Element("FileName")?.Value ?? string.Empty,
+                    itemElement.Element("Description")?.Value ?? string.Empty,
+                    new Point(
+                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("X")?.Value ?? "0.0"),
+                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("Y")?.Value ?? "0.0")),
+                    new Size(
+                        double.Parse(itemElement.Element("Size")?.Attribute("Width")?.Value ?? "0"),
+                        double.Parse(itemElement.Element("Size")?.Attribute("Height")?.Value ?? "0")),
+                    bool.Parse(itemElement.Element("RotationLocked")?.Value ?? "false"),
+                    new SKColor(
+                        byte.Parse(itemElement.Element("Color")?.Attribute("Red")?.Value ?? "0"),
+                        byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
+                        byte.Parse(itemElement.Element("Color")?.Attribute("Blue")?.Value ?? "0")),
+                    double.Parse(itemElement.Element("Scale")?.Value ?? "1.0")
+                );
+
+                iconItems.Add(iconItem);
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error reading the XML file: " + ex.Message);
+        }
+
+        return iconItems;
+    }
+
+    public static void UpdateIconItem(string filePath, IconItem updatedIconItem)
+    {
+        try
+        {
+            XDocument doc = XDocument.Load(filePath);
+            var itemElement = doc.Descendants("Item")
+                .FirstOrDefault(x => x.Element("FileName")?.Value == updatedIconItem.FileName);
+
+            if (itemElement != null)
+            {
+                // Update values
+                itemElement.Element("Description").Value = updatedIconItem.DisplayName;
+                itemElement.Element("AnchorPoint").SetAttributeValue("X", updatedIconItem.AnchorPoint.X.ToString());
+                itemElement.Element("AnchorPoint").SetAttributeValue("Y", updatedIconItem.AnchorPoint.Y.ToString());
+                itemElement.Element("Size").SetAttributeValue("Width", updatedIconItem.IconSize.Width.ToString());
+                itemElement.Element("Size").SetAttributeValue("Height", updatedIconItem.IconSize.Height.ToString());
+                itemElement.Element("RotationLocked").Value = updatedIconItem.IsRotationLocked.ToString();
+                itemElement.Element("Color").SetAttributeValue("Red", updatedIconItem.PinColor.Red.ToString());
+                itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
+                itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
+                itemElement.Element("Scale").Value = updatedIconItem.IconScale.ToString();
+            }
+            else
+            {
+                // Add new item if not found
+                doc.Root.Add(new XElement("Item",
+                    new XElement("FileName", updatedIconItem.FileName),
+                    new XElement("Description", updatedIconItem.DisplayName),
+                    new XElement("AnchorPoint",
+                        new XAttribute("X", updatedIconItem.AnchorPoint.X),
+                        new XAttribute("Y", updatedIconItem.AnchorPoint.Y)),
+                    new XElement("Size",
+                        new XAttribute("Width", updatedIconItem.IconSize.Width),
+                        new XAttribute("Height", updatedIconItem.IconSize.Height)),
+                    new XElement("RotationLocked", updatedIconItem.IsRotationLocked),
+                    new XElement("Color",
+                        new XAttribute("Red", updatedIconItem.PinColor.Red),
+                        new XAttribute("Green", updatedIconItem.PinColor.Green),
+                        new XAttribute("Blue", updatedIconItem.PinColor.Blue)),
+                    new XElement("Scale", updatedIconItem.IconScale)
+                ));
+            }
+
+            // Save the changes back to the file
+            doc.Save(filePath);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Error writing to the XML file: " + ex.Message);
+        }
     }
 }

@@ -23,7 +23,7 @@
         VerticalOptions="Center">
 
         <VerticalStackLayout>
-            <Label Text="Icon Editor"/>
+            <Label Text="Icon Editor" FontAttributes="Bold"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -36,7 +36,7 @@
                 </Grid.RowDefinitions>
 
                 <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-                       x:Name="iconImage" Margin="10"/>                    
+                       x:Name="iconImage" Margin="10"/>
 
                 <material:TextField Grid.Column="2" Grid.Row="0" 
                                     x:Name="anchorX"
