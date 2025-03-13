@@ -12,7 +12,7 @@ public partial class GPSViewModel : INotifyPropertyChanged
     private const double MIN_MARK_INTERVAL = 1.0d;
     public event PropertyChangedEventHandler PropertyChanged;
     private string _gpsData;
-    private string _gpsButtonText;
+    private FontImageSource _gpsButtonIcon;
     private double _lon;
     private double _lat;
     private double _acc;
@@ -37,17 +37,25 @@ public partial class GPSViewModel : INotifyPropertyChanged
         set { _acc = value; OnPropertyChanged(nameof(Acc)); }
     }
     public bool IsRunning { get; set; }
-    public string GPSButtonText
+    public FontImageSource GPSButtonIcon
     {
-        get { return _gpsButtonText; }
-        set { _gpsButtonText = value; OnPropertyChanged(nameof(GPSButtonText)); }
+        get { return _gpsButtonIcon; }
+        set { _gpsButtonIcon = value; OnPropertyChanged(nameof(GPSButtonIcon)); }
     }
     public Command ToggleGPSCommand { get; set; }
 
     private GPSViewModel()
     {
         ToggleGPSCommand = new Command(OnToggleGPS);
-        GPSButtonText = "GPS aus";
+        GPSButtonIcon = new FontImageSource
+        {
+            FontFamily = "MaterialOutlined",
+            Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off,
+            Color = Application.Current.RequestedTheme == AppTheme.Dark
+                    ? (Color)Application.Current.Resources["PrimaryDark"]
+                    : (Color)Application.Current.Resources["Primary"],
+            Size=24
+        };
     }
 
     public virtual void OnPropertyChanged([CallerMemberName] string propertyName = "")
@@ -59,7 +67,17 @@ public partial class GPSViewModel : INotifyPropertyChanged
     {
         await Toggle(!IsRunning);
 
-        GPSButtonText = IsRunning ? "GPS ein" : "GPS Off";
+        GPSButtonIcon = new FontImageSource
+        {
+            FontFamily = "MaterialOutlined",
+            Glyph = IsRunning
+                    ? UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote
+                    : UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off,
+            Color = Application.Current.RequestedTheme == AppTheme.Dark
+                    ? (Color)Application.Current.Resources["PrimaryDark"]
+                    : (Color)Application.Current.Resources["Primary"],
+            Size = 24
+        };
     }
 
     /// <summary>
