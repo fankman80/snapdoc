@@ -47,6 +47,10 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+
+            <Label Text="Gedrückt halten um Icon zu editieren."
+                   FontSize="12"
+                   VerticalOptions="Center"/>
         </Grid>
 
         <!-- Overlay für Busy-Indikator -->
