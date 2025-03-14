@@ -286,4 +286,36 @@ public class Helper
             Console.WriteLine("Error writing to the XML file: " + ex.Message);
         }
     }
+
+    public static void DeleteIconItem(string filePath, string fileName)
+    {
+        try
+        {
+            // XML-Datei laden
+            XDocument doc = XDocument.Load(filePath);
+
+            // Element finden, das gelöscht werden soll
+            var itemElement = doc.Descendants("Item")
+                .FirstOrDefault(x => x.Element("FileName")?.Value == fileName);
+
+            if (itemElement != null)
+            {
+                // Element löschen
+                itemElement.Remove();
+
+                // Änderungen zurück in die Datei speichern
+                doc.Save(filePath);
+
+                Console.WriteLine($"Item mit FileName '{fileName}' wurde erfolgreich gelöscht.");
+            }
+            else
+            {
+                Console.WriteLine($"Kein Item mit FileName '{fileName}' gefunden.");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine("Fehler beim Löschen des Items in der XML-Datei: " + ex.Message);
+        }
+    }
 }

@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Alerts;
+using System.IO;
 using Mopups.Services;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -98,49 +99,57 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     {
         try
         {
-            var result = await FilePicker.PickAsync(new PickOptions
+            var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = FilePickerFileType.Images,
                 PickerTitle = "Wähle ein Bild aus"
             });
 
-            if (result != null)
+            if (result == null)
+                return;
+
+            var origName = Path.Combine(FileSystem.AppDataDirectory, "customicons", result.FileName);
+            var ext = Path.GetExtension(origName);
+            string newName = origName;
+            int i = 1;
+            while (File.Exists(newName))
             {
-                using var stream = await result.OpenReadAsync();
-                var fileName = result.FileName;
-                var localPath = Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName);
-
-                if (!Directory.Exists(Path.Combine(FileSystem.AppDataDirectory, "customicons")))
-                    Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, "customicons"));
-
-                using (var fileStream = File.Create(localPath))
-                {
-                    await stream.CopyToAsync(fileStream);
-                }
-
-                var updatedItem = new IconItem(
-                    Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName),
-                    "Neues Icon",
-                    new Point(0.5, 0.5),
-                    GetImageSize(localPath),
-                    false,
-                    new SKColor(255, 0, 0),
-                    1
-                );
-
-                var popup = new PopupIconEdit(updatedItem);
-                await MopupService.Instance.PushAsync(popup);
-                var popup_result = await popup.PopupDismissedTask;
-
-                if (popup_result == null)
-                {
-                    File.Delete(localPath);
-                }
-
-                Icons = [.. Settings.PinData];
-                IconCollectionView.ItemsSource = null;
-                IconCollectionView.ItemsSource = Icons;
+                newName = Path.GetFileNameWithoutExtension(origName) + "_" + i.ToString() + ext;
+                i++;
             }
+
+            var fileName = newName;    
+            using var stream = await result.OpenReadAsync();
+            var localPath = Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName);
+
+            if (!Directory.Exists(Path.Combine(FileSystem.AppDataDirectory, "customicons")))
+                Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, "customicons"));
+
+            using (var fileStream = File.Create(localPath))
+            {
+                await stream.CopyToAsync(fileStream);
+            }
+
+            var updatedItem = new IconItem(
+                Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName),
+                "Neues Icon " + i.ToString(),
+                new Point(0.5, 0.5),
+                GetImageSize(localPath),
+                false,
+                new SKColor(255, 0, 0),
+                1
+            );
+
+            var popup = new PopupIconEdit(updatedItem);
+            await MopupService.Instance.PushAsync(popup);
+            var popup_result = await popup.PopupDismissedTask;
+
+            if (popup_result == null)
+                File.Delete(localPath);  // Delete temporary Icon-File
+
+            Icons = [.. Settings.PinData];
+            IconCollectionView.ItemsSource = null;
+            IconCollectionView.ItemsSource = Icons;
         }
         catch (Exception ex)
         {

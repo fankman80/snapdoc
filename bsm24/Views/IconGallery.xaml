@@ -51,6 +51,7 @@
                                     AutomationId = "{Binding FileName}"
                                     Background="Transparent"
                                     LongPressing="OnLongPressed"
+                                    Clicked="OnIconClicked"
                                     Tapped="OnIconClicked">
                             </mr:Button>
                         </Grid>

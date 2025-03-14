@@ -12,6 +12,7 @@
              CloseWhenBackgroundIsClicked="True"
              HasSystemPadding="False"
              BackgroundColor="#60000000"
+             IsAnimationEnabled="False"
              Title="Icon Editor">
 
     <Border
@@ -72,8 +73,7 @@
 
             <HorizontalStackLayout>
                 <Label Text="Voreinstellung Rotation sperren:" VerticalOptions="Start"/>
-                <Switch Grid.Column="1" Grid.Row="0"
-                        x:Name="allowRotate"
+                <Switch x:Name="allowRotate"
                         Margin="0,-8,0,0"
                         ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         OnColor="{DynamicResource Secondary}"/>
@@ -132,7 +132,17 @@
                        HorizontalTextAlignment="Center"                       
                        Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
             </Grid>
-           
+
+            <HorizontalStackLayout>
+                <Label Text="Icon löschen:" VerticalOptions="Start"/>
+                <Switch x:Name="deleteIcon"
+                        IsToggled="False"
+                        IsEnabled="False"
+                        Margin="0,-8,0,0"
+                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        OnColor="{DynamicResource Secondary}"/>
+            </HorizontalStackLayout>
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

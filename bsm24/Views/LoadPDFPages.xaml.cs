@@ -124,7 +124,6 @@ public partial class LoadPDFPages : UraniumContentPage
     {
         try
         {
-            // Öffne den FilePicker nur für PDF-Dateien
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = "Bitte wähle eine PDF-Datei aus",

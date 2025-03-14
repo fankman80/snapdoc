@@ -34,7 +34,10 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
         BlueValue = iconItem.PinColor.Blue;
         SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
 
-        this.BindingContext = this;
+        if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
+            deleteIcon.IsEnabled = true;
+
+        BindingContext = this;
         UpdateSelectedColor();
     }
 
@@ -52,30 +55,40 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        // XML-Daten schreiben
         // Falls CustomIcon, dann wird Pfad relativ gesetzt
         var file = iconItem.FileName;
         int index = file.IndexOf("customicons", StringComparison.OrdinalIgnoreCase);
         if (index >= 0)
             file = file[index..];
 
-        var updatedItem = new IconItem(
-            file,
-            iconName.Text,
-            new Point(string.IsNullOrEmpty(anchorX.Text) ? 0.0 : double.Parse(anchorX.Text, CultureInfo.InvariantCulture),
-                      string.IsNullOrEmpty(anchorY.Text) ? 0.0 : double.Parse(anchorY.Text, CultureInfo.InvariantCulture)),
-            iconItem.IconSize,
-            allowRotate.IsToggled,
-            new SKColor((byte)RedValue, (byte)GreenValue, (byte)BlueValue),
-            Math.Round(iconScale.Value / 100, 1)
-        );
-        Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
+        if (deleteIcon.IsToggled == false)
+        {
+            var updatedItem = new IconItem(
+                file,
+                iconName.Text,
+                new Point(string.IsNullOrEmpty(anchorX.Text) ? 0.0 : double.Parse(anchorX.Text, CultureInfo.InvariantCulture),
+                          string.IsNullOrEmpty(anchorY.Text) ? 0.0 : double.Parse(anchorY.Text, CultureInfo.InvariantCulture)),
+                iconItem.IconSize,
+                allowRotate.IsToggled,
+                new SKColor((byte)RedValue, (byte)GreenValue, (byte)BlueValue),
+                Math.Round(iconScale.Value / 100, 1)
+            );
+            Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
+            ReturnValue = file;
+        }
+        else
+        {
+            var iconFile = Path.Combine(FileSystem.AppDataDirectory, file);
+            if (File.Exists(iconFile))
+            {
+                File.Delete(iconFile);
+                Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
+            }
+        }
 
         // Icon-Daten einlesen
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
         Settings.PinData = iconItems;
-
-        ReturnValue = file;
         await MopupService.Instance.PopAsync();
     }
 
