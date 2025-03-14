@@ -143,7 +143,7 @@
                     <ColumnDefinition Width="3*" />
                     <ColumnDefinition Width="1*" />
                 </Grid.ColumnDefinitions>
-                <Label Text="Icon löschen:"  Grid.Column="0" Grid.Row="0"/>
+                <Label Text="Icon löschen:" TextColor="Red" Grid.Column="0" Grid.Row="0"/>
                 <Switch Grid.Column="1" Grid.Row="0"
                         x:Name="deleteIcon"
                         IsToggled="False"
