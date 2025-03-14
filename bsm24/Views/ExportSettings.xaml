@@ -138,59 +138,59 @@
 
                     <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="160"
-                                Minimum="10"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding ImageExportSize}"/>
+                            Minimum="10"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding ImageExportSize}"/>
 
                     <Label Text="{Binding ImageExportScale, StringFormat='Foto Auflösung: {0:0.##}'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="1"
-                                Minimum="0.01"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding ImageExportScale}"/>
+                            Minimum="0.01"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding ImageExportScale}"/>
 
                     <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="160"
-                                Minimum="10"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding PinPosExportSize}"/>
+                            Minimum="10"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding PinPosExportSize}"/>
 
                     <Label Text="{Binding PosImageExportScale, StringFormat='Positionsbilder Auflösung: {0:0.##}'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="1"
-                                Minimum="0.01"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding PosImageExportScale}"/>
+                            Minimum="0.01"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding PosImageExportScale}"/>
 
                     <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="1000"
-                                Minimum="100"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding PinPosCropExportSize}"/>
+                            Minimum="100"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding PinPosCropExportSize}"/>
 
                     <Label Text="{Binding ImageExportQuality, StringFormat='Bildqualität: {0:0.##}%'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="100"
-                                Minimum="10"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding ImageExportQuality}"/>
+                            Minimum="10"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding ImageExportQuality}"/>
 
                     <Label Text="{Binding TitleExportSize, StringFormat='Titelbildhöhe: {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
-                                Minimum="10"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding TitleExportSize}"/>
+                            Minimum="10"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding TitleExportSize}"/>
                 </VerticalStackLayout>
             </ScrollView>
 

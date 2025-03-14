@@ -10,12 +10,18 @@
              xmlns:local="clr-namespace:bsm24"
              x:Name="IconGalleryPage"
              x:Class="bsm24.Views.IconGallery"
-             x:DataType="views:IconGallery"
              BackgroundColor="White"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Title="Pin auswählen">
 
-    <Grid>
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name ="ImportIcon"                     
+                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"             
+                     Text="Icon importieren"
+                     Clicked="ImportIconClicked"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid x:DataType="views:IconGallery">
         <Grid Margin="10">
             <CollectionView x:Name="IconCollectionView"
                             ItemsSource="{Binding Icons}"

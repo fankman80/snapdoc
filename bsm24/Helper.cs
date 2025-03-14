@@ -2,7 +2,9 @@
 #nullable disable
 
 using bsm24.Services;
+using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
+using System.Globalization;
 using System.IO.Compression;
 using System.Reflection;
 using System.Xml.Linq;
@@ -159,27 +161,6 @@ public class Helper
         return bestLocation;
     }
 
-    public static async Task<bool> IsLocationEnabledAsync()
-    {
-        try
-        {
-            var location = await Geolocation.GetLastKnownLocationAsync() ?? await Geolocation.GetLocationAsync(new GeolocationRequest
-                {
-                    DesiredAccuracy = GeolocationAccuracy.Medium,
-                    Timeout = TimeSpan.FromSeconds(10)
-                });
-            return true;
-        }
-        catch (FeatureNotEnabledException)
-        {
-            return false;
-        }
-        catch (Exception)
-        {
-            return false;
-        }
-    }
-
     public static void PackDirectory(string sourceDirectory, string destinationZipFile)
     {
         if (!Directory.Exists(sourceDirectory))
@@ -220,29 +201,35 @@ public class Helper
             XDocument doc = XDocument.Load(filePath);
             foreach (var itemElement in doc.Descendants("Item"))
             {
+                var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
+                if (fileName.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                {
+                    fileName = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                }
+
                 var iconItem = new IconItem(
-                    itemElement.Element("FileName")?.Value ?? string.Empty,
+                    fileName,
                     itemElement.Element("Description")?.Value ?? string.Empty,
                     new Point(
-                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("X")?.Value ?? "0.0"),
-                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("Y")?.Value ?? "0.0")),
+                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("X")?.Value ?? "0.0", CultureInfo.InvariantCulture),
+                        double.Parse(itemElement.Element("AnchorPoint")?.Attribute("Y")?.Value ?? "0.0", CultureInfo.InvariantCulture)),
                     new Size(
-                        double.Parse(itemElement.Element("Size")?.Attribute("Width")?.Value ?? "0"),
-                        double.Parse(itemElement.Element("Size")?.Attribute("Height")?.Value ?? "0")),
+                        double.Parse(itemElement.Element("Size")?.Attribute("Width")?.Value ?? "0", CultureInfo.InvariantCulture),
+                        double.Parse(itemElement.Element("Size")?.Attribute("Height")?.Value ?? "0", CultureInfo.InvariantCulture)),
                     bool.Parse(itemElement.Element("RotationLocked")?.Value ?? "false"),
                     new SKColor(
                         byte.Parse(itemElement.Element("Color")?.Attribute("Red")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Blue")?.Value ?? "0")),
-                    double.Parse(itemElement.Element("Scale")?.Value ?? "1.0")
+                    double.Parse(itemElement.Element("Scale")?.Value ?? "1.0", CultureInfo.InvariantCulture)
                 );
 
                 iconItems.Add(iconItem);
             }
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine("Error reading the XML file: " + ex.Message);
+            Toast.Make($"Fehler in der Icon-Datenbank.").Show();
         }
 
         return iconItems;
@@ -260,15 +247,15 @@ public class Helper
             {
                 // Update values
                 itemElement.Element("Description").Value = updatedIconItem.DisplayName;
-                itemElement.Element("AnchorPoint").SetAttributeValue("X", updatedIconItem.AnchorPoint.X.ToString());
-                itemElement.Element("AnchorPoint").SetAttributeValue("Y", updatedIconItem.AnchorPoint.Y.ToString());
+                itemElement.Element("AnchorPoint").SetAttributeValue("X", updatedIconItem.AnchorPoint.X.ToString(CultureInfo.InvariantCulture));
+                itemElement.Element("AnchorPoint").SetAttributeValue("Y", updatedIconItem.AnchorPoint.Y.ToString(CultureInfo.InvariantCulture));
                 itemElement.Element("Size").SetAttributeValue("Width", updatedIconItem.IconSize.Width.ToString());
                 itemElement.Element("Size").SetAttributeValue("Height", updatedIconItem.IconSize.Height.ToString());
                 itemElement.Element("RotationLocked").Value = updatedIconItem.IsRotationLocked.ToString();
                 itemElement.Element("Color").SetAttributeValue("Red", updatedIconItem.PinColor.Red.ToString());
                 itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
                 itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
-                itemElement.Element("Scale").Value = updatedIconItem.IconScale.ToString();
+                itemElement.Element("Scale").Value = updatedIconItem.IconScale.ToString(CultureInfo.InvariantCulture);
             }
             else
             {

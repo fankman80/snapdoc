@@ -71,7 +71,11 @@ public partial class NewPage : IQueryAttributable
                 .FirstOrDefault(i => i.AutomationId == PinUpdate);
             if (image != null)
             {
-                image.Source = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
+                var pinIcon = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
+                if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                    pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
+                
+                image.Source = pinIcon;
                 image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
                 image.AnchorY = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.Y;
                 image.Rotation = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLockRotate ?
@@ -217,6 +221,10 @@ public partial class NewPage : IQueryAttributable
         {
             pinIcon = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, pinIcon);
             _rotation = 0;
+        }
+        else if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+        {
+            pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
         }
 
         // berechne Anchor-Koordinaten

@@ -195,64 +195,64 @@
 
 	<ItemGroup>
 		<MauiXaml Update="App.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="AppShell.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="BusyOverlayView.xaml">
-		  <Generator>MSBuild:Compile</Generator>
+		  <Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\MapView.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\ExportSettings.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PinList.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\LoadPDFPages.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupIconEdit.xaml">
-		  <Generator>MSBuild:Compile</Generator>
+		  <Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupSlider.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupAlert.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupDualResponse.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupSettings.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\PopupEntry.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\OpenProject.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\ImageViewPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\IconGallery.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\HomeScreen.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\NewPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\ProjectDetails.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Views\SetPin.xaml">
-			<Generator>MSBuild:Compile</Generator>
+			<Generator>None</Generator>
 		</MauiXaml>
 	</ItemGroup>
 

@@ -1,6 +1,4 @@
 ﻿using bsm24.Services;
-using SkiaSharp;
-using System.IO;
 using UraniumUI;
 #if WINDOWS
 using Microsoft.UI.Windowing;
@@ -35,23 +33,7 @@ public partial class App : Application
 
         // Icon-Daten einlesen
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
-        foreach (var item in iconItems)
-        {
-            //Console.WriteLine($"FileName: {item.FileName}, Description: {item.Description}");
-        }
-
-        // Daten schreiben
-        //var writer = new IconItemWriter();
-        //var updatedItem = new IconItem(
-        //    "tuere_rauchdicht.png",
-        //    "Neue Türe rauchdicht",
-        //    new Point(0.5, 0.5),
-        //    new Size(64, 84),
-        //    true,
-        //    new SKColor(255, 0, 0),
-        //    1.0
-        //);
-        //writer.UpdateIconItem("path_to_your_file.xml", updatedItem);
+        Settings.PinData = iconItems;
     }
 
     protected override Window CreateWindow(IActivationState? activationState)

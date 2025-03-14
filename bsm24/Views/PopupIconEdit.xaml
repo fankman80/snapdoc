@@ -6,6 +6,7 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"   
+             xmlns:local="clr-namespace:bsm24.Views"
              x:Class="bsm24.Views.PopupIconEdit"
              BackgroundClicked="PopupPage_BackgroundClicked"
              BackgroundInputTransparent="False"
@@ -22,7 +23,7 @@
         HorizontalOptions="Center"
         VerticalOptions="Center">
 
-        <VerticalStackLayout>
+        <VerticalStackLayout x:DataType="local:PopupIconEdit">
             <Label Text="Icon Editor" FontAttributes="Bold"/>
 
             <Grid>
@@ -60,7 +61,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
                                 AllowClear="True"/>
 
-            <Label x:Name="sliderText" Text="Voreinstellung Skalierung"/>
+            <Label x:Name="sliderText" Text="Voreinstellung Skalierung:" Margin="0, 0, 0, -12"/>
             <Slider x:Name="iconScale"
                     Maximum="100"
                     Minimum="1"
@@ -69,7 +70,70 @@
                     MinimumTrackColor="{DynamicResource Primary}"
                     MaximumTrackColor="{DynamicResource PrimaryDark}"
                     ValueChanged="OnSliderValueChanged"/>
-            
+
+            <HorizontalStackLayout>
+                <Label Text="Voreinstellung Rotation sperren:" VerticalOptions="Start"/>
+                <Switch Grid.Column="1" Grid.Row="0"
+                        x:Name="allowRotate"
+                        Margin="0,-8,0,0"
+                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        OnColor="{DynamicResource Secondary}"/>
+            </HorizontalStackLayout>
+           
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Label Grid.Column="0" Text="Pin Farbe wählen:" VerticalTextAlignment="Center" HeightRequest="30"/>   
+                <BoxView Grid.Column="1" Color="{Binding SelectedColor}" />                
+            </Grid>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="*" />                    
+                </Grid.RowDefinitions>                
+                
+                <!-- Slider for Red -->
+                <Slider Grid.Column="1" Grid.Row="0"
+                        Margin="0,6,0,0"
+                        Minimum="0" Maximum="255" Value="{Binding RedValue}"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{DynamicResource Primary}"
+                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                <Entry Grid.Column="0" Grid.Row="0"
+                       HorizontalTextAlignment="Center"
+                       Text="{Binding RedValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Red" />
+
+                <!-- Slider for Green -->
+                <Slider Grid.Column="1" Grid.Row="1"
+                        Margin="0,6,0,0"                        
+                        Minimum="0" Maximum="255" Value="{Binding GreenValue}"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{DynamicResource Primary}"
+                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                <Entry Grid.Column="0" Grid.Row="1"
+                       HorizontalTextAlignment="Center"                       
+                       Text="{Binding GreenValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Green" />
+
+                <!-- Slider for Blue -->
+                <Slider Grid.Column="1" Grid.Row="2"
+                        Margin="0,6,0,0"                        
+                        Minimum="0" Maximum="255" Value="{Binding BlueValue}"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{DynamicResource Primary}"
+                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                <Entry Grid.Column="0" Grid.Row="2"
+                       HorizontalTextAlignment="Center"                       
+                       Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
+            </Grid>
+           
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

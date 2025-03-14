@@ -62,7 +62,6 @@ public partial class MapView : IQueryAttributable
             }
             else
             {
-                //if (await Helper.IsLocationEnabledAsync())
                 if (GPSViewModel.Instance.IsRunning)
                 {
                     //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
@@ -82,7 +81,6 @@ public partial class MapView : IQueryAttributable
         }
         else
         {
-            //if (await Helper.IsLocationEnabledAsync())
             if (GPSViewModel.Instance.IsRunning)
             {
                 //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
@@ -175,7 +173,7 @@ public partial class MapView : IQueryAttributable
     }
     private async void SetPosClicked(object sender, EventArgs e)
     {
-        if (await Helper.IsLocationEnabledAsync())
+        if (GPSViewModel.Instance.IsRunning)
         {
             var popup = new PopupDualResponse("Sind Sie sicher dass Sie die Positionsdaten überschreiben wollen?");
             await MopupService.Instance.PushAsync(popup);
@@ -278,6 +276,9 @@ public partial class MapView : IQueryAttributable
                 await Toast.Make($"KML-Datei wurde nicht gespeichert").Show();
         }
         saveStream.Close();
+
+        if (File.Exists(outputPath))
+            File.Delete(outputPath);
     }
 
     private async void OnButtonPressed(object sender, EventArgs e)

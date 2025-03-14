@@ -63,12 +63,15 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         ImageGallery.ItemsSource = Images; // Dann wieder auf die Collection setzen
 
         priorityPicker.ItemsSource = Settings.PriorityItems.Select(item => item.Key).ToList();
+        
+        var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+        if (file.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+            file = Path.Combine(FileSystem.AppDataDirectory, file);
 
-        // read data
         this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
         PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
         PinLocation.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation;
-        PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+        PinImage.Source = file;
         LockSwitch.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
         LockRotate.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
         AllowExport.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
@@ -135,10 +138,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
-
-        var iconItem = Settings.PinData.FirstOrDefault(item => item.FileName.Equals(PinIcon, StringComparison.OrdinalIgnoreCase));
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
     }
 
     private void OnCheckedChanged(object sender, CheckedChangedEventArgs e)
@@ -160,7 +159,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void OnOkayClick(object sender, EventArgs e)
     {
-        // write data
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = this.Title;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;

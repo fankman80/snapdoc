@@ -1,654 +1,652 @@
 <?xml version="1.0" encoding="utf-8"?>
 <IconData>
-	
-<Item>
-<FileName>a_pin_blue.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>a_pin_green.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>a_pin_grey.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="112" Green="112" Blue="112" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>a_pin_pink.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="252" Green="2" Blue="202" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>a_pin_red.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>a_pin_yellow.png</FileName>
-<Description></Description>
-<AnchorPoint X="0.297" Y="0.97" />
-<Size Width="64" Height="64" />
-<RotationLocked>false</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>blitzleuchte.png</FileName>
-<Description>Blitzleuchte</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>blitzleuchte_evakuierungsanlage.png</FileName>
-<Description>Blitzleuchte Evakuierungsanlage</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>brandfallgesteuert.png</FileName>
-<Description>Brandfallgesteuert</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>brandmeldeanlage_bedienstelle.png</FileName>
-<Description>Brandmeldeanlage Bedienstelle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="192" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>brandmeldezentrale.png</FileName>
-<Description>Brandmeldezentrale</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="192" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>druckentlastungsoeffnung.png</FileName>
-<Description>Druckentlastungsöffnung</Description>
-<AnchorPoint X="0.0" Y="0.5" />
-<Size Width="197" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>druckschacht.png</FileName>
-<Description>Druckschacht</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="121" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>einspeisestelle_trockensteigleitung.png</FileName>
-<Description>Einspeisestelle mit Storz (Trockensteigleitung)</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="109" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>einzelrauchmelder.png</FileName>
-<Description>Einzelrauchmelder</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>entnahmestelle_trockensteigleitung.png</FileName>
-<Description>Entnahmestelle mit Storz (Trockensteigleitung)</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="109" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>entrauchung_mit_luefter_der_feuerwehr.png</FileName>
-<Description>Entrauchung mit Lüfter der Feuerwehr (LRWA) in m³/h</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="160" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.8</Scale>
-</Item>
-
-<Item>
-<FileName>evakuierungsanlage_bedienstelle.png</FileName>
-<Description>Evakuierungsanlage Bedienstelle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="192" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>evakuierungsanlage_zentrale.png</FileName>
-<Description>Zentrale Evakuierungsanlage</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="192" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>ex_zone.png</FileName>
-<Description>Raum / Schrank mit Explosionsgefährdung</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="73" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>feuerwehraufzug.png</FileName>
-<Description>Feuerwehraufzug</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="102" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>grosser_ueberdruck.png</FileName>
-<Description>Grosser Überdruck</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuerloescher.png</FileName>
-<Description>Handfeuerlöscher</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="71" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuerloescher_a_feste_nicht_schmelzende_stoffe.png</FileName>
-<Description>Handfeuerlöscher: Löschmittel für feste, nicht schmelzende Stoffe</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="71" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuerloescher_b_fluessigkeiten_schmelzende_stoffe.png</FileName>
-<Description>Handfeuerlöscher: Löschmittel für Flüssigkeiten und schmelzende, feste Stoffe</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="71" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuerloescher_c_gase.png</FileName>
-<Description>Handfeuerlöscher: Löschmittel für Gase</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="71" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuerloescher_d_metalle.png</FileName>
-<Description>Handfeuerlöscher: Löschmittel für Metalle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="71" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-	<FileName>handfeuerloescher_f_fettbrand.png</FileName>
-	<Description>Handfeuerlöscher: Löschmittel für Fettbrand</Description>
-	<AnchorPoint X="0.5" Y="0.5" />
-	<Size Width="71" Height="64" />
-	<RotationLocked>true</RotationLocked>
-	<Color Red="0" Green="50" Blue="204" />
-	<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>handfeuermelder.png</FileName>
-<Description>Handfeuermelder</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>hauptzugang_feuerwehr.png</FileName>
-<Description>Hauptzugang Feuerwehr</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="90" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>innenhydrant.png</FileName>
-<Description>Innenhydrant</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="144" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>maschinelle_rauch_und_waermeabzugsanlage.png</FileName>
-<Description>maschinelle Rauch- und Wärmeabzugsanlage (MRWA) in m³/h</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="160" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.8</Scale>
-</Item>
-
-<Item>
-<FileName>mobiler_luefter_der_feuerwehr.png</FileName>
-<Description>Mobiler Lüfter der Feuerwehr</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="111" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>natuerliche_rauch_und_waermeabzugsanlage_m2.png</FileName>
-<Description>natürliche Rauch- und Wärmeabzugsanlage (NRWA) in m²</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="160" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.8</Scale>
-</Item>
-
-<Item>
-<FileName>natuerliche_rauch_und_waermeabzugsanlage_prozent.png</FileName>
-<Description>natürliche Rauch- und Wärmeabzugsanlage (NRWA) in %</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="160" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.8</Scale>
-</Item>
-
-<Item>
-<FileName>notausgang.png</FileName>
-<Description>Notausgang</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="89" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>notausgangsverschluss_sn_en_179.png</FileName>
-<Description>Notausgangsverschluss gemäss SN EN 179 oder nicht abschliessbar</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>notoeffnungstaster.png</FileName>
-<Description>Notöffnungstaster</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>oeffnung_fuer_natuerliche_abstroemung.png</FileName>
-<Description>Öffnung für natürliche Abströmung in m²</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="160" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.8</Scale>
-</Item>
-
-<Item>
-<FileName>paniktuerverschluss_sn_en_1125.png</FileName>
-<Description>Paniktürverschluss gemäss SN EN 1125</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="129" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>rauchschutz_druckanlage_bedienstelle.png</FileName>
-<Description>Rauchschutz-Druckanlage Bedienstelle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="185" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>rauch_waermeabzugsanlage_bedienstelle.png</FileName>
-<Description>Rauch- und Wärmeabzug Bedienstelle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="185" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>rwa_schacht.png</FileName>
-<Description>RWA Schacht</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="121" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>sammelplatz.png</FileName>
-<Description>Sammelplatz</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="153" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>schluesseldepot.png</FileName>
-<Description>Schlüsseldepot</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="128" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>selbstschliessend_mit_freilauftuerschliesser.png</FileName>
-<Description>selbstschliessend mit Freilauftürschliesser</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="131" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>selbstschliessend_ts.png</FileName>
-<Description>Selbstschliessend TS</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>sicherheitsbeleuchtung.png</FileName>
-<Description>Raum / Bereich mit Sicherheitsbeleuchtung</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>sicherheitsleuchte_tragbar.png</FileName>
-<Description>Sicherheitsleuchte tragbar</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>spezielle_loeschanlage.png</FileName>
-<Description>Spezielle Löschanlage</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>sprinklerzentrale.png</FileName>
-<Description>Sprinklerzentrale</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="192" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>spuellueftung_bedienstelle.png</FileName>
-<Description>Spüllüftung Bedienstelle</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="185" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>0.4</Scale>
-</Item>
-
-<Item>
-<FileName>tuere_rauchdicht.png</FileName>
-<Description>Türe rauchdicht</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="84" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>ueberdruck.png</FileName>
-<Description>Überdruck</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>ueberflurhydrant.png</FileName>
-<Description>Überflurhydrant</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>unterdruck.png</FileName>
-<Description>Unterdruck</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>unterflurhydrant.png</FileName>
-<Description>Unterflurhyfrand</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>ventilator_rda_sla.png</FileName>
-<Description>Ventilator Rauchschutz-Druckanlage</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>ventilator_rwa.png</FileName>
-<Description>Ventilator Rauch- und Wärmeabzug</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>wasserloeschposten.png</FileName>
-<Description>Wasserlöschposten</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="118" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>wechselrichter_pv.png</FileName>
-<Description>Wechselrichter PV-Anlage</Description>
-<AnchorPoint X="0.5" Y="0.5" />
-<Size Width="64" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>zugang_spa_z.png</FileName>
-<Description>Zugang SPA-Z</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="89" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="0" Green="50" Blue="204" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>zuluft_absaugung_maschinell.png</FileName>
-<Description>Zuluft / Absaugung maschinell</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="141" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>zuluft_abstroemung_natuerlich.png</FileName>
-<Description>Zuluft / Abströmung natürlich</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="141" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="217" Green="217" Blue="20" />
-<Scale>1.0</Scale>
-</Item>
-
-<Item>
-<FileName>zusaetzlicher_zugang_feuerwehr.png</FileName>
-<Description>Zusätzlicher Zugang Feuerwehr</Description>
-<AnchorPoint X="1.0" Y="0.5" />
-<Size Width="89" Height="64" />
-<RotationLocked>true</RotationLocked>
-<Color Red="255" Green="0" Blue="0" />
-<Scale>1.0</Scale>
-</Item>
-
+	<Item>
+		<FileName>a_pin_blue.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>a_pin_green.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>a_pin_grey.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="112" Green="112" Blue="112" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>a_pin_pink.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="252" Green="2" Blue="202" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>a_pin_red.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>a_pin_yellow.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.297" Y="0.97" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>false</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>blitzleuchte.png</FileName>
+		<Description>Blitzleuchte</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>blitzleuchte_evakuierungsanlage.png</FileName>
+		<Description>Blitzleuchte Evakuierungsanlage</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>brandfallgesteuert.png</FileName>
+		<Description>Brandfallgesteuert</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>brandmeldeanlage_bedienstelle.png</FileName>
+		<Description>Brandmeldeanlage Bedienstelle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="192" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>brandmeldezentrale.png</FileName>
+		<Description>Brandmeldezentrale</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="192" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>druckentlastungsoeffnung.png</FileName>
+		<Description>Druckentlastungsöffnung</Description>
+		<AnchorPoint X="0.0" Y="0.5" />
+		<Size Width="197" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>druckschacht.png</FileName>
+		<Description>Druckschacht</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="121" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>einspeisestelle_trockensteigleitung.png</FileName>
+		<Description>Einspeisestelle mit Storz (Trockensteigleitung)</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="109" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>einzelrauchmelder.png</FileName>
+		<Description>Einzelrauchmelder</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>entnahmestelle_trockensteigleitung.png</FileName>
+		<Description>Entnahmestelle mit Storz (Trockensteigleitung)</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="109" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>entrauchung_mit_luefter_der_feuerwehr.png</FileName>
+		<Description>Entrauchung mit Lüfter der Feuerwehr (LRWA) in m³/h</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="160" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.8</Scale>
+	</Item>
+
+	<Item>
+		<FileName>evakuierungsanlage_bedienstelle.png</FileName>
+		<Description>Evakuierungsanlage Bedienstelle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="192" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>evakuierungsanlage_zentrale.png</FileName>
+		<Description>Zentrale Evakuierungsanlage</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="192" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>ex_zone.png</FileName>
+		<Description>Raum / Schrank mit Explosionsgefährdung</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="73" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>feuerwehraufzug.png</FileName>
+		<Description>Feuerwehraufzug</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="102" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>grosser_ueberdruck.png</FileName>
+		<Description>Grosser Überdruck</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher.png</FileName>
+		<Description>Handfeuerlöscher</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher_a_feste_nicht_schmelzende_stoffe.png</FileName>
+		<Description>Handfeuerlöscher: Löschmittel für feste, nicht schmelzende Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher_b_fluessigkeiten_schmelzende_stoffe.png</FileName>
+		<Description>Handfeuerlöscher: Löschmittel für Flüssigkeiten und schmelzende, feste Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher_c_gase.png</FileName>
+		<Description>Handfeuerlöscher: Löschmittel für Gase</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher_d_metalle.png</FileName>
+		<Description>Handfeuerlöscher: Löschmittel für Metalle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuerloescher_f_fettbrand.png</FileName>
+		<Description>Handfeuerlöscher: Löschmittel für Fettbrand</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="71" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>handfeuermelder.png</FileName>
+		<Description>Handfeuermelder</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>hauptzugang_feuerwehr.png</FileName>
+		<Description>Hauptzugang Feuerwehr</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="90" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>innenhydrant.png</FileName>
+		<Description>Innenhydrant</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="144" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>maschinelle_rauch_und_waermeabzugsanlage.png</FileName>
+		<Description>maschinelle Rauch- und Wärmeabzugsanlage (MRWA) in m³/h</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="160" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.8</Scale>
+	</Item>
+
+	<Item>
+		<FileName>mobiler_luefter_der_feuerwehr.png</FileName>
+		<Description>Mobiler Lüfter der Feuerwehr</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="111" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>natuerliche_rauch_und_waermeabzugsanlage_m2.png</FileName>
+		<Description>natürliche Rauch- und Wärmeabzugsanlage (NRWA) in m²</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="160" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.8</Scale>
+	</Item>
+
+	<Item>
+		<FileName>natuerliche_rauch_und_waermeabzugsanlage_prozent.png</FileName>
+		<Description>natürliche Rauch- und Wärmeabzugsanlage (NRWA) in %</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="160" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.8</Scale>
+	</Item>
+
+	<Item>
+		<FileName>notausgang.png</FileName>
+		<Description>Notausgang</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="89" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>notausgangsverschluss_sn_en_179.png</FileName>
+		<Description>Notausgangsverschluss gemäss SN EN 179 oder nicht abschliessbar</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>notoeffnungstaster.png</FileName>
+		<Description>Notöffnungstaster</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>oeffnung_fuer_natuerliche_abstroemung.png</FileName>
+		<Description>Öffnung für natürliche Abströmung in m²</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="160" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.8</Scale>
+	</Item>
+
+	<Item>
+		<FileName>paniktuerverschluss_sn_en_1125.png</FileName>
+		<Description>Paniktürverschluss gemäss SN EN 1125</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="129" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rauchschutz_druckanlage_bedienstelle.png</FileName>
+		<Description>Rauchschutz-Druckanlage Bedienstelle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="185" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rauch_waermeabzugsanlage_bedienstelle.png</FileName>
+		<Description>Rauch- und Wärmeabzug Bedienstelle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="185" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rwa_schacht.png</FileName>
+		<Description>RWA Schacht</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="121" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>sammelplatz.png</FileName>
+		<Description>Sammelplatz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>schluesseldepot.png</FileName>
+		<Description>Schlüsseldepot</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>selbstschliessend_mit_freilauftuerschliesser.png</FileName>
+		<Description>selbstschliessend mit Freilauftürschliesser</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="131" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>selbstschliessend_ts.png</FileName>
+		<Description>Selbstschliessend TS</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>sicherheitsbeleuchtung.png</FileName>
+		<Description>Raum / Bereich mit Sicherheitsbeleuchtung</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>sicherheitsleuchte_tragbar.png</FileName>
+		<Description>Sicherheitsleuchte tragbar</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>spezielle_loeschanlage.png</FileName>
+		<Description>Spezielle Löschanlage</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>sprinklerzentrale.png</FileName>
+		<Description>Sprinklerzentrale</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="192" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>spuellueftung_bedienstelle.png</FileName>
+		<Description>Spüllüftung Bedienstelle</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="185" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.4</Scale>
+	</Item>
+
+	<Item>
+		<FileName>tuere_rauchdicht.png</FileName>
+		<Description>Türe rauchdicht</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>ueberdruck.png</FileName>
+		<Description>Überdruck</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>ueberflurhydrant.png</FileName>
+		<Description>Überflurhydrant</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>unterdruck.png</FileName>
+		<Description>Unterdruck</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>unterflurhydrant.png</FileName>
+		<Description>Unterflurhyfrand</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>ventilator_rda_sla.png</FileName>
+		<Description>Ventilator Rauchschutz-Druckanlage</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>ventilator_rwa.png</FileName>
+		<Description>Ventilator Rauch- und Wärmeabzug</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>wasserloeschposten.png</FileName>
+		<Description>Wasserlöschposten</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="118" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>wechselrichter_pv.png</FileName>
+		<Description>Wechselrichter PV-Anlage</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="64" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>zugang_spa_z.png</FileName>
+		<Description>Zugang SPA-Z</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="89" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>zuluft_absaugung_maschinell.png</FileName>
+		<Description>Zuluft / Absaugung maschinell</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="141" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>zuluft_abstroemung_natuerlich.png</FileName>
+		<Description>Zuluft / Abströmung natürlich</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="141" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>zusaetzlicher_zugang_feuerwehr.png</FileName>
+		<Description>Zusätzlicher Zugang Feuerwehr</Description>
+		<AnchorPoint X="1.0" Y="0.5" />
+		<Size Width="89" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
 </IconData>
