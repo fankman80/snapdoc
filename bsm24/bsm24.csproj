@@ -48,6 +48,15 @@
 	  <AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 	  <AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 	  <AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
+	  <TrimMode>link</TrimMode>
+	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+	  <DebugSymbols>False</DebugSymbols>
+	  <EnableLLVM>True</EnableLLVM>
+	  <PublishTrimmed>True</PublishTrimmed>
+	  <RunAOTCompilation>True</RunAOTCompilation>
+	  <AndroidLinkTool>r8</AndroidLinkTool>
+	  <DebugType>embedded</DebugType>
+	  <Optimize>True</Optimize>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-android35.0|AnyCPU'">
@@ -56,10 +65,23 @@
 	  <AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 	  <AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 	  <AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
+	  <TrimMode>link</TrimMode>
+	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
+	  <EnableLLVM>True</EnableLLVM>
+	  <DebugType>embedded</DebugType>
 	</PropertyGroup>
 
 	<PropertyGroup>
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.26100.0</TargetFrameworks>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.26100.0|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-windows10.0.26100.0|AnyCPU'">
+	  <DebugType>embedded</DebugType>
+	  <Optimize>True</Optimize>
 	</PropertyGroup>
 
 	<ItemGroup>

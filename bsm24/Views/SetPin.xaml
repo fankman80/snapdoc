@@ -162,7 +162,7 @@
                 </Border>
 
                 <Picker Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
-                        x:DataType="services:SettingsService"
+                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                         x:Name="priorityPicker"
                         SelectedIndexChanged="OnSelectedValueChanged">
                 </Picker>

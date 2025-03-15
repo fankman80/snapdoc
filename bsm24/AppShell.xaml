@@ -18,14 +18,9 @@
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"       
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
-    <Shell.Resources>
-        <x:Static Member="services:SettingsService.Instance" x:Key="Settings" />
-        <x:Static Member="model:GPSViewModel.Instance" x:Key="GPSData" />
-    </Shell.Resources>
-
     <Shell.FlyoutHeaderTemplate>
-        <DataTemplate x:DataType="services:SettingsService">
-            <Grid BindingContext="{StaticResource Settings}"
+        <DataTemplate>
+            <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                   BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="100" />
@@ -61,8 +56,8 @@
     </Shell.FlyoutHeaderTemplate>
 
     <Shell.FlyoutFooterTemplate>
-        <DataTemplate x:DataType="model:GPSViewModel">
-            <Grid BindingContext="{StaticResource GPSData}"
+        <DataTemplate>
+            <Grid x:DataType="model:GPSViewModel" BindingContext="{x:Static model:GPSViewModel.Instance}"
                   BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />

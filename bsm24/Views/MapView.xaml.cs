@@ -64,9 +64,6 @@ public partial class MapView : IQueryAttributable
             {
                 if (GPSViewModel.Instance.IsRunning)
                 {
-                    //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
-                    //lon = location.Longitude;
-                    //lat = location.Latitude;
                     lon = GPSViewModel.Instance.Lon;
                     lat = GPSViewModel.Instance.Lat;
                     zoom = 18;
@@ -83,9 +80,6 @@ public partial class MapView : IQueryAttributable
         {
             if (GPSViewModel.Instance.IsRunning)
             {
-                //var location = await Helper.GetCurrentLocationAsync(20, 10, _ => { });
-                //lon = location.Longitude;
-                //lat = location.Latitude;
                 lon = GPSViewModel.Instance.Lon;
                 lat = GPSViewModel.Instance.Lat;
                 zoom = 18;

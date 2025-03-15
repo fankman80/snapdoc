@@ -16,13 +16,12 @@
         Title="Bericht exportieren">
 
     <uranium:UraniumContentPage.Resources>
-        <x:Static Member="services:SettingsService.Instance" x:Key="Settings" />        
         <ResourceDictionary>
             <services:BooleanInverterConverter x:Key="BooleanInverterConverter" />
         </ResourceDictionary>
     </uranium:UraniumContentPage.Resources>
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{StaticResource Settings}">
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

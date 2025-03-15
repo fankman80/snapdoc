@@ -3,7 +3,6 @@ using bsm24.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Text.Json;
-using bsm24.ViewModels;
 
 namespace bsm24.Services;
 public partial class SettingsService : INotifyPropertyChanged
@@ -18,14 +17,7 @@ public partial class SettingsService : INotifyPropertyChanged
         SelectedDarkMode = DarkMode[0]; // Standardauswahl
     }
 
-    public List<string> MapIcons { get; set; } =
-    [
-        "mappin1a.png",
-        "mappin2a.png",
-        "mappin3a.png",
-        "mappin4a.png",
-        "mappin5a.png"
-    ];
+    public List<string> MapIcons { get; set; } = ["mappin1a.png", "mappin2a.png", "mappin3a.png", "mappin4a.png", "mappin5a.png"];
 
     private string _flyoutHeaderTitle = "";
     public string FlyoutHeaderTitle

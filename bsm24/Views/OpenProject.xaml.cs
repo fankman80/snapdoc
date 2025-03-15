@@ -158,7 +158,6 @@ public partial class OpenProject : UraniumContentPage
                     // Daten laden und verarbeiten (nicht UI-bezogen)
                     LoadDataToView.ResetFlyoutItems();
                     LoadDataToView.ResetData();
-
                     GlobalJson.LoadFromFile(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
                     Helper.HeaderUpdate();  // UI-Aktualisierung

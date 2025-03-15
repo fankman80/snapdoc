@@ -15,13 +15,12 @@
              Title="Settings">
 
     <Mopups:PopupPage.Resources>
-        <x:Static Member="services:SettingsService.Instance" x:Key="Settings" />
         <ResourceDictionary>
             <services:IntToBoolConverter x:Key="IntToBoolConverter" />
         </ResourceDictionary>
     </Mopups:PopupPage.Resources>
 
-    <Border x:DataType="services:SettingsService" BindingContext="{StaticResource Settings}"
+    <Border x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
             StrokeShape="RoundRectangle 20,20,20,20"
             Padding="16,16,16,16"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"

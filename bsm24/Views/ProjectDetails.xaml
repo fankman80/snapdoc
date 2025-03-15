@@ -12,12 +12,8 @@
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.ProjectDetails"
              Title="Projekt Details">
-    
-    <uranium:UraniumContentPage.Resources>
-        <x:Static Member="services:SettingsService.Instance" x:Key="Settings" />
-    </uranium:UraniumContentPage.Resources>
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{StaticResource Settings}">
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="120" />
