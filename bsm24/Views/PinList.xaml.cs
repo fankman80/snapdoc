@@ -2,6 +2,7 @@
 
 using bsm24.Models;
 using System.ComponentModel;
+using System.Threading.Tasks;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;
@@ -20,6 +21,13 @@ public partial class PinList : UraniumContentPage
         LoadPins();
     }
 
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        LoadPins();
+    }
+
     private void OnSizeChanged(object sender, EventArgs e)
     {
         UpdateSpan();
@@ -28,8 +36,9 @@ public partial class PinList : UraniumContentPage
     private void LoadPins()
     {
         int pincounter = 0;
-
         List<PinItem> pinItems = [];
+        pinListView.ItemsSource = null;
+
         foreach (var plan in GlobalJson.Data.Plans)
         {
             if (GlobalJson.Data.Plans[plan.Key].Pins != null)
@@ -38,10 +47,13 @@ public partial class PinList : UraniumContentPage
                 {
                     if (!GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin)
                     {
+                        var pinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
+                        if (pinIcon.Contains("customicons", StringComparison.OrdinalIgnoreCase))
+                            pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
                         var newPin = new PinItem
                         {
                             PinDesc = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc,
-                            PinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon,
+                            PinIcon = pinIcon,
                             PinName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName,
                             PinLocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation,
                             OnPlanName = GlobalJson.Data.Plans[plan.Key].Name,
@@ -105,7 +117,6 @@ public partial class PinList : UraniumContentPage
         else
             await Shell.Current.Navigation.PushAsync(newPage);
     }
-
 
     private async void UpdateSpan()
     {

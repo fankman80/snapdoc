@@ -1,7 +1,6 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Alerts;
-using System.IO;
 using Mopups.Services;
 using SkiaSharp;
 using System.Collections.ObjectModel;
@@ -115,7 +114,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                 i++;
             }
 
-            var fileName = "opsz271_1.png"; // newName;    
+            var fileName = newName;    
             using var stream = await result.OpenReadAsync();
             var localPath = Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName);
 
@@ -131,7 +130,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
             var updatedItem = new IconItem(
                 Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName),
-                "Neues Icon " + i.ToString(),
+                "Neues Icon",
                 new Point(0.5, 0.5),
                 size,
                 false,

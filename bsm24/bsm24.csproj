@@ -52,8 +52,8 @@
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
 	  <DebugSymbols>False</DebugSymbols>
 	  <EnableLLVM>True</EnableLLVM>
-	  <PublishTrimmed>True</PublishTrimmed>
-	  <RunAOTCompilation>True</RunAOTCompilation>
+	  <PublishTrimmed>False</PublishTrimmed>
+	  <RunAOTCompilation>False</RunAOTCompilation>
 	  <AndroidLinkTool>r8</AndroidLinkTool>
 	  <DebugType>embedded</DebugType>
 	  <Optimize>True</Optimize>
