@@ -72,10 +72,10 @@ public partial class LoadDataToView
             (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellitem);
         }
 
-        Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked", "project_details");
-        Helper.AddMenuItem("swisstopo Karte", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Map, "OnMapViewClicked", "mapview");
-        Helper.AddMenuItem("Pin Liste", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Format_list_numbered, "OnPinListClicked", "pinList");
-        Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked", "exportSettings");
+        Helper.AddMenuItem("Projekt Details", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Home_work, "OnProjectDetailsClicked");
+        Helper.AddMenuItem("swisstopo Karte", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Map, "OnMapViewClicked");
+        Helper.AddMenuItem("Pin Liste", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Format_list_numbered, "OnPinListClicked");
+        Helper.AddMenuItem("Bericht exportieren", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Download, "OnExportClicked");
         Helper.AddDivider();
     }
 

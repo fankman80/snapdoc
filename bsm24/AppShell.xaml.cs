@@ -15,6 +15,7 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
+        Routing.RegisterRoute("open_project", typeof(OpenProject));
         Routing.RegisterRoute("icongallery", typeof(IconGallery));
         Routing.RegisterRoute("setpin", typeof(SetPin));
         Routing.RegisterRoute("imageview", typeof(ImageViewPage));
@@ -23,6 +24,14 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("pinList", typeof(PinList));
         Routing.RegisterRoute("exportSettings", typeof(ExportSettings));
         Routing.RegisterRoute("mapview", typeof(MapView));
+    }
+
+    private async void OnProjectOpenClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("open_project");
+#if ANDROID
+        Shell.Current.FlyoutIsPresented = false;
+#endif
     }
 
     private async void OnProjectDetailsClicked(object sender, EventArgs e)
