@@ -107,9 +107,4 @@
     <ShellContent Route="homescreen"
                   ContentTemplate="{DataTemplate views:HomeScreen}"
                   FlyoutItemIsVisible="False" />
-
-    <ShellContent Route="open_project"
-                  Title="Projektliste"
-                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Open_in_new}}"
-                  ContentTemplate="{DataTemplate views:OpenProject}"/>
 </Shell>

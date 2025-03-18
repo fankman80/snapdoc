@@ -34,6 +34,8 @@ public partial class App : Application
         // Icon-Daten einlesen
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
         Settings.PinData = iconItems;
+
+        Helper.AddMenuItem("Projektliste", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Open_in_new, "OnProjectOpenClicked");
     }
 
     protected override Window CreateWindow(IActivationState? activationState)
