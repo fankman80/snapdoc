@@ -6,6 +6,8 @@ using Microsoft.Maui.Controls.Compatibility;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
+using UraniumUI.Material.Controls;
+using CheckBox = Microsoft.Maui.Controls.CheckBox;
 
 namespace bsm24.Views;
 
@@ -23,6 +25,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         InitializeComponent();
         UpdateSpan();
         SizeChanged += OnSizeChanged;
+        priorityPicker.PropertyChanged += OnSelectedItemChanged;
     }
 
     protected override bool OnBackButtonPressed()
@@ -242,12 +245,17 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         OnPropertyChanged(nameof(DynamicSize));
     }
 
-    private void OnSelectedValueChanged(object sender, EventArgs e)
+    private void OnSelectedItemChanged(object sender, EventArgs e)
     {
-        if (sender is Picker picker)
+        if (sender is PickerField picker)
         {
             var selectedIndex = picker.SelectedIndex;
-            priorityPicker.TextColor = Color.FromArgb(Settings.PriorityItems[selectedIndex].Color);
+            if (selectedIndex >= 0)
+            {
+                priorityPicker.BorderColor = Color.FromArgb(Settings.PriorityItems[selectedIndex].Color);
+                priorityPicker.AccentColor = Color.FromArgb(Settings.PriorityItems[selectedIndex].Color);
+                priorityLabel.TextColor = Color.FromArgb(Settings.PriorityItems[selectedIndex].Color);
+            }
         }
     }
 }

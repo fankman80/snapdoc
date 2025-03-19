@@ -72,7 +72,7 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5"> 
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" Spacing="0"> 
                             <CheckBox x:Name="isPlanRotateLocked"
                                       Scale="1.2"
                                       Color="{DynamicResource Primary}"

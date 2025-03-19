@@ -68,7 +68,7 @@
                             <RowDefinition Height="40" />
                         </Grid.RowDefinitions>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0">
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
                             <CheckBox
                               Scale="1.2"
                               Color="{DynamicResource Primary}"
@@ -76,7 +76,7 @@
                             <Label Text="Exportiere Pläne" VerticalTextAlignment="Center"/>                            
                         </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="1">
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="1" Spacing="0">
                             <CheckBox
                               Scale="1.2"
                               Color="{DynamicResource Primary}"
@@ -84,7 +84,7 @@
                             <Label Text="Exportiere Positionsbilder" VerticalTextAlignment="Center"/> 
                         </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="2">
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="2" Spacing="0">
                             <CheckBox
                                   Scale="1.2"
                                   Color="{DynamicResource Primary}"
@@ -92,7 +92,7 @@
                             <Label Text="Exportiere Pin-Icons" VerticalTextAlignment="Center"/>                            
                         </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="3">
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="3" Spacing="0">
                             <CheckBox
                                   Scale="1.2"
                                   Color="{DynamicResource Primary}"
@@ -100,7 +100,7 @@
                             <Label Text="Exportiere Fotos" VerticalTextAlignment="Center"/>                            
                         </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="4">
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="4" Spacing="0">
                             <CheckBox
                                   Scale="1.2"
                                   Color="{DynamicResource Primary}"

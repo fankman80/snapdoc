@@ -102,7 +102,7 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="120" />
+                    <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="40" />
@@ -110,21 +110,21 @@
                     <RowDefinition Height="40" />
                 </Grid.RowDefinitions>
                 
-                <HorizontalStackLayout Grid.Column="0" Grid.Row="0">
+                <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
                     <CheckBox x:Name="AllowExport"
                               Scale="1.2"
                               Color="{DynamicResource Primary}"/>
                     <Label Text="Pin exportieren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 
-                <HorizontalStackLayout Grid.Column="0" Grid.Row="1">
+                <HorizontalStackLayout Grid.Column="0" Grid.Row="1" Spacing="0">
                     <CheckBox x:Name="LockSwitch"
                               Scale="1.2"
                               Color="{DynamicResource Primary}"/>
                     <Label Text="Position sperren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 
-                <HorizontalStackLayout Grid.Column="0" Grid.Row="2">
+                <HorizontalStackLayout Grid.Column="0" Grid.Row="2" Spacing="0">
                     <CheckBox x:Name="LockRotate"
                               Scale="1.2"
                               Color="{DynamicResource Primary}"/>
@@ -167,11 +167,10 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" Text="Priorität:" VerticalOptions="Center"/>
-                <Picker Grid.Column="1"
-                        x:Name="priorityPicker"
-                        SelectedIndexChanged="OnSelectedValueChanged">
-                </Picker>                  
+                <Label x:Name="priorityLabel" Grid.Column="0" Text="Priorität:" VerticalOptions="Center"/>
+
+                <material:PickerField Grid.Column="1"
+                                      x:Name="priorityPicker"/>
             </Grid>
       
             <Grid>
