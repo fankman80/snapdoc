@@ -1,6 +1,6 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net9.0-android35.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android35.0</TargetFrameworks>
 
 		<OutputType>Exe</OutputType>
 		<RootNamespace>bsm24</RootNamespace>
@@ -20,9 +20,9 @@
 		<ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
 		<ApplicationVersion>1</ApplicationVersion>
 
-		<Title>BSM24</Title>
+		<Title>BSM 24</Title>
 		<Authors>Michael Fankhauser</Authors>
-		<Company>Emch+Berger Bern</Company>
+		<Company>Emch+Berger Bern AG</Company>
 
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">11.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
@@ -74,7 +74,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup>
-	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net9.0-windows10.0.26100.0</TargetFrameworks>
+	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net9.0-windows10.0.26100.0|AnyCPU'">
@@ -205,9 +205,9 @@
 		<PackageReference Include="FFImageLoading.Maui" Version="1.2.7" />
 		<PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.50" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.50" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-preview.2.25165.1" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0-preview.2.25165.1" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-preview.2.25163.2" />
 		<PackageReference Include="Mopups" Version="1.3.2" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="PDFtoImage" Version="5.1.0-preview5" />

@@ -1,8 +1,7 @@
 ﻿#nullable disable
 
-using bsm24.Models;
+using bsm24.Services;
 using System.ComponentModel;
-using System.Threading.Tasks;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;
@@ -12,6 +11,7 @@ public partial class PinList : UraniumContentPage
     public Command<IconItem> IconTappedCommand { get; }
     public int DynamicSpan = 1;
     public int MinSize = 1;
+    public List<PinItem> pinItems = [];
 
     public PinList()
     {
@@ -36,7 +36,6 @@ public partial class PinList : UraniumContentPage
     private void LoadPins()
     {
         int pincounter = 0;
-        List<PinItem> pinItems = [];
         pinListView.ItemsSource = null;
 
         foreach (var plan in GlobalJson.Data.Plans)
@@ -60,6 +59,7 @@ public partial class PinList : UraniumContentPage
                             OnPlanId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].OnPlanId,
                             SelfId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].SelfId,
                             AllowExport = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport,
+                            Time = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].DateTime
                         };
                         newPin.PropertyChanged += Pin_PropertyChanged;
                         pinItems.Add(newPin);
@@ -70,6 +70,8 @@ public partial class PinList : UraniumContentPage
             pinListView.ItemsSource = pinItems;
         }
         pinListView.Footer = "Pins: " + pincounter;
+
+        IconSorting();
     }
 
     private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -103,18 +105,48 @@ public partial class PinList : UraniumContentPage
         await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");
     }
 
-    private async void UpdateSpan()
+    private void OnSortPickerChanged(object sender, EventArgs e)
     {
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "Icons werden geladen...";
+        IconSorting();
+        SettingsService.Instance.SaveSettings();
+    }
 
-        await Task.Run(() =>
+    private void IconSorting()
+    {
+        if (SortPicker.SelectedIndex == -1) return;
+
+        SettingsService.Instance.PinSortCrit = SortPicker.SelectedItem.ToString();
+
+        var selectedOption = SortPicker.SelectedItem.ToString();
+
+        switch (SettingsService.Instance.PinSortCrit)
         {
-            OnPropertyChanged(nameof(DynamicSpan));
-        });
+            case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
+                pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanName).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
+                pinItems = [.. pinItems.OrderBy(pin => pin.PinIcon).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
+                pinItems = [.. pinItems.OrderBy(pin => pin.PinLocation).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
+                pinItems = [.. pinItems.OrderBy(pin => pin.PinName).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
+                pinItems = [.. pinItems.OrderByDescending(pin => pin.AllowExport).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
+                pinItems = [.. pinItems.OrderBy(pin => pin.Time).ToList()];
+                break;
+        }
 
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
+        pinListView.ItemsSource = null;
+        pinListView.ItemsSource = pinItems;
+    }
+
+    private void UpdateSpan()
+    {
+        OnPropertyChanged(nameof(DynamicSpan));
     }
 }

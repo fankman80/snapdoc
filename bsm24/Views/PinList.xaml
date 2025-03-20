@@ -21,9 +21,38 @@
         </ResourceDictionary>
     </uranium:UraniumContentPage.Resources>
 
-    <Grid>
-        <Grid>
-            <CollectionView x:Name="pinListView" SelectionMode="Single" Margin="10">
+    
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                HeightRequest="30"
+                HorizontalOptions="End"
+                StrokeThickness="0.5">
+            <Grid>
+                <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                       HorizontalOptions="Start"
+                       Margin="10,0,0,0"
+                       WidthRequest="20"
+                       HeightRequest="20"
+                       BackgroundColor="Transparent"/>
+                <Picker x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                        WidthRequest="250"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HorizontalTextAlignment="End"
+                        ItemsSource="{Binding PinSortCrits}"
+                        SelectedItem="{Binding PinSortCrit}"
+                        SelectedIndexChanged="OnSortPickerChanged">
+                </Picker>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+            <CollectionView x:Name="pinListView" SelectionMode="Single">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="10"/>
                 </CollectionView.ItemsLayout>
@@ -110,10 +139,5 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
 </uranium:UraniumContentPage>

@@ -2,7 +2,6 @@
 
 using bsm24.Views;
 using Mopups.Services;
-using System.Collections.ObjectModel;
 using System.Windows.Input;
 
 namespace bsm24;

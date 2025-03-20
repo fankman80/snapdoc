@@ -19,6 +19,11 @@ public partial class SettingsService : INotifyPropertyChanged
 
     public List<string> MapIcons { get; set; } = ["mappin1a.png", "mappin2a.png", "mappin3a.png", "mappin4a.png", "mappin5a.png"];
 
+    public List<string> IconSortCrits { get; set; } = ["nach Name", "nach Farbe"];
+
+    public List<string> PinSortCrits { get; set; } = ["nach Plan", "nach Pin", "nach Standort", "nach Bezeichnung", "nach aktiv/deaktiv", "nach Aufnahmedatum"];
+
+
     private string _flyoutHeaderTitle = "";
     public string FlyoutHeaderTitle
     {
@@ -155,6 +160,34 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _mapIcon = value;
                 OnPropertyChanged(nameof(MapIcon));
+            }
+        }
+    }
+
+    private string _iconSortCrit = "Sortieren nach Namen";
+    public string IconSortCrit
+    {
+        get => _iconSortCrit;
+        set
+        {
+            if (_iconSortCrit != value)
+            {
+                _iconSortCrit = value;
+                OnPropertyChanged(nameof(IconSortCrit));
+            }
+        }
+    }
+
+    private string _pinSortCrit = "Sortieren nach Plan";
+    public string PinSortCrit
+    {
+        get => _pinSortCrit;
+        set
+        {
+            if (_pinSortCrit != value)
+            {
+                _pinSortCrit = value;
+                OnPropertyChanged(nameof(PinSortCrit));
             }
         }
     }
@@ -611,6 +644,8 @@ public partial class SettingsService : INotifyPropertyChanged
             PinMaxScaleLimit = this.PinMaxScaleLimit,
             MapIconSize = this.MapIconSize,
             MapIcon = this.MapIcon,
+            IconSortCrit = this.IconSortCrit,
+            PinSortCrit = this.PinSortCrit,
             IsPlanRotateLocked = this.IsPlanRotateLocked,
             PdfQuality = this.PdfQuality,
             SelectedTheme = this.SelectedTheme,
@@ -636,6 +671,8 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.PinMaxScaleLimit = settings.PinMaxScaleLimit;
                 this.MapIconSize = settings.MapIconSize;
                 this.MapIcon = settings.MapIcon;
+                this.IconSortCrit = settings.IconSortCrit;
+                this.PinSortCrit = settings.PinSortCrit;
                 this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
                 this.PdfQuality = settings.PdfQuality;
                 this.SelectedTheme = settings.SelectedTheme;

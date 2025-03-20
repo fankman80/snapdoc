@@ -1,10 +1,12 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Alerts;
+using DocumentFormat.OpenXml.Spreadsheet;
 using Mopups.Services;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
+using bsm24.Services;
 
 namespace bsm24.Views;
 
@@ -22,9 +24,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     {
         InitializeComponent();
         SizeChanged += OnSizeChanged;
-        Icons = [.. Settings.PinData];
+        IconSorting();
         BindingContext = this;
-    }    
+    }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
@@ -88,9 +90,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        Icons = [.. Settings.PinData];
-        IconCollectionView.ItemsSource = null;
-        IconCollectionView.ItemsSource = Icons;
+        IconSorting();
     }
 
     private async void ImportIconClicked(object sender, EventArgs e)
@@ -102,6 +102,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                 FileTypes = FilePickerFileType.Images,
                 PickerTitle = "Wähle ein Bild aus"
             });
+
+            if (result == null)
+                return;
 
             var origName = Path.Combine(FileSystem.AppDataDirectory, "customicons", result.FileName);
             var ext = Path.GetExtension(origName);
@@ -144,9 +147,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             if (popup_result == null)
                 File.Delete(localPath);  // Delete temporary Icon-File
 
-            Icons = [.. Settings.PinData];
-            IconCollectionView.ItemsSource = null;
-            IconCollectionView.ItemsSource = Icons;
+            IconSorting();
         }
         catch (Exception ex)
         {
@@ -154,19 +155,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         }
     }
 
-    private async void UpdateSpan()
+    private void UpdateSpan()
     {
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "Icons werden geladen...";
-
-        await Task.Run(() =>
-        {
-            OnPropertyChanged(nameof(DynamicSpan));
-        });
-
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
+        OnPropertyChanged(nameof(DynamicSpan));
     }
 
     public static Size GetImageSize(string localPath)
@@ -174,5 +165,33 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         using var stream = File.OpenRead(localPath);
         using var bitmap = SKBitmap.Decode(stream);
         return new Size(bitmap.Width, bitmap.Height);
+    }
+
+    private void OnSortPickerChanged(object sender, EventArgs e)
+    {
+        IconSorting();
+        SettingsService.Instance.SaveSettings();
+    }
+
+    private void IconSorting()
+    {
+        if (SortPicker.SelectedIndex == -1) return;
+
+        SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
+
+        var selectedOption = SortPicker.SelectedItem.ToString();
+
+        switch (SettingsService.Instance.IconSortCrit)
+        {
+            case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
+                Icons = [.. Settings.PinData.OrderBy(pin => pin.DisplayName).ToList()];
+                break;
+            case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
+                Icons = [.. Settings.PinData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
+                break;
+        }
+
+        IconCollectionView.ItemsSource = null;
+        IconCollectionView.ItemsSource = Icons;
     }
 }

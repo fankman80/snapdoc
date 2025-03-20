@@ -35,6 +35,7 @@ namespace bsm24
         public required string OnPlanId { get; set; }
         public required string OnPlanName { get; set; }
         public required string SelfId { get; set; }
+        public required DateTime Time { get; set; }
 
         private bool allowExport;
         public bool AllowExport

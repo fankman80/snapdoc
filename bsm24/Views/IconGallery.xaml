@@ -7,6 +7,7 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"            
+             xmlns:services="clr-namespace:bsm24.Services"
              xmlns:local="clr-namespace:bsm24"
              x:Name="IconGalleryPage"
              x:Class="bsm24.Views.IconGallery"
@@ -21,12 +22,40 @@
                      Clicked="ImportIconClicked"/>
     </ContentPage.ToolbarItems>
 
-    <Grid x:DataType="views:IconGallery">
-        <Grid Margin="10">
+    <Grid RowSpacing="10" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />            
+        </Grid.RowDefinitions>
+
+        <Border Grid.Row="0"
+                HeightRequest="30"
+                HorizontalOptions="End"
+                StrokeThickness="0.5">
+            <Grid>
+                <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                       HorizontalOptions="Start"
+                       Margin="10,0,0,0"
+                       WidthRequest="20"
+                       HeightRequest="20"
+                       BackgroundColor="Transparent"/>
+                <Picker x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                        WidthRequest="250"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        HorizontalTextAlignment="End"
+                        ItemsSource="{Binding IconSortCrits}"
+                        SelectedItem="{Binding IconSortCrit}"
+                        SelectedIndexChanged="OnSortPickerChanged">
+                </Picker>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1" x:DataType="views:IconGallery">
             <CollectionView x:Name="IconCollectionView"
                             ItemsSource="{Binding Icons}"
-                            SelectionMode="Single"
-                            Margin="0,0,0,24">
+                            SelectionMode="Single">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" />
                 </CollectionView.ItemsLayout>
@@ -58,17 +87,7 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-            
-            <Label Text="Gedrückt halten um Icon zu editieren."
-                   FontSize="12"
-                   VerticalOptions="End"/>
-
         </Grid>
-        
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
+        <Label Grid.Row="2" Text="Gedrückt halten um Icon zu editieren." FontSize="12"/>        
     </Grid>
 </uranium:UraniumContentPage>
