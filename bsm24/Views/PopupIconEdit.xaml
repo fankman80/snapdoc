@@ -87,7 +87,7 @@
                 <BoxView Grid.Column="1" Color="{Binding SelectedColor}" />                
             </Grid>
 
-            <Grid>
+            <Grid RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="*" />
@@ -106,6 +106,7 @@
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                 <Entry Grid.Column="0" Grid.Row="0"
+                       Scale="0.8"
                        HorizontalTextAlignment="Center"
                        Text="{Binding RedValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Red" />
 
@@ -117,6 +118,7 @@
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                 <Entry Grid.Column="0" Grid.Row="1"
+                       Scale="0.8"
                        HorizontalTextAlignment="Center"                       
                        Text="{Binding GreenValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Green" />
 
@@ -128,6 +130,7 @@
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                 <Entry Grid.Column="0" Grid.Row="2"
+                       Scale="0.8"
                        HorizontalTextAlignment="Center"                       
                        Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
             </Grid>
