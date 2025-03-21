@@ -32,7 +32,9 @@
                 HorizontalOptions="Start"
                 Margin="10,0,0,0"
                 BackgroundColor="Transparent"/>
-            <Border Stroke="DarkGrey" StrokeThickness="0.5">
+            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    StrokeThickness="0.5"
+                    StrokeShape="RoundRectangle 4">
                 <uranium:Dropdown x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                   FontSize="12"
                                   ItemsSource="{Binding PinSortCrits}"
@@ -139,7 +141,7 @@
                                     Clicked="OnEditClicked"/>
 
                             <Border Grid.ColumnSpan="4" Grid.RowSpan="4"
-                                     StrokeThickness="0.5"
+                                    StrokeThickness="0.5"
                                     Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     StrokeShape="RoundRectangle 10"/>
                         </Grid>

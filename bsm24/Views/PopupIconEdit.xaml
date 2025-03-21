@@ -71,18 +71,12 @@
                     MaximumTrackColor="{DynamicResource PrimaryDark}"
                     ValueChanged="OnSliderValueChanged"/>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Label Text="Rotation sperren:" Grid.Column="0" Grid.Row="0"/>
-                <Switch Grid.Column="1" Grid.Row="0"
-                        x:Name="allowRotate"
-                        Margin="0,-8,0,0"
-                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        OnColor="{DynamicResource Secondary}"/>
-            </Grid>
+            <HorizontalStackLayout Spacing="0">
+                <CheckBox x:Name="allowRotate"
+                          Scale="1.2"
+                          Color="{DynamicResource Primary}"/>
+                <Label Text="Rotation sperren" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
            
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -101,9 +95,9 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="*" />
                     <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />                    
-                </Grid.RowDefinitions>                
-                
+                    <RowDefinition Height="*" />
+                </Grid.RowDefinitions>
+
                 <!-- Slider for Red -->
                 <Slider Grid.Column="1" Grid.Row="0"
                         Margin="0,6,0,0"
@@ -138,20 +132,14 @@
                        Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
             </Grid>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="3*" />
-                    <ColumnDefinition Width="1*" />
-                </Grid.ColumnDefinitions>
-                <Label Text="Icon löschen:" TextColor="Red" Grid.Column="0" Grid.Row="0"/>
-                <Switch Grid.Column="1" Grid.Row="0"
-                        x:Name="deleteIcon"
-                        IsToggled="False"
-                        IsEnabled="False"
-                        Margin="0,-8,0,0"
-                        ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        OnColor="{DynamicResource Secondary}"/>
-            </Grid>
+            <HorizontalStackLayout Spacing="0">
+                <CheckBox x:Name="deleteIcon"
+                          IsChecked="False"
+                          IsEnabled="False"
+                          Scale="1.2"
+                          Color="{DynamicResource Primary}"/>
+                <Label Text="Icon löschen" VerticalOptions="Center"/>
+            </HorizontalStackLayout>
 
             <Grid>
                 <Grid.ColumnDefinitions>

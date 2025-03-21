@@ -649,4 +649,84 @@
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 	</Item>
+	
+	<Item>
+		<FileName>rettungszeichen_r.png</FileName>
+		<Description>Rettungszeichen nach rechts</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_l.png</FileName>
+		<Description>Rettungszeichen nach links</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+	
+	<Item>
+		<FileName>rettungszeichen_o.png</FileName>
+		<Description>Rettungszeichen geradeaus</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_u.png</FileName>
+		<Description>Rettungszeichen geradeaus</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_lo.png</FileName>
+		<Description>Rettungszeichen nach links unten</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_lo.png</FileName>
+		<Description>Rettungszeichen nach links oben</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_ru.png</FileName>
+		<Description>Rettungszeichen nach rechts unten</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>
+
+	<Item>
+		<FileName>rettungszeichen_ro.png</FileName>
+		<Description>Rettungszeichen nach rechts oben</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="128" Height="64" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>1.0</Scale>
+	</Item>	
 </IconData>
