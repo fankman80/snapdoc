@@ -10,6 +10,7 @@ public partial class PinList : UraniumContentPage
 {
     public Command<IconItem> IconTappedCommand { get; }
     private List<PinItem> pinItems = [];
+    private List<PinItem> originalPinItems = []; // Originalreihenfolge speichern
     private object previousSelectedItem;
 
     public PinList()
@@ -67,8 +68,11 @@ public partial class PinList : UraniumContentPage
                     }
                 }     
             }
-            pinListView.ItemsSource = pinItems;
         }
+
+        originalPinItems = [.. pinItems];
+
+        pinListView.ItemsSource = pinItems;
         pinListView.Footer = "Pins: " + pincounter;
 
         IconSorting();
@@ -119,6 +123,9 @@ public partial class PinList : UraniumContentPage
     private void IconSorting()
     {
         if (SortPicker.SelectedItem == null) return;
+
+        // Setze die Liste auf die ursprüngliche Reihenfolge zurück, bevor sortiert wird
+        pinItems = [.. originalPinItems];
 
         SettingsService.Instance.PinSortCrit = SortPicker.SelectedItem.ToString();
 

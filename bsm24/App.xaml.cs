@@ -22,22 +22,20 @@ public partial class App : Application
         System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
         System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
 
-        if (!File.Exists(Path.Combine(FileSystem.AppDataDirectory, "appsettings.ini")))
-            SettingsService.Instance.SaveSettings();
-        else
-            SettingsService.Instance.LoadSettings();
-
+        // Template-Dateien und Konfigurationsdatei kopieren
         if (!Directory.Exists(Settings.TemplateDirectory))
             Directory.CreateDirectory(Settings.TemplateDirectory);
-
         if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx")))
             _ = Helper.CopyFileFromResourcesAsync("template_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx"));
-       
         if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx")))
             _ = Helper.CopyFileFromResourcesAsync("template_location_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx"));
-      
         if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "IconData.xml")))
             _ = Helper.CopyFileFromResourcesAsync("IconData.xml", Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
+        if (!File.Exists(Path.Combine(FileSystem.AppDataDirectory, "appsettings.ini")))
+            SettingsService.Instance.SaveSettings();
+
+        // lade Einstellungen
+        SettingsService.Instance.LoadSettings();
 
         // Icon-Daten einlesen
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"));

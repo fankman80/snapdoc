@@ -6,12 +6,10 @@ internal class SettingsModel
     public double PinMaxScaleLimit { get; set; }
     public int MapIconSize { get; set; }
     public int MapIcon { get; set; }
-    public string? IconSortCrit { get; set; }
-    public string? PinSortCrit { get; set; }
+    public int IconSortCrit { get; set; }
+    public int PinSortCrit { get; set; }
     public bool IsPlanRotateLocked { get; set; }
     public int PdfQuality { get; set; }
-    public string? SelectedTheme { get; set; }
-    public string? SelectedDarkMode { get; set; }
-    public int GpsTestTimer { get; set; }
-    public int GpsAccuracyLimit { get; set; }
+    public int SelectedColorTheme { get; set; }
+    public int SelectedAppTheme { get; set; }
 }

@@ -11,10 +11,10 @@ public partial class SettingsService : INotifyPropertyChanged
     private const string SettingsFileName = "appsettings.ini";
     private SettingsService()
     {
-        Themes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Flower", "Barbie"];
-        DarkMode = ["Light", "Dark"];
-        SelectedTheme = Themes[0]; // Standardauswahl
-        SelectedDarkMode = DarkMode[0]; // Standardauswahl
+        ColorThemes = ["EBBE", "Lachs", "Gras", "Ozean", "Feuer", "Flower", "Barbie"];
+        AppThemes = ["Light", "Dark"];
+        SelectedColorTheme = ColorThemes[0]; // Standardauswahl
+        SelectedAppTheme = AppThemes[0]; // Standardauswahl
     }
 
     public List<string> MapIcons { get; set; } = ["mappin1a.png", "mappin2a.png", "mappin3a.png", "mappin4a.png", "mappin5a.png"];
@@ -80,14 +80,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-#if WINDOWS
-    private double _pinMinScaleLimit = 40;
-#endif
-
-#if ANDROID
-    private double _pinMinScaleLimit = 40;
-#endif
-
+    private double _pinMinScaleLimit = 60;
     public double PinMinScaleLimit
     {
         get => _pinMinScaleLimit;
@@ -101,14 +94,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-#if WINDOWS
     private double _pinMaxScaleLimit = 80;
-#endif
-
-#if ANDROID
-    private double _pinMaxScaleLimit = 60;
-#endif
-
     public double PinMaxScaleLimit
     {
         get => _pinMaxScaleLimit;
@@ -122,7 +108,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _pdfQuality = 450;
+    private int _pdfQuality = 350;
     public int PdfQuality
     {
         get => _pdfQuality;
@@ -188,34 +174,6 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _pinSortCrit = value;
                 OnPropertyChanged(nameof(PinSortCrit));
-            }
-        }
-    }
-
-    private int _gpsTestTimer = 10;
-    public int GpsTestTimer
-    {
-        get => _gpsTestTimer;
-        set
-        {
-            if (_gpsTestTimer != value)
-            {
-                _gpsTestTimer = value;
-                OnPropertyChanged(nameof(GpsTestTimer));
-            }
-        }
-    }
-
-    private int _gpsAccuracyLimit = 8;
-    public int GpsAccuracyLimit
-    {
-        get => _gpsAccuracyLimit;
-        set
-        {
-            if (_gpsAccuracyLimit != value)
-            {
-                _gpsAccuracyLimit = value;
-                OnPropertyChanged(nameof(GpsAccuracyLimit));
             }
         }
     }
@@ -449,30 +407,30 @@ public partial class SettingsService : INotifyPropertyChanged
     }
     #endregion
 
-    private List<string> _themes;
-    public List<string> Themes
+    private List<string> _colorThemes;
+    public List<string> ColorThemes
     {
-        get => _themes;
+        get => _colorThemes;
         set
         {
-            _themes = value;
-            OnPropertyChanged(nameof(Themes));
+            _colorThemes = value;
+            OnPropertyChanged(nameof(ColorThemes));
         }
     }
 
-    private string _selectedTheme;
-    public string SelectedTheme
+    private string _selectedColorTheme;
+    public string SelectedColorTheme
     {
-        get => _selectedTheme;
+        get => _selectedColorTheme;
         set
         {
-            if (_selectedTheme != value)
+            if (_selectedColorTheme != value)
             {
-                _selectedTheme = value;
-                OnPropertyChanged(nameof(SelectedTheme));
+                _selectedColorTheme = value;
+                OnPropertyChanged(nameof(SelectedColorTheme));
 
                 // Logik für das Anwenden der Farben basierend auf der Auswahl
-                switch (_selectedTheme)
+                switch (_selectedColorTheme)
                 {
                     case "EBBE":
                         App.Current.Resources["Primary"] = Color.FromArgb("#000000");
@@ -572,30 +530,30 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private List<string> _darkMode;
-    public List<string> DarkMode
+    private List<string> _appThemes;
+    public List<string> AppThemes
     {
-        get => _darkMode;
+        get => _appThemes;
         set
         {
-            _darkMode = value;
-            OnPropertyChanged(nameof(DarkMode));
+            _appThemes = value;
+            OnPropertyChanged(nameof(AppThemes));
         }
     }
 
-    private string _selectedDarkMode;
-    public string SelectedDarkMode
+    private string _selectedAppTheme;
+    public string SelectedAppTheme
     {
-        get => _selectedDarkMode;
+        get => _selectedAppTheme;
         set
         {
-            if (_selectedDarkMode != value)
+            if (_selectedAppTheme != value)
             {
-                _selectedDarkMode = value;
-                OnPropertyChanged(nameof(SelectedDarkMode));
+                _selectedAppTheme = value;
+                OnPropertyChanged(nameof(SelectedAppTheme));
 
                 // Logik für das Anwenden der Farben basierend auf der Auswahl
-                switch (_selectedDarkMode)
+                switch (_selectedAppTheme)
                 {
                     case "Light":
                         App.Current.UserAppTheme = AppTheme.Light; // Setze auf helles Theme
@@ -644,14 +602,12 @@ public partial class SettingsService : INotifyPropertyChanged
             PinMaxScaleLimit = this.PinMaxScaleLimit,
             MapIconSize = this.MapIconSize,
             MapIcon = this.MapIcon,
-            IconSortCrit = this.IconSortCrit,
-            PinSortCrit = this.PinSortCrit,
             IsPlanRotateLocked = this.IsPlanRotateLocked,
             PdfQuality = this.PdfQuality,
-            SelectedTheme = this.SelectedTheme,
-            SelectedDarkMode = this.SelectedDarkMode,
-            GpsTestTimer = this.GpsTestTimer,
-            GpsAccuracyLimit = this.GpsAccuracyLimit
+            SelectedColorTheme = ColorThemes.IndexOf(this.SelectedColorTheme),
+            SelectedAppTheme = AppThemes.IndexOf(this.SelectedAppTheme),
+            IconSortCrit = IconSortCrits.IndexOf(this.IconSortCrit),
+            PinSortCrit = PinSortCrits.IndexOf(this.PinSortCrit),
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -671,14 +627,20 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.PinMaxScaleLimit = settings.PinMaxScaleLimit;
                 this.MapIconSize = settings.MapIconSize;
                 this.MapIcon = settings.MapIcon;
-                this.IconSortCrit = settings.IconSortCrit;
-                this.PinSortCrit = settings.PinSortCrit;
                 this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
                 this.PdfQuality = settings.PdfQuality;
-                this.SelectedTheme = settings.SelectedTheme;
-                this.SelectedDarkMode = settings.SelectedDarkMode;
-                this.GpsTestTimer = settings.GpsTestTimer;
-                this.GpsAccuracyLimit = settings.GpsAccuracyLimit;
+                this.SelectedAppTheme = (settings.SelectedAppTheme  < AppThemes.Count)
+                    ? AppThemes[settings.SelectedAppTheme]
+                    : AppThemes[0];
+                this.SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count)
+                    ? ColorThemes[settings.SelectedColorTheme]
+                    : ColorThemes[0];
+                this.IconSortCrit = (settings.IconSortCrit < IconSortCrits.Count)
+                    ? IconSortCrits[settings.IconSortCrit]
+                    : IconSortCrits[0];
+                this.PinSortCrit = (settings.PinSortCrit < PinSortCrits.Count)
+                    ? PinSortCrits[settings.PinSortCrit]
+                    : PinSortCrits[0];
             }
         }
     }

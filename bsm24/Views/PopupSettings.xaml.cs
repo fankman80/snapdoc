@@ -23,10 +23,10 @@ public partial class PopupSettings : PopupPage
     {
         base.OnAppearing();
 
-        darkModePicker.ItemsSource = SettingsService.Instance.DarkMode;
-        colorThemePicker.ItemsSource = SettingsService.Instance.Themes;
-        darkModePicker.SelectedItem = SettingsService.Instance.SelectedDarkMode;
-        colorThemePicker.SelectedItem = SettingsService.Instance.SelectedTheme;
+        darkModePicker.ItemsSource = SettingsService.Instance.AppThemes;
+        colorThemePicker.ItemsSource = SettingsService.Instance.ColorThemes;
+        darkModePicker.SelectedItem = SettingsService.Instance.SelectedAppTheme;
+        colorThemePicker.SelectedItem = SettingsService.Instance.SelectedColorTheme;
 
         _taskCompletionSource = new TaskCompletionSource<string>();
     }

@@ -57,7 +57,13 @@
                                 <RowDefinition Height="Auto"/>
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
-
+                            
+                            <Border Grid.ColumnSpan="4" Grid.RowSpan="4"
+                                    IsVisible="{Binding AllowExport, Converter={StaticResource BooleanInverterConverter}}"
+                                    Opacity="0.6"
+                                    BackgroundColor="LightGray"
+                                    StrokeShape="RoundRectangle 10"/>
+                            
                             <Grid Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" RowSpacing="0" ColumnSpacing="0">
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
@@ -70,7 +76,7 @@
                                     <RowDefinition Height="Auto"/>
                                     <RowDefinition Height="Auto"/>
                                 </Grid.RowDefinitions>
-                                
+
                                 <Label Grid.Column="0" Grid.Row="0"
                                        Margin="10,4,0,0"
                                        FontAttributes="Bold"
@@ -91,16 +97,17 @@
                                        LineBreakMode="TailTruncation"
                                        Text="{Binding PinName}"/>
                                 <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                        ZIndex="999"
                                         ClassId="{Binding SelfId}"
                                         AutomationId = "{Binding OnPlanId}"  
                                         Background="Transparent"
                                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Recenter}}"
                                         Clicked="OnPinClicked"/>
                                 <CheckBox Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
-                                          IsChecked="{Binding AllowExport, Mode=TwoWay}"
-                                          Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDark}}"/>                                                   
+                                          Scale="1.2"
+                                          Color="{DynamicResource Primary}"
+                                          IsChecked="{Binding AllowExport, Mode=TwoWay}"/>
                             </Grid>
-
 
                             <BoxView Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -108,11 +115,11 @@
                                      Margin="10,2,10,2"/>
 
                             <ff:CachedImage Grid.Column="0" Grid.Row="2"
-                                    VerticalOptions="Center"
-                                    Source="{Binding PinIcon}"
-                                    CacheType="Memory"
-                                    Aspect="AspectFit"
-                                    Margin="12,16,6,0"/>
+                                            VerticalOptions="Center"
+                                            Source="{Binding PinIcon}"
+                                            CacheType="Memory"
+                                            Aspect="AspectFit"
+                                            Margin="12,0,6,0"/>
 
                             <Label Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="3"
                                    MaxLines="4"
@@ -122,20 +129,19 @@
                                    Margin="6,4,10,4"
                                    Text="{Binding PinDesc}"/>
 
-                            <Border Grid.ColumnSpan="4" Grid.RowSpan="4"
-                                    IsVisible="{Binding AllowExport, Converter={StaticResource BooleanInverterConverter}}"
-                                    Opacity="0.6"
-                                    BackgroundColor="LightGray"/>
-
                             <Button Grid.ColumnSpan="4" Grid.RowSpan="4"
                                     ClassId="{Binding SelfId}"
-                                    AutomationId = "{Binding OnPlanId}"                                    
-                                    BorderWidth="1"
-                                    BorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    AutomationId = "{Binding OnPlanId}"
+                                    Margin="0,0,100,0"
+                                    BorderWidth="0"
+                                    BorderColor="Transparent"
                                     Background="Transparent"
                                     Clicked="OnEditClicked"/>
 
-
+                            <Border Grid.ColumnSpan="4" Grid.RowSpan="4"
+                                     StrokeThickness="0.5"
+                                    Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    StrokeShape="RoundRectangle 10"/>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
