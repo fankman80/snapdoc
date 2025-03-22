@@ -2,6 +2,7 @@
 
 public static class Settings
 {
+    public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
     public static List<PriorityItem> PriorityItems { get => priorityItems; set => priorityItems = value; }
     public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
     public static string TemplateDirectory { get => templateDirectory; set => templateDirectory = value; }
@@ -14,8 +15,19 @@ public static class Settings
     public static Color[] ColorData { get => colorData; set => colorData = value; }
     public static List<MapViewItem> SwissTopoLayers { get => swissTopoLayers; set => swissTopoLayers = value; }
 
-    private static string cacheDirectory = Path.Combine(FileSystem.AppDataDirectory, "cache");
-    private static string templateDirectory = Path.Combine(FileSystem.AppDataDirectory, "templates");
+
+# if WINDOWS
+    private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BSM24");
+#endif
+# if ANDROID
+    private static string dataDirectory = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "BSM24");
+#endif
+#if IOS
+    private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BSM24");
+#endif
+
+    private static string cacheDirectory = FileSystem.CacheDirectory;
+    private static string templateDirectory = Path.Combine(dataDirectory, "templates");
     private static int thumbSize = 150;
     private static int planPreviewSize = 150;
     private static double defaultPinZoom = 2;

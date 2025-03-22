@@ -25,7 +25,7 @@ public class CapturePicture
                     if (filepath != null)
                     {
                         var type = photo.ContentType;
-                        string newFilePath = Path.Combine(FileSystem.AppDataDirectory, filepath, filename);
+                        string newFilePath = Path.Combine(Settings.DataDirectory, filepath, filename);
                         var originalStream = File.OpenRead(originalFilePath);
                         var newStream = File.Create(newFilePath);
                         await originalStream.CopyToAsync(newStream);
@@ -36,7 +36,7 @@ public class CapturePicture
 
                     if (thumbnailPath != null)
                     {
-                        string thumbFilePath = Path.Combine(FileSystem.AppDataDirectory, thumbnailPath, filename);
+                        string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
                         Thumbnail.Generate(originalFilePath, thumbFilePath);
                     }
 

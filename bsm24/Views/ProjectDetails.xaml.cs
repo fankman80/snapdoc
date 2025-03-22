@@ -49,7 +49,7 @@ public partial class ProjectDetails : UraniumContentPage
         if (isPdfChanged)
         {
             LoadDataToView.ResetFlyoutItems();
-            LoadDataToView.LoadData(new FileResult(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.JsonFile)));
+            LoadDataToView.LoadData(new FileResult(Path.Combine(Settings.DataDirectory, GlobalJson.Data.JsonFile)));
         }
 
         Helper.HeaderUpdate();
@@ -68,10 +68,10 @@ public partial class ProjectDetails : UraniumContentPage
         var result = await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ProjectPath, thumbFileName);
         if (result != null)
         {
-            if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
-                File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
-            if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
-                File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+            if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
+                File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
+            if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
+                File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.SaveToFile();
             Helper.HeaderUpdate();
@@ -92,8 +92,8 @@ public partial class ProjectDetails : UraniumContentPage
             {
                 string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
                 string sourceFilePath = fileResult.FullPath;
-                var destinationPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, thumbFileName);
-                var destinationThumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, thumbFileName);
+                var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, thumbFileName);
+                var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, thumbFileName);
 
                 if (File.Exists(destinationPath))
                     File.Delete(destinationPath);
@@ -108,10 +108,10 @@ public partial class ProjectDetails : UraniumContentPage
 
                 Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
-                if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
-                    File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
-                if (File.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
-                    File.Delete(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+                if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
+                    File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
+                if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
+                    File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
                 GlobalJson.Data.TitleImage = thumbFileName;
                 GlobalJson.SaveToFile();
                 Helper.HeaderUpdate();

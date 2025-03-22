@@ -17,12 +17,13 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     private string PinId;
     private bool isLongPressed = false;
     private object previousSelectedItem;
+    private string OrderDirection = "asc";
 
     public IconGallery()
     {
         InitializeComponent();
         BindingContext = this;
-        IconSorting();
+        IconSorting(OrderDirection);
     }
 
     protected override void OnAppearing()
@@ -97,7 +98,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         var result = await popup.PopupDismissedTask;
 
         if (result != null)
-            IconSorting();
+            IconSorting(OrderDirection);
     }
 
     private async void ImportIconClicked(object sender, EventArgs e)
@@ -113,7 +114,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             if (result == null)
                 return;
 
-            var origName = Path.Combine(FileSystem.AppDataDirectory, "customicons", result.FileName);
+            var origName = Path.Combine(Settings.DataDirectory, "customicons", result.FileName);
             var ext = Path.GetExtension(origName);
             string newName = origName;
             int i = 1;
@@ -125,10 +126,10 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
             var fileName = newName;    
             using var stream = await result.OpenReadAsync();
-            var localPath = Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName);
+            var localPath = Path.Combine(Settings.DataDirectory, "customicons", fileName);
 
-            if (!Directory.Exists(Path.Combine(FileSystem.AppDataDirectory, "customicons")))
-                Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, "customicons"));
+            if (!Directory.Exists(Path.Combine(Settings.DataDirectory, "customicons")))
+                Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, "customicons"));
 
             using (var fileStream = File.Create(localPath))
             {
@@ -138,7 +139,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             var size = await Task.Run(() => GetImageSize(localPath));
 
             var updatedItem = new IconItem(
-                Path.Combine(FileSystem.AppDataDirectory, "customicons", fileName),
+                Path.Combine(Settings.DataDirectory, "customicons", fileName),
                 "Neues Icon",
                 new Point(0.5, 0.5),
                 size,
@@ -154,7 +155,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             if (popup_result == null)
                 File.Delete(localPath);  // Delete temporary Icon-File
 
-            IconSorting();
+            IconSorting(OrderDirection);
         }
         catch (Exception ex)
         {
@@ -175,12 +176,29 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         if (previousSelectedItem != currentSelectedItem)
         {
             previousSelectedItem = currentSelectedItem;
-            IconSorting();
+            IconSorting(OrderDirection);
             SettingsService.Instance.SaveSettings();
         }
     }
 
-    private void IconSorting()
+    private void OnSortDirectionClicked(object sender, EventArgs e)
+    {
+
+        if (OrderDirection == "asc")
+        {
+            SortDirection.ScaleY *= -1;
+            OrderDirection = "desc";
+            IconSorting("desc");
+        }
+        else
+        {
+            SortDirection.ScaleY *= -1;
+            OrderDirection = "asc";
+            IconSorting("asc");
+        }
+    }
+
+    private void IconSorting(string order)
     {
         if (SortPicker.SelectedItem == null) return;
 
@@ -188,14 +206,29 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
         var selectedOption = SortPicker.SelectedItem.ToString();
 
-        switch (SettingsService.Instance.IconSortCrit)
+        if (order == "asc") // Sortiere aufsteigend
         {
-            case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
-                Icons = [.. Settings.PinData.OrderBy(pin => pin.DisplayName).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
-                Icons = [.. Settings.PinData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
-                break;
+            switch (SettingsService.Instance.IconSortCrit)
+            {
+                case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
+                    Icons = [.. Settings.PinData.OrderBy(pin => pin.DisplayName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
+                    Icons = [.. Settings.PinData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
+                    break;
+            }
+        }
+        else // Sortiere absteigend
+        {
+            switch (SettingsService.Instance.IconSortCrit)
+            {
+                case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
+                    Icons = [.. Settings.PinData.OrderByDescending(pin => pin.DisplayName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
+                    Icons = [.. Settings.PinData.OrderByDescending(pin => pin.PinColor.ToString()).ToList()];
+                    break;
+            }
         }
 
         IconCollectionView.ItemsSource = null;

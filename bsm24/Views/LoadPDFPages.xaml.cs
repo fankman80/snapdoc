@@ -52,8 +52,8 @@ public partial class LoadPDFPages : UraniumContentPage
 
                 for (int i = 0; i < pagecount; i++)
                 {
-                    string imgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
-                    string previewPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
+                    string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
+                    string previewPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
                     var renderOptions = new RenderOptions()
                     {
                         AntiAliasing = PdfAntiAliasing.None,
@@ -101,8 +101,8 @@ public partial class LoadPDFPages : UraniumContentPage
 
             for (int i = 0; i < pagecount; i++)
             {
-                string imgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
-                string previewImgPath = Path.Combine(FileSystem.AppDataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
+                string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "plan_" + i + ".jpg");
+                string previewImgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "preview_" + i + ".jpg");
                 var renderOptions = new RenderOptions()
                 {
                     AntiAliasing = PdfAntiAliasing.All,
@@ -199,7 +199,7 @@ public partial class LoadPDFPages : UraniumContentPage
     {
         await LoadPDFImages(); //generiere High-Res Images
         
-        string imageDirectory = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath);
+        string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath);
         int i = 0;
 
         // Überprüfen, ob Plans null ist, und es gegebenenfalls initialisieren

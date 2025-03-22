@@ -45,8 +45,8 @@ public partial class ExportSettings : UraniumContentPage
                 return;
         }
 
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        string templatePath = Path.Combine(FileSystem.AppDataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
+        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
+        string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
@@ -92,8 +92,8 @@ public partial class ExportSettings : UraniumContentPage
                 return;
         }
 
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        string templatePath = Path.Combine(FileSystem.AppDataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
+        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
+        string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;

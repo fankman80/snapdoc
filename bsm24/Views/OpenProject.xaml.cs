@@ -23,7 +23,7 @@ public partial class OpenProject : UraniumContentPage
     private void LoadJsonFiles()
     {
         // Hauptverzeichnis, in dem die Suche beginnen soll (z.B. das App-Datenverzeichnis)
-        string rootDirectory = FileSystem.AppDataDirectory;
+        string rootDirectory = Settings.DataDirectory;
         List<FileItem> foundFiles = [];
         string searchPattern = "*.json"; // Alle JSON-Dateien suchen
 
@@ -72,14 +72,14 @@ public partial class OpenProject : UraniumContentPage
             // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
             int counter = 1;
             string _result = result;
-            while (Directory.Exists(Path.Combine(FileSystem.AppDataDirectory, _result)))
+            while (Directory.Exists(Path.Combine(Settings.DataDirectory, _result)))
             {
                 _result = Path.Combine($"{result} ({counter})");
                 counter++;
             }
             result = _result;
 
-            string filePath = Path.Combine(FileSystem.AppDataDirectory, result, result + ".json");
+            string filePath = Path.Combine(Settings.DataDirectory, result, result + ".json");
 
             LoadDataToView.ResetFlyoutItems();
             LoadDataToView.ResetData();
@@ -120,7 +120,7 @@ public partial class OpenProject : UraniumContentPage
                 PickerTitle = "Bitte wähle eine Zip-Datei aus"
             });
 
-            var targetDirectory = FileSystem.AppDataDirectory;
+            var targetDirectory = Settings.DataDirectory;
             if (fileResult != null)
             {
                 busyOverlay.IsOverlayVisible = true;
@@ -186,7 +186,7 @@ public partial class OpenProject : UraniumContentPage
         {
             if (Directory.Exists(Path.GetDirectoryName(item.FilePath)))
             {
-                var newFilePath = Path.Combine(FileSystem.AppDataDirectory, result, result + ".json");
+                var newFilePath = Path.Combine(Settings.DataDirectory, result, result + ".json");
                 var oldFilePath = item.FilePath;
 
                 GlobalJson.LoadFromFile(oldFilePath);
@@ -234,7 +234,7 @@ public partial class OpenProject : UraniumContentPage
             if (button.BindingContext is FileItem item)
             {
                 string sourceDirectory = Path.GetDirectoryName(item.FilePath);
-                string outputPath = Path.Combine(FileSystem.AppDataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
+                string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
 
                 busyOverlay.IsOverlayVisible = true;
                 busyOverlay.IsActivityRunning = true;

@@ -65,7 +65,7 @@ public class Helper
         if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
             SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
         else
-            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
+            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
 
 #if WINDOWS
         // zwinge das UI zum Aktualisieren
@@ -195,7 +195,7 @@ public class Helper
                 var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
                 if (fileName.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
                 {
-                    fileName = Path.Combine(FileSystem.AppDataDirectory, fileName);
+                    fileName = Path.Combine(Settings.DataDirectory, fileName);
                 }
 
                 var iconItem = new IconItem(

@@ -60,7 +60,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
             Images.Add(new ImageItem
             {
-                ImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, imgPath),
+                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, imgPath),
                 IsChecked = isChecked,
                 DateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[img.Key].DateTime
             });
@@ -73,7 +73,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         
         var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-            file = Path.Combine(FileSystem.AppDataDirectory, file);
+            file = Path.Combine(Settings.DataDirectory, file);
 
         this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
         PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;

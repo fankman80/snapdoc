@@ -12,6 +12,7 @@ public partial class PinList : UraniumContentPage
     private List<PinItem> pinItems = [];
     private List<PinItem> originalPinItems = []; // Originalreihenfolge speichern
     private object previousSelectedItem;
+    private string OrderDirection = "asc";
 
     public PinList()
     {
@@ -49,7 +50,7 @@ public partial class PinList : UraniumContentPage
                     {
                         var pinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
                         if (pinIcon.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-                            pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
+                            pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
                         var newPin = new PinItem
                         {
                             PinDesc = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc,
@@ -75,7 +76,7 @@ public partial class PinList : UraniumContentPage
         pinListView.ItemsSource = pinItems;
         pinListView.Footer = "Pins: " + pincounter;
 
-        IconSorting();
+        IconSorting(OrderDirection);
     }
 
     private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -115,12 +116,29 @@ public partial class PinList : UraniumContentPage
         if (previousSelectedItem != currentSelectedItem)
         {
             previousSelectedItem = currentSelectedItem;
-            IconSorting();
+            IconSorting(OrderDirection);
             SettingsService.Instance.SaveSettings();
         }
     }
 
-    private void IconSorting()
+    private void OnSortDirectionClicked(object sender, EventArgs e)
+    {
+
+        if (OrderDirection == "asc")
+        {
+            SortDirection.ScaleY *= -1;
+            OrderDirection = "desc";
+            IconSorting("desc");
+        }
+        else
+        {
+            SortDirection.ScaleY *= -1;
+            OrderDirection = "asc";
+            IconSorting("asc");
+        }
+    }
+
+    private void IconSorting(string order)
     {
         if (SortPicker.SelectedItem == null) return;
 
@@ -131,26 +149,53 @@ public partial class PinList : UraniumContentPage
 
         var selectedOption = SortPicker.SelectedItem.ToString();
 
-        switch (SettingsService.Instance.PinSortCrit)
+        if (order == "asc") // Sortiere aufsteigend
         {
-            case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
-                pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanName).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
-                pinItems = [.. pinItems.OrderBy(pin => pin.PinIcon).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
-                pinItems = [.. pinItems.OrderBy(pin => pin.PinLocation).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
-                pinItems = [.. pinItems.OrderBy(pin => pin.PinName).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
-                pinItems = [.. pinItems.OrderByDescending(pin => pin.AllowExport).ToList()];
-                break;
-            case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
-                pinItems = [.. pinItems.OrderBy(pin => pin.Time).ToList()];
-                break;
+            switch (SettingsService.Instance.PinSortCrit)
+            {
+                case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.PinIcon).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.PinLocation).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.PinName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.AllowExport).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
+                    pinItems = [.. pinItems.OrderBy(pin => pin.Time).ToList()];
+                    break;
+            }
+        }
+        else // Sortiere absteigend
+        {
+            switch (SettingsService.Instance.PinSortCrit)
+            {
+                case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.OnPlanName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinIcon).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinLocation).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinName).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.AllowExport).ToList()];
+                    break;
+                case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.Time).ToList()];
+                    break;
+            }
         }
 
         pinListView.ItemsSource = null;

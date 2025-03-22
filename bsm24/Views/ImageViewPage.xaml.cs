@@ -60,7 +60,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource = value4 as string;
-            var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, ImgSource);
+            var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, ImgSource);
             var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
             string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
             this.Title = formattedDate;
@@ -154,9 +154,9 @@ public partial class ImageViewPage : IQueryAttributable
         EraseBtn.IsVisible = false;
         DrawBtn.IsVisible = true;
 
-        var imgPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, ImgSource);
-        var origPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
-        var thumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, ImgSource);
+        var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, ImgSource);
+        var origPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
+        var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, ImgSource);
 
         if (isCleared)
         {
@@ -169,8 +169,8 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
         {
-            if (!Directory.Exists(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals")))
-                Directory.CreateDirectory(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals"));
+            if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, "originals")))
+                Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, "originals"));
 
             if (!File.Exists(origPath))
                 File.Copy(imgPath, origPath);
@@ -189,7 +189,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
-            ImageView.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            ImageView.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, "originals", ImgSource);
             
             // save data to file
             GlobalJson.SaveToFile();
@@ -204,11 +204,11 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (result != null)
         {
-            string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file))
                 File.Delete(file);
 
-            file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file))
                 File.Delete(file);
 
@@ -267,7 +267,7 @@ public partial class ImageViewPage : IQueryAttributable
             data.SaveTo(newStream);
             newStream.Close();
 
-            var thumbPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, ImgSource);
+            var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, ImgSource);
             Thumbnail.Generate(filePath, thumbPath);
         }
     }

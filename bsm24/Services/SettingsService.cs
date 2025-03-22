@@ -15,6 +15,8 @@ public partial class SettingsService : INotifyPropertyChanged
         AppThemes = ["Light", "Dark"];
         SelectedColorTheme = ColorThemes[0]; // Standardauswahl
         SelectedAppTheme = AppThemes[0]; // Standardauswahl
+        IconSortCrit = IconSortCrits[0]; // Standardauswahl
+        PinSortCrit = PinSortCrits[0]; // Standardauswahl
     }
 
     public List<string> MapIcons { get; set; } = ["mappin1a.png", "mappin2a.png", "mappin3a.png", "mappin4a.png", "mappin5a.png"];
@@ -611,12 +613,12 @@ public partial class SettingsService : INotifyPropertyChanged
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
-        File.WriteAllText(Path.Combine(FileSystem.AppDataDirectory, SettingsFileName), json);
+        File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), json);
     }
 
     public void LoadSettings()
     {
-        var filePath = Path.Combine(FileSystem.AppDataDirectory, SettingsFileName);
+        var filePath = Path.Combine(Settings.DataDirectory, SettingsFileName);
         if (File.Exists(filePath))
         {
             var json = File.ReadAllText(filePath);

@@ -31,7 +31,7 @@ public partial class App : Application
             _ = Helper.CopyFileFromResourcesAsync("template_location_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx"));
         if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "IconData.xml")))
             _ = Helper.CopyFileFromResourcesAsync("IconData.xml", Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
-        if (!File.Exists(Path.Combine(FileSystem.AppDataDirectory, "appsettings.ini")))
+        if (!File.Exists(Path.Combine(Settings.DataDirectory, "appsettings.ini")))
             SettingsService.Instance.SaveSettings();
 
         // lade Einstellungen

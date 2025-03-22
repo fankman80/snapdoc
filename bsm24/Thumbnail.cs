@@ -8,7 +8,7 @@ class Thumbnail
     {
         var originalStream = File.OpenRead(originalFilePath);
         var skBitmap = SKBitmap.Decode(originalStream);
-        string thumbFilePath = Path.Combine(FileSystem.AppDataDirectory, thumbnailPath);
+        string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath);
 
         // Zielgröße festlegen (keine Kante kürzer als 150 Pixel)
         int minSize = Settings.ThumbSize;

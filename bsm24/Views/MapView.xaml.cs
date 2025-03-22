@@ -224,7 +224,7 @@ public partial class MapView : IQueryAttributable
 
     private async void KmlExportClicked(object sender, EventArgs e)
     {
-        string outputPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".kml");
+        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".kml");
 
         List<(double Latitude, double Longitude, string Name, DateTime Time)> coordinates = [];
         foreach (var plan in GlobalJson.Data.Plans)

@@ -79,7 +79,7 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
         }
         else
         {
-            var iconFile = Path.Combine(FileSystem.AppDataDirectory, file);
+            var iconFile = Path.Combine(Settings.DataDirectory, file);
             if (File.Exists(iconFile))
             {
                 File.Delete(iconFile);

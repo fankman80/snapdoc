@@ -29,7 +29,7 @@ public partial class XmlImage
     {
         var originalStream = File.OpenRead(imagePath.FullPath);
         var skBitmap = SKBitmap.Decode(originalStream);
-        string newImagePath = Path.Combine(FileSystem.AppDataDirectory, "imagecache", imagePath.FileName);
+        string newImagePath = Path.Combine(Settings.CacheDirectory, imagePath.FileName);
 
         // Schneide das Bild zu
         if (crop_center != null)
@@ -51,8 +51,8 @@ public partial class XmlImage
         {
             foreach ((string, SKPoint, SKPoint, float) overlayImage in overlayImages.Select(v => v))
             {
-                var cacheDir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "imagecache", overlayImage.Item1);
-                var stream = File.OpenRead(cacheDir);
+                var cacheFile = Path.Combine(Settings.CacheDirectory, overlayImage.Item1);
+                var stream = File.OpenRead(cacheFile);
                 var skStream = new SKManagedStream(stream);
                 var overlay = SKBitmap.Decode(skStream);
                 SKBitmap combinedBitmap = new(skBitmap.Width, skBitmap.Height);

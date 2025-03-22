@@ -84,7 +84,7 @@ public partial class NewPage : IQueryAttributable
             {
                 var pinIcon = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinIcon;
                 if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
-                    pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
+                    pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
                 
                 image.Source = pinIcon;
                 image.AnchorX = GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].Anchor.X;
@@ -117,11 +117,11 @@ public partial class NewPage : IQueryAttributable
                 foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos)
                 {
                     string file;
-                    file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
+                    file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
                     if (File.Exists(file))
                         File.Delete(file);
 
-                    file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
+                    file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].Fotos[del_image.Key].File);
                     if (File.Exists(file))
                         File.Delete(file);
                 }
@@ -129,7 +129,7 @@ public partial class NewPage : IQueryAttributable
                 // remove custom pin image
                 if (GlobalJson.Data.Plans[PlanId].Pins[PinDelete].IsCustomPin)
                 {
-                    String file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].PinIcon);
+                    String file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[PinDelete].PinIcon);
                     if (File.Exists(file))
                         File.Delete(file);
                 }
@@ -189,7 +189,7 @@ public partial class NewPage : IQueryAttributable
             PlanImage.WidthRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Width;
             PlanImage.HeightRequest = GlobalJson.Data.Plans[PlanId].ImageSize.Height;
         }
-        PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
 
         PlanContainer.PropertyChanged += (s, e) =>
         {
@@ -234,12 +234,12 @@ public partial class NewPage : IQueryAttributable
 
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin) // Add Path for Custom Pin-Image
         {
-            pinIcon = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath, pinIcon);
+            pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.CustomPinsPath, pinIcon);
             _rotation = 0;
         }
         else if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
         {
-            pinIcon = Path.Combine(FileSystem.AppDataDirectory, pinIcon);
+            pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
         }
 
         // berechne Anchor-Koordinaten
@@ -557,11 +557,11 @@ public partial class NewPage : IQueryAttributable
         else
         {
             string grayImageFile = "gs_" + GlobalJson.Data.Plans[PlanId].File;
-            string grayImagePath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, grayImageFile);
+            string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, grayImageFile);
 
             if (!File.Exists(grayImagePath))
             {
-                using var originalStream = File.OpenRead(Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
+                using var originalStream = File.OpenRead(Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
                 using var originalBitmap = SKBitmap.Decode(originalStream);
                 var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
                 using SKImage image = SKImage.FromBitmap(grayBitmap);
@@ -589,7 +589,7 @@ public partial class NewPage : IQueryAttributable
 
         isFirstLoad = true;
 
-        PlanImage.Source = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
     }
 
     private async void OnEditClick(object sender, EventArgs e)
@@ -622,7 +622,7 @@ public partial class NewPage : IQueryAttributable
             if (shellItem != null)
                 (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
 
-            string file = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
             if (File.Exists(file))
                 File.Delete(file);
 
@@ -729,7 +729,7 @@ public partial class NewPage : IQueryAttributable
     {
         if (drawingView.Lines.Count > 0)
         {
-            var customPinPath = Path.Combine(FileSystem.AppDataDirectory, GlobalJson.Data.CustomPinsPath);
+            var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.CustomPinsPath);
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 

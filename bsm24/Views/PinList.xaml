@@ -27,11 +27,16 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
-            <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
-                HorizontalOptions="Start"
-                Margin="10,0,0,0"
-                BackgroundColor="Transparent"/>
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
+            <Button x:Name="SortDirection"
+                    Padding="0"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                    BorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    BorderWidth="0.5"
+                    HorizontalOptions="Start"
+                    BackgroundColor="Transparent"
+                    CornerRadius="4"
+                    Clicked="OnSortDirectionClicked"/>
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     StrokeThickness="0.5"
                     StrokeShape="RoundRectangle 4">
