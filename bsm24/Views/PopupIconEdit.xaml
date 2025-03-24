@@ -16,141 +16,149 @@
              Title="Icon Editor">
 
     <Border x:DataType="local:PopupIconEdit"
-        StrokeShape="RoundRectangle 20,20,20,20"
-        Padding="16,16,16,16"
-        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-        WidthRequest="300"
-        HorizontalOptions="Center"
-        VerticalOptions="Center">
+            StrokeShape="RoundRectangle 20,20,20,20"
+            Margin="0,30,0,30"
+            Padding="16,16,16,16"
+            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+            WidthRequest="300"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
 
-        <VerticalStackLayout>
-            <Label Text="Icon Editor" FontAttributes="Bold"/>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollView Grid.Row="0">
+                <VerticalStackLayout>
+                    <Label Text="Icon Editor" FontAttributes="Bold"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                               x:Name="iconImage" Margin="10"/>
 
-                <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-                       x:Name="iconImage" Margin="10"/>
+                        <material:TextField Grid.Column="2" Grid.Row="0" 
+                                            x:Name="anchorX"
+                                            Title="Ankerpunkt X"
+                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
 
-                <material:TextField Grid.Column="2" Grid.Row="0" 
-                                    x:Name="anchorX"
-                                    Title="Ankerpunkt X"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
-               
-                <material:TextField Grid.Column="2" Grid.Row="1" 
-                                    x:Name="anchorY"
-                                    Title="Ankerpunkt Y"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>                
-            </Grid>
+                        <material:TextField Grid.Column="2" Grid.Row="1" 
+                                            x:Name="anchorY"
+                                            Title="Ankerpunkt Y"
+                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
+                    </Grid>
 
-            <material:TextField x:Name="iconName"
-                                Title="Bezeichnung"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                                AllowClear="True"/>
+                    <material:TextField x:Name="iconName"
+                                        Title="Bezeichnung"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                        BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                        AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                        AllowClear="True"/>
 
-            <material:TextField x:Name="iconCategory"
-                                Title="Kategorie"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                                AllowClear="True"/>
+                    <material:TextField x:Name="iconCategory"
+                                        Title="Kategorie"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                        BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                        AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                        AllowClear="True"/>
 
-            <Label x:Name="sliderText" Text="Skalierung:" Margin="0, 0, 0, -12"/>
-            <Slider x:Name="iconScale"
-                    Maximum="100"
-                    Minimum="1"
-                    Value="100"
-                    ThumbColor="{DynamicResource Primary}"
-                    MinimumTrackColor="{DynamicResource Primary}"
-                    MaximumTrackColor="{DynamicResource PrimaryDark}"
-                    ValueChanged="OnSliderValueChanged"/>
+                    <Label x:Name="sliderText" Text="Skalierung:" Margin="0, 0, 0, -12"/>
+                    <Slider x:Name="iconScale"
+                            Maximum="100"
+                            Minimum="1"
+                            Value="100"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            ValueChanged="OnSliderValueChanged"/>
 
-            <HorizontalStackLayout Spacing="0">
-                <CheckBox x:Name="allowRotate"
-                          Scale="1.2"
-                          Color="{DynamicResource Primary}"/>
-                <Label Text="Rotation sperren" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
-           
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" Text="Pin Farbe wählen:" VerticalTextAlignment="Center" HeightRequest="30"/>   
-                <BoxView Grid.Column="1" Color="{Binding SelectedColor}" />                
-            </Grid>
+                    <HorizontalStackLayout Spacing="0">
+                        <CheckBox x:Name="allowRotate"
+                                  Scale="1.2"
+                                  Color="{DynamicResource Primary}"/>
+                        <Label Text="Rotation sperren" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
 
-            <Grid RowSpacing="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Label Grid.Column="0" Text="Pin Farbe wählen:" VerticalTextAlignment="Center" HeightRequest="30"/>
+                        <BoxView Grid.Column="1" Color="{Binding SelectedColor}" />
+                    </Grid>
 
-                <!-- Slider for Red -->
-                <Slider Grid.Column="1" Grid.Row="0"
-                        Margin="0,6,0,0"
-                        Minimum="0" Maximum="255" Value="{Binding RedValue}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="0"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"
-                       Text="{Binding RedValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Red" />
+                    <Grid RowSpacing="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                <!-- Slider for Green -->
-                <Slider Grid.Column="1" Grid.Row="1"
-                        Margin="0,6,0,0"                        
-                        Minimum="0" Maximum="255" Value="{Binding GreenValue}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="1"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"                       
-                       Text="{Binding GreenValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Green" />
+                        <!-- Slider for Red -->
+                        <Slider Grid.Column="1" Grid.Row="0"
+                                Margin="0,6,0,0"
+                                Minimum="0" Maximum="255" Value="{Binding RedValue}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        <Entry Grid.Column="0" Grid.Row="0"
+                               Scale="0.8"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding RedValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Red" />
 
-                <!-- Slider for Blue -->
-                <Slider Grid.Column="1" Grid.Row="2"
-                        Margin="0,6,0,0"                        
-                        Minimum="0" Maximum="255" Value="{Binding BlueValue}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="2"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"                       
-                       Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
-            </Grid>
+                        <!-- Slider for Green -->
+                        <Slider Grid.Column="1" Grid.Row="1"
+                                Margin="0,6,0,0"                        
+                                Minimum="0" Maximum="255" Value="{Binding GreenValue}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        <Entry Grid.Column="0" Grid.Row="1"
+                               Scale="0.8"
+                               HorizontalTextAlignment="Center"                       
+                               Text="{Binding GreenValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Green" />
 
-            <HorizontalStackLayout x:Name="deleteIconContainer" Spacing="0" IsVisible="False">
-                <CheckBox x:Name="deleteIcon"
-                          IsChecked="False"
-                          Scale="1.2"
-                          Color="{DynamicResource Primary}"/>
-                <Label Text="Icon löschen" VerticalOptions="Center"/>
-            </HorizontalStackLayout>
+                        <!-- Slider for Blue -->
+                        <Slider Grid.Column="1" Grid.Row="2"
+                                Margin="0,6,0,0"                        
+                                Minimum="0" Maximum="255" Value="{Binding BlueValue}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        <Entry Grid.Column="0" Grid.Row="2"
+                               Scale="0.8"
+                               HorizontalTextAlignment="Center"                       
+                               Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
+                    </Grid>
 
-            <Grid>
+                    <HorizontalStackLayout x:Name="deleteIconContainer" Spacing="0" IsVisible="False">
+                        <CheckBox x:Name="deleteIcon"
+                                  IsChecked="False"
+                                  Scale="1.2"
+                                  Color="{DynamicResource Primary}"/>
+                        <Label Text="Icon löschen" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -168,7 +176,6 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
                         Clicked="OnOkClicked" />
             </Grid>
-        </VerticalStackLayout>
+        </Grid>
     </Border>
-
 </Mopups:PopupPage>

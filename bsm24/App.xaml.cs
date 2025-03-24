@@ -79,13 +79,13 @@ public partial class App : Application
         // Warte, bis alle Kopiervorgänge abgeschlossen sind
         await Task.WhenAll(copyTasks);
 
-        // lade Einstellungen
-        SettingsService.Instance.LoadSettings();
-
         // Icon-Daten einlesen
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
         Settings.PinData = iconItems;
+
+        // lade Einstellungen
+        SettingsService.Instance.LoadSettings();
 
         Helper.AddMenuItem("Projektliste", UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Open_in_new, "OnProjectOpenClicked");
     }

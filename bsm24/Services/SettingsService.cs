@@ -17,6 +17,7 @@ public partial class SettingsService : INotifyPropertyChanged
         SelectedAppTheme = AppThemes[0]; // Standardauswahl
         IconSortCrit = IconSortCrits[0]; // Standardauswahl
         PinSortCrit = PinSortCrits[0]; // Standardauswahl
+        IconCategory = IconCategories[0]; // Standardauswahl
     }
 
     public List<string> MapIcons { get; set; } = Settings.MapIcons;
@@ -24,6 +25,8 @@ public partial class SettingsService : INotifyPropertyChanged
     public List<string> IconSortCrits { get; set; } = Settings.IconSortCrits;
 
     public List<string> PinSortCrits { get; set; } = Settings.PinSortCrits;
+
+    public List<string> IconCategories { get; set; } = ["alle Icons"];
 
 
     private string _flyoutHeaderTitle = "";
@@ -180,16 +183,16 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private List<string> _iconCategories;
-    public List<string> IconCategories
+    private string _iconCategory;
+    public string IconCategory
     {
-        get => _iconCategories;
+        get => _iconCategory;
         set
         {
-            if (_iconCategories != value)
+            if (_iconCategory != value)
             {
-                _iconCategories = value;
-                OnPropertyChanged(nameof(IconCategories));
+                _iconCategory = value;
+                OnPropertyChanged(nameof(IconCategory));
             }
         }
     }
@@ -624,6 +627,7 @@ public partial class SettingsService : INotifyPropertyChanged
             SelectedAppTheme = AppThemes.IndexOf(this.SelectedAppTheme),
             IconSortCrit = IconSortCrits.IndexOf(this.IconSortCrit),
             PinSortCrit = PinSortCrits.IndexOf(this.PinSortCrit),
+            IconCategory = IconCategories.IndexOf(this.IconCategory),
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -657,6 +661,9 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.PinSortCrit = (settings.PinSortCrit < PinSortCrits.Count)
                     ? PinSortCrits[settings.PinSortCrit]
                     : PinSortCrits[0];
+                this.IconCategory = (settings.IconCategory < IconCategories.Count)
+                    ? IconCategories[settings.IconCategory]
+                    : IconCategories[0];
             }
         }
     }

@@ -76,7 +76,6 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
                 new SKColor((byte)RedValue, (byte)GreenValue, (byte)BlueValue),
                 Math.Round(iconScale.Value / 100, 1),
                 iconCategory.Text
-
             );
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
             ReturnValue = file;

@@ -24,15 +24,15 @@
 
         <VerticalStackLayout>
             <Label Text="Projekt bearbeiten"
-                   FontAttributes="Bold"
-                   HorizontalOptions="Center"/>
-
+                FontAttributes="Bold"
+                HorizontalOptions="Center"/>
+            
             <material:TextField x:Name="text_entry"
-                                Title="Projekt Titel"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                                AllowClear="True"/>
+                            Title="Projekt Titel"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                            AllowClear="True"/>
 
             <Button Grid.Column="0"
                     Text="Zip Exportieren"
@@ -74,5 +74,4 @@
             </Grid>
         </VerticalStackLayout>
     </Border>
-
 </Mopups:PopupPage>

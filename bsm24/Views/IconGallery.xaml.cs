@@ -149,7 +149,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                 false,
                 new SKColor(255, 0, 0),
                 1,
-                ""
+                "Eigene Icons"
             );
 
             var popup = new PopupIconEdit(updatedItem);
@@ -225,6 +225,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         if (SortPicker.SelectedItem == null) return;
 
         SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
+        SettingsService.Instance.IconCategory = CategoryPicker.SelectedItem.ToString();
 
         var selectedOption = SortPicker.SelectedItem.ToString();
 

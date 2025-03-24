@@ -22,14 +22,19 @@
 
     <Border x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
             StrokeShape="RoundRectangle 20,20,20,20"
+            Margin="0,30,0,30"
             Padding="16,16,16,16"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
             HorizontalOptions="Center"
             VerticalOptions="Center">
 
-        <VerticalStackLayout>
-            <ScrollView HorizontalOptions="Fill">
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollView Grid.Row="0">
                 <VerticalStackLayout Spacing="0">
                     <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
                     <Slider Maximum="100"
@@ -56,7 +61,7 @@
                             MinimumTrackColor="{DynamicResource Primary}"
                             MaximumTrackColor="{DynamicResource PrimaryDark}"
                             Value="{Binding PdfQuality}"/>
-                    
+
                     <Grid RowSpacing="16" Margin="0,16,0,16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -72,16 +77,16 @@
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" Spacing="0"> 
+                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" Spacing="0">
                             <CheckBox x:Name="isPlanRotateLocked"
                                       Scale="1.2"
                                       Color="{DynamicResource Primary}"
                                       IsChecked="{Binding IsPlanRotateLocked}"/>
                             <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
-                        </HorizontalStackLayout>      
-                        
-                        <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="5" Text="Icon für Map:"/>                        
-                        
+                        </HorizontalStackLayout>
+
+                        <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="5" Text="Icon für Map:"/>
+
                         <material:RadioButton Grid.Column="0" Grid.Row="2"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
@@ -145,28 +150,27 @@
                             Value="{Binding MapIconSize}"/>
 
                     <Label Text="Farbthema:" />
-                    <material:PickerField
-                        x:Name="darkModePicker"
-                        Title="Appthema:"
-                        Margin="0,10,0,10"
-                        BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                        AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                        ItemsSource="{Binding AppThemes}"
-                        SelectedItem="{Binding SelectedAppTheme}">
+                    <material:PickerField x:Name="darkModePicker"
+                                          Title="Appthema:"
+                                          Margin="0,10,0,10"
+                                          BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                          ItemsSource="{Binding AppThemes}"
+                                          SelectedItem="{Binding SelectedAppTheme}">
                     </material:PickerField>
 
-                    <material:PickerField
-                        x:Name="colorThemePicker"
-                        Title="Farbthema:"
-                        Margin="0,0,0,10"
-                        BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                        AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                        ItemsSource="{Binding ColorThemes}"
-                        SelectedItem="{Binding SelectedColorTheme}">
-                    </material:PickerField>                
+                    <material:PickerField x:Name="colorThemePicker"
+                                          Title="Farbthema:"
+                                          Margin="0,0,0,10"
+                                          BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                          ItemsSource="{Binding ColorThemes}"
+                                          SelectedItem="{Binding SelectedColorTheme}">
+                    </material:PickerField>
                 </VerticalStackLayout>
             </ScrollView>
-            <Grid>
+
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -178,6 +182,6 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                   
                         Clicked="OnOkClicked" />
             </Grid>
-        </VerticalStackLayout>
+        </Grid>
     </Border>
 </Mopups:PopupPage>

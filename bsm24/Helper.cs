@@ -264,6 +264,7 @@ public class Helper
                 itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
                 itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
                 itemElement.Element("Scale").Value = updatedIconItem.IconScale.ToString(CultureInfo.InvariantCulture);
+                itemElement.Element("Category").Value = updatedIconItem.Category;
             }
             else
             {
@@ -282,7 +283,8 @@ public class Helper
                         new XAttribute("Red", updatedIconItem.PinColor.Red),
                         new XAttribute("Green", updatedIconItem.PinColor.Green),
                         new XAttribute("Blue", updatedIconItem.PinColor.Blue)),
-                    new XElement("Scale", updatedIconItem.IconScale)
+                    new XElement("Scale", updatedIconItem.IconScale),
+                    new XElement("Category", updatedIconItem.Category)
                 ));
             }
 

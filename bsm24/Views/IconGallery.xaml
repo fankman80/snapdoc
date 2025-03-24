@@ -26,8 +26,20 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />            
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+        
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="Start" Scale="0.8" AnchorX="0">
+            <Label Text="Kategorie" FontAttributes="Bold" VerticalTextAlignment="Center"/>
+            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    StrokeThickness="0.5"
+                    StrokeShape="RoundRectangle 4">
+                <uranium:Dropdown x:Name="CategoryPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                      FontSize="12"
+                                      ItemsSource="{Binding IconCategories}"
+                                      SelectedItem="{Binding IconCategory}"/>
+            </Border>              
+        </HorizontalStackLayout>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
             <Button x:Name="SortDirection"
@@ -42,18 +54,10 @@
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     StrokeThickness="0.5"
                     StrokeShape="RoundRectangle 4">
-                <uranium:Dropdown x:Name="CategoryPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                      FontSize="12"
-                                      ItemsSource="{Binding IconCategories}"
-                                      SelectedItem="alle Icons"/>
-            </Border>            
-            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    StrokeThickness="0.5"
-                    StrokeShape="RoundRectangle 4">
                 <uranium:Dropdown x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                  FontSize="12"
-                                  ItemsSource="{Binding IconSortCrits}"
-                                  SelectedItem="{Binding IconSortCrit}"/>
+                                FontSize="12"
+                                ItemsSource="{Binding IconSortCrits}"
+                                SelectedItem="{Binding IconSortCrit}"/>
             </Border>
         </HorizontalStackLayout>
 
