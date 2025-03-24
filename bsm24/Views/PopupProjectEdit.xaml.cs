@@ -23,6 +23,10 @@ public partial class PopupProjectEdit : PopupPage
     {
         base.OnAppearing();
         _taskCompletionSource = new TaskCompletionSource<string>();
+
+#if WINDOWS
+        openFolderBtn.IsVisible = true;
+# endif
     }
 
     protected override void OnDisappearing()

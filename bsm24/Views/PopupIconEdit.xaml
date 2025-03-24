@@ -61,6 +61,13 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
                                 AllowClear="True"/>
 
+            <material:TextField x:Name="iconCategory"
+                                Title="Kategorie"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                AllowClear="True"/>
+
             <Label x:Name="sliderText" Text="Skalierung:" Margin="0, 0, 0, -12"/>
             <Slider x:Name="iconScale"
                     Maximum="100"

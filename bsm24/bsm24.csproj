@@ -50,7 +50,7 @@
 	  <AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
 	  <TrimMode>link</TrimMode>
 	  <AndroidEnableMultiDex>True</AndroidEnableMultiDex>
-	  <DebugSymbols>False</DebugSymbols>
+	  <DebugSymbols>True</DebugSymbols>
 	  <EnableLLVM>True</EnableLLVM>
 	  <PublishTrimmed>False</PublishTrimmed>
 	  <RunAOTCompilation>False</RunAOTCompilation>

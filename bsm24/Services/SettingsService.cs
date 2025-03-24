@@ -19,11 +19,11 @@ public partial class SettingsService : INotifyPropertyChanged
         PinSortCrit = PinSortCrits[0]; // Standardauswahl
     }
 
-    public List<string> MapIcons { get; set; } = ["mappin1a.png", "mappin2a.png", "mappin3a.png", "mappin4a.png", "mappin5a.png"];
+    public List<string> MapIcons { get; set; } = Settings.MapIcons;
 
-    public List<string> IconSortCrits { get; set; } = ["nach Name", "nach Farbe"];
+    public List<string> IconSortCrits { get; set; } = Settings.IconSortCrits;
 
-    public List<string> PinSortCrits { get; set; } = ["nach Plan", "nach Pin", "nach Standort", "nach Bezeichnung", "nach aktiv/deaktiv", "nach Aufnahmedatum"];
+    public List<string> PinSortCrits { get; set; } = Settings.PinSortCrits;
 
 
     private string _flyoutHeaderTitle = "";
@@ -152,7 +152,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _iconSortCrit = "Sortieren nach Namen";
+    private string _iconSortCrit;
     public string IconSortCrit
     {
         get => _iconSortCrit;
@@ -166,7 +166,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private string _pinSortCrit = "Sortieren nach Plan";
+    private string _pinSortCrit;
     public string PinSortCrit
     {
         get => _pinSortCrit;
@@ -176,6 +176,20 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _pinSortCrit = value;
                 OnPropertyChanged(nameof(PinSortCrit));
+            }
+        }
+    }
+
+    private List<string> _iconCategories;
+    public List<string> IconCategories
+    {
+        get => _iconCategories;
+        set
+        {
+            if (_iconCategories != value)
+            {
+                _iconCategories = value;
+                OnPropertyChanged(nameof(IconCategories));
             }
         }
     }

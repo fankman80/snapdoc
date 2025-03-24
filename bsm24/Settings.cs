@@ -13,14 +13,17 @@ public static class Settings
     public static int PinTextDistance { get => pinTextDistance; set => pinTextDistance = value; }
     public static List<IconItem> PinData { get => pinData; set => pinData = value; }
     public static Color[] ColorData { get => colorData; set => colorData = value; }
+    public static List<string> IconSortCrits { get => iconSortCrits; set => iconSortCrits = value; }
+    public static List<string> PinSortCrits { get => pinSortCrits; set => pinSortCrits = value; }
+    public static List<string> MapIcons { get => mapIcons; set => mapIcons = value; }
     public static List<MapViewItem> SwissTopoLayers { get => swissTopoLayers; set => swissTopoLayers = value; }
 
 
-# if WINDOWS
+#if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BSM24");
 #endif
-# if ANDROID
-    private static string dataDirectory = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments).AbsolutePath, "BSM24");
+#if ANDROID
+    private static string dataDirectory = Path.Combine(Android.OS.Environment.GetExternalStoragePublicDirectory(Android.OS.Environment.DirectoryDocuments)?.AbsolutePath ?? string.Empty, "BSM24");
 #endif
 #if IOS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BSM24");
@@ -102,5 +105,30 @@ public static class Settings
         new PriorityItem { Key = "Empfehlung", Color = "#92D050" },
         new PriorityItem { Key = "Wichtig", Color = "#FFC000" },
         new PriorityItem { Key = "Kritisch", Color = "#FF0000" }
+    ];
+
+    private static List<string> iconSortCrits =
+    [
+        "nach Name",
+        "nach Farbe"
+    ];
+
+    private static List<string> pinSortCrits =
+    [
+        "nach Plan",
+        "nach Pin",
+        "nach Standort",
+        "nach Bezeichnung",
+        "nach aktiv/deaktiv",
+        "nach Aufnahmedatum"
+    ];
+
+    private static List<string> mapIcons =
+    [
+        "mappin1a.png",
+        "mappin2a.png",
+        "mappin3a.png",
+        "mappin4a.png",
+        "mappin5a.png"
     ];
 }

@@ -5,7 +5,7 @@ using System.ComponentModel;
 
 namespace bsm24
 {
-    public class IconItem(string fileName, string displayName, Point anchorPoint, Size iconSize, bool isRotationLocked, SKColor pinColor, double iconScale)
+    public class IconItem(string fileName, string displayName, Point anchorPoint, Size iconSize, bool isRotationLocked, SKColor pinColor, double iconScale, string category)
     {
         public string FileName { get; set; } = fileName;
         public string DisplayName { get; set; } = displayName;
@@ -15,6 +15,7 @@ namespace bsm24
         public bool IsCustomPin { get; set; } = false;
         public SKColor PinColor { get; set; } = pinColor;
         public double IconScale { get; set; } = iconScale;
+        public string Category { get; set; } = category;
     }
 
     public class FileItem

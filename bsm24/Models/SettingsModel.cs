@@ -8,6 +8,7 @@ internal class SettingsModel
     public int MapIcon { get; set; }
     public int IconSortCrit { get; set; }
     public int PinSortCrit { get; set; }
+    public int IconCategory { get; set; }
     public bool IsPlanRotateLocked { get; set; }
     public int PdfQuality { get; set; }
     public int SelectedColorTheme { get; set; }

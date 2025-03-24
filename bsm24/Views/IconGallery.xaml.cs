@@ -16,7 +16,8 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     private string PlanId;
     private string PinId;
     private bool isLongPressed = false;
-    private object previousSelectedItem;
+    private object previousSelectedSortItem;
+    private object previousSelectedCategoryItem;
     private string OrderDirection = "asc";
 
     public IconGallery()
@@ -31,6 +32,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         base.OnAppearing();
 
         SortPicker.PropertyChanged += OnSortPickerChanged;
+        CategoryPicker.PropertyChanged += OnCategoryPickerChanged;
     }
 
     protected override void OnDisappearing()
@@ -38,6 +40,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         base.OnDisappearing();
 
         SortPicker.PropertyChanged -= OnSortPickerChanged;
+        CategoryPicker.PropertyChanged -= OnCategoryPickerChanged;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -145,7 +148,8 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                 size,
                 false,
                 new SKColor(255, 0, 0),
-                1
+                1,
+                ""
             );
 
             var popup = new PopupIconEdit(updatedItem);
@@ -173,9 +177,27 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     private void OnSortPickerChanged(object sender, EventArgs e)
     {
         var currentSelectedItem = SortPicker.SelectedItem;
-        if (previousSelectedItem != currentSelectedItem)
+        if (previousSelectedSortItem != currentSelectedItem)
         {
-            previousSelectedItem = currentSelectedItem;
+            previousSelectedSortItem = currentSelectedItem;
+            IconSorting(OrderDirection);
+            SettingsService.Instance.SaveSettings();
+        }
+    }
+
+    private void OnCategoryPickerChanged(object sender, EventArgs e)
+    {
+        var currentSelectedItem = CategoryPicker.SelectedItem;
+        if (previousSelectedCategoryItem != currentSelectedItem)
+        {
+            previousSelectedCategoryItem = currentSelectedItem;
+
+            // Icon-Daten einlesen
+            var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, currentSelectedItem.ToString());
+            SettingsService.Instance.IconCategories = iconCategories;
+            Settings.PinData = iconItems;
+
+            Settings.PinData = iconItems;
             IconSorting(OrderDirection);
             SettingsService.Instance.SaveSettings();
         }

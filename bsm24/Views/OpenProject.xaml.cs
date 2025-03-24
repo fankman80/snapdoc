@@ -272,11 +272,7 @@ public partial class OpenProject : UraniumContentPage
 #endif
 
 #if ANDROID
-                    var directoryUri = Android.Net.Uri.FromFile(new Java.IO.File(directoryPath));
-                    var intent = new Intent(Intent.ActionView);
-                    intent.SetDataAndType(directoryUri, "*/*");
-                    intent.SetFlags(ActivityFlags.NewTask);
-                    Platform.CurrentActivity.StartActivity(intent);
+                    // noch nicht implementiert
 #endif
 
 #if IOS

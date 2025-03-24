@@ -6,6 +6,7 @@ using SkiaSharp;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
+using bsm24.Services;
 
 namespace bsm24.Views;
 
@@ -24,6 +25,7 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
 
         iconImage.Source = file;
         iconName.Text = iconItem.DisplayName;
+        iconCategory.Text = iconItem.Category;
         anchorX.Text = iconItem.AnchorPoint.X.ToString(CultureInfo.InvariantCulture);
         anchorY.Text = iconItem.AnchorPoint.Y.ToString(CultureInfo.InvariantCulture);
         iconScale.Value = iconItem.IconScale * 100;
@@ -72,7 +74,9 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
                 iconItem.IconSize,
                 allowRotate.IsChecked,
                 new SKColor((byte)RedValue, (byte)GreenValue, (byte)BlueValue),
-                Math.Round(iconScale.Value / 100, 1)
+                Math.Round(iconScale.Value / 100, 1),
+                iconCategory.Text
+
             );
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
             ReturnValue = file;
@@ -88,8 +92,10 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
         }
 
         // Icon-Daten einlesen
-        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
+        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+        SettingsService.Instance.IconCategories = iconCategories;
         Settings.PinData = iconItems;
+
         await MopupService.Instance.PopAsync();
     }
 

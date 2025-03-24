@@ -35,22 +35,24 @@
                                 AllowClear="True"/>
 
             <Button Grid.Column="0"
-                        Text="Zip Exportieren"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
-                        Clicked="OnSaveClicked" />
+                    Text="Zip Exportieren"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                    Clicked="OnSaveClicked" />
 
             <Button Grid.Column="0"
-                        Text="Verzeichnis öffnen"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
-                        Clicked="OnOpenFolderClicked" />
+                    x:Name="openFolderBtn"
+                    IsVisible="False"
+                    Text="Verzeichnis öffnen"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                    Clicked="OnOpenFolderClicked" />
 
             <Button Grid.Column="0"
-                        Text="Projekt löschen"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
-                        Clicked="OnDeleteClicked" />
+                    Text="Projekt löschen"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                    Clicked="OnDeleteClicked" />
 
             <Grid Margin="0,16,0,0">
                 <Grid.ColumnDefinitions>

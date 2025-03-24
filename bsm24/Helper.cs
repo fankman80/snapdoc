@@ -183,15 +183,30 @@ public class Helper
         await stream.CopyToAsync(fileStream);
     }
 
-    public static List<IconItem> LoadIconItems(string filePath)
+    public static List<IconItem> LoadIconItems(string filePath, out List<string> allCategories, string category = "alle Icons")
     {
         var iconItems = new List<IconItem>();
+        var categories = new HashSet<string>();
 
         try
         {
+            categories.Add("alle Icons");
             XDocument doc = XDocument.Load(filePath);
             foreach (var itemElement in doc.Descendants("Item"))
             {
+                // Erfasse alle Kategorien
+                var categoryValue = itemElement.Element("Category")?.Value ?? string.Empty;
+                if (!string.IsNullOrEmpty(categoryValue))
+                {
+                    categories.Add(categoryValue); // Fügt die Kategorie hinzu, wenn sie nicht leer ist
+                }
+
+                // Wenn eine Kategorie zum Filtern übergeben wurde
+                if (category != "alle Icons" && !categoryValue.Equals(category, StringComparison.OrdinalIgnoreCase))
+                {
+                    continue; // Springe zum nächsten Element, wenn die Kategorie nicht übereinstimmt
+                }
+
                 var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
                 if (fileName.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
                 {
@@ -212,7 +227,8 @@ public class Helper
                         byte.Parse(itemElement.Element("Color")?.Attribute("Red")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Blue")?.Value ?? "0")),
-                    double.Parse(itemElement.Element("Scale")?.Value ?? "1.0", CultureInfo.InvariantCulture)
+                    double.Parse(itemElement.Element("Scale")?.Value ?? "1.0", CultureInfo.InvariantCulture),
+                    itemElement.Element("Category")?.Value ?? string.Empty
                 );
 
                 iconItems.Add(iconItem);
@@ -223,6 +239,7 @@ public class Helper
             Toast.Make($"Fehler in der Icon-Datenbank." + ex.Message).Show();
         }
 
+        allCategories = [.. categories];
         return iconItems;
     }
 

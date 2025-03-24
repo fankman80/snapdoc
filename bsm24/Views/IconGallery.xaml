@@ -42,6 +42,14 @@
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     StrokeThickness="0.5"
                     StrokeShape="RoundRectangle 4">
+                <uranium:Dropdown x:Name="CategoryPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                      FontSize="12"
+                                      ItemsSource="{Binding IconCategories}"
+                                      SelectedItem="alle Icons"/>
+            </Border>            
+            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    StrokeThickness="0.5"
+                    StrokeShape="RoundRectangle 4">
                 <uranium:Dropdown x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                   FontSize="12"
                                   ItemsSource="{Binding IconSortCrits}"

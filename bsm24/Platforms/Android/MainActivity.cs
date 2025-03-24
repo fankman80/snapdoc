@@ -1,9 +1,13 @@
 ﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
+using AP = Android.Provider;
 using AndroidX.Core.App;
 using AndroidX.Core.Content;
 using Android;
+using Android.Content;
+using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
+using Environment = Android.OS.Environment;
 
 namespace bsm24.Platforms.Android
 {
@@ -14,27 +18,20 @@ namespace bsm24.Platforms.Android
         {
             base.OnCreate(savedInstanceState);
 
-            if (ContextCompat.CheckSelfPermission(this, Manifest.Permission.WriteExternalStorage) != Permission.Granted)
+            if (Build.VERSION.SdkInt >= BuildVersionCodes.R)
             {
-                ActivityCompat.RequestPermissions(this, [Manifest.Permission.WriteExternalStorage], 1);
+                if (!Environment.IsExternalStorageManager)
+                {
+                    RequestManageExternalStoragePermission();
+                }
             }
         }
 
-        public override void OnRequestPermissionsResult(int requestCode, string[] permissions, Permission[] grantResults)
+        private void RequestManageExternalStoragePermission()
         {
-            base.OnRequestPermissionsResult(requestCode, permissions, grantResults);
-
-            if (requestCode == 1)
-            {
-                if (grantResults.Length > 0 && grantResults[0] == Permission.Granted)
-                {
-                    // Zugriff gewährt
-                }
-                else
-                {
-                    // Zugriff verweigert
-                }
-            }
+            // Intent to request MANAGE_EXTERNAL_STORAGE
+            Intent intent = new(AP.Settings.ActionManageAllFilesAccessPermission);
+            StartActivity(intent);
         }
     }
 }
