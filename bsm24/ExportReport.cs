@@ -54,7 +54,7 @@ public partial class ExportReport
         List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
         foreach (string icon in uniquePinIcons)
             if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
-                CopyImageToDirectory(cacheDir, GlobalJson.Data.CustomPinsPath, icon);
+                CopyImageToDirectory(cacheDir, System.IO.Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
             else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
                 CopyImageToDirectory(System.IO.Path.Combine(cacheDir, "customicons"), "customicons", System.IO.Path.GetFileName(icon));  
             else
@@ -153,7 +153,7 @@ public partial class ExportReport
                                                         {
                                                             // add Part of Plan Image
                                                             string planName = GlobalJson.Data.Plans[plan.Key].File;
-                                                            string planPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, planName);
+                                                            string planPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, planName);
                                                             Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
                                                             string pinImage = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
 
@@ -194,10 +194,10 @@ public partial class ExportReport
                                                                 if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos[img.Key].IsChecked)
                                                                 {
                                                                     string imgName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos[img.Key].File;
-                                                                    string imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, imgName);
+                                                                    string imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, imgName);
                                                                     if (!SettingsService.Instance.IsFotoOverlayExport)
                                                                         if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos[img.Key].HasOverlay)
-                                                                            imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, "originals", imgName);
+                                                                            imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", imgName);
                                                                     Drawing _img = XmlImage.GenerateImage(mainPart,
                                                                                                     new FileResult(imgPath),
                                                                                                     SettingsService.Instance.ImageExportScale,
@@ -277,7 +277,7 @@ public partial class ExportReport
                                 if (text.Text.Contains("${title_image"))
                                 {
                                     text.Text = ""; // Lösche den Platzhaltertext
-                                    string imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+                                    string imgPath = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                                     if (File.Exists(imgPath))
                                     {
                                         Drawing _img = XmlImage.GenerateImage(mainPart,
@@ -354,7 +354,7 @@ public partial class ExportReport
 
                                     // Zweiter Paragraph für das Plan-Image und Pins (ohne manuelles Break)
                                     Paragraph imageAndPinsParagraph = new();
-                                    string planImage = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[plan.Key].File);
+                                    string planImage = System.IO.Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[plan.Key].File);
                                     Size planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
                                     SizeF scaledPlanSize = ScaleToFit(planSize, planMaxSize);
                                     SizeF scaleFactor = new(scaledPlanSize.Width / (float)planSize.Width, scaledPlanSize.Height / (float)planSize.Height);

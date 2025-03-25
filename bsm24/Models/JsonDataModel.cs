@@ -18,7 +18,6 @@ public class JsonDataModel
     public Dictionary<string, Plan> Plans { get; set; }
     public string PlanPath { get; set; }
     public string ImagePath { get; set; }
-    public string ImageOverlayPath { get; set; }
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
     public string ProjectPath { get; set; }

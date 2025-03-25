@@ -60,7 +60,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
             Images.Add(new ImageItem
             {
-                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ThumbnailPath, imgPath),
+                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, imgPath),
                 IsChecked = isChecked,
                 DateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[img.Key].DateTime
             });
@@ -190,7 +190,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void TakePhoto(object sender, EventArgs e)
     {
-        FileResult path = await CapturePicture.Capture(GlobalJson.Data.ImagePath, GlobalJson.Data.ThumbnailPath);
+        FileResult path = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
         if (path != null)
         {

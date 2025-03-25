@@ -199,7 +199,7 @@ public partial class LoadPDFPages : UraniumContentPage
     {
         await LoadPDFImages(); //generiere High-Res Images
         
-        string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.PlanPath);
+        string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
         int i = 0;
 
         // Überprüfen, ob Plans null ist, und es gegebenenfalls initialisieren

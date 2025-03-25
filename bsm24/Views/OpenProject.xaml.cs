@@ -99,13 +99,12 @@ public partial class OpenProject : UraniumContentPage
             GlobalJson.Data.Object_name = "";
             GlobalJson.Data.Creation_date = DateTime.Now;
             GlobalJson.Data.Project_manager = "";
-            GlobalJson.Data.ProjectPath = Path.Combine(result);
-            GlobalJson.Data.JsonFile = Path.Combine(result, result + ".json");
-            GlobalJson.Data.PlanPath = Path.Combine(result, "plans");
-            GlobalJson.Data.ImagePath = Path.Combine(result, "images");
-            GlobalJson.Data.ImageOverlayPath = Path.Combine(result, "images", "originals");
-            GlobalJson.Data.ThumbnailPath = Path.Combine(result, "thumbnails");
-            GlobalJson.Data.CustomPinsPath = Path.Combine(result, "custompins");
+            GlobalJson.Data.ProjectPath = result;
+            GlobalJson.Data.JsonFile = result + ".json";
+            GlobalJson.Data.PlanPath = "plans";
+            GlobalJson.Data.ImagePath = "images";
+            GlobalJson.Data.ThumbnailPath = "thumbnails";
+            GlobalJson.Data.CustomPinsPath = "custompins";
             GlobalJson.Data.TitleImage = "banner_thumbnail.png";
 
             // save data to file
@@ -293,13 +292,12 @@ public partial class OpenProject : UraniumContentPage
                     var oldFilePath = item.FilePath;
 
                     GlobalJson.LoadFromFile(oldFilePath);
-                    GlobalJson.Data.ProjectPath = Path.Combine(_result);
-                    GlobalJson.Data.JsonFile = Path.Combine(_result, _result + ".json");
-                    GlobalJson.Data.PlanPath = Path.Combine(_result, "plans");
-                    GlobalJson.Data.ImagePath = Path.Combine(_result, "images");
-                    GlobalJson.Data.ImageOverlayPath = Path.Combine(_result, "images", "originals");
-                    GlobalJson.Data.ThumbnailPath = Path.Combine(_result, "thumbnails");
-                    GlobalJson.Data.CustomPinsPath = Path.Combine(_result, "custompins");
+                    GlobalJson.Data.ProjectPath = _result;
+                    GlobalJson.Data.JsonFile = _result + ".json";
+                    GlobalJson.Data.PlanPath = "plans";
+                    GlobalJson.Data.ImagePath = "images";
+                    GlobalJson.Data.ThumbnailPath = "thumbnails";
+                    GlobalJson.Data.CustomPinsPath = "custompins";
                     GlobalJson.SaveToFile();
 
                     // Verzeichnis an die neue Stelle verschieben (umbenennen)
@@ -311,7 +309,7 @@ public partial class OpenProject : UraniumContentPage
 
                     GlobalJson.UpdateFilePath(newFilePath);
 
-                    if (item.FileName == Path.GetFileName(GlobalJson.Data.JsonFile))
+                    if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath,GlobalJson.Data.JsonFile)))
                     {
                         // Daten laden und verarbeiten (nicht UI-bezogen)
                         LoadDataToView.ResetFlyoutItems();
