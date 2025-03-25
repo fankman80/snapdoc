@@ -50,15 +50,14 @@ public partial class ExportReport
             {"${pin_geolocCH1903}", "${pin_geolocCH1903}"}, //bereinige splitted runs
         };
 
-        string cacheDir = Settings.CacheDirectory;
         List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
         foreach (string icon in uniquePinIcons)
             if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
-                CopyImageToDirectory(cacheDir, System.IO.Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
+                CopyImageToDirectory(Settings.CacheDirectory, System.IO.Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
             else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
-                CopyImageToDirectory(System.IO.Path.Combine(cacheDir, "customicons"), "customicons", System.IO.Path.GetFileName(icon));  
+                CopyImageToDirectory(System.IO.Path.Combine(Settings.CacheDirectory, "customicons"), "customicons", System.IO.Path.GetFileName(icon));  
             else
-                await CopyImageToDirectoryAsync(cacheDir, icon);
+                await CopyImageToDirectoryAsync(Settings.CacheDirectory, icon);
 
         using MemoryStream memoryStream = new();
         using (Stream fileStream = new FileStream(templateDoc, FileMode.Open, FileAccess.Read))
@@ -158,14 +157,14 @@ public partial class ExportReport
                                                             string pinImage = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
 
                                                             // Pin-Icon ein/ausblenden
-                                                            List<(string, SKPoint, SKPoint, float)> pinList = [];
+                                                            List<(string, SKPoint, SKPoint, float, float)> pinList = [];
                                                             if (SettingsService.Instance.IsPinIconExport)
                                                             {
                                                                 pinList = [(pinImage,
                                                                         new SKPoint(0.5f, 0.5f),
-                                                                        new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X,
-                                                                                    (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y),
-                                                                                    (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)];
+                                                                        new SKPoint((float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.X, (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor.Y),
+                                                                        (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale,
+                                                                        (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation)];
                                                             }
                                                             else
                                                                 pinList = null;
@@ -360,7 +359,7 @@ public partial class ExportReport
                                     SizeF scaleFactor = new(scaledPlanSize.Width / (float)planSize.Width, scaledPlanSize.Height / (float)planSize.Height);
 
                                     run = new Run();
-                                    run.Append(GetImageElement(mainPart, planImage, scaledPlanSize, new Point(0, 0)));
+                                    run.Append(GetImageElement(mainPart, planImage, scaledPlanSize, new Point(0, 0), 0));
 
                                     if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                                     {
@@ -368,7 +367,7 @@ public partial class ExportReport
                                         {
                                             if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport)
                                             {
-                                                string pinImage = System.IO.Path.Combine(cacheDir, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
+                                                string pinImage = System.IO.Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
                                                 Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
                                                 Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                 Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
@@ -378,8 +377,9 @@ public partial class ExportReport
                                                                       ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize * (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
                                                 Point posOnPlan = new((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
                                                                       (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
+                                                float rotationAngle = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
 
-                                                run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan));
+                                                run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan, rotationAngle));
 
                                                 run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
                                                                                   new Point(posOnPlan.X + scaledPinSize.Width, posOnPlan.Y - scaledPinSize.Height),
@@ -418,10 +418,10 @@ public partial class ExportReport
         outputFileStream.Dispose();
 
         // lösche den Bild-Cache
-        if (Directory.Exists(cacheDir))
-            Directory.Delete(cacheDir, true);
+        if (Directory.Exists(Settings.CacheDirectory))
+            Directory.Delete(Settings.CacheDirectory, true);
     }
-    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos)
+    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle)
     {
         // Prüfen, ob das Bild bereits hinzugefügt wurde
         if (!imageRelationshipIds.TryGetValue(imgPath, out string relationshipId))
@@ -434,12 +434,12 @@ public partial class ExportReport
             relationshipId = mainPart.GetIdOfPart(imagePart);
             imageRelationshipIds[imgPath] = relationshipId;
         }
-        Drawing element = GetAnchorPicture(relationshipId, size, pos);
+        Drawing element = GetAnchorPicture(relationshipId, size, pos, rotationAngle);
 
         return element;
     }
 
-    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos)
+    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle)
     {
         Drawing _drawing = new();
         DW.Anchor _anchor = new()
@@ -572,6 +572,9 @@ public partial class ExportReport
             Cy = MillimetersToEMU(size.Height)
         };
 
+        // (in 1/60000 Grad, daher multiplizieren)
+        _t2d.Rotation = (OXML.Int32Value)(rotationAngle * 60000);
+
         _t2d.Append(_os);
         _t2d.Append(_ex);
 
@@ -613,15 +616,11 @@ public partial class ExportReport
 
     private static List<string> GetUniquePinIcons(JsonDataModel jsonDataModel)
     {
-        // HashSet für einzigartige PinIcons
         HashSet<string> uniquePinIcons = [];
-
-        // Durchlaufe alle Plans im JsonDataModel
         if (jsonDataModel.Plans != null)
         {
             foreach (Plan plan in jsonDataModel.Plans.Values)
             {
-                // Durchlaufe alle Pins im Plan
                 if (plan.Pins != null)
                 {
                     foreach (Pin pin in plan.Pins.Values)
@@ -632,7 +631,6 @@ public partial class ExportReport
                 }
             }
         }
-        // Rückgabe der eindeutigen PinIcons als Liste
         return [.. uniquePinIcons];
     }
 
@@ -683,8 +681,8 @@ public partial class ExportReport
 
     private static Picture CreateTextBoxWithShape(string text, Point coordinateMM, double fontSizePt, string fontColorHex)
     {
-        double xCoordinatePt = coordinateMM.X * 3.8; //3.7795;
-        double yCoordinatePt = coordinateMM.Y * 3.8; //3.7795;
+        double xCoordinatePt = coordinateMM.X * 2.83465; //3.7795;
+        double yCoordinatePt = coordinateMM.Y * 2.83465; //3.7795;
         double textWidthPt = GetTextWidthInPoints(text, "Arial", fontSizePt, 96) * 2;
 
         Picture picture1 = new();
@@ -826,24 +824,24 @@ public partial class ExportReport
                 stream = File.OpenRead(icon);
             }
 #if ANDROID
-        if (stream == null)
-        {
-            var context = Android.App.Application.Context;
-            var resources = context.Resources;
-
-            var resourceId = resources.GetIdentifier(System.IO.Path.GetFileNameWithoutExtension(icon), "drawable", context.PackageName);
-            if (resourceId > 0)
+            if (stream == null)
             {
-                var imageUri = new Android.Net.Uri.Builder()
-                    .Scheme(Android.Content.ContentResolver.SchemeAndroidResource)
-                    .Authority(resources.GetResourcePackageName(resourceId))
-                    .AppendPath(resources.GetResourceTypeName(resourceId))
-                    .AppendPath(resources.GetResourceEntryName(resourceId))
-                    .Build();
+                var context = Android.App.Application.Context;
+                var resources = context.Resources;
 
-                stream = context.ContentResolver.OpenInputStream(imageUri);
+                var resourceId = resources.GetIdentifier(System.IO.Path.GetFileNameWithoutExtension(icon), "drawable", context.PackageName);
+                if (resourceId > 0)
+                {
+                    var imageUri = new Android.Net.Uri.Builder()
+                        .Scheme(Android.Content.ContentResolver.SchemeAndroidResource)
+                        .Authority(resources.GetResourcePackageName(resourceId))
+                        .AppendPath(resources.GetResourceTypeName(resourceId))
+                        .AppendPath(resources.GetResourceEntryName(resourceId))
+                        .Build();
+
+                    stream = context.ContentResolver.OpenInputStream(imageUri);
+                }
             }
-        }
 #elif WINDOWS
             if (stream == null)
             {
@@ -874,16 +872,16 @@ public partial class ExportReport
                 }
             }
 #elif IOS || MACCATALYST
-        if (stream == null)
-        {
-            var root = Foundation.NSBundle.MainBundle.BundlePath;
+            if (stream == null)
+            {
+                var root = Foundation.NSBundle.MainBundle.BundlePath;
 #if MACCATALYST || MACOS
-            root = Path.Combine(root, "Contents", "Resources");
+                root = Path.Combine(root, "Contents", "Resources");
 #endif
-            icon = Path.Combine(root, icon);
-            if (File.Exists(icon))
-                stream = File.OpenRead(icon);
-        }
+                icon = Path.Combine(root, icon);
+                if (File.Exists(icon))
+                    stream = File.OpenRead(icon);
+            }
 #endif
             if (stream == null)
                 throw new FileNotFoundException($"The file '{icon}' could not be found.");
@@ -891,11 +889,13 @@ public partial class ExportReport
             // Kopiere den Stream in das Zielverzeichnis
             using FileStream fileStream = new(destinationFilePath, FileMode.Create, FileAccess.Write);
             await stream.CopyToAsync(fileStream);
-        }
-        finally
-        {
+
             stream.Close();
             stream.Dispose();
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error while copying image to directory: {ex.Message}");
         }
     }
 }

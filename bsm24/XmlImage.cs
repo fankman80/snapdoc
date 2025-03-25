@@ -21,11 +21,12 @@ public partial class XmlImage
                                             double widthMilimeters = 0,
                                             double heightMilimeters = 0,
                                             int imageQuality = 90,
-                                            List<(string, SKPoint, SKPoint, float)> overlayImages = null)
+                                            List<(string, SKPoint, SKPoint, float, float)> overlayImages = null)
     // Item1 = Image
     // Item2 = Position
     // Item3 = Anchor
     // Item4 = Scale
+    // Item5 = Rotate Degrees
     {
         var originalStream = File.OpenRead(imagePath.FullPath);
         var skBitmap = SKBitmap.Decode(originalStream);
@@ -49,7 +50,7 @@ public partial class XmlImage
         // Add Overlay-Image
         if (overlayImages != null)
         {
-            foreach ((string, SKPoint, SKPoint, float) overlayImage in overlayImages.Select(v => v))
+            foreach ((string, SKPoint, SKPoint, float, float) overlayImage in overlayImages.Select(v => v))
             {
                 var cacheFile = Path.Combine(Settings.CacheDirectory, overlayImage.Item1);
                 var stream = File.OpenRead(cacheFile);
@@ -63,6 +64,7 @@ public partial class XmlImage
                         (skBitmap.Height * overlayImage.Item2.Y) - (overlay.Height * overlayImage.Item4 * overlayImage.Item3.Y));
                     SKRect destRect = new(_pos.X, _pos.Y, _pos.X + overlay.Width * overlayImage.Item4, _pos.Y + overlay.Height * overlayImage.Item4);
                     canvas.DrawBitmap(skBitmap, new SKPoint(0, 0));
+                    canvas.RotateDegrees(overlayImage.Item5, (float)(skBitmap.Width * overlayImage.Item3.X), (float)(skBitmap.Height * overlayImage.Item3.Y));
                     canvas.DrawBitmap(overlay, destRect);
                 }
                 skBitmap = combinedBitmap;
