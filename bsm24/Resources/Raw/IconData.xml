@@ -8,7 +8,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -19,7 +19,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -30,7 +30,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="112" Green="112" Blue="112" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -41,7 +41,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="252" Green="2" Blue="202" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -52,7 +52,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -63,7 +63,7 @@
 		<RotationLocked>false</RotationLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
-		<Category>farbige Icons</Category>
+		<Category>Stecknadeln</Category>
 	</Item>
 
 	<Item>
@@ -801,5 +801,214 @@
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
+	</Item>
+	
+	<Item>
+		<FileName>atemschutz.png</FileName>
+		<Description>Atemschutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>
+
+	<Item>
+		<FileName>augen_gehoerschutz.png</FileName>
+		<Description>Augen- und Gehörschutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+
+	<Item>
+		<FileName>augenschutz.png</FileName>
+		<Description>Augenschutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+
+	<Item>
+		<FileName>fussschutz.png</FileName>
+		<Description>Fuss-Schutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
 	</Item>	
+	
+	<Item>
+		<FileName>gehoerschutz.png</FileName>
+		<Description>Gehörschutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>handschuhe.png</FileName>
+		<Description>Handschuhe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+
+	<Item>
+		<FileName>kopfschutz.png</FileName>
+		<Description>Kopfschutz</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>schutzkleidung.png</FileName>
+		<Description>Schutzkleidung</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>schutzmaske.png</FileName>
+		<Description>Schutzmaske</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>sicherheitsschuhe.png</FileName>
+		<Description>Sicherheitsschuhe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+
+	<Item>
+		<FileName>warnweste.png</FileName>
+		<Description>Warnweste</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="96" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="0" Green="83" Blue="134" />
+		<Scale>1.0</Scale>
+		<Category>Arbeitssicherheit</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>aetzendende_stoffe.png</FileName>
+		<Description>Ätzende Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>elektrische_spannung.png</FileName>
+		<Description>Elektrische Spannung</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>feuergefaehrliche_stoffe.png</FileName>
+		<Description>Feuergefährliche Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>		
+
+	<Item>
+		<FileName>gesundheitsgefaehrdende_stoffe.png</FileName>
+		<Description>Gesundheitsgefährdende Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>
+
+	<Item>
+		<FileName>giftige_stoffe.png</FileName>
+		<Description>Giftige Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>radioaktive_stoffe.png</FileName>
+		<Description>Radioaktive Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>	
+
+	<Item>
+		<FileName>umweltgefaehrdende_stoffe.png</FileName>
+		<Description>Umweltgefährdende Stoffe</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>warnung_gasflaschen.png</FileName>
+		<Description>Warnung Gasflaschen</Description>
+		<AnchorPoint X="0.5" Y="0.5" />
+		<Size Width="96" Height="84" />
+		<RotationLocked>true</RotationLocked>
+		<Color Red="242" Green="198" Blue="51" />
+		<Scale>1.0</Scale>
+		<Category>Gefährliche Stoffe</Category>
+	</Item>		
 </IconData>
