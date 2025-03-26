@@ -178,6 +178,8 @@ public partial class ExportReport
 
                                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
 
+
+
                                                             var cropFactorX = (1 / planSize.Width * 300) / 2;
                                                             var cropFactorY = (1 / planSize.Height * 300) / 2;
                                                             var crop = new SKRectI
@@ -192,10 +194,11 @@ public partial class ExportReport
                                                                 SettingsService.Instance.PinPosExportSize,
                                                                 SettingsService.Instance.PinPosExportSize);
 
-
                                                             Drawing _imgPlan = GetImageElement(mainPart, planPath, exportSize, new Point(0, 0), 0, crop);
 
-                                                            var scaledPinSize = new SizeF((float)(pinSize.Width * planScaleFactor * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale / 2.83465), (float)(pinSize.Height * planScaleFactor * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale / 2.83465));
+                                                            var scaleF = new Size(100 / 300 / 96 * exportSize.Width / 10 / 2.54 / 100, 100 / 300 / 96 * exportSize.Height / 10 / 2.54 / 100);
+
+                                                            var scaledPinSize = new Size((float)(pinSize.Width * scaleF.Width * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale), (float)(pinSize.Height * scaleF.Height * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
 
                                                             Drawing _imgPin = GetImageElement(mainPart, pinImage, scaledPinSize, new Point(exportSize.Width/2, exportSize.Height/2), 0, new SKRectI(0,0,0,0));
 
