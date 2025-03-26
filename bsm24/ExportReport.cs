@@ -196,7 +196,7 @@ public partial class ExportReport
 
                                                             Drawing _imgPlan = GetImageElement(mainPart, planPath, exportSize, new Point(0, 0), 0, crop);
 
-                                                            var scaleF = new Size(100 / 300 / 96 * exportSize.Width / 10 / 2.54 / 100, 100 / 300 / 96 * exportSize.Height / 10 / 2.54 / 100);
+                                                            var scaleF = new Size(100 / (300 / 96) * (exportSize.Width / 25.4) / 100, 100 / (300 / 96) * (exportSize.Height / 25.4) / 100);
 
                                                             var scaledPinSize = new Size((float)(pinSize.Width * scaleF.Width * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale), (float)(pinSize.Height * scaleF.Height * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
 
