@@ -169,14 +169,25 @@ public partial class ExportReport
                                                             else
                                                                 pinList = null;
 
+                                                            var cropSize = new SKSize(SettingsService.Instance.PinPosCropExportSize, SettingsService.Instance.PinPosCropExportSize);
+                                                            var cropPos = new SKPoint((float)pinPos.X, (float)pinPos.Y);
                                                             var crop = new SKRectI
                                                             {
-                                                                Left = (int)(500 / GlobalJson.Data.Plans[plan.Key].ImageSize.Width * 1000000),
-                                                                Right = (int)(500 / GlobalJson.Data.Plans[plan.Key].ImageSize.Width * 1000000),
-                                                                Top = (int)(500 / GlobalJson.Data.Plans[plan.Key].ImageSize.Height * 1000000),
-                                                                Bottom = (int)(500 / GlobalJson.Data.Plans[plan.Key].ImageSize.Height * 1000000),
+
+                                                                Left = (int)((cropPos.X-0.05) * 1000000),
+                                                                Right = (int)(((1-cropPos.X) + 0.05) * 1000000),
+                                                                Top = (int)((cropPos.Y - 0.05) * 1000000),
+                                                                Bottom = (int)(((1-cropPos.Y) + 0.05) * 1000000),
                                                             };
 
+
+                                                            SizeF scaleFactor = new Size(1, 1);
+                                                            Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
+                                                            Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
+                                                            SKColor pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
+                                                            SizeF scaledPinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin ?
+                                                                                  new SizeF((float)pinSize.Width * scaleFactor.Width, (float)pinSize.Height * scaleFactor.Height) :
+                                                                                  ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize * (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
 
                                                             Drawing _imgPlan = GetImageElement(mainPart, planPath, new SizeF(40, 40), new Point(0, 0), 0, crop);
 
@@ -190,7 +201,8 @@ public partial class ExportReport
                                                             //                                    imageQuality: SettingsService.Instance.ImageExportQuality,
                                                             //                                    overlayImages: pinList);
 
-                                                            Drawing _imgPin = GetImageElement(mainPart, pinImage, new SizeF(40, 40), new Point(0,0), 0, new SKRectI(20000, 20000, 20000, 20000));
+
+                                                            Drawing _imgPin = GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), new Point(0,0), 0, new SKRectI(0,0,0,0));
 
                                                             newParagraph.Append(new Run(_imgPlan));
                                                             newParagraph.Append(new Run(_imgPin));
