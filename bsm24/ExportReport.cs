@@ -389,15 +389,18 @@ public partial class ExportReport
                                                 Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                 Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                 SKColor pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                SizeF scaledPinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin ?
-                                                                      new SizeF((float)pinSize.Width * scaleFactor.Width, (float)pinSize.Height * scaleFactor.Height) :
-                                                                      ScaleToFit(pinSize, new SizeF(0, (float)SettingsService.Instance.PinExportSize * (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale));
+
+                                                var scaledPinSize = new SizeF
+                                                {
+                                                    Width = (float)(pinSize.Width * scaledPlanSize.Width / planSize.Width * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale),
+                                                    Height = (float)(pinSize.Height * scaledPlanSize.Height / planSize.Height * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)
+                                                };    
+                                                
                                                 Point posOnPlan = new((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
                                                                       (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
                                                 float rotationAngle = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
 
                                                 run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan, rotationAngle, "anchor"));
-
                                                 run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix + i.ToString(),
                                                                                   new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - scaledPinSize.Height), // offset 1mm to right
                                                                                   SettingsService.Instance.PlanLabelFontSize,
