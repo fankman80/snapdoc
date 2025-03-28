@@ -23,25 +23,29 @@
             <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                   BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="70" />
-                    <RowDefinition Height="30" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <Image Grid.Column="0"
-                       Grid.RowSpan="2"
-                       Aspect="AspectFill"
-                       Source="{Binding FlyoutHeaderImage}"/>
+                <ImageButton Grid.Column="0"                             
+                             HeightRequest="100"
+                             WidthRequest="100"
+                             Grid.RowSpan="2"
+                             Aspect="AspectFill"
+                             Source="{Binding FlyoutHeaderImage}"
+                             Clicked="OnTitleClicked"/>
                 <Label Grid.Column="1"
                        Grid.Row="0"
                        Text="{Binding FlyoutHeaderDesc}"
-                       LineBreakMode="WordWrap"
+                       LineBreakMode="TailTruncation"
                        Padding="4,4,4,0"
                        FontSize="18"
                        TextColor="{DynamicResource PrimaryDark}"
-                       FontAttributes="Bold" 
+                       FontAttributes="Bold"
+                        VerticalTextAlignment="Center"
                        HorizontalTextAlignment="Start"/>
                 <Label Grid.Column="1"
                        Grid.Row="1"
@@ -49,7 +53,8 @@
                        LineBreakMode="WordWrap"
                        Padding="4,0,4,0"
                        FontSize="14"
-                       TextColor="{DynamicResource PrimaryDark}"  
+                       TextColor="{DynamicResource PrimaryDark}"
+                       VerticalTextAlignment="Center"
                        HorizontalTextAlignment="Start"/>
             </Grid>
         </DataTemplate>

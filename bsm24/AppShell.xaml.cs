@@ -95,4 +95,13 @@ public partial class AppShell : Shell
         Shell.Current.FlyoutIsPresented = false;
 #endif
     }
+
+    public void OnTitleClicked(object sender, EventArgs e)
+    {
+        if (GlobalJson.Data.JsonFile != null)
+        {
+            var projectDetails = new ProjectDetails();
+            projectDetails.OnTitleCaptureClicked(null, null);
+        }
+    }
 }

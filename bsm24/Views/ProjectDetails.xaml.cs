@@ -62,7 +62,7 @@ public partial class ProjectDetails : UraniumContentPage
 #endif
     }
 
-    private async void OnTitleCaptureClicked(object sender, EventArgs e)
+    public async void OnTitleCaptureClicked(object sender, EventArgs e)
     {
         string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 

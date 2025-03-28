@@ -13,7 +13,7 @@
    
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Upload_file}}" 
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}" 
             Text="Importieren"            
             Clicked="OnUploadClicked"/>
         <ToolbarItem
