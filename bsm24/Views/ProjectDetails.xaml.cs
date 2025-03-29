@@ -55,8 +55,8 @@ public partial class ProjectDetails : UraniumContentPage
 
         Helper.HeaderUpdate();
 
-        await Shell.Current.GoToAsync("//homescreen");
-
+        await Shell.Current.GoToAsync("..", true);
+        
 #if ANDROID
         Shell.Current.FlyoutIsPresented = true;
 #endif
