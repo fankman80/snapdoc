@@ -1,17 +1,17 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <mr:ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                xmlns:views="clr-namespace:bsm24.Views"
-                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-                xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
-                xmlns:pc="clr-namespace:bsm24.ViewModels"
-                xmlns:local="clr-namespace:bsm24"                
-                BackgroundColor="DimGrey"
-                Shell.TitleColor="{DynamicResource PrimaryDark}"
-                x:Class="bsm24.Views.NewPage"
-                x:DataType="views:NewPage"
-                Title="{Binding PageTitle}">
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:views="clr-namespace:bsm24.Views"
+        xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+        xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+        xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+        xmlns:pc="clr-namespace:bsm24.ViewModels"
+        xmlns:local="clr-namespace:bsm24"                
+        BackgroundColor="DimGrey"
+        Shell.TitleColor="{DynamicResource PrimaryDark}"
+        x:Class="bsm24.Views.NewPage"
+        x:DataType="views:NewPage"
+        Title="{Binding PageTitle}">
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
@@ -20,23 +20,15 @@
             Text="Grösse anpassen"
             Clicked="ImageFit"/>
         <ToolbarItem
-            x:Name ="btnColorSwitch"
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}" 
-            Text="Farben an"            
-            Clicked="OnGrayscaleClick"/>
-        <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 
-            Text="Umbenennen"            
-            Clicked="OnEditClick"/>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}" 
-            Text="Löschen"            
-            Clicked="OnDeleteClick"/>
+            Text="Bearbeiten"            
+            Clicked="OnEditClicked"/>
     </ContentPage.ToolbarItems>
 
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
             <mr:ContentView
+                AutomationId="PlanContainer"                
                 PinchingCommand="{Binding PinchingCommand}"
                 RotatingCommand="{Binding RotatingCommand}"
                 Panning="OnPanning"
@@ -61,36 +53,45 @@
                 </AbsoluteLayout>
             </mr:ContentView>
 
-            <Border x:Name="PinSizeBorder"
-                IsVisible="False"
-                BackgroundColor="{DynamicResource Primary}"
-                StrokeThickness="0"
-                HeightRequest="60"
-                AbsoluteLayout.LayoutBounds="0, 1, 1, AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional, WidthProportional"
-                Margin="20,0,20,20">
-                <Border.StrokeShape>
-                    <RoundRectangle CornerRadius="30"/>
-                </Border.StrokeShape>
-                <Slider x:Name="PinSizeSlider"
-                        Margin="60,15,15,15"
-                        Minimum="0"                    
-                        Maximum="360"
-                        Value="0"
-                        ThumbColor="{DynamicResource PrimaryDarkText}"
-                        MinimumTrackColor="{DynamicResource PrimaryDarkText}"
-                        MaximumTrackColor="{DynamicResource PrimaryDarkText}"
-                        ValueChanged="OnSliderValueChanged"
-                        DragCompleted="OnSliderDragCompleted"/>
-            </Border>
-            <Image x:Name="PinSizeLabel"            
-                   IsVisible="False"
-                   Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
-                   HeightRequest="40"
-                   Margin="40,0,0,30"               
-                   AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                   AbsoluteLayout.LayoutFlags="PositionProportional"/>
-
+            <Grid x:Name="PinSizeBorder"
+                  IsVisible="False"                  
+                  AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                  AbsoluteLayout.LayoutFlags="All">
+                <Border
+                    BackgroundColor="{DynamicResource Primary}"
+                    StrokeThickness="0"
+                    HeightRequest="60"
+                    VerticalOptions="End"
+                    Margin="20,0,20,20"
+                    ZIndex="10000">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <Slider x:Name="PinSizeSlider"
+                            Margin="70,15,15,15"
+                            Minimum="0"                    
+                            Maximum="360"
+                            Value="0"
+                            ThumbColor="{DynamicResource PrimaryDarkText}"
+                            MinimumTrackColor="{DynamicResource PrimaryDarkText}"
+                            MaximumTrackColor="{DynamicResource PrimaryDarkText}"
+                            ValueChanged="OnSliderValueChanged"
+                            DragCompleted="OnSliderDragCompleted"/>
+                </Border>
+                <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
+                       HeightRequest="40"
+                       Margin="40,0,0,30"
+                       ZIndex="10000"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"/>
+                <Button InputTransparent="False"
+                        CornerRadius="0"
+                        BackgroundColor="Transparent"
+                        VerticalOptions="Fill"
+                        Clicked="OnFullScreenButtonClicked"
+                        AbsoluteLayout.LayoutBounds="0, 0, 1, 1"/>
+            </Grid>
+            
             <Button x:Name="SetPinBtn"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
                     BackgroundColor="{DynamicResource Primary}"

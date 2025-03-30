@@ -1,17 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <uranium:UraniumContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"     
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"                             
-             xmlns:views="clr-namespace:bsm24.Views"
-             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-             xmlns:services="clr-namespace:bsm24.Services"
-             xmlns:local="clr-namespace:bsm24"
-             Shell.TitleColor="{DynamicResource PrimaryDark}"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             x:Class="bsm24.Views.ProjectDetails"
-             Title="Projekt Details">
+        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+        xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"                             
+        xmlns:views="clr-namespace:bsm24.Views"
+        xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+        xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+        xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+        xmlns:services="clr-namespace:bsm24.Services"
+        xmlns:local="clr-namespace:bsm24"
+        Shell.TitleColor="{DynamicResource PrimaryDark}"
+        x:Class="bsm24.Views.ProjectDetails"
+        Title="Projekt Details">
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />

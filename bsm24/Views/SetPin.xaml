@@ -6,11 +6,10 @@
                             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-                            Shell.TitleColor="{DynamicResource PrimaryDark}"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                             xmlns:local="clr-namespace:bsm24.Views"  
                             xmlns:services="clr-namespace:bsm24.Services"
                             x:DataType="views:SetPin"
+                            Shell.TitleColor="{DynamicResource PrimaryDark}"
                             x:Class="bsm24.Views.SetPin"
                             Title="Pin bearbeiten">
     

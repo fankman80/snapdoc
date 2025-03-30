@@ -150,19 +150,6 @@ public partial class NewPage : IQueryAttributable
 
     private void AddPlan()
     {
-        if (GlobalJson.Data.Plans[PlanId].IsGrayscale) // prüfe ob Pläne Grayscaled sind
-        {
-            btnColorSwitch.Text = "Farben aus";
-            btnColorSwitch.IconImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors_off,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                ? (Color)Application.Current.Resources["Primary"]
-                : (Color)Application.Current.Resources["PrimaryDark"]
-            };
-        }
-
         //calculate aspect-ratio, resolution and imagesize
         if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > 7168 || GlobalJson.Data.Plans[PlanId].ImageSize.Height > 7168)
         {
@@ -298,14 +285,11 @@ public partial class NewPage : IQueryAttributable
         smallImage.DoubleTapped += (s, e) =>
         {
             activePin = smallImage;
-
             PinSizeSlider.Value = activePin.Rotation;
             planContainer.IsPanningEnabled = false;
-
             DrawBtn.IsVisible = false;
             SetPinBtn.IsVisible = false;
             PinSizeBorder.IsVisible = true;
-            PinSizeLabel.IsVisible = true;
         };
 
         // sort large custom pins on lower z-indexes
@@ -540,104 +524,6 @@ public partial class NewPage : IQueryAttributable
         planContainer.Scale = targetScale;
     }
 
-    private void OnGrayscaleClick(object sender, EventArgs e)
-    {
-        if (GlobalJson.Data.Plans[PlanId].IsGrayscale)
-        {
-            string colorImageFile = GlobalJson.Data.Plans[PlanId].File.Replace("gs_", "");
-
-            btnColorSwitch.Text = "Farben an";
-            btnColorSwitch.IconImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                ? (Color)Application.Current.Resources["Primary"]
-                : (Color)Application.Current.Resources["PrimaryDark"]
-            };
-
-            GlobalJson.Data.Plans[PlanId].File = colorImageFile;
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
-        }
-        else
-        {
-            string grayImageFile = "gs_" + GlobalJson.Data.Plans[PlanId].File;
-            string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
-
-            if (!File.Exists(grayImagePath))
-            {
-                using var originalStream = File.OpenRead(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
-                using var originalBitmap = SKBitmap.Decode(originalStream);
-                var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
-                using SKImage image = SKImage.FromBitmap(grayBitmap);
-                using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
-                using var fileStream = File.OpenWrite(grayImagePath);
-                data.SaveTo(fileStream);
-            }
-
-            GlobalJson.Data.Plans[PlanId].File = grayImageFile;
-            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
-
-            btnColorSwitch.Text = "Farben aus";
-            btnColorSwitch.IconImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Invert_colors_off,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                ? (Color)Application.Current.Resources["Primary"]
-                : (Color)Application.Current.Resources["PrimaryDark"]
-            };
-        }
-
-        // save data to file
-        GlobalJson.SaveToFile();
-
-        isFirstLoad = true;
-
-        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-    }
-
-    private async void OnEditClick(object sender, EventArgs e)
-    {
-        var popup = new PopupEntry(title: "Plan umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Name);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
-
-        if (result != null)
-        {
-            (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result;
-            Title = result;
-
-            GlobalJson.Data.Plans[PlanId].Name = result;
-
-            // save data to file
-            GlobalJson.SaveToFile();
-        }
-    }
-
-    private async void OnDeleteClick(object sender, EventArgs e)
-    {
-        var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
-        if (result != null)
-        {
-            // löscht das dazugehörige Menü-Item
-            var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
-            if (shellItem != null)
-                (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
-
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-            if (File.Exists(file))
-                File.Delete(file);
-
-            GlobalJson.Data.Plans.Remove(PlanId);
-
-            // save data to file
-            GlobalJson.SaveToFile();
-        }
-    }
-
     private void ZoomToPin(string pinId)
     {
         var pos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
@@ -812,6 +698,15 @@ public partial class NewPage : IQueryAttributable
         drawingView.Clear();
     }
 
+    private void OnFullScreenButtonClicked(object sender, EventArgs e)
+    {
+        planContainer.IsPanningEnabled = true;
+        PinSizeBorder.IsVisible = false;
+        DrawBtn.IsVisible = true;
+        SetPinBtn.IsVisible = true;
+        activePin = null;
+    }
+
     private void OnSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
@@ -830,9 +725,99 @@ public partial class NewPage : IQueryAttributable
 
         planContainer.IsPanningEnabled = true;
         PinSizeBorder.IsVisible = false;
-        PinSizeLabel.IsVisible = false;
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = true;
         activePin = null;
+    }
+
+    private async void OnEditClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupPlanEdit(name: GlobalJson.Data.Plans[PlanId].Name,
+                                      desc: GlobalJson.Data.Plans[PlanId].Description,
+                                      gray: GlobalJson.Data.Plans[PlanId].IsGrayscale);
+        await MopupService.Instance.PushAsync(popup);
+        var (result1, result2) = await popup.PopupDismissedTask;
+
+        switch (result1)
+        {
+            case "delete":
+                OnDeleteClick();
+                break;
+
+            case "grayscale":
+                OnGrayscaleClick();
+                break;
+
+            case null:
+                break;
+
+            default:
+                (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId).Title = result1;
+                Title = result1;
+
+                GlobalJson.Data.Plans[PlanId].Name = result1;
+                GlobalJson.Data.Plans[PlanId].Description = result2;
+
+                // save data to file
+                GlobalJson.SaveToFile();
+                break;
+        }
+    }
+
+    private async void OnDeleteClick()
+    {
+        var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
+        await MopupService.Instance.PushAsync(popup);
+        var result = await popup.PopupDismissedTask;
+        if (result != null)
+        {
+            // löscht das dazugehörige Menü-Item
+            var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
+            if (shellItem != null)
+                (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
+
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+            if (File.Exists(file))
+                File.Delete(file);
+
+            GlobalJson.Data.Plans.Remove(PlanId);
+
+            // save data to file
+            GlobalJson.SaveToFile();
+        }
+    }
+
+    private void OnGrayscaleClick()
+    {
+        if (GlobalJson.Data.Plans[PlanId].IsGrayscale)
+        {
+            string colorImageFile = GlobalJson.Data.Plans[PlanId].File.Replace("gs_", "");
+            GlobalJson.Data.Plans[PlanId].File = colorImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = false;
+        }
+        else
+        {
+            string grayImageFile = "gs_" + GlobalJson.Data.Plans[PlanId].File;
+            string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
+            if (!File.Exists(grayImagePath))
+            {
+                using var originalStream = File.OpenRead(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File));
+                using var originalBitmap = SKBitmap.Decode(originalStream);
+                var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
+                using SKImage image = SKImage.FromBitmap(grayBitmap);
+                using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
+                using var fileStream = File.OpenWrite(grayImagePath);
+                data.SaveTo(fileStream);
+            }
+            GlobalJson.Data.Plans[PlanId].File = grayImageFile;
+            GlobalJson.Data.Plans[PlanId].IsGrayscale = true;
+        }
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        isFirstLoad = true;
+
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
     }
 }

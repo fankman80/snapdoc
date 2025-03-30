@@ -6,13 +6,13 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"   
-             x:Class="bsm24.Views.PopupProjectEdit"
+             x:Class="bsm24.Views.PopupPlanEdit"
              BackgroundClicked="PopupPage_BackgroundClicked"
              BackgroundInputTransparent="False"
              CloseWhenBackgroundIsClicked="True"
              HasSystemPadding="False"
              BackgroundColor="#60000000"
-             Title="Project Edit">
+             Title="Plan Edit">
 
     <Border
         StrokeShape="RoundRectangle 20,20,20,20"
@@ -23,31 +23,29 @@
         VerticalOptions="Center">
 
         <VerticalStackLayout>
-            <material:TextField x:Name="text_entry"
-                            Title="Projekt Titel"
+            <material:TextField x:Name="name_entry"
+                            Title="Planbezeichnung"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
                             AllowClear="True"/>
 
-            <Button Grid.Column="0"
-                    Text="Zip Exportieren"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"    
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
-                    Clicked="OnSaveClicked" />
+            <material:EditorField x:Name="desc_entry"
+                            Title="Beschreibung"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
 
             <Button Grid.Column="0"
-                    x:Name="openFolderBtn"
-                    IsVisible="False"
-                    Text="Verzeichnis öffnen"
+                    x:Name="grayscaleButtonText"
+                    Text="Farben entfernen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"    
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Folder_open}}"
-                    Clicked="OnOpenFolderClicked" />
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}"
+                    Clicked="OnGrayscaleClicked" />
 
             <Button Grid.Column="0"
-                    Text="Projekt löschen"
+                    Text="Plan löschen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"        
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"

@@ -32,21 +32,22 @@ public partial class ExportReport
         };
         Dictionary<string, string> placeholders_lists = new()
         {
-            {"${plan_indexes}", "${plan_indexes}"}, //bereinige splitted runs
-            {"${plan_images/", "${plan_images/"},   //bereinige splitted runs  
-            {"${title_image}", "${title_image}"},   //bereinige splitted runs
+            {"${plan_indexes}", "${plan_indexes}"},         //bereinige splitted runs
+            {"${plan_images/", "${plan_images/"},           //bereinige splitted runs  
+            {"${title_image}", "${title_image}"},           //bereinige splitted runs
+            {"${plan_descs}", "${plan_descs}"},             //bereinige splitted runs
         };
         Dictionary<string, string> placeholders_table = new()
         {
-            {"${pin_nr}", "${pin_nr}"},             //bereinige splitted runs
-            {"${pin_planName}", "${pin_planName}"}, //bereinige splitted runs
-            {"${pin_posImage}", "${pin_posImage}"}, //bereinige splitted runs
-            {"${pin_fotoList}", "${pin_fotoList}"}, //bereinige splitted runs
-            {"${pin_name}", "${pin_name}"},         //bereinige splitted runs
-            {"${pin_desc}", "${pin_desc}"},         //bereinige splitted runs
-            {"${pin_location}", "${pin_location}"}, //bereinige splitted runs
-            {"${pin_priority}", "${pin_priority}"}, //bereinige splitted runs
-            {"${pin_geolocWGS84}", "${pin_geolocWGS84}"}, //bereinige splitted runs
+            {"${pin_nr}", "${pin_nr}"},                     //bereinige splitted runs
+            {"${pin_planName}", "${pin_planName}"},         //bereinige splitted runs
+            {"${pin_posImage}", "${pin_posImage}"},         //bereinige splitted runs
+            {"${pin_fotoList}", "${pin_fotoList}"},         //bereinige splitted runs
+            {"${pin_name}", "${pin_name}"},                 //bereinige splitted runs
+            {"${pin_desc}", "${pin_desc}"},                 //bereinige splitted runs
+            {"${pin_location}", "${pin_location}"},         //bereinige splitted runs
+            {"${pin_priority}", "${pin_priority}"},         //bereinige splitted runs
+            {"${pin_geolocWGS84}", "${pin_geolocWGS84}"},   //bereinige splitted runs
             {"${pin_geolocCH1903}", "${pin_geolocCH1903}"}, //bereinige splitted runs
         };
 

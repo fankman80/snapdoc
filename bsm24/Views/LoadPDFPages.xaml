@@ -6,9 +6,9 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:bsm24.Views"
              xmlns:local="clr-namespace:bsm24"
-             Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="DimGrey"
              x:DataType="views:LoadPDFPages"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
              x:Class="bsm24.Views.LoadPDFPages"
              Title="PDF Seiten hinzufügen">
 

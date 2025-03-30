@@ -6,12 +6,11 @@
         xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
         xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
         xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
-        Shell.TitleColor="{DynamicResource PrimaryDark}"
-        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
         xmlns:local="clr-namespace:bsm24"
         xmlns:models="clr-namespace:bsm24.Models"
         xmlns:services="clr-namespace:bsm24.Services"
         x:Name="ExportSettingsPage"
+        Shell.TitleColor="{DynamicResource PrimaryDark}"
         x:Class="bsm24.Views.ExportSettings"
         Title="Bericht exportieren">
     

@@ -78,7 +78,7 @@ public partial class ExportSettings : UraniumContentPage
         if (File.Exists(outputPath))
             File.Delete(outputPath);
 
-        await Shell.Current.GoToAsync("..", true);
+        await Shell.Current.GoToAsync("..");
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -127,7 +127,7 @@ public partial class ExportSettings : UraniumContentPage
         if (File.Exists(outputPath))
             File.Delete(outputPath);
 
-        await Shell.Current.GoToAsync("..", true);
+        await Shell.Current.GoToAsync("..");
     }
 
     private static async Task ShareFileAsync(string filePath)
@@ -142,7 +142,7 @@ public partial class ExportSettings : UraniumContentPage
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync("..", true);
+        await Shell.Current.GoToAsync("..");
     }
 
     private static void LoadDocuments()
