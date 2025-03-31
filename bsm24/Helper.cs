@@ -103,55 +103,6 @@ public class Helper
         return grayBitmap;
     }
 
-    public static ImageSource SKBitmapToImageSource(SKBitmap bitmap)
-    {
-        using var image = SKImage.FromBitmap(bitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 90); // Du kannst PNG oder JPEG verwenden
-
-        using var stream = new MemoryStream();
-        data.SaveTo(stream);
-        stream.Seek(0, SeekOrigin.Begin); // Stream zurücksetzen
-
-        return ImageSource.FromStream(() => stream);
-    }
-
-    public static async Task<Location> GetCurrentLocationAsync(double desiredAccuracy, int maxTimeoutSeconds, Action<(int accuracy, int remainingTime)> onUpdate)
-    {
-        Location bestLocation = null;
-        var startTime = DateTime.UtcNow;
-        var cancellationTokenSource = new CancellationTokenSource(TimeSpan.FromSeconds(maxTimeoutSeconds));
-
-        while (!cancellationTokenSource.IsCancellationRequested)
-        {
-            try
-            {
-                var request = new GeolocationRequest(GeolocationAccuracy.Best, TimeSpan.FromSeconds(10));
-                var location = await Geolocation.Default.GetLocationAsync(request, cancellationTokenSource.Token);
-                if (location != null)
-                {
-                    bestLocation = location;
-                    var elapsed = (DateTime.UtcNow - startTime).TotalSeconds;
-                    var remainingTime = maxTimeoutSeconds - (int)elapsed;
-
-                    onUpdate(((int)Math.Round(location.Accuracy ?? 9999), remainingTime));
-
-                    if (location.Accuracy.Value <= desiredAccuracy)
-                        return location;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fehler bei Standortabfrage: {ex.Message}");
-            }
-
-            await Task.Delay(500);
-
-            if ((DateTime.UtcNow - startTime).TotalSeconds > maxTimeoutSeconds)
-                break;
-        }
-        return bestLocation;
-    }
-
     public static void PackDirectory(string sourceDirectory, string destinationZipFile)
     {
         if (!Directory.Exists(sourceDirectory))
@@ -327,5 +278,22 @@ public class Helper
         {
             Console.WriteLine("Fehler beim Löschen des Items in der XML-Datei: " + ex.Message);
         }
+    }
+
+    public static void BitmapResizer(string sourcePath, string destinationPath, double scaleFactor)
+    {
+        using var inputBitmap = SKBitmap.Decode(sourcePath);
+
+        int newWidth = (int)(inputBitmap.Width * scaleFactor);
+        int newHeight = (int)(inputBitmap.Height * scaleFactor);
+        var resizedBitmap = new SKBitmap(newWidth, newHeight);
+        var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None);
+
+        inputBitmap.ScalePixels(resizedBitmap, samplingOptions);
+
+        using var image = SKImage.FromBitmap(resizedBitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
+        using var stream = File.OpenWrite(destinationPath);
+        data.SaveTo(stream);
     }
 }

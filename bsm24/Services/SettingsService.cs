@@ -313,6 +313,34 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
+    private bool _isFotoCompressed = false;
+    public bool IsFotoCompressed
+    {
+        get => _isFotoCompressed;
+        set
+        {
+            if (_isFotoCompressed != value)
+            {
+                _isFotoCompressed = value;
+                OnPropertyChanged(nameof(IsFotoCompressed));
+            }
+        }
+    }
+
+    private int _fotoCompressValue = 20;
+    public int FotoCompressValue
+    {
+        get => _fotoCompressValue;
+        set
+        {
+            if (_fotoCompressValue != value)
+            {
+                _fotoCompressValue = value;
+                OnPropertyChanged(nameof(FotoCompressValue));
+            }
+        }
+    }
+
     private int _imageExportSize = 40;
     public int ImageExportSize
     {
@@ -355,34 +383,6 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private double _imageExportScale = 0.1;
-    public double ImageExportScale
-    {
-        get => _imageExportScale;
-        set
-        {
-            if (_imageExportScale != value)
-            {
-                _imageExportScale = Math.Round(value, 2);
-                OnPropertyChanged(nameof(ImageExportScale));
-            }
-        }
-    }
-
-    private int _posImageExportSize = 40;
-    public int PosImageExportSize
-    {
-        get => _posImageExportSize;
-        set
-        {
-            if (_posImageExportSize != value)
-            {
-                _posImageExportSize = value;
-                OnPropertyChanged(nameof(PosImageExportSize));
-            }
-        }
-    }
-
     private int _pinPosExportSize = 25;
     public int PinPosExportSize
     {
@@ -407,20 +407,6 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _pinPosCropExportSize = value;
                 OnPropertyChanged(nameof(PinPosCropExportSize));
-            }
-        }
-    }
-
-    private double _posImageExportScale = 0.5;
-    public double PosImageExportScale
-    {
-        get => _posImageExportScale;
-        set
-        {
-            if (_posImageExportScale != value)
-            {
-                _posImageExportScale = Math.Round(value, 2);
-                OnPropertyChanged(nameof(PosImageExportScale));
             }
         }
     }

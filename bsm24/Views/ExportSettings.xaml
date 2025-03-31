@@ -58,124 +58,114 @@
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="40" />
-                            <RowDefinition Height="40" />
-                            <RowDefinition Height="40" />
-                            <RowDefinition Height="40" />
-                            <RowDefinition Height="40" />
-                        </Grid.RowDefinitions>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox
+                            Scale="1.2"
+                            Color="{DynamicResource Primary}"
+                            IsChecked="{Binding IsPlanExport}"/>                            
+                        <Label Text="Exportiere Pläne" VerticalTextAlignment="Center"/>                            
+                    </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
-                            <CheckBox
-                              Scale="1.2"
-                              Color="{DynamicResource Primary}"
-                              IsChecked="{Binding IsPlanExport}"/>                            
-                            <Label Text="Exportiere Pläne" VerticalTextAlignment="Center"/>                            
-                        </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox
+                            Scale="1.2"
+                            Color="{DynamicResource Primary}"
+                            IsChecked="{Binding IsPosImageExport}"/>
+                        <Label Text="Exportiere Positionsbilder" VerticalTextAlignment="Center"/> 
+                    </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="1" Spacing="0">
-                            <CheckBox
-                              Scale="1.2"
-                              Color="{DynamicResource Primary}"
-                              IsChecked="{Binding IsPosImageExport}"/>
-                            <Label Text="Exportiere Positionsbilder" VerticalTextAlignment="Center"/> 
-                        </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox Scale="1.2"
+                                    Color="{DynamicResource Primary}"
+                                    IsChecked="{Binding IsPinIconExport}"/>
+                        <Label Text="Exportiere Pin-Icons" VerticalTextAlignment="Center"/>                            
+                    </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="2" Spacing="0">
-                            <CheckBox
-                                  Scale="1.2"
-                                  Color="{DynamicResource Primary}"
-                                  IsChecked="{Binding IsPinIconExport}"/>
-                            <Label Text="Exportiere Pin-Icons" VerticalTextAlignment="Center"/>                            
-                        </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox Scale="1.2"
+                                    Color="{DynamicResource Primary}"
+                                    IsChecked="{Binding IsImageExport}"/>
+                        <Label Text="Exportiere Fotos" VerticalTextAlignment="Center"/>                            
+                    </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="3" Spacing="0">
-                            <CheckBox
-                                  Scale="1.2"
-                                  Color="{DynamicResource Primary}"
-                                  IsChecked="{Binding IsImageExport}"/>
-                            <Label Text="Exportiere Fotos" VerticalTextAlignment="Center"/>                            
-                        </HorizontalStackLayout>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox Scale="1.2"
+                                    IsVisible="{Binding IsImageExport}"
+                                    Color="{DynamicResource Primary}"
+                                    IsChecked="{Binding IsFotoOverlayExport}"/>
+                        <Label Text="Exportiere Foto-Overlays" VerticalTextAlignment="Center" IsVisible="{Binding IsImageExport}"/>
+                    </HorizontalStackLayout>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="4" Spacing="0">
-                            <CheckBox
-                                  Scale="1.2"
-                                  Color="{DynamicResource Primary}"
-                                  IsChecked="{Binding IsFotoOverlayExport}"/>
-                            <Label Text="Exportiere Foto-Overlays" VerticalTextAlignment="Center"/>                            
-                        </HorizontalStackLayout>
-                    </Grid>
+                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
+                        <CheckBox Scale="1.2"
+                                    Color="{DynamicResource Primary}"
+                                    IsChecked="{Binding IsFotoCompressed}"/>
+                        <Label Text="Bildkomprimierung" VerticalTextAlignment="Center"/>
+                    </HorizontalStackLayout>                       
+                    
 
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0:0.##}%'}"
+                           Margin="0, 0, 0, -12"
+                           IsVisible="{Binding IsFotoCompressed}"/>
+                    <Slider Maximum="100"
+                            Minimum="1"
+                            IsVisible="{Binding IsFotoCompressed}"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding FotoCompressValue}"/>
 
-                        <material:TextField Grid.Column="0"
-                                Title="Pinbeschriftung"                   
-                                Text="{Binding PlanLabelPrefix}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
-                        <material:TextField Grid.Column="1"
-                                Title="Grösse"
-                                HorizontalTextAlignment="Center"
-                                Text="{Binding PlanLabelFontSize}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
-                    </Grid>
-
+                    <material:TextField Grid.Column="0" Grid.Row="1"
+                            Title="Pinbeschriftung"                   
+                            Text="{Binding PlanLabelPrefix}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
+    
+                    <Label Text="{Binding PlanLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
+                    <Slider Maximum="20"
+                            Minimum="1"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding PlanLabelFontSize}"/>
+                    
                     <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
-                                Minimum="1"
-                                ThumbColor="{DynamicResource Primary}"
-                                MinimumTrackColor="{DynamicResource Primary}"
-                                MaximumTrackColor="{DynamicResource PrimaryDark}"
-                                Value="{Binding PinExportSize}"/>
+                            Minimum="1"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{DynamicResource Primary}"
+                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            Value="{Binding PinExportSize}"/>
 
-                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}"
+                           Margin="0, 0, 0, -12"
+                           IsVisible="{Binding IsImageExport}"/>
                     <Slider Maximum="160"
                             Minimum="10"
+                            IsVisible="{Binding IsImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{DynamicResource Primary}"
                             MaximumTrackColor="{DynamicResource PrimaryDark}"
                             Value="{Binding ImageExportSize}"/>
 
-                    <Label IsVisible="False" Text="{Binding ImageExportScale, StringFormat='Foto Auflösung: {0:0.##}'}" Margin="0, 0, 0, -12"/>
-                    <Slider IsVisible="False" Maximum="1"
-                            Minimum="0.01"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
-                            Value="{Binding ImageExportScale}"/>
-
-                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}"
+                           Margin="0, 0, 0, -12"
+                           IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="160"
                             Minimum="10"
+                            IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{DynamicResource Primary}"
                             MaximumTrackColor="{DynamicResource PrimaryDark}"
                             Value="{Binding PinPosExportSize}"/>
 
-                    <Label IsVisible="False" Text="{Binding PosImageExportScale, StringFormat='Positionsbilder Auflösung: {0:0.##}'}" Margin="0, 0, 0, -12"/>
-                    <Slider IsVisible="False" Maximum="1"
-                            Minimum="0.01"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
-                            Value="{Binding PosImageExportScale}"/>
-
-                    <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}"
+                           Margin="0, 0, 0, -12"
+                           IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="1000"
                             Minimum="100"
+                            IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{DynamicResource Primary}"
                             MaximumTrackColor="{DynamicResource PrimaryDark}"

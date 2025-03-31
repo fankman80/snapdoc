@@ -5,7 +5,6 @@ using bsm24.Services;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
-using Microsoft.Maui;
 using SkiaSharp;
 using System.Text.RegularExpressions;
 using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -215,7 +214,14 @@ public partial class ExportReport
                                                                         Width = SettingsService.Instance.ImageExportSize,
                                                                         Height = SettingsService.Instance.ImageExportSize / factor
                                                                     };
-                                                                    
+
+                                                                    if (SettingsService.Instance.IsFotoCompressed)
+                                                                    {
+                                                                        var newPath = System.IO.Path.Combine(Settings.CacheDirectory, System.IO.Path.GetFileName(imgName));
+                                                                        Helper.BitmapResizer(imgPath, newPath, SettingsService.Instance.FotoCompressValue / 100f);
+                                                                        imgPath = newPath; 
+                                                                    }
+
                                                                     Drawing _img = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline");
 
                                                                     newRun.Append(_img);
@@ -423,7 +429,6 @@ public partial class ExportReport
                                         // Füge das Plan-Image und die Pins zum Paragraph hinzu
                                         imageAndPinsParagraph.Append(run);
                                         paragraph.Append(imageAndPinsParagraph);
-                                        planCounter--;
 
                                         // Erstelle einen neuen Paragraph mit einem Seitenumbruch (ausser nach dem letzen Plan)
                                         if (planCounter > 1)
@@ -431,6 +436,7 @@ public partial class ExportReport
                                             Paragraph pageBreakParagraph = new(new Run(new Break() { Type = BreakValues.Page }));
                                             paragraph.Append(pageBreakParagraph);
                                         }
+                                        planCounter--;
                                     }
                                     else // lasse den Pin-Zähler weiter laufen, aber zeichne keine Pins oder Pläne
                                     {

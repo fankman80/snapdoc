@@ -48,7 +48,7 @@
                                           Color="{DynamicResource Primary}"
                                           VerticalOptions="End"
                                           HorizontalOptions="End"/>
-                                <Label Text="{Binding Dpi, StringFormat='DPI: {0:0.##}'}"
+                                <Label Text="{Binding Dpi, StringFormat='{0:0.##} dpi'}"
                                        FontSize="12"
                                        Padding="4"
                                        HorizontalTextAlignment="Center"

@@ -12,7 +12,7 @@ public partial class LoadPDFPages : UraniumContentPage
     FileResult result;
     public int DynamicSpan { get; set; } = 2; // Standardwert
     public int MinSize = 2;
-    private int tagrgetDpi = SettingsService.Instance.PdfQuality;
+    private int targetDpi = SettingsService.Instance.PdfQuality;
 
     public LoadPDFPages()
     {
@@ -68,14 +68,14 @@ public partial class LoadPDFPages : UraniumContentPage
                     var skBitmap = SKBitmap.Decode(stream);
                     Size _imgSize = new(skBitmap.Width, skBitmap.Height);
 
-                    int widthHighDpi = skBitmap.Width * tagrgetDpi / 72;
-                    int heightHighDpi = skBitmap.Height * tagrgetDpi / 72;
+                    int widthHighDpi = skBitmap.Width * targetDpi / 72;
+                    int heightHighDpi = skBitmap.Height * targetDpi / 72;
 
                     if (widthHighDpi > 8000 || heightHighDpi > 8000)
                     {
-                        widthHighDpi = tagrgetDpi * 8000 / widthHighDpi;
-                        heightHighDpi = tagrgetDpi * 8000 / heightHighDpi;
-                        tagrgetDpi = Math.Min(widthHighDpi, heightHighDpi);
+                        widthHighDpi = targetDpi * 8000 / widthHighDpi;
+                        heightHighDpi = targetDpi * 8000 / heightHighDpi;
+                        targetDpi = Math.Min(widthHighDpi, heightHighDpi);
                     }
 
                     pdfImages.Add(new ImageItem
@@ -83,7 +83,7 @@ public partial class LoadPDFPages : UraniumContentPage
                         ImagePath = imgPath,
                         PreviewPath = previewPath,
                         IsChecked = true,
-                        Dpi = tagrgetDpi
+                        Dpi = targetDpi
                     });
                 }
             });
@@ -118,7 +118,7 @@ public partial class LoadPDFPages : UraniumContentPage
                 var renderOptions = new RenderOptions()
                 {
                     AntiAliasing = PdfAntiAliasing.All,
-                    Dpi = tagrgetDpi, //SettingsService.Instance.PdfQuality,
+                    Dpi = targetDpi,
                     WithAnnotations = true,
                     WithFormFill = true,
                     UseTiling = true,
