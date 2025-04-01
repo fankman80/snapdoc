@@ -1,9 +1,8 @@
 #nullable disable
 
+using bsm24.Services;
 using Mopups.Pages;
 using Mopups.Services;
-using bsm24.Services;
-using bsm24.ViewModels;
 
 namespace bsm24.Views;
 

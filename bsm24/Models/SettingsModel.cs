@@ -2,8 +2,8 @@
 
 internal class SettingsModel
 {
-    public double PinMinScaleLimit { get; set; }
-    public double PinMaxScaleLimit { get; set; }
+    public int PinMinScaleLimit { get; set; }
+    public int PinMaxScaleLimit { get; set; }
     public int MapIconSize { get; set; }
     public int MapIcon { get; set; }
     public int IconSortCrit { get; set; }
@@ -13,4 +13,6 @@ internal class SettingsModel
     public int PdfQuality { get; set; }
     public int SelectedColorTheme { get; set; }
     public int SelectedAppTheme { get; set; }
+    public bool IsFotoCompressed { get; set; }
+    public int FotoCompressValue { get; set; }
 }

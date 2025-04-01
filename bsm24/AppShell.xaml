@@ -99,7 +99,7 @@
                        HorizontalTextAlignment="Center"/>
 
                 <Label Grid.Row="1" Grid.Column="1"
-                       Text="Version 1.0"
+                       Text="Version 1.1"
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontSize="10"
                        VerticalOptions="Start"

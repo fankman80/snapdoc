@@ -34,6 +34,13 @@ public partial class ExportSettings : UraniumContentPage
             SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.First();
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        SettingsService.Instance.SaveSettings();
+    }
+
     private async void OnShareClicked(object sender, EventArgs e)
     {
         if (SettingsService.Instance.SelectedTemplate == null)

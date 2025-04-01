@@ -37,7 +37,8 @@
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
                 <VerticalStackLayout Spacing="0">
                     <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
-                    <Slider Maximum="100"
+                    <Slider x:Name="MinScaleSlider"
+                            Maximum="{Binding PinMaxScaleLimit}"
                             Minimum="1"
                             Margin="0,0,0,10"
                             ThumbColor="{DynamicResource Primary}"
@@ -46,8 +47,9 @@
                             Value="{Binding PinMinScaleLimit}"/>
 
                     <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
-                    <Slider Maximum="100"
-                            Minimum="1"
+                    <Slider x:Name="MaxScaleSlider"
+                            Maximum="100"
+                            Minimum="{Binding PinMinScaleLimit}"
                             Margin="0,0,0,10"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{DynamicResource Primary}"
@@ -85,7 +87,7 @@
                             <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
                         </HorizontalStackLayout>
 
-                        <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="5" Text="Icon für Map:"/>
+                        <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="5" Text="Map-Icon:"/>
 
                         <material:RadioButton Grid.Column="0" Grid.Row="2"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
@@ -150,7 +152,7 @@
                             Value="{Binding MapIconSize}"/>
 
                     <material:PickerField x:Name="darkModePicker"
-                                          Title="Appthema:"
+                                          Title="Appthema"
                                           Margin="0,10,0,10"
                                           BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                           AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
@@ -159,7 +161,7 @@
                     </material:PickerField>
 
                     <material:PickerField x:Name="colorThemePicker"
-                                          Title="Farbthema:"
+                                          Title="Farbthema"
                                           Margin="0,0,0,10"
                                           BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                           AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"

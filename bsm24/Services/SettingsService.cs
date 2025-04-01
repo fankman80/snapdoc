@@ -85,29 +85,29 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private double _pinMinScaleLimit = 60;
-    public double PinMinScaleLimit
+    private int _pinMinScaleLimit = 60;
+    public int PinMinScaleLimit
     {
         get => _pinMinScaleLimit;
         set
         {
             if (_pinMinScaleLimit != value)
             {
-                _pinMinScaleLimit = Math.Min(Math.Round(value,0), PinMaxScaleLimit);
+                _pinMinScaleLimit = value;
                 OnPropertyChanged(nameof(PinMinScaleLimit));
             }
         }
     }
 
-    private double _pinMaxScaleLimit = 80;
-    public double PinMaxScaleLimit
+    private int _pinMaxScaleLimit = 80;
+    public int PinMaxScaleLimit
     {
         get => _pinMaxScaleLimit;
         set
         {
             if (_pinMaxScaleLimit != value)
             {
-                _pinMaxScaleLimit = Math.Max(Math.Round(value,0), PinMinScaleLimit);
+                _pinMaxScaleLimit = value;
                 OnPropertyChanged(nameof(PinMaxScaleLimit));
             }
         }
@@ -121,7 +121,7 @@ public partial class SettingsService : INotifyPropertyChanged
         {
             if (_pdfQuality != value)
             {
-                _pdfQuality = (int)(value / 50) * 50; ;
+                _pdfQuality = (value / 50) * 50; ;
                 OnPropertyChanged(nameof(PdfQuality));
             }
         }
@@ -313,7 +313,7 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private bool _isFotoCompressed = false;
+    private bool _isFotoCompressed = true;
     public bool IsFotoCompressed
     {
         get => _isFotoCompressed;
@@ -614,6 +614,8 @@ public partial class SettingsService : INotifyPropertyChanged
             IconSortCrit = IconSortCrits.IndexOf(this.IconSortCrit),
             PinSortCrit = PinSortCrits.IndexOf(this.PinSortCrit),
             IconCategory = IconCategories.IndexOf(this.IconCategory),
+            IsFotoCompressed = this.IsFotoCompressed,
+            FotoCompressValue = this.FotoCompressValue
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -650,6 +652,8 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0)
                     ? IconCategories[settings.IconCategory]
                     : IconCategories[0];
+                this.IsFotoCompressed = settings.IsFotoCompressed;
+                this.FotoCompressValue = settings.FotoCompressValue;
             }
         }
     }
