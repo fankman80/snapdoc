@@ -19,18 +19,40 @@
         }
 
         #popup {
-            position: absolute;
+            position: absolute; /* Damit das Pseudo-Element relativ zum Popup positioniert wird */
             background-color: white;
             padding: 10px;
             border-radius: 10px;
-            box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.4);
+            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.5);
             width: 250px;
             font-family: "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
             display: none;
             word-wrap: break-word;
-            max-height: auto;
             z-index: 9999;
+            border: 1px solid gray;
+        }
+
+        /* Rahmen-Pfeil (größeres Dreieck) */
+        #popup::before {
+            content: "";
+            position: absolute;
+            left: -11px;         /* Etwas weiter links, damit der Rahmen sichtbar ist */
+            top: 40px;           /* Feste Position, z.B. 20px vom oberen Rand */
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-right: 11px solid gray; /* Rahmenfarbe */
+        }
+
+        /* Innerer Pfeil (kleineres Dreieck) */
+        #popup::after {
+            content: "";
+            position: absolute;
+            left: -10px;         /* Etwas nach innen verschoben, damit der Rahmen um den Pfeil entsteht */
+            top: 41px;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid white; /* Gleiche Hintergrundfarbe wie das Popup */
         }
 
         #popup h4 {
@@ -129,7 +151,7 @@
 
                 var popupElement = document.getElementById('popup');
 
-                if (feature) {
+                if (feature && feature.get('pinname') !== undefined) {
                     var coordinates = feature.getGeometry().getCoordinates();
                     let content = '';
 
@@ -151,7 +173,7 @@
 
                     // Falls alle Felder leer sind, Standardtext setzen
                     if (!content) {
-                        content = '<h4 class="popup-header">Keine Informationen verfügbar</h4>';
+                        content = '<h4 class="popup-header">Hinweis:</h4><p class="popup-header">Für diesen Pin sind noch keine Informationen verfügbar.</p>';
                     } else {
                         // Entferne das letzte `<hr>` falls vorhanden
                         content = content.replace(/<hr class="solid">$/, '');
@@ -165,7 +187,6 @@
                     popupElement.style.display = 'none';
                 }
             });
-
         }
 
         function setMarkerPosition(lon, lat, pinname, pinlocation, pindesc, plankey, pinkey) {
@@ -238,6 +259,7 @@
         }
     </script>
 </head>
+
 <body onload="initMap()">
     <div id="map"></div>
     <div id="popup">
