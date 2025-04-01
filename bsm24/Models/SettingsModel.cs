@@ -2,8 +2,8 @@
 
 internal class SettingsModel
 {
-    public int PinMinScaleLimit { get; set; }
-    public int PinMaxScaleLimit { get; set; }
+    public double PinMinScaleLimit { get; set; }
+    public double PinMaxScaleLimit { get; set; }
     public int MapIconSize { get; set; }
     public int MapIcon { get; set; }
     public int IconSortCrit { get; set; }

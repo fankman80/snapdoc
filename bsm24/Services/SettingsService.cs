@@ -85,29 +85,29 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _pinMinScaleLimit = 60;
-    public int PinMinScaleLimit
+    private double _pinMinScaleLimit = 60;
+    public double PinMinScaleLimit
     {
         get => _pinMinScaleLimit;
         set
         {
             if (_pinMinScaleLimit != value)
             {
-                _pinMinScaleLimit = value;
+                _pinMinScaleLimit = Math.Round(value, 0);
                 OnPropertyChanged(nameof(PinMinScaleLimit));
             }
         }
     }
 
-    private int _pinMaxScaleLimit = 80;
-    public int PinMaxScaleLimit
+    private double _pinMaxScaleLimit = 80;
+    public double PinMaxScaleLimit
     {
         get => _pinMaxScaleLimit;
         set
         {
             if (_pinMaxScaleLimit != value)
             {
-                _pinMaxScaleLimit = value;
+                _pinMaxScaleLimit = Math.Round(value,0);
                 OnPropertyChanged(nameof(PinMaxScaleLimit));
             }
         }
