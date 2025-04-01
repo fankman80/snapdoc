@@ -17,7 +17,7 @@
             margin: 0;
             padding: 0;
         }
-       
+
         #popup {
             position: absolute;
             background-color: white;
@@ -26,6 +26,7 @@
             box-shadow: 6px 6px 6px rgba(0, 0, 0, 0.4);
             width: 250px;
             font-family: "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
             display: none;
             word-wrap: break-word;
             max-height: auto;
@@ -33,21 +34,24 @@
         }
 
         #popup h4 {
-            font-size: 14px;
             font-weight: bold;
-            font-style: italic;
             margin: 5px;
             color: #999999;
         }
 
         #popup p {
-            font-size: 14px;
             margin: 5px, 5px, 15px, 5px;
         }
 
         .popup-header {
             font-size: 14px;
             margin: 5px;
+        }
+
+        hr.solid {
+            border: none;
+            border-top: 1px solid #999999; /* Hier kannst du die Farbe anpassen */
+            margin: 10px 0; /* Abstand um den Strich */
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
@@ -128,7 +132,9 @@
                     var popupElement = document.getElementById('popup');
                     popupElement.innerHTML =
                         '<h4 class="popup-header">Bezeichnung:</h4><p class="popup-header">' + feature.get('pinname') + '</p>' +
+                        '<hr class="solid">' +
                         '<h4 class="popup-header">Standort:</h4><p class="popup-header">' + feature.get('pinlocation') + '</p>' +
+                        '<hr class="solid">' +
                         '<h4 class="popup-header">Beschreibung:</h4><p class="popup-header">' + feature.get('pindesc') + '</p>';
                     popupElement.style.display = 'block';
                 } else {
@@ -212,8 +218,10 @@
     <div id="popup">
         <h4>Bezeichnung:</h4>
         <p id="pinname"></p>
+        <hr class="solid">
         <h4>Standort:</h4>
         <p id="pinlocation"></p>
+        <hr class="solid">
         <h4>Beschreibung:</h4>
         <p id="pindesc"></p>
     </div>
