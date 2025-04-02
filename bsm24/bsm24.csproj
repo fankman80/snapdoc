@@ -205,7 +205,7 @@
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.2.7" />
 		<PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
-		<PackageReference Include="HarfBuzzSharp" Version="8.3.1-preview.2.3" />
+		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.1-preview.1.2" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0-rc2" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="9.0.50" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.50" />
@@ -356,7 +356,7 @@
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">
 	  <PackageReference Include="HarfBuzzSharp.NativeAssets.Android">
-	    <Version>8.3.1-preview.2.3</Version>
+	    <Version>8.3.1.1-preview.1.2</Version>
 	  </PackageReference>
 	</ItemGroup>
 </Project>

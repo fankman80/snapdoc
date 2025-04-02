@@ -106,11 +106,19 @@
                        HorizontalTextAlignment="Center"/>
 
                 <ImageButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2"
-                             Source="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Settings}}"
+                             HeightRequest="12"
+                             Padding="0"
                              HorizontalOptions="End"
                              VerticalOptions="Center"
                              BackgroundColor="Transparent"
-                             Clicked="OnSettingsClicked"/>
+                             Clicked="OnSettingsClicked">
+                    <ImageButton.Source>
+                        <FontImageSource Glyph="{x:Static m:MaterialOutlined.Settings}"
+                         FontFamily="MaterialOutlined"
+                         Size="24"
+                         Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                    </ImageButton.Source>                    
+                </ImageButton>
             </Grid>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>
