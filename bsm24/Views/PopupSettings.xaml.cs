@@ -44,11 +44,11 @@ public partial class PopupSettings : PopupPage
 
     private void OnThemeChanged(object sender, object e)
     {
-        Color newColor_m1 = Application.Current.RequestedTheme == AppTheme.Dark
+        Color newColor_root_menu = Application.Current.RequestedTheme == AppTheme.Dark
             ? (Color)Application.Current.Resources["PrimaryDarkText"]
             : (Color)Application.Current.Resources["PrimaryText"];
 
-        Color newColor_m2 = Application.Current.RequestedTheme == AppTheme.Dark
+        Color newColor_plan_menu = Application.Current.RequestedTheme == AppTheme.Dark
             ? (Color)Application.Current.Resources["PrimaryDark"]
             : (Color)Application.Current.Resources["Primary"];
 
@@ -56,10 +56,10 @@ public partial class PopupSettings : PopupPage
         {
             if (item is FlyoutItem flyoutItem && flyoutItem.Icon is FontImageSource fontIcon)
             {
-                if (item.AutomationId == "m1")
-                    fontIcon.Color = newColor_m1;
-                else if (item.AutomationId == "m2")
-                    fontIcon.Color = newColor_m2;
+                if (item.AutomationId == "root_menu")
+                    fontIcon.Color = newColor_root_menu;
+                else
+                    fontIcon.Color = newColor_plan_menu;
             }
         }
     }

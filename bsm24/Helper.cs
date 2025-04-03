@@ -19,7 +19,7 @@ public class Helper
         var shellItem = new FlyoutItem
         {
             Title = title,
-            AutomationId = "m1",
+            AutomationId = "root_menu",
             Icon = new FontImageSource
             {
                 FontFamily = "MaterialOutlined",
@@ -56,6 +56,7 @@ public class Helper
             Title = "────────────────────────────────────────────────────────",
             IsEnabled = false,
             Items = { new ShellContent{} },
+            AutomationId = "plan_menu",
         };
 
         if (Shell.Current.Items is IList<ShellItem> shellItems)

@@ -31,7 +31,7 @@ public partial class LoadDataToView
                     var newFlyoutItem = new FlyoutItem
                     {
                         Title = planTitle,
-                        AutomationId = "m2",
+                        AutomationId = planId,
                         Icon = new FontImageSource
                         {
                             FontFamily = "MaterialOutlined",
