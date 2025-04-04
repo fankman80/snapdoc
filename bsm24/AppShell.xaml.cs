@@ -24,6 +24,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("pinList", typeof(PinList));
         Routing.RegisterRoute("exportSettings", typeof(ExportSettings));
         Routing.RegisterRoute("mapview", typeof(MapView));
+        BindingContext = this;
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)
@@ -38,6 +39,22 @@ public partial class AppShell : Shell
         {
             var projectDetails = new ProjectDetails();
             projectDetails.OnTitleCaptureClicked(null, null);
+        }
+    }
+
+    public void OnUpArrowClicked(object sender, EventArgs e)
+    {
+        if (sender is ImageButton button && button.BindingContext is FlyoutItem flyoutItem)
+        {
+            Helper.MoveItem(flyoutItem.AutomationId, -1);
+        }
+    }
+
+    public void OnDownArrowClicked(object sender, EventArgs e)
+    {
+        if (sender is ImageButton button && button.BindingContext is FlyoutItem flyoutItem)
+        {
+            Helper.MoveItem(flyoutItem.AutomationId, 1);
         }
     }
 }

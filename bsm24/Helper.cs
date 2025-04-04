@@ -56,7 +56,7 @@ public class Helper
             Title = "────────────────────────────────────────────────────────",
             IsEnabled = false,
             Items = { new ShellContent{} },
-            AutomationId = "plan_menu",
+            AutomationId = "root_menu",
         };
 
         if (Shell.Current.Items is IList<ShellItem> shellItems)
@@ -303,5 +303,54 @@ public class Helper
         using var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
         using var stream = File.OpenWrite(destinationPath);
         data.SaveTo(stream);
+    }
+
+    public static void MoveItem(string automationId, int direction)
+    {
+        // Dictionary in eine Liste umwandeln, um Reihenfolge zu manipulieren
+        var plansList = GlobalJson.Data.Plans.ToList();
+
+        // Index des Elements finden
+        int index = plansList.FindIndex(p => p.Key == automationId);
+        int newIndex = index + direction;
+
+        if (index >= 0 && newIndex >= 0 && newIndex < plansList.Count)
+        {
+            // Elemente tauschen
+            var temp = plansList[index];
+            plansList[index] = plansList[newIndex];
+            plansList[newIndex] = temp;
+
+            // Das Dictionary neu aufbauen (Reihenfolge der Liste beibehalten)
+            GlobalJson.Data.Plans = plansList.ToDictionary(p => p.Key, p => p.Value);
+
+            // FlyoutItem in Shell aktualisieren
+            MoveFlyoutItem(automationId, direction);
+
+            // Speichern
+            GlobalJson.SaveToFile();
+        }
+    }
+
+    public static void MoveFlyoutItem(string automationId, int direction)
+    {
+        var shellItems = Shell.Current.Items.ToList(); // In eine Liste umwandeln, da Shell.Items keine List<T> ist
+        int index = shellItems.FindIndex(item => item is FlyoutItem flyoutItem && flyoutItem.AutomationId == automationId);
+        int newIndex = index + direction;
+
+        if (index >= 0 && newIndex >= 0 && newIndex < shellItems.Count)
+        {
+            // FlyoutItem verschieben
+            var temp = shellItems[index];
+            shellItems[index] = shellItems[newIndex];
+            shellItems[newIndex] = temp;
+
+            // Shell leeren und neu befüllen (Reihenfolge aktualisieren)
+            Shell.Current.Items.Clear();
+            foreach (var item in shellItems)
+            {
+                Shell.Current.Items.Add(item);
+            }
+        }
     }
 }

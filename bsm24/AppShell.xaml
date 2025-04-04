@@ -19,7 +19,7 @@
 
     <Shell.ItemTemplate>
         <DataTemplate>
-            <Grid ColumnDefinitions="Auto,Auto" RowDefinitions="44">
+            <Grid ColumnDefinitions="Auto,Auto,Auto" RowDefinitions="44">
                 <Label Grid.Column="0" Grid.Row="0"
                        Margin= "10,0,0,0"
                        FontSize="22"
@@ -32,14 +32,41 @@
                     </Label.Text>
                 </Label>
                 <Label Grid.Column="1" Grid.Row="0"
+                       WidthRequest="140"
                        Margin= "10,0,0,0"
                        Text="{Binding Title}" 
                        TextColor="{Binding Path=Icon.Color}"
                        VerticalOptions="Center"/>
+                <HorizontalStackLayout Grid.Column="2" Grid.Row="0" Spacing="0">
+                    <HorizontalStackLayout.Triggers>
+                        <DataTrigger TargetType="HorizontalStackLayout" 
+                             Binding="{Binding Source={RelativeSource AncestorType={x:Type FlyoutItem}}, Path=AutomationId}" 
+                             Value="root_menu">
+                            <Setter Property="IsVisible" Value="False" />
+                        </DataTrigger>
+                    </HorizontalStackLayout.Triggers>
+
+                    <ImageButton Clicked="OnUpArrowClicked">
+                        <ImageButton.Source>
+                            <FontImageSource Glyph="{x:Static m:MaterialOutlined.Arrow_upward}"
+                             FontFamily="MaterialOutlined"
+                             Size="16"
+                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                    <ImageButton Clicked="OnDownArrowClicked">
+                        <ImageButton.Source>
+                            <FontImageSource Glyph="{x:Static m:MaterialOutlined.Arrow_downward}"
+                             FontFamily="MaterialOutlined"
+                             Size="16"
+                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                        </ImageButton.Source>
+                    </ImageButton>
+                </HorizontalStackLayout>
             </Grid>
         </DataTemplate>
     </Shell.ItemTemplate>
-    
+
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
             <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
@@ -138,7 +165,7 @@
                          FontFamily="MaterialOutlined"
                          Size="24"
                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
-                    </ImageButton.Source>                    
+                    </ImageButton.Source>
                 </ImageButton>
             </Grid>
         </DataTemplate>
