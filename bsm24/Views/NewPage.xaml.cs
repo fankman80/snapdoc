@@ -682,6 +682,9 @@ public partial class NewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupColorPicker(lineWidth, selectedColor);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
@@ -732,6 +735,9 @@ public partial class NewPage : IQueryAttributable
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupPlanEdit(name: GlobalJson.Data.Plans[PlanId].Name,
                                       desc: GlobalJson.Data.Plans[PlanId].Description,
                                       gray: GlobalJson.Data.Plans[PlanId].IsGrayscale,
@@ -768,6 +774,9 @@ public partial class NewPage : IQueryAttributable
 
     private async void OnDeleteClick()
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;

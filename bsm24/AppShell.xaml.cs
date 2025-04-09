@@ -31,6 +31,9 @@ public partial class AppShell : Shell
 
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupSettings();
         await MopupService.Instance.PushAsync(popup);
     }

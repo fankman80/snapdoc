@@ -118,6 +118,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void OnDeleteClick(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupDualResponse("Wollen Sie diesen Pin wirklich löschen?");
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
@@ -127,6 +130,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void OnEditClick(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupEntry(title: "Pin umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
@@ -219,6 +225,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
     private async void OnResizeClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupSlider(GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;

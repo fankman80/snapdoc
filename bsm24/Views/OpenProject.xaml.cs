@@ -73,6 +73,9 @@ public partial class OpenProject : UraniumContentPage
 
     private async void OnNewClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupEntry(title: "Neues Projekt eröffnen...", okText: "Erstellen");
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
@@ -182,6 +185,9 @@ public partial class OpenProject : UraniumContentPage
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var button = sender as Button;
         FileItem item = (FileItem)button.BindingContext;
 

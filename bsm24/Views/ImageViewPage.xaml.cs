@@ -116,6 +116,9 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupColorPicker(lineWidth, selectedColor);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
@@ -198,6 +201,9 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
+        if (MopupService.Instance.PopupStack.Any())
+            return;
+
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
