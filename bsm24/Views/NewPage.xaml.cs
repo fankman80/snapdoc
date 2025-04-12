@@ -797,9 +797,6 @@ public partial class NewPage : IQueryAttributable
 
     private async void OnDeleteClick()
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
