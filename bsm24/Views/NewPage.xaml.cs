@@ -285,8 +285,8 @@ public partial class NewPage : IQueryAttributable
         smallImage.DoubleTapped += (s, e) =>
         {
             activePin = smallImage;
-            PinSizeSlider.Value = activePin.Scale * 100;
-            PinRotateSlider.Value = activePin.Rotation;
+            PinSizeSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale * 100;
+            PinRotateSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation;
             planContainer.IsPanningEnabled = false;
             DrawBtn.IsVisible = false;
             SetPinBtn.IsVisible = false;

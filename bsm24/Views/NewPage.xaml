@@ -69,7 +69,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinSizeSlider"
-                            Margin="54,15,60,15"
+                            Margin="54,15,54,15"
                             Minimum="10"                    
                             Maximum="100"
                             Value="0"
@@ -80,7 +80,7 @@
                             DragCompleted="OnResizeSliderDragCompleted"/>
                 </Border>
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
-                       HeightRequest="34"
+                       HeightRequest="38"
                        Margin="36,0,0,113"
                        ZIndex="10000"
                        HorizontalOptions="Start"
@@ -106,7 +106,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinRotateSlider"
-                            Margin="54,15,60,15"
+                            Margin="54,15,54,15"
                             Minimum="0"                    
                             Maximum="360"
                             Value="0"
@@ -117,7 +117,7 @@
                             DragCompleted="OnRotateSliderDragCompleted"/>
                 </Border>
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
-                       HeightRequest="34"
+                       HeightRequest="38"
                        Margin="36,0,0,33"
                        ZIndex="10000"
                        HorizontalOptions="Start"
