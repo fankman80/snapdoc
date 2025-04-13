@@ -123,7 +123,7 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
                 <Label x:Name="degreesLabel" 
-                       Text="360°"
+                       Text="0°"
                        FontSize="18"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="End"
