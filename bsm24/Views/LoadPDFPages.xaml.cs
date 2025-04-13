@@ -223,6 +223,7 @@ public partial class LoadPDFPages : UraniumContentPage
             {
                 string sourceFilePath = item.ImagePath;
                 string fileName = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i + ".jpg";
+                string planId = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i;
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string planSourceName = "plan_" + i + ".jpg";
 
@@ -256,6 +257,10 @@ public partial class LoadPDFPages : UraniumContentPage
 
                 File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
                 i += 1;
+
+                // fügr neue Pläne hinzu
+                var newPlan = new KeyValuePair<string, Models.Plan>(planId, plan);
+                LoadDataToView.AddPlan(newPlan);
             }
         }
 
@@ -271,7 +276,8 @@ public partial class LoadPDFPages : UraniumContentPage
         {
             File.Delete(cacheFile);
         }
-        await Shell.Current.GoToAsync("..");
+
+        await Shell.Current.GoToAsync("project_details");
     }
 
     private void UpdateSpan()

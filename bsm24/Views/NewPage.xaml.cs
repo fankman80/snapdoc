@@ -715,6 +715,7 @@ public partial class NewPage : IQueryAttributable
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
         activePin.Rotation = sliderValue;
+        degreesLabel.Text = $"{Math.Round(sliderValue)}°";
     }
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
@@ -738,6 +739,7 @@ public partial class NewPage : IQueryAttributable
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
         activePin.Scale = sliderValue / 100;
+        percentLabel.Text = $"{Math.Round(sliderValue)}%";
     }
 
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
@@ -802,12 +804,15 @@ public partial class NewPage : IQueryAttributable
         var result = await popup.PopupDismissedTask;
         if (result != null)
         {
-            // löscht das dazugehörige Menü-Item
-            var shellItem = (Application.Current.Windows[0].Page as AppShell).Items.FirstOrDefault(i => i.AutomationId == PlanId);
-            if (shellItem != null)
-                (Application.Current.Windows[0].Page as AppShell).Items.Remove(shellItem);
+            var menuitem = (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId);
+            if (menuitem != null)
+                (Application.Current.Windows[0].Page as AppShell).PlanItems.Remove(menuitem);
 
             string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+            if (File.Exists(file))
+                File.Delete(file);
+
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + GlobalJson.Data.Plans[PlanId].File);
             if (File.Exists(file))
                 File.Delete(file);
 

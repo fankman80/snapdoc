@@ -69,7 +69,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinSizeSlider"
-                            Margin="70,15,15,15"
+                            Margin="54,15,60,15"
                             Minimum="10"                    
                             Maximum="100"
                             Value="0"
@@ -80,12 +80,21 @@
                             DragCompleted="OnResizeSliderDragCompleted"/>
                 </Border>
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
-                       HeightRequest="40"
-                       Margin="40,0,0,110"
+                       HeightRequest="34"
+                       Margin="36,0,0,113"
                        ZIndex="10000"
                        HorizontalOptions="Start"
-                       VerticalOptions="End"/>                
-                
+                       VerticalOptions="End"/>
+                <Label x:Name="percentLabel" 
+                       Text="100%"
+                       FontSize="18"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="0,0,30,118"
+                       ZIndex="10000"/>
+
                 <Border
                     BackgroundColor="{DynamicResource Primary}"
                     StrokeThickness="0"
@@ -97,7 +106,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinRotateSlider"
-                            Margin="70,15,15,15"
+                            Margin="54,15,60,15"
                             Minimum="0"                    
                             Maximum="360"
                             Value="0"
@@ -108,12 +117,21 @@
                             DragCompleted="OnRotateSliderDragCompleted"/>
                 </Border>
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
-                       HeightRequest="40"
-                       Margin="40,0,0,30"
+                       HeightRequest="34"
+                       Margin="36,0,0,33"
                        ZIndex="10000"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
-                
+                <Label x:Name="degreesLabel" 
+                       Text="360°"
+                       FontSize="18"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="0,0,30,38"
+                       ZIndex="10000"/>
+
                 <Button InputTransparent="False"
                         Visual="None"
                         CornerRadius="0"

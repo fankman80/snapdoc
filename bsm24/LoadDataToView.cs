@@ -5,7 +5,6 @@ namespace bsm24;
 
 public partial class LoadDataToView
 {
-
     public static void LoadData(FileResult path)
     {
         if (path == null || string.IsNullOrEmpty(path.FullPath))
@@ -14,43 +13,44 @@ public partial class LoadDataToView
         if (GlobalJson.Data.Plans == null)
             return;
 
-        if (Application.Current.Windows[0].Page is not AppShell appShell)
-            return;
-
         foreach (var plan in GlobalJson.Data.Plans)
         {
-            string planId = plan.Key;
-            string planTitle = plan.Value.Name;
-
-            // Neue Plan-Seite mit Übergabe der ID erstellen
-            var newPage = new Views.NewPage(planId)
-            {
-                Title = planTitle,
-                AutomationId = planId,
-                PlanId = planId,
-            };
-
-            // ShellContent erzeugen und mit eindeutiger Route versehen
-            var shellContent = new ShellContent
-            {
-                Content = newPage,
-                Route = planId,
-                Title = planTitle,
-                Icon = "icon_placeholder.png"
-            };
-
-            // Seite zur Shell dynamisch hinzufügen
-            appShell.Items.Add(shellContent);
-
-            // PlanItem für ein Flyout- oder Menü-Item hinzufügen
-            appShell.PlanItems.Add(new PlanItem(GlobalJson.Data.Plans[plan.Key])
-            {
-                Title = planTitle,
-                PlanId = planId,
-                IconGlyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Layers,
-                PlanRoute = planId
-            });
+            AddPlan(plan);
         }
+    }
+
+    public static void AddPlan(KeyValuePair<string, Models.Plan> plan)
+    {
+        string planId = plan.Key;
+        string planTitle = plan.Value.Name;
+
+        // Neue Plan-Seite mit Übergabe der ID erstellen
+        var newPage = new Views.NewPage(planId)
+        {
+            Title = planTitle,
+            AutomationId = planId,
+            PlanId = planId,
+        };
+
+        // ShellContent erzeugen und mit eindeutiger Route versehen
+        var shellContent = new ShellContent
+        {
+            Content = newPage,
+            Route = planId,
+            Title = planTitle
+        };
+
+        // Seite zur Shell dynamisch hinzufügen
+        (Application.Current.Windows[0].Page as AppShell).Items.Add(shellContent);
+
+        // PlanItem für ein Flyout- oder Menü-Item hinzufügen
+        (Application.Current.Windows[0].Page as AppShell).PlanItems.Add(new PlanItem(GlobalJson.Data.Plans[plan.Key])
+        {
+            Title = planTitle,
+            PlanId = planId,
+            IconGlyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Layers,
+            PlanRoute = planId
+        });
     }
 
     public static void ResetData()

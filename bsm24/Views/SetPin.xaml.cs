@@ -53,7 +53,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
             .Select(img => new ImageItem
             {
-                Key = img.Key,
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
                 IsChecked = img.Value.IsChecked,
                 DateTime = img.Value.DateTime
@@ -201,7 +200,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
             Images.Add(new ImageItem
             {
-                Key = Guid.NewGuid().ToString(),
                 ImagePath = path.FullPath,
                 IsChecked = true,
                 DateTime = DateTime.Now
@@ -246,9 +244,9 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         if ((sender as CollectionView).ItemsSource is ObservableCollection<ImageItem> reorderedItems)
         {
             var newFotosDict = reorderedItems
-                .ToDictionary(img => img.Key, img => new Foto
+                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Foto
                 {
-                    File = Path.GetFileName(img.ImagePath),
+                    File = Path.GetFileName(Path.GetFileName(img.ImagePath)),
                     IsChecked = img.IsChecked,
                     DateTime = img.DateTime
                 });
@@ -261,14 +259,11 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
 
 public class ImageItem
 {
-    public string Key { get; set; }
     public string ImagePath { get; set; }
     public string PreviewPath { get; set; }
     public bool IsChecked { get; set; }
     public DateTime DateTime { get; set; }
     public int Dpi { get; set; }
-
-    public event PropertyChangedEventHandler PropertyChanged;
 }
 
 public partial class SquareView : ContentView

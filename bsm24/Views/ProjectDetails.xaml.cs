@@ -7,12 +7,9 @@ namespace bsm24.Views;
 
 public partial class ProjectDetails : UraniumContentPage
 {
-    bool isPdfChanged = false;
-
     public ProjectDetails()
     {
         InitializeComponent();
-        isPdfChanged = false;
     }
 
     protected override bool OnBackButtonPressed()
@@ -46,11 +43,6 @@ public partial class ProjectDetails : UraniumContentPage
 
         // save data to file
         GlobalJson.SaveToFile();
-
-        if (isPdfChanged)
-        {
-            LoadDataToView.LoadData(new FileResult(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)));
-        }
 
         Helper.HeaderUpdate();
 
@@ -143,7 +135,5 @@ public partial class ProjectDetails : UraniumContentPage
         GlobalJson.SaveToFile();
 
         await Shell.Current.GoToAsync("loadPdfImages");
-
-        isPdfChanged = true;
     }
 }

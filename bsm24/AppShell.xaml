@@ -163,7 +163,7 @@
                        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                        IsVisible="{Binding IsProjectLoaded}"
                        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
-                       Text="Zum Umsortieren Pläne gedrückt halten und ziehen" 
+                       Text="Pläne umsortieren: Gedrückt halten und ziehen" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontSize="11"
                        HorizontalTextAlignment="Center"/>
