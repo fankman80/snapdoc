@@ -94,7 +94,7 @@
                        VerticalOptions="End"/>
                 <Label x:Name="percentLabel" 
                        Text="100%"
-                       FontSize="18"
+                       FontSize="16"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="End"
                        VerticalOptions="End"
@@ -138,7 +138,7 @@
                        VerticalOptions="End"/>
                 <Label x:Name="degreesLabel" 
                        Text="0°"
-                       FontSize="18"
+                       FontSize="16"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="End"
                        VerticalOptions="End"
