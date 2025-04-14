@@ -136,7 +136,8 @@
                        ZIndex="10000"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
-                <Label x:Name="degreesLabel" 
+                <Label x:Name="degreesLabel"
+                       IsVisible="True"
                        Text="0°"
                        FontSize="16"
                        VerticalTextAlignment="Center"
@@ -145,6 +146,24 @@
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,38"
                        ZIndex="10000"/>
+                <Image x:Name="rotateLockIcon"
+                       IsVisible="False"
+                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Sync}}"
+                       HeightRequest="38"
+                       Margin="0,0,36,33"
+                       ZIndex="10000"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"/>
+                <Label x:Name="degreesModeLabel"
+                       IsVisible="True"
+                       Text="Planausrichtung aktiviert"
+                       FontSize="12"
+                       VerticalTextAlignment="End"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="0,0,80,24"
+                       ZIndex="10000"/>                
 
                 <Button InputTransparent="False"
                         Visual="None"

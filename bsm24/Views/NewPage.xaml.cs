@@ -293,6 +293,19 @@ public partial class NewPage : IQueryAttributable
             DrawBtn.IsVisible = false;
             SetPinBtn.IsVisible = false;
             PinEditBorder.IsVisible = true;
+
+            if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
+            {
+                rotateLockIcon.IsVisible = false;
+                degreesLabel.IsVisible = true;
+                degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
+            }
+            else
+            {
+                rotateLockIcon.IsVisible = true;
+                degreesLabel.IsVisible = false;
+                degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
+            }
         };
 
         // sort large custom pins on lower z-indexes
@@ -724,14 +737,35 @@ public partial class NewPage : IQueryAttributable
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
         activePin.Rotation = sliderValue;
         degreesLabel.Text = $"{Math.Round(sliderValue)}°";
+
+        if (sliderValue == 360)
+        {
+            rotateLockIcon.IsVisible = true;
+            degreesLabel.IsVisible = false;
+            degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
+        }
+        else
+        {
+            rotateLockIcon.IsVisible = false;
+            degreesLabel.IsVisible = true;
+            degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
+        }
     }
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
 
-        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
-        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
+        if (sliderValue == 360)
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
+        }
+        else
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
+        }
 
         // save data to file
         GlobalJson.SaveToFile();

@@ -131,4 +131,7 @@ public static class Settings
         "mappin4a.png",
         "mappin5a.png"
     ];
+
+    public const string PinEditSliderRotateLock = "Autom. ausrichten ▶ ziehen";
+    public const string PinEditSliderRotateUnlock = "Autom. Ausrichtung aktiviert";
 }

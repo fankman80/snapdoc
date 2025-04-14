@@ -115,9 +115,8 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
-                    <RowDefinition Height="40" />
+                    <RowDefinition Height="50" />
+                    <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
                 
                 <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
@@ -134,16 +133,9 @@
                     <Label Text="Position sperren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 
-                <HorizontalStackLayout Grid.Column="0" Grid.Row="2" Spacing="0">
-                    <CheckBox x:Name="LockRotate"
-                              Scale="1.2"
-                              Color="{DynamicResource Primary}"/>
-                    <Label Text="Rotation sperren" VerticalTextAlignment="Center"/>
-                </HorizontalStackLayout>
-
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
                         x:Name="PinImageContainer"
-                        WidthRequest="120"
+                        WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="White"

@@ -70,7 +70,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         PinLocation.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation;
         PinImage.Source = file;
         LockSwitch.IsChecked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
-        LockRotate.IsChecked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate;
         AllowExport.IsChecked = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         priorityPicker.SelectedIndex = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority;
         PinAcc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null ?
@@ -163,7 +162,6 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsChecked;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = LockRotate.IsChecked;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport = AllowExport.IsChecked;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedIndex;
 
