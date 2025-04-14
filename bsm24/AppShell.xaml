@@ -197,7 +197,8 @@
                            FontAttributes="Bold"
                            FontSize="12"
                            HorizontalTextAlignment="Center"/>
-                    <Label Text="Version 1.1"
+                    <Label x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                           Text="{Binding AppVersion}"
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontSize="10"
                            HorizontalTextAlignment="Center"/>

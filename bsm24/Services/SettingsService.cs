@@ -20,6 +20,8 @@ public partial class SettingsService : INotifyPropertyChanged
         IconCategory = IconCategories[0]; // Standardauswahl
     }
 
+    public string AppVersion { get; set; } = $"Version {AppInfo.VersionString}";
+
     public List<string> MapIcons { get; set; } = Settings.MapIcons;
 
     public List<string> IconSortCrits { get; set; } = Settings.IconSortCrits;

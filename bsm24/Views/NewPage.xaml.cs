@@ -297,12 +297,16 @@ public partial class NewPage : IQueryAttributable
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
             {
                 rotateLockIcon.IsVisible = false;
+                rotateAutoIcon.IsVisible = true;
+                rotateModeIcon.IsVisible = false;
                 degreesLabel.IsVisible = true;
                 degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
             }
             else
             {
                 rotateLockIcon.IsVisible = true;
+                rotateAutoIcon.IsVisible = false;
+                rotateModeIcon.IsVisible = true;
                 degreesLabel.IsVisible = false;
                 degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
             }
@@ -741,12 +745,16 @@ public partial class NewPage : IQueryAttributable
         if (sliderValue == 360)
         {
             rotateLockIcon.IsVisible = true;
+            rotateAutoIcon.IsVisible = false;
+            rotateModeIcon.IsVisible = true;
             degreesLabel.IsVisible = false;
             degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
         }
         else
         {
             rotateLockIcon.IsVisible = false;
+            rotateAutoIcon.IsVisible = true;
+            rotateModeIcon.IsVisible = false;
             degreesLabel.IsVisible = true;
             degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
         }
