@@ -2,7 +2,7 @@
 
 namespace bsm24.ViewModels;
 
-public class TextOnlyViewModel : ObservableObject
+public partial class TextOnlyViewModel : ObservableObject
 {
     protected static readonly string ImagePath = "";
     //(DeviceInfo.Platform == DevicePlatform.iOS || DeviceInfo.Platform == DevicePlatform.macOS || DeviceInfo.Platform == DevicePlatform.MacCatalyst) ? "images/"
@@ -74,7 +74,7 @@ public class TextOnlyViewModel : ObservableObject
         get
         {
             var threadType = System.Threading.Thread.CurrentThread.IsBackground ? "BG" : "UI";
-            var threadId = System.Threading.Thread.CurrentThread.ManagedThreadId;
+            var threadId = Environment.CurrentManagedThreadId;
 
             return $"[T:{threadType}#{threadId}]";
         }

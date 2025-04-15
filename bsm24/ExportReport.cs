@@ -2,6 +2,7 @@
 
 using bsm24.Models;
 using bsm24.Services;
+using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
@@ -35,7 +36,6 @@ public partial class ExportReport
             {"${plan_indexes}", "${plan_indexes}"},         //bereinige splitted runs
             {"${plan_images/", "${plan_images/"},           //bereinige splitted runs  
             {"${title_image}", "${title_image}"},           //bereinige splitted runs
-            {"${plan_descs}", "${plan_descs}"},             //bereinige splitted runs
         };
         Dictionary<string, string> placeholders_table = new()
         {
@@ -71,13 +71,13 @@ public partial class ExportReport
         {
             // Platzhalter durch die entsprechenden Werte ersetzen
             foreach (KeyValuePair<string, string> placeholder in placeholders_single)
-                if (placeholder.Value != "")
+                if (!string.IsNullOrEmpty(placeholder.Value))
                     Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
             foreach (KeyValuePair<string, string> placeholder in placeholders_lists)
-                if (placeholder.Value != "")
+                if (!string.IsNullOrEmpty(placeholder.Value))
                     Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
             foreach (KeyValuePair<string, string> placeholder in placeholders_table)
-                if (placeholder.Value != "")
+                if (!string.IsNullOrEmpty(placeholder.Value))
                     Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
 
             MainDocumentPart mainPart = wordDoc.MainDocumentPart;
@@ -338,6 +338,11 @@ public partial class ExportReport
                                             if (GlobalJson.Data.Plans[plan.Key].AllowExport)
                                             {
                                                 run.Append(new Text("- " + GlobalJson.Data.Plans[plan.Key].Name));
+                                                if (!string.IsNullOrWhiteSpace(GlobalJson.Data.Plans[plan.Key].Description))
+                                                {
+                                                    run.Append(new Text(" (" + GlobalJson.Data.Plans[plan.Key].Description + ")")
+                                                    {Space = SpaceProcessingModeValues.Preserve});
+                                                }
                                                 run.Append(new Break() { Type = BreakValues.TextWrapping });
                                             }
                                         }

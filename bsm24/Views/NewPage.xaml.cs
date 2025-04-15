@@ -788,7 +788,14 @@ public partial class NewPage : IQueryAttributable
     private void OnResizeSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
-        activePin.Scale = sliderValue / 100;
+        var scale = 1 / PlanContainer.Scale;
+        var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
+
+        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+            activePin.Scale = scale * sliderValue / 100;
+        else
+            activePin.Scale = sliderValue / 100;
+
         percentLabel.Text = $"{Math.Round(sliderValue)}%";
     }
 

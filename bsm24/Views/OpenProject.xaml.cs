@@ -110,6 +110,11 @@ public partial class OpenProject : UraniumContentPage
             GlobalJson.Data.CustomPinsPath = "custompins";
             GlobalJson.Data.TitleImage = "banner_thumbnail.png";
 
+            SettingsService.Instance.IsProjectLoaded = true;
+            GlobalJson.LoadFromFile(filePath);
+            LoadDataToView.LoadData(new FileResult(filePath));
+            Helper.HeaderUpdate();  // UI-Aktualisierung
+
             // save data to file
             GlobalJson.SaveToFile();
 
@@ -165,7 +170,6 @@ public partial class OpenProject : UraniumContentPage
                 // Alle UI-Änderungen im Haupt-Thread
                 MainThread.BeginInvokeOnMainThread(async () =>
                 {
-                    // Daten laden und verarbeiten (nicht UI-bezogen)
                     SettingsService.Instance.IsProjectLoaded = true;
                     LoadDataToView.ResetData();
                     GlobalJson.LoadFromFile(item.FilePath);

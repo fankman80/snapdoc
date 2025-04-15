@@ -47,7 +47,7 @@
                 <Label Grid.Column="1"
                        Grid.Row="0"
                        Text="{Binding FlyoutHeaderDesc}"
-                       LineBreakMode="TailTruncation"
+                       LineBreakMode="WordWrap"
                        FontSize="18"
                        TextColor="{DynamicResource PrimaryDark}"
                        FontAttributes="Bold"
