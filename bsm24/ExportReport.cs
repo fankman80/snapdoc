@@ -25,7 +25,7 @@ public partial class ExportReport
         Dictionary<string, string> placeholders_single = new()
         {
             {"${client_name}", GlobalJson.Data.Client_name},
-            {"${object_address}", GlobalJson.Data.Object_address.Replace("\r", "{linebreak}")},
+            {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "{linebreak}")},
             {"${working_title}", GlobalJson.Data.Working_title},
             {"${object_name}", GlobalJson.Data.Object_name},
             {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
@@ -236,7 +236,7 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_desc}":
-                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc.Replace("\r", "{linebreak}");
+                                                        text = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "{linebreak}");
                                                         break;
 
                                                     case "${pin_location}":
