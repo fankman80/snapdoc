@@ -13,7 +13,7 @@
              x:Class="bsm24.Views.IconGallery"
              BackgroundColor="White"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-             Title="Pin auswählen">
+             Title="Icon auswählen">
 
     <uranium:UraniumContentPage.Resources>
         <ResourceDictionary>
