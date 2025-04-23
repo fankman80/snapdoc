@@ -12,27 +12,42 @@ namespace bsm24.Views;
 public partial class IconGallery : UraniumContentPage, IQueryAttributable
 {
     public ObservableCollection<IconItem> Icons { get; set; }
-    private Command<IconItem> IconTappedCommand { get; }
     private string PlanId;
     private string PinId;
     private bool isLongPressed = false;
     private object previousSelectedSortItem;
     private object previousSelectedCategoryItem;
     private string OrderDirection = "asc";
+    public int DynamicSpan { get; set; } = 1; // Standardwert
+    private bool _showDescription = true;
+
+    public bool ShowDescription
+    {
+        get => _showDescription;
+        set
+        {
+            if (_showDescription != value)
+            {
+                _showDescription = value;
+                OnPropertyChanged(nameof(ShowDescription));
+            }
+        }
+    }
 
     public IconGallery()
     {
-        InitializeComponent();
+        InitializeComponent(); 
+        SizeChanged += OnSizeChanged;
+        SortPicker.PropertyChanged += OnSortPickerChanged;
+        CategoryPicker.PropertyChanged += OnCategoryPickerChanged;
         BindingContext = this;
-        IconSorting(OrderDirection);
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
 
-        SortPicker.PropertyChanged += OnSortPickerChanged;
-        CategoryPicker.PropertyChanged += OnCategoryPickerChanged;
+        IconSorting(OrderDirection);
     }
 
     protected override void OnDisappearing()
@@ -254,5 +269,55 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
         IconCollectionView.ItemsSource = null;
         IconCollectionView.ItemsSource = Icons;
+    }
+
+    private void OnChangeRowsClicked(object sender, EventArgs e)
+    {
+        if (DynamicSpan == 1)
+        {
+            DynamicSpan = 0;
+            btnRows.IconImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        else
+        {
+            DynamicSpan = 1;
+            btnRows.IconImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        ShowDescription = !ShowDescription;
+        IconCollectionView.ItemTemplate =
+            ShowDescription
+                ? (DataTemplate)Resources["IconListTemplate"]
+                : (DataTemplate)Resources["IconGridTemplate"];
+        UpdateSpan();
+    }
+
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        UpdateSpan();
+    }
+
+    private void UpdateSpan()
+    {
+        if (DynamicSpan != 1)
+        {
+            double screenWidth = this.Width;
+            double imageWidth = Settings.IconPreviewSize; // Mindestbreite in Pixeln
+            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
+        }
+        OnPropertyChanged(nameof(DynamicSpan));
     }
 }

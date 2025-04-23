@@ -10,14 +10,12 @@ namespace bsm24.Views;
 public partial class LoadPDFPages : UraniumContentPage
 {
     FileResult result;
-    public int DynamicSpan { get; set; } = 2; // Standardwert
-    public int MinSize = 2;
+    public int DynamicSpan { get; set; } = 0; // Standardwert
     private int targetDpi = SettingsService.Instance.PdfQuality;
 
     public LoadPDFPages()
     {
         InitializeComponent();
-        UpdateSpan();
         SizeChanged += OnSizeChanged;
         BindingContext = this;
     }
@@ -25,6 +23,7 @@ public partial class LoadPDFPages : UraniumContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
         LoadPreviewPDFImages();
     }
     protected override bool OnBackButtonPressed()
@@ -172,41 +171,6 @@ public partial class LoadPDFPages : UraniumContentPage
         AddPdfImages();
     }
 
-    private void OnChangeRowsClicked(object sender, EventArgs e)
-    {
-        if (MinSize == 1)
-        {
-            MinSize = 2;
-            btnRows.IconImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["Primary"]
-                        : (Color)Application.Current.Resources["PrimaryDark"]
-            };
-        }
-        else
-        {
-            MinSize = 1;
-            DynamicSpan = 1;
-            btnRows.IconImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["Primary"]
-                        : (Color)Application.Current.Resources["PrimaryDark"]
-            };
-        }
-        UpdateSpan();
-    }
-
-    private void OnSizeChanged(object sender, EventArgs e)
-    {
-        UpdateSpan();
-    }
-
     private async void AddPdfImages()
     {
         await LoadPDFImages(); //generiere High-Res Images
@@ -280,13 +244,47 @@ public partial class LoadPDFPages : UraniumContentPage
         await Shell.Current.GoToAsync("project_details");
     }
 
+    private void OnChangeRowsClicked(object sender, EventArgs e)
+    {
+        if (DynamicSpan == 1)
+        {
+            DynamicSpan = 0;
+            btnRows.IconImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        else
+        {
+            DynamicSpan = 1;
+            btnRows.IconImageSource = new FontImageSource
+            {
+                FontFamily = "MaterialOutlined",
+                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
+                Color = Application.Current.RequestedTheme == AppTheme.Dark
+                        ? (Color)Application.Current.Resources["Primary"]
+                        : (Color)Application.Current.Resources["PrimaryDark"]
+            };
+        }
+        UpdateSpan();
+    }
+
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        UpdateSpan();
+    }
+
     private void UpdateSpan()
     {
-        if (MinSize != 1)
+        if (DynamicSpan != 1)
         {
             double screenWidth = this.Width;
             double imageWidth = Settings.PlanPreviewSize; // Mindestbreite in Pixeln
-            DynamicSpan = Math.Max(MinSize, (int)(screenWidth / imageWidth));
+            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
         }
         OnPropertyChanged(nameof(DynamicSpan));
     }

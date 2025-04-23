@@ -15,7 +15,66 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Title="Pin auswählen">
 
+    <uranium:UraniumContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Template für Liste (Label sichtbar) -->
+            <DataTemplate x:Key="IconListTemplate" x:DataType="local:IconItem">
+                <Grid HeightRequest="48">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="26" />
+                    </Grid.ColumnDefinitions>
+                    <ff:CachedImage Grid.Column="0"
+                                    Source="{Binding FileName}"
+                                    CacheType="Memory"
+                                    Aspect="AspectFill"
+                                    Margin="6"/>
+                    <Label Grid.Column="1"
+                           Text="{Binding DisplayName}"
+                           VerticalOptions="Center"
+                           Margin="16,0,0,0"
+                           LineBreakMode="WordWrap"/>
+                    <BoxView Grid.Column="2"
+                             HeightRequest="26"
+                             CornerRadius="6"
+                             BackgroundColor="{Binding PinColor, Converter={StaticResource SkColorToHexConverter}}"/>                    
+                    <mr:Button Grid.ColumnSpan="3"
+                               AutomationId = "{Binding FileName}"
+                               BorderColor="Transparent"
+                               Background="Transparent"
+                               LongPressing="OnLongPressed"
+                               Clicked="OnIconClicked"
+                               Tapped="OnIconClicked"/>
+
+                </Grid>
+            </DataTemplate>
+
+            <!-- Template für Grid (Label unsichtbar) -->
+            <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
+                <Grid HeightRequest="64" WidthRequest="64">
+                    <ff:CachedImage Source="{Binding FileName}"
+                                    CacheType="Memory"
+                                    Aspect="AspectFit"
+                                    Margin="6"/>
+                    <mr:Button AutomationId = "{Binding FileName}"
+                               BorderColor="Transparent"
+                               Background="Transparent"
+                               LongPressing="OnLongPressed"
+                               Clicked="OnIconClicked"
+                               Tapped="OnIconClicked"/>
+                </Grid>
+            </DataTemplate>
+            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>
+        </ResourceDictionary>
+    </uranium:UraniumContentPage.Resources>
+
+
     <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="btnRows"
+                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Table_rows}}"
+                     Text="Liste"
+                     Clicked="OnChangeRowsClicked"/>
         <ToolbarItem x:Name ="ImportIcon"                     
                      IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"             
                      Text="Icon importieren"
@@ -62,42 +121,18 @@
             </Border>
         </HorizontalStackLayout>
 
-        <Grid Grid.Row="1" x:DataType="views:IconGallery">
+        <Grid x:DataType="views:IconGallery" Grid.Row="1">
             <CollectionView x:Name="IconCollectionView"
-                            ItemsSource="{Binding Icons}"
-                            SelectionMode="Single">
+                ItemsSource="{Binding Icons}"
+                SelectionMode="Single"
+                ItemTemplate="{StaticResource IconListTemplate}">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" />
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
                 </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Grid x:DataType="local:IconItem" HeightRequest="48">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <ff:CachedImage Grid.Column="0"
-                                            Source="{Binding FileName}"
-                                            CacheType="Memory"
-                                            Aspect="AspectFill"
-                                            Margin="6,6,6,6"/>
-                            <Label Grid.Column="1"
-                                   Text="{Binding DisplayName}"
-                                   VerticalOptions="Center"
-                                   Margin="16,0,0,0"
-                                   LineBreakMode="WordWrap"/>
-                            <mr:Button Grid.ColumnSpan="2"
-                                    AutomationId = "{Binding FileName}"
-                                    Background="Transparent"
-                                    LongPressing="OnLongPressed"
-                                    Clicked="OnIconClicked"
-                                    Tapped="OnIconClicked">
-                            </mr:Button>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
-        <Label Grid.Row="2" Text="Gedrückt halten um Icon zu editieren." FontSize="12"/>        
+        <Label Grid.Row="2"
+               Text="Gedrückt halten um Icon zu editieren."
+               FontSize="12"/>
     </Grid>
 </uranium:UraniumContentPage>

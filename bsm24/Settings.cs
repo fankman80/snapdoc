@@ -2,22 +2,14 @@
 
 public static class Settings
 {
-    public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
-    public static List<PriorityItem> PriorityItems { get => priorityItems; set => priorityItems = value; }
-    public static string CacheDirectory { get => cacheDirectory; set => cacheDirectory = value; }
-    public static string TemplateDirectory { get => templateDirectory; set => templateDirectory = value; }
-    public static int ThumbSize { get => thumbSize; set => thumbSize = value; }
-    public static int PlanPreviewSize { get => planPreviewSize; set => planPreviewSize = value; }
-    public static double DefaultPinZoom { get => defaultPinZoom; set => defaultPinZoom = value; }
-    public static int PinTextPadding { get => pinTextPadding; set => pinTextPadding = value; }
-    public static int PinTextDistance { get => pinTextDistance; set => pinTextDistance = value; }
-    public static List<IconItem> IconData { get => iconData; set => iconData = value; }
-    public static Color[] ColorData { get => colorData; set => colorData = value; }
-    public static List<string> IconSortCrits { get => iconSortCrits; set => iconSortCrits = value; }
-    public static List<string> PinSortCrits { get => pinSortCrits; set => pinSortCrits = value; }
-    public static List<string> MapIcons { get => mapIcons; set => mapIcons = value; }
-    public static List<MapViewItem> SwissTopoLayers { get => swissTopoLayers; set => swissTopoLayers = value; }
-
+    public const int ThumbSize = 150;
+    public const int PlanPreviewSize = 150;
+    public const int IconPreviewSize = 64;
+    public const int PinTextPadding = 6;
+    public const int PinTextDistance = 3;
+    public const double DefaultPinZoom = 2;
+    public const string PinEditSliderRotateLock = "Autom. ausrichten ▶ ziehen";
+    public const string PinEditSliderRotateUnlock = "Autom. Ausrichtung aktiviert";
 
 #if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "BSM24");
@@ -28,17 +20,14 @@ public static class Settings
 #if IOS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "BSM24");
 #endif
+    public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
+    public static List<IconItem> IconData { get; set; } = [];
 
-    private static string cacheDirectory = FileSystem.CacheDirectory;
-    private static string templateDirectory = Path.Combine(dataDirectory, "templates");
-    private static int thumbSize = 150;
-    private static int planPreviewSize = 150;
-    private static double defaultPinZoom = 2;
-    private static int pinTextPadding = 6;
-    private static int pinTextDistance = 3;
-    private static List<IconItem> iconData = [];
+    public static readonly string CacheDirectory = FileSystem.CacheDirectory;
 
-    private static List<MapViewItem> swissTopoLayers = [
+    public static readonly string TemplateDirectory = Path.Combine(dataDirectory, "templates");
+
+    public static readonly List<MapViewItem> SwissTopoLayers = [
         new MapViewItem { Desc = "kein Map-Layer", Id = "" },
         new MapViewItem { Desc = "PIXELKARTE_FARBE", Id = "ch.swisstopo.pixelkarte-farbe" },
         new MapViewItem { Desc = "PIXELKARTE_FARK_PK1000", Id = "ch.swisstopo.pixelkarte-farbe-pk1000.noscale" },
@@ -70,7 +59,7 @@ public static class Settings
         new MapViewItem { Desc = "SCHUTZGEBIETE_LUFTFAHRT", Id = "ch.bafu.schutzgebiete-luftfahrt" },
         new MapViewItem { Desc = "EISZEIT", Id = "ch.swisstopo.geologie-eiszeit-lgm-raster" }];
 
-    private static Color[] colorData = [
+    public static readonly Color[] ColorData = [
         new Color(0, 153, 0),
         new Color(202, 254, 150),
         new Color(159, 255, 127),
@@ -99,7 +88,7 @@ public static class Settings
         new Color(255, 233, 210),
         new Color(255, 255, 255)];
 
-    private static List<PriorityItem> priorityItems =
+    public static readonly List<PriorityItem> PriorityItems =
     [
         new PriorityItem { Key = "", Color = "#000000" },
         new PriorityItem { Key = "Empfehlung", Color = "#92D050" },
@@ -107,13 +96,13 @@ public static class Settings
         new PriorityItem { Key = "Kritisch", Color = "#FF0000" }
     ];
 
-    private static List<string> iconSortCrits =
+    public static readonly List<string> IconSortCrits =
     [
         "nach Name",
         "nach Farbe"
     ];
 
-    private static List<string> pinSortCrits =
+    public static readonly List<string> PinSortCrits =
     [
         "nach Plan",
         "nach Pin",
@@ -123,7 +112,7 @@ public static class Settings
         "nach Aufnahmedatum"
     ];
 
-    private static List<string> mapIcons =
+    public static readonly List<string> MapIcons =
     [
         "mappin1a.png",
         "mappin2a.png",
@@ -131,7 +120,4 @@ public static class Settings
         "mappin4a.png",
         "mappin5a.png"
     ];
-
-    public const string PinEditSliderRotateLock = "Autom. ausrichten ▶ ziehen";
-    public const string PinEditSliderRotateUnlock = "Autom. Ausrichtung aktiviert";
 }
