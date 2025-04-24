@@ -19,20 +19,6 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     private object previousSelectedCategoryItem;
     private string OrderDirection = "asc";
     public int DynamicSpan { get; set; } = 1; // Standardwert
-    private bool _showDescription = true;
-
-    public bool ShowDescription
-    {
-        get => _showDescription;
-        set
-        {
-            if (_showDescription != value)
-            {
-                _showDescription = value;
-                OnPropertyChanged(nameof(ShowDescription));
-            }
-        }
-    }
 
     public IconGallery()
     {
@@ -47,6 +33,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
+        IconCollectionView.ItemTemplate = (DataTemplate)Resources[SettingsService.Instance.IconGalleryMode];
+        UpdateButton();
+        UpdateSpan();
         IconSorting(OrderDirection);
     }
 
@@ -54,6 +43,7 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
     {
         base.OnDisappearing();
 
+        SizeChanged -= OnSizeChanged;
         SortPicker.PropertyChanged -= OnSortPickerChanged;
         CategoryPicker.PropertyChanged -= OnCategoryPickerChanged;
     }
@@ -273,9 +263,22 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
     private void OnChangeRowsClicked(object sender, EventArgs e)
     {
-        if (DynamicSpan == 1)
+        if (SettingsService.Instance.IconGalleryMode == "IconListTemplate")
+            SettingsService.Instance.IconGalleryMode = "IconGridTemplate";
+        else
+            SettingsService.Instance.IconGalleryMode = "IconListTemplate";
+
+        SettingsService.Instance.SaveSettings();
+
+        IconCollectionView.ItemTemplate = (DataTemplate)Resources[SettingsService.Instance.IconGalleryMode];
+        UpdateButton();
+        UpdateSpan();
+    }
+
+    private void UpdateButton()
+    {
+        if (SettingsService.Instance.IconGalleryMode == "IconGridTemplate")
         {
-            DynamicSpan = 0;
             btnRows.IconImageSource = new FontImageSource
             {
                 FontFamily = "MaterialOutlined",
@@ -284,10 +287,10 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                         ? (Color)Application.Current.Resources["Primary"]
                         : (Color)Application.Current.Resources["PrimaryDark"]
             };
+            btnRows.Text = "Kacheln";
         }
         else
         {
-            DynamicSpan = 1;
             btnRows.IconImageSource = new FontImageSource
             {
                 FontFamily = "MaterialOutlined",
@@ -296,13 +299,8 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
                         ? (Color)Application.Current.Resources["Primary"]
                         : (Color)Application.Current.Resources["PrimaryDark"]
             };
+            btnRows.Text = "Liste";
         }
-        ShowDescription = !ShowDescription;
-        IconCollectionView.ItemTemplate =
-            ShowDescription
-                ? (DataTemplate)Resources["IconListTemplate"]
-                : (DataTemplate)Resources["IconGridTemplate"];
-        UpdateSpan();
     }
 
     private void OnSizeChanged(object sender, EventArgs e)
@@ -312,12 +310,14 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
 
     private void UpdateSpan()
     {
-        if (DynamicSpan != 1)
+        if (SettingsService.Instance.IconGalleryMode == "IconGridTemplate")
         {
             double screenWidth = this.Width;
             double imageWidth = Settings.IconPreviewSize; // Mindestbreite in Pixeln
             DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
         }
+        else
+            DynamicSpan = 1;
         OnPropertyChanged(nameof(DynamicSpan));
     }
 }

@@ -257,6 +257,7 @@ public partial class LoadPDFPages : UraniumContentPage
                         ? (Color)Application.Current.Resources["Primary"]
                         : (Color)Application.Current.Resources["PrimaryDark"]
             };
+            btnRows.Text = "Kacheln";
         }
         else
         {
@@ -269,6 +270,7 @@ public partial class LoadPDFPages : UraniumContentPage
                         ? (Color)Application.Current.Resources["Primary"]
                         : (Color)Application.Current.Resources["PrimaryDark"]
             };
+            btnRows.Text = "Liste";
         }
         UpdateSpan();
     }

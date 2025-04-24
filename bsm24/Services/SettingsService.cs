@@ -2,6 +2,7 @@
 using bsm24.Models;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics.CodeAnalysis;
 using System.Text.Json;
 
 namespace bsm24.Services;
@@ -83,6 +84,20 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _flyoutHeaderImage = value;
                 OnPropertyChanged(nameof(FlyoutHeaderImage));
+            }
+        }
+    }
+
+    private string _iconGalleryMode = "IconListTemplate";
+    public string IconGalleryMode
+    {
+        get => _iconGalleryMode;
+        set
+        {
+            if (_iconGalleryMode != value)
+            {
+                _iconGalleryMode = value;
+                OnPropertyChanged(nameof(IconGalleryMode));
             }
         }
     }
@@ -631,7 +646,8 @@ public partial class SettingsService : INotifyPropertyChanged
             PinSortCrit = PinSortCrits.IndexOf(this.PinSortCrit),
             IconCategory = IconCategories.IndexOf(this.IconCategory),
             IsFotoCompressed = this.IsFotoCompressed,
-            FotoCompressValue = this.FotoCompressValue
+            FotoCompressValue = this.FotoCompressValue,
+            IconGalleryMode = this.IconGalleryMode
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -670,6 +686,7 @@ public partial class SettingsService : INotifyPropertyChanged
                     : IconCategories[0];
                 this.IsFotoCompressed = settings.IsFotoCompressed;
                 this.FotoCompressValue = settings.FotoCompressValue;
+                this.IconGalleryMode = settings.IconGalleryMode ?? "IconListTemplate";
             }
         }
     }
