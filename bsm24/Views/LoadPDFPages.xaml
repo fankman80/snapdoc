@@ -20,7 +20,7 @@
         <ToolbarItem
             x:Name="btnRows"
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Grid_on}}"
-            Text="Liste"
+            Text="Kacheln"
             Clicked="OnChangeRowsClicked"/>
     </ContentPage.ToolbarItems>
     
