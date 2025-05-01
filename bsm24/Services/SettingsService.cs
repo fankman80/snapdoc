@@ -645,7 +645,7 @@ public partial class SettingsService : INotifyPropertyChanged
             IconCategory = IconCategories.IndexOf(this.IconCategory),
             IsFotoCompressed = this.IsFotoCompressed,
             FotoCompressValue = this.FotoCompressValue,
-            IconGalleryMode = this.IconGalleryMode
+            IconGalleryMode = this.IconGalleryMode,
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());

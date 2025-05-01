@@ -15,6 +15,13 @@
              BackgroundColor="#60000000"
              Title="Color Picker">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:BoolToStrokeColorConverter x:Key="BoolToStrokeColorConverter"/>
+            <services:BoolToCornerRadiusConverter x:Key="BoolToCornerRadiusConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Border x:Name="popupBorder"
             StrokeShape="RoundRectangle 20,20,20,20"
             Padding="16,16,16,16"
@@ -24,44 +31,31 @@
             VerticalOptions="Center">
 
         <VerticalStackLayout x:DataType="views:PopupColorPicker">
-            <CollectionView x:Name="ColorListPicker" ItemsSource="{Binding ColorsList}" SelectionMode="Single">
+            <CollectionView x:Name="ColorListPicker"
+                ItemsSource="{Binding ColorsList}"
+                SelectionMode="None">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="6" />
+                </CollectionView.ItemsLayout>
+
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="views:ColorBoxItem">
-                        <Border BackgroundColor="{Binding BackgroundColor}" HeightRequest="40" WidthRequest="40">
+                        <Border WidthRequest="40"
+                                HeightRequest="40"
+                                BackgroundColor="{Binding BackgroundColor}"
+                                Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
+                                StrokeThickness="2"
+                                Padding="8"
+                                Margin="4">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
+                            </Border.StrokeShape>
                             <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnColorTapped"/>
+                                <TapGestureRecognizer Tapped="OnColorTapped" />
                             </Border.GestureRecognizers>
-                            <VisualStateManager.VisualStateGroups>
-                                <VisualStateGroup Name="CommonStates">
-                                    <VisualState Name="Selected">
-                                        <VisualState.Setters>
-                                            <Setter Property="Stroke" Value="Black" />
-                                            <Setter Property="StrokeThickness" Value="2" />
-                                            <Setter Property="StrokeShape">
-                                                <Setter.Value>
-                                                    <RoundRectangle CornerRadius="20" />
-                                                </Setter.Value>
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                    <VisualState Name="Normal">
-                                        <VisualState.Setters>
-                                            <Setter Property="Stroke" Value="Transparent" />
-                                            <Setter Property="StrokeShape">
-                                                <Setter.Value>
-                                                    <RoundRectangle CornerRadius="0" />
-                                                </Setter.Value>
-                                            </Setter>
-                                        </VisualState.Setters>
-                                    </VisualState>
-                                </VisualStateGroup>
-                            </VisualStateManager.VisualStateGroups>
                         </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="6"/>
-                </CollectionView.ItemsLayout>
             </CollectionView>
 
             <Grid RowSpacing="0">

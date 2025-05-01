@@ -1,9 +1,11 @@
 #nullable disable
 
+using bsm24.Services;
 using Mopups.Pages;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace bsm24.Views;
@@ -30,13 +32,17 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         var matchingItem = ColorsList.FirstOrDefault(c => c.BackgroundColor.ToHex() == selectedColor.ToHex());
         if (matchingItem != null)
         {
-            SelectedColor = matchingItem.BackgroundColor;
-            ColorListPicker.SelectedItem = matchingItem;
+            matchingItem.IsSelected = true;
+            RedValue = (int)(matchingItem.BackgroundColor.Red * 255);
+            GreenValue = (int)(matchingItem.BackgroundColor.Green * 255);
+            BlueValue = (int)(matchingItem.BackgroundColor.Blue * 255);
         }            
         else if (ColorsList.Count > 0)
         {
-            SelectedColor = ColorsList[0].BackgroundColor;
-            ColorListPicker.SelectedItem = ColorsList[0];
+            ColorsList[0].IsSelected = true;
+            RedValue = (int)(ColorsList[0].BackgroundColor.Red * 255);
+            GreenValue = (int)(ColorsList[0].BackgroundColor.Green * 255);
+            BlueValue = (int)(ColorsList[0].BackgroundColor.Blue * 255);
         }            
         
         BindingContext = this;
@@ -49,13 +55,18 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         _taskCompletionSource = new TaskCompletionSource<(Color, int)>();
     }
 
-    private void OnColorTapped(object sender, TappedEventArgs e)
+    private void OnColorTapped(object sender, EventArgs e)
     {
-        if (sender is Border backgroundcolor && backgroundcolor.BindingContext is ColorBoxItem item)
+        if (sender is Border border && border.BindingContext is ColorBoxItem tappedItem)
         {
-            RedValue = (int)(item.BackgroundColor.Red * 255);
-            GreenValue = (int)(item.BackgroundColor.Green * 255);
-            BlueValue = (int)(item.BackgroundColor.Blue * 255);
+            foreach (var item in ColorsList)
+                item.IsSelected = false;
+
+            tappedItem.IsSelected = true;
+
+            RedValue = (int)(tappedItem.BackgroundColor.Red * 255);
+            GreenValue = (int)(tappedItem.BackgroundColor.Green * 255);
+            BlueValue = (int)(tappedItem.BackgroundColor.Blue * 255);
         }
     }
 
@@ -168,8 +179,27 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
     }
 }
 
-public partial class ColorBoxItem
+public partial class ColorBoxItem : INotifyPropertyChanged
 {
     public Color BackgroundColor { get; set; }
-}
 
+    private bool _isSelected;
+    public bool IsSelected
+    {
+        get => _isSelected;
+        set
+        {
+            if (_isSelected != value)
+            {
+                _isSelected = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public event PropertyChangedEventHandler PropertyChanged;
+    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+    {
+        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+    }
+}
