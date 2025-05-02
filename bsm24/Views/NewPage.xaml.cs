@@ -715,11 +715,13 @@ public partial class NewPage : IQueryAttributable
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        selectedColor = result.Item1;
-        lineWidth = result.Item2;
-
-        drawingView.LineColor = result.Item1;
-        drawingView.LineWidth = (int)(result.Item2 / densityX);
+        if (result.Item1 != null)
+        {
+            selectedColor = result.Item1;
+            lineWidth = result.Item2;
+            drawingView.LineColor = result.Item1;
+            drawingView.LineWidth = (int)(result.Item2 / densityX);
+        }
     }
 
     private void EraseClicked(object sender, EventArgs e)

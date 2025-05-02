@@ -19,116 +19,167 @@
         <ResourceDictionary>
             <services:BoolToStrokeColorConverter x:Key="BoolToStrokeColorConverter"/>
             <services:BoolToCornerRadiusConverter x:Key="BoolToCornerRadiusConverter"/>
+            <services:Scale255To0Converter x:Key="Scale255To0Converter"/>
+            <services:Scale100To0Converter x:Key="Scale100To0Converter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
     <Border x:Name="popupBorder"
             StrokeShape="RoundRectangle 20,20,20,20"
+            Margin="0,30,0,30"
             Padding="16,16,16,16"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
             HorizontalOptions="Center"
             VerticalOptions="Center">
 
-        <VerticalStackLayout x:DataType="views:PopupColorPicker">
-            <CollectionView x:Name="ColorListPicker"
-                ItemsSource="{Binding ColorsList}"
-                SelectionMode="None">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="6" />
-                </CollectionView.ItemsLayout>
+        <Grid VerticalOptions="Center">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+                <VerticalStackLayout x:DataType="views:PopupColorPicker">
+                    <CollectionView x:Name="ColorListPicker"
+                    ItemsSource="{Binding ColorsList}"
+                    SelectionMode="None">
+                        <CollectionView.ItemsLayout>
+                            <GridItemsLayout Orientation="Vertical" Span="6" />
+                        </CollectionView.ItemsLayout>
 
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="views:ColorBoxItem">
-                        <Border WidthRequest="40"
-                                HeightRequest="40"
-                                BackgroundColor="{Binding BackgroundColor}"
-                                Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
-                                StrokeThickness="2"
-                                Padding="8"
-                                Margin="4">
-                            <Border.StrokeShape>
-                                <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
-                            </Border.StrokeShape>
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnColorTapped" />
-                            </Border.GestureRecognizers>
-                        </Border>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate x:DataType="views:ColorBoxItem">
+                                <Border WidthRequest="40"
+                                    HeightRequest="40"
+                                    BackgroundColor="{Binding BackgroundColor}"
+                                    Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
+                                    StrokeThickness="2"
+                                    Padding="8"
+                                    Margin="4">
+                                    <Border.StrokeShape>
+                                        <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
+                                    </Border.StrokeShape>
+                                    <Border.GestureRecognizers>
+                                        <TapGestureRecognizer Tapped="OnColorTapped" />
+                                    </Border.GestureRecognizers>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
 
-            <Grid RowSpacing="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="30" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                    <RowDefinition Height="*" />
-                </Grid.RowDefinitions>
+                    <Grid RowSpacing="0">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="30" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                            <RowDefinition Height="*" />
+                        </Grid.RowDefinitions>
 
-                <!-- Slider for Red -->
-                <Slider Grid.Column="1" Grid.Row="0"
-                        Margin="0,6,0,0"
-                        Minimum="0" Maximum="255" Value="{Binding RedValue}"
+                        <!-- Slider for Red -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="0" Spacing="0">
+                            <Label Text="Rot (R)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="0"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding RedValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Red" />
+
+                        <!-- Slider for Green -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="1" Spacing="0">
+                            <Label Text="Grün (G)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="1"
+                               HorizontalTextAlignment="Center"                       
+                               Text="{Binding GreenValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Green" />
+
+                        <!-- Slider for Blue -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="2" Spacing="0">
+                            <Label Text="Blau (B)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="2"
+                               HorizontalTextAlignment="Center"                       
+                               Text="{Binding BlueValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Blue" />
+
+                        <!-- Slider for Hue -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="3" Spacing="0">
+                            <Label Text="Farbwert (H)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="3"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding HueValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+
+                        <!-- Slider for Saturation -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="4" Spacing="0">
+                            <Label Text="Sättigung (S)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="4"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding SaturationValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+
+                        <!-- Slider for Brightness -->
+                        <VerticalStackLayout Grid.Column="1" Grid.Row="5" Spacing="0">
+                            <Label Text="Helligkeit (V)" Margin="0,0,0,-10"/>
+                            <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{DynamicResource Primary}"
+                                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                        </VerticalStackLayout>
+                        <Entry Grid.Column="0" Grid.Row="5"
+                               HorizontalTextAlignment="Center"
+                               Text="{Binding BrightnessValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+
+                        <BoxView Grid.Column="2" Grid.Row="0" Grid.RowSpan="6"
+                                 BackgroundColor="{Binding SelectedColor}"/>
+                    </Grid>
+
+                    <Label x:Name="sliderText"
+                       IsVisible="{Binding LineWidthVisibility}"
+                       HorizontalOptions="Start"
+                       Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
+                    <Slider x:Name="LineWidthSlider"
+                        IsVisible="{Binding LineWidthVisibility}"
+                        Maximum="60"
+                        Minimum="1"
+                        Value="{Binding LineWidth}"
                         ThumbColor="{DynamicResource Primary}"
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="0"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"
-                       Text="{Binding RedValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Red" />
 
-                <!-- Slider for Green -->
-                <Slider Grid.Column="1" Grid.Row="1"
-                        Margin="0,6,0,0"                        
-                        Minimum="0" Maximum="255" Value="{Binding GreenValue}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="1"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"                       
-                       Text="{Binding GreenValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Green" />
+                </VerticalStackLayout>
+            </ScrollView>
 
-                <!-- Slider for Blue -->
-                <Slider Grid.Column="1" Grid.Row="2"
-                        Margin="0,6,0,0"                        
-                        Minimum="0" Maximum="255" Value="{Binding BlueValue}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                <Entry Grid.Column="0" Grid.Row="2"
-                       Scale="0.8"
-                       HorizontalTextAlignment="Center"                       
-                       Text="{Binding BlueValue, Mode=TwoWay}" Keyboard="Numeric" TextColor="Blue" />
-
-                <BoxView Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
-                         BackgroundColor="{Binding SelectedColor}"/>
-            </Grid>
-
-            <Label x:Name="sliderText"
-                   IsVisible="{Binding LineWidthVisibility}"
-                   HorizontalOptions="Start"
-                   Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
-            <Slider x:Name="LineWidthSlider"
-                    IsVisible="{Binding LineWidthVisibility}"
-                    Maximum="60"
-                    Minimum="1"
-                    Value="{Binding LineWidth}"
-                    ThumbColor="{DynamicResource Primary}"
-                    MinimumTrackColor="{DynamicResource Primary}"
-                    MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-            <Grid>
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
-                        x:Name="cancelButtonText"
                         Text="Abbrechen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
@@ -140,7 +191,7 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         Clicked="OnOkClicked" />
             </Grid>
-        </VerticalStackLayout>
+        </Grid>
     </Border>
 
 </Mopups:PopupPage>

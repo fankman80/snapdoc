@@ -127,6 +127,7 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
         await MopupService.Instance.PushAsync(popup);
         var result = await popup.PopupDismissedTask;
 
-        SelectedColor = result.Item1;
+        if (result.Item1 != null)
+            SelectedColor = result.Item1;
     }
 }

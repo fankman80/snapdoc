@@ -1,11 +1,11 @@
 #nullable disable
 
-using bsm24.Services;
+using ColorMine.ColorSpaces;
+using DocumentFormat.OpenXml;
 using Mopups.Pages;
 using Mopups.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 
 namespace bsm24.Views;
@@ -17,6 +17,9 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
     public Task<(Color, int)> PopupDismissedTask => _taskCompletionSource.Task;
     public (Color, int) ReturnValue { get; set; }
     public bool LineWidthVisibility { get; set; }
+    private bool isUpdating = false;
+    private double workR, workG, workB;
+    private float workH, workS, workV;
 
     public PopupColorPicker(int lineWidth, Color selectedColor, bool lineWidthVisibility = true, string okText = "Ok")
     {
@@ -33,26 +36,30 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         if (matchingItem != null)
         {
             matchingItem.IsSelected = true;
-            RedValue = (int)(matchingItem.BackgroundColor.Red * 255);
-            GreenValue = (int)(matchingItem.BackgroundColor.Green * 255);
-            BlueValue = (int)(matchingItem.BackgroundColor.Blue * 255);
+            RedValue = matchingItem.BackgroundColor.Red;
+            GreenValue = matchingItem.BackgroundColor.Green;
+            BlueValue = matchingItem.BackgroundColor.Blue;
         }            
         else if (ColorsList.Count > 0)
         {
-            ColorsList[0].IsSelected = true;
-            RedValue = (int)(ColorsList[0].BackgroundColor.Red * 255);
-            GreenValue = (int)(ColorsList[0].BackgroundColor.Green * 255);
-            BlueValue = (int)(ColorsList[0].BackgroundColor.Blue * 255);
-        }            
-        
+            RedValue = selectedColor.Red;
+            GreenValue = selectedColor.Green;
+            BlueValue = selectedColor.Blue;
+        }
+
         BindingContext = this;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         _taskCompletionSource = new TaskCompletionSource<(Color, int)>();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        _taskCompletionSource.SetResult(ReturnValue);
     }
 
     private void OnColorTapped(object sender, EventArgs e)
@@ -64,21 +71,21 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
 
             tappedItem.IsSelected = true;
 
-            RedValue = (int)(tappedItem.BackgroundColor.Red * 255);
-            GreenValue = (int)(tappedItem.BackgroundColor.Green * 255);
-            BlueValue = (int)(tappedItem.BackgroundColor.Blue * 255);
+            RedValue = tappedItem.BackgroundColor.Red;
+            GreenValue = tappedItem.BackgroundColor.Green;
+            BlueValue = tappedItem.BackgroundColor.Blue;
         }
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _taskCompletionSource.SetResult((SelectedColor, LineWidth));
     }
 
     private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
     {
-        ReturnValue = (SelectedColor, LineWidth);
+        ReturnValue = (null, 0);
+        await MopupService.Instance.PopAsync();
+    }
+
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        ReturnValue = (null, 0);
         await MopupService.Instance.PopAsync();
     }
 
@@ -88,54 +95,162 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         await MopupService.Instance.PopAsync();
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    public double RedValue
     {
-        ReturnValue = (SelectedColor, LineWidth);
-        await MopupService.Instance.PopAsync();
-    }
-
-    private int redValue;
-    public int RedValue
-    {
-        get => redValue;
+        get => workR;
         set
         {
-            if (redValue != value)
-            {
-                redValue = value;
-                OnPropertyChanged();
-                UpdateSelectedColor();
-            }
+            if (workR == value || isUpdating) return;
+            isUpdating = true;
+
+            // 1) Arbeitsschritt: Arbeitsfelder updaten
+            workR = value;
+
+            // 2) Gesamtes Farbmodell umrechnen
+            UpdateHSVFromRGB_Work();
+            UpdateSelectedColor_Work();
+
+            // 3) Gebundene Properties feuern
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
         }
     }
 
-    private int greenValue;
-    public int GreenValue
+    public double GreenValue
     {
-        get => greenValue;
+        get => workG;
         set
         {
-            if (greenValue != value)
-            {
-                greenValue = value;
-                OnPropertyChanged();
-                UpdateSelectedColor();
-            }
+            if (workG == value || isUpdating) return;
+            isUpdating = true;
+
+            // 1) Arbeitsschritt: Arbeitsfelder updaten
+            workG = value;
+
+            // 2) Gesamtes Farbmodell umrechnen
+            UpdateHSVFromRGB_Work();
+            UpdateSelectedColor_Work();
+
+            // 3) Gebundene Properties feuern
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
         }
     }
 
-    private int blueValue;
-    public int BlueValue
+    public double BlueValue
     {
-        get => blueValue;
+        get => workB;
         set
         {
-            if (blueValue != value)
-            {
-                blueValue = value;
-                OnPropertyChanged();
-                UpdateSelectedColor();
-            }
+            if (workB == value || isUpdating) return;
+            isUpdating = true;
+
+            // 1) Arbeitsschritt: Arbeitsfelder updaten
+            workB = value;
+
+            // 2) Gesamtes Farbmodell umrechnen
+            UpdateHSVFromRGB_Work();
+            UpdateSelectedColor_Work();
+
+            // 3) Gebundene Properties feuern
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
+        }
+    }
+
+    public float BrightnessValue
+    {
+        get => workV;
+        set
+        {
+            if (Math.Abs(workV - value) < 0.001f || isUpdating) return;
+            isUpdating = true;
+
+            workV = value;
+
+            UpdateRGBFromHSV_Work();
+            UpdateSelectedColor_Work();
+
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
+        }
+    }
+
+    public float SaturationValue
+    {
+        get => workS;
+        set
+        {
+            if (Math.Abs(workS - value) < 0.001f || isUpdating) return;
+            isUpdating = true;
+
+            workS = value;
+
+            UpdateRGBFromHSV_Work();
+            UpdateSelectedColor_Work();
+
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
+        }
+    }
+
+    public float HueValue
+    {
+        get => workH;
+        set
+        {
+            if (Math.Abs(workH - value) < 0.001f || isUpdating) return;
+            isUpdating = true;
+
+            workH = value;
+
+            UpdateRGBFromHSV_Work();
+            UpdateSelectedColor_Work();
+
+            OnPropertyChanged(nameof(RedValue));
+            OnPropertyChanged(nameof(GreenValue));
+            OnPropertyChanged(nameof(BlueValue));
+            OnPropertyChanged(nameof(HueValue));
+            OnPropertyChanged(nameof(SaturationValue));
+            OnPropertyChanged(nameof(BrightnessValue));
+            OnPropertyChanged(nameof(SelectedColor));
+
+            isUpdating = false;
         }
     }
 
@@ -167,9 +282,28 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         }
     }
 
-    private void UpdateSelectedColor()
+    private void UpdateSelectedColor_Work()
     {
-        SelectedColor = Color.FromRgb(RedValue, GreenValue, BlueValue);
+        SelectedColor = Color.FromHsv(workH, workS, workV);
+    }
+
+    private void UpdateHSVFromRGB_Work()
+    {
+        workH = Color.FromRgb(RedValue, GreenValue, BlueValue).GetHue();
+        workS = Color.FromRgb(RedValue, GreenValue, BlueValue).GetSaturation();
+        //workV = Color.FromRgb(RedValue, GreenValue, BlueValue).GetLuminosity();
+
+        var conv = Color.FromRgb(RedValue, GreenValue, BlueValue).To<Hsv>();
+        //workH = (float)conv.H;
+        //workS = (float)conv.S;
+        workV = (float)conv.V;
+    }
+
+    private void UpdateRGBFromHSV_Work()
+    {
+        workR = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Red;
+        workG = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Green;
+        workB = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Blue;
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;
