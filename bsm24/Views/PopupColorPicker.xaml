@@ -21,6 +21,7 @@
             <services:BoolToCornerRadiusConverter x:Key="BoolToCornerRadiusConverter"/>
             <services:Scale255To0Converter x:Key="Scale255To0Converter"/>
             <services:Scale100To0Converter x:Key="Scale100To0Converter"/>
+            <services:Scale360To0Converter x:Key="Scale360To0Converter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -84,75 +85,81 @@
 
                         <!-- Slider for Red -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="0" Spacing="0">
-                            <Label Text="Rot (R)" Margin="0,0,0,-10"/>
+                            <Label Text="Rot (R)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="0"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"
                                Text="{Binding RedValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Red" />
 
                         <!-- Slider for Green -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="1" Spacing="0">
-                            <Label Text="Grün (G)" Margin="0,0,0,-10"/>
+                            <Label Text="Grün (G)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="1"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"                       
                                Text="{Binding GreenValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Green" />
 
                         <!-- Slider for Blue -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="2" Spacing="0">
-                            <Label Text="Blau (B)" Margin="0,0,0,-10"/>
+                            <Label Text="Blau (B)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="2"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"                       
                                Text="{Binding BlueValue, Mode=TwoWay, Converter={StaticResource Scale255To0Converter}}" Keyboard="Numeric" TextColor="Blue" />
 
                         <!-- Slider for Hue -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="3" Spacing="0">
-                            <Label Text="Farbwert (H)" Margin="0,0,0,-10"/>
+                            <Label Text="Farbwert (H)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="3"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"
-                               Text="{Binding HueValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+                               Text="{Binding HueValue, Mode=TwoWay, Converter={StaticResource Scale360To0Converter}}" Keyboard="Numeric"/>
 
                         <!-- Slider for Saturation -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="4" Spacing="0">
-                            <Label Text="Sättigung (S)" Margin="0,0,0,-10"/>
+                            <Label Text="Sättigung (S)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="4"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"
-                               Text="{Binding SaturationValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+                               Text="{Binding SaturationValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric"/>
 
                         <!-- Slider for Brightness -->
                         <VerticalStackLayout Grid.Column="1" Grid.Row="5" Spacing="0">
-                            <Label Text="Helligkeit (V)" Margin="0,0,0,-10"/>
+                            <Label Text="Helligkeit (L)" Margin="0,0,0,-10" FontSize="12"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                         </VerticalStackLayout>
                         <Entry Grid.Column="0" Grid.Row="5"
+                               FontSize="12"
                                HorizontalTextAlignment="Center"
-                               Text="{Binding BrightnessValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric" TextColor="Gray" />
+                               Text="{Binding BrightnessValue, Mode=TwoWay, Converter={StaticResource Scale100To0Converter}}" Keyboard="Numeric"/>
 
                         <BoxView Grid.Column="2" Grid.Row="0" Grid.RowSpan="6"
                                  BackgroundColor="{Binding SelectedColor}"/>

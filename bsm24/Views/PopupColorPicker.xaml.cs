@@ -19,7 +19,7 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
     public bool LineWidthVisibility { get; set; }
     private bool isUpdating = false;
     private double workR, workG, workB;
-    private float workH, workS, workV;
+    private double workH, workS, workV;
 
     public PopupColorPicker(int lineWidth, Color selectedColor, bool lineWidthVisibility = true, string okText = "Ok")
     {
@@ -179,12 +179,12 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         }
     }
 
-    public float BrightnessValue
+    public double BrightnessValue
     {
         get => workV;
         set
         {
-            if (Math.Abs(workV - value) < 0.001f || isUpdating) return;
+            if (workV == value || isUpdating) return;
             isUpdating = true;
 
             workV = value;
@@ -204,12 +204,12 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         }
     }
 
-    public float SaturationValue
+    public double SaturationValue
     {
         get => workS;
         set
         {
-            if (Math.Abs(workS - value) < 0.001f || isUpdating) return;
+            if (workS == value || isUpdating) return;
             isUpdating = true;
 
             workS = value;
@@ -229,12 +229,12 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         }
     }
 
-    public float HueValue
+    public double HueValue
     {
         get => workH;
         set
         {
-            if (Math.Abs(workH - value) < 0.001f || isUpdating) return;
+            if (workH == value|| isUpdating) return;
             isUpdating = true;
 
             workH = value;
@@ -284,26 +284,21 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
 
     private void UpdateSelectedColor_Work()
     {
-        SelectedColor = Color.FromHsv(workH, workS, workV);
+        SelectedColor = Color.FromHsla((float)workH, (float)workS, (float)workV);
     }
 
     private void UpdateHSVFromRGB_Work()
     {
-        workH = Color.FromRgb(RedValue, GreenValue, BlueValue).GetHue();
-        workS = Color.FromRgb(RedValue, GreenValue, BlueValue).GetSaturation();
-        //workV = Color.FromRgb(RedValue, GreenValue, BlueValue).GetLuminosity();
-
-        var conv = Color.FromRgb(RedValue, GreenValue, BlueValue).To<Hsv>();
-        //workH = (float)conv.H;
-        //workS = (float)conv.S;
-        workV = (float)conv.V;
+        workH = Color.FromRgb(workR, workG, workB).GetHue();
+        workS = Color.FromRgb(workR, workG, workB).GetSaturation();
+        workV = Color.FromRgb(workR, workG, workB).GetLuminosity();
     }
 
     private void UpdateRGBFromHSV_Work()
     {
-        workR = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Red;
-        workG = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Green;
-        workB = Color.FromHsv(HueValue, SaturationValue, BrightnessValue).Blue;
+        workR = Color.FromHsla((float)workH, (float)workS, (float)workV).Red;
+        workG = Color.FromHsla((float)workH, (float)workS, (float)workV).Green;
+        workB = Color.FromHsla((float)workH, (float)workS, (float)workV).Blue;
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;
