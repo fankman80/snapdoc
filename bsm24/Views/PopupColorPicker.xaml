@@ -47,16 +47,15 @@
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="6" />
                         </CollectionView.ItemsLayout>
-
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="views:ColorBoxItem">
                                 <Border WidthRequest="40"
-                                    HeightRequest="40"
-                                    BackgroundColor="{Binding BackgroundColor}"
-                                    Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
-                                    StrokeThickness="2"
-                                    Padding="8"
-                                    Margin="4">
+                                        HeightRequest="40"
+                                        BackgroundColor="{Binding BackgroundColor}"
+                                        Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
+                                        StrokeThickness="2"
+                                        Padding="8"
+                                        Margin="4">
                                     <Border.StrokeShape>
                                         <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
                                     </Border.StrokeShape>

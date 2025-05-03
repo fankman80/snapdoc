@@ -199,7 +199,6 @@
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="8.0.314" />
-		<PackageReference Include="ColorMinePortable.Maui" Version="2.0.3" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="11.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="11.2.0" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
@@ -212,7 +211,7 @@
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
 		<PackageReference Include="Mopups" Version="1.3.2" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
-		<PackageReference Include="PDFtoImage" Version="5.1.0-preview6" />
+		<PackageReference Include="PDFtoImage" Version="5.1.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="UraniumUI" Version="2.11.1" />
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.11.1" />
