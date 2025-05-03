@@ -27,7 +27,10 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         LineWidth = lineWidth;
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     Settings.ColorData.Select(c => new ColorBoxItem
-                    { BackgroundColor = c }));
+                    { BackgroundColor = c }))
+        {
+            new() { IsAddButton = true }
+        };
 
         // Prüfen, ob selectedColor in der Liste vorkommt
         var matchingItem = ColorsList.FirstOrDefault(c => c.BackgroundColor.ToHex() == selectedColor.ToHex());
@@ -91,6 +94,29 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
     {
         ReturnValue = (SelectedColor, LineWidth);
         await MopupService.Instance.PopAsync();
+    }
+
+    public void OnAddTapped(object sender, EventArgs e)
+    {
+        // Prüfen, ob selectedColor in der Liste vorkommt
+        var matchingItem = ColorsList
+            .Take(ColorsList.Count - 1)
+            .FirstOrDefault(c => c.BackgroundColor.ToHex() == SelectedColor.ToHex());
+
+        if (matchingItem == null)
+        {
+            foreach (var item in ColorsList)
+                item.IsSelected = false;
+
+            // Dummy entfernen
+            ColorsList.RemoveAt(ColorsList.Count - 1);
+
+            // Neue Farbe hinzufügen
+            ColorsList.Add(new ColorBoxItem { BackgroundColor = SelectedColor, IsSelected = true });
+
+            // Dummy wieder ans Ende setzen
+            ColorsList.Add(new ColorBoxItem { BackgroundColor = SelectedColor, IsAddButton = true });
+        }
     }
 
     public double RedValue
@@ -283,6 +309,11 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
     private void UpdateSelectedColor_Work()
     {
         SelectedColor = Color.FromHsla((float)workH, (float)workS, (float)workV);
+        if (ColorsList?.Any() == true)
+        {
+            var lastItem = ColorsList.Last();
+            lastItem.BackgroundColor = SelectedColor;
+        }
     }
 
     private void UpdateHSVFromRGB_Work()
@@ -308,7 +339,20 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
 
 public partial class ColorBoxItem : INotifyPropertyChanged
 {
-    public Color BackgroundColor { get; set; }
+    private Color backgroundColor;
+    public Color BackgroundColor
+    {
+        get => backgroundColor;
+        set
+        {
+            if (backgroundColor != value)
+            {
+                backgroundColor = value;
+                OnPropertyChanged(nameof(BackgroundColor));
+            }
+        }
+    }
+    public bool IsAddButton { get; set; }
 
     private bool _isSelected;
     public bool IsSelected
