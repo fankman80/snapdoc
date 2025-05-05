@@ -716,7 +716,7 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.IsFotoCompressed = settings.IsFotoCompressed;
                 this.FotoCompressValue = settings.FotoCompressValue;
                 this.IconGalleryMode = settings.IconGalleryMode ?? "IconListTemplate";
-                this.ColorList = settings.ColorList;
+                this.ColorList = settings.ColorList ?? _colorList;
             }
         }
     }

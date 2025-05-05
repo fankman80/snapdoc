@@ -73,8 +73,6 @@
                                             HeightRequest="40"
                                             BackgroundColor="Transparent"
                                             Stroke="Black"
-                                            StrokeDashArray="6"
-                                            StrokeThickness="1"
                                             Padding="10">
                                         <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static m:MaterialOutlined.Add}}"/>
                                         <Border.GestureRecognizers>
