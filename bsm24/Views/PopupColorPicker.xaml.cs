@@ -1,7 +1,6 @@
 #nullable disable
 
 using bsm24.Services;
-using FFImageLoading.Extensions;
 using Mopups.Pages;
 using Mopups.Services;
 using System.Collections.ObjectModel;
@@ -29,13 +28,16 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         LineWidth = lineWidth;
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
-                    { BackgroundColor = Color.Parse(c) }))
+                    { BackgroundColor = Color.FromRgba(c) }))
         {
             new() { BackgroundColor = selectedColor, IsAddButton = true }
         };
 
         // Prüfen, ob selectedColor in der Liste vorkommt
-        var matchingItem = ColorsList.FirstOrDefault(c => c.BackgroundColor.ToHex() == selectedColor.ToHex());
+        var matchingItem = ColorsList
+            .Take(ColorsList.Count - 1)
+            .FirstOrDefault(c => c.BackgroundColor.ToHex() == selectedColor.ToHex());
+
         if (matchingItem != null)
         {
             matchingItem.IsSelected = true;
@@ -43,7 +45,7 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
             GreenValue = matchingItem.BackgroundColor.Green;
             BlueValue = matchingItem.BackgroundColor.Blue;
         }            
-        else if (ColorsList.Count > 0)
+        else
         {
             RedValue = selectedColor.Red;
             GreenValue = selectedColor.Green;
@@ -154,14 +156,11 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
             if (workR == value || isUpdating) return;
             isUpdating = true;
 
-            // 1) Arbeitsschritt: Arbeitsfelder updaten
             workR = value;
 
-            // 2) Gesamtes Farbmodell umrechnen
             UpdateHSVFromRGB_Work();
             UpdateSelectedColor_Work();
 
-            // 3) Gebundene Properties feuern
             OnPropertyChanged(nameof(RedValue));
             OnPropertyChanged(nameof(GreenValue));
             OnPropertyChanged(nameof(BlueValue));
@@ -182,14 +181,11 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
             if (workG == value || isUpdating) return;
             isUpdating = true;
 
-            // 1) Arbeitsschritt: Arbeitsfelder updaten
             workG = value;
 
-            // 2) Gesamtes Farbmodell umrechnen
             UpdateHSVFromRGB_Work();
             UpdateSelectedColor_Work();
 
-            // 3) Gebundene Properties feuern
             OnPropertyChanged(nameof(RedValue));
             OnPropertyChanged(nameof(GreenValue));
             OnPropertyChanged(nameof(BlueValue));
@@ -210,14 +206,11 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
             if (workB == value || isUpdating) return;
             isUpdating = true;
 
-            // 1) Arbeitsschritt: Arbeitsfelder updaten
             workB = value;
 
-            // 2) Gesamtes Farbmodell umrechnen
             UpdateHSVFromRGB_Work();
             UpdateSelectedColor_Work();
 
-            // 3) Gebundene Properties feuern
             OnPropertyChanged(nameof(RedValue));
             OnPropertyChanged(nameof(GreenValue));
             OnPropertyChanged(nameof(BlueValue));

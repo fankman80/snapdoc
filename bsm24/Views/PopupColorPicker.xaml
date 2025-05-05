@@ -24,7 +24,6 @@
             <services:Scale100To0Converter x:Key="Scale100To0Converter"/>
             <services:Scale360To0Converter x:Key="Scale360To0Converter"/>
             <services:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
-            <services:ColorToContrastingTextColorConverter x:Key="ContrastConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
