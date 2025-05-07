@@ -97,6 +97,7 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
             {
                 File.Delete(iconFile);
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
+                ReturnValue = "deleted";
             }
         }
         await MopupService.Instance.PopAsync();
