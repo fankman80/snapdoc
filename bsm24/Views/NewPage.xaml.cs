@@ -6,9 +6,12 @@ using bsm24.ViewModels;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Maui;
 using Mopups.Services;
 using MR.Gestures;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
+using SkiaSharp.Views.Maui.Controls;
 using Application = Microsoft.Maui.Controls.Application;
 
 #if WINDOWS
@@ -30,10 +33,13 @@ public partial class NewPage : IQueryAttributable
     private Point mousePos;
     private readonly TransformViewModel planContainer;
     private DrawingView drawingView;
+    private SKCanvasView fillView;
     private int lineWidth = 15;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
     SKRectI pinBound;
+    private string drawingMode = null;
+    private SKBitmap previewBitmap;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -96,10 +102,6 @@ public partial class NewPage : IQueryAttributable
                                  PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].PinRotation;
                 image.Scale = PinScaling(PinUpdate);
 
-                if (GlobalJson.Data.Plans[PlanId].Pins[PinUpdate].IsLocked == true)
-                    image.Opacity = .5;
-                else
-                    image.Opacity = 1;
                 AdjustImagePosition(image);
             }
         }
@@ -333,12 +335,6 @@ public partial class NewPage : IQueryAttributable
 
         PlanContainer.Children.Add(smallImage);
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
-
-        // set transparency
-        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true)
-            smallImage.Opacity = .5;
-        else
-            smallImage.Opacity = 1;
     }
 
     private void AdjustImagePosition(MR.Gestures.Image image)
@@ -406,8 +402,16 @@ public partial class NewPage : IQueryAttributable
 
         if (activePin != null && PinEditBorder.IsVisible == false)
         {
-            activePin.TranslationX += deltaX * scaleSpeed;
-            activePin.TranslationY += deltaY * scaleSpeed;
+            if (activePin.AutomationId == "fillIcon")
+            {
+                activePin.TranslationX += e.DeltaDistance.X;
+                activePin.TranslationY += e.DeltaDistance.Y;
+            }
+            else
+            {
+                activePin.TranslationX += deltaX * scaleSpeed;
+                activePin.TranslationY += deltaY * scaleSpeed;
+            }
         }
         else if (planContainer.IsPanningEnabled)
         {
@@ -424,9 +428,159 @@ public partial class NewPage : IQueryAttributable
         SetPin();
     }
 
-    private void SetRegionClicked(object sender, EventArgs e)
+    private void DrawingClicked(object sender, EventArgs e)
     {
+        planContainer.IsPanningEnabled = false;
+        SetPinBtn.IsVisible = false;
+        DrawBtn.IsVisible = false;
+        PenSettingsBtn.IsVisible = true;
+        CheckBtn.IsVisible = true;
+        EraseBtn.IsVisible = true;
+
+        drawingMode = "draw";
+
         AddDrawingView();
+    }
+
+    private void FillRegionClicked(object sender, EventArgs e)
+    {
+        SetPinBtn.IsVisible = false;
+        DrawBtn.IsVisible = false;
+        PenSettingsBtn.IsVisible = true;
+        CheckBtn.IsVisible = true;
+        EraseBtn.IsVisible = true;
+        DraggableIcon.IsVisible = true;
+        DraggableIcon.TranslationX =  this.Width / 2;
+        DraggableIcon.TranslationY = this.Height / 2;
+
+        drawingMode = "fill";
+
+        AddFillView();
+    }
+
+    private void AddFillTapped(object sender, EventArgs e)
+    {
+        var plan_path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+        var img = SKBitmap.Decode(plan_path);
+
+        // Koordinaten umrechnen wie bisher
+        var scaleSpeed = 1 / PlanContainer.Scale;
+        double angle = PlanContainer.Rotation * Math.PI / 180.0;
+        double cos = Math.Cos(-angle);
+        double sin = Math.Sin(-angle);
+        var _dx = (DraggableIcon.TranslationX + (DraggableIcon.Width * DraggableIcon.AnchorX) - (this.Width / 2)) * scaleSpeed;
+        var _dy = (DraggableIcon.TranslationY + (DraggableIcon.Height * DraggableIcon.AnchorY) - (this.Height / 2)) * scaleSpeed;
+        var dx = _dx * cos - _dy * sin;
+        var dy = _dx * sin + _dy * cos;
+        Point pos = new(PlanContainer.AnchorX * PlanContainer.Width + dx, PlanContainer.AnchorY * PlanContainer.Height + dy);
+
+        // Maske erstellen
+        var result = CreateFloodMaskWithOffset(img, (int)pos.X, (int)pos.Y, new SKColor(selectedColor.ToUint()));
+        if (result != null)
+        {
+            // Initialisiere die Vorschau-Bitmap beim ersten Mal
+            previewBitmap ??= new SKBitmap(img.Width, img.Height);
+
+            using (var canvas = new SKCanvas(previewBitmap))
+            {
+                canvas.DrawBitmap(result.MaskBitmap, result.OffsetX, result.OffsetY);
+            }
+            fillView.InvalidateSurface();
+        }
+    }
+
+    private void OnCanvasPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        if (previewBitmap != null)
+        {
+            canvas.DrawBitmap(previewBitmap, 0, 0);
+        }
+    }
+   
+    public static MaskResult CreateFloodMaskWithOffset(SKBitmap source, int startX, int startY, SKColor fillColor, int tolerance = 20)
+    {
+        var targetColor = source.GetPixel(startX, startY);
+        var width = source.Width;
+        var height = source.Height;
+
+        var mask = new SKBitmap(width, height, isOpaque: false);
+        Queue<SKPointI> queue = new();
+        bool[,] visited = new bool[width, height];
+        queue.Enqueue(new SKPointI(startX, startY));
+
+        int minX = width, maxX = 0, minY = height, maxY = 0;
+
+        while (queue.Count > 0)
+        {
+            var pt = queue.Dequeue();
+            int x = pt.X;
+            int y = pt.Y;
+
+            if (x < 0 || x >= width || y < 0 || y >= height)
+                continue;
+            if (visited[x, y])
+                continue;
+
+            var currentColor = source.GetPixel(x, y);
+            if (!ColorsAreClose(currentColor, targetColor, tolerance))
+                continue;
+
+            visited[x, y] = true;
+            mask.SetPixel(x, y, fillColor);
+
+            if (x < minX) minX = x;
+            if (x > maxX) maxX = x;
+            if (y < minY) minY = y;
+            if (y > maxY) maxY = y;
+
+            queue.Enqueue(new SKPointI(x + 1, y));
+            queue.Enqueue(new SKPointI(x - 1, y));
+            queue.Enqueue(new SKPointI(x, y + 1));
+            queue.Enqueue(new SKPointI(x, y - 1));
+        }
+
+        int boxWidth = maxX - minX + 1;
+        int boxHeight = maxY - minY + 1;
+
+        if (boxWidth <= 0 || boxHeight <= 0)
+            return null;
+
+        var trimmed = new SKBitmap(boxWidth, boxHeight, isOpaque: false);
+        using (var canvas = new SKCanvas(trimmed))
+        {
+            var srcRect = new SKRectI(minX, minY, maxX + 1, maxY + 1);
+            canvas.DrawBitmap(mask, srcRect, new SKRect(0, 0, boxWidth, boxHeight));
+        }
+
+        return new MaskResult
+        {
+            MaskBitmap = trimmed,
+            OffsetX = minX,
+            OffsetY = minY
+        };
+    }
+
+    static bool ColorsAreClose(SKColor c1, SKColor c2, int tolerance)
+    {
+        return Math.Abs(c1.Red - c2.Red) <= tolerance &&
+               Math.Abs(c1.Green - c2.Green) <= tolerance &&
+               Math.Abs(c1.Blue - c2.Blue) <= tolerance;
+    }
+
+    private void FillIconDown(object sender, EventArgs e)
+    {
+        MR.Gestures.Image icon = (MR.Gestures.Image)sender;
+        planContainer.IsPanningEnabled = false;
+        activePin = icon;
+    }
+
+    private void FillIconUp(object sender, EventArgs e)
+    {
+        planContainer.IsPanningEnabled = true;
+        activePin = null;
     }
 
     private void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null)
@@ -458,7 +612,9 @@ public partial class NewPage : IQueryAttributable
             Point _anchorPoint = iconItem.AnchorPoint;
             Size _size = iconItem.IconSize;
             bool _isRotationLocked = iconItem.IsRotationLocked;
+            bool _isPosLocked = false;
             bool _isCustomPin = false;
+            bool _isAllowExport = true;
             string _displayName = iconItem.DisplayName;
 
             if (customName != null)
@@ -467,9 +623,11 @@ public partial class NewPage : IQueryAttributable
                 _anchorPoint = new Point(0.5, 0.5);
                 _size = new Size(customPinSizeWidth, customPinSizeHeight);
                 _isRotationLocked = true;
+                _isPosLocked = true;
                 _isCustomPin = true;
                 _newPin = customName;
                 _displayName = "";
+                _isAllowExport = false;
             }
 
             Pin newPinData = new()
@@ -477,7 +635,7 @@ public partial class NewPage : IQueryAttributable
                 Pos = _pos,
                 Anchor = _anchorPoint,
                 Size = _size,
-                IsLocked = false,
+                IsLocked = _isPosLocked,
                 IsLockRotate = _isRotationLocked,
                 IsCustomPin = _isCustomPin,
                 PinName = _displayName,
@@ -493,7 +651,7 @@ public partial class NewPage : IQueryAttributable
                 PinScale = iconItem.IconScale,
                 PinRotation = 0,
                 GeoLocation = location != null ? new GeoLocData(location) : null,
-                AllowExport = true,
+                AllowExport = _isAllowExport,
             };
 
             // Sicherstellen, dass der Plan existiert
@@ -601,10 +759,6 @@ public partial class NewPage : IQueryAttributable
 
     private void AddDrawingView()
     {
-        planContainer.IsPanningEnabled = false;
-        SetPinBtn.IsVisible = false;
-        DrawBtn.IsVisible = false;
-
         drawingView = new DrawingView
         {
             BackgroundColor = Colors.Transparent,
@@ -631,10 +785,6 @@ public partial class NewPage : IQueryAttributable
         drawingView.PointDrawn += OnDrawingLineUpdated;
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         absoluteLayout.Children.Add(drawingView);
-
-        PenSettingsBtn.IsVisible = true;
-        CheckBtn.IsVisible = true;
-        EraseBtn.IsVisible = true;
     }
 
     private void RemoveDrawingView()
@@ -642,6 +792,34 @@ public partial class NewPage : IQueryAttributable
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         if (drawingView != null && absoluteLayout != null)
             absoluteLayout.Children.Remove(drawingView);
+    }
+
+    private void AddFillView()
+    {
+        fillView = new SKCanvasView
+        {
+            BackgroundColor = Colors.Transparent,
+            InputTransparent = true,
+            WidthRequest = PlanImage.Width,
+            HeightRequest = PlanImage.Height
+        };
+
+        pinBound.Left = int.MaxValue;
+        pinBound.Right = int.MinValue;
+        pinBound.Top = int.MaxValue;
+        pinBound.Bottom = int.MinValue;
+
+        // Füge die EventHandler hinzu
+        fillView.PaintSurface += OnCanvasPaintSurface;
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
+        absoluteLayout.Children.Add(fillView);
+    }
+
+    private void RemoveFillView()
+    {
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
+        if (fillView != null && absoluteLayout != null)
+            absoluteLayout.Children.Remove(fillView);
     }
 
     private void OnDrawingLineUpdated(object sender, PointDrawnEventArgs e)
@@ -658,50 +836,127 @@ public partial class NewPage : IQueryAttributable
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView.Lines.Count > 0)
+        if (drawingMode == "draw")
         {
+            if (drawingView.Lines.Count > 0)
+            {
+                var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+                var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+                string filePath = Path.Combine(customPinPath, customPinName);
+
+                await using var imageStream = await DrawingViewService.GetImageStream(
+                                                    ImageLineOptions.JustLines(drawingView.Lines,
+                                                    new Size(pinBound.Width, pinBound.Height),
+                                                    Brush.Transparent));
+                if (imageStream != null)
+                {
+                    if (!Directory.Exists(customPinPath))
+                        Directory.CreateDirectory(customPinPath);
+
+                    using var memoryStream = new MemoryStream();
+                    await imageStream.CopyToAsync(memoryStream);
+                    memoryStream.Seek(0, SeekOrigin.Begin);
+                    using var _skBitmap = SKBitmap.Decode(memoryStream);
+                    var skBitmap = CropBitmap(_skBitmap, 4);
+                    var resizedBitmap = new SKBitmap(pinBound.Width + (int)drawingView.LineWidth, pinBound.Height + (int)drawingView.LineWidth);
+                    var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
+                    skBitmap.ScalePixels(resizedBitmap, samplingOptions);
+
+                    using var imageData = resizedBitmap.Encode(SKEncodedImageFormat.Png, 90); // 90 = Qualität
+                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
+                    {
+                        imageData.SaveTo(fileStream);
+                    }
+
+                    SetPin(customPinName, resizedBitmap.Width, resizedBitmap.Height,
+                          (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                          (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
+                          new SKColor(drawingView.LineColor.ToUint()));
+                }
+            }
+            RemoveDrawingView();
+        }
+
+        if (drawingMode == "fill")
+        {
+            // Speichern
             var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+            if (!Directory.Exists(customPinPath))
+                Directory.CreateDirectory(customPinPath);
+
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
-            await using var imageStream = await DrawingViewService.GetImageStream(
-                                                ImageLineOptions.JustLines(drawingView.Lines,
-                                                new Size(pinBound.Width, pinBound.Height),
-                                                Brush.Transparent));
-            if (imageStream != null)
+            var result = SaveFinalMask();
+            if (result != null)
             {
-                if (!Directory.Exists(customPinPath))
-                    Directory.CreateDirectory(customPinPath);
+                var (cropped, offsetX, offsetY) = result.Value;
+                using var image = SKImage.FromBitmap(cropped);
+                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+                File.WriteAllBytes(filePath, data.ToArray());
 
-                using var memoryStream = new MemoryStream();
-                await imageStream.CopyToAsync(memoryStream);
-                memoryStream.Seek(0, SeekOrigin.Begin);
-                using var _skBitmap = SKBitmap.Decode(memoryStream);
-                var skBitmap = CropBitmap(_skBitmap, 4);
-                var resizedBitmap = new SKBitmap(pinBound.Width + (int)drawingView.LineWidth, pinBound.Height + (int)drawingView.LineWidth);
-                var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
-                skBitmap.ScalePixels(resizedBitmap, samplingOptions);
-
-                using var imageData = resizedBitmap.Encode(SKEncodedImageFormat.Png, 90); // 90 = Qualität
-                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                {
-                    imageData.SaveTo(fileStream);
-                }
-
-                SetPin(customPinName, resizedBitmap.Width, resizedBitmap.Height,
-                      (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                      (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                      new SKColor(drawingView.LineColor.ToUint()));
+                // Pin setzen
+                SetPin(customPinName, image.Width, image.Height,
+                       (offsetX + (image.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                       (offsetY + (image.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
+                       new SKColor(selectedColor.ToUint()));
             }
+            RemoveFillView();
         }
 
-        RemoveDrawingView();
+        drawingMode = "none";
         planContainer.IsPanningEnabled = true;
         PenSettingsBtn.IsVisible = false;
         CheckBtn.IsVisible = false;
         EraseBtn.IsVisible = false;
         SetPinBtn.IsVisible = true;
         DrawBtn.IsVisible = true;
+        DraggableIcon.IsVisible = false;
+    }
+
+    public (SKBitmap CroppedBitmap, int OffsetX, int OffsetY)? SaveFinalMask()
+    {
+        if (previewBitmap == null)
+            return null;
+
+        int minX = previewBitmap.Width;
+        int minY = previewBitmap.Height;
+        int maxX = 0;
+        int maxY = 0;
+        bool hasColor = false;
+
+        // Bounding-Box ermitteln
+        for (int y = 0; y < previewBitmap.Height; y++)
+        {
+            for (int x = 0; x < previewBitmap.Width; x++)
+            {
+                var pixel = previewBitmap.GetPixel(x, y);
+                if (pixel.Alpha > 0) // oder: pixel != SKColors.Transparent
+                {
+                    hasColor = true;
+                    if (x < minX) minX = x;
+                    if (y < minY) minY = y;
+                    if (x > maxX) maxX = x;
+                    if (y > maxY) maxY = y;
+                }
+            }
+        }
+
+        if (!hasColor)
+            return null;
+
+        int croppedWidth = maxX - minX + 1;
+        int croppedHeight = maxY - minY + 1;
+
+        var croppedBitmap = new SKBitmap(croppedWidth, croppedHeight);
+        using (var canvas = new SKCanvas(croppedBitmap))
+        {
+            var sourceRect = new SKRectI(minX, minY, maxX + 1, maxY + 1);
+            var destPoint = new SKPoint(0, 0);
+            canvas.DrawBitmap(previewBitmap, sourceRect, new SKRect(destPoint.X, destPoint.Y, croppedWidth, croppedHeight));
+        }
+
+        return (croppedBitmap, minX, minY);
     }
 
     public static SKBitmap CropBitmap(SKBitmap originalBitmap, int cropWidth)
@@ -733,14 +988,23 @@ public partial class NewPage : IQueryAttributable
         {
             selectedColor = result.Item1;
             lineWidth = result.Item2;
-            drawingView.LineColor = result.Item1;
-            drawingView.LineWidth = (int)(result.Item2 / densityX);
+            if (drawingView != null)
+            {
+                drawingView.LineColor = selectedColor;
+                drawingView.LineWidth = (int)(lineWidth / densityX);
+            }   
         }
     }
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        drawingView.Clear();
+        if (drawingMode == "draw")
+            drawingView.Clear();
+        if (drawingMode == "fill")
+        {
+            previewBitmap = new SKBitmap((int)fillView.CanvasSize.Width, (int)fillView.CanvasSize.Height);
+            fillView.InvalidateSurface();
+        }
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
@@ -929,4 +1193,11 @@ public partial class NewPage : IQueryAttributable
 
         PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
     }
+}
+
+public class MaskResult
+{
+    public SKBitmap MaskBitmap { get; set; }
+    public int OffsetX { get; set; }
+    public int OffsetY { get; set; }
 }

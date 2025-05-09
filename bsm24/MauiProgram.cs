@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
 using Mopups.Hosting;
 using MR.Gestures;
+using SkiaSharp.Views.Maui.Controls.Hosting;
 using UraniumUI;
 
 #if WINDOWS
@@ -24,6 +25,7 @@ public static class MauiProgram
             .UseFFImageLoading()
             .ConfigureMRGestures()
             .ConfigureMopups()
+            .UseSkiaSharp()
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
