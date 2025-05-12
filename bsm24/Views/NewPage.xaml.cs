@@ -12,6 +12,20 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using Application = Microsoft.Maui.Controls.Application;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
+using SixLabors.ImageSharp.Processing;
+using Color = Microsoft.Maui.Graphics.Color;
+using Point = Microsoft.Maui.Graphics.Point;
+using Image = SixLabors.ImageSharp.Image;
+using Size = Microsoft.Maui.Graphics.Size;
+using System.IO;
+
+
+
+
+
+
 
 #if WINDOWS
 using bsm24.Platforms.Windows;
@@ -31,14 +45,15 @@ public partial class NewPage : IQueryAttributable
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
+    private Microsoft.Maui.Controls.Image fillView;
     private DrawingView drawingView;
-    private SKCanvasView fillView;
+    private Image<Rgba32> originalImage;
+    private Image<Rgba32> overlayImage; // Nur Maske mit Alpha
     private int lineWidth = 15;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
     SKRectI pinBound;
     private string drawingMode = null;
-    private SKBitmap previewBitmap;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -459,10 +474,7 @@ public partial class NewPage : IQueryAttributable
 
     private void AddFillTapped(object sender, EventArgs e)
     {
-        var plan_path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-        var img = SKBitmap.Decode(plan_path);
-
-        // Koordinaten umrechnen wie bisher
+        // Koordinaten umrechnen
         var scaleSpeed = 1 / PlanContainer.Scale;
         double angle = PlanContainer.Rotation * Math.PI / 180.0;
         double cos = Math.Cos(-angle);
@@ -473,100 +485,70 @@ public partial class NewPage : IQueryAttributable
         var dy = _dx * sin + _dy * cos;
         Point pos = new(PlanContainer.AnchorX * PlanContainer.Width + dx, PlanContainer.AnchorY * PlanContainer.Height + dy);
 
-        // Maske erstellen
-        var result = CreateFloodMaskWithOffset(img, (int)pos.X, (int)pos.Y, new SKColor(selectedColor.ToUint()));
-        if (result != null)
-        {
-            // Initialisiere die Vorschau-Bitmap beim ersten Mal
-            previewBitmap ??= new SKBitmap(img.Width, img.Height);
-
-            using (var canvas = new SKCanvas(previewBitmap))
-            {
-                canvas.DrawBitmap(result.MaskBitmap, result.OffsetX, result.OffsetY);                
-            }
-            fillView.InvalidateSurface();
-        }
+        ApplyFloodFillToOverlay((int)pos.X, (int)pos.Y, new Rgba32(selectedColor.Red, selectedColor.Green, selectedColor.Blue));
     }
 
-    private void OnCanvasPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void ApplyFloodFillToOverlay(int x, int y, Rgba32 fillColor, int tolerance = 20)
     {
-        var canvas = e.Surface.Canvas;
-        canvas.Clear(SKColors.Transparent);
+        if (originalImage == null || overlayImage == null)
+            return;
 
-        if (previewBitmap != null)
-        {
-            canvas.DrawBitmap(previewBitmap, 0, 0);
-        }
-    }
-   
-    public static MaskResult CreateFloodMaskWithOffset(SKBitmap source, int startX, int startY, SKColor fillColor, int tolerance = 20)
-    {
-        var targetColor = source.GetPixel(startX, startY);
-        var width = source.Width;
-        var height = source.Height;
-
-        var mask = new SKBitmap(width, height, isOpaque: false);
-        Queue<SKPointI> queue = new();
-        bool[,] visited = new bool[width, height];
-        queue.Enqueue(new SKPointI(startX, startY));
-
-        int minX = width, maxX = 0, minY = height, maxY = 0;
+        var targetColor = originalImage[x, y];
+        var visited = new bool[originalImage.Width, originalImage.Height];
+        var queue = new Queue<(int x, int y)>();
+        queue.Enqueue((x, y));
 
         while (queue.Count > 0)
         {
-            var pt = queue.Dequeue();
-            int x = pt.X;
-            int y = pt.Y;
-
-            if (x < 0 || x >= width || y < 0 || y >= height)
+            var (px, py) = queue.Dequeue();
+            if (px < 0 || px >= originalImage.Width || py < 0 || py >= originalImage.Height)
                 continue;
-            if (visited[x, y])
+            if (visited[px, py])
                 continue;
 
-            var currentColor = source.GetPixel(x, y);
-            if (!ColorsAreClose(currentColor, targetColor, tolerance))
+            var color = originalImage[px, py];
+            if (!ColorsAreClose(color, targetColor, tolerance))
                 continue;
 
-            visited[x, y] = true;
-            mask.SetPixel(x, y, fillColor);
+            visited[px, py] = true;
+            overlayImage[px, py] = fillColor; // Nur ins Overlay schreiben
 
-            if (x < minX) minX = x;
-            if (x > maxX) maxX = x;
-            if (y < minY) minY = y;
-            if (y > maxY) maxY = y;
-
-            queue.Enqueue(new SKPointI(x + 1, y));
-            queue.Enqueue(new SKPointI(x - 1, y));
-            queue.Enqueue(new SKPointI(x, y + 1));
-            queue.Enqueue(new SKPointI(x, y - 1));
+            queue.Enqueue((px + 1, py));
+            queue.Enqueue((px - 1, py));
+            queue.Enqueue((px, py + 1));
+            queue.Enqueue((px, py - 1));
         }
 
-        int boxWidth = maxX - minX + 1;
-        int boxHeight = maxY - minY + 1;
-
-        if (boxWidth <= 0 || boxHeight <= 0)
-            return null;
-
-        var trimmed = new SKBitmap(boxWidth, boxHeight, isOpaque: false);
-        using (var canvas = new SKCanvas(trimmed))
-        {
-            var srcRect = new SKRectI(minX, minY, maxX + 1, maxY + 1);
-            canvas.DrawBitmap(mask, srcRect, new SKRect(0, 0, boxWidth, boxHeight));
-        }
-
-        return new MaskResult
-        {
-            MaskBitmap = trimmed,
-            OffsetX = minX,
-            OffsetY = minY
-        };
+        UpdateImageViewWithOverlay();
     }
 
-    static bool ColorsAreClose(SKColor c1, SKColor c2, int tolerance)
+    private void UpdateImageViewWithOverlay()
     {
-        return Math.Abs(c1.Red - c2.Red) <= tolerance &&
-               Math.Abs(c1.Green - c2.Green) <= tolerance &&
-               Math.Abs(c1.Blue - c2.Blue) <= tolerance;
+        using var combined = new Image<Rgba32>(originalImage.Width, originalImage.Height);
+        combined.Mutate(ctx =>
+        {
+            ctx.DrawImage(originalImage, 1f);
+            ctx.DrawImage(overlayImage ,1f);
+        });
+        fillView.Source = ConvertImageSharpToImageSource(combined);
+    }
+
+    private ImageSource ConvertImageSharpToImageSource(Image<Rgba32> image)
+    {
+        var ms = new MemoryStream();
+        image.SaveAsPng(ms);
+        ms.Position = 0;
+        return ImageSource.FromStream(() => ms);
+    }
+
+    private static bool ColorsAreClose(Rgba32 c1, Rgba32 c2, int tolerance)
+    {
+        int dr = c1.R - c2.R;
+        int dg = c1.G - c2.G;
+        int db = c1.B - c2.B;
+        int da = c1.A - c2.A;
+        int distance = dr * dr + dg * dg + db * db + da * da;
+        return distance <= tolerance * tolerance;
     }
 
     private void FillIconDown(object sender, EventArgs e)
@@ -795,9 +777,13 @@ public partial class NewPage : IQueryAttributable
 
     private void AddFillView()
     {
-        fillView = new SKCanvasView
+        var plan_path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
+        var stream = File.OpenRead(plan_path);
+        originalImage = Image.Load<Rgba32>(stream);
+        overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
+
+        fillView = new Microsoft.Maui.Controls.Image
         {
-            BackgroundColor = Colors.Transparent,
             InputTransparent = true,
             WidthRequest = PlanImage.Width,
             HeightRequest = PlanImage.Height,
@@ -805,8 +791,6 @@ public partial class NewPage : IQueryAttributable
             AnchorY = 0,
         };
 
-        // Füge die EventHandler hinzu
-        fillView.PaintSurface += OnCanvasPaintSurface;
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
         absoluteLayout.Children.Add(fillView);
     }
@@ -882,20 +866,22 @@ public partial class NewPage : IQueryAttributable
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
-            var result = SaveFinalMask();
-            if (result != null)
+            var (trimmedMask, offsetX, offsetY) = TrimTransparentEdgesWithOffset(overlayImage);
+            if (trimmedMask.Width > 1 || trimmedMask.Height > 1)
             {
-                var (cropped, offsetX, offsetY) = result.Value;
-                using var image = SKImage.FromBitmap(cropped);
-                using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-                File.WriteAllBytes(filePath, data.ToArray());
+                using (var fs = File.OpenWrite(filePath))
+                {
+                    trimmedMask.SaveAsPng(fs);
+                }
 
                 // Pin setzen
-                SetPin(customPinName, image.Width, image.Height,
-                       (offsetX + (image.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                       (offsetY + (image.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                       new SKColor(selectedColor.ToUint()));
+                SetPin(customPinName, trimmedMask.Width, trimmedMask.Height,
+                        (offsetX + (trimmedMask.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                        (offsetY + (trimmedMask.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
+                        new SKColor(selectedColor.ToUint()));
             }
+
+
             RemoveFillView();
         }
 
@@ -909,49 +895,33 @@ public partial class NewPage : IQueryAttributable
         DraggableIcon.IsVisible = false;
     }
 
-    public (SKBitmap CroppedBitmap, int OffsetX, int OffsetY)? SaveFinalMask()
+    public static (Image<Rgba32> TrimmedImage, int OffsetX, int OffsetY) TrimTransparentEdgesWithOffset(Image<Rgba32> source)
     {
-        if (previewBitmap == null)
-            return null;
+        int left = source.Width, right = 0, top = source.Height, bottom = 0;
 
-        int minX = previewBitmap.Width;
-        int minY = previewBitmap.Height;
-        int maxX = 0;
-        int maxY = 0;
-        bool hasColor = false;
-
-        // Bounding-Box ermitteln
-        for (int y = 0; y < previewBitmap.Height; y++)
+        for (int y = 0; y < source.Height; y++)
         {
-            for (int x = 0; x < previewBitmap.Width; x++)
+            for (int x = 0; x < source.Width; x++)
             {
-                var pixel = previewBitmap.GetPixel(x, y);
-                if (pixel.Alpha > 0) // oder: pixel != SKColors.Transparent
+                if (source[x, y].A > 0)
                 {
-                    hasColor = true;
-                    if (x < minX) minX = x;
-                    if (y < minY) minY = y;
-                    if (x > maxX) maxX = x;
-                    if (y > maxY) maxY = y;
+                    if (x < left) left = x;
+                    if (x > right) right = x;
+                    if (y < top) top = y;
+                    if (y > bottom) bottom = y;
                 }
             }
         }
 
-        if (!hasColor)
-            return null;
+        // Kein sichtbarer Inhalt?
+        if (right < left || bottom < top)
+            return (new Image<Rgba32>(1, 1), 0, 0);
 
-        int croppedWidth = maxX - minX + 1;
-        int croppedHeight = maxY - minY + 1;
+        int width = right - left + 1;
+        int height = bottom - top + 1;
+        var trimmed = source.Clone(ctx => ctx.Crop(new Rectangle(left, top, width, height)));
 
-        var croppedBitmap = new SKBitmap(croppedWidth, croppedHeight);
-        using (var canvas = new SKCanvas(croppedBitmap))
-        {
-            var sourceRect = new SKRectI(minX, minY, maxX + 1, maxY + 1);
-            var destPoint = new SKPoint(0, 0);
-            canvas.DrawBitmap(previewBitmap, sourceRect, new SKRect(destPoint.X, destPoint.Y, croppedWidth, croppedHeight));
-        }
-
-        return (croppedBitmap, minX, minY);
+        return (trimmed, left, top);
     }
 
     public static SKBitmap CropBitmap(SKBitmap originalBitmap, int cropWidth)
@@ -997,8 +967,8 @@ public partial class NewPage : IQueryAttributable
             drawingView.Clear();
         if (drawingMode == "fill")
         {
-            previewBitmap = new SKBitmap((int)fillView.CanvasSize.Width, (int)fillView.CanvasSize.Height);
-            fillView.InvalidateSurface();
+            overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
+            UpdateImageViewWithOverlay();
         }
     }
 

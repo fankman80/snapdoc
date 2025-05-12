@@ -213,6 +213,7 @@
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="PDFtoImage" Version="5.1.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
+		<PackageReference Include="SixLabors.ImageSharp" Version="3.1.8" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.0" />
 		<PackageReference Include="UraniumUI" Version="2.12.1" />
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.12.1" />
