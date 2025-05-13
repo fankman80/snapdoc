@@ -3,6 +3,7 @@
 using bsm24.Models;
 using bsm24.Services;
 using bsm24.ViewModels;
+using Codeuctivity.OpenXmlPowerTools;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Views;
@@ -40,7 +41,8 @@ public partial class NewPage : IQueryAttributable
     private Microsoft.Maui.Controls.Image fillView;
     private DrawingView drawingView;
     private Image<Rgba32> originalImage;
-    private Image<Rgba32> overlayImage; // Nur Maske mit Alpha
+    private DynamicOverlayMask overlayMask; // Nur Maske mit Alpha
+    private TileManager tileManager;
     private int lineWidth = 15;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
@@ -478,80 +480,76 @@ public partial class NewPage : IQueryAttributable
         var dy = _dx * sin + _dy * cos;
         Point pos = new(PlanContainer.AnchorX * PlanContainer.Width + dx, PlanContainer.AnchorY * PlanContainer.Height + dy);
 
-        ApplyFloodFillToOverlay((int)pos.X, (int)pos.Y, new Rgba32(selectedColor.Red, selectedColor.Green, selectedColor.Blue));
+        // overlayMask ist ein Feld deiner Page
+        FloodFillWithDynamicOverlay(
+            (int)pos.X, (int)pos.Y,
+            new Rgba32(255, 0, 0, 120),  // z. B. halbtransparentes Rot
+            tileManager,
+            ref overlayMask,
+            25);
+
+        // Danach aktualisierst du die Anzeige:
+        UpdateImageViewWithOverlay(tileManager, overlayMask);      
     }
 
-    private void ApplyFloodFillToOverlay(int x, int y, Rgba32 fillColor, int tolerance = 20)
+    public void FloodFillWithDynamicOverlay(
+        int startX, int startY,
+        Rgba32 fillColor,
+        TileManager tileManager,
+        ref DynamicOverlayMask overlayMask,
+        int tolerance = 20)
     {
-        if (originalImage == null || overlayImage == null)
-            return;
+        if (overlayMask == null)
+            overlayMask = new DynamicOverlayMask();
 
-        var targetColor = originalImage[x, y];
-        var visited = new bool[originalImage.Width, originalImage.Height];
+        var targetColor = tileManager.GetPixel(startX, startY);
+        var visited = new HashSet<(int x, int y)>();
         var queue = new Queue<(int x, int y)>();
-        queue.Enqueue((x, y));
+        queue.Enqueue((startX, startY));
 
         while (queue.Count > 0)
         {
-            var (px, py) = queue.Dequeue();
-            if (px < 0 || px >= originalImage.Width || py < 0 || py >= originalImage.Height)
-                continue;
-            if (visited[px, py])
-                continue;
+            var (x, y) = queue.Dequeue();
 
-            var color = originalImage[px, py];
-            if (!ColorsAreClose(color, targetColor, tolerance))
+            if (visited.Contains((x, y)))
                 continue;
 
-            visited[px, py] = true;
-            overlayImage[px, py] = fillColor; // Nur ins Overlay schreiben
+            if (x < 0 || y < 0 || x >= tileManager.Width || y >= tileManager.Height)
+                continue;
 
-            // Überprüfe benachbarte Pixel, um die Füllregion dynamisch zu erweitern
-            if (IsNearFilledRegion(px, py))
-            {
-                queue.Enqueue((px + 1, py));
-                queue.Enqueue((px - 1, py));
-                queue.Enqueue((px, py + 1));
-                queue.Enqueue((px, py - 1));
-            }
+            var currentColor = tileManager.GetPixel(x, y);
+            if (!ColorsAreClose(currentColor, targetColor, tolerance))
+                continue;
+
+            visited.Add((x, y));
+            overlayMask.Set(x, y, fillColor);
+
+            queue.Enqueue((x + 1, y));
+            queue.Enqueue((x - 1, y));
+            queue.Enqueue((x, y + 1));
+            queue.Enqueue((x, y - 1));
         }
-
-        UpdateImageViewWithOverlay();
     }
 
-    private bool IsNearFilledRegion(int x, int y)
+    private void UpdateImageViewWithOverlay(TileManager tileManager, DynamicOverlayMask mask)
     {
-        // Prüfe, ob das Pixel nahe an der ursprünglich gefüllten Region liegt
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                int nx = x + dx;
-                int ny = y + dy;
+        var overlay = mask.GetImage();
+        if (overlay == null)
+            return;
 
-                if (nx >= 0 && ny >= 0 && nx < originalImage.Width && ny < originalImage.Height)
-                {
-                    // Überprüfe, ob benachbarte Pixel bereits die Füllfarbe haben
-                    if (overlayImage[nx, ny] != new Rgba32(0, 0, 0, 0)) // Wenn das benachbarte Pixel nicht transparent ist
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-
-    private void UpdateImageViewWithOverlay()
-    {
-        using var combined = new Image<Rgba32>(originalImage.Width, originalImage.Height);
+        using var combined = new Image<Rgba32>(tileManager.Width, tileManager.Height);
         combined.Mutate(ctx =>
         {
-            ctx.DrawImage(originalImage, 1f);
-            ctx.DrawImage(overlayImage, 1f);
+            ctx.DrawImage(tileManager.LoadBaseImage(), 1f);
+            ctx.DrawImage(overlay, new SixLabors.ImageSharp.Point(mask.OffsetX, mask.OffsetY), 1f);
         });
+
         fillView.Source = ConvertImageSharpToImageSource(combined);
+    }
+
+    private bool ColorsAreClose(L8 a, L8 b, int tolerance)
+    {
+        return Math.Abs(a.PackedValue - b.PackedValue) < tolerance;
     }
 
     private ImageSource ConvertImageSharpToImageSource(Image<Rgba32> image)
@@ -562,15 +560,7 @@ public partial class NewPage : IQueryAttributable
         return ImageSource.FromStream(() => ms);
     }
 
-    private static bool ColorsAreClose(Rgba32 c1, Rgba32 c2, int tolerance)
-    {
-        int dr = c1.R - c2.R;
-        int dg = c1.G - c2.G;
-        int db = c1.B - c2.B;
-        int da = c1.A - c2.A;
-        int distance = dr * dr + dg * dg + db * db + da * da;
-        return distance <= tolerance * tolerance;
-    }
+
 
     private void FillIconDown(object sender, EventArgs e)
     {
@@ -799,9 +789,6 @@ public partial class NewPage : IQueryAttributable
     private void AddFillView()
     {
         var plan_path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-        var stream = File.OpenRead(plan_path);
-        originalImage = Image.Load<Rgba32>(stream);
-        overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
 
         fillView = new Microsoft.Maui.Controls.Image
         {
@@ -811,6 +798,8 @@ public partial class NewPage : IQueryAttributable
             AnchorX = 0,
             AnchorY = 0,
         };
+
+        tileManager = new TileManager(plan_path);
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
         absoluteLayout.Children.Add(fillView);
@@ -888,20 +877,20 @@ public partial class NewPage : IQueryAttributable
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
-            var (trimmedMask, offsetX, offsetY) = TrimTransparentEdgesWithOffset(overlayImage);
-            if (trimmedMask.Width > 1 || trimmedMask.Height > 1)
-            {
-                using (var fs = File.OpenWrite(filePath))
-                {
-                    trimmedMask.SaveAsPng(fs);
-                }
+            //var (trimmedMask, offsetX, offsetY) = TrimTransparentEdgesWithOffset(overlayMask);
+            //if (trimmedMask.Width > 1 || trimmedMask.Height > 1)
+            //{
+            //    using (var fs = File.OpenWrite(filePath))
+            //    {
+            //        trimmedMask.SaveAsPng(fs);
+            //    }
 
-                // Pin setzen
-                SetPin(customPinName, trimmedMask.Width, trimmedMask.Height,
-                        (offsetX + (trimmedMask.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                        (offsetY + (trimmedMask.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                        new SKColor(selectedColor.ToUint()));
-            }
+            //    // Pin setzen
+            //    SetPin(customPinName, trimmedMask.Width, trimmedMask.Height,
+            //            (offsetX + (trimmedMask.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+            //            (offsetY + (trimmedMask.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
+            //            new SKColor(selectedColor.ToUint()));
+            //}
 
 
             RemoveFillView();
@@ -989,8 +978,8 @@ public partial class NewPage : IQueryAttributable
             drawingView.Clear();
         if (drawingMode == "fill")
         {
-            overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
-            UpdateImageViewWithOverlay();
+            //overlayMask = new Image<Rgba32>(originalImage.Width, originalImage.Height);
+            //UpdateImageViewWithOverlay();
         }
     }
 
