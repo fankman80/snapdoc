@@ -64,7 +64,16 @@
                             MaximumTrackColor="{DynamicResource PrimaryDark}"
                             Value="{Binding PdfQuality}"/>
 
-                    <Grid RowSpacing="16" Margin="0,16,0,16">
+                    <HorizontalStackLayout>
+                        <CheckBox x:Name="isPlanRotateLocked"
+                                  Margin="0,0,0,10"
+                                  Scale="1.2"
+                                  Color="{DynamicResource Primary}"
+                                  IsChecked="{Binding IsPlanRotateLocked}"/>
+                        <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+
+                    <Grid RowSpacing="16" Margin="0,0,0,16">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="*" />
@@ -73,70 +82,61 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto" />
-                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />                            
                             <RowDefinition Height="Auto" />
                             <RowDefinition Height="Auto" />
                         </Grid.RowDefinitions>
 
-                        <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" Spacing="0">
-                            <CheckBox x:Name="isPlanRotateLocked"
-                                      Scale="1.2"
-                                      Color="{DynamicResource Primary}"
-                                      IsChecked="{Binding IsPlanRotateLocked}"/>
-                            <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-
-                        <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="5" Text="Map-Icon:"/>
-
-                        <material:RadioButton Grid.Column="0" Grid.Row="2"
+                        <Label Text="Map-Icon:" Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5"/>      
+                        
+                        <material:RadioButton Grid.Column="0" Grid.Row="1"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     HorizontalOptions="Center"
                                     IsChecked="{Binding MapIcon, Converter={StaticResource IntToBoolConverter}, ConverterParameter=0}">
                         </material:RadioButton>
-                        <material:RadioButton Grid.Column="1" Grid.Row="2"
+                        <material:RadioButton Grid.Column="1" Grid.Row="1"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     HorizontalOptions="Center"
                                     IsChecked="{Binding MapIcon, Converter={StaticResource IntToBoolConverter}, ConverterParameter=1}">
                         </material:RadioButton>
-                        <material:RadioButton Grid.Column="2" Grid.Row="2"
+                        <material:RadioButton Grid.Column="2" Grid.Row="1"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     HorizontalOptions="Center"
                                     IsChecked="{Binding MapIcon, Converter={StaticResource IntToBoolConverter}, ConverterParameter=2}">
                         </material:RadioButton>
-                        <material:RadioButton Grid.Column="3" Grid.Row="2"
+                        <material:RadioButton Grid.Column="3" Grid.Row="1"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     HorizontalOptions="Center"
                                     IsChecked="{Binding MapIcon, Converter={StaticResource IntToBoolConverter}, ConverterParameter=3}">
                         </material:RadioButton>
-                        <material:RadioButton Grid.Column="4" Grid.Row="2"
+                        <material:RadioButton Grid.Column="4" Grid.Row="1"
                                     CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     HorizontalOptions="Center"
                                     IsChecked="{Binding MapIcon, Converter={StaticResource IntToBoolConverter}, ConverterParameter=4}">
                         </material:RadioButton>
 
-                        <Image Grid.Column="0" Grid.Row="3"
+                        <Image Grid.Column="0" Grid.Row="2"
                                HorizontalOptions="Start"
                                WidthRequest="30"
                                Source="{Binding MapIcons[0]}"/>
-                        <Image Grid.Column="1" Grid.Row="3"
+                        <Image Grid.Column="1" Grid.Row="2"
                                HorizontalOptions="Start"
                                WidthRequest="30"
                                Source="{Binding MapIcons[1]}"/>
-                        <Image Grid.Column="2" Grid.Row="3"
+                        <Image Grid.Column="2" Grid.Row="2"
                                HorizontalOptions="Start"
                                WidthRequest="30"
                                Source="{Binding MapIcons[2]}"/>
-                        <Image Grid.Column="3" Grid.Row="3"
+                        <Image Grid.Column="3" Grid.Row="2"
                                HorizontalOptions="Start"
                                WidthRequest="30"
                                Source="{Binding MapIcons[3]}"/>
-                        <Image Grid.Column="4" Grid.Row="3"
+                        <Image Grid.Column="4" Grid.Row="2"
                                HorizontalOptions="Start"
                                WidthRequest="30"
                                Source="{Binding MapIcons[4]}"/>
