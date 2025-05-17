@@ -2,7 +2,7 @@
 
 using bsm24.ViewModels;
 using CommunityToolkit.Maui.Core.Views;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using MR.Gestures;
 using SkiaSharp;
 
@@ -41,7 +41,7 @@ public partial class ImageViewPage : IQueryAttributable
             if (ImageViewContainer.Width > 0 && ImageViewContainer.Height > 0)
             {
                 ImageViewContainer.PropertyChanged -= ImageView_PropertyChanged;
-                ImageFit();
+                ImageFit(null, null);
             }   
         }
     }
@@ -71,7 +71,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     public void OnDoubleTapped(object sender, EventArgs e)
     {
-        ImageFit();
+        ImageFit(null, null);
     }
 
     public void OnPinching(object sender, PinchEventArgs e)
@@ -99,7 +99,33 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    private void ImageFit()
+    private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
+    {
+        var mousePos = e.Center;
+
+        // Dynamischer Zoomfaktor basierend auf der aktuellen Skalierung
+        double zoomFactor;
+        if (imageViewContainer.Scale > 2) // Sehr stark vergrößert
+            zoomFactor = e.ScrollDelta.Y > 0 ? 1.05 : 0.95;  // Sehr langsame Zoom-Änderung
+        else if (imageViewContainer.Scale > 1) // Moderat vergrößert
+            zoomFactor = e.ScrollDelta.Y > 0 ? 1.1 : 0.9;  // Langsame Zoom-Änderung
+        else // Wenig vergrößert oder sehr klein
+            zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;  // Moderate Zoom-Änderung
+
+        double targetScale = imageViewContainer.Scale * zoomFactor; ;
+        double newAnchorX = 1 / ImageViewContainer.Width * (mousePos.X - imageViewContainer.TranslationX);
+        double newAnchorY = 1 / ImageViewContainer.Height * (mousePos.Y - imageViewContainer.TranslationY);
+        double deltaTranslationX = (ImageViewContainer.Width * (newAnchorX - imageViewContainer.AnchorX)) * (targetScale / imageViewContainer.Scale - 1);
+        double deltaTranslationY = (ImageViewContainer.Height * (newAnchorY - imageViewContainer.AnchorY)) * (targetScale / imageViewContainer.Scale - 1);
+
+        imageViewContainer.AnchorX = newAnchorX;
+        imageViewContainer.AnchorY = newAnchorY;
+        imageViewContainer.TranslationX -= deltaTranslationX;
+        imageViewContainer.TranslationY -= deltaTranslationY;
+        imageViewContainer.Scale = targetScale;
+    }
+
+    private void ImageFit(object sender, EventArgs e)
     {
         var scale = Math.Min(this.Width / ImageViewContainer.Width, this.Height / ImageViewContainer.Height);
         imageViewContainer.Scale = scale;
@@ -116,12 +142,8 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupColorPicker(lineWidth, selectedColor);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        (Color, int) result = ((Color, int))await this.ShowPopupAsync(popup);
 
         selectedColor = result.Item1;
         lineWidth = result.Item2;
@@ -201,12 +223,9 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        this.ShowPopup(popup);
+        var result = await this.ShowPopupAsync(popup);
 
         if (result != null)
         {

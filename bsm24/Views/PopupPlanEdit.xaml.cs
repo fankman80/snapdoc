@@ -1,14 +1,11 @@
 #nullable disable
 
-using Mopups.Pages;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 
 namespace bsm24.Views;
 
-public partial class PopupPlanEdit : PopupPage
+public partial class PopupPlanEdit : Popup
 {
-    TaskCompletionSource<(string, string, bool)> _taskCompletionSource;
-    public Task<(string, string, bool)> PopupDismissedTask => _taskCompletionSource.Task;
     public (string, string, bool) ReturnValue { get; set; }
 
     public PopupPlanEdit(string name, string desc, bool gray, bool export = true, string okText = "Ok", string cancelText = "Abbrechen")
@@ -26,44 +23,30 @@ public partial class PopupPlanEdit : PopupPage
             grayscaleButtonText.Text = "Farben entfernen";
     }
 
-    protected override void OnAppearing()
+    private void OnOkClicked(object sender, EventArgs e)
     {
-        base.OnAppearing();
-        _taskCompletionSource = new TaskCompletionSource<(string, string, bool)>();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _taskCompletionSource.SetResult(ReturnValue);
-    }
-
-    private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
-    {
-        ReturnValue = (null, null, true);
-        await MopupService.Instance.PopAsync();
-    }
-
-    private async void OnOkClicked(object sender, EventArgs e)
-    {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = (name_entry.Text, desc_entry.Text, allow_export.IsChecked);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    private void OnCancelClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = (null, null, true);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnDeleteClicked(object sender, EventArgs e)
+    private void OnDeleteClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = ("delete", null, true);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
-    private async void OnGrayscaleClicked(object sender, EventArgs e)
+    private void OnGrayscaleClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = ("grayscale", null, true);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 }

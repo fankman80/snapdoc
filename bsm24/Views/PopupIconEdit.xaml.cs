@@ -1,8 +1,6 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
-using Mopups.Pages;
-using Mopups.Services;
 using SkiaSharp;
 using System.ComponentModel;
 using System.Globalization;
@@ -10,10 +8,8 @@ using System.Runtime.CompilerServices;
 
 namespace bsm24.Views;
 
-public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
+public partial class PopupIconEdit : Popup, INotifyPropertyChanged
 {
-    TaskCompletionSource<string> _taskCompletionSource;
-    public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
     public IconItem iconItem;
 
@@ -38,20 +34,6 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
             deleteIconContainer.IsVisible = true;
     }
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-
-        _taskCompletionSource = new TaskCompletionSource<string>();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-
-        _taskCompletionSource.SetResult(ReturnValue);
-    }
-
     private Color selectedColor;
     public Color SelectedColor
     {
@@ -66,8 +48,9 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnOkClicked(object sender, EventArgs e)
+    private void OnOkClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         // Falls CustomIcon, dann wird Pfad relativ gesetzt
         var file = iconItem.FileName;
         int index = file.IndexOf("customicons", StringComparison.OrdinalIgnoreCase);
@@ -100,13 +83,14 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
                 ReturnValue = "deleted";
             }
         }
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    private void OnCancelClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = null;
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
     private void OnSliderValueChanged(object sender, EventArgs e)
@@ -125,8 +109,7 @@ public partial class PopupIconEdit : PopupPage, INotifyPropertyChanged
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(0, SelectedColor, lineWidthVisibility: false);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        (Color, int) result = ((Color, int))await Application.Current.Windows[0].Page.ShowPopupAsync(popup, CancellationToken.None);
 
         if (result.Item1 != null)
             SelectedColor = result.Item1;

@@ -1,14 +1,11 @@
 #nullable disable
 
-using Mopups.Pages;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 
 namespace bsm24.Views;
 
-public partial class PopupDualResponse : PopupPage
+public partial class PopupDualResponse : Popup
 {
-    TaskCompletionSource<string> _taskCompletionSource;
-    public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
     private int countdown = 5;
     private readonly string OkText;
@@ -23,35 +20,18 @@ public partial class PopupDualResponse : PopupPage
         if (alert)
             StartTimer();
     }
-
-    protected override void OnAppearing()
+    private void OnOkClicked(object sender, EventArgs e)
     {
-        base.OnAppearing();
-        _taskCompletionSource = new TaskCompletionSource<string>();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _taskCompletionSource.SetResult(ReturnValue);
-    }
-
-    private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
-    {
-        ReturnValue = null;
-        await MopupService.Instance.PopAsync();
-    }
-
-    private async void OnOkClicked(object sender, EventArgs e)
-    {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = "Ok";
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    private void OnCancelClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = null;
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
     private void StartTimer()

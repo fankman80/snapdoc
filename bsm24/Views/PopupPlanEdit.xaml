@@ -1,81 +1,79 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:Mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
-             xmlns:Animations="clr-namespace:Mopups.Animations;assembly=Mopups"
-             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"   
-             x:Class="bsm24.Views.PopupPlanEdit"
-             BackgroundClicked="PopupPage_BackgroundClicked"
-             BackgroundInputTransparent="False"
-             CloseWhenBackgroundIsClicked="True"
-             HasSystemPadding="False"
-             BackgroundColor="#60000000"
-             Title="Plan Edit">
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+               CanBeDismissedByTappingOutsideOfPopup ="False"
+               Color="Transparent"
+               x:Class="bsm24.Views.PopupPlanEdit">
+    
+    <Grid>
+        <Border
+            StrokeShape="RoundRectangle 20,20,20,20"
+            Padding="16"
+            Margin="30"
+            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+            WidthRequest="300"
+            HorizontalOptions="Center"
+            VerticalOptions="Center">
 
-    <Border
-        StrokeShape="RoundRectangle 20,20,20,20"
-        Padding="16,16,16,16"
-        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-        WidthRequest="300"
-        HorizontalOptions="Center"
-        VerticalOptions="Center">
+            <VerticalStackLayout>
+                <material:TextField x:Name="name_entry"
+                                    Title="Planbezeichnung"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"                            
+                                    AllowClear="True"/>
 
-        <VerticalStackLayout>
-            <material:TextField x:Name="name_entry"
-                            Title="Planbezeichnung"
-                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"                            
-                            AllowClear="True"/>
+                <material:TextField x:Name="desc_entry"
+                                    Title="Beschreibung"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                    AllowClear="True"/>
+                <HorizontalStackLayout>
+                    <CheckBox x:Name="allow_export"
+                              Scale="1.2"
+                              Color="{DynamicResource Primary}"/>
+                    <Label Text="Bericht Export" VerticalTextAlignment="Center"/>
+                </HorizontalStackLayout>
 
-            <material:EditorField x:Name="desc_entry"
-                            Title="Beschreibung"
-                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
-
-            <HorizontalStackLayout>
-                <CheckBox x:Name="allow_export"
-                          Scale="1.2"
-                          Color="{DynamicResource Primary}"/>
-                <Label Text="Bericht Export" VerticalTextAlignment="Center"/>
-            </HorizontalStackLayout>
-
-            <Button x:Name="grayscaleButtonText"
-                    Padding="0"                    
-                    Text="Farben entfernen"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"    
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}"
-                    Clicked="OnGrayscaleClicked" />
-
-            <Button Text="Plan löschen"
-                    Padding="0"                    
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"        
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
-                    Clicked="OnDeleteClicked" />
-
-            <Grid Margin="0,16,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        x:Name="cancelButtonText"
-                        Text="Abbrechen"
+                <Button x:Name="grayscaleButtonText"
+                        Padding="0"                    
+                        Text="Farben entfernen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
-                        Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
-                        x:Name="okButtonText"
-                        Text="Ok"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"    
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}"
+                        Clicked="OnGrayscaleClicked" />
+
+                <Button Text="Plan löschen"
+                        Padding="0"                    
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
-                        Clicked="OnOkClicked" />
-            </Grid>
-        </VerticalStackLayout>
-    </Border>
-</Mopups:PopupPage>
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"        
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                        Clicked="OnDeleteClicked" />
+
+                <Grid Margin="0,16,0,0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            x:Name="cancelButtonText"
+                            Text="Abbrechen"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                            Clicked="OnCancelClicked" />
+                    <Button Grid.Column="1"
+                            x:Name="okButtonText"
+                            Text="Ok"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
+                            Clicked="OnOkClicked" />
+                </Grid>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</toolkit:Popup>

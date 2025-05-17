@@ -222,19 +222,6 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Clicked="DrawingClicked"/>
 
-            <Button x:Name="FillBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Format_color_fill}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}"                
-                    Margin="0,0,180,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Clicked="FillRegionClicked"/>
-
             <Button x:Name="PenSettingsBtn"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
                     BackgroundColor="{DynamicResource Primary}"
@@ -262,20 +249,6 @@
                     AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Clicked="EraseClicked"/>
-
-            <mr:Image x:Name="DraggableIcon"
-                      IsVisible="False"
-                      AutomationId="fillIcon"
-                      Source="paintbucket.png"
-                      WidthRequest="100"
-                      HeightRequest="100"
-                      BackgroundColor="Transparent"
-                      AnchorX="0.109375"
-                      AnchorY="0.890625"
-                      Down="FillIconDown"
-                      Up="FillIconUp"
-                      ZIndex="10000"
-                      Tapped="AddFillTapped"/>
         </AbsoluteLayout>
         
         <!-- Overlay für Busy-Indikator -->

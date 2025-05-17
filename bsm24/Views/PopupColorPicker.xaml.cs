@@ -1,19 +1,16 @@
 #nullable disable
 
 using bsm24.Services;
-using Mopups.Pages;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace bsm24.Views;
 
-public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
+public partial class PopupColorPicker : Popup, INotifyPropertyChanged
 {
-    TaskCompletionSource<(Color, int)> _taskCompletionSource;
     public ObservableCollection<ColorBoxItem> ColorsList { get; set; }
-    public Task<(Color, int)> PopupDismissedTask => _taskCompletionSource.Task;
     public (Color, int) ReturnValue { get; set; }
     public bool LineWidthVisibility { get; set; }
     private bool isUpdating = false;
@@ -55,18 +52,6 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         BindingContext = this;
     }
 
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
-        _taskCompletionSource = new TaskCompletionSource<(Color, int)>();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _taskCompletionSource.SetResult(ReturnValue);
-    }
-
     private void OnColorTapped(object sender, EventArgs e)
     {
         if (sender is MR.Gestures.Border border && border.BindingContext is ColorBoxItem tappedItem)
@@ -82,22 +67,18 @@ public partial class PopupColorPicker : PopupPage, INotifyPropertyChanged
         }
     }
 
-    private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
+    private void OnCancelClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = (null, 0);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    private void OnOkClicked(object sender, EventArgs e)
     {
-        ReturnValue = (null, 0);
-        await MopupService.Instance.PopAsync();
-    }
-
-    private async void OnOkClicked(object sender, EventArgs e)
-    {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = (SelectedColor, LineWidth);
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
     public void OnAddTapped(object sender, EventArgs e)

@@ -1,14 +1,11 @@
 #nullable disable
 
-using Mopups.Pages;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 
 namespace bsm24.Views;
 
-public partial class PopupProjectEdit : PopupPage
+public partial class PopupProjectEdit : Popup
 {
-    TaskCompletionSource<string> _taskCompletionSource;
-    public Task<string> PopupDismissedTask => _taskCompletionSource.Task;
     public string ReturnValue { get; set; }
 
     public PopupProjectEdit(string entry, string okText = "Ok", string cancelText = "Abbrechen")
@@ -19,55 +16,38 @@ public partial class PopupProjectEdit : PopupPage
         text_entry.Text = entry;
     }
 
-    protected override void OnAppearing()
+    private void OnOkClicked(object sender, EventArgs e)
     {
-        base.OnAppearing();
-        _taskCompletionSource = new TaskCompletionSource<string>();
-
-#if WINDOWS
-        openFolderBtn.IsVisible = true;
-# endif
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        _taskCompletionSource.SetResult(ReturnValue);
-    }
-
-    private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
-    {
-        ReturnValue = null;
-        await MopupService.Instance.PopAsync();
-    }
-
-    private async void OnOkClicked(object sender, EventArgs e)
-    {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = text_entry.Text;
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
+    private void OnCancelClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = null;
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnDeleteClicked(object sender, EventArgs e)
+    private void OnDeleteClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = "delete";
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnSaveClicked(object sender, EventArgs e)
+    private void OnSaveClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = "zip";
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 
-    private async void OnOpenFolderClicked(object sender, EventArgs e)
+    private void OnOpenFolderClicked(object sender, EventArgs e)
     {
+        var cts = new CancellationTokenSource(TimeSpan.FromSeconds(5));
         ReturnValue = "folder";
-        await MopupService.Instance.PopAsync();
+        CloseAsync(ReturnValue, cts.Token);
     }
 }

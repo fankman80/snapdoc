@@ -1,11 +1,10 @@
 #nullable disable
 
-using Mopups.Pages;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 
 namespace bsm24.Views;
 
-public partial class PopupAlert : PopupPage
+public partial class PopupAlert : Popup
 {
     public PopupAlert(string title, string okText = "Ok")
 	{
@@ -14,13 +13,8 @@ public partial class PopupAlert : PopupPage
         okButtonText.Text = okText;
     }
 
-    private async void PopupPage_BackgroundClicked(object sender, EventArgs e)
+    private void OnOkClicked(object sender, EventArgs e)
     {
-        await MopupService.Instance.PopAsync();
-    }
-
-    private async void OnOkClicked(object sender, EventArgs e)
-    {
-        await MopupService.Instance.PopAsync();
+        Close();
     }
 }

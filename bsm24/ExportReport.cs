@@ -8,7 +8,8 @@ using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
 using SkiaSharp;
 using System.Text.RegularExpressions;
-using DW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using DDW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
+using DW = DocumentFormat.OpenXml.Wordprocessing;
 using OXML = DocumentFormat.OpenXml;
 
 namespace bsm24;
@@ -383,7 +384,7 @@ public partial class ExportReport
                                         Paragraph textParagraph = new();
                                         Run run = new();
                                         RunProperties runProperties = new(); // definiere Schriftgrösse
-                                        DocumentFormat.OpenXml.Wordprocessing.FontSize fontSize = new() { Val = fontSizeVal }; // 16pt Schriftgröße
+                                        DW.FontSize fontSize = new() { Val = fontSizeVal }; // 16pt Schriftgröße
                                         runProperties.Append(fontSize);
                                         run.PrependChild(runProperties);
                                         run.Append(new Text(GlobalJson.Data.Plans[plan.Key].Name));
@@ -507,30 +508,30 @@ public partial class ExportReport
     private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, SKRectI crop)
     {
         Drawing drawing = new();
-        DW.Inline inline = new()
+        DDW.Inline inline = new()
         {
             DistanceFromTop = (OXML.UInt32Value)0U,
             DistanceFromBottom = (OXML.UInt32Value)0U,
             DistanceFromLeft = (OXML.UInt32Value)0U,
             DistanceFromRight = (OXML.UInt32Value)0U,
-            Extent = new DW.Extent
+            Extent = new DDW.Extent
             {
                 Cx = MillimetersToEMU(size.Width),
                 Cy = MillimetersToEMU(size.Height)
             },
-            EffectExtent = new DW.EffectExtent
+            EffectExtent = new DDW.EffectExtent
             {
                 LeftEdge = 0L,
                 TopEdge = 0L,
                 RightEdge = 0L,
                 BottomEdge = 0L
             },
-            DocProperties = new DW.DocProperties
+            DocProperties = new DDW.DocProperties
             {
                 Id = 1U,
                 Name = "Picture"
             },
-            NonVisualGraphicFrameDrawingProperties = new DW.NonVisualGraphicFrameDrawingProperties()
+            NonVisualGraphicFrameDrawingProperties = new DDW.NonVisualGraphicFrameDrawingProperties()
         };
 
         OXML.Drawing.Graphic graphic = new();
@@ -613,7 +614,7 @@ public partial class ExportReport
     private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle, SKRectI crop)
     {
         Drawing _drawing = new();
-        DW.Anchor _anchor = new()
+        DDW.Anchor _anchor = new()
         {
             DistanceFromTop = (OXML.UInt32Value)0U,
             DistanceFromBottom = (OXML.UInt32Value)0U,
@@ -628,39 +629,39 @@ public partial class ExportReport
             EditId = "44CEF5E4",
             AnchorId = "44803ED1"
         };
-        DW.SimplePosition _spos = new()
+        DDW.SimplePosition _spos = new()
         {
             X = MillimetersToEMU(pos.X),
             Y = MillimetersToEMU(pos.Y)
         };
 
-        DW.HorizontalPosition _hp = new()
+        DDW.HorizontalPosition _hp = new()
         {
-            RelativeFrom = DW.HorizontalRelativePositionValues.Column
+            RelativeFrom = DDW.HorizontalRelativePositionValues.Column
         };
-        DW.PositionOffset _hPO = new()
+        DDW.PositionOffset _hPO = new()
         {
             Text = MillimetersToEMU(pos.X).ToString()
         };
         _hp.Append(_hPO);
 
-        DW.VerticalPosition _vp = new()
+        DDW.VerticalPosition _vp = new()
         {
-            RelativeFrom = DW.VerticalRelativePositionValues.Paragraph
+            RelativeFrom = DDW.VerticalRelativePositionValues.Paragraph
         };
-        DW.PositionOffset _vPO = new()
+        DDW.PositionOffset _vPO = new()
         {
             Text = MillimetersToEMU(pos.Y).ToString()
         };
         _vp.Append(_vPO);
 
-        DW.Extent _e = new()
+        DDW.Extent _e = new()
         {
             Cx = MillimetersToEMU(size.Width),
             Cy = MillimetersToEMU(size.Height)
         };
 
-        DW.EffectExtent _ee = new()
+        DDW.EffectExtent _ee = new()
         {
             LeftEdge = 0L,
             TopEdge = 0L,
@@ -668,26 +669,26 @@ public partial class ExportReport
             BottomEdge = 0L
         };
 
-        DW.WrapSquare _wp = new()
+        DDW.WrapSquare _wp = new()
         {
-            WrapText = DW.WrapTextValues.BothSides
+            WrapText = DDW.WrapTextValues.BothSides
         };
 
-        DW.WrapPolygon _wpp = new()
+        DDW.WrapPolygon _wpp = new()
         {
             Edited = false
         };
 
-        DW.StartPoint _sp = new()
+        DDW.StartPoint _sp = new()
         {
             X = 0L,
             Y = 0L
         };
 
-        DW.LineTo _l1 = new() { X = 0L, Y = 0L };
-        DW.LineTo _l2 = new() { X = 0L, Y = 0L };
-        DW.LineTo _l3 = new() { X = 0L, Y = 0L };
-        DW.LineTo _l4 = new() { X = 0L, Y = 0L };
+        DDW.LineTo _l1 = new() { X = 0L, Y = 0L };
+        DDW.LineTo _l2 = new() { X = 0L, Y = 0L };
+        DDW.LineTo _l3 = new() { X = 0L, Y = 0L };
+        DDW.LineTo _l4 = new() { X = 0L, Y = 0L };
 
         _wpp.Append(_sp);
         _wpp.Append(_l1);
@@ -697,7 +698,7 @@ public partial class ExportReport
 
         _wp.Append(_wpp);
 
-        DW.DocProperties _dp = new()
+        DDW.DocProperties _dp = new()
         {
             Id = 1U,
             Name = "Picture"
@@ -911,13 +912,13 @@ public partial class ExportReport
         Run run2 = new();
         RunProperties runProperties = new()
         {
-            FontSize = new DocumentFormat.OpenXml.Wordprocessing.FontSize() { Val = (fontSizePt * 2).ToString() },  // Schriftgröße
-            Color = new DocumentFormat.OpenXml.Wordprocessing.Color() { Val = fontColorHex.Replace("#", "") },  // Schriftfarbe
-            RunFonts = new DocumentFormat.OpenXml.Wordprocessing.RunFonts() { Ascii = "Arial" }  // Schriftart auf Arial setzen
+            FontSize = new DW.FontSize() { Val = (fontSizePt * 2).ToString() },  // Schriftgröße
+            Color = new DW.Color() { Val = fontColorHex.Replace("#", "") },  // Schriftfarbe
+            RunFonts = new DW.RunFonts() { Ascii = "Arial" }  // Schriftart auf Arial setzen
         };
 
         // Füge den Textinhalt hinzu
-        DocumentFormat.OpenXml.Wordprocessing.Text text2 = new() { Text = text };
+        DW.Text text2 = new() { Text = text };
 
         // Setze die Formatierungen auf den Text und füge ihn hinzu
         run2.Append(runProperties);

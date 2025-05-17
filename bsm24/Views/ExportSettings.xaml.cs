@@ -3,7 +3,7 @@
 using bsm24.Services;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using UraniumUI.Pages;
 
 namespace bsm24.Views;
@@ -46,8 +46,7 @@ public partial class ExportSettings : UraniumContentPage
         if (SettingsService.Instance.SelectedTemplate == null)
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
-            await MopupService.Instance.PushAsync(popup);
-            var result = await popup.PopupDismissedTask;
+            var result = await this.ShowPopupAsync(popup);
             if (result != null)
                 return;
         }
@@ -93,8 +92,7 @@ public partial class ExportSettings : UraniumContentPage
         if (SettingsService.Instance.SelectedTemplate == null)
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
-            await MopupService.Instance.PushAsync(popup);
-            var result = await popup.PopupDismissedTask;
+            var result = await this.ShowPopupAsync(popup);
             if (result != null)
                 return;
         }

@@ -2,10 +2,11 @@
 
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
-using Mopups.Services;
 using System.Globalization;
 using UraniumUI.Pages;
 using bsm24.Services;
+using CommunityToolkit.Maui.Views;
+
 
 #if WINDOWS
 using System.Diagnostics;
@@ -73,12 +74,8 @@ public partial class OpenProject : UraniumContentPage
 
     private async void OnNewClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupEntry(title: "Neues Projekt eröffnen...", okText: "Erstellen");
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        var result = (string)await this.ShowPopupAsync(popup);
         if (result != null)
         {
             // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
@@ -189,22 +186,17 @@ public partial class OpenProject : UraniumContentPage
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var button = sender as Button;
         FileItem item = (FileItem)button.BindingContext;
 
         var _popup = new PopupProjectEdit(entry: item.FileName);
-        await MopupService.Instance.PushAsync(_popup);
-        var _result = await _popup.PopupDismissedTask;
+        var _result = (string)await this.ShowPopupAsync(_popup);
 
         switch (_result)
         {
             case "delete":
                 var popup1 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich löschen?", okText: "Löschen", alert: true);
-                await MopupService.Instance.PushAsync(popup1);
-                var result1 = await popup1.PopupDismissedTask;
+                var result1 = (string)await this.ShowPopupAsync(popup1);
                 if (result1 == "Ok")
                 {
                     List<FileItem> tmp_list = (List<FileItem>)fileListView.ItemsSource;
@@ -230,8 +222,7 @@ public partial class OpenProject : UraniumContentPage
 
             case "zip":
                 var popup2 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich als Zip exportieren?");
-                await MopupService.Instance.PushAsync(popup2);
-                var result2 = await popup2.PopupDismissedTask;
+                var result2 = (string)await this.ShowPopupAsync(popup2);
                 if (result2 == "Ok")
                 {
                     string sourceDirectory = Path.GetDirectoryName(item.FilePath);

@@ -14,6 +14,11 @@
     
     <ContentPage.ToolbarItems>
         <ToolbarItem
+            x:Name ="btnImageFit"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Fit_screen}}"
+            Text="Grösse anpassen"
+            Clicked="ImageFit"/>
+        <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}" 
             Text="Delete"          
             Clicked="OnDeleteButtonClicked"/>
@@ -25,7 +30,8 @@
             Panning="OnPanning"
             Pinching="OnPinching"
             Pinched="OnPinched"
-            DoubleTapped="OnDoubleTapped">
+            DoubleTapped="OnDoubleTapped"
+            ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="ImageViewContainer"
 				Scale="{Binding Scale}"
 				TranslationX="{Binding TranslationX}"

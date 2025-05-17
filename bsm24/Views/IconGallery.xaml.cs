@@ -2,7 +2,7 @@
 
 using bsm24.Services;
 using CommunityToolkit.Maui.Alerts;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using SkiaSharp;
 using System.Collections.ObjectModel;
 using UraniumUI.Pages;
@@ -102,10 +102,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
         var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
 
         var popup = new PopupIconEdit(iconItem);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        var result1 = await this.ShowPopupAsync(popup);
 
-        if (result != null)
+        if (result1 != null)
             IconSorting(OrderDirection);
     }
 
@@ -158,10 +157,9 @@ public partial class IconGallery : UraniumContentPage, IQueryAttributable
             );
 
             var popup = new PopupIconEdit(updatedItem);
-            await MopupService.Instance.PushAsync(popup);
-            var popup_result = await popup.PopupDismissedTask;
+            var result2 = await this.ShowPopupAsync(popup);
 
-            if (popup_result == null)
+            if (result2 == null)
                 File.Delete(localPath);  // Delete temporary Icon-File
 
             IconSorting(OrderDirection);

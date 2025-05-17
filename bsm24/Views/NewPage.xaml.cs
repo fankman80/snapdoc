@@ -6,17 +6,9 @@ using bsm24.ViewModels;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Views;
-using Mopups.Services;
 using MR.Gestures;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.PixelFormats;
-using SixLabors.ImageSharp.Processing;
+using SharpKml.Dom.GX;
 using SkiaSharp;
-using Application = Microsoft.Maui.Controls.Application;
-using Color = Microsoft.Maui.Graphics.Color;
-using Image = SixLabors.ImageSharp.Image;
-using Point = Microsoft.Maui.Graphics.Point;
-using Size = Microsoft.Maui.Graphics.Size;
 
 #if WINDOWS
 using bsm24.Platforms.Windows;
@@ -36,15 +28,11 @@ public partial class NewPage : IQueryAttributable
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
-    private Microsoft.Maui.Controls.Image fillView;
     private DrawingView drawingView;
-    private Image<Rgb24> originalImage;
-    private Image<Rgba32> overlayImage; // Nur Maske mit Alpha
     private int lineWidth = 15;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
     SKRectI pinBound;
-    private string drawingMode = null;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -443,143 +431,7 @@ public partial class NewPage : IQueryAttributable
         CheckBtn.IsVisible = true;
         EraseBtn.IsVisible = true;
 
-        drawingMode = "draw";
-
         AddDrawingView();
-    }
-
-    private void FillRegionClicked(object sender, EventArgs e)
-    {
-        SetPinBtn.IsVisible = false;
-        DrawBtn.IsVisible = false;
-        PenSettingsBtn.IsVisible = true;
-        CheckBtn.IsVisible = true;
-        EraseBtn.IsVisible = true;
-        DraggableIcon.IsVisible = true;
-        DraggableIcon.TranslationX =  this.Width / 2;
-        DraggableIcon.TranslationY = this.Height / 2;
-
-        drawingMode = "fill";
-
-        AddFillView();
-    }
-
-    private void AddFillTapped(object sender, EventArgs e)
-    {
-        // Koordinaten umrechnen
-        var scaleSpeed = 1 / PlanContainer.Scale;
-        double angle = PlanContainer.Rotation * Math.PI / 180.0;
-        double cos = Math.Cos(-angle);
-        double sin = Math.Sin(-angle);
-        var _dx = (DraggableIcon.TranslationX + (DraggableIcon.Width * DraggableIcon.AnchorX) - (this.Width / 2)) * scaleSpeed;
-        var _dy = (DraggableIcon.TranslationY + (DraggableIcon.Height * DraggableIcon.AnchorY) - (this.Height / 2)) * scaleSpeed;
-        var dx = _dx * cos - _dy * sin;
-        var dy = _dx * sin + _dy * cos;
-        Point pos = new(PlanContainer.AnchorX * PlanContainer.Width + dx, PlanContainer.AnchorY * PlanContainer.Height + dy);
-
-        ApplyFloodFillToOverlay((int)pos.X, (int)pos.Y, new Rgba32(selectedColor.Red, selectedColor.Green, selectedColor.Blue));
-    }
-
-    private void ApplyFloodFillToOverlay(int x, int y, Rgba32 fillColor, int tolerance = 20)
-    {
-        if (originalImage == null || overlayImage == null)
-            return;
-
-        var targetColor = originalImage[x, y];
-        var visited = new bool[originalImage.Width, originalImage.Height];
-        var queue = new Queue<(int x, int y)>();
-        queue.Enqueue((x, y));
-
-        while (queue.Count > 0)
-        {
-            var (px, py) = queue.Dequeue();
-            if (px < 0 || px >= originalImage.Width || py < 0 || py >= originalImage.Height)
-                continue;
-            if (visited[px, py])
-                continue;
-
-            var color = originalImage[px, py];
-            if (!ColorsAreClose(color, targetColor, tolerance))
-                continue;
-
-            visited[px, py] = true;
-            overlayImage[px, py] = fillColor; // Nur ins Overlay schreiben
-
-            // Überprüfe benachbarte Pixel, um die Füllregion dynamisch zu erweitern
-            if (IsNearFilledRegion(px, py))
-            {
-                queue.Enqueue((px + 1, py));
-                queue.Enqueue((px - 1, py));
-                queue.Enqueue((px, py + 1));
-                queue.Enqueue((px, py - 1));
-            }
-        }
-
-        UpdateImageViewWithOverlay();
-    }
-
-    private bool IsNearFilledRegion(int x, int y)
-    {
-        // Prüfe, ob das Pixel nahe an der ursprünglich gefüllten Region liegt
-        for (int dx = -1; dx <= 1; dx++)
-        {
-            for (int dy = -1; dy <= 1; dy++)
-            {
-                int nx = x + dx;
-                int ny = y + dy;
-
-                if (nx >= 0 && ny >= 0 && nx < originalImage.Width && ny < originalImage.Height)
-                {
-                    // Überprüfe, ob benachbarte Pixel bereits die Füllfarbe haben
-                    if (overlayImage[nx, ny] != new Rgba32(0, 0, 0, 0)) // Wenn das benachbarte Pixel nicht transparent ist
-                    {
-                        return true;
-                    }
-                }
-            }
-        }
-        return false;
-    }
-
-    private void UpdateImageViewWithOverlay()
-    {
-        using var combined = new Image<Rgba32>(originalImage.Width, originalImage.Height);
-        combined.Mutate(ctx =>
-        {
-            ctx.DrawImage(originalImage, 1f);
-            ctx.DrawImage(overlayImage, 1f);
-        });
-        fillView.Source = ConvertImageSharpToImageSource(combined);
-    }
-
-    private ImageSource ConvertImageSharpToImageSource(Image<Rgba32> image)
-    {
-        var ms = new MemoryStream();
-        image.SaveAsPng(ms);
-        ms.Position = 0;
-        return ImageSource.FromStream(() => ms);
-    }
-
-    private static bool ColorsAreClose(Rgb24 c1, Rgb24 c2, int tolerance)
-    {
-        int dr = c1.R - c2.R;
-        int dg = c1.G - c2.G;
-        int db = c1.B - c2.B;
-        int distance = dr * dr + dg * dg + db * db;
-        return distance <= tolerance * tolerance;
-    }
-
-    private void FillIconDown(object sender, EventArgs e)
-    {
-        MR.Gestures.Image icon = (MR.Gestures.Image)sender;
-        planContainer.IsPanningEnabled = false;
-        activePin = icon;
-    }
-
-    private void FillIconUp(object sender, EventArgs e)
-    {
-        planContainer.IsPanningEnabled = true;
-        activePin = null;
     }
 
     private void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null)
@@ -793,33 +645,6 @@ public partial class NewPage : IQueryAttributable
             absoluteLayout.Children.Remove(drawingView);
     }
 
-    private void AddFillView()
-    {
-        var plan_path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-        var stream = File.OpenRead(plan_path);
-        originalImage = Image.Load<Rgb24>(stream);
-        overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
-
-        fillView = new Microsoft.Maui.Controls.Image
-        {
-            InputTransparent = true,
-            WidthRequest = PlanImage.Width,
-            HeightRequest = PlanImage.Height,
-            AnchorX = 0,
-            AnchorY = 0,
-        };
-
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
-        absoluteLayout.Children.Add(fillView);
-    }
-
-    private void RemoveFillView()
-    {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanContainer");
-        if (fillView != null && absoluteLayout != null)
-            absoluteLayout.Children.Remove(fillView);
-    }
-
     private void OnDrawingLineUpdated(object sender, PointDrawnEventArgs e)
     {
         if (e.Point.X < pinBound.Left)
@@ -834,113 +659,50 @@ public partial class NewPage : IQueryAttributable
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingMode == "draw")
+        if (drawingView.Lines.Count > 0)
         {
-            if (drawingView.Lines.Count > 0)
-            {
-                var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-                var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-                string filePath = Path.Combine(customPinPath, customPinName);
-
-                await using var imageStream = await DrawingViewService.GetImageStream(
-                                                    ImageLineOptions.JustLines(drawingView.Lines,
-                                                    new Size(pinBound.Width, pinBound.Height),
-                                                    Brush.Transparent));
-                if (imageStream != null)
-                {
-                    if (!Directory.Exists(customPinPath))
-                        Directory.CreateDirectory(customPinPath);
-
-                    using var memoryStream = new MemoryStream();
-                    await imageStream.CopyToAsync(memoryStream);
-                    memoryStream.Seek(0, SeekOrigin.Begin);
-                    using var _skBitmap = SKBitmap.Decode(memoryStream);
-                    var skBitmap = CropBitmap(_skBitmap, 4);
-                    var resizedBitmap = new SKBitmap(pinBound.Width + (int)drawingView.LineWidth, pinBound.Height + (int)drawingView.LineWidth);
-                    var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
-                    skBitmap.ScalePixels(resizedBitmap, samplingOptions);
-
-                    using var imageData = resizedBitmap.Encode(SKEncodedImageFormat.Png, 90); // 90 = Qualität
-                    using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-                    {
-                        imageData.SaveTo(fileStream);
-                    }
-
-                    SetPin(customPinName, resizedBitmap.Width, resizedBitmap.Height,
-                          (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                          (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                          new SKColor(drawingView.LineColor.ToUint()));
-                }
-            }
-            RemoveDrawingView();
-        }
-
-        if (drawingMode == "fill")
-        {
-            // Speichern
             var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-            if (!Directory.Exists(customPinPath))
-                Directory.CreateDirectory(customPinPath);
-
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
-            var (trimmedMask, offsetX, offsetY) = TrimTransparentEdgesWithOffset(overlayImage);
-            if (trimmedMask.Width > 1 || trimmedMask.Height > 1)
+            await using var imageStream = await DrawingViewService.GetImageStream(
+                                                ImageLineOptions.JustLines(drawingView.Lines,
+                                                new Size(pinBound.Width, pinBound.Height),
+                                                Brush.Transparent));
+            if (imageStream != null)
             {
-                using (var fs = File.OpenWrite(filePath))
+                if (!Directory.Exists(customPinPath))
+                    Directory.CreateDirectory(customPinPath);
+
+                using var memoryStream = new MemoryStream();
+                await imageStream.CopyToAsync(memoryStream);
+                memoryStream.Seek(0, SeekOrigin.Begin);
+                using var _skBitmap = SKBitmap.Decode(memoryStream);
+                var skBitmap = CropBitmap(_skBitmap, 4);
+                var resizedBitmap = new SKBitmap(pinBound.Width + (int)drawingView.LineWidth, pinBound.Height + (int)drawingView.LineWidth);
+                var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear);
+                skBitmap.ScalePixels(resizedBitmap, samplingOptions);
+
+                using var imageData = resizedBitmap.Encode(SKEncodedImageFormat.Png, 90); // 90 = Qualität
+                using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
-                    trimmedMask.SaveAsPng(fs);
+                    imageData.SaveTo(fileStream);
                 }
 
-                // Pin setzen
-                SetPin(customPinName, trimmedMask.Width, trimmedMask.Height,
-                        (offsetX + (trimmedMask.Width / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                        (offsetY + (trimmedMask.Height / 2)) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                        new SKColor(selectedColor.ToUint()));
+                SetPin(customPinName, resizedBitmap.Width, resizedBitmap.Height,
+                        (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                        (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
+                        new SKColor(drawingView.LineColor.ToUint()));
             }
-
-
-            RemoveFillView();
         }
+        RemoveDrawingView();
 
-        drawingMode = "none";
         planContainer.IsPanningEnabled = true;
         PenSettingsBtn.IsVisible = false;
         CheckBtn.IsVisible = false;
         EraseBtn.IsVisible = false;
         SetPinBtn.IsVisible = true;
         DrawBtn.IsVisible = true;
-        DraggableIcon.IsVisible = false;
-    }
-
-    public static (Image<Rgba32> TrimmedImage, int OffsetX, int OffsetY) TrimTransparentEdgesWithOffset(Image<Rgba32> source)
-    {
-        int left = source.Width, right = 0, top = source.Height, bottom = 0;
-
-        for (int y = 0; y < source.Height; y++)
-        {
-            for (int x = 0; x < source.Width; x++)
-            {
-                if (source[x, y].A > 0)
-                {
-                    if (x < left) left = x;
-                    if (x > right) right = x;
-                    if (y < top) top = y;
-                    if (y > bottom) bottom = y;
-                }
-            }
-        }
-
-        // Kein sichtbarer Inhalt?
-        if (right < left || bottom < top)
-            return (new Image<Rgba32>(1, 1), 0, 0);
-
-        int width = right - left + 1;
-        int height = bottom - top + 1;
-        var trimmed = source.Clone(ctx => ctx.Crop(new Rectangle(left, top, width, height)));
-
-        return (trimmed, left, top);
     }
 
     public static SKBitmap CropBitmap(SKBitmap originalBitmap, int cropWidth)
@@ -961,12 +723,8 @@ public partial class NewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupColorPicker(lineWidth, selectedColor, lineWidthVisibility: true);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        (Color, int) result = ((Color, int))await this.ShowPopupAsync(popup);
 
         if (result.Item1 != null)
         {
@@ -976,19 +734,13 @@ public partial class NewPage : IQueryAttributable
             {
                 drawingView.LineColor = selectedColor;
                 drawingView.LineWidth = (int)(lineWidth / densityX);
-            }   
+            }
         }
     }
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        if (drawingMode == "draw")
-            drawingView.Clear();
-        if (drawingMode == "fill")
-        {
-            overlayImage = new Image<Rgba32>(originalImage.Width, originalImage.Height);
-            UpdateImageViewWithOverlay();
-        }
+        drawingView.Clear();
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
@@ -1081,17 +833,13 @@ public partial class NewPage : IQueryAttributable
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupPlanEdit(name: GlobalJson.Data.Plans[PlanId].Name,
                                       desc: GlobalJson.Data.Plans[PlanId].Description,
                                       gray: GlobalJson.Data.Plans[PlanId].IsGrayscale,
                                       export: GlobalJson.Data.Plans[PlanId].AllowExport);
-        await MopupService.Instance.PushAsync(popup);
-        var (result1, result2, result3) = await popup.PopupDismissedTask;
+        (string, string, bool) result = ((string, string, bool))await this.ShowPopupAsync(popup);
 
-        switch (result1)
+        switch (result.Item1)
         {
             case "delete":
                 OnDeleteClick();
@@ -1105,12 +853,12 @@ public partial class NewPage : IQueryAttributable
                 break;
 
             default:
-                (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result1;
-                Title = result1;
+                (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Item1;
+                Title = result.Item1;
 
-                GlobalJson.Data.Plans[PlanId].Name = result1;
-                GlobalJson.Data.Plans[PlanId].Description = result2;
-                GlobalJson.Data.Plans[PlanId].AllowExport = result3;
+                GlobalJson.Data.Plans[PlanId].Name = result.Item1;
+                GlobalJson.Data.Plans[PlanId].Description = result.Item2;
+                GlobalJson.Data.Plans[PlanId].AllowExport = result.Item3;
 
                 // save data to file
                 GlobalJson.SaveToFile();
@@ -1121,8 +869,7 @@ public partial class NewPage : IQueryAttributable
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
-        await MopupService.Instance.PushAsync(popup);
-        var result = await popup.PopupDismissedTask;
+        var result = await this.ShowPopupAsync(popup);
         if (result != null)
         {
             var menuitem = (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId);

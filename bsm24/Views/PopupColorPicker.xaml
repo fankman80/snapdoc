@@ -1,22 +1,18 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:Mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
-             xmlns:Animations="clr-namespace:Mopups.Animations;assembly=Mopups"
-             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
-             xmlns:views="clr-namespace:bsm24.Views"
-             xmlns:services="clr-namespace:bsm24.Services"
-             x:Class="bsm24.Views.PopupColorPicker"
-             BackgroundInputTransparent="False"
-             CloseWhenBackgroundIsClicked="True"
-             HasSystemPadding="False"
-             BackgroundColor="#60000000"
-             Title="Color Picker">
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
+               xmlns:views="clr-namespace:bsm24.Views"
+               xmlns:services="clr-namespace:bsm24.Services"
+               CanBeDismissedByTappingOutsideOfPopup ="False"
+               Color="Transparent"
+               x:Class="bsm24.Views.PopupColorPicker">
 
-    <ContentPage.Resources>
+    <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:BoolToStrokeColorConverter x:Key="BoolToStrokeColorConverter"/>
             <services:BoolToCornerRadiusConverter x:Key="BoolToCornerRadiusConverter"/>
@@ -25,148 +21,149 @@
             <services:Scale360To0Converter x:Key="Scale360To0Converter"/>
             <services:BooleanInverterConverter x:Key="BooleanInverterConverter"/>
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </toolkit:Popup.Resources>
 
-    <Border x:Name="popupBorder"
+    <Grid>
+        <Border x:Name="popupBorder"
             StrokeShape="RoundRectangle 20,20,20,20"
-            Margin="0,30,0,30"
-            Padding="16,16,16,16"
+            Padding="16"
+            Margin="30"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
             HorizontalOptions="Center"
             VerticalOptions="Center">
 
-        <Grid VerticalOptions="Center">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-                <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
-                    <CollectionView x:Name="ColorListPicker"
-                    ItemsSource="{Binding ColorsList}"
-                    SelectionMode="None">
-                        <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="6" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="views:ColorBoxItem">
-                                <Grid>
-                                    <!-- Normales Farbfeld -->
-                                    <mr:Border IsVisible="{Binding IsAddButton, Converter={StaticResource BooleanInverterConverter}}"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
-                                            BackgroundColor="{Binding BackgroundColor}"
-                                            Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
-                                            StrokeThickness="1"
-                                            Tapped="OnColorTapped"
-                                            LongPressing="OnLongPressed">
-                                        <mr:Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
-                                        </mr:Border.StrokeShape>
-                                    </mr:Border>
+            <Grid VerticalOptions="Center">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+                    <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
+                        <CollectionView x:Name="ColorListPicker"
+                        ItemsSource="{Binding ColorsList}"
+                        SelectionMode="None">
+                            <CollectionView.ItemsLayout>
+                                <GridItemsLayout Orientation="Vertical" Span="6" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate x:DataType="views:ColorBoxItem">
+                                    <Grid>
+                                        <!-- Normales Farbfeld -->
+                                        <mr:Border IsVisible="{Binding IsAddButton, Converter={StaticResource BooleanInverterConverter}}"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                BackgroundColor="{Binding BackgroundColor}"
+                                                Stroke="{Binding IsSelected, Converter={StaticResource BoolToStrokeColorConverter}}"
+                                                StrokeThickness="1"
+                                                Tapped="OnColorTapped"
+                                                LongPressing="OnLongPressed">
+                                            <mr:Border.StrokeShape>
+                                                <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource BoolToCornerRadiusConverter}}" />
+                                            </mr:Border.StrokeShape>
+                                        </mr:Border>
 
-                                    <!-- Plusfeld -->
-                                    <Border IsVisible="{Binding IsAddButton}"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
-                                            BackgroundColor="Transparent"
-                                            Stroke="Black"
-                                            Padding="10">
-                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static m:MaterialOutlined.Add}}"/>
-                                        <Border.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnAddTapped" />
-                                        </Border.GestureRecognizers>
-                                    </Border>
-                                </Grid>
-                            </DataTemplate>
+                                        <!-- Plusfeld -->
+                                        <Border IsVisible="{Binding IsAddButton}"
+                                                WidthRequest="40"
+                                                HeightRequest="40"
+                                                BackgroundColor="Transparent"
+                                                Stroke="Black"
+                                                Padding="10">
+                                            <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static m:MaterialOutlined.Add}}"/>
+                                            <Border.GestureRecognizers>
+                                                <TapGestureRecognizer Tapped="OnAddTapped" />
+                                            </Border.GestureRecognizers>
+                                        </Border>
+                                    </Grid>
+                                </DataTemplate>
 
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
 
-                    <BoxView BackgroundColor="{Binding SelectedColor}" HeightRequest="30" Margin="0,16,0,16"/>
+                        <BoxView BackgroundColor="{Binding SelectedColor}" HeightRequest="30" Margin="0,16,0,16"/>
 
-                    <!-- Slider for Red -->
-                    <Label Text="{Binding RedValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Rot (R): {0:0.##}'}" TextColor="Red" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
+                        <!-- Slider for Red -->
+                        <Label Text="{Binding RedValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Rot (R): {0:0.##}'}" TextColor="Red" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <!-- Slider for Green -->
+                        <Label Text="{Binding GreenValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Grün (G): {0:0.##}'}" TextColor="Green" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <!-- Slider for Blue -->
+                        <Label Text="{Binding BlueValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Blau (B): {0:0.##}'}" TextColor="Blue" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <!-- Slider for Hue -->
+                        <Label Text="{Binding HueValue, Converter={StaticResource Scale360To0Converter}, StringFormat='Farbwert (H): {0:0.##}°'}" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <!-- Slider for Saturation -->
+                        <Label Text="{Binding SaturationValue, Converter={StaticResource Scale100To0Converter}, StringFormat='Sättigung (S): {0:0.##}%'}" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <!-- Slider for Brightness -->
+                        <Label Text="{Binding BrightnessValue, Converter={StaticResource Scale100To0Converter}, StringFormat='Helligkeit (L): {0:0.##}%'}" FontSize="12"/>
+                        <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
+                                ThumbColor="{DynamicResource Primary}"
+                                MinimumTrackColor="{DynamicResource Primary}"
+                                MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+
+                        <BoxView IsVisible="{Binding LineWidthVisibility}"
+                                 BackgroundColor="Black"
+                                 HeightRequest="1"
+                                 Margin="0,16,0,16"/>
+
+                        <Label x:Name="sliderText"
+                           IsVisible="{Binding LineWidthVisibility}"
+                           HorizontalOptions="Start"
+                           Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
+                        <Slider x:Name="LineWidthSlider"
+                            IsVisible="{Binding LineWidthVisibility}"
+                            Maximum="60"
+                            Minimum="1"
+                            Value="{Binding LineWidth}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{DynamicResource Primary}"
                             MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
-                    <!-- Slider for Green -->
-                    <Label Text="{Binding GreenValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Grün (G): {0:0.##}'}" TextColor="Green" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"/>
+                    </VerticalStackLayout>
+                </ScrollView>
 
-                    <!-- Slider for Blue -->
-                    <Label Text="{Binding BlueValue, Converter={StaticResource Scale255To0Converter}, StringFormat='Blau (B): {0:0.##}'}" TextColor="Blue" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-
-                    <!-- Slider for Hue -->
-                    <Label Text="{Binding HueValue, Converter={StaticResource Scale360To0Converter}, StringFormat='Farbwert (H): {0:0.##}°'}" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-
-                    <!-- Slider for Saturation -->
-                    <Label Text="{Binding SaturationValue, Converter={StaticResource Scale100To0Converter}, StringFormat='Sättigung (S): {0:0.##}%'}" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-
-                    <!-- Slider for Brightness -->
-                    <Label Text="{Binding BrightnessValue, Converter={StaticResource Scale100To0Converter}, StringFormat='Helligkeit (L): {0:0.##}%'}" FontSize="12"/>
-                    <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-
-                    <BoxView IsVisible="{Binding LineWidthVisibility}"
-                             BackgroundColor="Black"
-                             HeightRequest="1"
-                             Margin="0,16,0,16"/>
-
-                    <Label x:Name="sliderText"
-                       IsVisible="{Binding LineWidthVisibility}"
-                       HorizontalOptions="Start"
-                       Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
-                    <Slider x:Name="LineWidthSlider"
-                        IsVisible="{Binding LineWidthVisibility}"
-                        Maximum="60"
-                        Minimum="1"
-                        Value="{Binding LineWidth}"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-
-                </VerticalStackLayout>
-            </ScrollView>
-
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        Text="Abbrechen"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
-                        x:Name="okButtonText"
-                        Text="Ok"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        Clicked="OnOkClicked" />
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
+                            Text="Abbrechen"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                            Clicked="OnCancelClicked" />
+                    <Button Grid.Column="1"
+                            x:Name="okButtonText"
+                            Text="Ok"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                            Clicked="OnOkClicked" />
+                </Grid>
             </Grid>
-        </Grid>
-    </Border>
-
-</Mopups:PopupPage>
+        </Border>
+    </Grid>
+</toolkit:Popup>

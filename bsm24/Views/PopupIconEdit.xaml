@@ -1,79 +1,75 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<Mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:Mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
-             xmlns:Animations="clr-namespace:Mopups.Animations;assembly=Mopups"
-             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-             xmlns:services="clr-namespace:bsm24.Services"
-             xmlns:local="clr-namespace:bsm24.Views"
-             x:Class="bsm24.Views.PopupIconEdit"
-             BackgroundInputTransparent="False"
-             CloseWhenBackgroundIsClicked="True"
-             HasSystemPadding="False"
-             BackgroundColor="#60000000"
-             IsAnimationEnabled="False"
-             Title="Icon Editor">
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+               xmlns:services="clr-namespace:bsm24.Services"
+               xmlns:local="clr-namespace:bsm24.Views"
+               CanBeDismissedByTappingOutsideOfPopup ="False"
+               Color="Transparent"
+               x:Class="bsm24.Views.PopupIconEdit">
 
-    <ContentPage.Resources>
+    <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:ColorToContrastingTextColorConverter x:Key="ContrastConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>
+    </toolkit:Popup.Resources>
 
-    <Border x:DataType="local:PopupIconEdit"
+    <Grid>
+        <Border x:DataType="local:PopupIconEdit"
             StrokeShape="RoundRectangle 20,20,20,20"
-            Margin="0,30,0,30"
-            Padding="16,16,16,16"
+            Padding="16"
+            Margin="30"
             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
             WidthRequest="300"
             HorizontalOptions="Center"
             VerticalOptions="Center">
 
-        <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-                <VerticalStackLayout>
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="100" />
-                            <ColumnDefinition Width="*" />
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="*" />
-                            <RowDefinition Height="*" />
-                        </Grid.RowDefinitions>
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+                <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+                    <VerticalStackLayout>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="*" />
+                                <RowDefinition Height="*" />
+                            </Grid.RowDefinitions>
 
-                        <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-                               x:Name="iconImage" Margin="10"/>
+                            <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
+                                x:Name="iconImage" Margin="10"/>
 
-                        <material:TextField Grid.Column="2" Grid.Row="0" 
+                            <material:TextField Grid.Column="2" Grid.Row="0" 
                                             x:Name="anchorX"
                                             Title="Ankerpunkt X"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
 
-                        <material:TextField Grid.Column="2" Grid.Row="1" 
+                            <material:TextField Grid.Column="2" Grid.Row="1" 
                                             x:Name="anchorY"
                                             Title="Ankerpunkt Y"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
-                    </Grid>
+                        </Grid>
 
-                    <material:TextField x:Name="iconName"
+                        <material:TextField x:Name="iconName"
                                         FontSize="14"
                                         Title="Bezeichnung"
                                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
                                         AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"/>
 
-                    <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                        <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                         x:Name="iconCategory"
                                         FontSize="14"            
                                         Title="Kategorie"
@@ -82,16 +78,16 @@
                                         AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
                                         ItemsSource="{Binding IconCategories}"
                                         AllowClear="True"/>
-                    
-                    <Button Text="Farbe wählen"
+
+                        <Button Text="Farbe wählen"
                             BackgroundColor="{Binding SelectedColor}"
                             TextColor="{Binding SelectedColor, Converter={StaticResource ContrastConverter}}"
                             Clicked="OnColorPickerClicked"/>
 
 
-                    <VerticalStackLayout Spacing="0">
-                        <Label x:Name="sliderText" Text="Skalierung:"/>
-                        <Slider x:Name="iconScale"
+                        <VerticalStackLayout Spacing="0">
+                            <Label x:Name="sliderText" Text="Skalierung:"/>
+                            <Slider x:Name="iconScale"
                                 Maximum="100"
                                 Minimum="1"
                                 Value="100"
@@ -100,42 +96,43 @@
                                 MaximumTrackColor="{DynamicResource PrimaryDark}"
                                 ValueChanged="OnSliderValueChanged"/>
 
-                        <HorizontalStackLayout Spacing="0">
-                            <CheckBox x:Name="allowRotate"
-                                      Scale="1.2"
-                                      Color="{DynamicResource Primary}"/>
-                            <Label Text="Rotation sperren" VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-                    
-                        <HorizontalStackLayout x:Name="deleteIconContainer" Spacing="0" IsVisible="False">
-                            <CheckBox x:Name="deleteIcon"
-                                      IsChecked="False"
-                                      Scale="1.2"
-                                      Color="{DynamicResource Primary}"/>
-                            <Label Text="Icon löschen" VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-                    </VerticalStackLayout>
-                </VerticalStackLayout>
-            </ScrollView>
+                            <HorizontalStackLayout Spacing="0">
+                                <CheckBox x:Name="allowRotate"
+                                        Scale="1.2"
+                                        Color="{DynamicResource Primary}"/>
+                                <Label Text="Rotation sperren" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
+                            <HorizontalStackLayout x:Name="deleteIconContainer" Spacing="0" IsVisible="False">
+                                <CheckBox x:Name="deleteIcon"
+                                        IsChecked="False"
+                                        Scale="1.2"
+                                        Color="{DynamicResource Primary}"/>
+                                <Label Text="Icon löschen" VerticalOptions="Center"/>
+                            </HorizontalStackLayout>
+                        </VerticalStackLayout>
+                    </VerticalStackLayout>
+                </ScrollView>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="Abbrechen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
                         Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
+                    <Button Grid.Column="1"
                         x:Name="okButtonText"
                         Text="Ok"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
                         Clicked="OnOkClicked" />
+                </Grid>
             </Grid>
-        </Grid>
-    </Border>
-</Mopups:PopupPage>
+        </Border>
+    </Grid>
+</toolkit:Popup>

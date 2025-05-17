@@ -9,7 +9,7 @@ using bsm24.Services;
 using bsm24.ViewModels;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
@@ -175,8 +175,7 @@ public partial class MapView : IQueryAttributable
         if (GPSViewModel.Instance.IsRunning)
         {
             var popup = new PopupDualResponse("Sind Sie sicher dass Sie die Positionsdaten überschreiben wollen?");
-            await MopupService.Instance.PushAsync(popup);
-            var result = await popup.PopupDismissedTask;
+            var result = await this.ShowPopupAsync(popup);
             if (result != null)
             {
                 Location location = new();
@@ -198,7 +197,7 @@ public partial class MapView : IQueryAttributable
         else
         {
             var popup1 = new PopupAlert("Aktivieren Sie zuerst die Ortungsdienste, damit der Standort aktualisiert werden kann?");
-            await MopupService.Instance.PushAsync(popup1);
+            this.ShowPopup(popup1);
         }
     }
 

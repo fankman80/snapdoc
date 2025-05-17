@@ -2,7 +2,7 @@
 
 using bsm24.Services;
 using bsm24.Views;
-using Mopups.Services;
+using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 
 namespace bsm24;
@@ -29,13 +29,10 @@ public partial class AppShell : Shell
         BindingContext = this;
     }
 
-    private async void OnSettingsClicked(object sender, EventArgs e)
+    private void OnSettingsClicked(object sender, EventArgs e)
     {
-        if (MopupService.Instance.PopupStack.Any())
-            return;
-
         var popup = new PopupSettings();
-        await MopupService.Instance.PushAsync(popup);
+        this.ShowPopup(popup);
     }
 
     public void OnTitleClicked(object sender, EventArgs e)
