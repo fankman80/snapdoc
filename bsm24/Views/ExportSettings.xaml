@@ -13,16 +13,10 @@
         Shell.TitleColor="{DynamicResource PrimaryDark}"
         x:Class="bsm24.Views.ExportSettings"
         Title="Bericht exportieren">
-    
+
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
-    
-    <uranium:UraniumContentPage.Resources>
-        <ResourceDictionary>
-            <services:BooleanInverterConverter x:Key="BooleanInverterConverter" />
-        </ResourceDictionary>
-    </uranium:UraniumContentPage.Resources>
 
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">

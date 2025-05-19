@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <Shell xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
        xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
        xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui" 
        xmlns:views="clr-namespace:bsm24.Views"
        xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
@@ -18,7 +19,7 @@
 
     <Shell.Resources>
         <ResourceDictionary>
-            <services:BooleanInverterConverter x:Key="BooleanInverterConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
         </ResourceDictionary>
     </Shell.Resources>
 
@@ -170,7 +171,7 @@
 
                 <Label x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                        Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                       IsVisible="{Binding IsProjectLoaded, Converter={StaticResource BooleanInverterConverter}}"
+                       IsVisible="{Binding IsProjectLoaded, Converter={StaticResource InvertedBoolConverter}}"
                        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
                        Text="Kein Projekt geladen" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -253,7 +254,7 @@
                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                             
                             <Label Grid.Column="2"
-                                   IsVisible="{Binding AllowExport, Converter={StaticResource BooleanInverterConverter}}"
+                                   IsVisible="{Binding AllowExport, Converter={StaticResource InvertedBoolConverter}}"
                                    Text="{x:Static m:MaterialOutlined.Visibility_off}"
                                    FontFamily="MaterialOutlined"
                                    FontSize="18" 

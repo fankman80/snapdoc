@@ -13,7 +13,7 @@
 
     <toolkit:Popup.Resources>
         <ResourceDictionary>
-            <services:ColorToContrastingTextColorConverter x:Key="ContrastConverter" />
+            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
@@ -81,9 +81,8 @@
 
                         <Button Text="Farbe wählen"
                             BackgroundColor="{Binding SelectedColor}"
-                            TextColor="{Binding SelectedColor, Converter={StaticResource ContrastConverter}}"
+                            TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                             Clicked="OnColorPickerClicked"/>
-
 
                         <VerticalStackLayout Spacing="0">
                             <Label x:Name="sliderText" Text="Skalierung:"/>

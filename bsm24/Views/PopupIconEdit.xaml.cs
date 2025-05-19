@@ -16,7 +16,6 @@ public partial class PopupIconEdit : Popup, INotifyPropertyChanged
     public PopupIconEdit(IconItem _iconItem)
     {
         InitializeComponent();
-        BindingContext = this;
         iconItem = _iconItem;
         var file = iconItem.FileName;
 
@@ -32,6 +31,8 @@ public partial class PopupIconEdit : Popup, INotifyPropertyChanged
 
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
             deleteIconContainer.IsVisible = true;
+
+        BindingContext = this;
     }
 
     private Color selectedColor;
