@@ -112,88 +112,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<None Remove="FodyWeavers.xml" />
-		<None Remove="FodyWeavers.xsd" />
-		<None Remove="Resources\AppIcon\icon1.png" />
-		<None Remove="Resources\Images\a_pin_blue.png" />
-		<None Remove="Resources\Images\a_pin_green.png" />
-		<None Remove="Resources\Images\a_pin_grey.png" />
-		<None Remove="Resources\Images\a_pin_pink.png" />
-		<None Remove="Resources\Images\a_pin_red.png" />
-		<None Remove="Resources\Images\a_pin_yellow.png" />
-		<None Remove="Resources\Images\banner.png" />
-		<None Remove="Resources\Images\bg_image.png" />
-		<None Remove="Resources\Images\blitzleuchte.png" />
-		<None Remove="Resources\Images\blitzleuchte_evakuierungsanlage.png" />
-		<None Remove="Resources\Images\brandfallgesteuert.png" />
-		<None Remove="Resources\Images\brandmeldeanlage_bedienstelle.png" />
-		<None Remove="Resources\Images\brandmeldezentrale.png" />
-		<None Remove="Resources\Images\dotnet_bot.png" />
-		<None Remove="Resources\Images\druckentlastungsoeffnung.png" />
-		<None Remove="Resources\Images\einspeisestelle_trockensteigleitung.png" />
-		<None Remove="Resources\Images\einzelrauchmelder.png" />
-		<None Remove="Resources\Images\entnahmestelle_trockensteigleitung.png" />
-		<None Remove="Resources\Images\entrauchung_mit_luefter_der_feuerwehr.png" />
-		<None Remove="Resources\Images\evakuierungsanlage_bedienstelle.png" />
-		<None Remove="Resources\Images\evakuierungsanlage_zentrale.png" />
-		<None Remove="Resources\Images\ex_zone.png" />
-		<None Remove="Resources\Images\feuerwehraufzug.png" />
-		<None Remove="Resources\Images\grosser_ueberdruck.png" />
-		<None Remove="Resources\Images\handfeuerloescher.png" />
-		<None Remove="Resources\Images\handfeuerloescher_a_feste_nicht_schmelzende_stoffe.png" />
-		<None Remove="Resources\Images\handfeuerloescher_b_fluessigkeiten_schmelzende_stoffe.png" />
-		<None Remove="Resources\Images\handfeuerloescher_c_gase.png" />
-		<None Remove="Resources\Images\handfeuerloescher_d_metalle.png" />
-		<None Remove="Resources\Images\handfeuerloescher_f_fettbrand.png" />
-		<None Remove="Resources\Images\handfeuermelder.png" />
-		<None Remove="Resources\Images\hauptzugang_feuerwehr.png" />
-		<None Remove="Resources\Images\innenhydrant.png" />
-		<None Remove="Resources\Images\maschinelle_rauch_und_waermeabzugsanlage.png" />
-		<None Remove="Resources\Images\mobiler_luefter_der_feuerwehr.png" />
-		<None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_m2.png" />
-		<None Remove="Resources\Images\natuerliche_rauch_und_waermeabzugsanlage_prozent.png" />
-		<None Remove="Resources\Images\notausgang.png" />
-		<None Remove="Resources\Images\notausgangsverschluss_sn_en_179.png" />
-		<None Remove="Resources\Images\notoeffnungstaster.png" />
-		<None Remove="Resources\Images\oeffnung_fuer_natuerliche_abstroemung.png" />
-		<None Remove="Resources\Images\paniktuerverschluss_sn_en_1125.png" />
-		<None Remove="Resources\Images\rauchschutz_druckanlage_bedienstelle.png" />
-		<None Remove="Resources\Images\rauch_waermeabzugsanlage_bedienstelle.png" />
-		<None Remove="Resources\Images\sammelplatz.png" />
-		<None Remove="Resources\Images\schluesseldepot.png" />
-		<None Remove="Resources\Images\selbstschliessend_mit_freilauftuerschliesser.png" />
-		<None Remove="Resources\Images\selbstschliessend_ts.png" />
-		<None Remove="Resources\Images\sicherheitsbeleuchtung.png" />
-		<None Remove="Resources\Images\sicherheitsleuchte_tragbar.png" />
-		<None Remove="Resources\Images\spezielle_loeschanlage.png" />
-		<None Remove="Resources\Images\sprinklerzentrale.png" />
-		<None Remove="Resources\Images\spuellueftung_bedienstelle.png" />
-		<None Remove="Resources\Images\tuere_rauchdicht.png" />
-		<None Remove="Resources\Images\ueberdruck.png" />
-		<None Remove="Resources\Images\ueberflurhydrant.png" />
-		<None Remove="Resources\Images\unterdruck.png" />
-		<None Remove="Resources\Images\unterflurhydrant.png" />
-		<None Remove="Resources\Images\ventilator_rda_sla.png" />
-		<None Remove="Resources\Images\ventilator_rwa.png" />
-		<None Remove="Resources\Images\wasserloeschposten.png" />
-		<None Remove="Resources\Images\wechselrichter_pv.png" />
-		<None Remove="Resources\Images\zugang_spa_z.png" />
-		<None Remove="Resources\Images\zuluft_absaugung_maschinell.png" />
-		<None Remove="Resources\Images\zuluft_abstroemung_natuerlich.png" />
-		<None Remove="Resources\Images\zusaetzlicher_zugang_feuerwehr.png" />
-		<None Remove="Resources\template.docx" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<EmbeddedResource Include="Resources\Raw\index.html" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <MauiImage Include="Resources\Raw\mappin1a.png" />
-	  <MauiImage Include="Resources\Raw\mappin2a.png" />
-	  <MauiImage Include="Resources\Raw\mappin3a.png" />
-	  <MauiImage Include="Resources\Raw\mappin4a.png" />
-	  <MauiImage Include="Resources\Raw\mappin5a.png" />
+		<EmbeddedResource Include="Resources\Raw\index.html">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
