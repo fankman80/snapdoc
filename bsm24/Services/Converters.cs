@@ -39,3 +39,18 @@ public class SkColorToHexConverter : IValueConverter
         return SKColors.Transparent;
     }
 }
+
+public class RawAssetToImageSourceConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is string filename)
+        {
+            var stream = FileSystem.OpenAppPackageFileAsync(filename).Result;
+            return ImageSource.FromStream(() => stream);
+        }
+        return null;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}

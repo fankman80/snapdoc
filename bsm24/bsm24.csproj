@@ -264,24 +264,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiImage Update="Resources\Images\mappin1a.png">
-	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-	  </MauiImage>
-	  <MauiImage Update="Resources\Images\mappin2a.png">
-	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-	  </MauiImage>
-	  <MauiImage Update="Resources\Images\mappin3a.png">
-	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-	  </MauiImage>
-	  <MauiImage Update="Resources\Images\mappin4a.png">
-	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-	  </MauiImage>
-	  <MauiImage Update="Resources\Images\mappin5a.png">
-	    <LogicalName>%(RecursiveDir)%(Filename)%(Extension)</LogicalName>
-	  </MauiImage>
-	</ItemGroup>
-
-	<ItemGroup>
 		<None Update="Resources\AppIcon\icon.png" ForegroundScale="0.66" />
 	</ItemGroup>
 

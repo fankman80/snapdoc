@@ -10,6 +10,12 @@
                Color="Transparent"
                x:Class="bsm24.Views.PopupSettings">
 
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+    
     <Grid>
         <Border x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                 StrokeShape="RoundRectangle 20,20,20,20"
@@ -114,19 +120,19 @@
                         <HorizontalStackLayout Spacing="28" Margin="0,0,0,10">
                             <Image HorizontalOptions="Center"
                                    WidthRequest="30"
-                                   Source="{Binding MapIcons[0]}"/>
+                                   Source="{Binding MapIcons[0], Converter={StaticResource RawAssetConverter}}"/>
                             <Image HorizontalOptions="Center"
                                    WidthRequest="30"
-                                   Source="{Binding MapIcons[1]}"/>
+                                   Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>
                             <Image HorizontalOptions="Center"
                                    WidthRequest="30"
-                                   Source="{Binding MapIcons[2]}"/>
+                                   Source="{Binding MapIcons[2], Converter={StaticResource RawAssetConverter}}"/>
                             <Image HorizontalOptions="Center"
                                    WidthRequest="30"
-                                   Source="{Binding MapIcons[3]}"/>
+                                   Source="{Binding MapIcons[3], Converter={StaticResource RawAssetConverter}}"/>
                             <Image HorizontalOptions="Center"
                                    WidthRequest="30"
-                                   Source="{Binding MapIcons[4]}"/>
+                                   Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
                         </HorizontalStackLayout>
 
                         <Label Text="{Binding MapIconSize, StringFormat='Icongrösse: {0:0.##}%'}"/>
