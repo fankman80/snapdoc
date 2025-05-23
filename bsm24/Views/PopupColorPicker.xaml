@@ -42,7 +42,7 @@
                 </Grid.RowDefinitions>
                 <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
                     <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
-                        <Label Text="zum Löschen gedrückt halten" FontSize="14" Margin="0,0,0,8"/>
+                        <Label Text="zum Löschen gedrückt halten" FontSize="12" Margin="0,0,0,8"/>
                         <CollectionView x:Name="ColorListPicker" Margin="-3"
                                         ItemsSource="{Binding ColorsList}"
                                         SelectionMode="None">
@@ -94,51 +94,47 @@
                             </toolkit:Expander.Header>
                             <VerticalStackLayout Spacing="0">
                                 <!-- Slider for Red -->
-                                <Label Text="{Binding RedValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Rot (R): {0:0}'}" TextColor="Red"/>
+                                <Label Text="{Binding RedValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Rot (R): {0:0}'}" FontSize="12" TextColor="Red"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
                                 <!-- Slider for Green -->
-                                <Label Text="{Binding GreenValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Grün (G): {0:0}'}" TextColor="Green"/>
+                                <Label Text="{Binding GreenValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Grün (G): {0:0}'}" FontSize="12" TextColor="Green"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
                                 <!-- Slider for Blue -->
-                                <Label Text="{Binding BlueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Blau (B): {0:0}'}" TextColor="Blue"/>
+                                <Label Text="{Binding BlueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Blau (B): {0:0}'}" FontSize="12" TextColor="Blue"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
                                 <!-- Slider for Hue -->
-                                <Label Text="{Binding HueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*360', StringFormat='Farbwert (H): {0:0}°'}"/>
+                                <Label Text="{Binding HueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*360', StringFormat='Farbwert (H): {0:0}°'}" FontSize="12"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
                                 <!-- Slider for Saturation -->
-                                <Label Text="{Binding SaturationValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Sättigung (S): {0:0}%'}"/>
+                                <Label Text="{Binding SaturationValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Sättigung (S): {0:0}%'}" FontSize="12"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                         MaximumTrackColor="{DynamicResource PrimaryDark}"/>
 
                                 <!-- Slider for Brightness -->
-                                <Label Text="{Binding BrightnessValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Helligkeit (L): {0:0}%'}"/>
+                                <Label Text="{Binding BrightnessValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Helligkeit (L): {0:0}%'}" FontSize="12"/>
                                 <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
                                         ThumbColor="{DynamicResource Primary}"
                                         MinimumTrackColor="{DynamicResource Primary}"
                                     MaximumTrackColor="{DynamicResource PrimaryDark}"/>
-                                
-                                <BoxView IsVisible="{Binding LineWidthVisibility}"
-                                         BackgroundColor="Black"
-                                         HeightRequest="1"
-                                         Margin="0,16,0,16"/>
+                               
                             </VerticalStackLayout>
                         </toolkit:Expander>
                         
