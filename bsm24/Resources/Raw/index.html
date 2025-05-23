@@ -35,37 +35,37 @@
             border: 1px solid gray;
         }
 
-            /* Rahmen-Pfeil (größeres Dreieck) */
-            #popup::before {
-                content: "";
-                position: absolute;
-                left: -11px; /* Etwas weiter links, damit der Rahmen sichtbar ist */
-                top: 40px; /* Feste Position, z.B. 20px vom oberen Rand */
-                border-top: 11px solid transparent;
-                border-bottom: 11px solid transparent;
-                border-right: 11px solid gray; /* Rahmenfarbe */
-            }
+        /* Rahmen-Pfeil (größeres Dreieck) */
+        #popup::before {
+            content: "";
+            position: absolute;
+            left: -11px; /* Etwas weiter links, damit der Rahmen sichtbar ist */
+            top: 40px; /* Feste Position, z.B. 20px vom oberen Rand */
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-right: 11px solid gray; /* Rahmenfarbe */
+        }
 
-            /* Innerer Pfeil (kleineres Dreieck) */
-            #popup::after {
-                content: "";
-                position: absolute;
-                left: -10px; /* Etwas nach innen verschoben, damit der Rahmen um den Pfeil entsteht */
-                top: 41px;
-                border-top: 10px solid transparent;
-                border-bottom: 10px solid transparent;
-                border-right: 10px solid white; /* Gleiche Hintergrundfarbe wie das Popup */
-            }
+        /* Innerer Pfeil (kleineres Dreieck) */
+        #popup::after {
+            content: "";
+            position: absolute;
+            left: -10px; /* Etwas nach innen verschoben, damit der Rahmen um den Pfeil entsteht */
+            top: 41px;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid white; /* Gleiche Hintergrundfarbe wie das Popup */
+        }
 
-            #popup h4 {
-                font-weight: bold;
-                margin: 5px;
-                color: #999999;
-            }
+        #popup h4 {
+            font-weight: bold;
+            margin: 5px;
+            color: #999999;
+        }
 
-            #popup p {
-                margin: 5px 5px 15px 5px;
-            }
+        #popup p {
+            margin: 5px 5px 15px 5px;
+        }
 
         .popup-header {
             font-size: 14px;
@@ -74,7 +74,7 @@
 
         hr.solid {
             border: none;
-            border-top: 1px solid #999999; /* Hier kannst du die Farbe anpassen */
+            border-top: 1px solid #999999; /* Diese Farbe wird themenbezogen ersetzt */
             margin: 10px 0; /* Abstand um den Strich */
         }
 
@@ -111,6 +111,20 @@
             right: 10px;
             background-color: rgba(255, 255, 255, 0.8);
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        #popup button {
+            margin-top: 10px;
+            padding: 6px 12px;
+            background-color: #999999;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #popup button:hover {
+            background-color: #005fa3;
         }
     </style>
 </head>
@@ -207,6 +221,8 @@
                     let pinname = feature.get('pinname')?.trim();
                     let pinlocation = feature.get('pinlocation')?.trim();
                     let pindesc = feature.get('pindesc')?.trim();
+                    let plankey = feature.get('plankey')?.trim();
+                    let pinkey = feature.get('pinkey')?.trim();
 
                     if (pinname) {
                         content += '<h4 class="popup-header">Bezeichnung:</h4><p class="popup-header">' + pinname + '</p><hr class="solid">';
@@ -229,7 +245,7 @@
                     }
 
                     // Zeige das Popup immer an
-                    popupElement.innerHTML = content;
+                    popupElement.innerHTML = content += `<button onclick="navigateBack('${plankey}', '${pinkey}')">Bearbeiten</button>`;
                     popupElement.style.display = 'block';
                     popup.setPosition(coordinates);
                 } else {
@@ -311,6 +327,11 @@
                 return JSON.stringify(coordinatesList);
             }
             return null;
+        }
+
+        function navigateBack(plankey, pinkey) {
+            const url = `invoke://navigateback?plankey=${encodeURIComponent(plankey)}&pinkey=${encodeURIComponent(pinkey)}`;
+            window.location.href = url;
         }
     </script>
 </body>

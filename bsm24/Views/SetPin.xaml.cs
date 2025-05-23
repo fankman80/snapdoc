@@ -85,7 +85,7 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
         LockSwitch.IsChecked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
         AllowExport.IsChecked = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         priorityPicker.SelectedIndex = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority;
-        PinAcc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null ?
+        GeoLocButton.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null ?
                       GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.Accuracy.ToString() :
                       "N/A";
 
@@ -96,8 +96,8 @@ public partial class SetPin : UraniumContentPage, IQueryAttributable
                 FontFamily = "MaterialOutlined",
                 Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote,
                 Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["PrimaryDark"]
-                        : (Color)Application.Current.Resources["Primary"]
+                        ? (Color)Application.Current.Resources["PrimaryText"]
+                        : (Color)Application.Current.Resources["PrimaryDarkText"]
             };
         }
 

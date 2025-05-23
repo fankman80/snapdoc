@@ -108,6 +108,21 @@ public partial class MapView : IQueryAttributable
         };
 #endif
 
+        GeoAdminWebView.Navigating += (s, e) =>
+        {
+            var uri = new Uri(e.Url);
+            if (uri.Scheme == "invoke" && uri.Host == "navigateback")
+            {
+                e.Cancel = true;
+
+                var query = System.Web.HttpUtility.ParseQueryString(uri.Query);
+                var planKey = query["plankey"];
+                var pinKey = query["pinkey"];
+
+                Shell.Current.GoToAsync($"setpin?planId={planKey}&pinId={pinKey}");
+            }
+        };
+
         mapLayerPicker.ItemsSource = Settings.SwissTopoLayers.Select(item => item.Desc).ToList(); // load map-layers to picker
         mapLayerPicker.SelectedItem = Settings.SwissTopoLayers[0].Desc;
     }
@@ -161,7 +176,12 @@ public partial class MapView : IQueryAttributable
                         var pindesc = EscapeForJs(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc);
                         var pinlocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation;
                         var pinname = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName;
-                        positionsJson += $"{{ lon: {lon.ToString(CultureInfo.InvariantCulture)}, lat: {lat.ToString(CultureInfo.InvariantCulture)}, pinname: '{pinname}', pinlocation: '{pinlocation}', pindesc: '{pindesc}', plankey: '{plan.Key}', pinkey: '{pin.Key}'}},";
+                        positionsJson += $"{{ lon: {lon.ToString(CultureInfo.InvariantCulture)}, " +
+                                            $"lat: {lat.ToString(CultureInfo.InvariantCulture)}," +
+                                            $"pinname: '{pinname}', pinlocation: '{pinlocation}'," +
+                                            $"pindesc: '{pindesc}'," +
+                                            $"plankey: '{plan.Key}'," +
+                                            $"pinkey: '{pin.Key}'}},";
                     }
                 }
             }

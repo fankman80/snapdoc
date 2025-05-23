@@ -75,38 +75,19 @@
         </CollectionView>
 
         <StackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
-            <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto, Auto">
-                <material:TextField Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-                    x:Name="PinLocation"
-                    HorizontalOptions="Fill"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                    AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                    Title="Standort"
-                    Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
-
-                <Button Grid.Column="1" Grid.Row="0"
-                        x:Name="GeoLocButton"
-                        HorizontalOptions="End"
-                        BackgroundColor="Transparent"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Not_listed_location}}"
-                        Clicked="ShowGeoLoc"/>
-
-                <Label Grid.Column="1" Grid.Row="1"
-                       x:Name="PinAcc"
-                       Text="100m"
-                       FontSize="10"
-                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                       HorizontalTextAlignment="Center"
-                       Margin="0,-16,0,0"/>
-            </Grid>
-            <material:EditorField
-                x:Name="PinDesc"
-                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
-                Title="Beschreibung"
-                Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Description}}" />
+            <material:TextField x:Name="PinLocation"
+                                HorizontalOptions="Fill"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                Title="Standort"
+                                Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
+            <material:EditorField x:Name="PinDesc"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                  BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                  AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                  Title="Beschreibung"
+                                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Description}}" />
 
             <Grid ColumnSpacing="6" RowSpacing="0">
                 <Grid.ColumnDefinitions>
@@ -171,23 +152,32 @@
             
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />                    
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
-                        Text="OK"
-                        MinimumWidthRequest="100"
+                        x:Name="GeoLocButton"
+                        Text="100m"                    
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
-                        Clicked="OnOkayClick"/>
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Not_listed_location}}"
+                        Clicked="ShowGeoLoc"/>
                 <Button Grid.Column="2"
                         Text="Foto"
                         Padding="16,0,16,0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
-                        Clicked="TakePhoto"/>
+                        Clicked="TakePhoto"/>                
+                <Button Grid.Column="3"
+                        Text="OK"
+                        MinimumWidthRequest="100"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                        Clicked="OnOkayClick"/>
+
             </Grid>
         </StackLayout>
     </Grid>
