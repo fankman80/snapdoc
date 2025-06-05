@@ -331,7 +331,6 @@
 
         function navigateBack(plankey, pinkey) {
             const url = `invoke://navigateback?plankey=${encodeURIComponent(plankey)}&pinkey=${encodeURIComponent(pinkey)}`;
-            window.location.href = url;
 
             if (window.platform === "android" || window.platform === "ios") {
                 window.external.notify(url);

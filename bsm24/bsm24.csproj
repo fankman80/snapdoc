@@ -131,7 +131,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="9.0.50" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.3" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
-		<PackageReference Include="PDFtoImage" Version="5.1.0" />
+		<PackageReference Include="PDFtoImage" Version="5.1.1" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.0" />
 		<PackageReference Include="UraniumUI" Version="2.12.1" />

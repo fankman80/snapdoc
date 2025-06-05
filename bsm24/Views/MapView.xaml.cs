@@ -134,7 +134,7 @@ public partial class MapView : IQueryAttributable
 #else
         "unknown";
 #endif
-        await GeoAdminWebView.EvalAsync($"window.platform = '{platform}';");
+        GeoAdminWebView.EvaluateJavaScriptAsync($"window.platform = '{platform}';");
 
         mapLayerPicker.ItemsSource = Settings.SwissTopoLayers.Select(item => item.Desc).ToList(); // load map-layers to picker
         mapLayerPicker.SelectedItem = Settings.SwissTopoLayers[0].Desc;
