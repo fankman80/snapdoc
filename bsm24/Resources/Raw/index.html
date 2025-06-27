@@ -185,7 +185,7 @@
                 stopEvent: false,
                 offset: [30, -50]
             });
-            map.addOverlay(popup);
+            map.addOverlay(popup, Settings.popupOptions);
 
             var modify = new ol.interaction.Modify({
                 hitDetection: vectorLayer,

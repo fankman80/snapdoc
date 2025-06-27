@@ -6,7 +6,6 @@ namespace bsm24.Views;
 
 public partial class PopupPlanEdit : Popup<PlanEditReturn>
 {
-
     public PopupPlanEdit(string name, string desc, bool gray, bool export = true, string okText = "Ok", string cancelText = "Abbrechen")
     {
         InitializeComponent();
@@ -29,7 +28,7 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn(null, null, true));
+        await CloseAsync(null);
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)

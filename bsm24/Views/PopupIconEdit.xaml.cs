@@ -169,10 +169,10 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(0, SelectedColor, lineWidthVisibility: false);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.popupOptions);
 
-        if (result.Result.penColor != null)
-            SelectedColor = result.Result.penColor;
+        if (result.Result != null)
+            SelectedColor = Color.FromArgb(result.Result.PenColorHex);
     }
 
     private void StartBlinking()

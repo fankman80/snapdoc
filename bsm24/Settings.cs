@@ -1,7 +1,9 @@
 ﻿namespace bsm24;
+using CommunityToolkit.Maui;
 
 public static class Settings
 {
+    public const int MaxPdfImageSize = 10000;
     public const int ThumbSize = 150;
     public const int PlanPreviewSize = 150;
     public const int IconPreviewSize = 64;
@@ -91,4 +93,14 @@ public static class Settings
         "mappin4a.png",
         "mappin5a.png"
     ];
+
+    public static readonly PopupOptions popupOptions = new()
+    {
+        CanBeDismissedByTappingOutsideOfPopup = false,
+        Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle
+        {
+            CornerRadius = new CornerRadius(14),
+            StrokeThickness = 0
+        }
+    };
 }

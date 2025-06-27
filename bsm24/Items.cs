@@ -62,30 +62,17 @@ namespace bsm24
         }
     }
 
-    public class ColorPickerReturn
+    public class ColorPickerReturn(string colorHex, int width)
     {
-        public Color penColor { get; set; }
-        public int penWidth { get; set; }
-
-        public ColorPickerReturn(Color color, int width)
-        {
-            penColor = color;
-            penWidth = width;
-        }
+        public string PenColorHex { get; set; } = colorHex;
+        public int PenWidth { get; set; } = width;
     }
 
-    public class PlanEditReturn
+    public class PlanEditReturn(string nameEntry, string descEntry, bool allowExport)
     {
-        public string name_entry { get; set; }
-        public string desc_entry { get; set; }
-        public bool allow_export { get; set; }
-
-        public PlanEditReturn(string nameentry, string descentry,bool  allowexport)
-        {
-            name_entry = nameentry;
-            desc_entry = descentry;
-            allow_export = allowexport;
-        }
+        public string NameEntry { get; set; } = nameEntry;
+        public string DescEntry { get; set; } = descEntry;
+        public bool AllowExport { get; set; } = allowExport;
     }
 
     public class PriorityItem

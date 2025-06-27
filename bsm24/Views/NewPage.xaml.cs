@@ -726,12 +726,12 @@ public partial class NewPage : IQueryAttributable
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(lineWidth, selectedColor, lineWidthVisibility: true);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, new PopupOptions{ CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.popupOptions);
 
-        if (result.Result.penColor != null)
+        if (result.Result != null)
         {
-            selectedColor = result.Result.penColor;
-            lineWidth = result.Result.penWidth;
+            selectedColor = Color.FromArgb(result.Result.PenColorHex);
+            lineWidth = result.Result.PenWidth;
             if (drawingView != null)
             {
                 drawingView.LineColor = selectedColor;
@@ -839,39 +839,39 @@ public partial class NewPage : IQueryAttributable
                                       desc: GlobalJson.Data.Plans[PlanId].Description,
                                       gray: GlobalJson.Data.Plans[PlanId].IsGrayscale,
                                       export: GlobalJson.Data.Plans[PlanId].AllowExport);
-        var result = await this.ShowPopupAsync<PlanEditReturn>(popup, new PopupOptions{ CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.popupOptions);
 
-        switch (result.Result.name_entry)
+        if (result.Result != null)
         {
-            case "delete":
-                OnDeleteClick();
-                break;
+            switch (result.Result.NameEntry)
+            {
+                case "delete":
+                    OnDeleteClick();
+                    break;
 
-            case "grayscale":
-                OnGrayscaleClick();
-                break;
+                case "grayscale":
+                    OnGrayscaleClick();
+                    break;
 
-            case null:
-                break;
+                default:
+                    (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Result.NameEntry;
+                    Title = result.Result.NameEntry;
 
-            default:
-                (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Result.name_entry;
-                Title = result.Result.name_entry;
+                    GlobalJson.Data.Plans[PlanId].Name = result.Result.NameEntry;
+                    GlobalJson.Data.Plans[PlanId].Description = result.Result.DescEntry;
+                    GlobalJson.Data.Plans[PlanId].AllowExport = result.Result.AllowExport;
 
-                GlobalJson.Data.Plans[PlanId].Name = result.Result.name_entry;
-                GlobalJson.Data.Plans[PlanId].Description = result.Result.desc_entry;
-                GlobalJson.Data.Plans[PlanId].AllowExport = result.Result.allow_export;
-
-                // save data to file
-                GlobalJson.SaveToFile();
-                break;
+                    // save data to file
+                    GlobalJson.SaveToFile();
+                    break;
+            }
         }
     }
 
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
-        var result = await this.ShowPopupAsync<string>(popup, new PopupOptions{ CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
         if (result.Result != null)
         {
             var menuitem = (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId);

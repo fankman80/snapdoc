@@ -119,7 +119,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnDeleteClick(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse("Wollen Sie diesen Pin wirklich löschen?");
-        var result = await this.ShowPopupAsync<string>(popup, new PopupOptions{ CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
         if (result.Result != null)
             await Shell.Current.GoToAsync($"//{PlanId}?pinDelete={PinId}");
     }
@@ -127,7 +127,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnEditClick(object sender, EventArgs e)
     {
         var popup = new PopupEntry(title: "Pin umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
-        var result = await this.ShowPopupAsync<string>(popup, new PopupOptions{ CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
 
         if (result.Result != null)
         {

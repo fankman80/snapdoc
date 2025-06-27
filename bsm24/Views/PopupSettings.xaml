@@ -7,6 +7,9 @@
                xmlns:services="clr-namespace:bsm24.Services"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
+               Margin="16"              
+               WidthRequest="280"
+               HorizontalOptions="Center"
                x:Class="bsm24.Views.PopupSettings">
 
     <toolkit:Popup.Resources>
@@ -15,10 +18,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-          WidthRequest="300"
-          Padding="-10">
-        
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />

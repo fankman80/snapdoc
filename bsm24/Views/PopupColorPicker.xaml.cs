@@ -25,9 +25,9 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
                     { BackgroundColor = Color.FromRgba(c) }))
-        {
-            new() { BackgroundColor = selectedColor, IsAddButton = true }
-        };
+                    {
+                        new() { BackgroundColor = selectedColor, IsAddButton = true }
+                    };
 
         // Prüfen, ob selectedColor in der Liste vorkommt
         var matchingItem = ColorsList
@@ -66,14 +66,14 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         }
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
-    {
-        await CloseAsync(new ColorPickerReturn(null, 0));
-    }
-
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new ColorPickerReturn(SelectedColor, LineWidth));
+        await CloseAsync(new ColorPickerReturn(SelectedColor.ToHex(), LineWidth));
+    }
+
+    private async void OnCancelClicked(object sender, EventArgs e)
+    {
+        await CloseAsync(null);
     }
 
     public void OnAddTapped(object sender, EventArgs e)

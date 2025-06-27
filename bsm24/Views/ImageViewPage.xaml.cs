@@ -140,16 +140,19 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
-    private void PenSettingsClicked(object sender, EventArgs e)
+    private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(lineWidth, selectedColor);
-        ColorPickerReturn result = (ColorPickerReturn)this.ShowPopupAsync(popup).Result;
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.popupOptions);
 
-        selectedColor = result.penColor;
-        lineWidth = result.penWidth;
+        if (result.Result != null)
+        {
+            selectedColor = Color.FromArgb(result.Result.PenColorHex);
+            lineWidth = result.Result.PenWidth;
+        }
 
-        DrawView.LineColor = result.penColor;
-        DrawView.LineWidth = result.penWidth;
+        DrawView.LineColor = selectedColor;
+        DrawView.LineWidth = lineWidth;
     }
 
     private void DrawClicked(object sender, EventArgs e)
@@ -224,7 +227,7 @@ public partial class ImageViewPage : IQueryAttributable
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
-        var result = await this.ShowPopupAsync<string>(popup);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
 
         if (result.Result != null)
         {

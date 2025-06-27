@@ -75,7 +75,7 @@ public partial class OpenProject : ContentPage
     private async void OnNewClicked(object sender, EventArgs e)
     {
         var popup = new PopupEntry(title: "Neues Projekt eröffnen...", okText: "Erstellen");
-        var result = await this.ShowPopupAsync<string>(popup, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
         if (result.Result != null)
         {
             // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
@@ -189,13 +189,13 @@ public partial class OpenProject : ContentPage
         FileItem item = (FileItem)button.BindingContext;
 
         var _popup = new PopupProjectEdit(entry: item.FileName);
-        var _result = await this.ShowPopupAsync<string>(_popup, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+        var _result = await this.ShowPopupAsync<string>(_popup, Settings.popupOptions);
 
         switch (_result.Result)
         {
             case "delete":
                 var popup1 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich löschen?", okText: "Löschen", alert: true);
-                var result1 = await this.ShowPopupAsync<string>(popup1, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+                var result1 = await this.ShowPopupAsync<string>(popup1, Settings.popupOptions);
                 if (result1.Result == "Ok")
                 {
                     List<FileItem> tmp_list = (List<FileItem>)FileListView.ItemsSource;
@@ -216,12 +216,14 @@ public partial class OpenProject : ContentPage
 
                     // Root-Verzeichnis löschen
                     Directory.Delete(Path.GetDirectoryName(item.FilePath));
+
+                    LoadJsonFiles();
                 }
                 break;
 
             case "zip":
                 var popup2 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich als Zip exportieren?");
-                var result2 = await this.ShowPopupAsync<string>(popup2, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+                var result2 = await this.ShowPopupAsync<string>(popup2, Settings.popupOptions);
                 if (result2.Result == "Ok")
                 {
                     string sourceDirectory = Path.GetDirectoryName(item.FilePath);

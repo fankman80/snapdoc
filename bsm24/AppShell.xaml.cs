@@ -34,7 +34,7 @@ public partial class AppShell : Shell
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupSettings();
-        await this.ShowPopupAsync<string>(popup, new PopupOptions { CanBeDismissedByTappingOutsideOfPopup = false });
+        await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
     }
 
     public void OnTitleClicked(object sender, EventArgs e)

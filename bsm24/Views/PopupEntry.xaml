@@ -7,10 +7,13 @@
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"               
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
-               x:TypeArguments="x:String"    
+               Margin="16"              
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="x:String"               
                x:Class="bsm24.Views.PopupEntry">
 
-    <Grid WidthRequest="300" Padding="-10">
+    <Grid>
         <VerticalStackLayout>
             <Label x:Name="titleText"
                        HorizontalOptions="Start"

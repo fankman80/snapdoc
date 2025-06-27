@@ -187,7 +187,7 @@ public partial class MapView : IQueryAttributable
         if (GPSViewModel.Instance.IsRunning)
         {
             var popup = new PopupDualResponse("Sind Sie sicher dass Sie die Positionsdaten überschreiben wollen?");
-            var result = await this.ShowPopupAsync<string>(popup);
+            var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
             if (result.Result != null)
             {
                 Location location = new();
@@ -209,7 +209,7 @@ public partial class MapView : IQueryAttributable
         else
         {
             var popup1 = new PopupAlert("Aktivieren Sie zuerst die Ortungsdienste, damit der Standort aktualisiert werden kann?");
-            this.ShowPopup(popup1);
+            this.ShowPopup(popup1, Settings.popupOptions);
         }
     }
 

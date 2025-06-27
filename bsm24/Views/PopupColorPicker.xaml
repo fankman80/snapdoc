@@ -3,15 +3,18 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"               
                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
                xmlns:services="clr-namespace:bsm24.Services"
                xmlns:views="clr-namespace:bsm24.Views"               
                xmlns:local="clr-namespace:bsm24"
-               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"               
-               x:TypeArguments="local:ColorPickerReturn"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"            
+               Padding="0"
+               Margin="16"              
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="local:ColorPickerReturn"               
                x:Class="bsm24.Views.PopupColorPicker">
 
     <toolkit:Popup.Resources>
@@ -27,7 +30,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
     
-    <Grid WidthRequest="300" Padding="-10">
+    <Grid>
         <Grid VerticalOptions="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

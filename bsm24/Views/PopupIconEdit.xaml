@@ -7,9 +7,12 @@
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:services="clr-namespace:bsm24.Services"
                xmlns:views="clr-namespace:bsm24.Views"
-               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"       
-               x:TypeArguments="x:String"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"     
+               Padding="0"
+               Margin="16"              
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="x:String"               
                x:Class="bsm24.Views.PopupIconEdit">
 
     <toolkit:Popup.Resources>
@@ -19,7 +22,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid WidthRequest="300" Padding="-10" x:DataType="views:PopupIconEdit">
+    <Grid x:DataType="views:PopupIconEdit">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />

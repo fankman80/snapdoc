@@ -69,10 +69,10 @@ public partial class LoadPDFPages : ContentPage
                     int widthHighDpi = skBitmap.Width * targetDpi / 72;
                     int heightHighDpi = skBitmap.Height * targetDpi / 72;
 
-                    if (widthHighDpi > 8000 || heightHighDpi > 8000)
+                    if (widthHighDpi > Settings.MaxPdfImageSize || heightHighDpi > Settings.MaxPdfImageSize)
                     {
-                        widthHighDpi = targetDpi * 8000 / widthHighDpi;
-                        heightHighDpi = targetDpi * 8000 / heightHighDpi;
+                        widthHighDpi = targetDpi * Settings.MaxPdfImageSize / widthHighDpi;
+                        heightHighDpi = targetDpi * Settings.MaxPdfImageSize / heightHighDpi;
                         targetDpi = Math.Min(widthHighDpi, heightHighDpi);
                     }
 
