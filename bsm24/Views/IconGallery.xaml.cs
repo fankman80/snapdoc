@@ -102,7 +102,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
 
         var popup = new PopupIconEdit(iconItem);
-        var result1 = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+        var result1 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result1.Result != null)
             IconSorting(OrderDirection);
@@ -157,7 +157,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             );
 
             var popup = new PopupIconEdit(updatedItem);
-            var result2 = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+            var result2 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
             if (result2.Result == null)
                 File.Delete(localPath);  // Delete temporary Icon-File

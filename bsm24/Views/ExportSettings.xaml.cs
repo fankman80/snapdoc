@@ -46,7 +46,7 @@ public partial class ExportSettings : ContentPage
         if (SettingsService.Instance.SelectedTemplate == null)
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
-            var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             if (result.Result != null)
                 return;
         }
@@ -92,7 +92,7 @@ public partial class ExportSettings : ContentPage
         if (SettingsService.Instance.SelectedTemplate == null)
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
-            var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             if (result.Result != null)
                 return;
         }

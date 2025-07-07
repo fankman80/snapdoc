@@ -143,7 +143,7 @@ public partial class ImageViewPage : IQueryAttributable
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(lineWidth, selectedColor);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.popupOptions);
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
@@ -227,7 +227,7 @@ public partial class ImageViewPage : IQueryAttributable
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
-        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {

@@ -726,7 +726,7 @@ public partial class NewPage : IQueryAttributable
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(lineWidth, selectedColor, lineWidthVisibility: true);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.popupOptions);
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
@@ -839,7 +839,7 @@ public partial class NewPage : IQueryAttributable
                                       desc: GlobalJson.Data.Plans[PlanId].Description,
                                       gray: GlobalJson.Data.Plans[PlanId].IsGrayscale,
                                       export: GlobalJson.Data.Plans[PlanId].AllowExport);
-        var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.popupOptions);
+        var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
@@ -871,7 +871,7 @@ public partial class NewPage : IQueryAttributable
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.popupOptions);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
             var menuitem = (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId);

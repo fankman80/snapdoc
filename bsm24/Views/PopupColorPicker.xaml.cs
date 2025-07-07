@@ -68,7 +68,7 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new ColorPickerReturn(SelectedColor.ToHex(), LineWidth));
+        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), lineWidth));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
