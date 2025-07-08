@@ -18,6 +18,7 @@
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
     
@@ -42,13 +43,14 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
-                        WidthRequest="60"
                         BorderWidth="1"
                         BorderColor="Black"
                         BackgroundColor="{Binding SelectedColor}"
+                        Text="Planfarbe"
+                        TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
                 <VerticalStackLayout Grid.Column="1">
-                    <Label Text="Farbe und Transparenz"/>
+                    <Label Text="{Binding Transparency, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Transparenz: {0:0}%'}"/>
                     <Slider x:Name="TransparencySlider"
                             Value="{Binding Transparency}"
                             Maximum="1"
