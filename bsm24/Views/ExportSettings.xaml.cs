@@ -30,7 +30,7 @@ public partial class ExportSettings : ContentPage
 
         LoadDocuments();
 
-        if (SettingsService.Instance.SelectedTemplate == null && SettingsService.Instance.Templates.Count > 0)
+        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate) && SettingsService.Instance.Templates.Count > 0)
             SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.First();
     }
 
@@ -43,7 +43,7 @@ public partial class ExportSettings : ContentPage
 
     private async void OnShareClicked(object sender, EventArgs e)
     {
-        if (SettingsService.Instance.SelectedTemplate == null)
+        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
@@ -89,7 +89,7 @@ public partial class ExportSettings : ContentPage
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        if (SettingsService.Instance.SelectedTemplate == null)
+        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
             var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);

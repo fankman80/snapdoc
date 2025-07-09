@@ -3,6 +3,7 @@
 using bsm24.Models;
 using PDFtoImage;
 using SkiaSharp;
+using bsm24.Services;
 
 namespace bsm24.Views;
 public partial class LoadPDFPages : ContentPage
@@ -74,7 +75,7 @@ public partial class LoadPDFPages : ContentPage
                         int height72dpi = probeBitmap.Height;
 
                         // Schritt 2: DPI berechnen anhand MaxPixelCount
-                        int targetDpi = CalculateMaxDpiFromPixelLimit(width72dpi, height72dpi, Settings.MaxPdfPixelCount);
+                        int targetDpi = CalculateMaxDpiFromPixelLimit(width72dpi, height72dpi, SettingsService.Instance.MaxPdfPixelCount);
 
                         pdfImages.Add(new ImageItem
                         {

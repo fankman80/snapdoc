@@ -1,6 +1,5 @@
 #nullable disable
 
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SkiaSharp;

@@ -172,16 +172,16 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
-    private int _pdfQuality = 350;
-    public int PdfQuality
+    private int _maxPdfPixelCount = 30000000;
+    public int MaxPdfPixelCount
     {
-        get => _pdfQuality;
+        get => _maxPdfPixelCount;
         set
         {
-            if (_pdfQuality != value)
+            if (_maxPdfPixelCount != value)
             {
-                _pdfQuality = (value / 50) * 50; ;
-                OnPropertyChanged(nameof(PdfQuality));
+                _maxPdfPixelCount = (value / 1000000) * 1000000; ;
+                OnPropertyChanged(nameof(MaxPdfPixelCount));
             }
         }
     }
@@ -667,7 +667,7 @@ public partial class SettingsService : INotifyPropertyChanged
             MapIconSize = this.MapIconSize,
             MapIcon = this.MapIcon,
             IsPlanRotateLocked = this.IsPlanRotateLocked,
-            PdfQuality = this.PdfQuality,
+            MaxPdfPixelCount = this.MaxPdfPixelCount,
             SelectedColorTheme = ColorThemes.IndexOf(this.SelectedColorTheme),
             SelectedAppTheme = AppThemes.IndexOf(this.SelectedAppTheme),
             IconSortCrit = IconSortCrits.IndexOf(this.IconSortCrit),
@@ -697,8 +697,8 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.MapIconSize = settings.MapIconSize;
                 this.MapIcon = settings.MapIcon;
                 this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
-                this.PdfQuality = settings.PdfQuality;
-                this.SelectedAppTheme = (settings.SelectedAppTheme  < AppThemes.Count)
+                this.MaxPdfPixelCount = settings.MaxPdfPixelCount;
+                this.SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count)
                     ? AppThemes[settings.SelectedAppTheme]
                     : AppThemes[0];
                 this.SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count)

@@ -50,7 +50,7 @@
                         TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
                 <VerticalStackLayout Grid.Column="1">
-                    <Label Text="{Binding Transparency, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Transparenz: {0:0}%'}"/>
+                    <Label Text="{Binding Transparency, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Deckkraft: {0:0}%'}"/>
                     <Slider x:Name="TransparencySlider"
                             Value="{Binding Transparency}"
                             Maximum="1"

@@ -15,6 +15,7 @@
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
@@ -45,13 +46,13 @@
                         MaximumTrackColor="{DynamicResource PrimaryDark}"
                         Value="{Binding PinMaxScaleLimit}"/>
 
-                <Label Text="{Binding PdfQuality, StringFormat='PDF-Auflösung: {0:0.##} dpi'}" />
-                <Slider Maximum="800"
-                        Minimum="100"
+                <Label Text="{Binding MaxPdfPixelCount, StringFormat='Max. Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
+                <Slider Maximum="50000000"
+                        Minimum="1000000"
                         ThumbColor="{DynamicResource Primary}"
                         MinimumTrackColor="{DynamicResource Primary}"
                         MaximumTrackColor="{DynamicResource PrimaryDark}"
-                        Value="{Binding PdfQuality}"/>
+                        Value="{Binding MaxPdfPixelCount}"/>
 
                 <HorizontalStackLayout Margin="0,0,0,10">
                     <CheckBox x:Name="isPlanRotateLocked"   

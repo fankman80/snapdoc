@@ -10,7 +10,7 @@ internal class SettingsModel
     public int PinSortCrit { get; set; }
     public int IconCategory { get; set; }
     public bool IsPlanRotateLocked { get; set; }
-    public int PdfQuality { get; set; }
+    public int MaxPdfPixelCount { get; set; }
     public int SelectedColorTheme { get; set; }
     public int SelectedAppTheme { get; set; }
     public bool IsFotoCompressed { get; set; }

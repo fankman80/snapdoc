@@ -5,7 +5,6 @@ public static class Settings
 {
     public const int MaxPdfImageSizeW = 8192;
     public const int MaxPdfImageSizeH = 8192;
-    public const int MaxPdfPixelCount = 30000000;
     public const int ThumbSize = 150;
     public const int PlanPreviewSize = 150;
     public const int IconPreviewSize = 64;

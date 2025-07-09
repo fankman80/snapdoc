@@ -17,8 +17,8 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         name_entry.Text = name;
         desc_entry.Text = desc;
         allow_export.IsChecked = export;
-        SelectedColor = Color.FromArgb(planColor);
-        Transparency = SelectedColor.Alpha; // Set transparency based on alpha value
+        SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
+        Transparency = String.IsNullOrEmpty(planColor) ? 0 : SelectedColor.Alpha;
 
         if (gray)
             grayscaleButtonText.Text = "Farben hinzufügen";
