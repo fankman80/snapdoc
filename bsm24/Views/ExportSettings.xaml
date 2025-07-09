@@ -11,6 +11,7 @@
              xmlns:local="clr-namespace:bsm24"                            
              x:Name="ExportSettingsPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.ExportSettings"
              Title="Bericht exportieren">
 
@@ -35,65 +36,64 @@
                         </Grid.ColumnDefinitions>
                         <material:PickerField Grid.Column="0" 
                                 Title="Export-Vorlage"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
                                 x:Name="templatePicker" 
                                 ItemsSource="{Binding Templates}"
                                 SelectedItem="{Binding SelectedTemplate}"/>
                         <Button Grid.Column="1"
                                 HorizontalOptions="End"
                                 BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="2" 
                                 HorizontalOptions="End"
                                 BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox
-                            Scale="1.2"
-                            Color="{DynamicResource Primary}"
-                            IsChecked="{Binding IsPlanExport}"/>                            
+                        <CheckBox Scale="1.2"
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsPlanExport}"/>                            
                         <Label Text="Exportiere Pläne" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox
-                            Scale="1.2"
-                            Color="{DynamicResource Primary}"
-                            IsChecked="{Binding IsPosImageExport}"/>
+                        <CheckBox Scale="1.2"
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsPosImageExport}"/>
                         <Label Text="Exportiere Positionsbilder" VerticalTextAlignment="Center"/> 
                     </HorizontalStackLayout>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
                         <CheckBox Scale="1.2"
-                                    Color="{DynamicResource Primary}"
-                                    IsChecked="{Binding IsPinIconExport}"/>
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsPinIconExport}"/>
                         <Label Text="Exportiere Pin-Icons" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
                         <CheckBox Scale="1.2"
-                                    Color="{DynamicResource Primary}"
-                                    IsChecked="{Binding IsImageExport}"/>
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsImageExport}"/>
                         <Label Text="Exportiere Fotos" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
                         <CheckBox Scale="1.2"
-                                    IsVisible="{Binding IsImageExport}"
-                                    Color="{DynamicResource Primary}"
-                                    IsChecked="{Binding IsFotoOverlayExport}"/>
+                                  IsVisible="{Binding IsImageExport}"
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsFotoOverlayExport}"/>
                         <Label Text="Exportiere Foto-Overlays" VerticalTextAlignment="Center" IsVisible="{Binding IsImageExport}"/>
                     </HorizontalStackLayout>
 
                     <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
                         <CheckBox Scale="1.2"
-                                    Color="{DynamicResource Primary}"
-                                    IsChecked="{Binding IsFotoCompressed}"/>
+                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  IsChecked="{Binding IsFotoCompressed}"/>
                         <Label Text="Bildkomprimierung" VerticalTextAlignment="Center"/>
                     </HorizontalStackLayout>                       
                     
@@ -113,8 +113,9 @@
                             Title="Pinbeschriftung"                   
                             Text="{Binding PlanLabelPrefix}"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                            AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}" />
+                            TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
     
                     <Label Text="{Binding PlanLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"

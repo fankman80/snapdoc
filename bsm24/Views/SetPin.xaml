@@ -9,6 +9,7 @@
              xmlns:services="clr-namespace:bsm24.Services"
              x:DataType="views:SetPin"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="bsm24.Views.SetPin"
              Title="Pin bearbeiten">
     
@@ -77,14 +78,16 @@
             <material:TextField x:Name="PinLocation"
                                 HorizontalOptions="Fill"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 Title="Standort"
                                 Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
             <material:EditorField x:Name="PinDesc"
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                  BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                  AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                  TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                  AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                   Title="Beschreibung"
                                   Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Description}}" />
 
@@ -102,14 +105,14 @@
                 <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
                     <CheckBox x:Name="AllowExport"
                               Scale="1.2"
-                              Color="{DynamicResource Primary}"/>
+                              Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
                     <Label Text="Pin exportieren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 
                 <HorizontalStackLayout Grid.Column="0" Grid.Row="1" Spacing="0">
                     <CheckBox x:Name="LockSwitch"
                               Scale="1.2"
-                              Color="{DynamicResource Primary}"/>
+                              Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
                     <Label Text="Position sperren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 

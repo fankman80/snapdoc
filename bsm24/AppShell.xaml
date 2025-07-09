@@ -10,7 +10,7 @@
        xmlns:sys="clr-namespace:System;assembly=System.Runtime"
        xmlns:services="clr-namespace:bsm24.Services"
        xmlns:model="clr-namespace:bsm24.ViewModels"
-       xmlns:views="clr-namespace:bsm24.Views"       
+       xmlns:views="clr-namespace:bsm24.Views"
        xmlns:local="clr-namespace:bsm24"
        x:Class="bsm24.AppShell"
        FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"  

@@ -281,10 +281,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             {
                 FontFamily = "MaterialOutlined",
                 Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["Primary"]
-                        : (Color)Application.Current.Resources["PrimaryDark"]
-            };
+                Color = (Color)Application.Current.Resources["PrimaryDark"]};
             btnRows.Text = "Kacheln";
         }
         else
@@ -293,10 +290,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             {
                 FontFamily = "MaterialOutlined",
                 Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["Primary"]
-                        : (Color)Application.Current.Resources["PrimaryDark"]
-            };
+                Color = (Color)Application.Current.Resources["PrimaryDark"]};
             btnRows.Text = "Liste";
         }
     }

@@ -57,14 +57,14 @@
                 <HorizontalStackLayout Margin="0,0,0,10">
                     <CheckBox x:Name="isPlanRotateLocked"   
                               Scale="1.2"
-                              Color="{DynamicResource Primary}"
+                              Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                               IsChecked="{Binding IsPlanRotateLocked}"/>
                     <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
 
                 <!-- Trennlinie -->
                 <Grid Margin="0,6,0,6">
-                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
+                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkAccent}}" StrokeThickness="1" />
                 </Grid>
 
                 <Label Text="Map-Icon:" Margin="0,0,0,10"/>
@@ -77,35 +77,35 @@
                     <material:RadioButton Value="0"
                                           WidthRequest="30"
                                           Margin="0,0,0,10"
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Center" />
 
                     <material:RadioButton Value="1" 
                                           WidthRequest="30"
                                           Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Center" />
 
                     <material:RadioButton Value="2"
                                           WidthRequest="30"
                                           Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Center" />
 
                     <material:RadioButton Value="3"
                                           WidthRequest="30"
                                           Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Center" />
 
                     <material:RadioButton Value="4"
                                           WidthRequest="30"
                                           Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Center" />
                 </material:RadioButtonGroupView>
@@ -138,14 +138,15 @@
 
                 <!-- Trennlinie -->
                 <Grid Margin="0,6,0,6">
-                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
+                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkAccent}}" StrokeThickness="1" />
                 </Grid>
 
                 <material:PickerField x:Name="darkModePicker"
                                       Title="Appthema"
                                       Margin="0,10,0,10"
-                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
                                       ItemsSource="{Binding AppThemes}"
                                       SelectedItem="{Binding SelectedAppTheme}">
                 </material:PickerField>
@@ -153,8 +154,9 @@
                 <material:PickerField x:Name="colorThemePicker"
                                       Title="Farbthema"
                                       Margin="0,0,0,10"
-                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
                                       ItemsSource="{Binding ColorThemes}"
                                       SelectedItem="{Binding SelectedColorTheme}">
                 </material:PickerField>
