@@ -102,4 +102,16 @@ public partial class AppShell : Shell
 
         GlobalJson.Data.Plans = reorderedPlans.ToDictionary(p => p.Key, p => p.Value);
     }
+
+    private void OnEditClicked(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+
+        PlanItem item = (PlanItem)button.BindingContext;
+
+        if (item != null)
+        {
+            item.AllowExport = !item.AllowExport;
+        }
+    }
 }

@@ -2,6 +2,7 @@
 
 using SkiaSharp;
 using System.Globalization;
+using UraniumUI;
 
 namespace bsm24.Services;
 
@@ -53,4 +54,29 @@ public class RawAssetToImageSourceConverter : IValueConverter
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture) => throw new NotImplementedException();
+}
+
+public class ExportToGlyphConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        bool allow = value is bool b && b;
+        return allow ? UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Visibility : UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Visibility_off;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}
+
+public class AllowExportToColorConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        var baseColor = parameter as Color ?? Colors.Black;
+        var disabledColor = baseColor.WithAlpha(0.3f);
+        return (value is bool b && b) ? baseColor : disabledColor;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
 }

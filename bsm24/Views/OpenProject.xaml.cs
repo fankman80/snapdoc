@@ -2,7 +2,6 @@
 
 using System.Globalization;
 using bsm24.Services;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;

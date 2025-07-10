@@ -67,7 +67,7 @@
             <HorizontalStackLayout>
                 <CheckBox x:Name="allow_export"
                           Scale="1.2"
-                          Color="{DynamicResource PrimaryDarkAccent}"/>
+                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
                 <Label Text="Plan in den Bericht exportieren" VerticalTextAlignment="Center"/>
             </HorizontalStackLayout>
 

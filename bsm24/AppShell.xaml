@@ -20,6 +20,8 @@
     <Shell.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
+            <services:AllowExportToColorConverter x:Key="AllowExportToColorConverter"/>
         </ResourceDictionary>
     </Shell.Resources>
 
@@ -257,15 +259,16 @@
                                    VerticalOptions="Center" 
                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
 
-                            <Label Grid.Column="2"
-                                   Margin="0,0,8,0"
-                                   IsVisible="{Binding AllowExport, Converter={StaticResource InvertedBoolConverter}}"
-                                   Text="{x:Static m:MaterialOutlined.Visibility_off}"
-                                   FontFamily="MaterialOutlined"
-                                   FontSize="18" 
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                            <Button Grid.Column="2"
+                                    Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                    Padding="6,0,0,0"
+                                    FontFamily="MaterialOutlined"
+                                    FontSize="18"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}"
+                                    Clicked="OnEditClicked"/>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
