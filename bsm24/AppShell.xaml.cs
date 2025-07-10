@@ -112,6 +112,9 @@ public partial class AppShell : Shell
         if (item != null)
         {
             item.AllowExport = !item.AllowExport;
+
+            // save data to file
+            GlobalJson.SaveToFile();
         }
     }
 }

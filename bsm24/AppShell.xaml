@@ -251,13 +251,13 @@
                                    FontSize="22" 
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
-                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />
 
                             <Label Grid.Column="1"
                                    Text="{Binding Title}" 
                                    FontSize="14" 
                                    VerticalOptions="Center" 
-                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />
 
                             <Button Grid.Column="2"
                                     Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
