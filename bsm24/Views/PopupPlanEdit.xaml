@@ -63,8 +63,8 @@
                             MaximumTrackColor="{DynamicResource PrimaryDark}"/>
                 </VerticalStackLayout>
             </Grid>
-            
-            <HorizontalStackLayout>
+
+            <HorizontalStackLayout Spacing="0">
                 <CheckBox x:Name="allow_export"
                           Scale="1.2"
                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>

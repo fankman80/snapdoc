@@ -54,8 +54,8 @@
                         MaximumTrackColor="{DynamicResource PrimaryDark}"
                         Value="{Binding MaxPdfPixelCount}"/>
 
-                <HorizontalStackLayout Margin="0,0,0,10">
-                    <CheckBox x:Name="isPlanRotateLocked"   
+                <HorizontalStackLayout Margin="0,0,0,10" Spacing="0">
+                    <CheckBox x:Name="isPlanRotateLocked"
                               Scale="1.2"
                               Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                               IsChecked="{Binding IsPlanRotateLocked}"/>
