@@ -22,6 +22,7 @@
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
+            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
             <services:AllowExportToColorConverter x:Key="AllowExportToColorConverter"/>
         </ResourceDictionary>
     </Shell.Resources>
@@ -231,7 +232,8 @@
 
     <Shell.FlyoutContent>
         <ContentView x:DataType="local:AppShell">
-            <CollectionView ItemsSource="{Binding PlanItems}"
+            <CollectionView x:Name="PlanCollectionView"
+                            ItemsSource="{Binding PlanItems}"
                             CanReorderItems="True"
                             Margin="14,0,14,0"
                             SelectionMode="Single"
@@ -244,6 +246,16 @@
                                 <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
                             </Grid.GestureRecognizers>
 
+                            <VisualStateManager.VisualStateGroups>
+                                <VisualStateGroup Name="CommonStates">
+                                    <VisualState Name="Selected">
+                                        <VisualState.Setters>
+                                            <Setter Property="BackgroundColor" Value="Transparent" />
+                                        </VisualState.Setters>
+                                    </VisualState>
+                                </VisualStateGroup>
+                            </VisualStateManager.VisualStateGroups>
+                            
                             <Border Grid.Column="0" Grid.ColumnSpan="3"
                                     BackgroundColor="{Binding PlanColor}"
                                     StrokeThickness="0"/>
@@ -257,7 +269,8 @@
                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />
 
                             <Label Grid.Column="1"
-                                   Text="{Binding Title}" 
+                                   Text="{Binding Title}"
+                                   FontAttributes="{Binding IsSelected, Converter={StaticResource BoolToFontAttributesConverter}}"
                                    FontSize="14"
                                    VerticalOptions="Center" 
                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />

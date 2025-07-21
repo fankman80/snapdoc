@@ -71,6 +71,10 @@ public partial class NewPage : IQueryAttributable
                 PinZoom = null;
             }
         }
+
+        // selektiere den aktuellen Plan im CollectionView im Shellmenü
+        var appShell = Application.Current.Windows[0].Page as AppShell;
+        appShell?.HighlightCurrentPlan(this.PlanId);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

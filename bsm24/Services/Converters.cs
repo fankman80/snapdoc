@@ -92,3 +92,17 @@ public class AllowExportToColorConverter : IValueConverter
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotImplementedException();
 }
+
+public class BoolToFontAttributesConverter : IValueConverter
+{
+    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    {
+        if (value is bool isBold && isBold)
+            return FontAttributes.Bold;
+
+        return FontAttributes.None;
+    }
+
+    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
+        => throw new NotImplementedException();
+}

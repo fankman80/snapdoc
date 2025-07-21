@@ -144,4 +144,14 @@ public partial class AppShell : Shell
             SelectedPlanItem = selected;
         }
     }
+
+    public void HighlightCurrentPlan(string planId)
+    {
+        if (PlanItems == null || PlanCollectionView == null)
+            return;
+
+        var selected = PlanItems.FirstOrDefault(p => p.PlanId == planId);
+        if (selected != null)
+            PlanCollectionView.SelectedItem = selected;
+    }
 }
