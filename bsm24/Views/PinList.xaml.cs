@@ -185,7 +185,10 @@ public partial class PinList : ContentPage
         if (SortPicker.SelectedItem == null) return;
 
         // Setze die Liste auf die ursprüngliche Reihenfolge zurück, bevor sortiert wird
-        pinItems = [.. originalPinItems];
+        if (string.IsNullOrWhiteSpace(SearchEntry.Text))
+            pinItems = [.. originalPinItems];
+        else
+            pinItems = [.. filteredPinItems];
 
         SettingsService.Instance.PinSortCrit = SortPicker.SelectedItem.ToString();
 
@@ -262,6 +265,11 @@ public partial class PinList : ContentPage
                 continue;
             }
         }
+
+        // Verwende Originalliste falls die Suche leer ist
+        if (string.IsNullOrWhiteSpace(SearchEntry.Text))
+            filteredPinItems = [.. originalPinItems];
+
         pinListView.ItemsSource = filteredPinItems;
         PinCounterLabel.Text = $"Pins: {filteredPinItems.Count}";
     }

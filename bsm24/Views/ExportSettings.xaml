@@ -54,50 +54,49 @@
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsPlanExport}"/>                            
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsPlanExport}"/>                            
                         <Label Text="Exportiere Pläne" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsPosImageExport}"/>
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsPosImageExport}"/>
                         <Label Text="Exportiere Positionsbilder" VerticalTextAlignment="Center"/> 
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsPinIconExport}"/>
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsPinIconExport}"/>
                         <Label Text="Exportiere Pin-Icons" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsImageExport}"/>
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsImageExport}"/>
                         <Label Text="Exportiere Fotos" VerticalTextAlignment="Center"/>                            
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  IsVisible="{Binding IsImageExport}"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsFotoOverlayExport}"/>
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsVisible="{Binding IsImageExport}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsFotoOverlayExport}"/>
                         <Label Text="Exportiere Foto-Overlays" VerticalTextAlignment="Center" IsVisible="{Binding IsImageExport}"/>
                     </HorizontalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0,-10,0,0">
-                        <CheckBox Scale="1.2"
-                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  IsChecked="{Binding IsFotoCompressed}"/>
+                    <HorizontalStackLayout Spacing="0">
+                        <material:CheckBox BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                           IsChecked="{Binding IsFotoCompressed}"/>
                         <Label Text="Bildkomprimierung" VerticalTextAlignment="Center"/>
                     </HorizontalStackLayout>                       
                     
-
                     <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0:0.##}%'}"
                            Margin="0, 0, 0, -12"
                            IsVisible="{Binding IsFotoCompressed}"/>
@@ -105,8 +104,8 @@
                             Minimum="1"
                             IsVisible="{Binding IsFotoCompressed}"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding FotoCompressValue}"/>
 
                     <material:TextField Grid.Column="0" Grid.Row="1"
@@ -121,16 +120,16 @@
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding PlanLabelFontSize}"/>
                     
                     <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding PinExportSize}"/>
 
                     <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}"
@@ -140,8 +139,8 @@
                             Minimum="10"
                             IsVisible="{Binding IsImageExport}"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding ImageExportSize}"/>
 
                     <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}"
@@ -151,8 +150,8 @@
                             Minimum="10"
                             IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding PinPosExportSize}"/>
 
                     <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}"
@@ -162,24 +161,24 @@
                             Minimum="100"
                             IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding PinPosCropExportSize}"/>
 
                     <Label IsVisible="False" Text="{Binding ImageExportQuality, StringFormat='Bildqualität: {0:0.##}%'}" Margin="0, 0, 0, -12"/>
                     <Slider IsVisible="False" Maximum="100"
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding ImageExportQuality}"/>
 
                     <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{DynamicResource Primary}"
-                            MaximumTrackColor="{DynamicResource PrimaryDark}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                             Value="{Binding TitleExportSize}"/>
                 </VerticalStackLayout>
             </ScrollView>

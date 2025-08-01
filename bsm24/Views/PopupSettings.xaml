@@ -32,8 +32,8 @@
                         Minimum="1"
                         Margin="0,0,0,10"
                         ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding PinMinScaleLimit}"/>
 
                 <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
@@ -42,23 +42,23 @@
                         Minimum="{Binding PinMinScaleLimit}"
                         Margin="0,0,0,10"
                         ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding PinMaxScaleLimit}"/>
 
                 <Label Text="{Binding MaxPdfPixelCount, StringFormat='Max. Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
                 <Slider Maximum="50000000"
                         Minimum="1000000"
                         ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding MaxPdfPixelCount}"/>
 
                 <HorizontalStackLayout Margin="0,0,0,10" Spacing="0">
-                    <CheckBox x:Name="isPlanRotateLocked"
-                              Scale="1.2"
-                              Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                              IsChecked="{Binding IsPlanRotateLocked}"/>
+                    <material:CheckBox x:Name="isPlanRotateLocked"
+                                       BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                       IsChecked="{Binding IsPlanRotateLocked}"/>
                     <Label Text="Planrotation sperren" HorizontalOptions="Start" VerticalOptions="Center"/>
                 </HorizontalStackLayout>
 
@@ -132,8 +132,8 @@
                 <Slider Maximum="100"
                         Minimum="1"
                         ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{DynamicResource Primary}"
-                        MaximumTrackColor="{DynamicResource PrimaryDark}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding MapIconSize}"/>
 
                 <!-- Trennlinie -->

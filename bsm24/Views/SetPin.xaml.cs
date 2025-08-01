@@ -1,13 +1,12 @@
 ﻿#nullable disable
 
 using bsm24.Models;
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Maui.Extensions;
 using FFImageLoading.Maui;
 using System.Collections.ObjectModel;
 using UraniumUI.Material.Controls;
-using CheckBox = Microsoft.Maui.Controls.CheckBox;
+using CheckBox =  Microsoft.Maui.Controls.CheckBox;
 
 namespace bsm24.Views;
 

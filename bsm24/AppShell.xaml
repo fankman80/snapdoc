@@ -266,14 +266,14 @@
                                    FontSize="22" 
                                    HorizontalOptions="Center"
                                    VerticalOptions="Center"
-                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />
+                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}" />
 
                             <Label Grid.Column="1"
                                    Text="{Binding Title}"
                                    FontAttributes="{Binding IsSelected, Converter={StaticResource BoolToFontAttributesConverter}}"
                                    FontSize="14"
                                    VerticalOptions="Center" 
-                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}" />
+                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}" />
 
                             <Button Grid.Column="2"
                                     Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
@@ -283,7 +283,7 @@
                                     HorizontalOptions="Center"
                                     VerticalOptions="Center"
                                     BackgroundColor="Transparent"
-                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}, ConverterParameter={StaticResource Primary}}"
+                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}"
                                     Clicked="OnAllowExportClicked"/>
                         </Grid>
                     </DataTemplate>

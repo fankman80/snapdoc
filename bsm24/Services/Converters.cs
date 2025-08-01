@@ -2,7 +2,6 @@
 
 using SkiaSharp;
 using System.Globalization;
-using UraniumUI;
 
 namespace bsm24.Services;
 
@@ -84,7 +83,14 @@ public class AllowExportToColorConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
-        var baseColor = parameter as Color ?? Colors.Black;
+        // Hole aktives Theme
+        var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+
+        // Hole passende Farbe aus Ressourcen
+        var resourceKey = isDark ? "PrimaryDark" : "Primary";
+        var baseColor = Application.Current.Resources.TryGetValue(resourceKey, out var raw)
+            && raw is Color color ? color : Colors.Black;
+
         var disabledColor = baseColor.WithAlpha(0.3f);
         return (value is bool b && b) ? baseColor : disabledColor;
     }

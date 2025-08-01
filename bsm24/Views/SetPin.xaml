@@ -62,12 +62,11 @@
                                       Color="{DynamicResource Primary}"
                                       VerticalOptions="End"
                                       HorizontalOptions="End"
-                                      CheckedChanged="OnCheckedChanged" />
+                                      CheckedChanged="OnCheckedChanged"/>
                         </Grid>
                         <Label Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy \\/ HH:mm}'}"
                                FontSize="12"
                                HorizontalTextAlignment="Center"
-                               TextColor="{DynamicResource Primary}"
                                Margin="0,-15,0,8"/>
                     </VerticalStackLayout>
                 </DataTemplate>
@@ -103,15 +102,15 @@
                 </Grid.RowDefinitions>
                 
                 <HorizontalStackLayout Grid.Column="0" Grid.Row="0" Spacing="0">
-                    <CheckBox x:Name="AllowExport"
-                              Scale="1.2"
+                    <material:CheckBox x:Name="AllowExport"
+                              BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                               Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
                     <Label Text="Pin exportieren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
 
                 <HorizontalStackLayout Grid.Column="0" Grid.Row="1" Spacing="0">
-                    <CheckBox x:Name="LockSwitch"
-                              Scale="1.2"
+                    <material:CheckBox x:Name="LockSwitch"
+                              BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                               Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
                     <Label Text="Position sperren" VerticalTextAlignment="Center"/>
                 </HorizontalStackLayout>
@@ -147,9 +146,10 @@
                 <material:PickerField Grid.Column="1"
                                       x:Name="priorityPicker" 
                                       Title="Priorität"   
-                                      TitleColor="{Binding PriorityColor}"
                                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                      BorderColor="{Binding PriorityColor}"/>
+                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
             </Grid>
             
             <Grid>
