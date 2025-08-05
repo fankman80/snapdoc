@@ -55,10 +55,9 @@
                 <DataTemplate x:DataType="local:FotoItem">
                     <VerticalStackLayout>
                         <Grid>
-                            <views:SquareView
-                                Margin="4"
-                                Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
+                            <views:SquareView Margin="4">
                                 <ff:CachedImage Source="{Binding ImagePath}"
+                                                Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}"
                                                 CacheType="Memory"
                                                 FadeAnimationEnabled ="False"
                                                 FadeAnimationForCachedImages ="False"
