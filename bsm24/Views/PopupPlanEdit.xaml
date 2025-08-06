@@ -69,9 +69,11 @@
                                  Grid.Column="0"
                                  HorizontalOptions="Start"
                                  VerticalOptions="Center"
-                                 KnobColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource Primary}}"
-                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Secondary}, Dark={DynamicResource Secondary}}"
-                                 SwitchColorOff="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackground}}"/>
+                                 BorderColorOff ="Transparent"
+                                 KnobColorOn="White"
+                                 KnobColorOff="White"
+                                 SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                 <Label Text="Plan in den Bericht exportieren" Grid.Column="1" VerticalOptions="Center" />
             </Grid>
 

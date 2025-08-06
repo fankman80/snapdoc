@@ -114,9 +114,11 @@
                                      Grid.Column="0"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
-                                     KnobColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource Primary}}"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Secondary}, Dark={DynamicResource Secondary}}"
-                                     SwitchColorOff="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackground}}"/>
+                                     BorderColorOff ="Transparent"
+                                     KnobColorOn="White"
+                                     KnobColorOff="White"
+                                     SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     <Label Text="Pin exportieren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
@@ -124,9 +126,11 @@
                                      Grid.Column="0"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
-                                     KnobColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource Primary}}"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Secondary}, Dark={DynamicResource Secondary}}"
-                                     SwitchColorOff="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackground}}"/>
+                                     BorderColorOff ="Transparent"
+                                     KnobColorOn="White"
+                                     KnobColorOff="White"
+                                     SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     <Label Text="Position sperren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
