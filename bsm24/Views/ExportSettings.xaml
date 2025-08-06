@@ -95,9 +95,8 @@
                                              SwitchColorOff="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackground}}"/>
                             <Label Text="Exportiere Fotos" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40" IsVisible="{Binding IsImageExport}">
                             <controls:Switch Grid.Column="0"
-                                             IsVisible="{Binding IsImageExport}"
                                              IsToggled="{Binding IsFotoOverlayExport}"
                                              HorizontalOptions="Start"
                                              VerticalOptions="Center"
