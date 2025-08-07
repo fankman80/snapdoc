@@ -60,38 +60,37 @@
                     <VerticalStackLayout Grid.Column="1">
                         <material:TextField Title="Anker X"
                                             Text="{Binding Anchor_X}"
+                                            TitleColor="{DynamicResource SecondaryBackground}"
+                                            BorderColor="{DynamicResource SecondaryBackground}"                        
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                            TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                         <material:TextField Title="Anker Y"
                                             Text="{Binding Anchor_Y}"
+                                            TitleColor="{DynamicResource SecondaryBackground}"
+                                            BorderColor="{DynamicResource SecondaryBackground}"                        
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                            TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                     </VerticalStackLayout>
                 </Grid>
 
                 <material:TextField x:Name="iconName"
-                                FontSize="14"
-                                Title="Bezeichnung"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                                    FontSize="14"
+                                    Title="Bezeichnung"
+                                    TitleColor="{DynamicResource SecondaryBackground}"
+                                    BorderColor="{DynamicResource SecondaryBackground}"                        
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    AllowClear="True"/>
 
                 <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                x:Name="iconCategory"
-                                FontSize="14"            
-                                Title="Kategorie"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                ItemsSource="{Binding IconCategories}"
-                                AllowClear="True"/>
+                                                x:Name="iconCategory"
+                                                Title="Kategorie"
+                                                TitleColor="{DynamicResource SecondaryBackground}"
+                                                BorderColor="{DynamicResource SecondaryBackground}"                        
+                                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                                ItemsSource="{Binding IconCategories}"/>
 
                 <Button Text="Farbe wählen"
                         BorderWidth="1"

@@ -85,20 +85,18 @@
         <StackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
             <material:TextField x:Name="PinLocation"
                                 HorizontalOptions="Fill"
+                                TitleColor="{DynamicResource SecondaryBackground}"
+                                BorderColor="{DynamicResource SecondaryBackground}"                        
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                Title="Standort"
-                                Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Flag}}" />
+                                AllowClear="True"
+                                Title="Standort"/>
             <material:EditorField x:Name="PinDesc"
+                                  TitleColor="{DynamicResource SecondaryBackground}"
+                                  BorderColor="{DynamicResource SecondaryBackground}"                        
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                  TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                  BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                   AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                  Title="Beschreibung"
-                                  Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource SecondaryAccent}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Description}}" />
-            
+                                  Title="Beschreibung"/>
             <Grid ColumnSpacing="6" RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

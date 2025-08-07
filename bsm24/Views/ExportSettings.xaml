@@ -145,10 +145,11 @@
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="Pinbeschriftung"                   
                             Text="{Binding PlanLabelPrefix}"
+                            TitleColor="{DynamicResource SecondaryBackground}"
+                            BorderColor="{DynamicResource SecondaryBackground}"                        
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            AllowClear="True"/>
     
                     <Label Text="{Binding PlanLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"

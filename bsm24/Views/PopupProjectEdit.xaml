@@ -17,9 +17,10 @@
         <VerticalStackLayout>
             <material:TextField x:Name="text_entry"
                                 Title="Projekt Titel"
+                                TitleColor="{DynamicResource SecondaryBackground}"
+                                BorderColor="{DynamicResource SecondaryBackground}"                        
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource SecondaryBackground}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource SecondaryDark}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"/>
 
             <Button Text="Zip Exportieren"
