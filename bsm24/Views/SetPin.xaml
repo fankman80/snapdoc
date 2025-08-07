@@ -82,7 +82,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <StackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
+        <VerticalStackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
             <material:TextField x:Name="PinLocation"
                                 HorizontalOptions="Fill"
                                 TitleColor="{DynamicResource SecondaryBackground}"
@@ -148,19 +148,14 @@
             </Grid>
 
             <Grid x:DataType="views:SetPin">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <material:PickerField Grid.Column="0"
-                                      x:Name="priorityPicker" 
+                <material:PickerField x:Name="priorityPicker" 
                                       Title="Priorität"
                                       AllowClear="False"
+                                      TitleColor="{DynamicResource SecondaryBackground}"
+                                      BorderColor="{DynamicResource SecondaryBackground}"                        
                                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
                                       AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                <Label Grid.Column="0"
-                       Text="{x:Static m:MaterialOutlined.Traffic}"                       
+                <Label Text="{x:Static m:MaterialOutlined.Traffic}"                       
                        Margin="0,0,0,4"
                        HorizontalOptions="End"
                        WidthRequest="50"
@@ -180,25 +175,27 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         x:Name="GeoLocButton"
+                        Padding="0"
                         MinimumWidthRequest="80"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Not_listed_location}}"
                         Clicked="ShowGeoLoc"/>
                 <Button Grid.Column="2"
+                        Padding="0"
                         MinimumWidthRequest="80"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
                         Clicked="TakePhoto"/>
                 <Button Grid.Column="3"
+                        Padding="0"
                         Text="OK"
                         MinimumWidthRequest="80"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
                         Clicked="OnOkayClick"/>
-
             </Grid>
-        </StackLayout>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

@@ -33,15 +33,7 @@ public partial class ProjectDetails : ContentPage
 
     private async void OnOkayClicked(object sender, EventArgs e)
     {
-        GlobalJson.Data.Client_name = client_name.Text;
-        GlobalJson.Data.Object_address = object_address.Text;
-        GlobalJson.Data.Working_title = working_title.Text;
-        GlobalJson.Data.Object_name = object_name.Text;
-        GlobalJson.Data.Project_manager = project_manager.Text;
-        GlobalJson.Data.Creation_date = creation_date.Date.Value;
-
-        // save data to file
-        GlobalJson.SaveToFile();
+        UpdateProjectData();
 
         Helper.HeaderUpdate();
 
@@ -123,16 +115,21 @@ public partial class ProjectDetails : ContentPage
 
     private async void OnAddPdfClicked(object sender, EventArgs e)
     {
+        UpdateProjectData();
+
+        await Shell.Current.GoToAsync("loadPdfImages");
+    }
+
+    private void UpdateProjectData()
+    {
         GlobalJson.Data.Client_name = client_name.Text;
         GlobalJson.Data.Object_address = object_address.Text;
         GlobalJson.Data.Working_title = working_title.Text;
         GlobalJson.Data.Object_name = object_name.Text;
         GlobalJson.Data.Project_manager = project_manager.Text;
-        GlobalJson.Data.Creation_date = creation_date.Date.Value;
+        GlobalJson.Data.Creation_date = creation_date.Date ?? DateTime.Today;
 
         // save data to file
         GlobalJson.SaveToFile();
-
-        await Shell.Current.GoToAsync("loadPdfImages");
     }
 }

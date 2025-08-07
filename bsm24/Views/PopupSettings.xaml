@@ -47,7 +47,7 @@
                         MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding PinMaxScaleLimit}"/>
 
-                <Label Text="{Binding MaxPdfPixelCount, StringFormat='Max. Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
+                <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
                 <Slider Maximum="50000000"
                         Minimum="1000000"
                         ThumbColor="{DynamicResource Primary}"
@@ -149,9 +149,10 @@
                                       Title="Appthema"
                                       Margin="0,10,0,10"
                                       AllowClear="False"
-                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      TitleColor="{DynamicResource SecondaryBackground}"
+                                      BorderColor="{DynamicResource SecondaryBackground}"                        
+                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                      AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                       ItemsSource="{Binding AppThemes}"
                                       SelectedItem="{Binding SelectedAppTheme}">
                 </material:PickerField>
@@ -160,9 +161,10 @@
                                       Title="Farbthema"
                                       Margin="0,0,0,10"
                                       AllowClear="False"
-                                      TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                      BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                      TitleColor="{DynamicResource SecondaryBackground}"
+                                      BorderColor="{DynamicResource SecondaryBackground}"                        
+                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                      AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                       ItemsSource="{Binding ColorThemes}"
                                       SelectedItem="{Binding SelectedColorTheme}">
                 </material:PickerField>

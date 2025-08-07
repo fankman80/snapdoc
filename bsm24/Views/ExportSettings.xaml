@@ -40,9 +40,10 @@
                                 x:Name="templatePicker"                                               
                                 Title="Export-Vorlage"
                                 AllowClear="False"
-                                TitleColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                BorderColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource PrimaryAccent}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                TitleColor="{DynamicResource SecondaryBackground}"
+                                BorderColor="{DynamicResource SecondaryBackground}"                        
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 ItemsSource="{Binding Templates}"
                                 SelectedItem="{Binding SelectedTemplate}"/>
                         <Button Grid.Column="1"
