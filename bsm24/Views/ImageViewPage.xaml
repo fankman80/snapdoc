@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui" 
 			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
@@ -37,7 +36,7 @@
 				TranslationY="{Binding TranslationY}"
                 AnchorX="{Binding AnchorX}"
 				AnchorY="{Binding AnchorY}">
-                <ff:CachedImage x:Name="ImageView" CacheType="Memory"/>
+                <Image x:Name="ImageView"/>
                 <mct:DrawingView
                     x:Name="DrawView"
                     BackgroundColor="Transparent"

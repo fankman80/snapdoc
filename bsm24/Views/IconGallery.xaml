@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui" 
              xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
@@ -25,11 +24,10 @@
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="26" />
                     </Grid.ColumnDefinitions>
-                    <ff:CachedImage Grid.Column="0"
-                                    Source="{Binding FileName}"
-                                    CacheType="Memory"
-                                    Aspect="AspectFill"
-                                    Margin="6"/>
+                    <Image Grid.Column="0"
+                           Source="{Binding FileName}"
+                           Aspect="AspectFill"
+                           Margin="6"/>
                     <Label Grid.Column="1"
                            Text="{Binding DisplayName}"
                            VerticalOptions="Center"
@@ -52,10 +50,9 @@
             <!-- Template für Grid (Label unsichtbar) -->
             <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
                 <Grid HeightRequest="64" WidthRequest="64">
-                    <ff:CachedImage Source="{Binding FileName}"
-                                    CacheType="Memory"
-                                    Aspect="AspectFit"
-                                    Margin="6"/>
+                    <Image Source="{Binding FileName}"
+                           Aspect="AspectFit"
+                           Margin="6"/>
                     <mr:Button AutomationId = "{Binding FileName}"
                                BorderColor="Transparent"
                                Background="Transparent"

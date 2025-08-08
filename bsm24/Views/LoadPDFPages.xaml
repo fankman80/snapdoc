@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:bsm24.Views"
              xmlns:local="clr-namespace:bsm24"
@@ -38,11 +37,8 @@
                     <DataTemplate x:DataType="local:PdfItem">
                         <VerticalStackLayout>
                             <Grid Margin="8">
-                                <ff:CachedImage Source="{Binding PreviewPath}"
-                                                CacheType="Memory"
-                                                FadeAnimationEnabled ="False"
-                                                FadeAnimationForCachedImages ="False"
-                                                Aspect="AspectFill"/>
+                                <Image Source="{Binding PreviewPath}"
+                                       Aspect="AspectFill"/>
                                 <CheckBox IsChecked="{Binding IsChecked}"
                                           Color="{DynamicResource Primary}"
                                           VerticalOptions="End"
