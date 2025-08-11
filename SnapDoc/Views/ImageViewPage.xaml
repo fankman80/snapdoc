@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+             xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+			 xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:pc="clr-namespace:SnapDoc.ViewModels"
+			 BackgroundColor="DimGrey"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+			 x:Class="SnapDoc.Views.ImageViewPage">
+    
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            x:Name ="btnImageFit"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Fit_screen}}"
+            Text="Grösse anpassen"
+            Clicked="ImageFit"/>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}" 
+            Text="Delete"          
+            Clicked="OnDeleteButtonClicked"/>
+    </ContentPage.ToolbarItems>
+
+    <AbsoluteLayout IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
+        <mr:ContentView
+            PinchingCommand="{Binding PinchingCommand}"
+            Panning="OnPanning"
+            Pinching="OnPinching"
+            Pinched="OnPinched"
+            DoubleTapped="OnDoubleTapped"
+            ScrollWheelChanged="OnMouseScroll">
+            <AbsoluteLayout x:Name="ImageViewContainer"
+				Scale="{Binding Scale}"
+				TranslationX="{Binding TranslationX}"
+				TranslationY="{Binding TranslationY}"
+                AnchorX="{Binding AnchorX}"
+				AnchorY="{Binding AnchorY}">
+                <Image x:Name="ImageView"/>
+                <mct:DrawingView
+                    x:Name="DrawView"
+                    BackgroundColor="Transparent"
+                    IsMultiLineModeEnabled="True"
+                    DrawingLineStarted="OnDrawing"
+                    LineColor="#FF0000"/>
+            </AbsoluteLayout>
+        </mr:ContentView>
+ 
+        <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
+                BackgroundColor="{DynamicResource Primary}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Margin="0,0,180,20"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                IsVisible="False"
+                ZIndex="10000"
+                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                Clicked="EraseClicked"/>
+
+        <Button x:Name="PenSettingsBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
+                BackgroundColor="{DynamicResource Primary}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Margin="0,0,100,20"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                IsVisible="False"
+                ZIndex="10000"
+                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                Clicked="PenSettingsClicked"/>
+
+        <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
+                BackgroundColor="{DynamicResource Primary}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Margin="0,0,20,20"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                IsVisible="True"
+                ZIndex="10000"
+                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                Clicked="DrawClicked"/>
+
+        <Button x:Name="CheckBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
+                BackgroundColor="{DynamicResource Primary}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Margin="0,0,20,20"
+                WidthRequest="60"
+                HeightRequest="60"
+                CornerRadius="30"
+                IsVisible="False"
+                ZIndex="10000"
+                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                Clicked="CheckClicked"/>
+    </AbsoluteLayout>
+</ContentPage>

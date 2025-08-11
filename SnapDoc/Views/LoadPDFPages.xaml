@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:local="clr-namespace:SnapDoc"
+             BackgroundColor="DimGrey"
+             x:DataType="views:LoadPDFPages"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             x:Class="SnapDoc.Views.LoadPDFPages"
+             Title="PDF Seiten hinzufügen">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>    
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            x:Name="btnRows"
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Grid_on}}"
+            Text="Kacheln"
+            Clicked="OnChangeRowsClicked"/>
+    </ContentPage.ToolbarItems>
+    
+    <Grid>
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            <CollectionView x:Name="fileListView" Grid.Row="0">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PdfItem">
+                        <VerticalStackLayout>
+                            <Grid Margin="8">
+                                <Image Source="{Binding PreviewPath}"
+                                       Aspect="AspectFill"/>
+                                <CheckBox IsChecked="{Binding IsChecked}"
+                                          Color="{DynamicResource Primary}"
+                                          VerticalOptions="End"
+                                          HorizontalOptions="End"/>
+                                <Label Text="{Binding Dpi, StringFormat='{0:0.##} dpi'}"
+                                       FontSize="12"
+                                       Padding="4"
+                                       HorizontalTextAlignment="Center"
+                                       Background="White"
+                                       TextColor="{DynamicResource Primary}"
+                                       VerticalOptions="End"
+                                       HorizontalOptions="Start"/>
+                            </Grid>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+
+            <Grid Grid.Row="1" Margin="0,6,16,16">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Text="Abbrechen"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Clicked="OnCancelClicked"/>
+                <Button Grid.Column="2"
+                        Text="Seiten hinzufügen"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Clicked="OnPagesAddClicked"/>
+            </Grid>
+        </Grid>
+
+        <!-- Overlay für Busy-Indikator -->
+        <local:BusyOverlayView x:Name="busyOverlay"
+                               AbsoluteLayout.LayoutBounds="0,0,1,1"
+                               AbsoluteLayout.LayoutFlags="All"/>
+    </Grid>
+</ContentPage>

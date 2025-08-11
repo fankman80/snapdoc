@@ -1,0 +1,146 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"     
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"                          
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:local="clr-namespace:SnapDoc"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             x:Class="SnapDoc.Views.ProjectDetails"
+             Title="Projekt Details">
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
+        <Grid Margin="16">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="120" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0"
+                        WidthRequest="200"
+                        HeightRequest="120"
+                        StrokeThickness="0"
+                        BackgroundColor="White"
+                        StrokeShape="RoundRectangle 8">
+                    <Image Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill"/>
+                </Border>
+                <Grid Grid.Column="0">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <ImageButton Grid.Column="0"
+                                 BackgroundColor="Transparent"
+                                 HeightRequest="70"
+                                 WidthRequest="70"
+                                 Source="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=50, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
+                                 Clicked="OnTitleCaptureClicked"/>
+
+                    <ImageButton Grid.Column="1"
+                                 BackgroundColor="Transparent"
+                                 HeightRequest="70"
+                                 WidthRequest="70"
+                                 Source="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=50, Glyph={x:Static m:MaterialOutlined.Image_search}}"
+                                 Clicked="OnTitleOpenClicked"/>
+                </Grid>
+                <Button Grid.Column="1"
+                        WidthRequest="120"
+                        HeightRequest="120"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                         
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=50, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
+                        Clicked="OnAddPdfClicked"/>                
+            </Grid>
+                  
+            <ScrollView Grid.Row="1" Margin="0,10,0,0">
+                <VerticalStackLayout>
+                    <material:TextField
+                        x:Name="client_name"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        AllowClear="True"
+                        Title="Kunde/Bauherrschaft"/>
+
+                    <material:TextField
+                        x:Name="object_name"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        AllowClear="True"
+                        Title="Objektbezeichnung"/>
+
+                    <material:EditorField
+                        x:Name="object_address"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        Title="Adresse"/>
+
+                    <material:TextField
+                        x:Name="working_title"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        AllowClear="True"
+                        Title="Projektvorgang"/>
+
+                    <material:TextField
+                        x:Name="project_manager"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        AllowClear="True"
+                        Title="Projektleiter"/>
+
+                    <material:DatePickerField
+                        x:Name="creation_date"                        
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        Title="Datum">
+                    </material:DatePickerField>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <Grid Grid.Row="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="1"
+                        Text="OK"
+                        MinimumWidthRequest="100"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        Clicked="OnOkayClicked"/>
+            </Grid>
+        </Grid>
+
+        <!-- Overlay für Busy-Indikator -->
+        <local:BusyOverlayView x:Name="busyOverlay"
+                               AbsoluteLayout.LayoutBounds="0,0,1,1"
+                               AbsoluteLayout.LayoutFlags="All"/>
+    </Grid>
+</ContentPage>

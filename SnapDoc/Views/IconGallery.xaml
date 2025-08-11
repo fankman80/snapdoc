@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"            
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:views="clr-namespace:SnapDoc.Views"                            
+             xmlns:local="clr-namespace:SnapDoc"
+             x:Name="IconGalleryPage"
+             x:Class="SnapDoc.Views.IconGallery"
+             BackgroundColor="White"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Title="Icon auswählen">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <!-- Template für Liste (Label sichtbar) -->
+            <DataTemplate x:Key="IconListTemplate" x:DataType="local:IconItem">
+                <Grid HeightRequest="48">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="26" />
+                    </Grid.ColumnDefinitions>
+                    <Image Grid.Column="0"
+                           Source="{Binding FileName}"
+                           Aspect="AspectFit"
+                           Margin="6"/>
+                    <Label Grid.Column="1"
+                           Text="{Binding DisplayName}"
+                           VerticalOptions="Center"
+                           Margin="16,0,0,0"
+                           LineBreakMode="WordWrap"/>
+                    <BoxView Grid.Column="2"
+                             HeightRequest="26"
+                             CornerRadius="6"
+                             BackgroundColor="{Binding PinColor, Converter={StaticResource SkColorToHexConverter}}"/>
+                    <mr:Button Grid.ColumnSpan="3"
+                               AutomationId = "{Binding FileName}"
+                               BorderColor="Transparent"
+                               Background="Transparent"
+                               LongPressing="OnLongPressed"
+                               Clicked="OnIconClicked"
+                               Tapped="OnIconClicked"/>
+                </Grid>
+            </DataTemplate>
+
+            <!-- Template für Grid (Label unsichtbar) -->
+            <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
+                <Grid HeightRequest="64" WidthRequest="64">
+                    <Image Source="{Binding FileName}"
+                           Aspect="AspectFit"
+                           Margin="6"/>
+                    <mr:Button AutomationId = "{Binding FileName}"
+                               BorderColor="Transparent"
+                               Background="Transparent"
+                               LongPressing="OnLongPressed"
+                               Clicked="OnIconClicked"
+                               Tapped="OnIconClicked"/>
+                </Grid>
+            </DataTemplate>
+            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+
+    <ContentPage.ToolbarItems>
+        <ToolbarItem x:Name="btnRows"
+                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Table_rows}}"
+                     Text="Liste"
+                     Clicked="OnChangeRowsClicked"/>
+        <ToolbarItem x:Name ="ImportIcon"                     
+                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"             
+                     Text="Icon importieren"
+                     Clicked="ImportIconClicked"/>
+    </ContentPage.ToolbarItems>
+
+    <Grid RowSpacing="10" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="Start" Scale="0.8" AnchorX="0">
+            <Label Text="Kategorie" FontAttributes="Bold" VerticalTextAlignment="Center" TextColor="Black"/>
+            <Border Stroke="{DynamicResource Primary}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 4">
+                <uranium:Dropdown x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                  x:Name="CategoryPicker" 
+                                  FontSize="12"
+                                  TextColor="Black"
+                                  ItemsSource="{Binding IconCategories}"
+                                  SelectedItem="{Binding IconCategory}"/>
+            </Border>              
+        </HorizontalStackLayout>
+
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
+            <Button x:Name="SortDirection"
+                    Padding="0"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                    BorderColor="{DynamicResource Primary}"
+                    BorderWidth="1"
+                    HorizontalOptions="Start"
+                    BackgroundColor="Transparent"
+                    CornerRadius="4"
+                    Clicked="OnSortDirectionClicked"/>
+            <Border Stroke="{DynamicResource Primary}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 4">
+                <uranium:Dropdown x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                FontSize="12"
+                                TextColor="Black"
+                                ItemsSource="{Binding IconSortCrits}"
+                                SelectedItem="{Binding IconSortCrit}"/>
+            </Border>
+        </HorizontalStackLayout>
+
+        <Grid x:DataType="views:IconGallery" Grid.Row="1">
+            <CollectionView x:Name="IconCollectionView"
+                ItemsSource="{Binding Icons}"
+                SelectionMode="Single"
+                ItemTemplate="{StaticResource IconListTemplate}">
+                <CollectionView.ItemsLayout>
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                </CollectionView.ItemsLayout>
+            </CollectionView>
+        </Grid>
+        <Label Grid.Row="2"
+               Text="Gedrückt halten um Icon zu editieren."
+               FontSize="12"/>
+    </Grid>
+</ContentPage>

@@ -1,0 +1,160 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+               xmlns:services="clr-namespace:SnapDoc.Services"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:views="clr-namespace:SnapDoc.Views"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"     
+               Padding="0"
+               Margin="16"              
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="x:String"               
+               x:Class="SnapDoc.Views.PopupIconEdit">
+
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+
+    <Grid x:DataType="views:PopupIconEdit">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+            <VerticalStackLayout>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <AbsoluteLayout WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
+                                    HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}">
+                        <Image x:Name="iconImage"
+                               Margin="12"
+                               WidthRequest="{Binding IconPreviewWidth}"                                         
+                               HeightRequest="{Binding IconPreviewHeight}"
+                               Aspect="AspectFit"/>
+
+                        <Label x:Name="blinkingLabel"
+                               FontFamily="MaterialRounded"        
+                               Text="{x:Static m:MaterialRounded.Point_scan}"
+                               FontSize="24"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               WidthRequest="24"
+                               HeightRequest="24"
+                               TranslationX="{Binding TransX}"
+                               TranslationY="{Binding TransY}">
+                        </Label>
+                    </AbsoluteLayout>
+                            
+                    <VerticalStackLayout Grid.Column="1">
+                        <material:TextField Title="Anker X"
+                                            Text="{Binding Anchor_X}"
+                                            TitleColor="{DynamicResource SecondaryBackground}"
+                                            BorderColor="{DynamicResource SecondaryBackground}"                        
+                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+
+                        <material:TextField Title="Anker Y"
+                                            Text="{Binding Anchor_Y}"
+                                            TitleColor="{DynamicResource SecondaryBackground}"
+                                            BorderColor="{DynamicResource SecondaryBackground}"                        
+                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    </VerticalStackLayout>
+                </Grid>
+
+                <material:TextField x:Name="iconName"
+                                    FontSize="14"
+                                    Title="Bezeichnung"
+                                    TitleColor="{DynamicResource SecondaryBackground}"
+                                    BorderColor="{DynamicResource SecondaryBackground}"                        
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    AllowClear="True"/>
+
+                <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                                x:Name="iconCategory"
+                                                Title="Kategorie"
+                                                TitleColor="{DynamicResource SecondaryBackground}"
+                                                BorderColor="{DynamicResource SecondaryBackground}"                        
+                                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                                ItemsSource="{Binding IconCategories}"/>
+
+                <Button Text="Farbe wählen"
+                        BorderWidth="1"
+                        BorderColor="Black"
+                        BackgroundColor="{Binding SelectedColor}"
+                        TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                        Clicked="OnColorPickerClicked"/>
+
+                <VerticalStackLayout Spacing="0">
+                    <Label x:Name="sliderText" Text="Skalierung: "/>
+                    <Slider x:Name="iconScale"
+                            Maximum="100"
+                            Minimum="1"
+                            Value="100"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            ValueChanged="OnSliderValueChanged"/>
+                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                        <controls:Switch x:Name="allowRotate"
+                                         Grid.Column="0"
+                                         HorizontalOptions="Start"
+                                         VerticalOptions="Center"
+                                         BorderColorOff ="Transparent"
+                                         KnobColorOn="White"
+                                         KnobColorOff="White"
+                                         SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        <Label Text="Rotation sperren" Grid.Column="1" VerticalOptions="Center" />
+                    </Grid>
+                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40" x:Name="deleteIconContainer" IsVisible="False">
+                        <controls:Switch x:Name="deleteIcon"
+                                         Grid.Column="0"
+                                         IsToggled="False"
+                                         HorizontalOptions="Start"
+                                         VerticalOptions="Center"
+                                         BorderColorOff ="Transparent"
+                                         KnobColorOn="White"
+                                         KnobColorOff="White"
+                                         SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        <Label Text="Icon löschen" Grid.Column="1" VerticalOptions="Center" />
+                    </Grid>
+                </VerticalStackLayout>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1" Margin="0,10,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    x:Name="cancelButtonText"
+                    Text="Abbrechen"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                    Clicked="OnCancelClicked" />
+            <Button Grid.Column="1"
+                    x:Name="okButtonText"
+                    Text="Ok"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
+                    Clicked="OnOkClicked" />
+        </Grid>
+    </Grid>
+</toolkit:Popup>

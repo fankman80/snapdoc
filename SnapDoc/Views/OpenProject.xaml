@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:views="clr-namespace:SnapDoc.Views"                            
+             xmlns:local="clr-namespace:SnapDoc"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             x:Class="SnapDoc.Views.OpenProject"
+             Title="Projektliste">
+   
+    <ContentPage.ToolbarItems>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}" 
+            Text="Importieren"            
+            Clicked="OnUploadClicked"/>
+        <ToolbarItem
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}" 
+            Text="Neu"            
+            Clicked="OnNewClicked"/>        
+    </ContentPage.ToolbarItems>
+
+    <Grid>
+        <Grid Margin="16,0,16,16">
+            <CollectionView x:Name="FileListView" ItemsLayout="VerticalGrid, 1">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:FileItem">
+                        <Grid Padding="0, 6, 0, 6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="66" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="35" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="25" />
+                                <RowDefinition Height="35" />
+                            </Grid.RowDefinitions>
+                            <Label Grid.Column="1" Grid.Row="0"
+                                   VerticalTextAlignment="End"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   FontSize="14"
+                                   Text="{Binding FileName}"/>
+                            <Label Grid.Column="1" Grid.Row="1"
+                                   FontSize="12"
+                                   Text="{Binding FileDate}"/>
+                            <Image Grid.Column="0" Grid.RowSpan="2"
+                                   Source="{Binding ImagePath}"
+                                   Aspect="AspectFill"/>
+                            <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
+                                   Background="Transparent"
+                                   Clicked="OnProjectClicked"/>
+                            <Button Grid.Column="2" Grid.RowSpan="2"
+                                   Padding="6"
+                                   Background="Transparent"
+                                   ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Edit_square}}"
+                                   Clicked="OnEditClicked"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+
+        <!-- Overlay für Busy-Indikator -->
+        <local:BusyOverlayView x:Name="busyOverlay"
+                               AbsoluteLayout.LayoutBounds="0,0,1,1"
+                               AbsoluteLayout.LayoutFlags="All"/>
+    </Grid>
+</ContentPage>
