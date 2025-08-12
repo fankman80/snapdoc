@@ -100,7 +100,7 @@
                         Clicked="OnColorPickerClicked"/>
 
                 <VerticalStackLayout Spacing="0">
-                    <Label x:Name="sliderText" Text="Skalierung: "/>
+                    <Label x:Name="sliderText" Text="Voreinstellung Skalierung: "/>
                     <Slider x:Name="iconScale"
                             Maximum="100"
                             Minimum="1"
