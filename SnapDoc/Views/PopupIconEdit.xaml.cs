@@ -155,7 +155,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     private void OnSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = ((Slider)sender).Value;
-        sliderText.Text = "Skalierung:" + Math.Round(sliderValue, 0).ToString() + "%";
+        sliderText.Text = "Voreinstellung Skalierung: " + Math.Round(sliderValue, 0).ToString() + "%";
     }
 
 
