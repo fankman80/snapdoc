@@ -496,7 +496,7 @@ public partial class SettingsService : INotifyPropertyChanged
                 // Logik für das Anwenden der Farben basierend auf der Auswahl
                 switch (_selectedColorTheme)
                 {
-                    case "EBBE":
+                    case "Monocrome":
                         App.Current.Resources["Primary"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#000000");
@@ -509,7 +509,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#000000");
                         break;
 
-                    case "Lachs":
+                    case "Wine":
                         App.Current.Resources["Primary"] = Color.FromArgb("#9c4e38");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#9c4e38");
@@ -522,7 +522,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#9c4e38");
                         break;
 
-                    case "Gras":
+                    case "Grass":
                         App.Current.Resources["Primary"] = Color.FromArgb("#32a852");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#32a852");
@@ -535,11 +535,11 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#32a852");
                         break;
 
-                    case "Ozean":
-                        App.Current.Resources["Primary"] = Color.FromArgb("#5e75ad");
+                    case "EBBE":
+                        App.Current.Resources["Primary"] = Color.FromArgb("#00b0ca");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#5e75ad");
-                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#c7d3f2");
+                        App.Current.Resources["PrimaryDark"] = Color.FromArgb("#00b0ca");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
                         App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#5e75ad");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
@@ -548,7 +548,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#5e75ad");
                         break;
 
-                    case "Feuer":
+                    case "Fire":
                         App.Current.Resources["Primary"] = Color.FromArgb("#e07a2d");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#e07a2d");
@@ -574,7 +574,7 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#9f4bcc");
                         break;
 
-                    case "Barbie":
+                    case "Pink":
                         App.Current.Resources["Primary"] = Color.FromArgb("#fc03df");
                         App.Current.Resources["PrimaryText"] = Color.FromArgb("#000000");
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#fc03df");
