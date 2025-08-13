@@ -147,6 +147,9 @@ public partial class MapView : IQueryAttributable
 
     private static string Generatescript()
     {
+        if (GlobalJson.Data.Plans != null)
+            return;
+    
         string positionsJson = "[";
         foreach (var plan in GlobalJson.Data.Plans)
         {
