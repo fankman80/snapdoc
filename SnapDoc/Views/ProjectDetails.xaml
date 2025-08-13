@@ -10,7 +10,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ProjectDetails"
-             Title="Projekt Details">
+             Title="Projektverwaltung">
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />

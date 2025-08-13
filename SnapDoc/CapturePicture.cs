@@ -8,7 +8,12 @@ public class CapturePicture
 {
     public static async Task<(FileResult, Size)> Capture(string filepath, string thumbnailPath = null, string customFilename = null)
     {
-        if (MediaPicker.Default.IsCaptureSupported)
+        var status = await Permissions.CheckStatusAsync<Permissions.Camera>();
+
+        if (status != PermissionStatus.Granted)
+            status = await Permissions.RequestAsync<Permissions.Camera>();
+
+        if (status == PermissionStatus.Granted)
         {
             try
             {
@@ -60,6 +65,14 @@ public class CapturePicture
             }
         }
         else
+        {
+            var currentPage = Application.Current.Windows[0].Page;
+            await currentPage.DisplayAlert(
+                "Kamera-Berechtigung fehlt",
+                "Die App benötigt Zugriff auf die Kamera, um Fotos aufzunehmen. Bitte erlaube die Berechtigung in den App-Einstellungen.",
+                "OK");
             return (null, new Size(0, 0));
+        }
+
     }
 }

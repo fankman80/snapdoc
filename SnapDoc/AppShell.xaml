@@ -12,10 +12,16 @@
        xmlns:views="clr-namespace:SnapDoc.Views"
        xmlns:local="clr-namespace:SnapDoc"
        x:Class="SnapDoc.AppShell"
-       FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"  
+       FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
+    <Shell.Behaviors>
+        <toolkit:StatusBarBehavior
+        StatusBarColor="{DynamicResource PrimaryDark}"
+        StatusBarStyle="LightContent" />
+    </Shell.Behaviors>
+    
     <Shell.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
@@ -93,7 +99,7 @@
                                Text="{x:Static m:MaterialOutlined.Home_work}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Projektdetails" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="Projektverwaltung" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 

@@ -1,10 +1,9 @@
 ﻿#nullable disable
 
-using SnapDoc.Services;
 using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Maui.Extensions;
-using UraniumUI.Pages;
+using CommunityToolkit.Maui.Storage;
+using SnapDoc.Services;
 
 namespace SnapDoc.Views;
 
@@ -19,12 +18,6 @@ public partial class ExportSettings : ContentPage
         InitializeComponent();
     }
     
-    protected override bool OnBackButtonPressed()
-    {
-        // Zurück-Taste ignorieren
-        return true;
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
@@ -92,10 +85,9 @@ public partial class ExportSettings : ContentPage
     {
         if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
-            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-            if (result.Result != null)
-                return;
+            var popup = new PopupAlert("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
+            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+            return;
         }
 
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");

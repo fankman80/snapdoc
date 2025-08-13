@@ -25,8 +25,8 @@ public partial class PinList : ContentPage
     {
         base.OnAppearing();
 
-        SortPicker.PropertyChanged += OnSortPickerChanged;
         LoadPins();
+        SortPicker.PropertyChanged += OnSortPickerChanged;
     }
 
     protected override void OnDisappearing()
@@ -38,9 +38,6 @@ public partial class PinList : ContentPage
 
     private void LoadPins()
     {
-        if (GlobalJson.Data.Plans != null)
-            return;
-            
         int pincounter = 0;
         pinListView.ItemsSource = null;
         bool saveRequested = false;
