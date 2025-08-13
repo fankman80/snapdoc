@@ -16,12 +16,6 @@
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
 
-    <Shell.Behaviors>
-        <toolkit:StatusBarBehavior
-        StatusBarColor="{DynamicResource PrimaryDark}"
-        StatusBarStyle="LightContent" />
-    </Shell.Behaviors>
-    
     <Shell.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
