@@ -138,11 +138,6 @@ public partial class ExportSettings : ContentPage
         });
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//homescreen");
-    }
-
     private static void LoadDocuments()
     {
         SettingsService.Instance.Templates.Clear();
