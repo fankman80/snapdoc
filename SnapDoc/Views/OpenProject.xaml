@@ -22,8 +22,13 @@
     </ContentPage.ToolbarItems>
 
     <Grid>
-        <Grid Margin="16,0,16,16">
-            <CollectionView x:Name="FileListView" ItemsLayout="VerticalGrid, 1">
+        <Grid Margin="16,0,16,10">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+            
+            <CollectionView x:Name="FileListView" Grid.Row="0" ItemsLayout="VerticalGrid, 1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">
                         <Grid Padding="0, 6, 0, 6">
@@ -43,7 +48,7 @@
                                    Text="{Binding FileName}"/>
                             <Label Grid.Column="1" Grid.Row="1"
                                    FontSize="12"
-                                   Text="{Binding FileDate}"/>
+                                   Text="{Binding DateTimeDisplay}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
@@ -59,6 +64,9 @@
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
+            <Label Grid.Row="1"
+                   x:Name="ProjectCounterLabel"
+                   FontSize="12"/>
         </Grid>
 
         <!-- Overlay für Busy-Indikator -->

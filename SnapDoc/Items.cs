@@ -1,8 +1,9 @@
 ﻿#nullable disable
 
 using SkiaSharp;
-using System.ComponentModel;
 using SnapDoc.Models;
+using System.ComponentModel;
+using System.Globalization;
 
 namespace SnapDoc
 {
@@ -23,7 +24,8 @@ namespace SnapDoc
     {
         public required string FileName { get; set; }
         public required string FilePath { get; set; }
-        public required string FileDate { get; set; }
+        public required DateTime FileDate { get; set; }
+        public string DateTimeDisplay => FileDate.ToString("dd. MMMM yyyy HH:mm", new CultureInfo("de-DE"));
         public required string ImagePath { get; set; }
         public required string ThumbnailPath { get; set; }
     }
@@ -167,7 +169,7 @@ namespace SnapDoc
             => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 
-    public class FotoItem : INotifyPropertyChanged
+    public partial class FotoItem : INotifyPropertyChanged
     {
         public string ImagePath { get; set; }
         public DateTime DateTime { get; set; }

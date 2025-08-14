@@ -7,17 +7,16 @@
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"   
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
-               Margin="16"              
+               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupAlert">
 
     <Grid>
         <VerticalStackLayout>
-            <Label
-                    HorizontalOptions="Start"
-                    x:Name="titleText"
-                    Text=""/>
+            <Label x:Name="titleText"
+                   Text=""
+                   HorizontalOptions="Start"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

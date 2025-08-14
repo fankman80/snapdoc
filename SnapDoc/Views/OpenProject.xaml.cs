@@ -54,7 +54,7 @@ public partial class OpenProject : ContentPage
                 {
                     FileName = Path.GetFileNameWithoutExtension(file),
                     FilePath = file,
-                    FileDate = "Geändert am:\n" + File.GetLastWriteTime(file).Date.ToString("d", new CultureInfo("de-DE")),
+                    FileDate = File.GetLastWriteTime(file),
                     ImagePath = thumbImg,
                     ThumbnailPath = thumbImg
                 });
@@ -68,7 +68,10 @@ public partial class OpenProject : ContentPage
 
         // Liste der JSON-Dateien dem ListView zuweisen        
         FileListView.ItemsSource = foundFiles;
-        FileListView.Footer = foundFiles.Count + " Projekt(e)";
+        ProjectCounterLabel.Text = "Projekte: " + foundFiles.Count ;
+
+        // nach Datum sortieren
+        FileListView.ItemsSource = foundFiles.OrderByDescending(f => f.FileDate).ToList();
     }
 
     private async void OnNewClicked(object sender, EventArgs e)
