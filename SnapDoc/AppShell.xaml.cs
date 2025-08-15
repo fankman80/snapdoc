@@ -61,7 +61,7 @@ public partial class AppShell : Shell
                 if (GlobalJson.Data.Plans == null && (parameter == "exportSettings" || parameter == "pinList" || parameter == "mapview"))
                 {
                     var popup = new PopupAlert("Es sind noch keine Pläne vorhanden. Importieren zuerst eine oder mehrere PDF-Seiten in der Projektverwaltung.");
-                    await this.ShowPopupAsync(popup);
+                    await this.ShowPopupAsync(popup, Settings.PopupOptions);
                     return;
                 }
 

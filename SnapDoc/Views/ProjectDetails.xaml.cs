@@ -11,12 +11,6 @@ public partial class ProjectDetails : ContentPage
         InitializeComponent();
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        // Zurück-Taste ignorieren
-        return true;
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();

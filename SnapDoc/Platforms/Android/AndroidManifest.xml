@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.4.7" android:versionCode="7">
-	<application android:allowBackup="true" android:icon="@mipmap/ic_background" android:supportsRtl="true" android:label="SnapDoc"></application>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="1.4.9" android:versionCode="9">
+	<!-- Berechtigungen -->
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
@@ -9,4 +9,12 @@
 	<uses-permission android:name="android.permission.ACCESS_GPS" />
 	<uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
 	<uses-permission android:name="android.permission.ACCESS_LOCATION" />
+	<!-- Package Visibility für Kamera -->
+	<queries>
+		<intent>
+			<action android:name="android.media.action.IMAGE_CAPTURE" />
+		</intent>
+	</queries>
+	<!-- App-Block -->
+	<application android:allowBackup="true" android:icon="@mipmap/ic_background" android:supportsRtl="true" android:label="SnapDoc"></application>
 </manifest>

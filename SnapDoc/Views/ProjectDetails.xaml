@@ -12,61 +12,56 @@
              x:Class="SnapDoc.Views.ProjectDetails"
              Title="Projektverwaltung">
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>
-
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">
             <Grid.RowDefinitions>
-                <RowDefinition Height="120" />
+                <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
-            <Grid Grid.Row="0">
+
+            <Grid Grid.Row="0" RowSpacing="10">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="152" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="44" />
+                    <RowDefinition Height="44" />
+                    <RowDefinition Height="44" />
+                </Grid.RowDefinitions>
 
-                <Border Grid.Column="0"
-                        WidthRequest="200"
-                        HeightRequest="120"
+                <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="3"
                         StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         StrokeShape="RoundRectangle 8">
                     <Image Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill"/>
                 </Border>
-                <Grid Grid.Column="0">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <ImageButton Grid.Column="0"
-                                 BackgroundColor="Transparent"
-                                 HeightRequest="70"
-                                 WidthRequest="70"
-                                 Source="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=50, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
-                                 Clicked="OnTitleCaptureClicked"/>
 
-                    <ImageButton Grid.Column="1"
-                                 BackgroundColor="Transparent"
-                                 HeightRequest="70"
-                                 WidthRequest="70"
-                                 Source="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=50, Glyph={x:Static m:MaterialOutlined.Image_search}}"
-                                 Clicked="OnTitleOpenClicked"/>
-                </Grid>
-                <Button Grid.Column="1"
-                        WidthRequest="120"
-                        HeightRequest="120"
+                <Button Grid.Column="1" Grid.Row="0" 
+                        Text="PDF-Seiten laden"
+                        Padding="14,0,14,0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                         
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=50, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
-                        Clicked="OnAddPdfClicked"/>                
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
+                        Clicked="OnAddPdfClicked"/>
+                <Button Grid.Column="1" Grid.Row="1"
+                        Text="Titelbild von Kamera"
+                        Padding="14,0,14,0"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                         
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
+                        Clicked="OnTitleCaptureClicked"/>
+                <Button Grid.Column="1" Grid.Row="2"
+                        Text="Titelbild von Fotos"
+                        Padding="14,0,14,0"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                         
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
+                        Clicked="OnTitleOpenClicked"/>
             </Grid>
-                  
+
             <ScrollView Grid.Row="1" Margin="0,10,0,0">
                 <VerticalStackLayout>
                     <material:TextField
