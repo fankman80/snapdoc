@@ -87,7 +87,7 @@
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net9.0-android|AnyCPU'">
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	  <ApplicationId>com.ebbe.snapdoc</ApplicationId>
 	  <ApplicationTitle>SnapDoc</ApplicationTitle>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
@@ -100,12 +100,12 @@
 	  <ApplicationTitle>SnapDoc</ApplicationTitle>
 	  <AndroidUseAapt2>True</AndroidUseAapt2>
 	  <AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-	  <AndroidPackageFormat>aab</AndroidPackageFormat>
+	  <AndroidPackageFormat>apk</AndroidPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\ic_background.png" ForegroundFile="Resources\AppIcon\ic_foreground.png" />
+		<MauiIcon Include="Resources\AppIcon\icon_background.png" ForegroundFile="Resources\AppIcon\icon_foreground.png" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
@@ -126,6 +126,10 @@
 
 	<ItemGroup>
 		<MauiAsset Remove="Resources\Raw\index.html" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Remove="Resources\AppIcon\ic_foreground.png" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -247,10 +251,6 @@
 	<MauiXaml Update="Views\SetPin.xaml">
 		<Generator>MSBuild:Compile</Generator>
 	</MauiXaml>
-	</ItemGroup>
-	
-	<ItemGroup>
-		<None Update="Resources\AppIcon\icon.png" ForegroundScale="0.66" />
 	</ItemGroup>
 
 	<ItemGroup Condition="'$(TargetFramework)' == 'net9.0-android35.0'">

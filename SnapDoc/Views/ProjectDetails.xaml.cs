@@ -126,4 +126,9 @@ public partial class ProjectDetails : ContentPage
         // save data to file
         GlobalJson.SaveToFile();
     }
+
+    private async void OnImageTapped(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"imageview?imgSource=showTitle");
+    }
 }

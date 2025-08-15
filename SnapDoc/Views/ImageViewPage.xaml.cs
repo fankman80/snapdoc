@@ -60,11 +60,20 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource = value4 as string;
-            var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
-            var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
-            string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
-            this.Title = formattedDate;
 
+            string imgPath;
+            if (ImgSource == "showTitle")
+            {
+                imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+                this.Title = "Titelbild";
+            }
+            else
+            {
+                imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
+                var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
+                string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
+                this.Title = formattedDate;
+            }
             ImageView.Source = imgPath;
         }
     }
