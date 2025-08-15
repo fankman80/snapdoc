@@ -105,7 +105,7 @@
 
 	<ItemGroup>
 		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\icon_background.png" ForegroundFile="Resources\AppIcon\icon_foreground.png" />
+		<MauiIcon Include="Resources\AppIcon\ic_background.png" ForegroundFile="Resources\AppIcon\icon_foreground.png" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
@@ -126,10 +126,6 @@
 
 	<ItemGroup>
 		<MauiAsset Remove="Resources\Raw\index.html" />
-	</ItemGroup>
-
-	<ItemGroup>
-	  <None Remove="Resources\AppIcon\ic_foreground.png" />
 	</ItemGroup>
 
 	<ItemGroup>
