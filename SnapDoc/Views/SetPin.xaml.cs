@@ -50,12 +50,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         priorityPicker.PropertyChanged -= OnSelectedItemChanged;
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        // Zurück-Taste ignorieren
-        return true;
-    }
-
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("planId", out object value1))
