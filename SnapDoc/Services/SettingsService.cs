@@ -214,6 +214,20 @@ public partial class SettingsService : INotifyPropertyChanged
         }
     }
 
+    private int _pinPlaceMode = 0;
+    public int PinPlaceMode
+    {
+        get => _pinPlaceMode;
+        set
+        {
+            if (_pinPlaceMode != value)
+            {
+                _pinPlaceMode = value;
+                OnPropertyChanged(nameof(PinPlaceMode));
+            }
+        }
+    }
+
     private string _iconSortCrit;
     public string IconSortCrit
     {
@@ -666,6 +680,7 @@ public partial class SettingsService : INotifyPropertyChanged
             PinMaxScaleLimit = this.PinMaxScaleLimit,
             MapIconSize = this.MapIconSize,
             MapIcon = this.MapIcon,
+            PinPlaceMode = this.PinPlaceMode,
             IsPlanRotateLocked = this.IsPlanRotateLocked,
             MaxPdfPixelCount = this.MaxPdfPixelCount,
             SelectedColorTheme = ColorThemes.IndexOf(this.SelectedColorTheme),
@@ -696,6 +711,7 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.PinMaxScaleLimit = settings.PinMaxScaleLimit;
                 this.MapIconSize = settings.MapIconSize;
                 this.MapIcon = settings.MapIcon;
+                this.PinPlaceMode = settings.PinPlaceMode;
                 this.IsPlanRotateLocked = settings.IsPlanRotateLocked;
                 this.MaxPdfPixelCount = settings.MaxPdfPixelCount;
                 this.SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count)

@@ -1,18 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
-             xmlns:views="clr-namespace:SnapDoc.Views"                
+             xmlns:views="clr-namespace:SnapDoc.Views"     
+             xmlns:services="clr-namespace:SnapDoc.Services" 
              xmlns:local="clr-namespace:SnapDoc"      
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              x:Class="SnapDoc.Views.NewPage"
              x:DataType="views:NewPage"
              BackgroundColor="DimGrey"             
              Title="{Binding PageTitle}">
-             
+
     <ContentPage.ToolbarItems>
         <ToolbarItem
             x:Name ="btnPlanFit"
@@ -24,9 +26,32 @@
             Text="Bearbeiten"            
             Clicked="OnEditClicked"/>
     </ContentPage.ToolbarItems>
+    
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>    
 
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
+            <Grid x:Name="SetPinFrame" IsVisible="False">
+                <Label Text="Setze Pin..."
+                       FontSize="20"
+                       FontAttributes="Bold"
+                       TextColor="White"
+                       HorizontalTextAlignment="Center"
+                       AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                       AbsoluteLayout.LayoutFlags="All"
+                       ZIndex="9999"/>
+                <Border Stroke="Red"
+                        StrokeThickness="30"
+                        StrokeLineJoin="Miter"
+                        Opacity="0.3"
+                        AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                        AbsoluteLayout.LayoutFlags="All"
+                        ZIndex="9998"/>
+            </Grid>
             <mr:ContentView
                 AutomationId="PlanContainer"                
                 PinchingCommand="{Binding PinchingCommand}"
@@ -36,13 +61,14 @@
                 Pinched="OnPinched"
                 MouseMoved="OnMouseMoved"
                 ScrollWheelChanged="OnMouseScroll">
-                <AbsoluteLayout x:Name="PlanContainer"
-                                Scale="{Binding Scale}"
-				                Rotation="{Binding Rotation}"
-				                TranslationX="{Binding TranslationX}"
-				                TranslationY="{Binding TranslationY}"
-				                AnchorX="{Binding AnchorX}"
-				                AnchorY="{Binding AnchorY}">
+                <mr:AbsoluteLayout x:Name="PlanContainer"
+                                   LongPressing="OnLongPressing"
+                                   Scale="{Binding Scale}"
+				                   Rotation="{Binding Rotation}"
+				                   TranslationX="{Binding TranslationX}"
+				                   TranslationY="{Binding TranslationY}"
+				                   AnchorX="{Binding AnchorX}"
+				                   AnchorY="{Binding AnchorY}">
                     <ff:CachedImageView x:Name="PlanImage"                                        
                                         CacheType="All"
                                         DownsampleUseDipUnits="False"
@@ -50,7 +76,7 @@
                                         FadeAnimationEnabled ="False"
                                         FadeAnimationForCachedImages ="False"
                                         LoadingDelay="0"/>
-                </AbsoluteLayout>
+                </mr:AbsoluteLayout>
             </mr:ContentView>
 
             <Grid x:Name="PinEditBorder"
@@ -181,74 +207,58 @@
                         VerticalOptions="Fill"
                         Clicked="OnFullScreenButtonClicked"/>
             </Grid>
-            
-            <Button x:Name="SetPinBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}" 
-                    Margin="0,0,20,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Clicked="SetPinClicked"/>
-            
-            <Button x:Name="CheckBtn"
-                    IsVisible="False"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}"                
-                    Margin="0,0,20,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Clicked="CheckClicked"/>
 
-            <Button x:Name="DrawBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}"                
-                    Margin="0,0,100,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Clicked="DrawingClicked"/>
-
-            <Button x:Name="PenSettingsBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}" 
-                    Margin="0,0,100,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    IsVisible="False"
-                    Clicked="PenSettingsClicked"/>
-
-            <Button x:Name="EraseBtn"
-                    IsVisible="False"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
-                    BackgroundColor="{DynamicResource Primary}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    Margin="0,0,180,20"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    ZIndex="10000"
-                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Clicked="EraseClicked"/>
+            <HorizontalStackLayout
+                x:Name="ToolBtns"
+                Margin="0,0,20,20"
+                Spacing="20"
+                ZIndex="10000"
+                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional">
+                <Button x:Name="EraseBtn"
+                        IsVisible="False"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="EraseClicked"/>
+                <Button x:Name="PenSettingsBtn"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}" 
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        IsVisible="False"
+                        Clicked="PenSettingsClicked"/>
+                <Button x:Name="CheckBtn"
+                        IsVisible="False"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"                
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="CheckClicked"/>
+                <Button x:Name="DrawBtn"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"                
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="DrawingClicked"/>
+                <Button x:Name="SetPinBtn"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}" 
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="SetPinClicked"/>
+            </HorizontalStackLayout>
         </AbsoluteLayout>
         
         <!-- Overlay für Busy-Indikator -->

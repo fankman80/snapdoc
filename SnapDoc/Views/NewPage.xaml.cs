@@ -1,16 +1,16 @@
 ﻿#nullable disable
 
-using SnapDoc.Models;
-using SnapDoc.Services;
-using SnapDoc.ViewModels;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.Messaging;
 using MR.Gestures;
 using SkiaSharp;
-using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
+using SnapDoc.Models;
+using SnapDoc.Services;
+using SnapDoc.ViewModels;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -48,7 +48,15 @@ public partial class NewPage : IQueryAttributable
         BindingContext = new TransformViewModel();
         PlanId = planId;
         planContainer = (TransformViewModel)PlanContainer.BindingContext;
-        PageTitle = GlobalJson.Data.Plans[PlanId].Name;        
+        PageTitle = GlobalJson.Data.Plans[PlanId].Name;
+
+        // Überwache Sichtbarkeit des SetPin-Buttons
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.PropertyChanged += (s, e) =>
+        {
+            if (e.PropertyName == nameof(SettingsService.PinPlaceMode))
+                SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        };
     }
 
     protected override bool OnBackButtonPressed()
@@ -408,6 +416,29 @@ public partial class NewPage : IQueryAttributable
         planContainer.IsPanningEnabled = true;
     }
 
+    private void SetPinClicked(object sender, EventArgs e)
+    {
+        if (SettingsService.Instance.PinPlaceMode == 0)
+            SetPin(new Point(PlanContainer.AnchorX, PlanContainer.AnchorY));
+
+        if (SettingsService.Instance.PinPlaceMode == 1)
+        {
+            ToolBtns.IsVisible = false;
+            SetPinFrame.IsVisible = true;
+        }
+    }
+
+    public void OnLongPressing(object sender, LongPressEventArgs e)
+    {
+        if (SettingsService.Instance.PinPlaceMode == 2)
+        {
+            var x = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X  * densityX;
+            var y = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
+
+            SetPin(new Point(x, y));
+        }
+    }
+
     public void OnPanning(object sender, PanEventArgs e)
     {
         var scaleSpeed = 1 / PlanContainer.Scale;
@@ -417,16 +448,8 @@ public partial class NewPage : IQueryAttributable
 
         if (activePin != null && PinEditBorder.IsVisible == false)
         {
-            if (activePin.AutomationId == "fillIcon")
-            {
-                activePin.TranslationX += e.DeltaDistance.X;
-                activePin.TranslationY += e.DeltaDistance.Y;
-            }
-            else
-            {
-                activePin.TranslationX += deltaX * scaleSpeed;
-                activePin.TranslationY += deltaY * scaleSpeed;
-            }
+            activePin.TranslationX += deltaX * scaleSpeed;
+            activePin.TranslationY += deltaY * scaleSpeed;
         }
         else if (planContainer.IsPanningEnabled)
         {
@@ -436,11 +459,6 @@ public partial class NewPage : IQueryAttributable
             planContainer.AnchorX = 1 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
             planContainer.AnchorY = 1 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
         }
-    }
-
-    private void SetPinClicked(object sender, EventArgs e)
-    {
-        SetPin();
     }
 
     private void DrawingClicked(object sender, EventArgs e)
@@ -455,7 +473,11 @@ public partial class NewPage : IQueryAttributable
         AddDrawingView();
     }
 
-    private void SetPin(string customName = null, int customPinSizeWidth = 0, int customPinSizeHeight = 0, double customPinX = 0, double customPinY = 0, SKColor? pinColor = null)
+    private void SetPin(Point _pos,
+                        string customName = null,
+                        int customPinSizeWidth = 0,
+                        int customPinSizeHeight = 0,
+                        SKColor? pinColor = null)
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage != null)
@@ -480,7 +502,7 @@ public partial class NewPage : IQueryAttributable
                 location = null;
 
             pinColor ??= SKColors.Red;
-            Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);
+            //Point _pos = new(PlanContainer.AnchorX, PlanContainer.AnchorY);
             Point _anchorPoint = iconItem.AnchorPoint;
             Size _size = iconItem.IconSize;
             bool _isRotationLocked = iconItem.IsRotationLocked;
@@ -491,7 +513,6 @@ public partial class NewPage : IQueryAttributable
 
             if (customName != null)
             {
-                _pos = new Point(customPinX, customPinY);
                 _anchorPoint = new Point(0.5, 0.5);
                 _size = new Size(customPinSizeWidth, customPinSizeHeight);
                 _isRotationLocked = true;
@@ -715,10 +736,12 @@ public partial class NewPage : IQueryAttributable
                     imageData.SaveTo(fileStream);
                 }
 
-                SetPin(customPinName, resizedBitmap.Width, resizedBitmap.Height,
-                        (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                        (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY,
-                        new SKColor(drawingView.LineColor.ToUint()));
+                SetPin(new Point((pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                                 (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
+                                 customPinName,
+                                 resizedBitmap.Width,
+                                 resizedBitmap.Height,
+                                 new SKColor(drawingView.LineColor.ToUint()));
             }
         }
         RemoveDrawingView();
@@ -727,7 +750,7 @@ public partial class NewPage : IQueryAttributable
         PenSettingsBtn.IsVisible = false;
         CheckBtn.IsVisible = false;
         EraseBtn.IsVisible = false;
-        SetPinBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawBtn.IsVisible = true;
     }
 
@@ -774,7 +797,7 @@ public partial class NewPage : IQueryAttributable
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
     }
 
@@ -823,7 +846,7 @@ public partial class NewPage : IQueryAttributable
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
     }
 
@@ -853,7 +876,7 @@ public partial class NewPage : IQueryAttributable
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
     }
 

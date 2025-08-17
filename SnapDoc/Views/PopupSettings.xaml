@@ -72,7 +72,6 @@
                 </Grid>
 
                 <Label Text="Map-Icon:" Margin="0,0,0,10"/>
-
                 <material:RadioButtonGroupView Spacing="28"
                                                Margin="2"
                                                SelectedIndex="{Binding MapIcon, Mode=TwoWay}"
@@ -168,6 +167,28 @@
                                       ItemsSource="{Binding ColorThemes}"
                                       SelectedItem="{Binding SelectedColorTheme}">
                 </material:PickerField>
+
+                <Label Text="Pinplatzierungs-Modus:" Margin="0,0,0,10"/>
+                <material:RadioButtonGroupView Spacing="10"
+                                               SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
+                                               HorizontalOptions="Start"
+                                               Orientation="Vertical">
+                    <material:RadioButton Value="0"
+                                          Text="Pin in die Bildmitte setzen"                                                
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          HorizontalOptions="Start" />
+                    <material:RadioButton Value="1"
+                                          Text="Pin durch Antippen setzen"                                               
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          HorizontalOptions="Start" />
+                    <material:RadioButton Value="2"
+                                          Text="Pin durch Gedrückthalten setzen"                                                
+                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          HorizontalOptions="Start" />
+                </material:RadioButtonGroupView>
             </VerticalStackLayout>
         </ScrollView>
 
