@@ -84,7 +84,7 @@ public partial class LoadPDFPages : ContentPage
                             PdfPath = file.FullPath,
                             IsChecked = true,
                             Dpi = targetDpi,
-                            DisplayName = $"PDF {pdfIndex + 1} – Seite {i + 1}",
+                            DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
                             ImageName = imgBaseName,
                             PdfPage = i,
                         });
