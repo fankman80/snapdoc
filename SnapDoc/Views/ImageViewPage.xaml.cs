@@ -240,19 +240,44 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (result.Result != null)
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file))
-                File.Delete(file);
+            if (ImgSource == "showTitle")
+            {
+                // delete original image
+                string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+                if (File.Exists(file))
+                    File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file))
-                File.Delete(file);
+                // delete thumbnail
+                file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
+                if (File.Exists(file))
+                    File.Delete(file);
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
-            // save data to file
-            GlobalJson.SaveToFile();
+                GlobalJson.Data.TitleImage = "banner_thumbnail.png";
 
-            await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
+                // save data to file
+                GlobalJson.SaveToFile();
+
+                await Shell.Current.GoToAsync($"..");
+            }
+            else
+            {
+                // delete original image
+                string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+                if (File.Exists(file))
+                    File.Delete(file);
+
+                // delete thumbnail
+                file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+                if (File.Exists(file))
+                    File.Delete(file);
+
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
+
+                // save data to file
+                GlobalJson.SaveToFile();
+
+                await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
+            }
         }
     }
 
