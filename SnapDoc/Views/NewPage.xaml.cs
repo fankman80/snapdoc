@@ -11,6 +11,7 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using System.ComponentModel;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -18,13 +19,14 @@ using SnapDoc.Platforms.Windows;
 
 namespace SnapDoc.Views;
 
-public partial class NewPage : IQueryAttributable
+public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 {
     public string PageTitle { get; set; } = "";
     public string PinUpdate;
     public string PlanId;
     public string PinDelete;
     public string PinZoom = null;
+    private bool isPinSet = false;
     private MR.Gestures.Image activePin = null;
     private double densityX, densityY;
     private bool isFirstLoad = true;
@@ -176,24 +178,24 @@ public partial class NewPage : IQueryAttributable
     private Task AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
-        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > 8192 || GlobalJson.Data.Plans[PlanId].ImageSize.Height > 8192)
+        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > Settings.MaxPdfImageSizeW || GlobalJson.Data.Plans[PlanId].ImageSize.Height > Settings.MaxPdfImageSizeH)
         {
             PlanImage.DownsampleToViewSize = true;
-            PlanImage.DownsampleWidth = 8192;
-            PlanImage.DownsampleHeight = 8192;
+            PlanImage.DownsampleWidth = Settings.MaxPdfImageSizeW;
+            PlanImage.DownsampleHeight = Settings.MaxPdfImageSizeH;
 
             var scaleFac = Math.Min(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height) /
                            Math.Max(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height);
 
             if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > GlobalJson.Data.Plans[PlanId].ImageSize.Height)
             {
-                PlanImage.WidthRequest = 8192;
-                PlanImage.HeightRequest = 8192 * scaleFac;
+                PlanImage.WidthRequest = Settings.MaxPdfImageSizeW;
+                PlanImage.HeightRequest = Settings.MaxPdfImageSizeH * scaleFac;
             }
             else
             {
-                PlanImage.WidthRequest = 8192 * scaleFac;
-                PlanImage.HeightRequest = 8192;
+                PlanImage.WidthRequest = Settings.MaxPdfImageSizeW * scaleFac;
+                PlanImage.HeightRequest = Settings.MaxPdfImageSizeH;
             }
         }
         else
@@ -425,6 +427,22 @@ public partial class NewPage : IQueryAttributable
         {
             ToolBtns.IsVisible = false;
             SetPinFrame.IsVisible = true;
+            isPinSet = true;
+        }
+    }
+
+    public void OnTapped(object sender, MR.Gestures.TapEventArgs e)
+    {
+        if (isPinSet)
+        {
+            var x = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X * densityX;
+            var y = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
+
+            SetPin(new Point(x, y));
+
+            ToolBtns.IsVisible = true;
+            SetPinFrame.IsVisible = false;
+            isPinSet = false;
         }
     }
 
@@ -437,6 +455,13 @@ public partial class NewPage : IQueryAttributable
 
             SetPin(new Point(x, y));
         }
+    }
+
+    public void OnPinSetCancelClicked(object sender, EventArgs e)
+    {
+        ToolBtns.IsVisible = true;
+        SetPinFrame.IsVisible = false;
+        isPinSet = false;
     }
 
     public void OnPanning(object sender, PanEventArgs e)

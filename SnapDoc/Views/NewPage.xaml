@@ -31,27 +31,10 @@
         <ResourceDictionary>
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
-    </ContentPage.Resources>    
+    </ContentPage.Resources>
 
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-            <Grid x:Name="SetPinFrame" IsVisible="False">
-                <Label Text="Setze Pin..."
-                       FontSize="20"
-                       FontAttributes="Bold"
-                       TextColor="White"
-                       HorizontalTextAlignment="Center"
-                       AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
-                       AbsoluteLayout.LayoutFlags="All"
-                       ZIndex="9999"/>
-                <Border Stroke="Red"
-                        StrokeThickness="30"
-                        StrokeLineJoin="Miter"
-                        Opacity="0.3"
-                        AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
-                        AbsoluteLayout.LayoutFlags="All"
-                        ZIndex="9998"/>
-            </Grid>
             <mr:ContentView
                 AutomationId="PlanContainer"                
                 PinchingCommand="{Binding PinchingCommand}"
@@ -63,6 +46,7 @@
                 ScrollWheelChanged="OnMouseScroll">
                 <mr:AbsoluteLayout x:Name="PlanContainer"
                                    LongPressing="OnLongPressing"
+                                   Tapped="OnTapped"
                                    Scale="{Binding Scale}"
 				                   Rotation="{Binding Rotation}"
 				                   TranslationX="{Binding TranslationX}"
@@ -260,7 +244,45 @@
                         Clicked="SetPinClicked"/>
             </HorizontalStackLayout>
         </AbsoluteLayout>
-        
+
+        <Grid x:Name="SetPinFrame" IsVisible="false">
+            <Border Stroke="Red"
+                    StrokeThickness="40"
+                    StrokeLineJoin="Miter"
+                    Opacity="0.2"
+                    ZIndex="9997"/>
+            <Label Text="Setze Pin..."
+                   Margin="0,8,0,0"
+                   FontSize="20"
+                   FontAttributes="Bold"
+                   TextColor="White"
+                   HorizontalTextAlignment="Center"
+                   ZIndex="9998">
+                <Label.Shadow>
+                    <Shadow Brush="Black"
+                    Offset="0,0"
+                    Radius="5"
+                    Opacity="1"/>
+                </Label.Shadow>
+            </Label>
+            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Cancel}}"
+                    Padding="0"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    WidthRequest="30"
+                    HeightRequest="30"
+                    BackgroundColor="Transparent"
+                    Clicked="OnPinSetCancelClicked"
+                    ZIndex="9999">
+                <Button.Shadow>
+                <Shadow Brush="Black"
+                    Offset="0,0"
+                    Radius="5"
+                    Opacity="1"/>
+            </Button.Shadow>
+            </Button>
+        </Grid>
+
         <!-- Overlay für Busy-Indikator -->
         <local:BusyOverlayView x:Name="busyOverlay"
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
