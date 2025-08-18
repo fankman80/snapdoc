@@ -3,6 +3,7 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -54,95 +55,7 @@
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
                         Value="{Binding MaxPdfPixelCount}"/>
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsPlanRotateLocked}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Planrotation sperren" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
-                <!-- Trennlinie -->
-                <Grid Margin="0,6,0,6">
-                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkAccent}}" StrokeThickness="1" />
-                </Grid>
 
-                <Label Text="Map-Icon:" Margin="0,0,0,10"/>
-                <material:RadioButtonGroupView Spacing="28"
-                                               Margin="2"
-                                               SelectedIndex="{Binding MapIcon, Mode=TwoWay}"
-                                               HorizontalOptions="Fill"
-                                               Orientation="Horizontal">
-                    <material:RadioButton Value="0"
-                                          WidthRequest="30"
-                                          Margin="0,0,0,10"
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Center" />
-
-                    <material:RadioButton Value="1" 
-                                          WidthRequest="30"
-                                          Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Center" />
-
-                    <material:RadioButton Value="2"
-                                          WidthRequest="30"
-                                          Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Center" />
-
-                    <material:RadioButton Value="3"
-                                          WidthRequest="30"
-                                          Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Center" />
-
-                    <material:RadioButton Value="4"
-                                          WidthRequest="30"
-                                          Margin="0,0,0,10"                                                  
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Center" />
-                </material:RadioButtonGroupView>
-
-                <HorizontalStackLayout Spacing="28" Margin="0,0,0,10">
-                    <Image HorizontalOptions="Center"
-                           WidthRequest="30"
-                           Source="{Binding MapIcons[0], Converter={StaticResource RawAssetConverter}}"/>
-                    <Image HorizontalOptions="Center"
-                           WidthRequest="30"
-                           Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>
-                    <Image HorizontalOptions="Center"
-                           WidthRequest="30"
-                           Source="{Binding MapIcons[2], Converter={StaticResource RawAssetConverter}}"/>
-                    <Image HorizontalOptions="Center"
-                           WidthRequest="30"
-                           Source="{Binding MapIcons[3], Converter={StaticResource RawAssetConverter}}"/>
-                    <Image HorizontalOptions="Center"
-                           WidthRequest="30"
-                           Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
-                </HorizontalStackLayout>
-
-                <Label Text="{Binding MapIconSize, StringFormat='Icongrösse: {0:0.##}%'}"/>
-                <Slider Maximum="100"
-                        Minimum="1"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
-                        Value="{Binding MapIconSize}"/>
-
-                <!-- Trennlinie -->
-                <Grid Margin="0,6,0,6">
-                    <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkAccent}}" StrokeThickness="1" />
-                </Grid>
 
                 <material:PickerField x:Name="darkModePicker"
                                       Title="Appthema"
@@ -168,7 +81,7 @@
                                       SelectedItem="{Binding SelectedColorTheme}">
                 </material:PickerField>
 
-                <Label Text="Pinplatzierungs-Modus:" Margin="0,0,0,10"/>
+                <Label Text="Modus für Pinplatzierung:" Margin="0,0,0,10"/>
                 <material:RadioButtonGroupView Spacing="10"
                                                SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
                                                HorizontalOptions="Start"
@@ -189,6 +102,98 @@
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Start" />
                 </material:RadioButtonGroupView>
+                <Grid ColumnDefinitions="50, Auto" HeightRequest="60">
+                    <controls:Switch Grid.Column="0"
+                                     IsToggled="{Binding IsPlanRotateLocked}"
+                                     HorizontalOptions="Start"
+                                     VerticalOptions="Center"
+                                     BorderColorOff ="Transparent"
+                                     KnobColorOn="White"
+                                     KnobColorOff="White"
+                                     SwitchColorOn="{AppThemeBinding {DynamicResource Primary}}"
+                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Label Text="Planrotation sperren" Grid.Column="1" VerticalOptions="Center" />
+                </Grid>
+                <Border Stroke="{DynamicResource SecondaryBackground}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
+                    <uranium:ExpanderView Margin="0,6,0,6">
+                        <uranium:ExpanderView.Header>
+                            <Label Text="swisstopo Map-Icons"/>
+                        </uranium:ExpanderView.Header>
+
+                        <VerticalStackLayout Spacing="0">
+                            <material:RadioButtonGroupView Spacing="28"
+                                                           Margin="2,10,0,0"
+                                                           SelectedIndex="{Binding MapIcon, Mode=TwoWay}"
+                                                           HorizontalOptions="Fill"
+                                                           Orientation="Horizontal">
+                                <material:RadioButton Value="0"
+                                                      WidthRequest="30"
+                                                      Margin="0,0,0,10"
+                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Center" />
+
+                                <material:RadioButton Value="1" 
+                                                      WidthRequest="30"
+                                                      Margin="0,0,0,10"                                                  
+                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Center" />
+
+                                <material:RadioButton Value="2"
+                                                      WidthRequest="30"
+                                                      Margin="0,0,0,10"                                                  
+                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Center" />
+
+                                <material:RadioButton Value="3"
+                                                      WidthRequest="30"
+                                                      Margin="0,0,0,10"                                                  
+                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Center" />
+
+                                <material:RadioButton Value="4"
+                                                      WidthRequest="30"
+                                                      Margin="0,0,0,10"                                                  
+                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Center" />
+                            </material:RadioButtonGroupView>
+
+                            <HorizontalStackLayout Spacing="28" Margin="0,0,0,10">
+                                <Image HorizontalOptions="Center"
+                                       WidthRequest="30"
+                                       Source="{Binding MapIcons[0], Converter={StaticResource RawAssetConverter}}"/>
+                                <Image HorizontalOptions="Center"
+                                       WidthRequest="30"
+                                       Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>
+                                <Image HorizontalOptions="Center"
+                                       WidthRequest="30"
+                                       Source="{Binding MapIcons[2], Converter={StaticResource RawAssetConverter}}"/>
+                                <Image HorizontalOptions="Center"
+                                       WidthRequest="30"
+                                       Source="{Binding MapIcons[3], Converter={StaticResource RawAssetConverter}}"/>
+                                <Image HorizontalOptions="Center"
+                                       WidthRequest="30"
+                                       Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
+                            </HorizontalStackLayout>
+
+                            <Label Text="{Binding MapIconSize, StringFormat='Icongrösse: {0:0.##}%'}"/>
+                            <Slider Maximum="100"
+                                    Minimum="1"
+                                    ThumbColor="{DynamicResource Primary}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                                    Value="{Binding MapIconSize}"/>
+                        </VerticalStackLayout>
+                    </uranium:ExpanderView>
+                </Border>
             </VerticalStackLayout>
         </ScrollView>
 

@@ -647,12 +647,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void ZoomToPin(string pinId)
     {
-        var pos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
-        planContainer.AnchorX = pos.X;
-        planContainer.AnchorY = pos.Y;
-        planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pos.X);
-        planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pos.Y);
-        planContainer.Scale = Settings.DefaultPinZoom;
+        if (GlobalJson.Data.Plans[PlanId].Pins.TryGetValue(pinId, out var pin) && pin != null)
+        {
+            var pos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
+            planContainer.AnchorX = pos.X;
+            planContainer.AnchorY = pos.Y;
+            planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pos.X);
+            planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pos.Y);
+            planContainer.Scale = Settings.DefaultPinZoom;
+        }
     }
 
     private void ImageFit(object sender, EventArgs e)
