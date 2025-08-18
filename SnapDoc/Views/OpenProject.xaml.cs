@@ -1,18 +1,12 @@
 ﻿#nullable disable
 
-using System.Globalization;
 using SnapDoc.Services;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
 
-
 #if WINDOWS
 using System.Diagnostics;
-#endif
-
-#if ANDROID
-using Android.Content;
 #endif
 
 namespace SnapDoc.Views;
@@ -26,6 +20,7 @@ public partial class OpenProject : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
         LoadJsonFiles();
     }
 
@@ -272,16 +267,6 @@ public partial class OpenProject : ContentPage
                         UseShellExecute = true,
                         Verb = "open"
                     });
-#endif
-
-#if ANDROID
-                    // noch nicht implementiert
-#endif
-
-#if IOS
-                    var directoryUrl = NSUrl.FromFilename(directoryPath);
-                    var documentController = UIDocumentInteractionController.FromUrl(directoryUrl);
-                    documentController.PresentOptionsMenu(UIApplication.SharedApplication.KeyWindow.RootViewController.View, true);
 #endif
                 }
                 break;
