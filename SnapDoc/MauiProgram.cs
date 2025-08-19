@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
+using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using UraniumUI;
@@ -63,6 +64,44 @@ public static class MauiProgram
                     }
                 });
             });
+        });
+#endif
+
+#if ANDROID
+        // Android Picker: Entfernt die Unterstreichung, fügt Pfeil hinzu und setzt Padding
+        Microsoft.Maui.Handlers.PickerHandler.Mapper.AppendToMapping("AddArrowIcon", (handler, view) =>
+        {
+            if (handler.PlatformView is Android.Widget.EditText editText)
+            {
+                editText.Background = null; // Unterstreichung weg
+
+                // Padding setzen (links, oben, rechts, unten)
+                editText.SetPadding(
+                    (int)handler.PlatformView.Context.ToPixels(14), // links
+                    0,                                             // oben
+                    (int)handler.PlatformView.Context.ToPixels(14), // rechts
+                    0                                              // unten
+                );
+
+                var drawable = AndroidX.Core.Content.ContextCompat.GetDrawable(
+                    editText.Context,
+                    Resource.Drawable.mtrl_dropdown_arrow
+                );
+
+                if (drawable != null)
+                {
+                    // Theme prüfen
+                    var theme = Application.Current?.RequestedTheme;
+
+                    if (theme == AppTheme.Dark)
+                        drawable.SetTint(Android.Graphics.Color.White);
+                    else
+                        drawable.SetTint(Android.Graphics.Color.Black);
+
+                    // Icon rechts einsetzen
+                    editText.SetCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+                }
+            }
         });
 #endif
 
