@@ -33,9 +33,6 @@
                     AbsoluteLayout.LayoutBounds="0.5,0,AutoSize,AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Picker x:Name="mapLayerPicker" FontSize="12"/>
-                <Border.Shadow>
-                    <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
-                </Border.Shadow>
             </Border>
 
             <StackLayout Orientation="Vertical"
@@ -89,7 +86,9 @@
                 </Button>
                 <Button x:Name="SetPosBtn"
                         Text="auf aktuelle&#10;Position setzen"
+                        TextSize="12"
                         IsVisible="false"
+                        Padding="6,0,6,0"
                         HeightRequest="60"
                         CornerRadius="30"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
