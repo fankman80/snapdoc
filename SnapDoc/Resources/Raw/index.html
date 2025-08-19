@@ -83,7 +83,7 @@
             border: 1px solid #999;
             border-radius: 4px;
             padding: 2px 8px;
-            bottom: 10px;
+            bottom: 14px;
             left: 10px;
             font-family: "Aptos", "Segoe UI", sans-serif;
             font-size: 14px;
@@ -157,9 +157,10 @@
             var scaleLineControl = new ol.control.ScaleLine({
                 units: 'metric',
                 bar: false,
-                steps: 4,
+                steps: 6,
                 text: true,
-                minWidth: 140,                
+                minWidth: 80,
+                maxWidth: 140
             });
             map.addControl(scaleLineControl);
 

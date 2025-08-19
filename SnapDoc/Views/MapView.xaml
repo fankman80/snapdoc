@@ -86,9 +86,8 @@
                 </Button>
                 <Button x:Name="SetPosBtn"
                         Text="auf aktuelle&#10;Position setzen"
-                        TextSize="12"
+                        FontSize="12"
                         IsVisible="false"
-                        Padding="6,0,6,0"
                         HeightRequest="60"
                         CornerRadius="30"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
