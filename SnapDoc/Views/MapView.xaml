@@ -84,19 +84,33 @@
                         <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
                     </Button.Shadow>
                 </Button>
-                <Button x:Name="SetPosBtn"
-                        Text="auf aktuelle&#10;Position setzen"
-                        FontSize="12"
-                        IsVisible="false"
+                <Border x:Name="SetPosBtn"
+                        IsVisible="False"
+                        Padding="10,10,14,10"
                         HeightRequest="60"
-                        CornerRadius="30"
+                        StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        Clicked="SetPosClicked">
-                    <Button.Shadow>
-                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
-                    </Button.Shadow>
-                </Button>
+                        StrokeShape="RoundRectangle 30">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="SetPosClicked"/>
+                    </Border.GestureRecognizers>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6" />
+                    </Border.Shadow>
+                    <Grid ColumnDefinitions="60,*"
+                          ColumnSpacing="6"
+                          VerticalOptions="Center"
+                          HorizontalOptions="Center">
+                        <Image x:Name="SetPosBtnIcon"
+                               Grid.Column="0"
+                               Source="{AppThemeBinding Light=ic_pin_dark.png, Dark=ic_pin_light.png}" />
+                        <Label Grid.Column="1"
+                               Text="Neu setzen"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}" />
+                    </Grid>
+                </Border>
             </StackLayout>
         </AbsoluteLayout>
     </Grid>

@@ -56,7 +56,7 @@ public partial class MapView : IQueryAttributable
         if (PinId != null)
         {
             SetPosBtn.IsVisible = true;
-            SetPosBtn.ImageSource = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
 
             if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
             {
