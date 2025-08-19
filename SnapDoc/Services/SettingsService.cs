@@ -12,7 +12,7 @@ public partial class SettingsService : INotifyPropertyChanged
     private SettingsService()
     {
         ColorThemes = ["EBBE", "Minimalist", "Wine", "Grass", "Fire", "Flower", "Pink"];
-        AppThemes = ["Light", "Dark"];
+        AppThemes = ["Hell", "Dunkel"];
         SelectedColorTheme = ColorThemes[0]; // Standardauswahl
         SelectedAppTheme = AppThemes[0]; // Standardauswahl
         IconSortCrit = IconSortCrits[0]; // Standardauswahl
@@ -555,11 +555,11 @@ public partial class SettingsService : INotifyPropertyChanged
                         App.Current.Resources["PrimaryAccent"] = Color.FromArgb("#5e75ad");
                         App.Current.Resources["PrimaryDark"] = Color.FromArgb("#00b0ca");
                         App.Current.Resources["PrimaryDarkText"] = Color.FromArgb("#ffffff");
-                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#5e75ad");
+                        App.Current.Resources["PrimaryDarkAccent"] = Color.FromArgb("#00b0ca");
                         App.Current.Resources["PrimaryBackground"] = Color.FromArgb("#ffffff");
-                        App.Current.Resources["Secondary"] = Color.FromArgb("#c7d3f2");
+                        App.Current.Resources["Secondary"] = Color.FromArgb("#00b0ca");
                         App.Current.Resources["SecondaryDark"] = Color.FromArgb("#ffffff");
-                        App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#5e75ad");
+                        App.Current.Resources["SecondaryAccent"] = Color.FromArgb("#00b0ca");
                         break;
 
                     case "Fire":
@@ -633,10 +633,10 @@ public partial class SettingsService : INotifyPropertyChanged
                 // Logik für das Anwenden der Farben basierend auf der Auswahl
                 switch (_selectedAppTheme)
                 {
-                    case "Light":
+                    case "Hell":
                         App.Current.UserAppTheme = AppTheme.Light; // Setze auf helles Theme
                         break;
-                    case "Dark":
+                    case "Dunkel":
                         App.Current.UserAppTheme = AppTheme.Dark; // Setze auf dunkles Theme
                         break;
                 }

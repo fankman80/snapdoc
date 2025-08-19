@@ -80,7 +80,7 @@
 
         <VerticalStackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
             <material:TextField x:Name="PinLocation"
-                                HorizontalOptions="Fill"
+                                MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -88,6 +88,7 @@
                                 AllowClear="True"
                                 Title="Standort"/>
             <material:EditorField x:Name="PinDesc"
+                                  MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

@@ -66,7 +66,7 @@
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                         <material:TextField Title="Anker Y"
-                                            Text="{Binding Anchor_Y}"
+                                            Text="{Binding Anchor_Y}"                                            
                                             TitleColor="{DynamicResource SecondaryBackground}"
                                             BorderColor="{DynamicResource SecondaryBackground}"                        
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -77,6 +77,7 @@
                 <material:TextField x:Name="iconName"
                                     FontSize="14"
                                     Title="Bezeichnung"
+                                    MaxLength="200"
                                     TitleColor="{DynamicResource SecondaryBackground}"
                                     BorderColor="{DynamicResource SecondaryBackground}"                        
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -107,7 +108,7 @@
                             Value="100"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             ValueChanged="OnSliderValueChanged"/>
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                         <controls:Switch x:Name="allowRotate"

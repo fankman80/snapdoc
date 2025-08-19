@@ -135,11 +135,12 @@
                             IsVisible="{Binding IsFotoCompressed}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding FotoCompressValue}"/>
 
                     <material:TextField Grid.Column="0" Grid.Row="1"
-                            Title="Pinbeschriftung"                   
+                            Title="Pinbeschriftung"
+                            MaxLength="20"
                             Text="{Binding PlanLabelPrefix}"
                             TitleColor="{DynamicResource SecondaryBackground}"
                             BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -152,7 +153,7 @@
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PlanLabelFontSize}"/>
                     
                     <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
@@ -160,7 +161,7 @@
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinExportSize}"/>
 
                     <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}"
@@ -171,7 +172,7 @@
                             IsVisible="{Binding IsImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding ImageExportSize}"/>
 
                     <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}"
@@ -182,7 +183,7 @@
                             IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosExportSize}"/>
 
                     <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}"
@@ -193,7 +194,7 @@
                             IsVisible="{Binding IsPosImageExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosCropExportSize}"/>
 
                     <Label IsVisible="False" Text="{Binding ImageExportQuality, StringFormat='Bildqualität: {0:0.##}%'}" Margin="0, 0, 0, -12"/>
@@ -201,7 +202,7 @@
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding ImageExportQuality}"/>
 
                     <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
@@ -209,7 +210,7 @@
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding TitleExportSize}"/>
                 </VerticalStackLayout>
             </ScrollView>

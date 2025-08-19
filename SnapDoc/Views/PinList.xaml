@@ -55,10 +55,10 @@
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 4">
-                <uranium:Dropdown x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                    FontSize="12"
-                                    ItemsSource="{Binding PinSortCrits}"
-                                    SelectedItem="{Binding PinSortCrit}"/>
+                <Picker x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                        FontSize="12"
+                        ItemsSource="{Binding PinSortCrits}"
+                        SelectedItem="{Binding PinSortCrit}"/>
             </Border>
         </HorizontalStackLayout>
 

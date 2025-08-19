@@ -429,6 +429,6 @@
     </Style>
 
     <Style TargetType="Path" Class="ExpanderView.Arrow">
-        <Setter Property="Fill" Value="Black" />
+        <Setter Property="Fill" Value="{AppThemeBinding Light={StaticResource PrimaryText}, Dark={StaticResource PrimaryDarkText}}" />
     </Style>
 </ResourceDictionary>

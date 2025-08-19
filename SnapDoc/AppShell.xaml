@@ -40,7 +40,7 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ImageButton Grid.Column="0"                             
+                <ImageButton Grid.Column="0"
                              HeightRequest="100"
                              WidthRequest="100"
                              Grid.RowSpan="2"
@@ -51,7 +51,8 @@
                 <Label Grid.Column="1"
                        Grid.Row="0"
                        Text="{Binding FlyoutHeaderDesc}"
-                       LineBreakMode="WordWrap"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="2"                       
                        FontSize="18"
                        TextColor="{DynamicResource PrimaryDark}"
                        FontAttributes="Bold"
@@ -60,7 +61,8 @@
                 <Label Grid.Column="1"
                        Grid.Row="1"
                        Text="{Binding FlyoutHeaderTitle}"
-                       LineBreakMode="WordWrap"
+                       LineBreakMode="TailTruncation"
+                       MaxLines="2"
                        FontSize="14"
                        TextColor="{DynamicResource PrimaryDark}"
                        VerticalTextAlignment="Center"

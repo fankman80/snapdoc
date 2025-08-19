@@ -27,82 +27,82 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout Spacing="0">
-                <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
-                <Slider x:Name="MinScaleSlider"
-                        Maximum="{Binding PinMaxScaleLimit}"
-                        Minimum="1"
-                        Margin="0,0,0,10"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
-                        Value="{Binding PinMinScaleLimit}"/>
+            <VerticalStackLayout>
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
+                    <Slider x:Name="MinScaleSlider"
+                            Maximum="{Binding PinMaxScaleLimit}"
+                            Minimum="1"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                            Value="{Binding PinMinScaleLimit}"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="0">                
+                    <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
+                    <Slider x:Name="MaxScaleSlider"
+                            Maximum="100"
+                            Minimum="{Binding PinMinScaleLimit}"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                            Value="{Binding PinMaxScaleLimit}"/>
+                </VerticalStackLayout>
+                <VerticalStackLayout Spacing="0">
+                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
+                    <Slider Maximum="50000000"
+                            Minimum="1000000"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                            Value="{Binding MaxPdfPixelCount}"/>
+                </VerticalStackLayout>
+                <Label Text="App-Modus und Thema:"/>
+                <Grid ColumnDefinitions="*,*">
+                    <Border Grid.Column="0"
+                        Stroke="{DynamicResource SecondaryBackground}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8">
+                        <Picker x:Name="darkModePicker"
+                                ItemsSource="{Binding AppThemes}"
+                                SelectedItem="{Binding SelectedAppTheme}"/>
+                    </Border>
 
-                <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
-                <Slider x:Name="MaxScaleSlider"
-                        Maximum="100"
-                        Minimum="{Binding PinMinScaleLimit}"
-                        Margin="0,0,0,10"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
-                        Value="{Binding PinMaxScaleLimit}"/>
+                    <Border Grid.Column="1"
+                        Stroke="{DynamicResource SecondaryBackground}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8">                
+                        <Picker x:Name="colorThemePicker"
+                                ItemsSource="{Binding ColorThemes}"
+                                SelectedItem="{Binding SelectedColorTheme}"/>
+                    </Border>
+                </Grid>
 
-                <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
-                <Slider Maximum="50000000"
-                        Minimum="1000000"
-                        ThumbColor="{DynamicResource Primary}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
-                        Value="{Binding MaxPdfPixelCount}"/>
-
-
-                <material:PickerField x:Name="darkModePicker"
-                                      Title="Appthema"
-                                      Margin="0,10,0,10"
-                                      AllowClear="False"
-                                      TitleColor="{DynamicResource SecondaryBackground}"
-                                      BorderColor="{DynamicResource SecondaryBackground}"                        
-                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                      ItemsSource="{Binding AppThemes}"
-                                      SelectedItem="{Binding SelectedAppTheme}">
-                </material:PickerField>
-
-                <material:PickerField x:Name="colorThemePicker"
-                                      Title="Farbthema"
-                                      Margin="0,0,0,10"
-                                      AllowClear="False"
-                                      TitleColor="{DynamicResource SecondaryBackground}"
-                                      BorderColor="{DynamicResource SecondaryBackground}"                        
-                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                      AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                      ItemsSource="{Binding ColorThemes}"
-                                      SelectedItem="{Binding SelectedColorTheme}">
-                </material:PickerField>
-
-                <Label Text="Modus für Pinplatzierung:" Margin="0,0,0,10"/>
+                <Label Text="Modus für Pinplatzierung:"/>
                 <material:RadioButtonGroupView Spacing="10"
                                                SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
                                                HorizontalOptions="Start"
                                                Orientation="Vertical">
                     <material:RadioButton Value="0"
-                                          Text="Pin in die Bildmitte setzen"                                                
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Text="Pin in die Bildmitte setzen"
+                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Start" />
                     <material:RadioButton Value="1"
-                                          Text="Pin durch Antippen setzen"                                               
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Text="Pin durch Antippen setzen"
+                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Start" />
                     <material:RadioButton Value="2"
-                                          Text="Pin durch Gedrückthalten setzen"                                                
-                                          CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                          Text="Pin durch Gedrückthalten setzen"
+                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                           Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                           HorizontalOptions="Start" />
                 </material:RadioButtonGroupView>
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="60">
+                <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                     <controls:Switch Grid.Column="0"
                                      IsToggled="{Binding IsPlanRotateLocked}"
                                      HorizontalOptions="Start"
@@ -119,13 +119,13 @@
                         StrokeShape="RoundRectangle 8"
                         Padding="8"
                         Margin="0,0,0,10">
-                    <uranium:ExpanderView Margin="0,6,0,6">
+                    <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
                             <Label Text="swisstopo Map-Icons"/>
                         </uranium:ExpanderView.Header>
 
                         <VerticalStackLayout Spacing="0">
-                            <material:RadioButtonGroupView Spacing="28"
+                            <material:RadioButtonGroupView Spacing="24"
                                                            Margin="2,10,0,0"
                                                            SelectedIndex="{Binding MapIcon, Mode=TwoWay}"
                                                            HorizontalOptions="Fill"
@@ -133,40 +133,40 @@
                                 <material:RadioButton Value="0"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"
-                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
 
                                 <material:RadioButton Value="1" 
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"                                                  
-                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
 
                                 <material:RadioButton Value="2"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"                                                  
-                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
 
                                 <material:RadioButton Value="3"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"                                                  
-                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
 
                                 <material:RadioButton Value="4"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"                                                  
-                                                      CircleColor="{AppThemeBinding Light={DynamicResource SecondaryBackground}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
                             </material:RadioButtonGroupView>
 
-                            <HorizontalStackLayout Spacing="28" Margin="0,0,0,10">
+                            <HorizontalStackLayout Spacing="24" Margin="0,0,0,10">
                                 <Image HorizontalOptions="Center"
                                        WidthRequest="30"
                                        Source="{Binding MapIcons[0], Converter={StaticResource RawAssetConverter}}"/>
@@ -189,7 +189,7 @@
                                     Minimum="1"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                     Value="{Binding MapIconSize}"/>
                         </VerticalStackLayout>
                     </uranium:ExpanderView>

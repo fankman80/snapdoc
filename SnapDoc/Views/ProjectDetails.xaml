@@ -69,6 +69,7 @@
                 <VerticalStackLayout>
                     <material:TextField
                         x:Name="client_name"
+                        MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"                        
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -78,6 +79,7 @@
 
                     <material:TextField
                         x:Name="object_name"
+                        MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"                        
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -87,6 +89,7 @@
 
                     <material:EditorField
                         x:Name="object_address"
+                        MaxLength="500"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"                        
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -95,6 +98,7 @@
 
                     <material:TextField
                         x:Name="working_title"
+                        MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"                        
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -104,6 +108,7 @@
 
                     <material:TextField
                         x:Name="project_manager"
+                        MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"                        
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

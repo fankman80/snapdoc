@@ -27,6 +27,7 @@
         <VerticalStackLayout>
             <material:TextField x:Name="name_entry"
                                 Title="Planbezeichnung"
+                                MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -35,6 +36,7 @@
 
             <material:TextField x:Name="desc_entry"
                                 Title="Beschreibung"
+                                MaxLength="2000"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -61,7 +63,7 @@
                             Margin="0,-14,0,0"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryDark}, Dark={DynamicResource Secondary}}"/>
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                 </VerticalStackLayout>
             </Grid>
             <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
