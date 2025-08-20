@@ -4,17 +4,17 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:models="clr-namespace:SnapDoc.Models"
-             xmlns:services="clr-namespace:SnapDoc.Services"  
-             xmlns:views="clr-namespace:SnapDoc.Views"                            
-             xmlns:local="clr-namespace:SnapDoc"                            
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:local="clr-namespace:SnapDoc"
              x:Name="PinListPage"
              x:Class="SnapDoc.Views.PinList"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Title="Pin Liste">
-    
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
@@ -26,7 +26,7 @@
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />            
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" HorizontalOptions="Start" Scale="0.8" AnchorX="0"
@@ -39,14 +39,14 @@
                    TextChanged="SearchEntry_TextChanged"
                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
-        
+
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 4">
                 <Button x:Name="SortDirection"
                     Padding="0"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Sort}}"
                     BorderWidth="0"
                     HorizontalOptions="Start"
                     BackgroundColor="Transparent"
@@ -115,7 +115,7 @@
                                 <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
                                         ZIndex="999"
                                         ClassId="{Binding SelfId}"
-                                        AutomationId = "{Binding OnPlanId}"  
+                                        AutomationId = "{Binding OnPlanId}"
                                         Background="Transparent"
                                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Recenter}}"
                                         Clicked="OnPinClicked"/>
@@ -157,7 +157,7 @@
                             <Image Grid.Column="0" Grid.Row="2"
                                    VerticalOptions="Center"
                                    ClassId="{Binding SelfId}"
-                                   AutomationId = "{Binding OnPlanId}"  
+                                   AutomationId = "{Binding OnPlanId}"
                                    Source="{Binding PinIcon}"
                                    Aspect="AspectFit"
                                    Margin="12,0,6,0">
@@ -170,7 +170,7 @@
                                     StrokeThickness="1"
                                     Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     StrokeShape="RoundRectangle 10"/>
-                            
+
                             <!-- This BoxView is used to control the opacity of the CollectionView-Item based on AllowExport property -->
                             <BoxView Grid.ColumnSpan="2" Grid.RowSpan="3"
                                      IsVisible="{Binding AllowExport, Converter={StaticResource InvertedBoolConverter}}"

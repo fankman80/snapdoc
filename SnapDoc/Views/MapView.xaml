@@ -7,7 +7,7 @@
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                 xmlns:services="clr-namespace:SnapDoc.Services"
-                xmlns:local="clr-namespace:SnapDoc"   
+                xmlns:local="clr-namespace:SnapDoc"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="SnapDoc.Views.MapView"
                 Title="swisstopo Karte">
@@ -15,12 +15,12 @@
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Moved_location}}"
                      Text="KML exportieren"
-                     Clicked="KmlExportClicked"/>        
+                     Clicked="KmlExportClicked"/>
     </ContentPage.ToolbarItems>
 
     <Grid>
         <AbsoluteLayout>
-            <WebView x:Name="GeoAdminWebView" 
+            <WebView x:Name="GeoAdminWebView"
                      AbsoluteLayout.LayoutBounds="0,0,1,1"
                      AbsoluteLayout.LayoutFlags="All" />
 

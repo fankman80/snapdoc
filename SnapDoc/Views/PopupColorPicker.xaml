@@ -5,11 +5,11 @@
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"  
+               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:views="clr-namespace:SnapDoc.Views"
                xmlns:local="clr-namespace:SnapDoc"
-               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"            
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
                Margin="16"
                WidthRequest="280"
@@ -21,15 +21,15 @@
         <ResourceDictionary>
             <SolidColorBrush x:Key="TrueColorBrush">Black</SolidColorBrush>
             <SolidColorBrush x:Key="FalseColorBrush">Transparent</SolidColorBrush>
-            <toolkit:BoolToObjectConverter x:Key="IsValidConverter" 
-                TrueObject="{StaticResource TrueColorBrush}" 
+            <toolkit:BoolToObjectConverter x:Key="IsValidConverter"
+                TrueObject="{StaticResource TrueColorBrush}"
                 FalseObject="{StaticResource FalseColorBrush}"/>
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
-    
+
     <Grid>
         <Grid VerticalOptions="Center">
             <Grid.RowDefinitions>
@@ -53,7 +53,7 @@
                                                WidthRequest="40"
                                                HeightRequest="40"
                                                BackgroundColor="{Binding BackgroundColor}"
-                                               Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"                                                                                                      
+                                               Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
                                                StrokeThickness="1"
                                                Tapped="OnColorTapped"
                                                LongPressing="OnLongPressed">

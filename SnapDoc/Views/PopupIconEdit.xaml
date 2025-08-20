@@ -8,12 +8,12 @@
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:views="clr-namespace:SnapDoc.Views"
-               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"     
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
-               Margin="16"              
+               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
-               x:TypeArguments="x:String"               
+               x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupIconEdit">
 
     <toolkit:Popup.Resources>
@@ -40,12 +40,12 @@
                                     HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}">
                         <Image x:Name="iconImage"
                                Margin="12"
-                               WidthRequest="{Binding IconPreviewWidth}"                                         
+                               WidthRequest="{Binding IconPreviewWidth}"
                                HeightRequest="{Binding IconPreviewHeight}"
                                Aspect="AspectFit"/>
 
                         <Label x:Name="blinkingLabel"
-                               FontFamily="MaterialRounded"        
+                               FontFamily="MaterialRounded"
                                Text="{x:Static m:MaterialRounded.Point_scan}"
                                FontSize="24"
                                HorizontalTextAlignment="Center"
@@ -56,19 +56,19 @@
                                TranslationY="{Binding TransY}">
                         </Label>
                     </AbsoluteLayout>
-                            
+
                     <VerticalStackLayout Grid.Column="1">
                         <material:TextField Title="Anker X"
                                             Text="{Binding Anchor_X}"
                                             TitleColor="{DynamicResource SecondaryBackground}"
-                                            BorderColor="{DynamicResource SecondaryBackground}"                        
+                                            BorderColor="{DynamicResource SecondaryBackground}"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                         <material:TextField Title="Anker Y"
-                                            Text="{Binding Anchor_Y}"                                            
+                                            Text="{Binding Anchor_Y}"
                                             TitleColor="{DynamicResource SecondaryBackground}"
-                                            BorderColor="{DynamicResource SecondaryBackground}"                        
+                                            BorderColor="{DynamicResource SecondaryBackground}"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                     </VerticalStackLayout>
@@ -79,7 +79,7 @@
                                     Title="Bezeichnung"
                                     MaxLength="200"
                                     TitleColor="{DynamicResource SecondaryBackground}"
-                                    BorderColor="{DynamicResource SecondaryBackground}"                        
+                                    BorderColor="{DynamicResource SecondaryBackground}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                     AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     AllowClear="True"/>
@@ -88,7 +88,7 @@
                                                 x:Name="iconCategory"
                                                 Title="Kategorie"
                                                 TitleColor="{DynamicResource SecondaryBackground}"
-                                                BorderColor="{DynamicResource SecondaryBackground}"                        
+                                                BorderColor="{DynamicResource SecondaryBackground}"
                                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                                 ItemsSource="{Binding IconCategories}"/>
@@ -148,13 +148,13 @@
                     x:Name="cancelButtonText"
                     Text="Abbrechen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                     Clicked="OnCancelClicked" />
             <Button Grid.Column="1"
                     x:Name="okButtonText"
                     Text="Ok"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                     
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                     Clicked="OnOkClicked" />
         </Grid>
     </Grid>

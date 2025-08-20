@@ -4,9 +4,9 @@
              xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"            
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:services="clr-namespace:SnapDoc.Services"
-             xmlns:views="clr-namespace:SnapDoc.Views"                            
+             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="IconGalleryPage"
              x:Class="SnapDoc.Views.IconGallery"
@@ -71,8 +71,8 @@
                      IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Table_rows}}"
                      Text="Liste"
                      Clicked="OnChangeRowsClicked"/>
-        <ToolbarItem x:Name ="ImportIcon"                     
-                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"             
+        <ToolbarItem x:Name ="ImportIcon"
+                     IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"
                      Text="Icon importieren"
                      Clicked="ImportIconClicked"/>
     </ContentPage.ToolbarItems>
@@ -83,7 +83,7 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        
+
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="Start" Scale="0.8" AnchorX="0">
             <Label Text="Kategorie" FontAttributes="Bold" VerticalTextAlignment="Center" TextColor="Black"/>
             <Border Stroke="{DynamicResource Primary}"
@@ -94,13 +94,13 @@
                         FontSize="12"
                         ItemsSource="{Binding IconCategories}"
                         SelectedItem="{Binding IconCategory}"/>
-            </Border>              
+            </Border>
         </HorizontalStackLayout>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
             <Button x:Name="SortDirection"
                     Padding="0"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}"                   
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}"
                     BorderColor="{DynamicResource Primary}"
                     BorderWidth="1"
                     HorizontalOptions="Start"

@@ -9,7 +9,7 @@
 			 BackgroundColor="DimGrey"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
 			 x:Class="SnapDoc.Views.ImageViewPage">
-    
+
     <ContentPage.ToolbarItems>
         <ToolbarItem
             x:Name ="btnImageFit"
@@ -17,8 +17,8 @@
             Text="Grösse anpassen"
             Clicked="ImageFit"/>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}" 
-            Text="Delete"          
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+            Text="Delete"
             Clicked="OnDeleteButtonClicked"/>
     </ContentPage.ToolbarItems>
 
@@ -45,7 +45,7 @@
                     LineColor="#FF0000"/>
             </AbsoluteLayout>
         </mr:ContentView>
- 
+
         <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"
@@ -56,7 +56,7 @@
                 IsVisible="False"
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="EraseClicked"/>
 
         <Button x:Name="PenSettingsBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
@@ -69,7 +69,7 @@
                 IsVisible="False"
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="PenSettingsClicked"/>
 
         <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
@@ -82,7 +82,7 @@
                 IsVisible="True"
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="DrawClicked"/>
 
         <Button x:Name="CheckBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
@@ -95,7 +95,7 @@
                 IsVisible="False"
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"                
+                AbsoluteLayout.LayoutFlags="PositionProportional"
                 Clicked="CheckClicked"/>
     </AbsoluteLayout>
 </ContentPage>

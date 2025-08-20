@@ -158,9 +158,9 @@ public partial class LoadPDFPages : ContentPage
         try
         {
             var fileResult = await FilePicker.Default.PickMultipleAsync(new PickOptions
-            {                
+            {
                 PickerTitle = "Eine oder mehrere PDF-Dateien auswählen",
-                FileTypes = FilePickerFileType.Pdf // Nur PDF-Dateien anzeigen                
+                FileTypes = FilePickerFileType.Pdf // Nur PDF-Dateien anzeigen
             });
 
             if (fileResult != null)
@@ -191,7 +191,7 @@ public partial class LoadPDFPages : ContentPage
     private async void AddPdfImages()
     {
         await LoadPDFImages(); //generiere High-Res Images
-        
+
         string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
         int i = 0;
 

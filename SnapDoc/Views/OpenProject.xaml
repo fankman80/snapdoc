@@ -3,22 +3,22 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-             xmlns:views="clr-namespace:SnapDoc.Views"                            
+             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.OpenProject"
              Title="Projektliste">
-   
+
     <ContentPage.ToolbarItems>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}" 
-            Text="Importieren"            
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
+            Text="Importieren"
             Clicked="OnUploadClicked"/>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}" 
-            Text="Neu"            
-            Clicked="OnNewClicked"/>        
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"
+            Text="Neu"
+            Clicked="OnNewClicked"/>
     </ContentPage.ToolbarItems>
 
     <Grid>
@@ -27,7 +27,7 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            
+
             <CollectionView x:Name="FileListView" Grid.Row="0" ItemsLayout="VerticalGrid, 1">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">

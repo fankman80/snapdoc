@@ -13,7 +13,7 @@
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>    
+    </Shell.BackButtonBehavior>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem
@@ -22,7 +22,7 @@
             Text="Kacheln"
             Clicked="OnChangeRowsClicked"/>
     </ContentPage.ToolbarItems>
-    
+
     <Grid>
         <Grid>
             <Grid.RowDefinitions>

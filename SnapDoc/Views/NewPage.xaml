@@ -6,13 +6,13 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
-             xmlns:views="clr-namespace:SnapDoc.Views"     
-             xmlns:services="clr-namespace:SnapDoc.Services" 
-             xmlns:local="clr-namespace:SnapDoc"      
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              x:Class="SnapDoc.Views.NewPage"
              x:DataType="views:NewPage"
-             BackgroundColor="DimGrey"             
+             BackgroundColor="DimGrey"
              Title="{Binding PageTitle}">
 
     <ContentPage.ToolbarItems>
@@ -22,11 +22,11 @@
             Text="Grösse anpassen"
             Clicked="ImageFit"/>
         <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 
-            Text="Bearbeiten"            
+            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}"
+            Text="Bearbeiten"
             Clicked="OnEditClicked"/>
     </ContentPage.ToolbarItems>
-    
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
@@ -36,7 +36,7 @@
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
             <mr:ContentView
-                AutomationId="PlanContainer"                
+                AutomationId="PlanContainer"
                 PinchingCommand="{Binding PinchingCommand}"
                 RotatingCommand="{Binding RotatingCommand}"
                 Panning="OnPanning"
@@ -53,7 +53,7 @@
 				                   TranslationY="{Binding TranslationY}"
 				                   AnchorX="{Binding AnchorX}"
 				                   AnchorY="{Binding AnchorY}">
-                    <ff:CachedImageView x:Name="PlanImage"                                        
+                    <ff:CachedImageView x:Name="PlanImage"
                                         CacheType="All"
                                         DownsampleUseDipUnits="False"
                                         DownsampleToViewSize="False"
@@ -64,10 +64,10 @@
             </mr:ContentView>
 
             <Grid x:Name="PinEditBorder"
-                  IsVisible="False"                  
+                  IsVisible="False"
                   AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                   AbsoluteLayout.LayoutFlags="All">
-                
+
                 <Border
                     BackgroundColor="{DynamicResource Primary}"
                     StrokeThickness="0"
@@ -79,7 +79,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinSizeSlider"
-                            Minimum="10"                    
+                            Minimum="10"
                             Maximum="100"
                             Value="0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
@@ -94,7 +94,7 @@
                                 <On Platform="WinUI" Value="70,15,70,15" />
                             </OnPlatform>
                         </Slider.Margin>
-                    </Slider>                        
+                    </Slider>
                 </Border>
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
                        HeightRequest="38"
@@ -102,7 +102,7 @@
                        ZIndex="10000"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
-                <Label x:Name="percentLabel" 
+                <Label x:Name="percentLabel"
                        Text="100%"
                        FontSize="16"
                        VerticalTextAlignment="Center"
@@ -123,7 +123,7 @@
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinRotateSlider"
-                            Minimum="0"                    
+                            Minimum="0"
                             Maximum="360"
                             Value="0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
@@ -163,7 +163,7 @@
                        Margin="0,0,36,33"
                        ZIndex="10000"
                        HorizontalOptions="End"
-                       VerticalOptions="End"/>                
+                       VerticalOptions="End"/>
                 <Label x:Name="degreesLabel"
                        IsVisible="True"
                        Text="0°"
@@ -182,7 +182,7 @@
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,90,24"
-                       ZIndex="10000"/>                
+                       ZIndex="10000"/>
 
                 <Button InputTransparent="False"
                         Visual="None"
@@ -211,7 +211,7 @@
                 <Button x:Name="PenSettingsBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
                         BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}" 
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -221,7 +221,7 @@
                         IsVisible="False"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
                         BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"                
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -229,7 +229,7 @@
                 <Button x:Name="DrawBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
                         BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"                
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -237,7 +237,7 @@
                 <Button x:Name="SetPinBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
                         BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}" 
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
