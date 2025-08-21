@@ -12,7 +12,6 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
-using System.Collections.ObjectModel;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -34,7 +33,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Point mousePos;
     private readonly TransformViewModel planContainer;
     private DrawingView drawingView;
-    private int lineWidth = 15;
+    private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
     SKRectI pinBound;
@@ -743,26 +742,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
-
-            // Basisgröße als Referenz
-            int referenceSize = 200; // px
-            float maxFactor = 6f;    // maximale Vergrößerung
-            float minFactor = 1f;    // mindestens 1× (keine Skalierung)
-
-            // kleinere Seitenlänge von pinBound
-            int smallerSide = Math.Min(pinBound.Width, pinBound.Height);
-
-            // Faktor berechnen (je kleiner das Bild, desto größer der Faktor)
-            float scaleFactor = referenceSize / (float)smallerSide;
-
-            // Faktor in Grenzen halten
-            scaleFactor = Math.Clamp(scaleFactor, minFactor, maxFactor);
-
-            var neueListe = ScaleLines(drawingView.Lines, scaleFactor);
-
             await using var imageStream = await DrawingViewService.GetImageStream(
-                ImageLineOptions.JustLines(neueListe,
-                new Size(pinBound.Width, pinBound.Height),
+                ImageLineOptions.JustLines(drawingView.Lines,
+                new Size(pinBound.Width + (2*lineWidth), pinBound.Height + (2*lineWidth)),
                 Brush.Transparent));
 
             if (imageStream != null)
@@ -774,15 +756,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 await imageStream.CopyToAsync(memoryStream);
                 memoryStream.Seek(0, SeekOrigin.Begin);
 
-                // --- Direktes Speichern ohne ScalePixels ---
                 using var skBitmap = SKBitmap.Decode(memoryStream);
-                using var imageData = skBitmap.Encode(SKEncodedImageFormat.Png, 90); // Qualität 90
+                using var imageData = skBitmap.Encode(SKEncodedImageFormat.Png, 90);
                 using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
                     imageData.SaveTo(fileStream);
                 }
 
-                // --- Pin-Position beibehalten, Größe anpassen ---
                 SetPin(
                     new Point(
                         (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
@@ -791,7 +771,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     skBitmap.Width,
                     skBitmap.Height,
                     new SKColor(drawingView.LineColor.ToUint()),
-                    1 / scaleFactor
+                    1
                 );
             }
         }
@@ -805,29 +785,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawBtn.IsVisible = true;
     }
-
-    private static List<IDrawingLine> ScaleLines(IEnumerable<IDrawingLine> originalLines, float scaleFactor)
-    {
-        var scaledLines = new List<IDrawingLine>();
-
-        foreach (var line in originalLines)
-        {
-            // Neue Punkteliste als ObservableCollection
-            var scaledPoints = new ObservableCollection<PointF>(
-                line.Points.Select(p => new PointF((float)(p.X * scaleFactor), (float)(p.Y * scaleFactor))));
-
-            // Neue Line erzeugen (CommunityToolkit.Maui.Views.DrawingLine)
-            var scaledLine = new DrawingLine
-            {
-                Points = scaledPoints,
-                LineWidth = line.LineWidth * scaleFactor,
-                LineColor = line.LineColor
-            };
-            scaledLines.Add(scaledLine);
-        }
-        return scaledLines;
-    }
-
 
     public static SKBitmap CropBitmap(SKBitmap originalBitmap)
     {
