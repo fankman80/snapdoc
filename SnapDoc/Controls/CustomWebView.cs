@@ -1,7 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Handlers;
-
-namespace SnapDoc.Controls;
+﻿namespace SnapDoc.Controls;
 
 public partial class CustomWebView : WebView
 {
