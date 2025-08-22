@@ -83,7 +83,7 @@ public partial class MapView : IQueryAttributable
 
         [JavascriptInterface]
         [Java.Interop.Export("invokeAction")]
-        public void InvokeAction(string message)
+        public static void InvokeAction(string message)
         {
             MainThread.BeginInvokeOnMainThread(() =>
             {
@@ -96,14 +96,9 @@ public partial class MapView : IQueryAttributable
         }
     }
 
-    public class CustomWebViewClient : WebViewClient
+    public class CustomWebViewClient(MapView mapView) : WebViewClient
     {
-        readonly MapView _mapView;
-
-        public CustomWebViewClient(MapView mapView)
-        {
-            _mapView = mapView;
-        }
+        readonly MapView _mapView = mapView;
 
         public override void OnPageFinished(Android.Webkit.WebView view, string url)
         {
@@ -190,7 +185,7 @@ public partial class MapView : IQueryAttributable
         var positions = new List<object>();
         foreach (var plan in GlobalJson.Data.Plans)
         {
-            foreach (var pin in plan.Value.Pins ?? new Dictionary<string, Pin>())
+            foreach (var pin in plan.Value.Pins ?? [])
             {
                 if (pin.Value.GeoLocation != null)
                 {

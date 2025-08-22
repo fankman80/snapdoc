@@ -1,9 +1,11 @@
-﻿namespace SnapDoc.Controls;
+﻿#nullable disable
+
+namespace SnapDoc.Controls;
 
 public partial class CustomWebView : WebView
 {
     // Event, auf das deine Pages hören können
-    public event EventHandler<string>? JsMessageReceived;
+    public event EventHandler<string> JsMessageReceived;
 
     // Wird von JsBridge aufgerufen (internal, damit nur innerhalb der Assembly sichtbar)
     internal void OnJsMessageReceived(string message)
