@@ -148,8 +148,6 @@ public partial class MapView : IQueryAttributable
     {
         base.OnAppearing();
 
-        var (lon, lat, zoom) = GetInitialMapCoordinates();
-
         GeoAdminWebView.Source = new HtmlWebViewSource
         {
             Html = LoadHtmlFromFile()
@@ -161,26 +159,39 @@ public partial class MapView : IQueryAttributable
 
     private (double lon, double lat, double zoom) GetInitialMapCoordinates()
     {
-        double lon, lat, zoom;
+        // Standard: Zoom ganze Schweiz
+        double lon = 8.226692;
+        double lat = 46.80121;
+        double zoom = 8;
 
-        if (!string.IsNullOrEmpty(PinId) && GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
+        if (!string.IsNullOrEmpty(PinId))
         {
-            var loc = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84;
-            lon = loc.Longitude;
-            lat = loc.Latitude;
-            zoom = 18;
+            SetPosBtn.IsVisible = true;
+            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source =
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+
+            var geo = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation;
+            if (geo != null)
+            {
+                // Pin-Position
+                lon = geo.WGS84.Longitude;
+                lat = geo.WGS84.Latitude;
+                zoom = 18;
+            }
+            else if (GPSViewModel.Instance.IsRunning)
+            {
+                // GPS-Position
+                lon = GPSViewModel.Instance.Lon;
+                lat = GPSViewModel.Instance.Lat;
+                zoom = 18;
+            }
         }
         else if (GPSViewModel.Instance.IsRunning)
         {
+            // GPS-Position
             lon = GPSViewModel.Instance.Lon;
             lat = GPSViewModel.Instance.Lat;
             zoom = 18;
-        }
-        else
-        {
-            lon = 8.226692;
-            lat = 46.80121;
-            zoom = 8;
         }
 
         return (lon, lat, zoom);
