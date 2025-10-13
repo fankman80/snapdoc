@@ -1,6 +1,7 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
+using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
 
 namespace SnapDoc.Views;
@@ -10,11 +11,13 @@ public partial class PopupPlanSelector : Popup<string>
     public ObservableCollection<PlanItem> PlanItems { get; set; }
     private static string selectedPlan;
 
-    public PopupPlanSelector(string planId, string okText = "Ok", string cancelText = "Abbrechen")
+    public PopupPlanSelector(string planId, string okText = "Verschieben", string cancelText = "Abbrechen")
     {
         InitializeComponent();
         okButtonText.Text = okText;
+        okButtonText.IsVisible = false;
         cancelButtonText.Text = cancelText;
+        labelText.Text = "Ziel auswählen:";
 
         // Zugriff auf die AppShell
         if (Application.Current.Windows[0].Page is AppShell shell)
@@ -56,6 +59,9 @@ public partial class PopupPlanSelector : Popup<string>
             PlanCollectionView.ItemsSource = PlanItems;
 
             selectedPlan = tappedItem.CommandParameter?.ToString();
+
+            labelText.Text = "Pin auf folgenden Plan verschieben:";
+            okButtonText.IsVisible = true;
         }
     }
 }

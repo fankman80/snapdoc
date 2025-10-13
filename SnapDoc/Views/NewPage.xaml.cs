@@ -576,6 +576,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 plan.Pins ??= [];
                 plan.Pins[currentDateTime] = newPinData;
 
+                GlobalJson.Data.Plans[PlanId].PinCount += 1;
+
                 // save data to file
                 GlobalJson.SaveToFile();
             }

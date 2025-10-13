@@ -107,6 +107,9 @@ namespace SnapDoc
 
                 if (e.PropertyName == nameof(Plan.PlanColor))
                     OnPropertyChanged(nameof(PlanColor));
+
+                if (e.PropertyName == nameof(Plan.PinCount))
+                    OnPropertyChanged(nameof(PinCount));
             };
         }
 
@@ -148,6 +151,19 @@ namespace SnapDoc
                 {
                     _plan.PlanColor = value;
                     OnPropertyChanged(nameof(PlanColor));
+                }
+            }
+        }
+
+        public int PinCount
+        {
+            get => _plan.PinCount;
+            set
+            {
+                if (_plan.PinCount != value)
+                {
+                    _plan.PinCount = value;
+                    OnPropertyChanged(nameof(PinCount));
                 }
             }
         }

@@ -1,9 +1,10 @@
 ﻿#nullable disable
 
-using SnapDoc.Services;
-using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
+using SnapDoc.Models;
+using SnapDoc.Services;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -169,10 +170,33 @@ public partial class OpenProject : ContentPage
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
                     Helper.HeaderUpdate();  // UI-Aktualisierung
 
+                    // Check Pin Count, if not correct, repair it
+                    if (GlobalJson.Data.Plans != null)
+                    {
+                        var repairCount = false;
+                        foreach (var plan in GlobalJson.Data.Plans)
+                        {
+                            var i = 0;
+                            if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+                                foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                                    i += 1;
+                            if (GlobalJson.Data.Plans[plan.Key].PinCount != i)
+                            {
+                                GlobalJson.Data.Plans[plan.Key].PinCount = i;
+                                repairCount = true;
+                            }
+                        }
+                        if (repairCount)
+                            GlobalJson.SaveToFile();
+                    }
+
                     await Shell.Current.GoToAsync("project_details");
 #if ANDROID
                     Shell.Current.FlyoutIsPresented = false;
+
 #endif  
+
+
                 });
             }
         });

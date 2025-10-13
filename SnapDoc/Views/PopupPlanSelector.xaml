@@ -32,7 +32,8 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <Label Grid.Row="0" Text="Ziel auswählen:"></Label>
+            <Label Grid.Row="0"
+				   x:Name="labelText"/>
             <ScrollView Grid.Row="1" VerticalOptions="Start" MaximumHeightRequest="800">
                 <CollectionView x:Name="PlanCollectionView"
                                 x:DataType="local:Views.PopupPlanSelector"
@@ -75,13 +76,11 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
-                        Text="Abbrechen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
-                        Text="Ok"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         Clicked="OnOkClicked" />

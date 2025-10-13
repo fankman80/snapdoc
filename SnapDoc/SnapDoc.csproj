@@ -140,7 +140,7 @@
 
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
-		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.385" />
+		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.416" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="12.2.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="12.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />

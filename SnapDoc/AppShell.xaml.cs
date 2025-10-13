@@ -113,7 +113,7 @@ public partial class AppShell : Shell
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
+        var button = sender as Label;
 
         PlanItem item = (PlanItem)button.BindingContext;
 

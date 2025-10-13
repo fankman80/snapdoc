@@ -169,6 +169,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 plan.Pins ??= [];
                 plan.Pins[currentDateTime] = newPin;
 
+                GlobalJson.Data.Plans[result.Result].PinCount += 1;
+
                 DeletePinData(PinId);
 
                 WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
@@ -224,6 +226,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // remove pin from database
         var plan = GlobalJson.Data.Plans[PlanId];
         plan.Pins.Remove(pinId);
+
+        GlobalJson.Data.Plans[PlanId].PinCount -= 1;
 
         // save data to file
         GlobalJson.SaveToFile();
