@@ -42,7 +42,7 @@
                                 SelectionMode="Single">
                     <CollectionView.ItemTemplate>
                         <DataTemplate x:DataType="local:PlanItem">
-                            <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44" IsVisible="{Binding IsVisible}">
+                            <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44">
                                 <Grid.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
                                 </Grid.GestureRecognizers>

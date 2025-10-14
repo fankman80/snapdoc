@@ -107,6 +107,10 @@
 	  <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
+	  <AndroidLinkTool>r8</AndroidLinkTool>
+	</PropertyGroup>
+
 	<ItemGroup>
 		<!-- App Icon -->
 		<MauiIcon Include="Resources\AppIcon\ic_background.png" ForegroundFile="Resources\AppIcon\ic_foreground.png" />
@@ -147,15 +151,15 @@
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
 		<PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
-		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.2" />
+		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.3-preview.1" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-rc.1.25452.6" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0-rc.1.25452.6" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-rc.1.25451.107" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-rc.2.25504.7" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0-rc.2.25504.7" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-rc.2.25502.107" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="PDFtoImage" Version="5.1.1" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.1" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2-preview.1" />
 		<PackageReference Include="UraniumUI" Version="2.12.1" />
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.12.1" />
 		<PackageReference Include="UraniumUI.Material" Version="2.12.1" />

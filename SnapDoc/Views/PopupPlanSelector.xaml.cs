@@ -1,7 +1,6 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
-using DocumentFormat.OpenXml.Wordprocessing;
 using System.Collections.ObjectModel;
 
 namespace SnapDoc.Views;
@@ -19,17 +18,17 @@ public partial class PopupPlanSelector : Popup<string>
         cancelButtonText.Text = cancelText;
         labelText.Text = "Ziel auswählen:";
 
-        // Zugriff auf die AppShell
+        // Kopie der Items von der AppShell
         if (Application.Current.Windows[0].Page is AppShell shell)
-            PlanItems = shell.PlanItems;
+            PlanItems = new ObservableCollection<PlanItem>(shell.PlanItems);
         else
             PlanItems = [];
 
-        foreach (var item in PlanItems)
-            if (item.PlanId != planId)
-                item.IsVisible = true;
-            else
-                item.IsVisible = false;
+        for (int i = PlanItems.Count - 1; i >= 0; i--)
+        {
+            if (PlanItems[i].PlanId == planId)
+                PlanItems.RemoveAt(i);
+        }
 
         BindingContext = this;
     }
@@ -52,8 +51,11 @@ public partial class PopupPlanSelector : Popup<string>
             if (ve.BindingContext is not PlanItem tappedPlan)
                 return;
 
-            foreach (var item in PlanItems)
-                item.IsVisible = item == tappedPlan;
+            for (int i = PlanItems.Count - 1; i >= 0; i--)
+            {
+                if (PlanItems[i] != tappedPlan)
+                    PlanItems.RemoveAt(i);
+            }
 
             PlanCollectionView.ItemsSource = null;
             PlanCollectionView.ItemsSource = PlanItems;

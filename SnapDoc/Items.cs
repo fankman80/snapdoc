@@ -94,8 +94,6 @@ namespace SnapDoc
     {
         private readonly Plan _plan; // direkte Referenz auf das zugrundeliegende Modell
 
-        public bool IsVisible { get; set; } = true;
-
         public PlanItem(Plan plan)
         {
             _plan = plan;

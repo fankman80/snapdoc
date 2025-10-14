@@ -27,6 +27,8 @@ public partial class ExportReport
 
     public static async Task DocX(string templateDoc, string savePath)
     {
+        imageRelationshipIds.Clear();
+
         Dictionary<string, string> placeholders_single = new()
         {
             {"${client_name}", GlobalJson.Data.Client_name},
@@ -57,13 +59,21 @@ public partial class ExportReport
         };
 
         List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
+        //foreach (string icon in uniquePinIcons)
+        //    if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
+        //        CopyImageToDirectory(Settings.CacheDirectory, Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
+        //    else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
+        //        CopyImageToDirectory(Path.Combine(Settings.CacheDirectory, "customicons"), "customicons", Path.GetFileName(icon));
+        //    else
+        //        await CopyImageToDirectoryAsync(Settings.CacheDirectory, icon);
+
         foreach (string icon in uniquePinIcons)
             if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
                 CopyImageToDirectory(Settings.CacheDirectory, Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
             else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
                 CopyImageToDirectory(Path.Combine(Settings.CacheDirectory, "customicons"), "customicons", Path.GetFileName(icon));
             else
-                await CopyImageToDirectoryAsync(Settings.CacheDirectory, icon);
+                await MauiResourceLoader.CopyAppPackageFileAsync(Settings.CacheDirectory, icon);
 
         using MemoryStream memoryStream = new();
         using (Stream fileStream = new FileStream(templateDoc, FileMode.Open, FileAccess.Read))
