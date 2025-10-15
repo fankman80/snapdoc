@@ -9,7 +9,20 @@
              x:DataType="views:LoadPDFPages"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              x:Class="SnapDoc.Views.LoadPDFPages"
+             x:Name="ThisPage"
              Title="PDF Seiten hinzufügen">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />

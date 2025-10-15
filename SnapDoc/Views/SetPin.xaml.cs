@@ -326,6 +326,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
             GlobalJson.SaveToFile();
         }
     }
+
+    private void OnTitleChanged(object sender, FocusEventArgs e)
+    {
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Title;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+    }
 }
 
 public partial class SquareView : ContentView

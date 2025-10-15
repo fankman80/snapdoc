@@ -10,10 +10,35 @@
              xmlns:local="clr-namespace:SnapDoc"
              x:DataType="views:SetPin"
              x:Class="SnapDoc.Views.SetPin"
+             x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
              Title="Pin bearbeiten">
 
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Entry Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   IsSpellCheckEnabled="False"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"
+                   Unfocused="OnTitleChanged">
+            </Entry>
+            <Label Text="{x:Static m:MaterialOutlined.Edit}"
+                   FontFamily="MaterialOutlined"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   VerticalOptions="Center"
+                   FontSize="24">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnEditClick"/>
+                </Label.GestureRecognizers>
+            </Label>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+    
     <ContentPage.Resources>
         <ResourceDictionary>
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
@@ -25,11 +50,7 @@
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Move_down}}" 
             Text="Auf anderen Plan verschieben"
-            Clicked="OnMoveClick"/>        
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Edit_square}}" 
-            Text="Umbenennen"
-            Clicked="OnEditClick"/>
+            Clicked="OnMoveClick"/>
         <ToolbarItem
             IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}"
             Text="Pin löschen"

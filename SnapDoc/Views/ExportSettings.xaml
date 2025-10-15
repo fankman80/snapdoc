@@ -7,12 +7,24 @@
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
-             x:Name="ExportSettingsPage"
+             x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ExportSettings"
              Title="Bericht exportieren">
 
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+    
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">
             <Grid.RowDefinitions>

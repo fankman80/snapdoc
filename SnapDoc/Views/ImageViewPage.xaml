@@ -8,7 +8,20 @@
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
 			 BackgroundColor="DimGrey"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-			 x:Class="SnapDoc.Views.ImageViewPage">
+			 x:Class="SnapDoc.Views.ImageViewPage"
+             x:Name="ThisPage">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem

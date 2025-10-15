@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Extensions;
@@ -1108,5 +1107,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             270 => new Point(oldPos.Y, 1 - oldPos.X),
             _ => throw new NotSupportedException($"Nur 0/90/180/270 Grad werden unterstützt (nicht: {angle})."),
         };
+    }
+
+    private void OnTitleChanged(object sender, FocusEventArgs e)
+    {
+        (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = Title;
+
+        GlobalJson.Data.Plans[PlanId].Name = Title;
+
+        // save data to file
+        GlobalJson.SaveToFile();
     }
 }

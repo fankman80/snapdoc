@@ -9,11 +9,23 @@
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
-             x:Name="PinListPage"
+             x:Name="ThisPage"
              x:Class="SnapDoc.Views.PinList"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Title="Pin Liste">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
 
     <ContentPage.Resources>
         <ResourceDictionary>

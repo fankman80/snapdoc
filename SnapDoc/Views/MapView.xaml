@@ -11,7 +11,20 @@
                 xmlns:controls="clr-namespace:SnapDoc.Controls"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="SnapDoc.Views.MapView"
+                x:Name="ThisPage"
                 Title="swisstopo Karte">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="24"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
 
     <ContentPage.ToolbarItems>
         <ToolbarItem IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Moved_location}}"
