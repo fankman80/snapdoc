@@ -17,8 +17,6 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private string PinId;
     private string SenderView;
     private bool isLongPressed = false;
-    private object previousSelectedSortItem;
-    private object previousSelectedCategoryItem;
     private string OrderDirection = "asc";
     public int DynamicSpan { get; set; } = 1; // Standardwert
 
@@ -34,8 +32,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         base.OnAppearing();
 
         SizeChanged += OnSizeChanged;
-        SortPicker.PropertyChanged += OnSortPickerChanged;
-        CategoryPicker.PropertyChanged += OnCategoryPickerChanged;
+        SortPicker.SelectedIndexChanged += OnSortPickerChanged;
+        CategoryPicker.SelectedIndexChanged += OnCategoryPickerChanged;
 
         IconCollectionView.ItemTemplate = (DataTemplate)Resources[SettingsService.Instance.IconGalleryMode];
         UpdateButton();
@@ -48,8 +46,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         base.OnDisappearing();
 
         SizeChanged -= OnSizeChanged;
-        SortPicker.PropertyChanged -= OnSortPickerChanged;
-        CategoryPicker.PropertyChanged -= OnCategoryPickerChanged;
+        SortPicker.SelectedIndexChanged -= OnSortPickerChanged;
+        CategoryPicker.SelectedIndexChanged -= OnCategoryPickerChanged;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -187,24 +185,14 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
     private void OnSortPickerChanged(object sender, EventArgs e)
     {
-        var currentSelectedItem = SortPicker.SelectedItem;
-        if (previousSelectedSortItem != currentSelectedItem)
-        {
-            previousSelectedSortItem = currentSelectedItem;
-            IconSorting(OrderDirection);
-            SettingsService.Instance.SaveSettings();
-        }
+        IconSorting(OrderDirection);
+        SettingsService.Instance.SaveSettings();
     }
 
     private void OnCategoryPickerChanged(object sender, EventArgs e)
     {
-        var currentSelectedItem = CategoryPicker.SelectedItem;
-        if (previousSelectedCategoryItem != currentSelectedItem)
-        {
-            previousSelectedCategoryItem = currentSelectedItem;
-            IconSorting(OrderDirection);
-            SettingsService.Instance.SaveSettings();
-        }
+        IconSorting(OrderDirection);
+        SettingsService.Instance.SaveSettings();
     }
 
     private void OnSortDirectionClicked(object sender, EventArgs e)

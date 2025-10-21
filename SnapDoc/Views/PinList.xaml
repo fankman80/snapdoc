@@ -21,7 +21,7 @@
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
-                   FontSize="24"
+                   FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
         </HorizontalStackLayout>
@@ -57,12 +57,12 @@
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 4">
                 <Button x:Name="SortDirection"
-                    Padding="0"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Sort}}"
-                    BorderWidth="0"
-                    HorizontalOptions="Start"
-                    BackgroundColor="Transparent"
-                    Clicked="OnSortDirectionClicked"/>
+                        Padding="0"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Sort}}"
+                        BorderWidth="0"
+                        HorizontalOptions="Start"
+                        BackgroundColor="Transparent"
+                        Clicked="OnSortDirectionClicked"/>
             </Border>
             <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                     StrokeThickness="1"

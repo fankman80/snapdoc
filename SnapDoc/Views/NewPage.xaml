@@ -17,23 +17,17 @@
              Title="{Binding PageTitle}">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Entry Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
-                   TextColor="{DynamicResource PrimaryDark}"
-                   IsSpellCheckEnabled="False"
-                   Background="Transparent"
-                   BackgroundColor="Transparent"
-                   FontSize="24"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Start"
-                   Unfocused="OnTitleChanged">
-            </Entry>
-            <Label Text="{x:Static m:MaterialOutlined.Edit}"
-                   FontFamily="MaterialOutlined"
-                   TextColor="{DynamicResource PrimaryDark}"
-                   VerticalOptions="Center"
-                   FontSize="24" />
-        </HorizontalStackLayout>
+        <Entry Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+               TextColor="{DynamicResource PrimaryDark}"
+               Placeholder="(Titel eingeben...)"
+               PlaceholderColor="{DynamicResource PrimaryDark}"
+               IsSpellCheckEnabled="False"
+               Background="Transparent"
+               BackgroundColor="Transparent"
+               FontSize="18"
+               VerticalOptions="Center"
+               Completed="OnTitleChanged"
+               Unfocused="OnTitleChanged"/>
     </Shell.TitleView>
     
     <ContentPage.ToolbarItems>

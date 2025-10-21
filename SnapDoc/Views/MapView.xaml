@@ -20,7 +20,7 @@
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
-                   FontSize="24"
+                   FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
         </HorizontalStackLayout>
@@ -37,17 +37,6 @@
             <controls:CustomWebView x:Name="GeoAdminWebView"
                      AbsoluteLayout.LayoutBounds="0,0,1,1"
                      AbsoluteLayout.LayoutFlags="All" />
-
-            <Border BackgroundColor="White"
-                    Scale="0.8"
-                    Margin="8"
-                    Stroke="DarkGrey"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 4"
-                    AbsoluteLayout.LayoutBounds="0.5,0,AutoSize,AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Picker x:Name="mapLayerPicker" FontSize="12"/>
-            </Border>
 
             <StackLayout Orientation="Vertical"
                          Spacing="14"

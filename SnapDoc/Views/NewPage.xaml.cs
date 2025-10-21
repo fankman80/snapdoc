@@ -16,6 +16,11 @@ using System.ComponentModel;
 using SnapDoc.Platforms.Windows;
 #endif
 
+#if ANDROID
+using Android.Views.InputMethods;
+using Microsoft.Maui.Platform;
+#endif
+
 namespace SnapDoc.Views;
 
 public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
@@ -1109,13 +1114,56 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         };
     }
 
-    private void OnTitleChanged(object sender, FocusEventArgs e)
+    private void OnTitleChanged(object sender, EventArgs e)
     {
-        (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = Title;
+        if (sender is not Microsoft.Maui.Controls.Entry entry)
+            return;
+
+        // Titel speichern
+        (Application.Current.Windows[0].Page as AppShell)
+            ?.PlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
 
         GlobalJson.Data.Plans[PlanId].Name = Title;
 
         // save data to file
         GlobalJson.SaveToFile();
+
+        // Fokus entfernen
+        entry.Unfocus();
+
+#if ANDROID
+        try
+        {
+            if (entry.Handler?.PlatformView is Android.Views.View nativeView)
+            {
+                var inputMethodManager = nativeView.Context?.GetSystemService(
+                    Android.Content.Context.InputMethodService) as Android.Views.InputMethods.InputMethodManager;
+
+                // Tastatur schließen
+                inputMethodManager?.HideSoftInputFromWindow(nativeView.WindowToken, 0);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Android keyboard hide failed: {ex.Message}");
+        }
+#endif
+
+#if IOS
+        try
+        {
+            UIKit.UIApplication.SharedApplication.InvokeOnMainThread(() =>
+            {
+                if (entry.Handler?.PlatformView is UIKit.UITextField textField)
+                {
+                    textField.ResignFirstResponder(); // Tastatur schließen
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
+        }
+#endif
     }
 }

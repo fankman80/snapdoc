@@ -159,9 +159,6 @@ public partial class MapView : IQueryAttributable
         {
             Html = LoadHtmlFromFile()
         };
-
-        mapLayerPicker.ItemsSource = Settings.SwissTopoLayers.Select(item => item.Desc).ToList();
-        mapLayerPicker.SelectedItem = Settings.SwissTopoLayers.FirstOrDefault()?.Desc;
     }
 
     private void UpdateUiFromQuery()
@@ -339,20 +336,6 @@ public partial class MapView : IQueryAttributable
 
         if (File.Exists(outputPath))
             File.Delete(outputPath);
-    }
-
-    private void MapLayerPicker_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(mapLayerPicker.SelectedItem))
-        {
-            var selectedDesc = mapLayerPicker.SelectedItem?.ToString();
-            var layer = Settings.SwissTopoLayers.FirstOrDefault(x => x.Desc == selectedDesc);
-            if (layer != null)
-            {
-                var script = $"changeOverlayLayer('{layer.Id}');";
-                GeoAdminWebView.EvaluateJavaScriptAsync(script);
-            }
-        }
     }
 
     private void OnMapLayerColorClicked(object sender, EventArgs e)

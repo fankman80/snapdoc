@@ -11,7 +11,6 @@ public partial class PinList : ContentPage
     public Command<IconItem> IconTappedCommand { get; }
     private List<PinItem> pinItems = [];
     private List<PinItem> originalPinItems = []; // Originalreihenfolge speichern
-    private object previousSelectedItem;
     private string OrderDirection = "asc";
     private ObservableCollection<PinItem> filteredPinItems;
 
@@ -26,14 +25,14 @@ public partial class PinList : ContentPage
         base.OnAppearing();
 
         LoadPins();
-        SortPicker.PropertyChanged += OnSortPickerChanged;
+        SortPicker.SelectedIndexChanged += OnSortPickerChanged;
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
 
-        SortPicker.PropertyChanged -= OnSortPickerChanged;
+        SortPicker.SelectedIndexChanged -= OnSortPickerChanged;
     }
 
     private void LoadPins()
@@ -167,13 +166,8 @@ public partial class PinList : ContentPage
 
     private void OnSortPickerChanged(object sender, EventArgs e)
     {
-        var currentSelectedItem = SortPicker.SelectedItem;
-        if (previousSelectedItem != currentSelectedItem)
-        {
-            previousSelectedItem = currentSelectedItem;
-            IconSorting(OrderDirection);
-            SettingsService.Instance.SaveSettings();
-        }
+        IconSorting(OrderDirection);
+        SettingsService.Instance.SaveSettings();
     }
 
     private void OnSortDirectionClicked(object sender, EventArgs e)

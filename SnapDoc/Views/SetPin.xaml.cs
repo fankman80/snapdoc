@@ -5,7 +5,6 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
 using SnapDoc.Models;
-using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using UraniumUI.Material.Controls;
 
@@ -133,21 +132,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
             DeletePinData(PinId);
             WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
             await Shell.Current.GoToAsync($"///{PlanId}");
-        }
-    }
-
-    private async void OnEditClick(object sender, EventArgs e)
-    {
-        var popup = new PopupEntry(title: "Pin umbenennen...", inputTxt: GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-
-        if (result.Result != null)
-        {
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = result.Result;
-            this.Title = result.Result;
-
-            // save data to file
-            GlobalJson.SaveToFile();
         }
     }
 
@@ -327,12 +311,53 @@ public partial class SetPin : ContentPage, IQueryAttributable
         }
     }
 
-    private void OnTitleChanged(object sender, FocusEventArgs e)
+    private void OnTitleChanged(object sender, EventArgs e)
     {
+        if (sender is not Microsoft.Maui.Controls.Entry entry)
+            return;
+
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Title;
 
         // save data to file
         GlobalJson.SaveToFile();
+
+        // Fokus entfernen
+        entry.Unfocus();
+
+#if ANDROID
+        try
+        {
+            if (entry.Handler?.PlatformView is Android.Views.View nativeView)
+            {
+                var inputMethodManager = nativeView.Context?.GetSystemService(
+                    Android.Content.Context.InputMethodService) as Android.Views.InputMethods.InputMethodManager;
+
+                // Tastatur schließen
+                inputMethodManager?.HideSoftInputFromWindow(nativeView.WindowToken, 0);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Android keyboard hide failed: {ex.Message}");
+        }
+#endif
+
+#if IOS
+        try
+        {
+            UIKit.UIApplication.SharedApplication.InvokeOnMainThread(() =>
+            {
+                if (entry.Handler?.PlatformView is UIKit.UITextField textField)
+                {
+                    textField.ResignFirstResponder(); // Tastatur schließen
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
+        }
+#endif
     }
 }
 
