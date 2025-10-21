@@ -98,7 +98,7 @@
             padding: 2px 8px;
             bottom: 14px;
             left: 10px;
-            font-family: "Aptos", "Segoe UI", sans-serif;
+            font-family: "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
             font-size: 14px;
             color: #333;
             box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
@@ -131,21 +131,21 @@
             z-index: 1000;
         }
 
-        .measure-buttons button {
-            background: white;
-            border: 1px solid #999;
-            border-radius: 4px;
-            padding: 6px 8px;
-            cursor: pointer;
-            font-size: 13px;
-            font-family: "Segoe UI", sans-serif;
-            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
-        }
+            .measure-buttons button {
+                background: white;
+                border: 1px solid #999;
+                border-radius: 4px;
+                padding: 6px 8px;
+                cursor: pointer;
+                font-size: 13px;
+                font-family: "Segoe UI", sans-serif;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            }
 
-        .measure-buttons button.active {
-            background: #999999;
-            color: white;
-        }
+                .measure-buttons button.active {
+                    background: #999999;
+                    color: white;
+                }
 
         #measureOptions {
             display: none;
@@ -168,8 +168,18 @@
         </div>
     </div>
 
+    <select id="type" style="display:none;">
+        <option value="LineString">Linie</option>
+        <option value="Polygon">Polygon</option>
+    </select>
+    <input type="checkbox" id="segments" checked style="display:none;">
+    <input type="checkbox" id="clear" style="display:none;">
+
     <script>
-        let map, vectorSource, vectorLayer, wmsLayer, measureSource, measureLayer;
+        let map, raster
+        let vectorSource, vectorLayer;
+        let pinSource, pinLayer;
+        let draw = null, modify = null, tipPoint = null;
         let mapReady = false;
         let pendingPositions = [];
         let currentPinkey = null, currentPlankey = null;
@@ -181,8 +191,137 @@
             if (markers && markers.length > 0) setMultipleMarkers(markers);
         }
 
+        // --- Hilfsfunktionen für Länge/Fläche ---
+        function formatLength(line) {
+            const length = ol.sphere.getLength(line);
+            return length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
+        }
+
+        function formatArea(polygon) {
+            const area = ol.sphere.getArea(polygon);
+            return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
+        }
+
+        // Basis-Stile
+        const baseStyle = new ol.style.Style({
+            stroke: new ol.style.Stroke({ color: '#999999', width: 3 }),
+            fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.3)' }),
+            image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: '#999999' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) })
+        });
+
+        const labelStyle = new ol.style.Style({
+            text: new ol.style.Text({ font: 'bold 14px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), stroke: new ol.style.Stroke({ color: '#333', width: 3 }), overflow: true })
+        });
+
+        const tipStyle = new ol.style.Style({
+            text: new ol.style.Text({
+                font: '12px Segoe UI',
+                fill: new ol.style.Fill({ color: '#fff' }),
+                backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
+                padding: [2, 2, 2, 2],
+                textAlign: 'left',
+                offsetX: 16,
+                offsetY: 0
+            })
+        });
+
+        const modifyStyle = new ol.style.Style({
+            image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), stroke: new ol.style.Stroke({ color: '#333', width: 1 }) }),
+            text: new ol.style.Text({
+                text: 'Drag to modify',
+                font: '12px Segoe UI',
+                fill: new ol.style.Fill({ color: '#fff' }),
+                backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
+                padding: [2, 2, 2, 2],
+                textAlign: 'left',
+                offsetX: 16,
+                offsetY: 0
+            })
+        });
+
+        // Segment-Stil
+        const segmentStyle = new ol.style.Style({
+            text: new ol.style.Text({ font: '12px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), padding: [2, 2, 2, 2], offsetY: -12 }),
+            image: new ol.style.RegularShape({ radius: 6, points: 3, angle: Math.PI, displacement: [0, 8], fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }) })
+        });
+        const segmentStyles = [segmentStyle];
+
+        // Linien/Polygon-Stile mit weißem Rand
+        const lineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }) });
+        const lineOutlineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#ffffff', width: 5 }) });
+
+        const polygonStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.3)' }) });
+        const polygonOutlineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#ffffff', width: 5 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0)' }) });
+
+        // --- Style-Funktion ---
+        function styleFunction(feature, segments, drawType, tip) {
+            const styles = [];
+            const geometry = feature.getGeometry();
+            const type = geometry.getType();
+            let point, label, line;
+
+            // Linien oder Polygone mit weißem Rand
+            if (type === 'LineString') {
+                styles.push(lineOutlineStyle);
+                styles.push(lineStyle);
+                point = new ol.geom.Point(geometry.getLastCoordinate());
+                label = formatLength(geometry);
+                line = geometry;
+
+            } else if (type === 'Polygon') {
+                styles.push(polygonOutlineStyle);
+                styles.push(polygonStyle);
+                point = geometry.getInteriorPoint();
+                label = formatArea(geometry);
+                line = new ol.geom.LineString(geometry.getCoordinates()[0]);
+
+            } else if (!drawType || drawType === type || type === 'Point') {
+                styles.push(baseStyle);
+            }
+
+            // Segmentbeschriftung
+            if (segments && line) {
+                let count = 0;
+                line.forEachSegment(function (a, b) {
+                    const seg = new ol.geom.LineString([a, b]);
+                    const segLabel = formatLength(seg);
+                    if (segmentStyles.length - 1 < count) segmentStyles.push(segmentStyle.clone());
+                    const segPoint = new ol.geom.Point(seg.getCoordinateAt(0.5));
+                    segmentStyles[count].setGeometry(segPoint);
+                    segmentStyles[count].getText().setText(segLabel);
+                    styles.push(segmentStyles[count]);
+                    count++;
+                });
+            }
+
+            // Label auf Linie oder Polygon
+            if (label) {
+                labelStyle.setGeometry(point);
+                labelStyle.getText().setText(label);
+                labelStyle.getText().setOffsetX(0); // nach rechts
+                labelStyle.getText().setOffsetY(-16); // nach oben
+                styles.push(labelStyle);
+            }
+
+            // Tip-Text für Punkte
+            if (tip && type === 'Point' && !modify.getOverlay().getSource().getFeatures().length) {
+                tipPoint = geometry;
+                tipStyle.getText().setText(tip);
+                styles.push(tipStyle);
+            }
+
+            return styles;
+        }
+
+        // --- Map initialisieren ---
         function initMap() {
-            wmsLayer = new ol.layer.Tile({
+            vectorSource = new ol.source.Vector();
+            vectorLayer = new ol.layer.Vector({ source: vectorSource, style: function (f) { return styleFunction(f, document.getElementById('segments').checked); } });
+
+            pinSource = new ol.source.Vector();
+            pinLayer = new ol.layer.Vector({ source: pinSource }); // Pins separater Layer
+
+            raster = new ol.layer.Tile({
                 source: new ol.source.TileWMS({
                     url: 'https://wms.geo.admin.ch/',
                     params: { LAYERS: 'ch.swisstopo.pixelkarte-farbe', TILED: true },
@@ -190,61 +329,7 @@
                 })
             });
 
-            map = new ol.Map({
-                target: 'map',
-                layers: [wmsLayer],
-                view: new ol.View({
-                    center: ol.proj.fromLonLat(initialCenter),
-                    zoom: initialZoom
-                })
-            });
-
-            // Maßstabsleiste
-            map.addControl(new ol.control.ScaleLine({ units: 'metric', bar: false, steps: 6, text: true, minWidth: 80, maxWidth: 140 }));
-
-            vectorSource = new ol.source.Vector();
-            vectorLayer = new ol.layer.Vector({ source: vectorSource });
-            map.addLayer(vectorLayer);
-
-            measureSource = new ol.source.Vector();
-            measureLayer = new ol.layer.Vector({
-                source: measureSource,
-                style: function (feature) {
-                    const geom = feature.getGeometry();
-                    let text = '';
-                    if (geom instanceof ol.geom.LineString) {
-                        const length = ol.sphere.getLength(geom);
-                        text = length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
-                    } else if (geom instanceof ol.geom.Polygon) {
-                        const area = ol.sphere.getArea(geom);
-                        text = area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²';
-                    }
-
-                    return [
-                        new ol.style.Style({
-                            stroke: new ol.style.Stroke({ color: 'rgba(255, 255, 255, 1.0)', width: 5 })
-                        }),
-
-                        new ol.style.Style({
-                            fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.4)' }),
-                            stroke: new ol.style.Stroke({ color: '#999999', width: 3 }),
-                            image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: '#999999' }) }),
-                            text: new ol.style.Text({
-                                text: text,
-                                placement: geom instanceof ol.geom.Polygon ? 'point' : 'line',
-                                font: 'bold 14px Segoe UI',
-                                fill: new ol.style.Fill({ color: '#fff' }),  // Textfarbe
-                                stroke: new ol.style.Stroke({ color: '#333', width: 3 }), // Umrandung (Schatteneffekt)
-                                backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), // optional dunkler Hintergrund hinter Text
-                                padding: [2, 4, 2, 4],
-                                overflow: true
-                            })
-                        })
-                    ];
-                }
-            });
-
-            map.addLayer(measureLayer);
+            map = new ol.Map({ target: 'map', layers: [raster, vectorLayer, pinLayer], view: new ol.View({ center: ol.proj.fromLonLat(initialCenter), zoom: initialZoom }) });
 
             const popupElement = document.getElementById('popup');
             const popupContent = document.getElementById('popupContent');
@@ -252,12 +337,18 @@
             map.addOverlay(popup);
 
             // Pins verschiebbar
-            var modify = new ol.interaction.Modify({
-                hitDetection: vectorLayer,
-                source: vectorSource
+            var pinmodify = new ol.interaction.Modify({
+                hitDetection: pinLayer,
+                source: pinSource
             });
-            map.addInteraction(modify);
+            map.addInteraction(pinmodify);
 
+            // Maßstabsleiste
+            map.addControl(new ol.control.ScaleLine({ units: 'metric', bar: false, steps: 6, text: true, minWidth: 80, maxWidth: 140 }));
+
+            // Modify
+            modify = new ol.interaction.Modify({ source: vectorSource, style: modifyStyle });
+            map.addInteraction(modify);
             mapReady = true;
 
             if (pendingPositions.length > 0) {
@@ -289,56 +380,37 @@
                     currentPinkey = null; currentPlankey = null;
                 }
             });
+        }
 
-            // Messwerkzeuge
-            let draw = null;
-            function removeDraw() { if (draw) { map.removeInteraction(draw); draw = null; } }
-            function addInteraction(type) {
-                removeDraw(); measureSource.clear();
-                const drawType = type === 'area' ? 'Polygon' : 'LineString';
-                draw = new ol.interaction.Draw({ source: measureSource, type: drawType });
-                map.addInteraction(draw);
-                draw.on('drawend', () => removeDraw());
-            }
+        // --- Draw-Funktion ---
+        function addInteraction(type) {
+            const drawType = type === 'area' ? 'Polygon' : 'LineString';
+            const activeTip = 'Click to continue drawing the ' + (drawType === 'Polygon' ? 'polygon' : 'line');
+            const idleTip = 'Click to start measuring';
+            let tip = idleTip;
 
-            // --- Button-Logik ---
-            const startMeasureBtn = document.getElementById('startMeasure');
-            const measureOptions = document.getElementById('measureOptions');
-            const distanceBtn = document.getElementById('measureDistance');
-            const areaBtn = document.getElementById('measureArea');
-            const clearBtn = document.getElementById('clearMeasure');
+            if (draw) map.removeInteraction(draw);
 
-            function deactivateButtons() {
-                document.querySelectorAll('#measureOptions button').forEach(b => b.classList.remove('active'));
-            }
-
-            function activateButton(btn) {
-                deactivateButtons();
-                btn.classList.add('active');
-            }
-
-            startMeasureBtn.addEventListener('click', function () {
-                startMeasureBtn.style.display = 'none';
-                measureOptions.style.display = 'flex';
+            draw = new ol.interaction.Draw({
+                source: vectorSource,
+                type: drawType,
+                style: function (feature) { return styleFunction(feature, document.getElementById('segments').checked, drawType, tip); }
             });
 
-            distanceBtn.addEventListener('click', function () {
-                activateButton(this);
-                addInteraction('length');
+            draw.on('drawstart', function () {
+                modify.setActive(false);
+                tip = activeTip;
             });
 
-            areaBtn.addEventListener('click', function () {
-                activateButton(this);
-                addInteraction('area');
+            draw.on('drawend', function () {
+                modifyStyle.setGeometry(tipPoint);
+                modify.setActive(true);
+                map.once('pointermove', function () { modifyStyle.setGeometry(null); });
+                tip = idleTip;
             });
 
-            clearBtn.addEventListener('click', function () {
-                measureSource.clear();
-                removeDraw();
-                deactivateButtons();
-                measureOptions.style.display = 'none';
-                startMeasureBtn.style.display = 'block';
-            });
+            modify.setActive(true);
+            map.addInteraction(draw);
         }
 
         function setMarkerPosition(lon, lat, pinname, pinlocation, pindesc, plankey, pinkey) {
@@ -353,12 +425,12 @@
                 image: new ol.style.Icon({ src: initialIcon, scale: initialIconScale, anchor: [0.5, 1], anchorXUnits: 'fraction', anchorYUnits: 'fraction' })
             }));
 
-            vectorSource.addFeature(marker);
+            pinSource.addFeature(marker);
         }
 
         function setMultipleMarkers(positions) { positions.forEach(p => setMarkerPosition(p.lon, p.lat, p.pinname, p.pinlocation, p.pindesc, p.plankey, p.pinkey)); }
 
-        function changeMapLayer(layer) { wmsLayer.getSource().updateParams({ LAYERS: layer, CACHEBUSTER: new Date().getTime() }); wmsLayer.getSource().refresh(); }
+        function changeMapLayer(layer) { raster.getSource().updateParams({ LAYERS: layer, CACHEBUSTER: new Date().getTime() }); raster.getSource().refresh(); }
 
         function getMarkerCoordinates() {
             const features = vectorSource.getFeatures();
@@ -375,6 +447,24 @@
                 else alert("Bridge noch nicht verfügbar!");
             });
         };
+
+        // --- Buttons ---
+        const startMeasureBtn = document.getElementById('startMeasure');
+        const measureOptions = document.getElementById('measureOptions');
+        const distanceBtn = document.getElementById('measureDistance');
+        const areaBtn = document.getElementById('measureArea');
+        const clearBtn = document.getElementById('clearMeasure');
+
+        function deactivateButtons() { document.querySelectorAll('#measureOptions button').forEach(b => b.classList.remove('active')); }
+        function activateButton(btn) { deactivateButtons(); btn.classList.add('active'); }
+
+        startMeasureBtn.addEventListener('click', () => { startMeasureBtn.style.display = 'none'; measureOptions.style.display = 'flex'; });
+        distanceBtn.addEventListener('click', () => { activateButton(distanceBtn); addInteraction('length'); });
+        areaBtn.addEventListener('click', () => { activateButton(areaBtn); addInteraction('area'); });
+        clearBtn.addEventListener('click', () => {
+            vectorSource.clear(); if (draw) map.removeInteraction(draw); deactivateButtons();
+            measureOptions.style.display = 'none'; startMeasureBtn.style.display = 'block';
+        });
     </script>
 </body>
 </html>
