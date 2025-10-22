@@ -4,6 +4,7 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -167,9 +168,8 @@
                             </material:RadioButtonGroupView>
 
                             <HorizontalStackLayout Spacing="24" Margin="0,0,0,10">
-                                <Image HorizontalOptions="Center"
-                                       WidthRequest="30"
-                                       Source="{Binding MapIcons[0], Converter={StaticResource RawAssetConverter}}"/>
+                                <ffimageloading:SvgCachedImage x:Name="svgIcon"
+                                       WidthRequest="30"/>
                                 <Image HorizontalOptions="Center"
                                        WidthRequest="30"
                                        Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>
