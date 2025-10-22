@@ -267,7 +267,8 @@ public partial class MapView : IQueryAttributable
 
     private async void GetCoordinatesClicked(object sender, EventArgs e)
     {
-        string result = await GeoAdminWebView.EvaluateJavaScriptAsync("getMarkerCoordinates()");
+        var script = "getMarkerCoordinates()";
+        string result = await GeoAdminWebView.EvaluateJavaScriptAsync(script);
 
         if (!string.IsNullOrEmpty(result))
         {

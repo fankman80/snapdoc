@@ -379,6 +379,7 @@
             // Modify
             modify = new ol.interaction.Modify({ source: vectorSource, style: modifyStyle });
             map.addInteraction(modify);
+
             mapReady = true;
 
             if (pendingPositions.length > 0) {
@@ -412,7 +413,6 @@
             });
         }
 
-        // Draw-Funktion
         // Draw-Funktion
         function addInteraction(type) {
             const drawType = type === 'area' ? 'Polygon' : 'LineString';
@@ -516,8 +516,8 @@
         function changeMapLayer(layer) { raster.getSource().updateParams({ LAYERS: layer, CACHEBUSTER: new Date().getTime() }); raster.getSource().refresh(); }
 
         function getMarkerCoordinates() {
-            const features = vectorSource.getFeatures();
-            return features.length ? JSON.stringify(features.map(f => { const c = ol.proj.toLonLat(f.getGeometry().getCoordinates()); return { lon: c[0], lat: c[1], pinkey: f.get('pinkey'), plankey: f.get('plankey') }; })) : null;
+            var features = pinSource.getFeatures();
+            return features.length ? JSON.stringify(features.map(f => { var c = ol.proj.toLonLat(f.getGeometry().getCoordinates()); return { lon: c[0], lat: c[1], pinkey: f.get('pinkey'), plankey: f.get('plankey') }; })) : null;
         }
 
         window.onload = function () {
