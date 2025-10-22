@@ -191,7 +191,7 @@
             if (markers && markers.length > 0) setMultipleMarkers(markers);
         }
 
-        // --- Hilfsfunktionen für Länge/Fläche ---
+        // Hilfsfunktionen für Länge/Fläche
         function formatLength(line) {
             const length = ol.sphere.getLength(line);
             return length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m';
@@ -210,7 +210,12 @@
         });
 
         const labelStyle = new ol.style.Style({
-            text: new ol.style.Text({ font: 'bold 14px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), stroke: new ol.style.Stroke({ color: '#333', width: 3 }), overflow: true })
+            text: new ol.style.Text({
+                font: 'bold 14px Segoe UI',
+                fill: new ol.style.Fill({ color: '#fff' }),
+                stroke: new ol.style.Stroke({ color: '#333', width: 3 }),
+                overflow: true
+            })
         });
 
         const tipStyle = new ol.style.Style({
@@ -220,7 +225,7 @@
                 backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
                 padding: [2, 2, 2, 2],
                 textAlign: 'left',
-                offsetX: 16,
+                offsetX: 18,
                 offsetY: 0
             })
         });
@@ -228,21 +233,27 @@
         const modifyStyle = new ol.style.Style({
             image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), stroke: new ol.style.Stroke({ color: '#333', width: 1 }) }),
             text: new ol.style.Text({
-                text: 'Drag to modify',
+                text: 'Zum Bearbeiten ziehen',
                 font: '12px Segoe UI',
                 fill: new ol.style.Fill({ color: '#fff' }),
                 backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
                 padding: [2, 2, 2, 2],
                 textAlign: 'left',
-                offsetX: 16,
+                offsetX: 18,
                 offsetY: 0
             })
         });
 
         // Segment-Stil
         const segmentStyle = new ol.style.Style({
-            text: new ol.style.Text({ font: '12px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), padding: [2, 2, 2, 2], offsetY: -12 }),
-            image: new ol.style.RegularShape({ radius: 6, points: 3, angle: Math.PI, displacement: [0, 8], fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }) })
+            image: new ol.style.RegularShape({ radius: 6, points: 3, angle: Math.PI, displacement: [0, 8], fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }) }),
+            text: new ol.style.Text({
+                font: '12px Segoe UI',
+                fill: new ol.style.Fill({ color: '#fff' }),
+                backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
+                padding: [2, 2, 2, 2],
+                offsetY: -12
+            })
         });
         const segmentStyles = [segmentStyle];
 
@@ -273,33 +284,52 @@
                 styles.push(polygonStyle);
                 point = geometry.getInteriorPoint();
                 label = formatArea(geometry);
-                line = new ol.geom.LineString(geometry.getCoordinates()[0]);
-
+                line = null;
             } else if (!drawType || drawType === type || type === 'Point') {
                 styles.push(baseStyle);
             }
 
-            // Segmentbeschriftung
+            // Segmentbeschriftungen mit kleinem Dreieck darunter ---
             if (segments && line) {
-                let count = 0;
-                line.forEachSegment(function (a, b) {
-                    const seg = new ol.geom.LineString([a, b]);
-                    const segLabel = formatLength(seg);
-                    if (segmentStyles.length - 1 < count) segmentStyles.push(segmentStyle.clone());
-                    const segPoint = new ol.geom.Point(seg.getCoordinateAt(0.5));
-                    segmentStyles[count].setGeometry(segPoint);
-                    segmentStyles[count].getText().setText(segLabel);
-                    styles.push(segmentStyles[count]);
-                    count++;
-                });
+                const coords = line.getCoordinates();
+                for (let i = 0; i < coords.length - 1; i++) {
+                    const c1 = coords[i];
+                    const c2 = coords[i + 1];
+                    const segment = new ol.geom.LineString([c1, c2]);
+                    const midpoint = segment.getCoordinateAt(0.5);
+                    const length = ol.sphere.getLength(segment);
+                    const segLabel = length > 1000
+                        ? (length / 1000).toFixed(2) + ' km'
+                        : length.toFixed(2) + ' m';
+
+                    styles.push(new ol.style.Style({
+                        geometry: new ol.geom.Point(midpoint),
+                        text: new ol.style.Text({
+                            text: segLabel,
+                            font: '12px Segoe UI',
+                            fill: new ol.style.Fill({ color: '#fff' }),
+                            backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
+                            padding: [2, 2, 2, 2],
+                            textBaseline: 'bottom',
+                            offsetY: -12
+                        }),
+                        image: new ol.style.RegularShape({
+                            radius: 6,
+                            points: 3,
+                            angle: Math.PI,
+                            displacement: [0, 8],
+                            fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' })
+                        })
+                    }));
+                }
             }
 
             // Label auf Linie oder Polygon
             if (label) {
                 labelStyle.setGeometry(point);
                 labelStyle.getText().setText(label);
-                labelStyle.getText().setOffsetX(0); // nach rechts
-                labelStyle.getText().setOffsetY(-16); // nach oben
+                labelStyle.getText().setOffsetX(0);
+                labelStyle.getText().setOffsetY(-18);
                 styles.push(labelStyle);
             }
 
@@ -313,7 +343,7 @@
             return styles;
         }
 
-        // --- Map initialisieren ---
+        // Map initialisieren
         function initMap() {
             vectorSource = new ol.source.Vector();
             vectorLayer = new ol.layer.Vector({ source: vectorSource, style: function (f) { return styleFunction(f, document.getElementById('segments').checked); } });
@@ -382,11 +412,11 @@
             });
         }
 
-        // --- Draw-Funktion ---
+        // Draw-Funktion
         function addInteraction(type) {
             const drawType = type === 'area' ? 'Polygon' : 'LineString';
-            const activeTip = 'Click to continue drawing the ' + (drawType === 'Polygon' ? 'polygon' : 'line');
-            const idleTip = 'Click to start measuring';
+            const activeTip = 'Klicken, um ' + (drawType === 'Polygon' ? 'das Polygon weiter zu zeichnen' : 'die Linie weiter zu zeichnen');
+            const idleTip = 'Klicken, um die Vermessung zu starten';
             let tip = idleTip;
 
             if (draw) map.removeInteraction(draw);
@@ -448,7 +478,7 @@
             });
         };
 
-        // --- Buttons ---
+        // Buttons
         const startMeasureBtn = document.getElementById('startMeasure');
         const measureOptions = document.getElementById('measureOptions');
         const distanceBtn = document.getElementById('measureDistance');
