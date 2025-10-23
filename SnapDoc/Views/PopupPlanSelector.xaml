@@ -26,63 +26,62 @@
     </toolkit:Popup.Resources>
 
     <Grid>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <Label Grid.Row="0"
-				   x:Name="labelText"/>
-            <ScrollView Grid.Row="1" VerticalOptions="Start" MaximumHeightRequest="800">
-                <CollectionView x:Name="PlanCollectionView"
-                                x:DataType="local:Views.PopupPlanSelector"
-                                ItemsSource="{Binding PlanItems}"
-                                CanReorderItems="False"
-                                SelectionMode="Single">
-                    <CollectionView.ItemTemplate>
-                        <DataTemplate x:DataType="local:PlanItem">
-                            <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44">
-                                <Grid.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
-                                </Grid.GestureRecognizers>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Label Grid.Row="0" x:Name="labelText"/>
+        <ScrollView Grid.Row="1" VerticalOptions="Start" MaximumHeightRequest="800">
+            <CollectionView x:Name="PlanCollectionView"
+                            x:DataType="local:Views.PopupPlanSelector"
+                            ItemsSource="{Binding PlanItems}"
+                            CanReorderItems="False"
+                            SelectionMode="Single">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PlanItem">
+                        <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
+                            </Grid.GestureRecognizers>
 
-                                <Border Grid.Column="0" Grid.ColumnSpan="3"
-                                        BackgroundColor="{Binding PlanColor}"
-                                        StrokeThickness="0"/>
+                            <Border Grid.Column="0" Grid.ColumnSpan="3"
+                                    BackgroundColor="{Binding PlanColor}"
+                                    StrokeThickness="0"/>
                                 
-                                <Label Grid.Column="1"
-                                       Text="{Binding Title}"
-                                       VerticalOptions="Center"/>
+                            <Label Grid.Column="1"
+                                    Text="{Binding Title}"
+                                    VerticalOptions="Center"/>
 
-                                <Label Grid.Column="2"
-                                       Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                       Padding="0,0,10,0"
-                                       FontFamily="MaterialOutlined"
-                                       FontSize="18"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center"
-                                       BackgroundColor="Transparent"/>
-                            </Grid>
-                        </DataTemplate>
-                    </CollectionView.ItemTemplate>
-                </CollectionView>
-            </ScrollView>
-            
-            <Grid Grid.Row="2">
-                    <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        x:Name="cancelButtonText"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
-                        x:Name="okButtonText"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        Clicked="OnOkClicked" />
-                </Grid>
+                            <Label Grid.Column="2"
+                                    Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                    Padding="0,0,10,0"
+                                    FontFamily="MaterialOutlined"
+                                    FontSize="18"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    BackgroundColor="Transparent"/>
+                        </Grid>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </ScrollView>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    x:Name="cancelButtonText"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    Clicked="OnCancelClicked" />
+            <Button Grid.Column="1"
+                    x:Name="okButtonText"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    Clicked="OnOkClicked" />
+        </Grid>
     </Grid>
 </toolkit:Popup>
