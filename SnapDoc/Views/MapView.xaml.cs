@@ -58,7 +58,8 @@ public partial class MapView : IQueryAttributable
                     if (icon == "themeColorPin")
                     {
                         string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
-                        icon = await LoadSvgAsBase64Async("customcolor.svg", hexColor);
+                        icon = await LoadSvgMarkupAsync("customcolor.svg", hexColor);
+                        icon = icon.Replace("'", "\\'").Replace("\r", "").Replace("\n", "");
                     }
 
                     double scale = (double)SettingsService.Instance.MapIconSize / 100;
@@ -202,18 +203,19 @@ public partial class MapView : IQueryAttributable
         }
     }
 
-    private static async Task<string> LoadSvgAsBase64Async(string rawFileName, string color)
+    private static async Task<string> LoadSvgMarkupAsync(string rawFileName, string newColor)
     {
-        using var stream = FileSystem.OpenAppPackageFileAsync(rawFileName).Result;
+        using var stream = await FileSystem.OpenAppPackageFileAsync(rawFileName);
         using var reader = new StreamReader(stream);
-        string svgText = reader.ReadToEnd();
+        string svgText = await reader.ReadToEndAsync();
 
         // Farbe ersetzen
-        svgText = svgText.Replace("#999999", color, StringComparison.OrdinalIgnoreCase);
+        svgText = svgText.Replace("#999999", newColor, StringComparison.OrdinalIgnoreCase);
 
-        // SVG in Data-URL Base64 umwandeln
-        string svgBase64 = "data:image/svg+xml;utf8," + Uri.EscapeDataString(svgText);
-        return svgBase64;
+        // Whitespace entfernen
+        svgText = svgText.Trim();
+
+        return svgText;
     }
 
     private static string LoadHtmlFromFile()

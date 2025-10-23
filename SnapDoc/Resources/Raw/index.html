@@ -467,9 +467,27 @@
                 pinname, pinlocation, pindesc, plankey, pinkey
             });
 
+            let iconSrc;
+            const trimmed = initialIcon.trim();
+
+            // Prüfen, ob SVG oder Datei-URL
+            if (
+                trimmed.startsWith("<svg") ||
+                trimmed.startsWith("<?xml") ||
+                trimmed.startsWith("<!DOCTYPE svg")
+            ) {
+                iconSrc = 'data:image/svg+xml;utf8,' + encodeURIComponent(trimmed);
+            } else if (trimmed.startsWith("data:")) {
+                // Bereits eine Data-URL
+                iconSrc = trimmed;
+            } else {
+                // Normale Datei (z. B. PNG)
+                iconSrc = trimmed;
+            }
+
             let style = new ol.style.Style({
                 image: new ol.style.Icon({
-                    src: initialIcon,
+                    src: iconSrc,
                     scale: initialIconScale,
                     anchor: [0.5, 1],
                     anchorXUnits: 'fraction',

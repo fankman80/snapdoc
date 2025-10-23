@@ -1,9 +1,8 @@
-#nullable disable
+ï»¿#nullable disable
 
 using CommunityToolkit.Maui.Views;
 using FFImageLoading.Maui;
 using SnapDoc.Services;
-using System.Net.Http;
 
 namespace SnapDoc.Views;
 
@@ -32,6 +31,13 @@ public partial class PopupSettings : Popup
 
     private static string LoadSvgWithColor(string rawFileName, string newColor)
     {
+        // TemporÃ¤ren Pfad erzeugen
+        string tempPath = Path.Combine(FileSystem.CacheDirectory, $"temp_{newColor.TrimStart('#')}.svg");
+
+        // Wenn bereits vorhanden â†’ direkt zurÃ¼ckgeben
+        if (File.Exists(tempPath))
+            return tempPath;
+
         // SVG aus dem Paket laden
         using var stream = FileSystem.OpenAppPackageFileAsync(rawFileName).Result;
         using var reader = new StreamReader(stream);
@@ -40,13 +46,10 @@ public partial class PopupSettings : Popup
         // Farbe ersetzen
         svgText = svgText.Replace("#999999", newColor, StringComparison.OrdinalIgnoreCase);
 
-        // Temporären Pfad erzeugen
-        string tempPath = Path.Combine(FileSystem.CacheDirectory, $"temp_{newColor.TrimStart('#')}.svg");
-
-        // Geänderten SVG-Text in Datei schreiben
+        // GeÃ¤nderten SVG-Text in Datei schreiben
         File.WriteAllText(tempPath, svgText);
 
-        // FileStream öffnen und zurückgeben
+        // FileStream Ã¶ffnen und zurÃ¼ckgeben
         return tempPath;
     }
 }

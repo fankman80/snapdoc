@@ -28,7 +28,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout>
+            <VerticalStackLayout Margin="0,0,0,10">
                 <VerticalStackLayout Spacing="0">
                     <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
                     <Slider x:Name="MinScaleSlider"
@@ -58,51 +58,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding MaxPdfPixelCount}"/>
                 </VerticalStackLayout>
-                <VerticalStackLayout Spacing="4">
-                    <Label Text="App-Modus und Thema" FontSize="12" Margin="8,0,0,0"/>
-                    <Grid ColumnDefinitions="*,*">
-                        <Border Grid.Column="0"
-                                Stroke="{DynamicResource SecondaryBackground}"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 8">
-                            <Picker x:Name="darkModePicker"
-                                    ItemsSource="{Binding AppThemes}"
-                                    SelectedItem="{Binding SelectedAppTheme}"/>
-                        </Border>
-                        <Border Grid.Column="1"
-                                Stroke="{DynamicResource SecondaryBackground}"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 8">
-                            <Picker x:Name="colorThemePicker"
-                                    ItemsSource="{Binding ColorThemes}"
-                                    SelectedItem="{Binding SelectedColorTheme}"/>
-                        </Border>
-                    </Grid>
-                </VerticalStackLayout>
-                <Label Text="Modus für Pinplatzierung:"/>
-                <material:RadioButtonGroupView Spacing="10"
-                                               SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
-                                               HorizontalOptions="Start"
-                                               Orientation="Vertical">
-                    <material:RadioButton Value="0"
-                                          Text="Pin in die Bildmitte setzen"
-                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Start" />
-                    <material:RadioButton Value="1"
-                                          Text="Pin durch Antippen setzen"
-                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Start" />
-                    <material:RadioButton Value="2"
-                                          Text="Pin durch Gedrückthalten setzen"
-                                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                          CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                          HorizontalOptions="Start" />
-                </material:RadioButtonGroupView>
+
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                     <controls:Switch Grid.Column="0"
                                      IsToggled="{Binding IsPlanRotateLocked}"
@@ -115,16 +71,51 @@
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     <Label Text="Planrotation sperren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
-                <Border Stroke="{DynamicResource SecondaryBackground}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 8"
-                        Padding="8"
-                        Margin="0,0,0,10">
+
+            <Border Stroke="{DynamicResource SecondaryBackground}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="8"
+                    Margin="0,0,0,10">
+                <uranium:ExpanderView Margin="6,6,6,6">
+                    <uranium:ExpanderView.Header>
+                        <Label Text="Modus für Pinplatzierung"/>
+                    </uranium:ExpanderView.Header>
+                        <material:RadioButtonGroupView Spacing="10"
+                                                       SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
+                                                       HorizontalOptions="Start"
+                                                       Orientation="Vertical">
+                            <material:RadioButton Value="0"
+                                                  Text="Pin in die Bildmitte setzen"
+                                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                  CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                  HorizontalOptions="Start" />
+                            <material:RadioButton Value="1"
+                                                  Text="Pin durch Antippen setzen"
+                                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                  CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                  HorizontalOptions="Start" />
+                            <material:RadioButton Value="2"
+                                                  Text="Pin durch Gedrückthalten setzen"
+                                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                  CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                  HorizontalOptions="Start" />
+                        </material:RadioButtonGroupView>
+                    </uranium:ExpanderView>
+            </Border>
+
+            <Border Stroke="{DynamicResource SecondaryBackground}"
+                    StrokeThickness="1"
+                    StrokeShape="RoundRectangle 8"
+                    Padding="8"
+                    Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
-                            <Label Text="swisstopo Map-Icons"/>
+                            <Label Text="swisstopo Karten-Pins"/>
                         </uranium:ExpanderView.Header>
-
                         <VerticalStackLayout Spacing="0">
                             <material:RadioButtonGroupView Spacing="24"
                                                            Margin="2,10,0,0"
@@ -184,7 +175,7 @@
                                        Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
                             </HorizontalStackLayout>
 
-                            <Label Text="{Binding MapIconSize, StringFormat='Icongrösse: {0:0.##}%'}"/>
+                            <Label Text="{Binding MapIconSize, StringFormat='Pingrösse: {0:0.##}%'}"/>
                             <Slider Maximum="100"
                                     Minimum="1"
                                     ThumbColor="{DynamicResource Primary}"
@@ -194,6 +185,28 @@
                         </VerticalStackLayout>
                     </uranium:ExpanderView>
                 </Border>
+
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="App-Modus und Thema"/>
+                    <Grid ColumnDefinitions="*,*">
+                        <Border Grid.Column="0"
+                                Stroke="{DynamicResource SecondaryBackground}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 8">
+                            <Picker x:Name="darkModePicker"
+                                    ItemsSource="{Binding AppThemes}"
+                                    SelectedItem="{Binding SelectedAppTheme}"/>
+                        </Border>
+                        <Border Grid.Column="1"
+                                Stroke="{DynamicResource SecondaryBackground}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 8">
+                            <Picker x:Name="colorThemePicker"
+                                    ItemsSource="{Binding ColorThemes}"
+                                    SelectedItem="{Binding SelectedColorTheme}"/>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
 
