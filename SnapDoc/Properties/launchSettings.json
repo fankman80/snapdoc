@@ -1,8 +1,10 @@
 {
   "profiles": {
-    "Windows Machine": {
-      "commandName": "Project",
-      "nativeDebugging": false
+    "SnapDoc (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "SnapDoc (Unpackaged)": {
+      "commandName": "Project"
     }
   }
 }
