@@ -28,6 +28,7 @@
 		<AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
+		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 
 	<!-- Debug Android -->
