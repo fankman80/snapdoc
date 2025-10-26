@@ -53,7 +53,17 @@ public partial class EditorView : ContentPage, IQueryAttributable
                 try
                 {
                     var data = JsonSerializer.Deserialize<Dictionary<string, string>>(msg);
-                    if (data != null && data.TryGetValue("json", out var json))
+                    if (data == null) return;
+
+                    // Abbrechen
+                    if (data.ContainsKey("cancel"))
+                    {
+                        await Shell.Current.GoToAsync("..");
+                        return;
+                    }
+
+                    // Speichern
+                    if (data.TryGetValue("json", out var json))
                         await SaveJsonAsync(json);
                 }
                 catch { }
@@ -167,7 +177,17 @@ public partial class EditorView : ContentPage, IQueryAttributable
                 if (!_weakRef.TryGetTarget(out var view)) return;
 
                 var data = JsonSerializer.Deserialize<Dictionary<string, string>>(message);
-                if (data != null && data.TryGetValue("json", out var json))
+                if (data == null) return;
+
+                // Abbrechen
+                if (data.ContainsKey("cancel"))
+                {
+                    await Shell.Current.GoToAsync("..");
+                    return;
+                }
+
+                // Speichern
+                if (data.TryGetValue("json", out var json))
                     await view.SaveJsonAsync(json);
             });
         }

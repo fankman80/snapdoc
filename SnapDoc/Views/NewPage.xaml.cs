@@ -177,24 +177,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Task AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
-        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > Settings.MaxPdfImageSizeW || GlobalJson.Data.Plans[PlanId].ImageSize.Height > Settings.MaxPdfImageSizeH)
+        if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || GlobalJson.Data.Plans[PlanId].ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
         {
             PlanImage.DownsampleToViewSize = true;
-            PlanImage.DownsampleWidth = Settings.MaxPdfImageSizeW;
-            PlanImage.DownsampleHeight = Settings.MaxPdfImageSizeH;
+            PlanImage.DownsampleWidth = SettingsService.Instance.MaxPdfImageSizeW;
+            PlanImage.DownsampleHeight = SettingsService.Instance.MaxPdfImageSizeH;
 
             var scaleFac = Math.Min(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height) /
                            Math.Max(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height);
 
             if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > GlobalJson.Data.Plans[PlanId].ImageSize.Height)
             {
-                PlanImage.WidthRequest = Settings.MaxPdfImageSizeW;
-                PlanImage.HeightRequest = Settings.MaxPdfImageSizeH * scaleFac;
+                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW;
+                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * scaleFac;
             }
             else
             {
-                PlanImage.WidthRequest = Settings.MaxPdfImageSizeW * scaleFac;
-                PlanImage.HeightRequest = Settings.MaxPdfImageSizeH;
+                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * scaleFac;
+                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH;
             }
         }
         else
@@ -656,7 +656,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.AnchorY = pos.Y;
             planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pos.X);
             planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pos.Y);
-            planContainer.Scale = Settings.DefaultPinZoom;
+            planContainer.Scale = SettingsService.Instance.DefaultPinZoom;
         }
     }
 

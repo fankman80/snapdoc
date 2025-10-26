@@ -7,8 +7,13 @@
 
     <!-- CodeMirror CSS & Theme -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/material.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/material-darker.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/monokai.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/dracula.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/eclipse.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/neo.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/idea.min.css">
+
 
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
@@ -26,12 +31,12 @@
 
         #toolbar {
             display: flex;
-            flex-wrap: wrap; /* ermöglicht Zeilenumbruch */
+            flex-wrap: wrap;
             align-items: center;
             justify-content: flex-start;
-            padding: 0 10px;
+            padding: 8px 8px;
             background: #2d2d2d;
-            gap: 6px;
+            gap: 8px;
         }
 
         button, select {
@@ -68,15 +73,21 @@
 <body>
     <div id="toolbar">
         <span id="editorTitle">JSON Editor</span>
-        <button id="sendButton">Speichern</button>
-        <button onclick="formatJson()">Formatieren</button>
         <button onclick="editor.undo()">↶</button>
         <button onclick="editor.redo()">↷</button>
+        <button onclick="formatJson()">Formatieren</button>
         <button onclick="validateJson()">Validieren</button>
         <select id="themeSelector" onchange="changeTheme(this.value)">
-            <option value="material" selected>Dark</option>
-            <option value="eclipse">Light</option>
+            <option value="material-darker" selected>Material (Dark)</option>
+            <option value="material">Material (Light)</option>
+            <option value="monokai">Monokai (Dark)</option>
+            <option value="dracula">Dracula (Dark)</option>
+            <option value="eclipse">Eclipse (Light)</option>
+            <option value="neo">Neo (Light)</option>
+            <option value="idea">IntelliJ Idea (Light)</option>
         </select>
+        <button onclick="sendCancel()">Abbrechen</button>
+        <button id="sendButton">Speichern</button>
     </div>
 
     <div id="editor"></div>
@@ -89,7 +100,7 @@
             editor = CodeMirror(document.getElementById("editor"), {
                 value: "",
                 mode: { name: "javascript", json: true },
-                theme: "material",
+                theme: "material-darker", // <- Dark-Theme als Voreinstellung
                 lineNumbers: true,
                 lineWrapping: true
             });
@@ -101,6 +112,7 @@
             }
 
             document.getElementById("sendButton").addEventListener("click", sendJsonToCSharp);
+            document.getElementById("cancelButton").addEventListener("click", cancelEditing);
         };
 
         // JSON von C# setzen
@@ -121,13 +133,21 @@
                 window.jsBridge.invokeAction(payload);      // Android
         }
 
+        function sendCancel() {
+            const payload = JSON.stringify({ cancel: "true" });
+            if (window.chrome?.webview)
+                window.chrome.webview.postMessage(payload); // Windows
+            else if (window.jsBridge?.invokeAction)
+                window.jsBridge.invokeAction(payload);      // Android
+        }
+
         // JSON formatieren
         function formatJson() {
             try {
                 const obj = JSON.parse(editor.getValue());
-                editor.setValue(JSON.stringify(obj, null, 4));
+                editor.setValue(JSON.stringify(obj, null, 2));
             } catch (e) {
-                alert("Ungültiges JSON:\n" + e.message);
+                alert("Ungültiges JSON:\n\n" + e.message);
             }
         }
 
@@ -137,7 +157,7 @@
                 JSON.parse(editor.getValue());
                 alert("JSON ist gültig!");
             } catch (e) {
-                alert("Fehler im JSON:\n" + e.message);
+                alert("Fehler im JSON:\n\n" + e.message);
             }
         }
 

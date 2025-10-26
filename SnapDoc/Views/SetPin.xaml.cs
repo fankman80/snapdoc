@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
 using SnapDoc.Models;
+using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using UraniumUI.Material.Controls;
 
@@ -75,7 +76,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             })
             .ToObservableCollection();
 
-        priorityPicker.ItemsSource = Settings.PriorityItems.Select(item => item.Key).ToList();
+        priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
         
         var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
@@ -259,7 +260,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private void UpdateSpan()
     {
         double screenWidth = this.Width;
-        double imageWidth = Settings.PlanPreviewSize;
+        double imageWidth = SettingsService.Instance.PlanPreviewSize;
         DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
         DynamicSize = (int)(screenWidth / DynamicSpan);
         OnPropertyChanged(nameof(DynamicSpan));
@@ -272,7 +273,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         {
             var selectedIndex = picker.SelectedIndex;
             if (selectedIndex >= 0)
-                PriorityColor = Color.FromArgb(Settings.PriorityItems[selectedIndex].Color);
+                PriorityColor = Color.FromArgb(SettingsService.Instance.PriorityItems[selectedIndex].Color);
         }
     }
 

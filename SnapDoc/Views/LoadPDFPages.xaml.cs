@@ -282,7 +282,7 @@ public partial class LoadPDFPages : ContentPage
         if (DynamicSpan != 1)
         {
             double screenWidth = this.Width;
-            double imageWidth = Settings.PlanPreviewSize; // Mindestbreite in Pixeln
+            double imageWidth = SettingsService.Instance.PlanPreviewSize; // Mindestbreite in Pixeln
             DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
         }
         OnPropertyChanged(nameof(DynamicSpan));

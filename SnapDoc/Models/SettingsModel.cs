@@ -17,5 +17,17 @@ internal class SettingsModel
     public bool IsFotoCompressed { get; set; }
     public int FotoCompressValue { get; set; }
     public string? IconGalleryMode { get; set; }
+    public int MaxPdfImageSizeW { get; set; }
+    public int MaxPdfImageSizeH { get; set; }
+    public int ThumbSize { get; set; }
+    public int PlanPreviewSize { get; set; }
+    public int IconPreviewSize { get; set; }
+    public int PinTextPadding { get; set; }
+    public int PinTextDistance { get; set; }
+    public double DefaultPinZoom { get; set; }
     public List<string>? ColorList { get; set; }
+    public List<string>? MapIcons { get; set; }
+    public List<string>? IconSortCrits { get; set; }
+    public List<string>? PinSortCrits { get; set; }
+    public List<PriorityItem>? PriorityItems { get; set; }
 }

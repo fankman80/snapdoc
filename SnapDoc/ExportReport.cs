@@ -321,7 +321,7 @@ public partial class ExportReport
                                                     case "${pin_priority}":
                                                         if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority != 0)
                                                         {
-                                                            string fillColor = Settings.PriorityItems[
+                                                            string fillColor = SettingsService.Instance.PriorityItems[
                                                                 GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority].Color;
                                                             newTableCell.TableCellProperties =
                                                                 new TableCellProperties(new Shading { Fill = fillColor.Replace("#", "") });

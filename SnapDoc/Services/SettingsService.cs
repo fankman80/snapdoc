@@ -22,11 +22,87 @@ public partial class SettingsService : INotifyPropertyChanged
 
     public string AppVersion { get; set; } = $"Version {AppInfo.VersionString}";
 
-    public List<string> MapIcons { get; set; } = Settings.MapIcons;
+    private List<string> _mapIcons = new()
+    {
+        "themeColorPin",
+        "mappin1a.png",
+        "mappin2a.png",
+        "mappin3a.png",
+        "mappin4a.png"
+    };
+    public List<string> MapIcons
+    {
+        get => _mapIcons;
+        set
+        {
+            if (_mapIcons != value)
+            {
+                _mapIcons = value;
+                OnPropertyChanged(nameof(MapIcons));
+            }
+        }
+    }
 
-    public List<string> IconSortCrits { get; set; } = Settings.IconSortCrits;
+    private List<string> _iconSortCrits = new()
+    {
+        "nach Name",
+        "nach Farbe"
+    };
+    public List<string> IconSortCrits
+    {
+        get => _iconSortCrits;
+        set
+        {
+            if (_iconSortCrits != value)
+            {
+                _iconSortCrits = value;
+                OnPropertyChanged(nameof(IconSortCrits));
+            }
+        }
+    }
 
-    public List<string> PinSortCrits { get; set; } = Settings.PinSortCrits;
+    private List<string> _pinSortCrits = new()
+    {
+        "nach Plan",
+        "nach Pin",
+        "nach Standort",
+        "nach Bezeichnung",
+        "nach aktiv/inaktiv",
+        "nach Aufnahmedatum"
+    };
+    public List<string> PinSortCrits
+    {
+        get => _pinSortCrits;
+        set
+        {
+            if (_pinSortCrits != value)
+            {
+                _pinSortCrits = value;
+                OnPropertyChanged(nameof(PinSortCrits));
+            }
+        }
+    }
+
+    private List<PriorityItem> _priorityItems = new()
+    {
+        new PriorityItem { Key = "", Color = "#000000" },
+        new PriorityItem { Key = "Empfehlung", Color = "#92D050" },
+        new PriorityItem { Key = "Wichtig", Color = "#FFC000" },
+        new PriorityItem { Key = "Kritisch", Color = "#FF0000" }
+    };
+
+    public List<PriorityItem> PriorityItems
+    {
+        get => _priorityItems;
+        set
+        {
+            if (_priorityItems != value)
+            {
+                _priorityItems = value;
+                OnPropertyChanged(nameof(PriorityItems));
+            }
+        }
+    }
 
     public List<string> IconCategories { get; set; } = ["alle Icons"];
 
@@ -96,6 +172,119 @@ public partial class SettingsService : INotifyPropertyChanged
             {
                 _iconGalleryMode = value;
                 OnPropertyChanged(nameof(IconGalleryMode));
+            }
+        }
+    }
+
+    // Allgemeine Größen-Settings
+    private int _maxPdfImageSizeW = 8192;
+    public int MaxPdfImageSizeW
+    {
+        get => _maxPdfImageSizeW;
+        set
+        {
+            if (_maxPdfImageSizeW != value)
+            {
+                _maxPdfImageSizeW = value;
+                OnPropertyChanged(nameof(MaxPdfImageSizeW));
+            }
+        }
+    }
+
+    private int _maxPdfImageSizeH = 8192;
+    public int MaxPdfImageSizeH
+    {
+        get => _maxPdfImageSizeH;
+        set
+        {
+            if (_maxPdfImageSizeH != value)
+            {
+                _maxPdfImageSizeH = value;
+                OnPropertyChanged(nameof(MaxPdfImageSizeH));
+            }
+        }
+    }
+
+    private int _thumbSize = 150;
+    public int ThumbSize
+    {
+        get => _thumbSize;
+        set
+        {
+            if (_thumbSize != value)
+            {
+                _thumbSize = value;
+                OnPropertyChanged(nameof(ThumbSize));
+            }
+        }
+    }
+
+    private int _planPreviewSize = 150;
+    public int PlanPreviewSize
+    {
+        get => _planPreviewSize;
+        set
+        {
+            if (_planPreviewSize != value)
+            {
+                _planPreviewSize = value;
+                OnPropertyChanged(nameof(PlanPreviewSize));
+            }
+        }
+    }
+
+    private int _iconPreviewSize = 64;
+    public int IconPreviewSize
+    {
+        get => _iconPreviewSize;
+        set
+        {
+            if (_iconPreviewSize != value)
+            {
+                _iconPreviewSize = value;
+                OnPropertyChanged(nameof(IconPreviewSize));
+            }
+        }
+    }
+
+    private int _pinTextPadding = 6;
+    public int PinTextPadding
+    {
+        get => _pinTextPadding;
+        set
+        {
+            if (_pinTextPadding != value)
+            {
+                _pinTextPadding = value;
+                OnPropertyChanged(nameof(PinTextPadding));
+            }
+        }
+    }
+
+    private int _pinTextDistance = 3;
+    public int PinTextDistance
+    {
+        get => _pinTextDistance;
+        set
+        {
+            if (_pinTextDistance != value)
+            {
+                _pinTextDistance = value;
+                OnPropertyChanged(nameof(PinTextDistance));
+            }
+        }
+    }
+
+    private double _defaultPinZoom = 2;
+    public double DefaultPinZoom
+    {
+        get => _defaultPinZoom;
+        set
+        {
+            if (_defaultPinZoom != value)
+            {
+                _defaultPinZoom = value;
+                OnPropertyChanged(nameof(DefaultPinZoom));
             }
         }
     }
@@ -691,7 +880,19 @@ public partial class SettingsService : INotifyPropertyChanged
             IsFotoCompressed = this.IsFotoCompressed,
             FotoCompressValue = this.FotoCompressValue,
             IconGalleryMode = this.IconGalleryMode,
-            ColorList = this.ColorList
+            MaxPdfImageSizeW = this.MaxPdfImageSizeW,
+            MaxPdfImageSizeH = this.MaxPdfImageSizeH,
+            ThumbSize = this.ThumbSize,
+            PlanPreviewSize = this.PlanPreviewSize,
+            IconPreviewSize = this.IconPreviewSize,
+            PinTextPadding = this.PinTextPadding,
+            PinTextDistance = this.PinTextDistance,
+            DefaultPinZoom = this.DefaultPinZoom,
+            ColorList = this.ColorList,
+            MapIcons = this.MapIcons,
+            IconSortCrits = this.IconSortCrits,
+            PinSortCrits = this.PinSortCrits,
+            PriorityItems = this.PriorityItems,
         };
 
         var json = JsonSerializer.Serialize(settings, GetOptions());
@@ -732,7 +933,19 @@ public partial class SettingsService : INotifyPropertyChanged
                 this.IsFotoCompressed = settings.IsFotoCompressed;
                 this.FotoCompressValue = settings.FotoCompressValue;
                 this.IconGalleryMode = settings.IconGalleryMode ?? "IconListTemplate";
+                this.MaxPdfImageSizeW = settings.MaxPdfImageSizeW;
+                this.MaxPdfImageSizeH = settings.MaxPdfImageSizeH;
+                this.ThumbSize = settings.ThumbSize;
+                this.PlanPreviewSize = settings.PlanPreviewSize;
+                this.IconPreviewSize = settings.IconPreviewSize;
+                this.PinTextPadding = settings.PinTextPadding;
+                this.PinTextDistance = settings.PinTextDistance;
+                this.DefaultPinZoom = settings.DefaultPinZoom;
                 this.ColorList = settings.ColorList ?? _colorList;
+                this.MapIcons = settings.MapIcons ?? _mapIcons;
+                this.IconSortCrits = settings.IconSortCrits ?? _iconSortCrits;
+                this.PinSortCrits = settings.PinSortCrits ?? _pinSortCrits;
+                this.PriorityItems = settings.PriorityItems ?? _priorityItems;
             }
         }
     }

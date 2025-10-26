@@ -3,14 +3,6 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
-    public const int MaxPdfImageSizeW = 8192;
-    public const int MaxPdfImageSizeH = 8192;
-    public const int ThumbSize = 150;
-    public const int PlanPreviewSize = 150;
-    public const int IconPreviewSize = 64;
-    public const int PinTextPadding = 6;
-    public const int PinTextDistance = 3;
-    public const double DefaultPinZoom = 2;
     public const string PinEditSliderRotateLock = "Autom. ausrichten ▶ ziehen";
     public const string PinEditSliderRotateUnlock = "Autom. Ausrichtung aktiviert";
 
@@ -61,39 +53,6 @@ public static class Settings
         new MapViewItem { Desc = "DROHNEN", Id = "ch.bazl.einschraenkungen-drohnen" },
         new MapViewItem { Desc = "SCHUTZGEBIETE_LUFTFAHRT", Id = "ch.bafu.schutzgebiete-luftfahrt" },
         new MapViewItem { Desc = "EISZEIT", Id = "ch.swisstopo.geologie-eiszeit-lgm-raster" }];
-
-    public static readonly List<PriorityItem> PriorityItems =
-    [
-        new PriorityItem { Key = "", Color = "#000000" },
-        new PriorityItem { Key = "Empfehlung", Color = "#92D050" },
-        new PriorityItem { Key = "Wichtig", Color = "#FFC000" },
-        new PriorityItem { Key = "Kritisch", Color = "#FF0000" }
-    ];
-
-    public static readonly List<string> IconSortCrits =
-    [
-        "nach Name",
-        "nach Farbe"
-    ];
-
-    public static readonly List<string> PinSortCrits =
-    [
-        "nach Plan",
-        "nach Pin",
-        "nach Standort",
-        "nach Bezeichnung",
-        "nach aktiv/inaktiv",
-        "nach Aufnahmedatum"
-    ];
-
-    public static readonly List<string> MapIcons =
-    [
-        "themeColorPin",
-        "mappin1a.png",
-        "mappin2a.png",
-        "mappin3a.png",
-        "mappin4a.png"
-    ];
 
     public static readonly PopupOptions PopupOptions = new()
     {

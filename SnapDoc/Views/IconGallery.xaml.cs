@@ -301,7 +301,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         if (SettingsService.Instance.IconGalleryMode == "IconGridTemplate")
         {
             double screenWidth = this.Width;
-            double imageWidth = Settings.IconPreviewSize; // Mindestbreite in Pixeln
+            double imageWidth = SettingsService.Instance.IconPreviewSize; // Mindestbreite in Pixeln
             DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
         }
         else
