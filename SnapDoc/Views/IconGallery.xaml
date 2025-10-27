@@ -61,7 +61,7 @@
 
             <!-- Template für Grid (Label unsichtbar) -->
             <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
-                <Grid HeightRequest="64" WidthRequest="64">
+                <Grid>
                     <Image Source="{Binding FileName}"
                            Aspect="AspectFit"
                            Margin="6"/>
@@ -136,7 +136,7 @@
                 SelectionMode="Single"
                 ItemTemplate="{StaticResource IconListTemplate}">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}"/>
                 </CollectionView.ItemsLayout>
             </CollectionView>
         </Grid>

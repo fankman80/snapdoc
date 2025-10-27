@@ -2,32 +2,44 @@
 
 internal class SettingsModel
 {
-    public double PinMinScaleLimit { get; set; }
-    public double PinMaxScaleLimit { get; set; }
-    public int MapIconSize { get; set; }
-    public int MapIcon { get; set; }
-    public int PinPlaceMode { get; set; }
-    public int IconSortCrit { get; set; }
-    public int PinSortCrit { get; set; }
-    public int IconCategory { get; set; }
-    public bool IsPlanRotateLocked { get; set; }
-    public int MaxPdfPixelCount { get; set; }
-    public int SelectedColorTheme { get; set; }
-    public int SelectedAppTheme { get; set; }
-    public bool IsFotoCompressed { get; set; }
-    public int FotoCompressValue { get; set; }
-    public string? IconGalleryMode { get; set; }
-    public int MaxPdfImageSizeW { get; set; }
-    public int MaxPdfImageSizeH { get; set; }
-    public int ThumbSize { get; set; }
-    public int PlanPreviewSize { get; set; }
-    public int IconPreviewSize { get; set; }
-    public int PinTextPadding { get; set; }
-    public int PinTextDistance { get; set; }
-    public double DefaultPinZoom { get; set; }
-    public List<string>? ColorList { get; set; }
-    public List<string>? MapIcons { get; set; }
-    public List<string>? IconSortCrits { get; set; }
-    public List<string>? PinSortCrits { get; set; }
-    public List<PriorityItem>? PriorityItems { get; set; }
+    public double PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
+    public double PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
+    public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo
+    public int MapIcon { get; set; } // Ausgewähltes Karten-Icon auf swisstopo
+    public int PinPlaceMode { get; set; } // Modus zum Platzieren der Pins
+    public int IconSortCrit { get; set; } // Kriterium zur Sortierung der Icons
+    public int PinSortCrit { get; set; } // Kriterium zur Sortierung der Pins
+    public int IconCategory { get; set; } // Icon-Kategorie
+    public bool IsPlanRotateLocked { get; set; } // Planrotation sperren
+    public int MaxPdfPixelCount { get; set; } // Maximale Pixelanzahl eines PDF-Bildes beim Import
+    public int SelectedColorTheme { get; set; } // App-Farbschema
+    public int SelectedAppTheme { get; set; } // App-Design (Hell/Dunkel)
+    public bool IsPlanExport { get; set; } // Pläne im Bericht exportieren
+    public bool IsPosImageExport { get; set; } // Positionsbilder im Bericht exportieren
+    public bool IsPinIconExport { get; set; } // Pin-Icons im Bericht exportieren
+    public bool IsImageExport { get; set; } // Fotos im Bericht exportieren
+    public bool IsFotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
+    public bool IsFotoCompressed { get; set; } // Fotos im Worddokument komprimieren
+    public int FotoCompressValue { get; set; } // Kompressionsqualität der Fotos im Worddokument (0-100)
+    public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
+    public double PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
+    public double PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter
+    public int ImageExportSize { get; set; } // Größe der Fotos im Bericht (maximale Kantenlänge in Pixel)
+    public int PinPosExportSize { get; set; } // Größe der Pin-Position-Bilder im Bericht (maximale Kantenlänge in Pixel)
+    public int PinPosCropExportSize { get; set; } // Größe der zugeschnittenen Pin-Position-Bilder im Bericht
+    public int TitleExportSize { get; set; } // Grösse vom Titelbild im Bericht
+    public string? IconGalleryMode { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
+    public int MaxPdfImageSizeW { get; set; } // Maximale Breite eines PDF-Bildes beim Import
+    public int MaxPdfImageSizeH { get; set; } // Maximale Höhe eines PDF-Bildes beim Import
+    public int FotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
+    public int FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
+    public int FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
+    public int PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
+    public int IconPreviewSize { get; set; } // Grösse der Icons in der Icon-Auswahl
+    public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins
+    public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
+    public List<string>? MapIcons { get; set; } // Liste der verfügbaren Karten-Icons
+    public List<string>? IconSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Icons
+    public List<string>? PinSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Pins
+    public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
 }

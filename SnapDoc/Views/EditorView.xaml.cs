@@ -117,7 +117,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
             _filePath = value as string;
     }
 
-    private async Task<string> LoadHtmlAsync(string fileName)
+    private static async Task<string> LoadHtmlAsync(string fileName)
     {
         using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
         using var reader = new StreamReader(stream);
@@ -126,14 +126,15 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     #region JSON Helpers
 
-    private string ToJsSafeJson(string json)
+    private static readonly JsonSerializerOptions JsSafeOptions = new()
     {
-        var options = new JsonSerializerOptions
-        {
-            WriteIndented = true,
-            Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
-        };
-        return JsonSerializer.Serialize(json, options);
+        WriteIndented = true,
+        Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+    };
+
+    private static string ToJsSafeJson(string json)
+    {
+        return JsonSerializer.Serialize(json, JsSafeOptions);
     }
 
     public async Task SetJsonAsync(string json)
@@ -145,7 +146,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
             webView.EvaluateJavascript($"window.setJsonText({ToJsSafeJson(json)});", null);
 #elif WINDOWS
         if (EditorWebView.Handler?.PlatformView is Microsoft.UI.Xaml.Controls.WebView2 webView2 && _editorReady)
-            await webView2.ExecuteScriptAsync($"window.setJsonText({ToJsSafeJson(json)});");
+            await webView2.ExecuteScriptAsync($"window.setJsonText({EditorView.ToJsSafeJson(json)});");
 #endif
     }
 
@@ -162,11 +163,9 @@ public partial class EditorView : ContentPage, IQueryAttributable
 #if ANDROID
     #region Android Bridge
 
-    public class JsBridge : Java.Lang.Object
+    public class JsBridge(EditorView view) : Java.Lang.Object
     {
-        private readonly WeakReference<EditorView> _weakRef;
-
-        public JsBridge(EditorView view) => _weakRef = new WeakReference<EditorView>(view);
+        private readonly WeakReference<EditorView> _weakRef = new(view);
 
         [JavascriptInterface]
         [Java.Interop.Export("invokeAction")]
@@ -193,11 +192,9 @@ public partial class EditorView : ContentPage, IQueryAttributable
         }
     }
 
-    public class CustomWebViewClient : WebViewClient
+    public class CustomWebViewClient(EditorView editorView) : WebViewClient
     {
-        private readonly EditorView _editorView;
-
-        public CustomWebViewClient(EditorView editorView) => _editorView = editorView;
+        private readonly EditorView _editorView = editorView;
 
         public override void OnPageFinished(Android.Webkit.WebView view, string url)
         {
@@ -207,7 +204,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
             _editorView._editorReady = true;
 
             if (!string.IsNullOrEmpty(_editorView._jsonString))
-                view.EvaluateJavascript($"window.setJsonText({_editorView.ToJsSafeJson(_editorView._jsonString)});", null);
+                view.EvaluateJavascript($"window.setJsonText({ToJsSafeJson(_editorView._jsonString)});", null);
         }
     }
 

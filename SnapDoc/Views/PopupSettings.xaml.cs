@@ -3,9 +3,7 @@
 using CommunityToolkit.Maui.Views;
 using FFImageLoading.Maui;
 using SnapDoc.Services;
-using System.Text;
-using System.Text.Json.Nodes;
-using System.Xml.Linq;
+using CommunityToolkit.Maui.Extensions;
 
 namespace SnapDoc.Views;
 
@@ -32,12 +30,27 @@ public partial class PopupSettings : Popup
         CloseAsync();
     }
 
-    private async void OpenXmlEditor(object sender, EventArgs e)
+    private async void OpenEditor(object sender, EventArgs e)
     {
         var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
         if (File.Exists(filePath))
         {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}");
+        }
+    }
+
+    private async void ResetValues(object sender, EventArgs e)
+    {
+        var popup = new PopupDualResponse("Standardeinstellungen laden?");
+        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+        if (result.Result != null)
+        {
+            var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
+            if (File.Exists(filePath))
+                File.Delete(filePath);
+            SettingsService.Instance.LoadSettings();
+            SettingsService.Instance.SaveSettings();
         }
     }
 

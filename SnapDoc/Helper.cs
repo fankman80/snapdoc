@@ -250,7 +250,7 @@ public class Helper
         inputBitmap.ScalePixels(resizedBitmap, samplingOptions);
 
         using var image = SKImage.FromBitmap(resizedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality);
         using var stream = File.OpenWrite(destinationPath);
         data.SaveTo(stream);
     }

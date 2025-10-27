@@ -492,12 +492,12 @@ public partial class ExportReport
                                                     float rotationAngle = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
 
                                                     run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan, rotationAngle, "anchor"));
-                                                    run.Append(CreateTextBoxWithShape(SettingsService.Instance.PlanLabelPrefix,
+                                                    run.Append(CreateTextBoxWithShape(SettingsService.Instance.PinLabelPrefix,
                                                                                       i,
                                                                                       storeItemId,
                                                                                       $"/positions/pos[@id='{i}']",
                                                                                       new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - scaledPinSize.Height), // offset 1mm to right
-                                                                                      SettingsService.Instance.PlanLabelFontSize,
+                                                                                      SettingsService.Instance.PinLabelFontSize,
                                                                                       pinColor.ToString()[3..]));
                                                     i++;
                                                 }

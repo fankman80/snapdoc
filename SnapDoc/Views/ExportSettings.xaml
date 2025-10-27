@@ -153,20 +153,20 @@
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="Pinbeschriftung"
                             MaxLength="20"
-                            Text="{Binding PlanLabelPrefix}"
+                            Text="{Binding PinLabelPrefix}"
                             TitleColor="{DynamicResource SecondaryBackground}"
                             BorderColor="{DynamicResource SecondaryBackground}"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
 
-                    <Label Text="{Binding PlanLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PlanLabelFontSize}"/>
+                            Value="{Binding PinLabelFontSize}"/>
 
                     <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
@@ -208,14 +208,6 @@
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosCropExportSize}"/>
-
-                    <Label IsVisible="False" Text="{Binding ImageExportQuality, StringFormat='Bildqualität: {0:0.##}%'}" Margin="0, 0, 0, -12"/>
-                    <Slider IsVisible="False" Maximum="100"
-                            Minimum="10"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding ImageExportQuality}"/>
 
                     <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
