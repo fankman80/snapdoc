@@ -54,6 +54,11 @@
 		<Optimize>true</Optimize>
 	</PropertyGroup>
 
+	<PropertyGroup Condition="'$(Configuration)'=='Release'">
+		<UseHotReload>false</UseHotReload>
+		<DebugSymbols>false</DebugSymbols>
+	</PropertyGroup>
+
     <PropertyGroup>
         <ApplicationIconScaling>true</ApplicationIconScaling>
         <PackageIcon>appicon.png</PackageIcon>
