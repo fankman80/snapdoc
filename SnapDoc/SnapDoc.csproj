@@ -65,8 +65,18 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\ic_background.png" ForegroundFile="Resources\AppIcon\ic_foreground.png" />
+		<!-- Android-spezifisches Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon_android_bg.png"
+				  ForegroundFile="Resources\AppIcon\appicon_android_fg.png"
+				  Condition="'$(TargetFramework)' == 'net10.0-android'" />
+
+		<!-- Windows-spezifisches Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon_win.png"
+				  Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
+
+		<!-- iOS-spezifisches Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon_win.png"
+				  Condition="'$(TargetFramework)' == 'net10.0-ios'" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />

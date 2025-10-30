@@ -75,7 +75,6 @@
                 </Grid>
 
                 <material:TextField x:Name="iconName"
-                                    FontSize="14"
                                     Title="Bezeichnung"
                                     MaxLength="200"
                                     TitleColor="{DynamicResource SecondaryBackground}"
