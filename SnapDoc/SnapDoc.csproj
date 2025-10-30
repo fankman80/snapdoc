@@ -24,7 +24,7 @@
 	<!-- Android Signatur (zentral, gilt für alle Builds) -->
 	<PropertyGroup>
 		<AndroidKeyStore>True</AndroidKeyStore>
-		<AndroidSigningKeyStore>C:\Users\mfankhauser\Desktop\SnapDoc\SnapDoc.keystore</AndroidSigningKeyStore>
+		<AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\SnapDoc\SnapDoc.keystore</AndroidSigningKeyStore>
 		<AndroidSigningStorePass>p0Ny05jY</AndroidSigningStorePass>
 		<AndroidSigningKeyAlias>bsm24</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>p0Ny05jY</AndroidSigningKeyPass>
@@ -75,7 +75,6 @@
 		<MauiIcon Include="Resources\AppIcon\appicon_win.png" Condition="'$(TargetFramework)' == 'net10.0-ios'" />
 
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -139,6 +138,10 @@
 	  <Compile Update="Views\PopupPlanSelector.xaml.cs">
 	    <DependentUpon>PopupPlanSelector.xaml</DependentUpon>
 	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiImage Update="Resources\Images\splash.svg" Color="#ffffff" BaseSize="128,128" />
 	</ItemGroup>
 
 	<ItemGroup>

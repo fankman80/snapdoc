@@ -16,5 +16,5 @@
 		</intent>
 	</queries>
 	<!-- App-Block -->
-	<application android:allowBackup="true" android:supportsRtl="true" android:label="SnapDoc" android:icon="@mipmap/ic_background" />
+	<application android:allowBackup="true" android:supportsRtl="true" android:label="SnapDoc" android:icon="@mipmap/appicon_android_bg" />
 </manifest>
