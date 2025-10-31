@@ -72,7 +72,7 @@
 		<MauiIcon Include="Resources\AppIcon\appicon_win.png" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
 
 		<!-- iOS-spezifisches Icon -->
-		<MauiIcon Include="Resources/Images/Assets.xcassets/appicon.appiconset/icon_1024x1024.png" />	
+		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" Condition="'$(TargetFramework)' == 'net10.0-ios'" />	
 		
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="White" />
