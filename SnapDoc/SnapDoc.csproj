@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<!-- Zielplattformen -->
 		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-windows10.0.26100.0</TargetFrameworks>
@@ -21,7 +21,7 @@
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
-	<!-- Android Signatur (zentral, gilt für alle Builds) -->
+	<!-- Android Signatur -->
 	<PropertyGroup>
 		<AndroidKeyStore>True</AndroidKeyStore>
 		<AndroidSigningKeyStore>C:\Users\fankhauser\Desktop\SnapDoc\SnapDoc.keystore</AndroidSigningKeyStore>
@@ -31,29 +31,7 @@
 		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 
-	<!-- Debug Android -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
-	</PropertyGroup>
-
-	<!-- Release Android -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
-		<AndroidLinkTool>r8</AndroidLinkTool>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
-
-	<!-- Windows Debug -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows10.0.26100.0|AnyCPU'">
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-	</PropertyGroup>
-
-	<!-- Windows Release -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-windows10.0.26100.0|AnyCPU'">
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
-
+	<!-- Build Settings -->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<UseHotReload>false</UseHotReload>
 		<DebugSymbols>false</DebugSymbols>
@@ -65,55 +43,56 @@
     </PropertyGroup>
 
 	<ItemGroup>
-        <!-- Android-spezifisches Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon_android_bg.png"
-          ForegroundFile="Resources\AppIcon\appicon_android_fg.png"
-          Condition="'$(TargetFramework)' == 'net10.0-android'"
-          LogicalName="AppIcon\%(Filename)%(Extension)" />
+		<!-- ✅ Android AppIcon -->
+		<MauiIcon Include="Resources\AppIcon\appicon_android_bg.png"
+		          ForegroundFile="Resources\AppIcon\appicon_android_fg.png"
+		          Condition="'$(TargetFramework)' == 'net10.0-android'"
+		          LogicalName="AppIcon\%(Filename)%(Extension)" />
 
-        <!-- Windows-spezifisches Icon -->
-        <MauiIcon Include="Resources\AppIcon\appicon_win.png"
-          Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'"
-          LogicalName="AppIcon\%(Filename)%(Extension)" />
+		<!-- ✅ Windows AppIcon -->
+		<MauiIcon Include="Resources\AppIcon\appicon_win.png"
+		          Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'"
+		          LogicalName="AppIcon\%(Filename)%(Extension)" />
 
-        <!-- iOS-spezifisches Icon -->
-        <MauiIcon Include="Resources\appicon.svg"
-          ForegroundFile="Resources\appiconfg.svg"
-          Color="#512BD4"
-          Condition="'$(TargetFramework)' == 'net10.0-ios'"
-          LogicalName="%(Filename)%(Extension)" />	
+		<!-- ✅ iOS AppIcon (SVG erlaubt!) -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg"
+		          ForegroundFile="Resources\AppIcon\appiconfg.svg"
+		          Color="#512BD4"
+		          Condition="'$(TargetFramework)' == 'net10.0-ios'"
+		          LogicalName="AppIcon\%(Filename)%(Extension)" />	
 
-        <!-- Splash Screen -->
-        <MauiSplashScreen Include="Resources\Splash\splash.svg"
-                  Color="White"
-                  LogicalName="Splash\splash.svg" />
+		<!-- ✅ Splash Screen -->
+		<MauiSplashScreen Include="Resources\Splash\splash.svg"
+		                  Color="White"
+		                  LogicalName="Splash\%(Filename)%(Extension)" />
 
-		<!-- Images -->
-        <MauiImage Include="Resources\Images\*" LogicalName="Images\%(RecursiveDir)%(Filename)%(Extension)" />
+		<!-- ✅ Allgemeine Ressourcen -->
+		<MauiImage Include="Resources\Images\**"
+		           LogicalName="Images\%(RecursiveDir)%(Filename)%(Extension)" />
 
-        <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*" LogicalName="Fonts\%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiFont Include="Resources\Fonts\**"
+		          LogicalName="Fonts\%(RecursiveDir)%(Filename)%(Extension)" />
 
-        <!-- Raw Assets -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="Raw\%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="Resources\Raw\**"
+		           LogicalName="Raw\%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+	<!-- Entfernte Dateien -->
 	<ItemGroup>
 		<Compile Remove="Models\ImageQuality.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<MauiAsset Remove="Resources\Raw\editor.html" />
 		<MauiAsset Remove="Resources\Raw\index.html" />
 	</ItemGroup>
 
+	<!-- Eingebettete HTMLs -->
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Raw\editor.html" />
 		<EmbeddedResource Include="Resources\Raw\index.html">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 		</EmbeddedResource>
 	</ItemGroup>
 
+	<!-- NuGet-Pakete -->
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.416" />
@@ -136,11 +115,12 @@
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.13.0" />
 		<PackageReference Include="UraniumUI.Material" Version="2.13.0" />
 	</ItemGroup>
-	
+
+	<!-- Paket-Icon -->
 	<ItemGroup>
-	  <None Update="Resources\AppIcon\appicon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="Resources\AppIcon\appicon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 </Project>
