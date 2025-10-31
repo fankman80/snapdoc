@@ -44,13 +44,14 @@ public partial class PinList : ContentPage
 
         foreach (var plan in GlobalJson.Data.Plans)
         {
-            if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+            if (plan.Value.Pins != null)
             {
-                foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                foreach (var pin in plan.Value.Pins.Values)
                 {
-                    if (!GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin)
+                    if (!pin.IsCustomPin)
                     {
-                        var pinIcon = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon;
+                        var pinIcon = pin.PinIcon;
+
                         if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
                         {
                             var _pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
@@ -58,32 +59,20 @@ public partial class PinList : ContentPage
                                 pinIcon = _pinIcon;
                             else
                             {
-                                // Lade Default-Icon falls Custom-Icon nicht existiert
                                 var iconItem = Settings.IconData.First();
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon = iconItem.FileName;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size = iconItem.IconSize;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsLockRotate = iconItem.IsRotationLocked;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin = iconItem.IsCustomPin;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor = iconItem.AnchorPoint;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale = iconItem.IconScale;
-                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor = iconItem.PinColor;
+                                pin.PinIcon = iconItem.FileName;
+                                pin.Size = iconItem.IconSize;
+                                pin.IsLockRotate = iconItem.IsRotationLocked;
+                                pin.IsCustomPin = iconItem.IsCustomPin;
+                                pin.Anchor = iconItem.AnchorPoint;
+                                pin.PinScale = iconItem.IconScale;
+                                pin.PinColor = iconItem.PinColor;
                                 pinIcon = iconItem.FileName;
                                 saveRequested = true;
                             }
                         }
-                        var newPin = new PinItem
-                        {
-                            PinDesc = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc,
-                            PinIcon = pinIcon,
-                            PinName = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName,
-                            PinLocation = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation,
-                            OnPlanName = GlobalJson.Data.Plans[plan.Key].Name,
-                            OnPlanId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].OnPlanId,
-                            SelfId = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].SelfId,
-                            AllowExport = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport,
-                            Time = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].DateTime
-                        };
-                        newPin.PropertyChanged += Pin_PropertyChanged;
+
+                        var newPin = new PinItem(pin);
                         pinItems.Add(newPin);
                         pincounter++;
                     }
@@ -91,7 +80,6 @@ public partial class PinList : ContentPage
             }
         }
 
-        // speichere Json nur wenn Daten geändert wurden
         if (saveRequested)
             GlobalJson.SaveToFile();
 
@@ -206,7 +194,7 @@ public partial class PinList : ContentPage
             switch (SettingsService.Instance.PinSortCrit)
             {
                 case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanName).ToList()];
+                    pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanId).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
                     pinItems = [.. pinItems.OrderBy(pin => pin.PinIcon).ToList()];
@@ -230,7 +218,7 @@ public partial class PinList : ContentPage
             switch (SettingsService.Instance.PinSortCrit)
             {
                 case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.OnPlanName).ToList()];
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.OnPlanId).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
                     pinItems = [.. pinItems.OrderByDescending(pin => pin.PinIcon).ToList()];
@@ -262,7 +250,7 @@ public partial class PinList : ContentPage
         foreach (var pin in pinItems)
         {
             if (
-                pin.OnPlanName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
+                pin.OnPlanId.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                 pin.PinLocation.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                 pin.PinName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
                 pin.PinDesc.Contains(searchText, StringComparison.OrdinalIgnoreCase)

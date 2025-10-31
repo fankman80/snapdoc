@@ -1,10 +1,9 @@
 ﻿#nullable disable
 
+using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using SnapDoc.Models;
-using System.ComponentModel;
 using System.Globalization;
-using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SnapDoc
 {
@@ -33,17 +32,45 @@ namespace SnapDoc
 
     public partial class PinItem : ObservableObject
     {
-        public required string PinDesc { get; set; }
-        public required string PinIcon { get; set; }
-        public required string PinName { get; set; }
-        public required string PinLocation { get; set; }
-        public required string OnPlanId { get; set; }
-        public required string OnPlanName { get; set; }
-        public required string SelfId { get; set; }
-        public required DateTime Time { get; set; }
+        private readonly Pin _pin; // direkte Referenz auf das zugrundeliegende Modell
 
-        [ObservableProperty] private bool _allowExport;
+        public PinItem(Pin pin)
+        {
+            _pin = pin ?? throw new ArgumentNullException(nameof(pin));
+
+            // UI-Update bei Änderungen am Modell
+            _pin.PropertyChanged += (s, e) =>
+            {
+                if (e.PropertyName == nameof(Pin.AllowExport))
+                    OnPropertyChanged(nameof(AllowExport));
+            };
+        }
+
+        // Grunddaten aus dem Modell
+        public string SelfId => _pin.SelfId;
+        public string OnPlanId => _pin.OnPlanId;
+        public string PinLocation => _pin.PinLocation;
+        public string PinDesc => _pin.PinDesc;
+        public string PinIcon => _pin.PinIcon;
+        public string PinName => _pin.PinName;
+        public DateTime Time => _pin.DateTime;
+
+        public bool AllowExport
+        {
+            get => _pin.AllowExport;
+            set
+            {
+                if (_pin.AllowExport != value)
+                {
+                    _pin.AllowExport = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string PlanDisplay => $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
     }
+
 
     public class ColorPickerReturn(string colorHex, int width)
     {
