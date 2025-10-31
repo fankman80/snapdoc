@@ -97,10 +97,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<EmbeddedResource Include="Resources\Raw\editor.html" />
-		<EmbeddedResource Include="Resources\Raw\index.html">
-		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-		</EmbeddedResource>
+        <MauiAsset Include="Resources\Raw\index.html" LogicalName="Raw\index.html" />
+        <MauiAsset Include="Resources\Raw\editor.html" LogicalName="Raw\editor.html" />
 	</ItemGroup>
 
 	<ItemGroup>
