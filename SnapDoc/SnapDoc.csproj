@@ -19,7 +19,6 @@
 		<DefaultLanguage>de-DE</DefaultLanguage>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<PackageIcon>appicon.png</PackageIcon>
 	</PropertyGroup>
 
 	<!-- Android Signatur (zentral, gilt für alle Builds) -->
@@ -72,6 +71,9 @@
 		<!-- Windows-spezifisches Icon -->
 		<MauiIcon Include="Resources\AppIcon\appicon_win.png" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
 
+		<!-- iOS-spezifisches Icon -->
+		<MauiIcon Include="Resources/Images/Assets.xcassets/appicon.appiconset/icon_1024x1024.png" />	
+		
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="White" />
 		
@@ -83,11 +85,6 @@
 
 		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<!-- iOS-AppIcons -->
-	<ItemGroup Condition="'$(TargetFramework)'=='net10.0-ios'">
-		<MauiIcon Include="Resources\Images\Assets.xcassets\appicon.appiconset\*" />
 	</ItemGroup>
 
 	<ItemGroup>
