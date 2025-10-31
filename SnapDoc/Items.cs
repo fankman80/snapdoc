@@ -68,7 +68,10 @@ namespace SnapDoc
             }
         }
 
-        public string PlanDisplay => $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
+        public string PlanDisplay =>
+                string.IsNullOrWhiteSpace(GlobalJson.Data.Plans[OnPlanId].Name) || string.IsNullOrWhiteSpace(PinLocation)
+                    ? GlobalJson.Data.Plans[OnPlanId].Name + PinLocation
+                    : $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
     }
 
 

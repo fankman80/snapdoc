@@ -30,7 +30,7 @@
         <ResourceDictionary>
             <!-- Template für Liste (Label sichtbar) -->
             <DataTemplate x:Key="IconListTemplate" x:DataType="local:IconItem">
-                <Grid HeightRequest="48" Padding="0,0,20,0">
+                <Grid HeightRequest="48">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="*" />
