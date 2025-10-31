@@ -101,7 +101,6 @@
 		<MauiIcon Include="Resources\Images\Assets.xcassets\AppIcon.appiconset\icon_83_5x83_5_2x.png" />
 		<MauiIcon Include="Resources\Images\Assets.xcassets\AppIcon.appiconset\itunes_artwork_1x.png" />
 	</ItemGroup>
-	
 
 	<ItemGroup>
 		<Compile Remove="Models\ImageQuality.cs" />
