@@ -5,10 +5,10 @@ on:
 
 jobs:
   build-maui:
-    runs-on: macos-26  # macOS-26 hat Xcode 26 für .NET 10 iOS Builds
+    runs-on: macos-26  # macOS-26 enthält Xcode 26 für .NET 10 iOS Builds
 
     steps:
-      # 1️⃣ Repo auschecken
+      # 1️⃣ Repository auschecken
       - name: Checkout Repository
         uses: actions/checkout@v4
 
@@ -28,13 +28,15 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore SnapDoc.sln
 
-      # 5️⃣ iOS-Build (Release)
-      - name: Build iOS app (Release)
-        run: dotnet build SnapDoc.sln -f net10.0-ios -c Release
+      # 5️⃣ iOS-App veröffentlichen (Release)
+      - name: Publish iOS app (Release)
+        run: |
+          dotnet publish SnapDoc.sln -f net10.0-ios -c Release -o ./bin/ios \
+            /p:ArchiveOnBuild=true /p:BuildIpa=true
 
-      # 7️⃣ Artefakte hochladen
-      - name: Upload iOS artifact
+      # 6️⃣ Artefakte hochladen
+      - name: Upload iOS App
         uses: actions/upload-artifact@v4
         with:
-          name: SnapDoc-iOS
-          path: '**/*.ipa'
+          name: ios-app
+          path: ./bin/ios/**/*.ipa
