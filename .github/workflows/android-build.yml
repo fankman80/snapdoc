@@ -31,6 +31,15 @@ jobs:
         run: |
            [System.IO.File]::WriteAllBytes("snapdoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
 
+      - name: Restore
+        run: dotnet restore SnapDoc.sln -r win-x64
+      
+      - name: Clean
+        run: dotnet clean SnapDoc.sln -c Release -r win-x64
+      
+      - name: Build Windows App
+        run: dotnet build SnapDoc.sln -c Release -f net10.0-windows10.0.26100.0 -r win-x64
+          
       - name: Build Android App (Release)
         shell: pwsh
         run: |
