@@ -4,42 +4,39 @@ on:
   workflow_dispatch:
 
 jobs:
-  build:
+  build-android:
     runs-on: windows-latest
 
     defaults:
       run:
-        working-directory: .   # Root-Verzeichnis des Repos
+        working-directory: .
 
     steps:
+      # 1️⃣ Code auschecken
       - name: Checkout code
         uses: actions/checkout@v4
 
+      # 2️⃣ .NET 10 SDK installieren
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
 
+      # 3️⃣ MAUI Workload installieren
       - name: Install MAUI workload
         run: dotnet workload install maui
 
-      - name: Restore dependencies
-        run: dotnet restore SnapDoc.sln
+      # 4️⃣ Abhängigkeiten wiederherstellen (nur Android)
+      - name: Restore dependencies for Android
+        run: dotnet restore SnapDoc.sln -f net10.0-android
 
+      # 5️⃣ Keystore aus Base64 dekodieren
       - name: Decode and save keystore
         shell: pwsh
         run: |
-           [System.IO.File]::WriteAllBytes("snapdoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
+          [System.IO.File]::WriteAllBytes("snapdoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
 
-      - name: Restore
-        run: dotnet restore SnapDoc.sln -r win-x64
-      
-      - name: Clean
-        run: dotnet clean SnapDoc.sln -c Release -r win-x64
-      
-      - name: Build Windows App
-        run: dotnet build SnapDoc.sln -c Release -f net10.0-windows10.0.26100.0 -r win-x64
-          
+      # 6️⃣ Android App bauen (Release, signiert)
       - name: Build Android App (Release)
         shell: pwsh
         run: |
@@ -50,10 +47,19 @@ jobs:
             /p:AndroidSigningKeyStore=SnapDoc.keystore `
             /p:AndroidSigningStorePass=$env:ANDROID_KEYSTORE_PASSWORD
 
+      # 7️⃣ Android App veröffentlichen als AAB
       - name: Publish Android AAB
         shell: pwsh
-        run: dotnet publish SnapDoc.sln -c Release -f net10.0-android -p:AndroidPackageFormat=aab
+        run: |
+          dotnet publish SnapDoc.sln -c Release -f net10.0-android `
+            -p:AndroidKeyStore=true `
+            -p:AndroidSigningKeyAlias=$env:ANDROID_KEY_ALIAS `
+            -p:AndroidSigningKeyPass=$env:ANDROID_KEY_PASSWORD `
+            -p:AndroidSigningKeyStore=SnapDoc.keystore `
+            -p:AndroidSigningStorePass=$env:ANDROID_KEYSTORE_PASSWORD `
+            -p:AndroidPackageFormat=aab
 
+      # 8️⃣ Artefakt hochladen
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
