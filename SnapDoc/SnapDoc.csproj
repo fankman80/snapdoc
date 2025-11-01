@@ -65,40 +65,19 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<!-- Android-spezifisches Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon_android_bg.png" ForegroundFile="Resources\AppIcon\appicon_android_fg.png" Condition="'$(TargetFramework)' == 'net10.0-android'" />
+		<!-- App Icon -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#17171a" />
 
-		<!-- Windows-spezifisches Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon_win.png" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
-
-		<!-- iOS-spezifisches Icon -->
-		<MauiIcon Include="Resources\appicon.svg" ForegroundFile="Resources\appiconfg.svg" Color="#512BD4" Condition="'$(TargetFramework)' == 'net10.0-ios'" />	
-		
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="White" />
-		
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
+
 		<!-- Images -->
-        <MauiImage Include="Resources\Images\*" LogicalName="Images\%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiImage Include="Resources\Images\*" />
+		<!-- Custom Fonts -->
+		<MauiFont Include="Resources\Fonts\*" />
 
-        <!-- Custom Fonts -->
-        <MauiFont Include="Resources\Fonts\*" LogicalName="Fonts\%(RecursiveDir)%(Filename)%(Extension)" />
-
-        <!-- Raw Assets -->
-        <MauiAsset Include="Resources\Raw\**" LogicalName="Raw\%(RecursiveDir)%(Filename)%(Extension)" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<Compile Remove="Models\ImageQuality.cs" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<MauiAsset Remove="Resources\Raw\editor.html" />
-		<MauiAsset Remove="Resources\Raw\index.html" />
-	</ItemGroup>
-
-	<ItemGroup>
-        <MauiAsset Include="Resources\Raw\index.html" LogicalName="Raw\index.html" />
-        <MauiAsset Include="Resources\Raw\editor.html" LogicalName="Raw\editor.html" />
+		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
+		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 	<ItemGroup>
