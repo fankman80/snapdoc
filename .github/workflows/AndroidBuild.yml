@@ -1,0 +1,47 @@
+name: Build MAUI Android
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.0.x
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Restore dependencies
+        run: dotnet restore bsm24.sln
+
+      - name: Decode and save keystore
+        run: |
+          echo "$ANDROID_KEYSTORE_BASE64" | base64 --decode > bsm24.keystore
+
+      - name: Build Android App (Release)
+        run: |
+          dotnet build bsm24.sln -c Release -f net9.0-android `
+            /p:AndroidKeyStore=true `
+            /p:AndroidSigningKeyAlias=$ANDROID_KEY_ALIAS `
+            /p:AndroidSigningKeyPass=$ANDROID_KEY_PASSWORD `
+            /p:AndroidSigningKeyStore=bsm24.keystore `
+            /p:AndroidSigningStorePass=$ANDROID_KEYSTORE_PASSWORD
+
+      - name: Publish .apk or .aab
+        run: dotnet publish bsm24.sln -c Release -f net9.0-android -p:AndroidPackageFormat=aab
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: AndroidApp
+          path: |
+            **/bin/Release/net9.0-android/**/*.apk
+            **/bin/Release/net9.0-android/**/*.aab
