@@ -65,9 +65,20 @@
     </PropertyGroup>
 
 	<ItemGroup>
-		<!-- App Icon -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" Color="#17171a" />
+		<!-- Android mit Hintergrundfarbe -->
+		<MauiIcon Include="Resources\AppIcon\appicon.svg"
+				  ForegroundFile="Resources\AppIcon\appiconfg.svg"
+				  Color="#11b2c9"
+				  Condition="'$(TargetFramework)' == 'net10.0-android'" />
 
+		<!-- iOS mit eigenem, flachem Icon -->
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg"
+				  Condition="'$(TargetFramework)' == 'net10.0-ios'" />
+
+		<!-- Windows transparent -->
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg"
+				  Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
+		
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
 
