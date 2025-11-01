@@ -1,12 +1,12 @@
-name: Build MAUI Android
+name: Build MAUI Android (Manual)
 
 on:
-  push:
-    branches: [ main ]
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -35,7 +35,7 @@ jobs:
             /p:AndroidSigningKeyStore=bsm24.keystore `
             /p:AndroidSigningStorePass=$ANDROID_KEYSTORE_PASSWORD
 
-      - name: Publish .apk or .aab
+      - name: Publish Android AAB
         run: dotnet publish bsm24.sln -c Release -f net9.0-android -p:AndroidPackageFormat=aab
 
       - name: Upload artifact
