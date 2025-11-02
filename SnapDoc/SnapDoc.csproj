@@ -100,6 +100,11 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
+    <ItemGroup>
+        <EmbeddedResource Include="Resources\Raw\index.html" />
+        <EmbeddedResource Include="Resources\Raw\appsettings.ini" />
+    </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Camera.MAUI" Version="1.5.1" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.416" />
