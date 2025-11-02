@@ -102,6 +102,7 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\Raw\index.html" />
+        <EmbeddedResource Include="Resources\Raw\editor.html" />
     </ItemGroup>
 
 	<ItemGroup>
