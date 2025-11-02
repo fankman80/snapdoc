@@ -103,7 +103,7 @@
                                    FontSize="12"
                                    LineBreakMode="TailTruncation"
                                    Text="{Binding PlanDisplay}"/>
-                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="3"
+                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
                                    Margin="14,0,0,0"
                                    FontSize="12"
                                    LineBreakMode="TailTruncation"
