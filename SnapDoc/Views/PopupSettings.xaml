@@ -30,7 +30,7 @@
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout Margin="0,0,0,10">
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0:0.##}%'}" />
+                    <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0}%'}" />
                     <Slider x:Name="MinScaleSlider"
                             Maximum="{Binding PinMaxScaleLimit}"
                             Minimum="1"
@@ -40,7 +40,7 @@
                             Value="{Binding PinMinScaleLimit}"/>
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0:0.##}%'}" />
+                    <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0}%'}" />
                     <Slider x:Name="MaxScaleSlider"
                             Maximum="100"
                             Minimum="{Binding PinMinScaleLimit}"
@@ -50,7 +50,7 @@
                             Value="{Binding PinMaxScaleLimit}"/>
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0:0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
+                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
                     <Slider Maximum="50000000"
                             Minimum="1000000"
                             ThumbColor="{DynamicResource Primary}"
