@@ -19,22 +19,19 @@
 		<DefaultLanguage>de-DE</DefaultLanguage>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+	
+	<PropertyGroup>
+		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(TargetFramework)' == 'net10.0-android'">
 	  <AndroidKeyStore>true</AndroidKeyStore>
-
-	  <!-- GitHub Actions Variablen -->
 	  <AndroidSigningKeyAlias>$(AndroidKeyAlias)</AndroidSigningKeyAlias>
 	  <AndroidSigningKeyPass>$(AndroidKeyPassword)</AndroidSigningKeyPass>
 	  <AndroidSigningStorePass>$(AndroidStorePassword)</AndroidSigningStorePass>
 	  <AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
-
-	  <!-- Fallback für lokale Builds -->
-	  <AndroidSigningKeyAlias Condition="'$(AndroidKeyAlias)' == ''">bsm24</AndroidSigningKeyAlias>
-	  <AndroidSigningKeyPass Condition="'$(AndroidKeyPassword)' == ''">p0Ny05jY</AndroidSigningKeyPass>
-	  <AndroidSigningStorePass Condition="'$(AndroidStorePassword)' == ''">p0Ny05jY</AndroidSigningStorePass>
-	  <AndroidSigningKeyStore Condition="'$(AndroidKeyStorePath)' == ''">$(MSBuildProjectDirectory)\SnapDoc.keystore</AndroidSigningKeyStore>
 	</PropertyGroup>
 
 	<!-- Debug Android -->
@@ -69,27 +66,21 @@
         <ApplicationIconScaling>true</ApplicationIconScaling>
         <PackageIcon>appicon.png</PackageIcon>
         <WindowsPackageType>None</WindowsPackageType>
+        <UserSecretsId>26b2a0b7-a7b6-4a99-8b47-0e34092c765d</UserSecretsId>
     </PropertyGroup>
 
 	<ItemGroup>
 		<!-- Android mit Hintergrundfarbe -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg"
-				  ForegroundFile="Resources\AppIcon\appiconfg.svg"
-                  ForegroundScale="0.65"
-				  Condition="'$(TargetFramework)' == 'net10.0-android'" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.65" Condition="'$(TargetFramework)' == 'net10.0-android'" />
 
 		<!-- iOS mit eigenem, flachem Icon -->
-		<MauiIcon Include="Resources\AppIcon\appiconfg.svg"
-				  Condition="'$(TargetFramework)' == 'net10.0-ios'" />
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="'$(TargetFramework)' == 'net10.0-ios'" />
 
 		<!-- Windows transparent -->
-		<MauiIcon Include="Resources\AppIcon\appiconfg.svg"
-				  Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
 		
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg"
-						  Color="#ffffff"
-						  BaseSize="128,128" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="128,128" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
@@ -116,6 +107,7 @@
 		<PackageReference Include="Geolocator.Plugin" Version="1.0.2" />
 		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.3-preview.1" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="6.0.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.0-rc.2.25504.7" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.0-rc.2.25504.7" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.0-rc.2.25502.107" />
