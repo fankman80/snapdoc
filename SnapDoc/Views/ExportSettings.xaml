@@ -139,7 +139,7 @@
                         </Grid>
                     </VerticalStackLayout>
 
-                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0:0.##}%'}"
+                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
                            Margin="0, 0, 0, -12"
                            IsVisible="{Binding IsFotoCompressed}"/>
                     <Slider Maximum="100"
@@ -160,7 +160,7 @@
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
 
-                    <Label Text="{Binding PinLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.##} pt'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.#} pt'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -168,7 +168,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinLabelFontSize}"/>
 
-                    <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.#} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -176,7 +176,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinExportSize}"/>
 
-                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0:0.##} mm'}"
+                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0} mm'}"
                            Margin="0, 0, 0, -12"
                            IsVisible="{Binding IsImageExport}"/>
                     <Slider Maximum="160"
@@ -187,7 +187,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding ImageExportSize}"/>
 
-                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0:0.##} mm'}"
+                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0} mm'}"
                            Margin="0, 0, 0, -12"
                            IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="160"
@@ -198,7 +198,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosExportSize}"/>
 
-                    <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0:0.##} Pixel'}"
+                    <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0} Pixel'}"
                            Margin="0, 0, 0, -12"
                            IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="1000"
@@ -209,7 +209,7 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosCropExportSize}"/>
 
-                    <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0:0.##} mm'}" Margin="0, 0, 0, -12"/>
+                    <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0} mm'}" Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"
