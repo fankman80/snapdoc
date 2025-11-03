@@ -32,10 +32,10 @@ jobs:
         run: |
           dotnet publish SnapDoc/SnapDoc.csproj -c Release -f net10.0-android `
             /p:AndroidKeyStore=true `
-            /p:AndroidKeyAlias=$env:ANDROID_KEY_ALIAS `
-            /p:AndroidKeyPassword=$env:ANDROID_KEY_PASSWORD `
-            /p:AndroidStorePassword=$env:ANDROID_KEYSTORE_PASSWORD `
-            /p:AndroidKeyStorePath=SnapDoc.keystore `
+            /p:AndroidKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" `
+            /p:AndroidKeyPassword="${{ secrets.ANDROID_KEY_PASSWORD }}" `
+            /p:AndroidStorePassword="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+            /p:AndroidKeyStorePath="SnapDoc.keystore" `
             /p:AndroidPackageFormat=aab
 
       - name: Upload artifact
