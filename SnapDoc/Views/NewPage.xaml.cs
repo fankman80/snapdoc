@@ -215,7 +215,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 {
                     if (img.AutomationId != null & GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsCustomPin != true)
                     {
-                        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
                             img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
                         if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
@@ -676,7 +676,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             var scale = 1 / planContainer.Scale;
             var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
-            if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
                 return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
             else
                 return scaleLimit * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
@@ -889,7 +889,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var scale = 1 / PlanContainer.Scale;
         var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
 
-        if (scale < scaleLimit & scale > SettingsService.Instance.PinMinScaleLimit / 100)
+        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
             activePin.Scale = scale * sliderValue / 100;
         else
             activePin.Scale = sliderValue / 100;

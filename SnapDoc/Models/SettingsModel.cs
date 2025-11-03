@@ -2,8 +2,8 @@
 
 internal class SettingsModel
 {
-    public double PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
-    public double PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
+    public int PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
+    public int PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
     public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo
     public int MapIcon { get; set; } // Ausgewähltes Karten-Icon auf swisstopo
     public int PinPlaceMode { get; set; } // Modus zum Platzieren der Pins

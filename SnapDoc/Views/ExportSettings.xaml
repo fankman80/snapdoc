@@ -24,7 +24,7 @@
                    HorizontalOptions="Start"/>
         </HorizontalStackLayout>
     </Shell.TitleView>
-    
+
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
         <Grid Margin="16">
             <Grid.RowDefinitions>

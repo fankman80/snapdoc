@@ -138,7 +138,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private string _pinSortCrit;
     [ObservableProperty] private string _iconCategory;
 
-    #region Export Settings
+    // Export Settings
     [ObservableProperty] private int _imageExportQuality = 80;
     [ObservableProperty] private double _pinLabelFontSize = 4;
     [ObservableProperty] private string _pinLabelPrefix = "Pos. ";
@@ -154,7 +154,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _titleExportSize = 90;
     [ObservableProperty] private int _pinPosExportSize = 25;
     [ObservableProperty] private int _pinPosCropExportSize = 300;
-    #endregion
 
     [ObservableProperty] private List<string> _colorThemes;
     [ObservableProperty] private List<string> _appThemes;
@@ -247,8 +246,8 @@ public partial class SettingsService : ObservableObject
             IsFotoCompressed = IsFotoCompressed,
             FotoCompressValue = FotoCompressValue,
             PinLabelPrefix = PinLabelPrefix,
-            PinLabelFontSize = PinLabelFontSize,
-            PinExportSize = PinExportSize,
+            PinLabelFontSize = Math.Round(PinLabelFontSize, 1),
+            PinExportSize = Math.Round(PinExportSize, 1),
             ImageExportSize = ImageExportSize,
             PinPosExportSize = PinPosExportSize,
             PinPosCropExportSize = PinPosCropExportSize,
