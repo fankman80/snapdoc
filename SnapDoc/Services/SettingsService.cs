@@ -128,8 +128,8 @@ public partial class SettingsService : ObservableObject
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
     [ObservableProperty] private bool _isPlanRotateLocked = false;
-    [ObservableProperty] private double _pinMinScaleLimit = 80;
-    [ObservableProperty] private double _pinMaxScaleLimit = 100;
+    [ObservableProperty] private int _pinMinScaleLimit = 80;
+    [ObservableProperty] private int _pinMaxScaleLimit = 100;
     [ObservableProperty] private int _maxPdfPixelCount = 30000000;
     [ObservableProperty] private int _mapIconSize = 85;
     [ObservableProperty] private int _mapIcon = 0;
