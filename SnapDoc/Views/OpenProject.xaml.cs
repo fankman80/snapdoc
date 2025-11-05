@@ -113,7 +113,7 @@ public partial class OpenProject : ContentPage
             GlobalJson.SaveToFile();
 
             await Shell.Current.GoToAsync("project_details");
-#if ANDROID
+#if not WINDOWS
             Shell.Current.FlyoutIsPresented = false;
 #endif
         }
@@ -191,12 +191,9 @@ public partial class OpenProject : ContentPage
                     }
 
                     await Shell.Current.GoToAsync("project_details");
-#if ANDROID
+#if not WINDOWS
                     Shell.Current.FlyoutIsPresented = false;
-
 #endif  
-
-
                 });
             }
         });
