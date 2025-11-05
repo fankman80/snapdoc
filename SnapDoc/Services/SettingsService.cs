@@ -87,7 +87,7 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    public string AppVersion { get; set; } = $"Version {AppInfo.VersionString}";
+    public string AppVersion { get; set; } = AppInfo.VersionString;
     // --- Observable Properties ---
     [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
     [ObservableProperty] private List<string> _iconSortCrits = ["nach Name", "nach Farbe"];
@@ -158,7 +158,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private List<string> _colorThemes;
     [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private double _gpsMinDistUpdate = 1.0;
-    [ObservableProperty] private float _gpsMinTimeUpdate = 0.5f;
+    [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
 

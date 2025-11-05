@@ -160,9 +160,9 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="3*" />
+                    <ColumnDefinition Width="2*" />
+                    <ColumnDefinition Width="3*" />
                 </Grid.ColumnDefinitions>
 
                 <Label x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
@@ -185,7 +185,8 @@
 
                 <Button Grid.Row="1" Grid.Column="0"
                         FontSize="12"
-                        Text="GPS"      
+                        HorizontalOptions="Start"
+                        Text="{Binding GPSButtonText}" 
                         TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         BackgroundColor="Transparent"
                         Command="{Binding ToggleGPSCommand}">

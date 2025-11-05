@@ -12,6 +12,9 @@ public partial class GPSViewModel : INotifyPropertyChanged
     public static GPSViewModel Instance { get; } = new GPSViewModel();
     public event PropertyChangedEventHandler PropertyChanged;
 
+    // 🔹 Event für Standortänderungen
+    public event Action<Location> LocationUpdated;
+
     private string _gpsData;
     private FontImageSource _gpsButtonIcon;
     private double _lon;
@@ -50,28 +53,33 @@ public partial class GPSViewModel : INotifyPropertyChanged
         set { _gpsButtonIcon = value; OnPropertyChanged(); }
     }
 
+    private string _gpsButtonText = "AUS";
+    public string GPSButtonText
+    {
+        get => _gpsButtonText;
+        set { _gpsButtonText = value; OnPropertyChanged(); }
+    }
+
     public Command ToggleGPSCommand { get; }
 
     private CancellationTokenSource _gpsToken;
 
     private GPSViewModel()
     {
-        ToggleGPSCommand = new Command(OnToggleGPS);
-        GPSButtonIcon = new FontImageSource
-        {
-            FontFamily = "MaterialOutlined",
-            Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off,
-            Color = Application.Current.RequestedTheme == AppTheme.Dark
-                    ? (Color)Application.Current.Resources["PrimaryDark"]
-                    : (Color)Application.Current.Resources["Primary"],
-            Size = 24
-        };
+        ToggleGPSCommand = new Command(OnToggleGPS); // 🔹 Command initialisieren
+        UpdateGPSButtonIcon();
     }
 
     private async void OnToggleGPS(object obj)
     {
-        await Toggle(!IsRunning);
+        GPSButtonText = IsRunning ? "AUS" : "laden..."; // Text sofort setzen
+        UpdateGPSButtonIcon();
 
+        await Toggle(!IsRunning);
+    }
+
+    private void UpdateGPSButtonIcon()
+    {
         GPSButtonIcon = new FontImageSource
         {
             FontFamily = "MaterialOutlined",
@@ -100,6 +108,7 @@ public partial class GPSViewModel : INotifyPropertyChanged
         if (status != PermissionStatus.Granted)
         {
             GPSData = "Standortberechtigung verweigert.";
+            GPSButtonText = "AUS";
             return false;
         }
 
@@ -109,11 +118,18 @@ public partial class GPSViewModel : INotifyPropertyChanged
             _gpsToken = null;
             GPSData = string.Empty;
             IsRunning = false;
+            GPSButtonText = "AUS"; // 🔹 Hier auf AUS setzen
         }
         else
         {
             _gpsToken = new CancellationTokenSource();
             IsRunning = true;
+            GPSButtonText = "laden..."; // 🔹 Text sofort ändern
+
+            // 🔹 Sofort letzte bekannte Position laden
+            await LoadLastKnownLocationAsync();
+
+            // 🔹 Danach dauerhaft GPS-Updates starten
             _ = Task.Run(() => StartListeningAsync(_gpsToken.Token));
         }
 
@@ -121,19 +137,48 @@ public partial class GPSViewModel : INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Wiederholte Standortabfrage (simuliert Listener).
+    /// Lädt die letzte bekannte Position (sofort, ohne neue Abfrage)
+    /// </summary>
+    private async Task LoadLastKnownLocationAsync()
+    {
+        try
+        {
+            var location = await Geolocation.Default.GetLastKnownLocationAsync();
+            if (location != null)
+            {
+                Lat = location.Latitude;
+                Lon = location.Longitude;
+                Acc = location.Accuracy ?? 0;
+                GPSData = $"Letzter Standort: {Lat:F6}, {Lon:F6} (±{Acc:F1}m)";
+                GPSButtonText = "AN";
+                LocationUpdated?.Invoke(location);
+            }
+        }
+        catch { /* ignore */ }
+    }
+
+    /// <summary>
+    /// Wiederholte Standortabfrage
     /// </summary>
     private async Task StartListeningAsync(CancellationToken token)
     {
+        var request = new GeolocationRequest(
+            GeolocationAccuracy.Best,
+            TimeSpan.FromSeconds(SettingsService.Instance.GpsMinTimeUpdate));
+
         while (!token.IsCancellationRequested)
         {
             try
             {
-                var request = new GeolocationRequest(
-                    GeolocationAccuracy.High,
-                    TimeSpan.FromSeconds(SettingsService.Instance.GpsMinTimeUpdate));
+                Location location = null;
 
-                var location = await Geolocation.Default.GetLocationAsync(request, token);
+                // 🔹 Wiederholen, bis GPS einen Fix liefert
+                while (!token.IsCancellationRequested && location == null)
+                {
+                    location = await Geolocation.Default.GetLocationAsync(request, token);
+                    if (location == null)
+                        await Task.Delay(1000, token);
+                }
 
                 if (location != null)
                 {
@@ -142,53 +187,27 @@ public partial class GPSViewModel : INotifyPropertyChanged
                     Acc = location.Accuracy ?? 0;
 
                     GPSData = string.Format(
-                        "Zeit: {0}\nLat: {1:F6}\nLon: {2:F6}\nGenauigkeit: {3:F1} m\nQuelle: {4}",
+                        "Zeit: {0}\nLat: {1:F6}\nLon: {2:F6}\nGenauigkeit: {3:F1} m",
                         location.Timestamp.LocalDateTime,
                         Lat,
                         Lon,
-                        Acc,
-                        location.Source);
+                        Acc);
+
+                    // 🔹 Event feuern
+                    LocationUpdated?.Invoke(location);
                 }
+            }
+            catch (TaskCanceledException)
+            {
+                // Task wurde gestoppt -> ignorieren
             }
             catch (Exception ex)
             {
                 GPSData = $"Fehler: {ex.Message}";
             }
 
-            // Wartezeit zwischen Updates
+            // 🔹 Wartezeit zwischen Updates
             await Task.Delay(TimeSpan.FromSeconds(SettingsService.Instance.GpsMinTimeUpdate), token);
-        }
-    }
-
-    /// <summary>
-    /// Liefert den letzten bekannten Standort (ohne neue Abfrage).
-    /// </summary>
-    public async Task<Location> GetLastKnownLocation()
-    {
-        try
-        {
-            var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
-            if (status != PermissionStatus.Granted)
-                status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
-
-            if (status != PermissionStatus.Granted)
-                return null;
-
-            var location = await Geolocation.Default.GetLastKnownLocationAsync();
-            if (location != null)
-            {
-                Lat = location.Latitude;
-                Lon = location.Longitude;
-                Acc = location.Accuracy ?? 0;
-                GPSData = $"Letzter Standort: {Lat:F6}, {Lon:F6} (±{Acc:F1}m)";
-            }
-
-            return location;
-        }
-        catch (Exception ex)
-        {
-            GPSData = $"Fehler: {ex.Message}";
-            return null;
         }
     }
 }

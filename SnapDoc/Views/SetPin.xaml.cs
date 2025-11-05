@@ -7,7 +7,6 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using UraniumUI.Material.Controls;
 
 namespace SnapDoc.Views;
 
