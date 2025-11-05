@@ -12,6 +12,7 @@ using Microsoft.Maui.LifecycleEvents;
 #endif
 
 namespace SnapDoc;
+
 public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
