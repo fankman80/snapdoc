@@ -1,4 +1,5 @@
-﻿using System.Windows.Input;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System.Windows.Input;
 
 namespace SnapDoc.ViewModels;
 

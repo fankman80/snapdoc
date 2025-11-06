@@ -43,6 +43,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     SKRectI pinBound;
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
+    private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -497,7 +498,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         AddDrawingView();
     }
 
-    private void SetPin(Point _pos,
+    private async void SetPin(Point _pos,
                         string customName = null,
                         int customPinSizeWidth = 0,
                         int customPinSizeHeight = 0,
@@ -516,15 +517,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
             var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
 
-            Location location = new();
-            if (GPSViewModel.Instance.IsRunning)
-            {
-                location.Longitude = GPSViewModel.Instance.Lon;
-                location.Latitude = GPSViewModel.Instance.Lat;
-                location.Accuracy = GPSViewModel.Instance.Acc;
-            }
-            else
-                location = null;
+            Location location = await geoViewModel.GetCurrentLocationAsync();
 
             pinColor ??= SKColors.Red;
             Point _anchorPoint = iconItem.AnchorPoint;

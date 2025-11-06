@@ -152,8 +152,7 @@
 
     <Shell.FlyoutFooterTemplate>
         <DataTemplate>
-            <Grid x:DataType="model:GPSViewModel" BindingContext="{x:Static model:GPSViewModel.Instance}"
-                  BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}"
+            <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}"
                   RowSpacing="0">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="20" />
@@ -183,7 +182,8 @@
                        FontSize="11"
                        HorizontalTextAlignment="Center"/>
 
-                <Button Grid.Row="1" Grid.Column="0"
+                <Button BindingContext="{x:Static model:GeolocationViewModel.Instance}"
+                        Grid.Row="1" Grid.Column="0"
                         FontSize="12"
                         Text="GPS"      
                         TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

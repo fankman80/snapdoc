@@ -23,6 +23,7 @@ public partial class MapView : IQueryAttributable
     private double lon = 8.226692;  // Default: Schweiz
     private double lat = 46.80121;
     private int zoom = 8;
+    private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
 
     public MapView()
     {
@@ -138,7 +139,7 @@ public partial class MapView : IQueryAttributable
         };
     }
 
-    private void UpdateUiFromQuery()
+    private async void UpdateUiFromQuery()
     {
         if (!string.IsNullOrEmpty(PlanId) &&
             !string.IsNullOrEmpty(PinId) &&
@@ -155,19 +156,23 @@ public partial class MapView : IQueryAttributable
                 lat = pin.GeoLocation.WGS84.Latitude;
                 zoom = 18;
             }
-            else if (GPSViewModel.Instance.IsRunning)
+            else if (geoViewModel.IsGpsActive)
             {
+                Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
+
                 // Zoom auf GPS
-                lon = GPSViewModel.Instance.Lon;
-                lat = GPSViewModel.Instance.Lat;
+                lon = location.Longitude;
+                lat = location.Latitude;
                 zoom = 18;
             }
         }
-        else if (GPSViewModel.Instance.IsRunning)
+        else if (geoViewModel.IsGpsActive)
         {
+            Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
+
             // Zoom auf GPS (wenn kein Pin)
-            lon = GPSViewModel.Instance.Lon;
-            lat = GPSViewModel.Instance.Lat;
+            lon = location.Longitude;
+            lat = location.Latitude;
             zoom = 18;
         }
     }
@@ -248,25 +253,7 @@ public partial class MapView : IQueryAttributable
 
     private async void SetPosClicked(object sender, EventArgs e)
     {
-        if (!GPSViewModel.Instance.IsRunning)
-        {
-            var popup = new PopupAlert("Aktivieren Sie zuerst die Ortungsdienste, damit der Standort aktualisiert werden kann.");
-            this.ShowPopup(popup, Settings.PopupOptions);
-            return;
-        }
-
-        var confirmPopup = new PopupDualResponse("Sind Sie sicher, dass Sie die Positionsdaten überschreiben wollen?");
-        var result = await this.ShowPopupAsync<string>(confirmPopup, Settings.PopupOptions);
-
-        if (result.Result == null)
-            return;
-
-        var location = new Location
-        {
-            Longitude = GPSViewModel.Instance.Lon,
-            Latitude = GPSViewModel.Instance.Lat,
-            Accuracy = GPSViewModel.Instance.Acc
-        };
+        Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
 
         lon = location.Longitude;
         lat = location.Latitude;

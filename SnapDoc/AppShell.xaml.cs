@@ -1,8 +1,9 @@
 ﻿#nullable disable
 
-using SnapDoc.Services;
-using SnapDoc.Views;
 using CommunityToolkit.Maui.Extensions;
+using SnapDoc.Services;
+using SnapDoc.ViewModels;
+using SnapDoc.Views;
 using System.Collections.ObjectModel;
 
 namespace SnapDoc;
