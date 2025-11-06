@@ -498,7 +498,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         AddDrawingView();
     }
 
-    private async void SetPin(Point _pos,
+    private void SetPin(Point _pos,
                         string customName = null,
                         int customPinSizeWidth = 0,
                         int customPinSizeHeight = 0,
@@ -506,83 +506,99 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         double customScale = 1)
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
-        if (currentPage != null)
+        if (currentPage == null) return;
+
+        // Icon-Daten einlesen
+        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+        SettingsService.Instance.IconCategories = iconCategories;
+        Settings.IconData = iconItems;
+
+        string _newPin = Settings.IconData.First().FileName;
+        string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
+
+        pinColor ??= SKColors.Red;
+        Point _anchorPoint = iconItem.AnchorPoint;
+        Size _size = iconItem.IconSize;
+        bool _isRotationLocked = iconItem.IsRotationLocked;
+        bool _isPosLocked = false;
+        bool _isCustomPin = false;
+        bool _isAllowExport = true;
+        string _displayName = iconItem.DisplayName;
+        double _scale = iconItem.IconScale;
+
+        if (customName != null)
         {
-            // Icon-Daten einlesen
-            var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
-            SettingsService.Instance.IconCategories = iconCategories;
-            Settings.IconData = iconItems;
+            _anchorPoint = new Point(0.5, 0.5);
+            _size = new Size(customPinSizeWidth, customPinSizeHeight);
+            _isRotationLocked = true;
+            _isPosLocked = true;
+            _isCustomPin = true;
+            _newPin = customName;
+            _displayName = "";
+            _isAllowExport = true;
+            _scale = customScale;
+        }
 
-            string _newPin = Settings.IconData.First().FileName;
-            string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
+        // Pin sofort erstellen, GeoLocation vorerst null
+        Pin newPinData = new()
+        {
+            Pos = _pos,
+            Anchor = _anchorPoint,
+            Size = _size,
+            IsLocked = _isPosLocked,
+            IsLockRotate = _isRotationLocked,
+            IsCustomPin = _isCustomPin,
+            PinName = _displayName,
+            PinDesc = "",
+            PinPriority = 0,
+            PinLocation = "",
+            PinIcon = _newPin,
+            Fotos = [],
+            OnPlanId = PlanId,
+            SelfId = currentDateTime,
+            DateTime = DateTime.Now,
+            PinColor = (SKColor)pinColor,
+            PinScale = _scale,
+            PinRotation = 0,
+            GeoLocation = null, // noch nicht bekannt
+            AllowExport = _isAllowExport,
+        };
 
-            Location location = await geoViewModel.GetCurrentLocationAsync();
+        // Sicherstellen, dass der Plan existiert
+        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+        {
+            plan.Pins ??= new();
+            plan.Pins[currentDateTime] = newPinData;
+            GlobalJson.Data.Plans[PlanId].PinCount += 1;
 
-            pinColor ??= SKColors.Red;
-            Point _anchorPoint = iconItem.AnchorPoint;
-            Size _size = iconItem.IconSize;
-            bool _isRotationLocked = iconItem.IsRotationLocked;
-            bool _isPosLocked = false;
-            bool _isCustomPin = false;
-            bool _isAllowExport = true;
-            string _displayName = iconItem.DisplayName;
-            double _scale = iconItem.IconScale;
-
-            if (customName != null)
-            {
-                _anchorPoint = new Point(0.5, 0.5);
-                _size = new Size(customPinSizeWidth, customPinSizeHeight);
-                _isRotationLocked = true;
-                _isPosLocked = true;
-                _isCustomPin = true;
-                _newPin = customName;
-                _displayName = "";
-                _isAllowExport = true;
-                _scale = customScale;
-            }
-
-            Pin newPinData = new()
-            {
-                Pos = _pos,
-                Anchor = _anchorPoint,
-                Size = _size,
-                IsLocked = _isPosLocked,
-                IsLockRotate = _isRotationLocked,
-                IsCustomPin = _isCustomPin,
-                PinName = _displayName,
-                PinDesc = "",
-                PinPriority = 0,
-                PinLocation = "",
-                PinIcon = _newPin,
-                Fotos = [],
-                OnPlanId = PlanId,
-                SelfId = currentDateTime,
-                DateTime = DateTime.Now,
-                PinColor = (SKColor)pinColor,
-                PinScale = _scale,
-                PinRotation = 0,
-                GeoLocation = location != null ? new GeoLocData(location) : null,
-                AllowExport = _isAllowExport,
-            };
-
-            // Sicherstellen, dass der Plan existiert
-            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan value))
-            {
-                var plan = value;
-                plan.Pins ??= [];
-                plan.Pins[currentDateTime] = newPinData;
-
-                GlobalJson.Data.Plans[PlanId].PinCount += 1;
-
-                // save data to file
-                GlobalJson.SaveToFile();
-            }
-            else
-                Console.WriteLine($"Plan mit ID {PlanId} existiert nicht.");
+            GlobalJson.SaveToFile(); // initial speichern
 
             AddPin(currentDateTime, newPinData.PinIcon);
-        };
+
+            // Asynchron GPS abrufen und später aktualisieren
+            _ = Task.Run(async () =>
+           {
+                try
+                {
+                    var location = await geoViewModel.GetCurrentLocationAsync();
+                    if (location != null)
+                    {
+                        newPinData.GeoLocation = new GeoLocData(location);
+                        // JSON erneut speichern, um GeoLocation zu aktualisieren
+                        GlobalJson.SaveToFile();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Fehler beim Abrufen der GPS-Koordinaten: {ex.Message}");
+                }
+            });
+        }
+        else
+        {
+            Console.WriteLine($"Plan mit ID {PlanId} existiert nicht.");
+        }
     }
 
     private void OnMouseMoved(object sender, MouseEventArgs e)
