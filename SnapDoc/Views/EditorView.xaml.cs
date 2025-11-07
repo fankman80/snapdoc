@@ -31,8 +31,10 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("fileMode", out object value))
-            if (value as string == "R")
+        if (query.TryGetValue("file", out var value1))
+            _filePath = value1 as string;
+        if (query.TryGetValue("fileMode", out object value2))
+            if (value2 as string == "R")
                 _isReadOnly = true;
     }    
 
@@ -120,13 +122,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
         htmlContent = htmlContent.Replace("#IS_READ_ONLY", isReadOnly.ToString().ToLowerInvariant());
 
         return htmlContent;
-    }
-
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("file", out var value))
-            _filePath = value as string;
-    }
 
     private static async Task<string> LoadHtmlAsync(string fileName)
     {
