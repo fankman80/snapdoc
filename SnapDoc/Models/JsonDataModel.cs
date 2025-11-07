@@ -98,7 +98,7 @@ public class GeoLocData
                         ? (GeolocationAccuracy)_wsg84.Accuracy.Value
                         : GeolocationAccuracy.Default;
             WGS84 = new LocationWGS84(_wsg84.Latitude, _wsg84.Longitude);
-            (double swissEasting, double swissNorthing) = await Functions.Wgs84ToLv95Async(_wsg84.Latitude, _wsg84.Longitude);
+            (double swissEasting, double swissNorthing) = await Helper.Wgs84ToLv95Async(_wsg84.Latitude, _wsg84.Longitude);
             CH1903 = new LocationCH1903(swissEasting, swissNorthing);
         }
     }
@@ -107,7 +107,7 @@ public class GeoLocData
     {
         if (WGS84 != null)
         {
-            (double e, double n) = await Functions.Wgs84ToLv95Async(WGS84.Latitude, WGS84.Longitude);
+            (double e, double n) = await Helper.Wgs84ToLv95Async(WGS84.Latitude, WGS84.Longitude);
             CH1903 = new LocationCH1903(e, n);
         }
     }

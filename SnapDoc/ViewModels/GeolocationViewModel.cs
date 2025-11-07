@@ -1,6 +1,5 @@
 ﻿#nullable disable
 using System.Windows.Input;
-using CommunityToolkit.Mvvm.ComponentModel;
 using SnapDoc.Services;
 
 namespace SnapDoc.ViewModels;
@@ -35,8 +34,8 @@ public partial class GeolocationViewModel : BaseViewModel
         private set => SetProperty(ref _isGpsActive, value);
     }
 
-    public bool IsListening => Geolocation.IsListeningForeground;
-    public bool IsNotListening => !IsListening;
+    public static bool IsListening => Geolocation.IsListeningForeground;
+    public static bool IsNotListening => !IsListening;
 
     public FontImageSource GPSButtonIcon
     {
@@ -136,7 +135,7 @@ public partial class GeolocationViewModel : BaseViewModel
         };
     }
 
-    private async Task<bool> IsSystemGpsEnabledAsync()
+    private async static Task<bool> IsSystemGpsEnabledAsync()
     {
 #if ANDROID
     try

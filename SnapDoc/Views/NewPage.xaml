@@ -266,7 +266,6 @@
                     Stroke="Red"
                     StrokeThickness="16"
                     StrokeLineJoin="Miter"                    
-                    StrokeDashArray="1"
                     Opacity="0.2"
                     ZIndex="9998"/>
             <Button AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
@@ -279,7 +278,6 @@
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Cancel}}"                    
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>
-
         </AbsoluteLayout>
 
         <!-- Overlay für Busy-Indikator -->
