@@ -10,6 +10,7 @@
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.NavBarIsVisible="False"
              x:Class="SnapDoc.Views.EditorView"
              x:Name="ThisPage"
              Title="Editor">

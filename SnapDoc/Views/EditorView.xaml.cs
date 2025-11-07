@@ -122,7 +122,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
         htmlContent = htmlContent.Replace("#IS_READ_ONLY", isReadOnly.ToString().ToLowerInvariant());
 
         return htmlContent;
-    {
+    }
 
     private static async Task<string> LoadHtmlAsync(string fileName)
     {

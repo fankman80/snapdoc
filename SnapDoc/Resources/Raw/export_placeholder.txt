@@ -1,58 +1,58 @@
-<Placeholders>
-    <Placeholder name="client_name">${client_name}</Placeholder>
-    <!-- Kommentar: Name des Kunden -->
+﻿// SYSTEMVARIABELN FÜR EXPORTVORLAGEN
 
-    <Placeholder name="object_address">${object_address}</Placeholder>
-    <!-- Kommentar: Adresse des Objekts -->
+${client_name}
+// Name des Kunden
 
-    <Placeholder name="working_title">${working_title}</Placeholder>
-    <!-- Kommentar: Arbeitstitel des Projekts -->
+${object_address}
+// Adresse des Objekts
 
-    <Placeholder name="object_name">${object_name}</Placeholder>
-    <!-- Kommentar: Objektbezeichnung -->
+${working_title}
+// Arbeitstitel des Projekts
 
-    <Placeholder name="creation_date">${creation_date}</Placeholder>
-    <!-- Kommentar: Erstellungsdatum -->
+${object_name}
+// Objektbezeichnung
 
-    <Placeholder name="project_manager">${project_manager}</Placeholder>
-    <!-- Kommentar: Projektleiter -->
+${creation_date}
+// Erstellungsdatum
 
-    <Placeholder name="plan_indexes">${plan_indexes}</Placeholder>
-    <!-- Kommentar: Liste der Pl�ne / Index -->
+${project_manager}
+// Projektleiter
 
-    <Placeholder name="plan_images">${plan_images}</Placeholder>
-    <!-- Kommentar: Liste der Planbilder -->
+${plan_indexes}
+// Liste der Pläne
 
-    <Placeholder name="title_image">${title_image}</Placeholder>
-    <!-- Kommentar: Titelbild -->
+${plan_images/x/y}
+// Pläne x und y max. Breite und Höhe in Millimeter
 
-    <Placeholder name="pin_nr">${pin_nr}</Placeholder>
-    <!-- Kommentar: Laufende Nummer des Pins -->
+${title_image}
+// Titelbild
 
-    <Placeholder name="pin_planName">${pin_planName}</Placeholder>
-    <!-- Kommentar: Name des Plans, auf dem der Pin liegt -->
+${pin_nr}
+// Laufende Nummer des Pins
 
-    <Placeholder name="pin_posImage">${pin_posImage}</Placeholder>
-    <!-- Kommentar: Position des Pins im Bildkoordinatensystem -->
+${pin_planName}
+// Name des Plans, auf dem der Pin liegt
 
-    <Placeholder name="pin_fotoList">${pin_fotoList}</Placeholder>
-    <!-- Kommentar: Zugeh�rige Fotos des Pins -->
+${pin_posImage}
+// Position des Pins im Bildkoordinatensystem
 
-    <Placeholder name="pin_name">${pin_name}</Placeholder>
-    <!-- Kommentar: Titel oder Bezeichnung des Pins -->
+${pin_fotoList}
+// Zugehörige Fotos des Pins
 
-    <Placeholder name="pin_desc">${pin_desc}</Placeholder>
-    <!-- Kommentar: Beschreibungstext des Pins -->
+${pin_name}
+// Titel oder Bezeichnung des Pins
 
-    <Placeholder name="pin_location">${pin_location}</Placeholder>
-    <!-- Kommentar: Standortbeschreibung -->
+${pin_desc}
+// Beschreibungstext des Pins
 
-    <Placeholder name="pin_priority">${pin_priority}</Placeholder>
-    <!-- Kommentar: Priorit�t oder Wichtigkeit -->
+${pin_location}
+// Standortbeschreibung
 
-    <Placeholder name="pin_geolocWGS84">${pin_geolocWGS84}</Placeholder>
-    <!-- Kommentar: GPS-Koordinaten (WGS84) -->
+${pin_priority}
+// Priorität oder Wichtigkeit
 
-    <Placeholder name="pin_geolocCH1903">${pin_geolocCH1903}</Placeholder>
-    <!-- Kommentar: Schweizer Koordinaten (CH1903) -->
-</Placeholders>
+${pin_geolocWGS84}
+// KGPS-Koordinaten (WGS84)
+
+${pin_geolocCH1903}
+// Schweizer Koordinaten (CH1903)
