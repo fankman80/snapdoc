@@ -199,10 +199,13 @@ public partial class ExportSettings : ContentPage
 
     private async void OnHelpClicked(object sender, EventArgs e)
     {
-        var filePath = "export_placeholder.txt";
-        if (File.Exists(filePath))
-        {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=R");
-        }
+        using var stream = await FileSystem.OpenAppPackageFileAsync("export_placeholder.txt");
+        if (stream == null)
+            return;
+
+        using var reader = new StreamReader(stream);
+        string stringTxt = await reader.ReadToEndAsync();
+        
+        await Shell.Current.GoToAsync($"xmleditor?string={stringTxt}&fileMode=R");
     }
 }
