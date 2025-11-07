@@ -52,7 +52,7 @@ public partial class PopupSettings : Popup
         var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
         if (File.Exists(filePath))
         {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}");
+            await Shell.Current.GoToAsync($"xmleditor?file={filePath}?fileMode=R");
         }
     }
 
