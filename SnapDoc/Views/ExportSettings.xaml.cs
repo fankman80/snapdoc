@@ -197,7 +197,7 @@ public partial class ExportSettings : ContentPage
         var filePath = "export_placeholder.txt";
         if (File.Exists(filePath))
         {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}");
+            await Shell.Current.GoToAsync($"xmleditor?file={filePath}?fileMode=R");
         }
     }
 }
