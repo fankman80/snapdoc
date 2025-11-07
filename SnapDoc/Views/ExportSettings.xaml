@@ -34,9 +34,10 @@
 
             <ScrollView Grid.Row="0">
                 <VerticalStackLayout>
-                    <Grid>
+                    <Grid ColumnSpacing="0">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
@@ -55,9 +56,15 @@
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Help}}"
+                                Clicked="OnHelpClicked"/>                           
+                        <Button Grid.Column="2"
+                                Padding="0"
+                                VerticalOptions="End"
+                                BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
                                 Clicked="OnAddDocument" />
-                        <Button Grid.Column="2"
+                        <Button Grid.Column="3"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"

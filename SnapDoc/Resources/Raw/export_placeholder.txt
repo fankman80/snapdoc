@@ -1,0 +1,58 @@
+<Placeholders>
+    <Placeholder name="client_name">${client_name}</Placeholder>
+    <!-- Kommentar: Name des Kunden -->
+
+    <Placeholder name="object_address">${object_address}</Placeholder>
+    <!-- Kommentar: Adresse des Objekts -->
+
+    <Placeholder name="working_title">${working_title}</Placeholder>
+    <!-- Kommentar: Arbeitstitel des Projekts -->
+
+    <Placeholder name="object_name">${object_name}</Placeholder>
+    <!-- Kommentar: Objektbezeichnung -->
+
+    <Placeholder name="creation_date">${creation_date}</Placeholder>
+    <!-- Kommentar: Erstellungsdatum -->
+
+    <Placeholder name="project_manager">${project_manager}</Placeholder>
+    <!-- Kommentar: Projektleiter -->
+
+    <Placeholder name="plan_indexes">${plan_indexes}</Placeholder>
+    <!-- Kommentar: Liste der Pläne / Index -->
+
+    <Placeholder name="plan_images">${plan_images}</Placeholder>
+    <!-- Kommentar: Liste der Planbilder -->
+
+    <Placeholder name="title_image">${title_image}</Placeholder>
+    <!-- Kommentar: Titelbild -->
+
+    <Placeholder name="pin_nr">${pin_nr}</Placeholder>
+    <!-- Kommentar: Laufende Nummer des Pins -->
+
+    <Placeholder name="pin_planName">${pin_planName}</Placeholder>
+    <!-- Kommentar: Name des Plans, auf dem der Pin liegt -->
+
+    <Placeholder name="pin_posImage">${pin_posImage}</Placeholder>
+    <!-- Kommentar: Position des Pins im Bildkoordinatensystem -->
+
+    <Placeholder name="pin_fotoList">${pin_fotoList}</Placeholder>
+    <!-- Kommentar: Zugehörige Fotos des Pins -->
+
+    <Placeholder name="pin_name">${pin_name}</Placeholder>
+    <!-- Kommentar: Titel oder Bezeichnung des Pins -->
+
+    <Placeholder name="pin_desc">${pin_desc}</Placeholder>
+    <!-- Kommentar: Beschreibungstext des Pins -->
+
+    <Placeholder name="pin_location">${pin_location}</Placeholder>
+    <!-- Kommentar: Standortbeschreibung -->
+
+    <Placeholder name="pin_priority">${pin_priority}</Placeholder>
+    <!-- Kommentar: Priorität oder Wichtigkeit -->
+
+    <Placeholder name="pin_geolocWGS84">${pin_geolocWGS84}</Placeholder>
+    <!-- Kommentar: GPS-Koordinaten (WGS84) -->
+
+    <Placeholder name="pin_geolocCH1903">${pin_geolocCH1903}</Placeholder>
+    <!-- Kommentar: Schweizer Koordinaten (CH1903) -->
+</Placeholders>

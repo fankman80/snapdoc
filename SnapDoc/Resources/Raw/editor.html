@@ -95,15 +95,26 @@
     <script>
         let editor;
         let pendingJson = null;
+        const isReadOnly = #IS_READ_ONLY;
 
         window.onload = function () {
             editor = CodeMirror(document.getElementById("editor"), {
                 value: "",
                 mode: { name: "javascript", json: true },
-                theme: "material-darker", // <- Dark-Theme als Voreinstellung
+                theme: "material-darker",
                 lineNumbers: true,
-                lineWrapping: true
+                lineWrapping: true,
+                readOnly: isReadOnly // <- hier wird das Flag gleich für den Editor genutzt
             });
+
+            if (isReadOnly) {
+                // bestimmte Buttons verstecken
+                document.getElementById("sendButton").style.display = "none";
+                document.querySelector("button[onclick='formatJson()']").style.display = "none";
+                document.querySelector("button[onclick='validateJson()']").style.display = "none";
+                document.querySelector("button[onclick='editor.redo()']").style.display = "none";
+                document.querySelector("button[onclick='editor.undo()']").style.display = "none";
+            }
 
             if (pendingJson !== null) {
                 editor.setValue(pendingJson);
@@ -112,8 +123,8 @@
             }
 
             document.getElementById("sendButton").addEventListener("click", sendJsonToCSharp);
-            document.getElementById("cancelButton").addEventListener("click", cancelEditing);
         };
+
 
         // JSON von C# setzen
         window.setJsonText = function (jsonString) {

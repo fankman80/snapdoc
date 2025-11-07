@@ -95,11 +95,11 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
         EditorWebView.Source = new HtmlWebViewSource
         {
-            Html = LoadHtmlFromFile()
+            Html = LoadHtmlFromFile(false)
         };
     }
 
-    private static string LoadHtmlFromFile()
+    private static string LoadHtmlFromFile(bool isReadOnly = true)
     {
         var assembly = typeof(MapView).Assembly;
         using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.editor.html")!;
@@ -107,6 +107,9 @@ public partial class EditorView : ContentPage, IQueryAttributable
         string htmlContent = reader.ReadToEnd();
         htmlContent = htmlContent.Replace("#999999", ((Color)Application.Current.Resources["Primary"]).ToRgbaHex());
         htmlContent = htmlContent.Replace("#888888", ((Color)Application.Current.Resources["PrimaryDarkText"]).ToRgbaHex());
+
+        // Neues Flag ersetzen
+        htmlContent = htmlContent.Replace("#IS_READ_ONLY", isReadOnly.ToString().ToLowerInvariant());
 
         return htmlContent;
     }
