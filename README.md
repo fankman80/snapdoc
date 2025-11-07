@@ -1,6 +1,6 @@
 # SnapDoc
 [🇩🇪 Deutsch](#deutsch) | [🇺🇸 English](#english)
-
+![Alt-Text](./SnapDoc/Resources/Images/banner.png)
 ## Deutsch
 
 **SnapDoc** ist eine plattformübergreifende .NET MAUI-App (Windows & Android) für das Bauwesen, Architekten, Fachplaner und Immobilienverwalter.  
