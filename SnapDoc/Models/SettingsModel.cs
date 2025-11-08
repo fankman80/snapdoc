@@ -39,6 +39,7 @@ internal class SettingsModel
     public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates
+    public string EditorTheme { get; set; } // Json Editor Thema
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<string>? IconSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Icons
     public List<string>? PinSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Pins
