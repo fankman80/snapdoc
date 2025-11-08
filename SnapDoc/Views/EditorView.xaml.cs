@@ -78,6 +78,13 @@ public partial class EditorView : ContentPage, IQueryAttributable
                     // Speichern
                     if (data.TryGetValue("json", out var json))
                         await SaveJsonAsync(json);
+                    
+                    // Thema wechsel speichern
+                    if (data.TryGetValue("theme", out var themeName))
+                    {
+                        SettingsService.Instance.EditorTheme = themeName;
+                        SettingsService.Instance.SaveSettings();
+                    }
                 }
                 catch { }
             };
@@ -202,6 +209,13 @@ public partial class EditorView : ContentPage, IQueryAttributable
                 // Speichern
                 if (data.TryGetValue("json", out var json))
                     await view.SaveJsonAsync(json);
+
+                // Thema wechsel speichern
+                if (data.TryGetValue("theme", out var themeName))
+                {
+                    SettingsService.Instance.EditorTheme = themeName;
+                    SettingsService.Instance.SaveSettings();
+                }
             });
         }
     }
