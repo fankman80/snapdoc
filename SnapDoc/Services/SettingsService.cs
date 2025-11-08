@@ -326,7 +326,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinZoom = settings.DefaultPinZoom;
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
-            EditorTheme = settings.EditorTheme;
+            EditorTheme = settings.EditorTheme ?? string.Empty;
             ColorList = settings.ColorList ?? ColorList;
             IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
             PinSortCrits = settings.PinSortCrits ?? PinSortCrits;
