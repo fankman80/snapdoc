@@ -159,6 +159,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
+    [ObservableProperty] private string _editorTheme = "material-darker";
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
 
@@ -263,6 +264,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinZoom = DefaultPinZoom,
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
+            EditorTheme = EditorTheme,
             ColorList = ColorList,
             IconSortCrits = IconSortCrits,
             PinSortCrits = PinSortCrits,
@@ -324,6 +326,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinZoom = settings.DefaultPinZoom;
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
+            EditorTheme = settings.EditorTheme;
             ColorList = settings.ColorList ?? ColorList;
             IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
             PinSortCrits = settings.PinSortCrits ?? PinSortCrits;
@@ -376,6 +379,7 @@ public partial class SettingsService : ObservableObject
         DefaultPinZoom = defaultSettings.DefaultPinZoom;
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
+        EditorTheme = defaultSettings.EditorTheme;
         ColorList = [.. defaultSettings.ColorList];
         IconSortCrits = [.. defaultSettings.IconSortCrits];
         PinSortCrits = [.. defaultSettings.PinSortCrits];
