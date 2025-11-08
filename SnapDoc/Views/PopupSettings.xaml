@@ -238,7 +238,7 @@
                         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
                             <Label Grid.Column="0" Grid.Row="0" Text="Programmeinstellungen" VerticalTextAlignment="Center"/>
                             <Label Grid.Column="0" Grid.Row="1" Text="Dokumenteinstellungen" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="0" Grid.Row="2" Text="Symboldefinitionen" VerticalTextAlignment="Center"/>
+                            <Label Grid.Column="0" Grid.Row="2" Text="Icondefinitionen" VerticalTextAlignment="Center"/>
                             <Label Grid.Column="0" Grid.Row="3" Text="Zurück setzen" VerticalTextAlignment="Center"/>
                             <Button Grid.Column="1" Grid.Row="0"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -249,12 +249,12 @@
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
-                                    Clicked="OpenDokEditor"></Button>
+                                    Clicked="OpenDocEditor"></Button>
                             <Button Grid.Column="1" Grid.Row="2"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
-                                    Clicked="OpenSymbolEditor"></Button>
+                                    Clicked="OpenIconEditor"></Button>
                             <Button Grid.Column="1" Grid.Row="3"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
