@@ -135,6 +135,9 @@ public partial class EditorView : ContentPage, IQueryAttributable
         // Neues Flag ersetzen
         htmlContent = htmlContent.Replace("#IS_READ_ONLY", isReadOnly.ToString().ToLowerInvariant());
 
+        // Thema setzen
+        htmlContent = htmlContent.Replace("#THEME_REPLACE", isReadOnly.ToString().ToLowerInvariant());
+
         return htmlContent;
     }
 
