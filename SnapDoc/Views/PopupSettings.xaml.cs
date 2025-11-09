@@ -58,7 +58,7 @@ public partial class PopupSettings : Popup
 
     private async void OpenDocEditor(object sender, EventArgs e)
     {
-        var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
+        var filePath = Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile);
         if (File.Exists(filePath))
         {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
@@ -67,7 +67,7 @@ public partial class PopupSettings : Popup
 
     private async void OpenIconEditor(object sender, EventArgs e)
     {
-        var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
+        var filePath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
         if (File.Exists(filePath))
         {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
