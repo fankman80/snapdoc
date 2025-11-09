@@ -178,7 +178,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
     {
         File.WriteAllText(_filePath, json);
         await DisplayAlertAsync("Erfolg", "Einstellungen gespeichert!", "OK");
-        SettingsService.Instance.LoadSettings();
+        // SettingsService.Instance.LoadSettings();
         await Shell.Current.GoToAsync("..");
     }
 
