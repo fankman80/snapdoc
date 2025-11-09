@@ -195,34 +195,32 @@
                         <uranium:ExpanderView.Header>
                             <Label Text="Oberfläche"/>
                         </uranium:ExpanderView.Header>
-                        <VerticalStackLayout Spacing="10">
-                            <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
-                                <Label Grid.Column="0" Grid.Row="0"
-                                       VerticalTextAlignment="Center"
-                                       Text="App-Modus"/>
-                                <Border Grid.Column="1" Grid.Row="0"
-                                        Stroke="{DynamicResource SecondaryBackground}"
-                                        StrokeThickness="1"
-                                        StrokeShape="RoundRectangle 8">
-                                    <Picker x:Name="darkModePicker"
-                                            ItemsSource="{Binding AppThemes}"
-                                            SelectedItem="{Binding SelectedAppTheme}"
-                                            SelectedIndexChanged="OnThemeChanged"/>
-                                </Border>
-                                <Label Grid.Column="0" Grid.Row="1"
-                                       VerticalTextAlignment="Center"
-                                       Text="Farb-Thema"/>                                
-                                <Border Grid.Column="1" Grid.Row="1"
-                                        Stroke="{DynamicResource SecondaryBackground}"
-                                        StrokeThickness="1"
-                                        StrokeShape="RoundRectangle 8">
-                                    <Picker x:Name="colorThemePicker"
-                                            ItemsSource="{Binding ColorThemes}"
-                                            SelectedItem="{Binding SelectedColorTheme}"
-                                            SelectedIndexChanged="OnThemeChanged"/>
-                                </Border>
-                            </Grid>
-                        </VerticalStackLayout>
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                            <Label Grid.Column="0" Grid.Row="0"
+                                    VerticalTextAlignment="Center"
+                                    Text="App-Modus"/>
+                            <Border Grid.Column="1" Grid.Row="0"
+                                    Stroke="{DynamicResource SecondaryBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8">
+                                <Picker x:Name="darkModePicker"
+                                        ItemsSource="{Binding AppThemes}"
+                                        SelectedItem="{Binding SelectedAppTheme}"
+                                        SelectedIndexChanged="OnThemeChanged"/>
+                            </Border>
+                            <Label Grid.Column="0" Grid.Row="1"
+                                   VerticalTextAlignment="Center"
+                                   Text="Farb-Thema"/>                                
+                            <Border Grid.Column="1" Grid.Row="1"
+                                    Stroke="{DynamicResource SecondaryBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8">
+                                <Picker x:Name="colorThemePicker"
+                                        ItemsSource="{Binding ColorThemes}"
+                                        SelectedItem="{Binding SelectedColorTheme}"
+                                        SelectedIndexChanged="OnThemeChanged"/>
+                            </Border>
+                        </Grid>
                     </uranium:ExpanderView>
                 </Border>
 
@@ -235,32 +233,28 @@
                         <uranium:ExpanderView.Header>
                             <Label Text="Experten Einstellungen"/>
                         </uranium:ExpanderView.Header>
-                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto">
-                            <Label Grid.Column="0" Grid.Row="0" Text="Programmeinstellungen" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="0" Grid.Row="1" Text="Dokumenteinstellungen" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="0" Grid.Row="2" Text="Icondefinitionen" VerticalTextAlignment="Center"/>
-                            <Label Grid.Column="0" Grid.Row="3" Text="Zurück setzen" VerticalTextAlignment="Center"/>
-                            <Button Grid.Column="1" Grid.Row="0"
+                        <VerticalStackLayout>
+                            <Button Text="Programmeinstellungen"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
                                     Clicked="OpenPrgEditor"></Button>
-                            <Button Grid.Column="1" Grid.Row="1"
+                            <Button Text="Dokumenteinstellungen"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
                                     Clicked="OpenDocEditor"></Button>
-                            <Button Grid.Column="1" Grid.Row="2"
+                            <Button Text="Icondefinitionen"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Edit}}"
                                     Clicked="OpenIconEditor"></Button>
-                            <Button Grid.Column="1" Grid.Row="3"
+                            <Button Text="Zurück setzen
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Disabled_by_default}}"
                                     Clicked="ResetValues"></Button>
-                        </Grid>
+                        </VerticalStackLayout>
                     </uranium:ExpanderView>
                 </Border>                        
             </VerticalStackLayout>
