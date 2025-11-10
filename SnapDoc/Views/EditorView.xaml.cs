@@ -11,6 +11,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
 {
     private string _jsonString = string.Empty;
     private string _filePath = null;
+    private string _fileType = null;
     private string _stringTxt = null;
     private bool _editorReady = false;
     private bool _isReadOnly = false;
@@ -32,6 +33,8 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        if (query.TryGetValue("fileType", out var value0))
+            _fileType = value0 as string;
         if (query.TryGetValue("file", out var value1))
             _filePath = value1 as string;
         if (query.TryGetValue("string", out var value2))
@@ -178,12 +181,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
     {
         File.WriteAllText(_filePath, json);
         await DisplayAlertAsync(Path.GetFileName(_filePath), "Einstellungen gespeichert!", "OK");
-
-        // Daten neu laden
-        GlobalJson.LoadFromFile(_filePath);
-        SettingsService.Instance.LoadSettings();
-
-        await Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync($"..?fileType={_fileType}");
     }
 
     #endregion

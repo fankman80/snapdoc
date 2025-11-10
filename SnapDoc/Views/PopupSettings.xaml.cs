@@ -7,7 +7,7 @@ using CommunityToolkit.Maui.Extensions;
 
 namespace SnapDoc.Views;
 
-public partial class PopupSettings : Popup
+public partial class PopupSettings : Popup, IQueryAttributable
 {
     public SvgCachedImage PinSvgImage;
 
@@ -24,6 +24,23 @@ public partial class PopupSettings : Popup
         
         string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
         svgIcon.Source = LoadSvgWithColor("customcolor.svg", hexColor);
+    }
+
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        if (query.TryGetValue("fileType", out var value))
+        {
+            if (value as string == "Prg")
+                SettingsService.Instance.LoadSettings();
+            if (value as string == "Doc")
+                GlobalJson.LoadFromFile(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile));
+            if (value as string == "Icon")
+            {
+                var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+                SettingsService.Instance.IconCategories = iconCategories;
+                Settings.IconData = iconItems;
+            }
+        }
     }
 
     private void OnOkClicked(object sender, EventArgs e)
@@ -52,7 +69,7 @@ public partial class PopupSettings : Popup
         var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
         if (File.Exists(filePath))
         {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
+            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Prg");
         }
     }
 
@@ -61,7 +78,7 @@ public partial class PopupSettings : Popup
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile);
         if (File.Exists(filePath))
         {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
+            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Doc");
         }
     }
 
@@ -70,7 +87,7 @@ public partial class PopupSettings : Popup
         var filePath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
         if (File.Exists(filePath))
         {
-            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
+            await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Icon");
         }
     }
 
