@@ -1,5 +1,4 @@
-﻿using Camera.MAUI;
-using CommunityToolkit.Maui;
+﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
@@ -20,7 +19,6 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCameraView()
             .UseMauiCommunityToolkit()
             .UseUraniumUI()
             .UseFFImageLoading()

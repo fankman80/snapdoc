@@ -177,7 +177,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
     public async Task SaveJsonAsync(string json)
     {
         File.WriteAllText(_filePath, json);
-        await DisplayAlertAsync("Erfolg", "Einstellungen gespeichert!", "OK");
+        await DisplayAlertAsync(Path.GetFileName(_filePath), "Einstellungen gespeichert!", "OK");
 
         // Daten neu laden
         GlobalJson.LoadFromFile(_filePath);
