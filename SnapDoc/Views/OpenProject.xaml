@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
@@ -13,7 +13,8 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout>
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+            <Label x:DataType="views:OpenProject"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"

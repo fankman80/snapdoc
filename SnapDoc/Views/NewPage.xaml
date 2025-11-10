@@ -6,7 +6,7 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
-             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"

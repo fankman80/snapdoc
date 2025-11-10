@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                xmlns:views="clr-namespace:SnapDoc.Views"
                 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+                xmlns:views="clr-namespace:SnapDoc.Views"             
                 xmlns:services="clr-namespace:SnapDoc.Services"
+                xmlns:controls="clr-namespace:SnapDoc.Controls"             
                 xmlns:local="clr-namespace:SnapDoc"
-                xmlns:controls="clr-namespace:SnapDoc.Controls"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 x:Class="SnapDoc.Views.MapView"
                 x:Name="ThisPage"
@@ -16,7 +16,8 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout>
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+            <Label x:DataType="views:MapView"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"

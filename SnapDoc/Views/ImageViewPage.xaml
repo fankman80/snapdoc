@@ -3,9 +3,9 @@
 			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
-			 xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"			 
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
+             xmlns:views="clr-namespace:SnapDoc.Views"             
 			 BackgroundColor="DimGrey"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
 			 x:Class="SnapDoc.Views.ImageViewPage"
@@ -13,7 +13,8 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout>
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+            <Label x:DataType="views:ImageViewPage"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"

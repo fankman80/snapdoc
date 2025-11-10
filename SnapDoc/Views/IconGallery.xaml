@@ -5,8 +5,8 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
-             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.IconGallery"
@@ -16,7 +16,8 @@
 
     <Shell.TitleView>
         <HorizontalStackLayout>
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+            <Label x:DataType="views:IconGallery"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
