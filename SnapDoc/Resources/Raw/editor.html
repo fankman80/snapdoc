@@ -104,7 +104,7 @@
                 theme: "#THEME_REPLACE",
                 lineNumbers: true,
                 lineWrapping: true,
-                readOnly: isReadOnly // <- hier wird das Flag gleich für den Editor genutzt
+                readOnly: isReadOnly
             });
 
             // aktuell gewähltes Theme im Dropdown anzeigen
@@ -133,7 +133,7 @@
         window.setJsonText = function (jsonString) {
             if (editor) {
                 editor.setValue(jsonString);
-                detectLanguageAndSetMode(jsonString); // <--- hier aufrufen
+                detectLanguageAndSetMode(jsonString);
                 editor.refresh();
             } else {
                 pendingJson = jsonString;
@@ -187,7 +187,7 @@
                         alert("✅ XML ist gültig!");
                     }
                 } catch (e) {
-                    alert("❌ Fehler beim XML-Parsing:\n\n" + e.message);
+                    alert("❌ Fehler im XML-Parsing:\n\n" + e.message);
                 }
                 return;
             }
@@ -198,12 +198,11 @@
                     JSON.parse(content);
                     alert("✅ JSON ist gültig!");
                 } catch (e) {
-                    alert("❌ Fehler im JSON:\n\n" + e.message);
+                    alert("❌ Fehler im JSON-Code:\n\n" + e.message);
                 }
                 return;
             }
 
-            // Wenn weder noch
             alert("Der Inhalt ist weder JSON noch XML.");
         }
 
