@@ -53,7 +53,6 @@ public partial class PopupSettings : Popup
         if (File.Exists(filePath))
         {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
-            SettingsService.Instance.LoadSettings();
         }
     }
 
@@ -63,7 +62,6 @@ public partial class PopupSettings : Popup
         if (File.Exists(filePath))
         {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W");
-            GlobalJson.LoadFromFile(filePath);
         }
     }
 
