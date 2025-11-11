@@ -73,10 +73,10 @@
 </head>
 <body>
     <div id="toolbar">
-        <button onclick="editor.undo()">↶</button>
-        <button onclick="editor.redo()">↷</button>
-        <button onclick="formatJson()">Formatieren</button>
-        <button onclick="validateContent()">Validieren</button>
+        <button id="btnUndo" onclick="editor.undo()">↶</button>
+        <button id="btnRedo" onclick="editor.redo()">↷</button>
+        <button id="btnFormat" onclick="formatJson()">Formatieren</button>
+        <button id="btnValidate" onclick="validateContent()">Validieren</button>
         <select id="themeSelector" onchange="changeTheme(this.value)">
             <option value="material-darker" selected>Material (Dark)</option>
             <option value="material">Material (Light)</option>
@@ -111,12 +111,9 @@
             document.getElementById("themeSelector").value = "#THEME_REPLACE";
 
             if (isReadOnly) {
-                // bestimmte Buttons verstecken
-                document.getElementById("sendButton").style.display = "none";
-                document.querySelector("button[onclick='formatJson()']").style.display = "none";
-                document.querySelector("button[onclick='validateContent()']").style.display = "none";
-                document.querySelector("button[onclick='editor.redo()']").style.display = "none";
-                document.querySelector("button[onclick='editor.undo()']").style.display = "none";
+                ["btnUndo", "btnRedo", "btnFormat", "btnValidate", "sendButton"].forEach(id => {
+                document.getElementById(id).style.display = "none";
+                });
             }
 
             if (pendingJson !== null) {
