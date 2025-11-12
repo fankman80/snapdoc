@@ -44,10 +44,11 @@
                     <Label Grid.Column="1"
                            Text="{Binding DisplayName}"
                            VerticalOptions="Center"
-                           Margin="16,0,0,0"
                            LineBreakMode="WordWrap"/>
                     <BoxView Grid.Column="2"
+                             Margin="0,0,10,0"
                              HeightRequest="26"
+                             WidthRequest="26"
                              CornerRadius="6"
                              BackgroundColor="{Binding PinColor, Converter={StaticResource SkColorToHexConverter}}"/>
                     <mr:Button Grid.ColumnSpan="3"

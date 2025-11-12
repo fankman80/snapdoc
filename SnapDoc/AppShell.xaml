@@ -237,8 +237,7 @@
             <CollectionView x:Name="PlanCollectionView"
                             ItemsSource="{Binding PlanItems}"
                             CanReorderItems="True"
-                           
-                            SelectionMode="Single"
+                            SelectionMode="None"
                             ReorderCompleted="OnReorderCompleted"
                             SelectionChanged="OnPlanSelectionChanged">
                 <CollectionView.ItemTemplate>
