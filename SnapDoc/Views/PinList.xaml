@@ -42,36 +42,51 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" HorizontalOptions="Start" Scale="0.8" AnchorX="0"
+        <Border Grid.Row="0" HorizontalOptions="Start"
+                HeightRequest="38"
                 WidthRequest="220"
-                Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                 StrokeThickness="1"
+                Stroke="{DynamicResource Primary}"                
                 StrokeShape="RoundRectangle 4">
-            <Entry x:Name="SearchEntry"
-                   Placeholder="Suche..."
-                   TextChanged="SearchEntry_TextChanged"
-                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
+            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
+                <Entry x:Name="SearchEntry"
+                       FontSize="10"
+                       VerticalOptions="Center"
+                       HorizontalOptions="Fill"
+                       Placeholder="Suche..."
+                       TextChanged="SearchEntry_TextChanged"
+                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
+            </Grid>
         </Border>
 
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" Scale="0.8" AnchorX="1">
-            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
+            <Border Padding="6"
+                    HeightRequest="38"
+                    WidthRequest="38"
                     StrokeThickness="1"
+                    Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
-                <Button x:Name="SortDirection"
-                        Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Sort}}"
-                        BorderWidth="0"
-                        HorizontalOptions="Start"
-                        BackgroundColor="Transparent"
-                        Clicked="OnSortDirectionClicked"/>
+                <Image x:Name="SortDirection"
+                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}">
+                    <Image.GestureRecognizers>
+                        <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
+                    </Image.GestureRecognizers>
+                </Image>
             </Border>
-            <Border Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+            <Border VerticalOptions="Center"
+                    HeightRequest="38"
                     StrokeThickness="1"
+                    Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
-                <Picker x:Name="SortPicker" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                        FontSize="12"
-                        ItemsSource="{Binding PinSortCrits}"
-                        SelectedItem="{Binding PinSortCrit}"/>
+                <Grid VerticalOptions="Center" HorizontalOptions="Fill">
+                    <Picker x:Name="SortPicker"
+                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                            FontSize="10"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding PinSortCrits}"
+                            SelectedItem="{Binding PinSortCrit}"/>
+                </Grid>
             </Border>
         </HorizontalStackLayout>
 
