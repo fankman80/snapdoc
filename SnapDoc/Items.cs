@@ -46,6 +46,17 @@ namespace SnapDoc
             };
         }
 
+        public string DisplayIconPath
+        {
+            get
+            {
+                if (PinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                    return Path.Combine(Settings.DataDirectory, PinIcon);
+
+                return PinIcon;
+            }
+        }
+
         // Grunddaten aus dem Modell
         public string SelfId => _pin.SelfId;
         public string OnPlanId => _pin.OnPlanId;

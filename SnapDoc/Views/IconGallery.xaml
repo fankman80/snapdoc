@@ -10,7 +10,7 @@
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.IconGallery"
-             BackgroundColor="White"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Title="Icon auswählen">
 

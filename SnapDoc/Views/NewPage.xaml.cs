@@ -262,13 +262,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 // Lade Default-Icon falls Custom-Icon nicht existiert
                 var iconItem = Settings.IconData.First();
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon = iconItem.FileName;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].Size = iconItem.IconSize;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLockRotate = iconItem.IsRotationLocked;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin = iconItem.IsCustomPin;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].Anchor = iconItem.AnchorPoint;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale = iconItem.IconScale;
-                GlobalJson.Data.Plans[PlanId].Pins[pinId].PinColor = iconItem.PinColor;
+                pinIcon = iconItem.FileName;
+                _originAnchor = iconItem.AnchorPoint;
+                _pinSize = iconItem.IconSize;
             }
         }
 

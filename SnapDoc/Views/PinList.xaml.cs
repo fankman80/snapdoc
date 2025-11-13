@@ -54,11 +54,20 @@ public partial class PinList : ContentPage
 
                         if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
                         {
-                            var _pinIcon = Path.Combine(Settings.DataDirectory, "customicons", Path.GetFileName(pinIcon));
-                            if (File.Exists(_pinIcon))
-                                pin.PinIcon = _pinIcon;
+                            var fullPath = Path.Combine(Settings.DataDirectory, pinIcon);
+                            if (!File.Exists(fullPath))
+                            {
+                                // Lade Default-Icon falls Custom-Icon nicht existiert
+                                var iconItem = Settings.IconData.First();
+                                pin.PinIcon = iconItem.FileName;
+                                pin.Size = iconItem.IconSize;
+                                pin.IsLockRotate = iconItem.IsRotationLocked;
+                                pin.IsCustomPin = iconItem.IsCustomPin;
+                                pin.Anchor = iconItem.AnchorPoint;
+                                pin.PinScale = iconItem.IconScale;
+                                pin.PinColor = iconItem.PinColor;
+                            }
                         }
-
                         var newPin = new PinItem(pin);
                         pinItems.Add(newPin);
                         pincounter++;

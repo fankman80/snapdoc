@@ -152,7 +152,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             var size = await Task.Run(() => GetImageSize(localPath));
 
             var updatedItem = new IconItem(
-                Path.Combine(Settings.DataDirectory, "customicons", fileName),
+                Path.Combine("customicons", fileName),
                 "Neues Icon",
                 new Point(0.5, 0.5),
                 size,

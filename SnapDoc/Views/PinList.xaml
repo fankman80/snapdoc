@@ -43,20 +43,18 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" HorizontalOptions="Start"
+                Padding="0,-3,0,0"
                 HeightRequest="38"
                 WidthRequest="220"
                 StrokeThickness="1"
-                Stroke="{DynamicResource Primary}"                
+                Stroke="{DynamicResource Primary}"
                 StrokeShape="RoundRectangle 4">
-            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                <Entry x:Name="SearchEntry"
-                       FontSize="10"
-                       VerticalOptions="Center"
-                       HorizontalOptions="Fill"
-                       Placeholder="Suche..."
-                       TextChanged="SearchEntry_TextChanged"
-                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
-            </Grid>
+            <Entry x:Name="SearchEntry"
+                   FontSize="12"
+                   VerticalTextAlignment="Center"
+                   Placeholder="Suche..."
+                   TextChanged="SearchEntry_TextChanged"
+                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
@@ -176,7 +174,7 @@
                                    Margin="14"
                                    ClassId="{Binding SelfId}"
                                    AutomationId = "{Binding OnPlanId}"
-                                   Source="{Binding PinIcon}"
+                                   Source="{Binding DisplayIconPath}"
                                    Aspect="AspectFit">
                                 <Image.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnPinIconClicked"/>
