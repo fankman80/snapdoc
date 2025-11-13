@@ -43,21 +43,21 @@
         </Grid.RowDefinitions>
 
         <Border Grid.Row="0" HorizontalOptions="Start"
+                MinimumWidthRequest="140"
                 Padding="0,-3,0,0"
                 HeightRequest="38"
-                WidthRequest="220"
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
                 StrokeShape="RoundRectangle 4">
             <Entry x:Name="SearchEntry"
-                   FontSize="12"
-                   VerticalTextAlignment="Center"
-                   Placeholder="Suche..."
-                   TextChanged="SearchEntry_TextChanged"
-                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
+                    FontSize="12"
+                    VerticalTextAlignment="Center"
+                    Placeholder="Suche..."
+                    TextChanged="SearchEntry_TextChanged"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
 
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
             <Border Padding="6"
                     HeightRequest="38"
                     WidthRequest="38"
@@ -65,25 +65,25 @@
                     Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
                 <Image x:Name="SortDirection"
-                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}">
+                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
                     </Image.GestureRecognizers>
                 </Image>
             </Border>
             <Border VerticalOptions="Center"
-                    HeightRequest="38"
-                    StrokeThickness="1"
-                    Stroke="{DynamicResource Primary}"
-                    StrokeShape="RoundRectangle 4">
+                        HeightRequest="38"
+                        StrokeThickness="1"
+                        Stroke="{DynamicResource Primary}"
+                        StrokeShape="RoundRectangle 4">
                 <Grid VerticalOptions="Center" HorizontalOptions="Fill">
                     <Picker x:Name="SortPicker"
-                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                            FontSize="10"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Fill"
-                            ItemsSource="{Binding PinSortCrits}"
-                            SelectedItem="{Binding PinSortCrit}"/>
+                                x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                FontSize="10"
+                                VerticalOptions="Center"
+                                HorizontalOptions="Fill"
+                                ItemsSource="{Binding PinSortCrits}"
+                                SelectedItem="{Binding PinSortCrit}"/>
                 </Grid>
             </Border>
         </HorizontalStackLayout>
