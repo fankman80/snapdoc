@@ -44,7 +44,7 @@
 
         <Border Grid.Row="0" HorizontalOptions="Start"
                 MinimumWidthRequest="140"
-                Padding="0,-3,0,0"
+                Padding="3,-2,3,0"
                 HeightRequest="38"
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
