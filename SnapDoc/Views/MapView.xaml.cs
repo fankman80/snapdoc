@@ -146,8 +146,12 @@ public partial class MapView : IQueryAttributable
             GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
             plan.Pins.TryGetValue(PinId, out var pin))
         {
+            var file = pin.PinIcon;
+            if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
+                file = Path.Combine(Settings.DataDirectory, file);
+        
             SetPosBtn.IsVisible = true;
-            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source = pin.PinIcon;
+            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source = file;
 
             if (pin.GeoLocation != null)
             {
