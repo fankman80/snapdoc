@@ -111,6 +111,7 @@
                         </Slider.Margin>
                     </Slider>
                 </Border>
+                
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
                        HeightRequest="38"
                        Margin="36,0,0,113"
@@ -223,6 +224,24 @@
                         HeightRequest="60"
                         CornerRadius="30"
                         Clicked="EraseClicked"/>
+                <Button x:Name="DrawPolyBtn"
+                        IsVisible="False"                        
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Polyline}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="DrawPolyClicked"/>
+                <Button x:Name="DrawFreeBtn"
+                        IsVisible="False"                        
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw_abstract}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="DrawFreeClicked"/>
                 <Button x:Name="PenSettingsBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
                         BackgroundColor="{DynamicResource Primary}"

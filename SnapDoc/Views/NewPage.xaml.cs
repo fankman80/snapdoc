@@ -11,6 +11,7 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
+using Microsoft.Maui.Graphics;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -19,6 +20,8 @@ using SnapDoc.Platforms.Windows;
 #if ANDROID
 using Android.Views.InputMethods;
 using Microsoft.Maui.Platform;
+using Microsoft.Maui.Graphics.Platform;
+using Microsoft.Maui.Controls;
 #endif
 
 namespace SnapDoc.Views;
@@ -36,7 +39,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
-    private DrawingView drawingView;
     private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
@@ -44,6 +46,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
+
+    private DrawingView freeDrawingView;
+    private Microsoft.Maui.Controls.GraphicsView polyDrawingView;
+    private InteractivePolylineDrawable polyDrawable;
+    private int? activeIndex = null;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -484,14 +491,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawingClicked(object sender, EventArgs e)
     {
-        planContainer.IsPanningEnabled = false;
         SetPinBtn.IsVisible = false;
         DrawBtn.IsVisible = false;
         PenSettingsBtn.IsVisible = true;
         CheckBtn.IsVisible = true;
         EraseBtn.IsVisible = true;
+        DrawPolyBtn.IsVisible = true;
+        DrawFreeBtn.IsVisible = true;
+    }
 
-        AddDrawingView();
+    private void DrawFreeClicked(object sender, EventArgs e)
+    {
+        planContainer.IsPanningEnabled = false;
+        AddFreeDrawingView();
+    }
+    private void DrawPolyClicked(object sender, EventArgs e)
+    {
+        planContainer.IsPanningEnabled = false;
+        AddPolyDrawingView();
     }
 
     private void SetPin(Point _pos,
@@ -686,9 +703,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             return GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
     }
 
-    private void AddDrawingView()
+    private void AddFreeDrawingView()
     {
-        drawingView = new DrawingView
+        freeDrawingView = new DrawingView
         {
             BackgroundColor = Colors.Transparent,
             IsMultiLineModeEnabled = true,
@@ -711,17 +728,59 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         pinBound.Bottom = int.MinValue;
 
         // Füge die EventHandler hinzu
-        drawingView.PointDrawn += OnDrawingLineUpdated;
+        freeDrawingView.PointDrawn += OnDrawingLineUpdated;
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-        absoluteLayout.Children.Add(drawingView);
+        absoluteLayout.Children.Add(freeDrawingView);
     }
 
-    private void RemoveDrawingView()
+    private void AddPolyDrawingView()
+    {
+        polyDrawable = new InteractivePolylineDrawable(
+            fillColor: selectedColor.WithAlpha(0.4f),
+            lineColor: selectedColor,
+            pointColor: Colors.Blue,
+            startPointColor: Colors.Red,
+            lineThickness: (float)lineWidth            
+        );
+
+        // GraphicsView erzeugen
+        polyDrawingView = new Microsoft.Maui.Controls.GraphicsView
+        {
+            Drawable = polyDrawable,
+            BackgroundColor = Colors.Transparent,
+            InputTransparent = false,
+            Scale = planContainer.Scale,
+            AnchorX = planContainer.AnchorX,
+            AnchorY = planContainer.AnchorY,
+            TranslationX = planContainer.TranslationX,
+            TranslationY = planContainer.TranslationY,
+            Rotation = planContainer.Rotation,
+            WidthRequest = PlanImage.Width,
+            HeightRequest = PlanImage.Height
+        };
+
+        // Füge die EventHandler hinzu
+        polyDrawingView.StartInteraction += OnStartInteraction;
+        polyDrawingView.DragInteraction += OnDragInteraction;
+        polyDrawingView.EndInteraction += OnEndInteraction;
+
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+        absoluteLayout.Children.Add(polyDrawingView);
+    }
+
+    private void RemoveFreeDrawingView()
     {
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-        if (drawingView != null && absoluteLayout != null)
-            absoluteLayout.Children.Remove(drawingView);
+        if (freeDrawingView != null && absoluteLayout != null)
+            absoluteLayout.Children.Remove(freeDrawingView);
+    }
+
+    private void RemovePolyDrawingView()
+    {
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+        if (polyDrawingView != null && absoluteLayout != null)
+            absoluteLayout.Children.Remove(polyDrawingView);
     }
 
     private void OnDrawingLineUpdated(object sender, PointDrawnEventArgs e)
@@ -738,14 +797,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView.Lines.Count > 0)
+        if (freeDrawingView.Lines.Count > 0)
         {
             var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
 
             await using var imageStream = await DrawingViewService.GetImageStream(
-                ImageLineOptions.JustLines(drawingView.Lines,
+                ImageLineOptions.JustLines(freeDrawingView.Lines,
                 new Size(pinBound.Width + (2*lineWidth), pinBound.Height + (2*lineWidth)),
                 Brush.Transparent));
 
@@ -772,18 +831,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     customPinName,
                     skBitmap.Width,
                     skBitmap.Height,
-                    new SKColor(drawingView.LineColor.ToUint()),
+                    new SKColor(freeDrawingView.LineColor.ToUint()),
                     1
                 );
             }
         }
 
-        RemoveDrawingView();
+        RemoveFreeDrawingView();
+        RemovePolyDrawingView();
 
         planContainer.IsPanningEnabled = true;
         PenSettingsBtn.IsVisible = false;
         CheckBtn.IsVisible = false;
         EraseBtn.IsVisible = false;
+        DrawPolyBtn.IsVisible = false;
+        DrawFreeBtn.IsVisible = false;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawBtn.IsVisible = true;
     }
@@ -813,17 +875,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             selectedColor = Color.FromArgb(result.Result.PenColorHex);
             lineWidth = result.Result.PenWidth;
-            if (drawingView != null)
+            if (freeDrawingView != null)
             {
-                drawingView.LineColor = selectedColor;
-                drawingView.LineWidth = (int)(lineWidth / densityX);
+                freeDrawingView.LineColor = selectedColor;
+                freeDrawingView.LineWidth = (int)(lineWidth / densityX);
+
+                polyDrawable.LineColor = selectedColor;
+                polyDrawable.FillColor = selectedColor.WithAlpha(0.4f);
+                polyDrawable.LineThickness = (int)lineWidth;
             }
         }
     }
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        drawingView.Clear();
+        freeDrawingView.Clear();
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
@@ -1166,5 +1232,41 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
 #endif
+    }
+
+    private void OnStartInteraction(object sender, TouchEventArgs e)
+    {
+        var p = e.Touches.FirstOrDefault();
+        if (p.IsEmpty) return;
+
+        activeIndex = polyDrawable.FindPointIndex(p.X, p.Y);
+
+        // Prüfen, ob Startpunkt angeklickt -> Polygon schließen
+        if (polyDrawable.TryClosePolygon(p.X, p.Y))
+        {
+            polyDrawingView.Invalidate();
+            return;
+        }
+
+        if (activeIndex == null)
+        {
+            polyDrawable.Points.Add(new PointF(p.X, p.Y));
+            polyDrawingView.Invalidate();
+        }
+    }
+
+    private void OnDragInteraction(object sender, TouchEventArgs e)
+    {
+        if (activeIndex != null)
+        {
+            var p = e.Touches[0];
+            polyDrawable.Points[(int)activeIndex] = new PointF(p.X, p.Y);
+            polyDrawingView.Invalidate();
+        }
+    }
+
+    private void OnEndInteraction(object sender, TouchEventArgs e)
+    {
+        activeIndex = null;
     }
 }
