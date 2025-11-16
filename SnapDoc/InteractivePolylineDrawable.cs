@@ -5,7 +5,8 @@ namespace SnapDoc;
 public class InteractivePolylineDrawable : IDrawable
 {
     public List<PointF> Points { get; set; } = [];
-    public float HandleRadius { get; set; } = 15f;
+    public float HandleRadius { get; set; }
+    public float PointRadius { get; set; }
     public bool IsClosed { get; private set; } = false;
     public Color FillColor { get; set; }
     public Color LineColor { get; set; }
@@ -18,13 +19,17 @@ public class InteractivePolylineDrawable : IDrawable
     Color? lineColor = null,
     Color? pointColor = null,
     Color? startPointColor = null,
-    float lineThickness = 3f)
+    float lineThickness = 3f,
+    float handleRadius = 15f,
+    float pointRadius = 8f)
     {
         FillColor = fillColor ?? Colors.LightBlue.WithAlpha(0.3f);
         LineColor = lineColor ?? Colors.Blue.WithAlpha(0.5f);
         PointColor = pointColor ?? Colors.Blue.WithAlpha(0.5f);
         StartPointColor = startPointColor ?? Colors.Green;
         LineThickness = lineThickness;
+        HandleRadius = handleRadius;
+        PointRadius = pointRadius;
     }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
@@ -67,7 +72,7 @@ public class InteractivePolylineDrawable : IDrawable
             else
                 canvas.FillColor = PointColor;
 
-            canvas.FillCircle(Points[i], 5);
+            canvas.FillCircle(Points[i], PointRadius);
         }
     }
 

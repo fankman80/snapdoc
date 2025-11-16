@@ -226,7 +226,7 @@
                         Clicked="EraseClicked"/>
                 <Button x:Name="DrawPolyBtn"
                         IsVisible="False"                        
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Polyline}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Pentagon}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -235,7 +235,7 @@
                         Clicked="DrawPolyClicked"/>
                 <Button x:Name="DrawFreeBtn"
                         IsVisible="False"                        
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw_abstract}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
