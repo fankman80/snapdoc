@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using MR.Gestures;
@@ -9,16 +8,11 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
+using Microsoft.Maui.Platform;
+using Microsoft.Maui.Graphics.Platform;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
-#endif
-
-#if ANDROID
-using Android.Views.InputMethods;
-using Microsoft.Maui.Platform;
-using Microsoft.Maui.Graphics.Platform;
-using Microsoft.Maui.Controls;
 #endif
 
 namespace SnapDoc.Views;
@@ -39,7 +33,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
     bool isTappedHandled = false;
-    SKRectI pinBound;
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
@@ -48,6 +41,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private CombinedDrawable combinedDrawable;
     private Microsoft.Maui.Controls.GraphicsView drawingView;
     private int? activeIndex = null;
+    private float MinX = float.MaxValue;
+    private float MinY = float.MaxValue;
+    private float MaxX = float.MinValue;
+    private float MaxY = float.MinValue;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -408,12 +405,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    public void OnPinching(object sender, PinchEventArgs e)
+    private void OnPinching(object sender, PinchEventArgs e)
     {
         planContainer.IsPanningEnabled = false;
     }
 
-    public void OnPinched(object sender, PinchEventArgs e)
+    private void OnPinched(object sender, PinchEventArgs e)
     {
         planContainer.IsPanningEnabled = true;
     }
@@ -431,7 +428,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    public void OnTapped(object sender, MR.Gestures.TapEventArgs e)
+    private void OnTapped(object sender, MR.Gestures.TapEventArgs e)
     {
         if (isPinSet)
         {
@@ -446,7 +443,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    public void OnLongPressing(object sender, LongPressEventArgs e)
+    private void OnLongPressing(object sender, LongPressEventArgs e)
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
@@ -457,14 +454,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    public void OnPinSetCancelClicked(object sender, EventArgs e)
+    private void OnPinSetCancelClicked(object sender, EventArgs e)
     {
         ToolBtns.IsVisible = true;
         SetPinFrame.IsVisible = false;
         isPinSet = false;
     }
 
-    public void OnPanning(object sender, PanEventArgs e)
+    private void OnPanning(object sender, PanEventArgs e)
     {
         var scaleSpeed = 1 / PlanContainer.Scale;
         double angle = PlanContainer.Rotation * Math.PI / 180.0;
@@ -744,211 +741,56 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawPolyBtn.CornerRadius = 8;
     }
 
-    //private void AddFreeDrawingView()
-    //{
-    //    freeDrawingView = new DrawingView
-    //    {
-    //        BackgroundColor = Colors.Transparent,
-    //        IsMultiLineModeEnabled = true,
-    //        LineWidth = (int)(lineWidth / densityX),
-    //        LineColor = selectedColor,
-    //        InputTransparent = false,
-    //        Scale = planContainer.Scale,
-    //        AnchorX = planContainer.AnchorX,
-    //        AnchorY = planContainer.AnchorY,
-    //        TranslationX = planContainer.TranslationX,
-    //        TranslationY = planContainer.TranslationY,
-    //        Rotation = planContainer.Rotation,
-    //        WidthRequest = PlanImage.Width,
-    //        HeightRequest = PlanImage.Height
-    //    };
-
-    //    pinBound.Left = int.MaxValue;
-    //    pinBound.Right = int.MinValue;
-    //    pinBound.Top = int.MaxValue;
-    //    pinBound.Bottom = int.MinValue;
-
-    //    // Füge die EventHandler hinzu
-    //    freeDrawingView.PointDrawn += OnDrawingLineUpdated;
-
-    //    var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-    //    absoluteLayout.Children.Add(freeDrawingView);
-    //}
-
-    //private void AddFreeDrawingView()
-    //{
-    //    freeDrawable = new InteractiveFreehandDrawable
-    //    {
-    //        LineThickness = (float)(lineWidth / PlanContainer.Scale),
-    //        LineColor = selectedColor
-    //    };
-
-    //    // GraphicsView erzeugen
-    //    freeDrawingView = new Microsoft.Maui.Controls.GraphicsView
-    //    {
-    //        Drawable = freeDrawable,
-    //        BackgroundColor = Colors.Transparent,
-    //        InputTransparent = false,
-    //        Scale = planContainer.Scale,
-    //        AnchorX = planContainer.AnchorX,
-    //        AnchorY = planContainer.AnchorY,
-    //        TranslationX = planContainer.TranslationX,
-    //        TranslationY = planContainer.TranslationY,
-    //        Rotation = planContainer.Rotation,
-    //        WidthRequest = PlanImage.Width,
-    //        HeightRequest = PlanImage.Height
-    //    };
-
-    //    // Füge die EventHandler hinzu
-    //    freeDrawingView.StartInteraction += OnStartInteraction;
-    //    freeDrawingView.DragInteraction += OnDragInteraction;
-    //    freeDrawingView.EndInteraction += OnEndInteraction;
-
-    //    var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-    //    absoluteLayout.Children.Add(freeDrawingView);
-    //}
-
-    //private void AddPolyDrawingView()
-    //{
-    //    polyDrawable = new InteractivePolylineDrawable(
-    //        fillColor: selectedColor.WithAlpha(0.4f),
-    //        lineColor: selectedColor,
-    //        pointColor: Colors.Gray.WithAlpha(0.4f),
-    //        startPointColor: Colors.Gray.WithAlpha(0.4f),
-    //        lineThickness: (float)(lineWidth / PlanContainer.Scale),
-    //        handleRadius: (float)(15 / PlanContainer.Scale),
-    //        pointRadius: (float)(8 / PlanContainer.Scale)
-    //    );
-
-    //    // GraphicsView erzeugen
-    //    polyDrawingView = new Microsoft.Maui.Controls.GraphicsView
-    //    {
-    //        Drawable = polyDrawable,
-    //        BackgroundColor = Colors.Transparent,
-    //        InputTransparent = false,
-    //        Scale = planContainer.Scale,
-    //        AnchorX = planContainer.AnchorX,
-    //        AnchorY = planContainer.AnchorY,
-    //        TranslationX = planContainer.TranslationX,
-    //        TranslationY = planContainer.TranslationY,
-    //        Rotation = planContainer.Rotation,
-    //        WidthRequest = PlanImage.Width,
-    //        HeightRequest = PlanImage.Height
-    //    };
-
-    //    // Füge die EventHandler hinzu
-    //    polyDrawingView.StartInteraction += OnStartInteraction;
-    //    polyDrawingView.DragInteraction += OnDragInteraction;
-    //    polyDrawingView.EndInteraction += OnEndInteraction;
-
-    //    var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-    //    absoluteLayout.Children.Add(polyDrawingView);
-    //}
-
-    //private void RemoveFreeDrawingView()
-    //{
-    //    var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-    //    if (freeDrawingView != null && absoluteLayout != null)
-    //        absoluteLayout.Children.Remove(freeDrawingView);
-    //}
-
-    //private void RemovePolyDrawingView()
-    //{
-    //    var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-    //    if (polyDrawingView != null && absoluteLayout != null)
-    //        absoluteLayout.Children.Remove(polyDrawingView);
-    //}
-
-    private void OnDrawingLineUpdated(object sender, PointDrawnEventArgs e)
+    private void RemoveDrawingView()
     {
-        if (e.Point.X < pinBound.Left)
-            pinBound.Left = (int)e.Point.X;
-        if (e.Point.X > pinBound.Right)
-            pinBound.Right = (int)e.Point.X;
-        if (e.Point.Y < pinBound.Top)
-            pinBound.Top = (int)e.Point.Y;
-        if (e.Point.Y > pinBound.Bottom)
-            pinBound.Bottom = (int)e.Point.Y;
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+        if (drawingView != null && absoluteLayout != null)
+            absoluteLayout.Children.Remove(drawingView);
     }
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        var pngBytes = ExportToPng(drawingView);
+        var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+        var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+        string filePath = Path.Combine(customPinPath, customPinName);
+
+        if (!Directory.Exists(customPinPath))
+            Directory.CreateDirectory(customPinPath);
+
+        var pngBytes = await CaptureCroppedAsync(drawingView,
+            Math.Min(MinX, MinX),
+            Math.Min(MinY, MinY),
+            Math.Max(MaxX, MaxX),
+            Math.Max(MaxY, MaxY),
+            extraPadding: 10
+        );
+
         if (pngBytes != null)
         {
-            File.WriteAllBytes(Path.Combine(FileSystem.CacheDirectory, "drawing.png"), pngBytes);
-        }
-    }
+            File.WriteAllBytes(filePath, pngBytes);
+        };
 
-    //private async void CheckClicked(object sender, EventArgs e)
-    //{
-    //    if (freeDrawingView.Lines.Count > 0)
-    //    {
-    //        var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-    //        var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-    //        string filePath = Path.Combine(customPinPath, customPinName);
+        SetPin(
+            new Point(
+            (MinX + (MaxX - MinX) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+            (MinY + (MaxY - MinY) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
+            customPinName,
+            (int)(MaxX - MinX),
+            (int)(MaxY - MinY),
+            new SKColor(selectedColor.ToUint()),
+            1
+        );
 
-    //        await using var imageStream = await DrawingViewService.GetImageStream(
-    //            ImageLineOptions.JustLines(freeDrawingView.Lines,
-    //            new Size(pinBound.Width + (2*lineWidth), pinBound.Height + (2*lineWidth)),
-    //            Brush.Transparent));
+        RemoveDrawingView();
 
-    //        if (imageStream != null)
-    //        {
-    //            if (!Directory.Exists(customPinPath))
-    //                Directory.CreateDirectory(customPinPath);
-
-    //            using var memoryStream = new MemoryStream();
-    //            await imageStream.CopyToAsync(memoryStream);
-    //            memoryStream.Seek(0, SeekOrigin.Begin);
-
-    //            using var skBitmap = SKBitmap.Decode(memoryStream);
-    //            using var imageData = skBitmap.Encode(SKEncodedImageFormat.Png, 90);
-    //            using (var fileStream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
-    //            {
-    //                imageData.SaveTo(fileStream);
-    //            }
-
-    //            SetPin(
-    //                new Point(
-    //                    (pinBound.Left + pinBound.Width / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-    //                    (pinBound.Top + pinBound.Height / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
-    //                customPinName,
-    //                skBitmap.Width,
-    //                skBitmap.Height,
-    //                new SKColor(freeDrawingView.LineColor.ToUint()),
-    //                1
-    //            );
-    //        }
-    //    }
-
-    //    RemoveFreeDrawingView();
-    //    RemovePolyDrawingView();
-
-    //    planContainer.IsPanningEnabled = true;
-    //    PenSettingsBtn.IsVisible = false;
-    //    CheckBtn.IsVisible = false;
-    //    EraseBtn.IsVisible = false;
-    //    DrawPolyBtn.IsVisible = false;
-    //    DrawFreeBtn.IsVisible = false;
-    //    SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-    //    DrawBtn.IsVisible = true;
-    //}
-
-    public static SKBitmap CropBitmap(SKBitmap originalBitmap)
-    {
-        int newWidth = originalBitmap.Width;
-        int newHeight = originalBitmap.Height;
-
-        if (newWidth <= 0 || newHeight <= 0)
-            throw new ArgumentException("Die neue Bildgröße ist ungültig.");
-
-        var croppedBitmap = new SKBitmap(newWidth, newHeight);
-        using (var canvas = new SKCanvas(croppedBitmap))
-        {
-            canvas.DrawBitmap(originalBitmap, new SKRect(0, 0, originalBitmap.Width, originalBitmap.Height));
-        }
-        return croppedBitmap;
+        planContainer.IsPanningEnabled = true;
+        PenSettingsBtn.IsVisible = false;
+        CheckBtn.IsVisible = false;
+        EraseBtn.IsVisible = false;
+        DrawPolyBtn.IsVisible = false;
+        DrawFreeBtn.IsVisible = false;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        DrawBtn.IsVisible = true;
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
@@ -1343,6 +1185,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             if (activeIndex == null && !poly.IsClosed)
             {
+                AddPoint(p);
                 poly.Points.Add(new PointF(p.X, p.Y));
                 drawingView.Invalidate();
             }
@@ -1351,6 +1194,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             var free = combinedDrawable.FreeDrawable;
             free.StartStroke();
+            AddPoint(p);
             free.AddPoint(new PointF(p.X, p.Y));
             drawingView.Invalidate();
         }
@@ -1360,9 +1204,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (drawMode == "poly")
         {
+
             var p = e.Touches[0];
             if (activeIndex != null)
             {
+                AddPoint(p);
                 combinedDrawable.PolyDrawable.Points[(int)activeIndex] = new PointF(p.X, p.Y);
                 drawingView.Invalidate();
             }
@@ -1370,6 +1216,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else if (drawMode == "free")
         {
             var p = e.Touches[0];
+            AddPoint(p);
             combinedDrawable.FreeDrawable.AddPoint(new PointF(p.X, p.Y));
             drawingView.Invalidate();
         }
@@ -1387,70 +1234,51 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private byte[] ExportToPng(this Microsoft.Maui.Controls.GraphicsView view, int extraPadding = 0)
+    private void AddPoint(PointF p)
     {
-        if (view.Drawable == null) return null;
+        if (p.X < MinX) MinX = p.X;
+        if (p.X > MaxX) MaxX = p.X;
+        if (p.Y < MinY) MinY = p.Y;
+        if (p.Y > MaxY) MaxY = p.Y;
+    }
 
-        // 1. Bitmap erzeugen in der Größe der GraphicsView
-        var width = (int)view.Width;
-        var height = (int)view.Height;
-
-        if (width <= 0 || height <= 0) return null;
-
-        using var bitmap = new Microsoft.Maui.Graphics.Platform.PlatformBitmap(width, height);
-        using var canvas = bitmap.CreateCanvas();
-
-        canvas.Clear(Colors.Transparent);
-
-        // 2. Drawable rendern
-        view.Drawable.Draw(canvas, new RectF(0, 0, width, height));
-
-        // 3. Bereich mit Inhalt ermitteln
-        int xMin = width, yMin = height, xMax = 0, yMax = 0;
-        var pixels = bitmap.GetPixels();
-
-        for (int y = 0; y < height; y++)
-        {
-            for (int x = 0; x < width; x++)
-            {
-                var color = pixels[y * width + x];
-                if (color.Alpha > 0) // Pixel ist nicht transparent
-                {
-                    if (x < xMin) xMin = x;
-                    if (x > xMax) xMax = x;
-                    if (y < yMin) yMin = y;
-                    if (y > yMax) yMax = y;
-                }
-            }
-        }
-
-        // Keine sichtbaren Pixel gefunden
-        if (xMax < xMin || yMax < yMin)
+    private static async Task<byte[]> CaptureCroppedAsync(
+        Microsoft.Maui.Controls.GraphicsView view,
+        float minX, float minY,
+        float maxX, float maxY,
+        int extraPadding = 0)
+    {
+        if (view == null)
             return null;
 
-        // 4. Zuschnitt auf minimalen Bereich + optional Padding
-        xMin = Math.Max(0, xMin - extraPadding);
-        yMin = Math.Max(0, yMin - extraPadding);
-        xMax = Math.Min(width - 1, xMax + extraPadding);
-        yMax = Math.Min(height - 1, yMax + extraPadding);
+        // Screenshot der gesamten GraphicsView
+        IScreenshotResult screenshot = await view.CaptureAsync();
+        if (screenshot == null)
+            return null;
 
-        int croppedWidth = xMax - xMin + 1;
-        int croppedHeight = yMax - yMin + 1;
+        // Bounding Box mit Padding
+        int left = (int)Math.Max(0, minX - extraPadding);
+        int top = (int)Math.Max(0, minY - extraPadding);
+        int right = (int)Math.Min(view.Width, maxX + extraPadding);
+        int bottom = (int)Math.Min(view.Height, maxY + extraPadding);
 
-        using var croppedBitmap = new Microsoft.Maui.Graphics.Platform.PlatformBitmap(croppedWidth, croppedHeight);
-        using var croppedCanvas = croppedBitmap.CreateCanvas();
+        int width = right - left;
+        int height = bottom - top;
+        if (width <= 0 || height <= 0)
+            return null;
 
-        for (int y = 0; y < croppedHeight; y++)
-        {
-            for (int x = 0; x < croppedWidth; x++)
-            {
-                croppedBitmap.SetPixel(x, y, pixels[(yMin + y) * width + (xMin + x)]);
-            }
-        }
+        // Screenshot in MemoryStream kopieren
+        using var memStream = new MemoryStream();
+        await screenshot.CopyToAsync(memStream);
+        memStream.Position = 0;
 
-        // 5. PNG speichern
-        using var ms = new MemoryStream();
-        croppedBitmap.Encode(ms, ImageFormat.Png);
-        return ms.ToArray();
+        // Plattformübergreifendes IImage laden
+        Microsoft.Maui.Graphics.IImage fullImage = PlatformImage.FromStream(memStream);
+        fullImage.Save(memStream, ImageFormat.Png);
+
+        // Als PNG exportieren
+        using var outputStream = new MemoryStream();
+        await fullImage.SaveAsync(outputStream, ImageFormat.Png);
+        return outputStream.ToArray();
     }
 }

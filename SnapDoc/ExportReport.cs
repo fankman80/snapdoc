@@ -221,7 +221,7 @@ public partial class ExportReport
                                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
                                                             var cropFactor = new Point((1 / planSize.Width * 300) / 2,
                                                                                        (1 / planSize.Height * 300) / 2);
-                                                            var crop = new SKRectI
+                                                            var crop = new OXML.Drawing.SourceRectangle
                                                             {
                                                                 Left = (int)((pinPos.X - cropFactor.X) * 100000),
                                                                 Top = (int)((pinPos.Y - cropFactor.Y) * 100000),
@@ -558,9 +558,9 @@ public partial class ExportReport
         );
     }
 
-    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, SKRectI? crop = null)
+    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, OXML.Drawing.SourceRectangle? crop = null)
     {
-        crop ??= new SKRectI(0, 0, 0, 0);
+        crop ??= new OXML.Drawing.SourceRectangle();
 
         // Prüfen, ob das Bild bereits hinzugefügt wurde
         if (!imageRelationshipIds.TryGetValue(imgPath, out string relationshipId))
@@ -575,12 +575,12 @@ public partial class ExportReport
         }
 
         if (wrap == "inline")
-            return GetInlinePicture(relationshipId, size, rotationAngle, crop.Value);
+            return GetInlinePicture(relationshipId, size, rotationAngle, crop);
         else
-            return GetAnchorPicture(relationshipId, size, pos, rotationAngle, crop.Value);
+            return GetAnchorPicture(relationshipId, size, pos, rotationAngle, crop);
     }
 
-    private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, SKRectI crop)
+    private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, OXML.Drawing.SourceRectangle crop)
     {
         Drawing drawing = new();
         DDW.Inline inline = new()
@@ -686,7 +686,7 @@ public partial class ExportReport
         return drawing;
     }
 
-    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle, SKRectI crop)
+    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle, OXML.Drawing.SourceRectangle crop)
     {
         Drawing _drawing = new();
         DDW.Anchor _anchor = new()
