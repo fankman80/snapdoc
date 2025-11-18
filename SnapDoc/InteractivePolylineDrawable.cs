@@ -5,37 +5,19 @@ namespace SnapDoc;
 public class InteractivePolylineDrawable
 {
     public List<SKPoint> Points { get; set; } = [];
-    public float HandleRadius { get; set; }
-    public float PointRadius { get; set; }
+    public float HandleRadius { get; set; } = 15f;
+    public float PointRadius { get; set; } = 8f;
     public bool IsClosed { get; private set; } = false;
-    public SKColor FillColor { get; set; }
-    public SKColor LineColor { get; set; }
-    public SKColor PointColor { get; set; }
-    public SKColor StartPointColor { get; set; }
-    public float LineThickness { get; set; }
-
-    public InteractivePolylineDrawable(
-        SKColor? fillColor = null,
-        SKColor? lineColor = null,
-        SKColor? pointColor = null,
-        SKColor? startPointColor = null,
-        float lineThickness = 3f,
-        float handleRadius = 15f,
-        float pointRadius = 8f)
-    {
-        FillColor = fillColor ?? new SKColor(173, 216, 230, 77); // LightBlue 30%
-        LineColor = lineColor ?? new SKColor(30, 144, 255, 128); // Blue 50%
-        PointColor = pointColor ?? new SKColor(30, 144, 255, 128);
-        StartPointColor = startPointColor ?? SKColors.Green;
-        LineThickness = lineThickness;
-        HandleRadius = handleRadius;
-        PointRadius = pointRadius;
-    }
+    public SKColor FillColor { get; set; } = SKColors.Red.WithAlpha(128);
+    public SKColor LineColor { get; set; } = SKColors.Red;
+    public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
+    public SKColor StartPointColor { get; set; } = SKColors.Green;
+    public float LineThickness { get; set; } = 3f;
+    public bool HasContent => Points.Count > 1;
 
     public void Draw(SKCanvas canvas)
     {
-        if (Points.Count < 2)
-            return;
+        if (Points.Count < 2) return;
 
         // Polygon füllen, falls geschlossen
         if (IsClosed)
@@ -75,7 +57,7 @@ public class InteractivePolylineDrawable
             canvas.DrawLine(Points[i], Points[nextIndex], linePaint);
         }
 
-        // Punkte zeichnen
+        // Punkte
         for (int i = 0; i < Points.Count; i++)
         {
             var color = i == 0 ? StartPointColor : PointColor;

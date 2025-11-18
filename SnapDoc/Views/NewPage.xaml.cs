@@ -692,15 +692,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 LineColor = SKColor.Parse(selectedColor.ToArgbHex()),
                 LineThickness = (float)(lineWidth / PlanContainer.Scale)
             },
-            PolyDrawable = new InteractivePolylineDrawable(
-                fillColor: SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()),
-                lineColor: SKColor.Parse(selectedColor.ToArgbHex()),
-                pointColor: SKColors.Gray.WithAlpha(128),
-                startPointColor: SKColors.Gray.WithAlpha(128),
-                lineThickness: (float)(lineWidth / PlanContainer.Scale),
-                handleRadius: (float)(15 / PlanContainer.Scale),
-                pointRadius: (float)(8 / PlanContainer.Scale)
-            ),
+            PolyDrawable = new InteractivePolylineDrawable
+            {
+                FillColor = SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()),
+                LineColor = SKColor.Parse(selectedColor.ToArgbHex()),
+                PointColor = SKColors.Gray.WithAlpha(128),
+                StartPointColor = SKColors.Gray.WithAlpha(128),
+                LineThickness = (float)(lineWidth / PlanContainer.Scale),
+                HandleRadius = (float)(15 / PlanContainer.Scale),
+                PointRadius = (float)(8 / PlanContainer.Scale)
+            },
         };
 
         drawingView = new SKCanvasView
@@ -755,11 +756,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnStartInteraction(SKPoint p)
     {
+        ResetBoundingBox();
+        ResizeBoundingBox(p);
+
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
             activeIndex = poly.FindPointIndex(p.X, p.Y);
-
             if (poly.TryClosePolygon(p.X, p.Y))
             {
                 drawingView.InvalidateSurface();
@@ -783,6 +786,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnDragInteraction(SKPoint p)
     {
+        ResizeBoundingBox(p);
         if (drawMode == "poly")
         {
             if (activeIndex != null)
@@ -810,7 +814,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-
     private void DrawFreeClicked(object sender, EventArgs e)
     {
         planContainer.IsPanningEnabled = false;
@@ -836,49 +839,91 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        //var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-        //var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-        //string filePath = Path.Combine(customPinPath, customPinName);
+        if (drawingView != null && !IsDrawingViewEmpty())
+        {
+            var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+            var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+            string filePath = Path.Combine(customPinPath, customPinName);
 
-        //if (!Directory.Exists(customPinPath))
-        //    Directory.CreateDirectory(customPinPath);
+            SKRectI imageRect = await SaveCanvasAsCroppedPng(filePath);
 
-        //var pngBytes = await CaptureCroppedAsync(drawingView,
-        //    Math.Min(MinX, MinX),
-        //    Math.Min(MinY, MinY),
-        //    Math.Max(MaxX, MaxX),
-        //    Math.Max(MaxY, MaxY),
-        //    extraPadding: 10
-        //);
+            SetPin(
+                new Point(
+                (imageRect.Left + (imageRect.Width) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+                (imageRect.Top + (imageRect.Height) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
+                customPinName,
+                imageRect.Width,
+                imageRect.Height,
+                new SKColor(selectedColor.ToUint()),
+                1
+            );
+        }
+        RemoveDrawingView();
 
-        //if (pngBytes != null)
-        //{
-        //    File.WriteAllBytes(filePath, pngBytes);
-        //};
-
-        //SetPin(
-        //    new Point(
-        //    (MinX + (MaxX - MinX) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-        //    (MinY + (MaxY - MinY) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
-        //    customPinName,
-        //    (int)(MaxX - MinX),
-        //    (int)(MaxY - MinY),
-        //    new SKColor(selectedColor.ToUint()),
-        //    1
-        //);
-
-        //RemoveDrawingView();
-
-        //planContainer.IsPanningEnabled = true;
-        //PenSettingsBtn.IsVisible = false;
-        //CheckBtn.IsVisible = false;
-        //EraseBtn.IsVisible = false;
-        //DrawPolyBtn.IsVisible = false;
-        //DrawFreeBtn.IsVisible = false;
-        //SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        //DrawBtn.IsVisible = true;
+        planContainer.IsPanningEnabled = true;
+        PenSettingsBtn.IsVisible = false;
+        CheckBtn.IsVisible = false;
+        EraseBtn.IsVisible = false;
+        DrawPolyBtn.IsVisible = false;
+        DrawFreeBtn.IsVisible = false;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        DrawBtn.IsVisible = true;
     }
 
+    private bool IsDrawingViewEmpty()
+    {
+        if (combinedDrawable == null)
+            return true;
+
+        // Prüfe PolyDrawables
+        if (combinedDrawable.PolyDrawable != null && combinedDrawable.PolyDrawable.Points.Count > 0)
+            return false;
+
+        // Prüfe FreeDrawables
+        if (combinedDrawable.FreeDrawable != null && combinedDrawable.FreeDrawable.Strokes.Count > 0)
+            return false;
+
+        return true; // Nichts gezeichnet
+    }
+
+    public async Task<SKRectI> SaveCanvasAsCroppedPng(string filePath)
+    {
+        int width = (int)drawingView.CanvasSize.Width;
+        int height = (int)drawingView.CanvasSize.Height;
+        var info = new SKImageInfo(width, height);
+        using var surface = SKSurface.Create(info);
+        var canvas = surface.Canvas;
+
+        canvas.Clear(SKColors.Transparent);
+
+        combinedDrawable?.Draw(canvas);
+
+        canvas.Flush();
+
+        // 5) Ganze Zeichnung als Bitmap holen
+        using var fullImage = surface.Snapshot();
+        using var fullBitmap = SKBitmap.FromImage(fullImage);
+
+        var offset = (lineWidth / PlanContainer.Scale) / 2;
+        int crop_x = (int)Math.Floor(MinX - offset);
+        int crop_y = (int)Math.Floor(MinY - offset);
+        int crop_w = (int)Math.Ceiling(MaxX - MinX + offset * 2);
+        int crop_h = (int)Math.Ceiling(MaxY - MinY + offset * 2);
+
+        var cropRect = new SKRectI(crop_x, crop_y, crop_x + crop_w, crop_y + crop_h);
+
+        // 7) Croppen
+        var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
+        fullBitmap.ExtractSubset(croppedBitmap, cropRect);
+
+        // 8) PNG speichern
+        using var image = SKImage.FromBitmap(croppedBitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
+        using var stream = File.OpenWrite(filePath);
+        data.SaveTo(stream);
+
+        return cropRect;
+    }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
@@ -1254,7 +1299,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 #endif
     }
 
-    private void AddPoint(PointF p)
+    private void ResetBoundingBox()
+    {
+        MinX = float.MaxValue;
+        MinY = float.MaxValue;
+        MaxX = float.MinValue;
+        MaxY = float.MinValue;
+    }
+
+    private void ResizeBoundingBox(SKPoint p)
     {
         if (p.X < MinX) MinX = p.X;
         if (p.X > MaxX) MaxX = p.X;

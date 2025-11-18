@@ -7,12 +7,12 @@ public class InteractiveFreehandDrawable
     public List<List<SKPoint>> Strokes { get; set; } = [];
     public float LineThickness { get; set; } = 3f;
     public SKColor LineColor { get; set; } = SKColors.Black;
-
     private List<SKPoint>? _currentStroke;
+    public bool HasContent => Strokes.Any(stroke => stroke.Count > 1);
 
     public void StartStroke()
     {
-        _currentStroke = new List<SKPoint>();
+        _currentStroke = [];
         Strokes.Add(_currentStroke);
     }
 

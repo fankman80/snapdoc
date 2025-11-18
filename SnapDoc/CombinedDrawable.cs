@@ -9,11 +9,11 @@ public class CombinedDrawable
 
     public void Draw(SKCanvas canvas)
     {
-        // zuerst Freihand zeichnen
-        FreeDrawable?.Draw(canvas);
+        if (FreeDrawable?.HasContent == true)
+            FreeDrawable.Draw(canvas);
 
-        // dann Polylinien zeichnen
-        PolyDrawable?.Draw(canvas);
+        if (PolyDrawable?.HasContent == true)
+            PolyDrawable.Draw(canvas);
     }
 
     public void Reset()
