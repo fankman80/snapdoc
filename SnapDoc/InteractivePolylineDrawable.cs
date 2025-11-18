@@ -1,38 +1,38 @@
-﻿using Microsoft.Maui.Graphics;
+﻿using SkiaSharp;
 
 namespace SnapDoc;
 
-public class InteractivePolylineDrawable : IDrawable
+public class InteractivePolylineDrawable
 {
-    public List<PointF> Points { get; set; } = [];
+    public List<SKPoint> Points { get; set; } = [];
     public float HandleRadius { get; set; }
     public float PointRadius { get; set; }
     public bool IsClosed { get; private set; } = false;
-    public Color FillColor { get; set; }
-    public Color LineColor { get; set; }
-    public Color PointColor { get; set; }
-    public Color StartPointColor { get; set; }
+    public SKColor FillColor { get; set; }
+    public SKColor LineColor { get; set; }
+    public SKColor PointColor { get; set; }
+    public SKColor StartPointColor { get; set; }
     public float LineThickness { get; set; }
 
     public InteractivePolylineDrawable(
-    Color? fillColor = null,
-    Color? lineColor = null,
-    Color? pointColor = null,
-    Color? startPointColor = null,
-    float lineThickness = 3f,
-    float handleRadius = 15f,
-    float pointRadius = 8f)
+        SKColor? fillColor = null,
+        SKColor? lineColor = null,
+        SKColor? pointColor = null,
+        SKColor? startPointColor = null,
+        float lineThickness = 3f,
+        float handleRadius = 15f,
+        float pointRadius = 8f)
     {
-        FillColor = fillColor ?? Colors.LightBlue.WithAlpha(0.3f);
-        LineColor = lineColor ?? Colors.Blue.WithAlpha(0.5f);
-        PointColor = pointColor ?? Colors.Blue.WithAlpha(0.5f);
-        StartPointColor = startPointColor ?? Colors.Green;
+        FillColor = fillColor ?? new SKColor(173, 216, 230, 77); // LightBlue 30%
+        LineColor = lineColor ?? new SKColor(30, 144, 255, 128); // Blue 50%
+        PointColor = pointColor ?? new SKColor(30, 144, 255, 128);
+        StartPointColor = startPointColor ?? SKColors.Green;
         LineThickness = lineThickness;
         HandleRadius = handleRadius;
         PointRadius = pointRadius;
     }
 
-    public void Draw(ICanvas canvas, RectF dirtyRect)
+    public void Draw(SKCanvas canvas)
     {
         if (Points.Count < 2)
             return;
@@ -40,7 +40,7 @@ public class InteractivePolylineDrawable : IDrawable
         // Polygon füllen, falls geschlossen
         if (IsClosed)
         {
-            using var path = new PathF();
+            using var path = new SKPath();
             path.MoveTo(Points[0]);
             for (int i = 1; i < Points.Count; i++)
             {
@@ -48,31 +48,44 @@ public class InteractivePolylineDrawable : IDrawable
             }
             path.Close();
 
-            canvas.FillColor = FillColor;
-            canvas.FillPath(path);
+            using var fillPaint = new SKPaint
+            {
+                Color = FillColor,
+                IsStroke = false,
+                IsAntialias = true
+            };
+
+            canvas.DrawPath(path, fillPaint);
         }
 
         // Linien
-        canvas.StrokeColor = LineColor;
-        canvas.StrokeSize = LineThickness;
-        canvas.StrokeLineCap = LineCap.Round;
+        using var linePaint = new SKPaint
+        {
+            Color = LineColor,
+            StrokeWidth = LineThickness,
+            IsStroke = true,
+            StrokeCap = SKStrokeCap.Round,
+            IsAntialias = true
+        };
 
         for (int i = 0; i < Points.Count; i++)
         {
             var nextIndex = (i + 1) % Points.Count;
             if (!IsClosed && nextIndex == 0) break;
-            canvas.DrawLine(Points[i], Points[nextIndex]);
+            canvas.DrawLine(Points[i], Points[nextIndex], linePaint);
         }
 
         // Punkte zeichnen
         for (int i = 0; i < Points.Count; i++)
         {
-            if (i == 0)
-                canvas.FillColor = StartPointColor;
-            else
-                canvas.FillColor = PointColor;
-
-            canvas.FillCircle(Points[i], PointRadius);
+            var color = i == 0 ? StartPointColor : PointColor;
+            using var pointPaint = new SKPaint
+            {
+                Color = color,
+                IsStroke = false,
+                IsAntialias = true
+            };
+            canvas.DrawCircle(Points[i], PointRadius, pointPaint);
         }
     }
 

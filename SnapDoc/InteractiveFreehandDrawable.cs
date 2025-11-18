@@ -1,20 +1,22 @@
-﻿namespace SnapDoc;
+﻿using SkiaSharp;
 
-public class InteractiveFreehandDrawable : IDrawable
+namespace SnapDoc;
+
+public class InteractiveFreehandDrawable
 {
-    public List<List<PointF>> Strokes { get; set; } = [];
+    public List<List<SKPoint>> Strokes { get; set; } = [];
     public float LineThickness { get; set; } = 3f;
-    public Color LineColor { get; set; } = Colors.Black;
+    public SKColor LineColor { get; set; } = SKColors.Black;
 
-    private List<PointF>? _currentStroke;
+    private List<SKPoint>? _currentStroke;
 
     public void StartStroke()
     {
-        _currentStroke = new List<PointF>();
+        _currentStroke = new List<SKPoint>();
         Strokes.Add(_currentStroke);
     }
 
-    public void AddPoint(PointF point)
+    public void AddPoint(SKPoint point)
     {
         _currentStroke?.Add(point);
     }
@@ -24,19 +26,24 @@ public class InteractiveFreehandDrawable : IDrawable
         _currentStroke = null;
     }
 
-    public void Draw(ICanvas canvas, RectF dirtyRect)
+    public void Draw(SKCanvas canvas)
     {
-        canvas.StrokeColor = LineColor;
-        canvas.StrokeSize = LineThickness;
-        canvas.StrokeLineCap = LineCap.Round;
-        canvas.StrokeLineJoin = LineJoin.Round;
+        using var paint = new SKPaint
+        {
+            Color = LineColor,
+            StrokeWidth = LineThickness,
+            IsStroke = true,
+            StrokeCap = SKStrokeCap.Round,
+            StrokeJoin = SKStrokeJoin.Round,
+            IsAntialias = true
+        };
 
         foreach (var stroke in Strokes)
         {
             if (stroke.Count < 2) continue;
             for (int i = 0; i < stroke.Count - 1; i++)
             {
-                canvas.DrawLine(stroke[i], stroke[i + 1]);
+                canvas.DrawLine(stroke[i], stroke[i + 1], paint);
             }
         }
     }

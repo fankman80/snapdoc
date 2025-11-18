@@ -1,15 +1,16 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
+using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
-using Microsoft.Maui.Platform;
-using Microsoft.Maui.Graphics.Platform;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -39,7 +40,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private string drawMode = "none"; // "free" oder "poly"
     private CombinedDrawable combinedDrawable;
-    private Microsoft.Maui.Controls.GraphicsView drawingView;
+    private SKCanvasView drawingView;
     private int? activeIndex = null;
     private float MinX = float.MaxValue;
     private float MinY = float.MaxValue;
@@ -688,42 +689,127 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             FreeDrawable = new InteractiveFreehandDrawable
             {
-                LineColor = selectedColor,
+                LineColor = SKColor.Parse(selectedColor.ToArgbHex()),
                 LineThickness = (float)(lineWidth / PlanContainer.Scale)
             },
-                PolyDrawable = new InteractivePolylineDrawable(
-                fillColor: selectedColor.WithAlpha(0.4f),
-                lineColor: selectedColor,
-                pointColor: Colors.Gray.WithAlpha(0.4f),
-                startPointColor: Colors.Gray.WithAlpha(0.4f),
+            PolyDrawable = new InteractivePolylineDrawable(
+                fillColor: SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()),
+                lineColor: SKColor.Parse(selectedColor.ToArgbHex()),
+                pointColor: SKColors.Gray.WithAlpha(128),
+                startPointColor: SKColors.Gray.WithAlpha(128),
                 lineThickness: (float)(lineWidth / PlanContainer.Scale),
                 handleRadius: (float)(15 / PlanContainer.Scale),
                 pointRadius: (float)(8 / PlanContainer.Scale)
             ),
         };
 
-        drawingView = new Microsoft.Maui.Controls.GraphicsView
+        drawingView = new SKCanvasView
         {
-            Drawable = combinedDrawable,
             BackgroundColor = Colors.Transparent,
-            InputTransparent = false,
+            EnableTouchEvents = true,
             WidthRequest = PlanImage.Width,
             HeightRequest = PlanImage.Height,
             Scale = planContainer.Scale,
-            AnchorX = planContainer.AnchorX,
-            AnchorY = planContainer.AnchorY,
             TranslationX = planContainer.TranslationX,
             TranslationY = planContainer.TranslationY,
             Rotation = planContainer.Rotation
         };
 
-        drawingView.StartInteraction += OnStartInteraction;
-        drawingView.DragInteraction += OnDragInteraction;
-        drawingView.EndInteraction += OnEndInteraction;
+        // Zeichnen aktivieren
+        drawingView.PaintSurface += OnPaintSurface;
+
+        // Touch-Event: ersetzt Start/Drag/EndInteraction
+        drawingView.Touch += OnTouch;
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         absoluteLayout.Children.Add(drawingView);
     }
+
+    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        combinedDrawable?.Draw(canvas);
+    }
+
+    private void OnTouch(object sender, SKTouchEventArgs e)
+    {
+        var p = e.Location;
+
+        if (e.ActionType == SKTouchAction.Pressed)
+        {
+            OnStartInteraction(p);
+        }
+        else if (e.ActionType == SKTouchAction.Moved)
+        {
+            OnDragInteraction(p);
+        }
+        else if (e.ActionType == SKTouchAction.Released || e.ActionType == SKTouchAction.Cancelled)
+        {
+            OnEndInteraction();
+        }
+
+        e.Handled = true;
+    }
+
+    private void OnStartInteraction(SKPoint p)
+    {
+        if (drawMode == "poly")
+        {
+            var poly = combinedDrawable.PolyDrawable;
+            activeIndex = poly.FindPointIndex(p.X, p.Y);
+
+            if (poly.TryClosePolygon(p.X, p.Y))
+            {
+                drawingView.InvalidateSurface();
+                return;
+            }
+
+            if (activeIndex == null && !poly.IsClosed)
+            {
+                poly.Points.Add(p);
+                drawingView.InvalidateSurface();
+            }
+        }
+        else if (drawMode == "free")
+        {
+            var free = combinedDrawable.FreeDrawable;
+            free.StartStroke();
+            free.AddPoint(p);
+            drawingView.InvalidateSurface();
+        }
+    }
+
+    private void OnDragInteraction(SKPoint p)
+    {
+        if (drawMode == "poly")
+        {
+            if (activeIndex != null)
+            {
+                combinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
+                drawingView.InvalidateSurface();
+            }
+        }
+        else if (drawMode == "free")
+        {
+            combinedDrawable.FreeDrawable.AddPoint(p);
+            drawingView.InvalidateSurface();
+        }
+    }
+
+    private void OnEndInteraction()
+    {
+        if (drawMode == "poly")
+        {
+            activeIndex = null;
+        }
+        else if (drawMode == "free")
+        {
+            combinedDrawable.FreeDrawable.EndStroke();
+        }
+    }
+
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
@@ -750,48 +836,49 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-        var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-        string filePath = Path.Combine(customPinPath, customPinName);
+        //var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+        //var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+        //string filePath = Path.Combine(customPinPath, customPinName);
 
-        if (!Directory.Exists(customPinPath))
-            Directory.CreateDirectory(customPinPath);
+        //if (!Directory.Exists(customPinPath))
+        //    Directory.CreateDirectory(customPinPath);
 
-        var pngBytes = await CaptureCroppedAsync(drawingView,
-            Math.Min(MinX, MinX),
-            Math.Min(MinY, MinY),
-            Math.Max(MaxX, MaxX),
-            Math.Max(MaxY, MaxY),
-            extraPadding: 10
-        );
+        //var pngBytes = await CaptureCroppedAsync(drawingView,
+        //    Math.Min(MinX, MinX),
+        //    Math.Min(MinY, MinY),
+        //    Math.Max(MaxX, MaxX),
+        //    Math.Max(MaxY, MaxY),
+        //    extraPadding: 10
+        //);
 
-        if (pngBytes != null)
-        {
-            File.WriteAllBytes(filePath, pngBytes);
-        };
+        //if (pngBytes != null)
+        //{
+        //    File.WriteAllBytes(filePath, pngBytes);
+        //};
 
-        SetPin(
-            new Point(
-            (MinX + (MaxX - MinX) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-            (MinY + (MaxY - MinY) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
-            customPinName,
-            (int)(MaxX - MinX),
-            (int)(MaxY - MinY),
-            new SKColor(selectedColor.ToUint()),
-            1
-        );
+        //SetPin(
+        //    new Point(
+        //    (MinX + (MaxX - MinX) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
+        //    (MinY + (MaxY - MinY) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
+        //    customPinName,
+        //    (int)(MaxX - MinX),
+        //    (int)(MaxY - MinY),
+        //    new SKColor(selectedColor.ToUint()),
+        //    1
+        //);
 
-        RemoveDrawingView();
+        //RemoveDrawingView();
 
-        planContainer.IsPanningEnabled = true;
-        PenSettingsBtn.IsVisible = false;
-        CheckBtn.IsVisible = false;
-        EraseBtn.IsVisible = false;
-        DrawPolyBtn.IsVisible = false;
-        DrawFreeBtn.IsVisible = false;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        DrawBtn.IsVisible = true;
+        //planContainer.IsPanningEnabled = true;
+        //PenSettingsBtn.IsVisible = false;
+        //CheckBtn.IsVisible = false;
+        //EraseBtn.IsVisible = false;
+        //DrawPolyBtn.IsVisible = false;
+        //DrawFreeBtn.IsVisible = false;
+        //SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        //DrawBtn.IsVisible = true;
     }
+
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
@@ -806,15 +893,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (drawingView != null)
             {
                 // Freihand aktualisieren
-                combinedDrawable.FreeDrawable.LineColor = selectedColor;
+                combinedDrawable.FreeDrawable.LineColor = SKColor.Parse(selectedColor.ToArgbHex());
                 combinedDrawable.FreeDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
 
                 // Polylinie aktualisieren
-                combinedDrawable.PolyDrawable.LineColor = selectedColor;
-                combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(0.4f); // optional
+                combinedDrawable.PolyDrawable.LineColor = SKColor.Parse(selectedColor.ToArgbHex());
+                combinedDrawable.PolyDrawable.FillColor = SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()); // optional
                 combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
 
-                drawingView.Invalidate();  // neu rendern
+                drawingView.InvalidateSurface();  // neu rendern
             }
         }
     }
@@ -822,7 +909,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void EraseClicked(object sender, EventArgs e)
     {
         combinedDrawable.Reset();   // setzt beide Modi zurück
-        drawingView.Invalidate();   // neu rendern
+        drawingView.InvalidateSurface();  // neu rendern
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
@@ -1167,118 +1254,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 #endif
     }
 
-    private void OnStartInteraction(object sender, TouchEventArgs e)
-    {
-        var p = e.Touches.FirstOrDefault();
-        if (p.IsEmpty) return;
-
-        if (drawMode == "poly")
-        {
-            var poly = combinedDrawable.PolyDrawable;
-            activeIndex = poly.FindPointIndex(p.X, p.Y);
-
-            if (poly.TryClosePolygon(p.X, p.Y))
-            {
-                drawingView.Invalidate();
-                return;
-            }
-
-            if (activeIndex == null && !poly.IsClosed)
-            {
-                AddPoint(p);
-                poly.Points.Add(new PointF(p.X, p.Y));
-                drawingView.Invalidate();
-            }
-        }
-        else if (drawMode == "free")
-        {
-            var free = combinedDrawable.FreeDrawable;
-            free.StartStroke();
-            AddPoint(p);
-            free.AddPoint(new PointF(p.X, p.Y));
-            drawingView.Invalidate();
-        }
-    }
-
-    private void OnDragInteraction(object sender, TouchEventArgs e)
-    {
-        if (drawMode == "poly")
-        {
-
-            var p = e.Touches[0];
-            if (activeIndex != null)
-            {
-                AddPoint(p);
-                combinedDrawable.PolyDrawable.Points[(int)activeIndex] = new PointF(p.X, p.Y);
-                drawingView.Invalidate();
-            }
-        }
-        else if (drawMode == "free")
-        {
-            var p = e.Touches[0];
-            AddPoint(p);
-            combinedDrawable.FreeDrawable.AddPoint(new PointF(p.X, p.Y));
-            drawingView.Invalidate();
-        }
-    }
-
-    private void OnEndInteraction(object sender, TouchEventArgs e)
-    {
-        if (drawMode == "poly")
-        {
-            activeIndex = null;
-        }
-        else if (drawMode == "free")
-        {
-            combinedDrawable.FreeDrawable.EndStroke();
-        }
-    }
-
     private void AddPoint(PointF p)
     {
         if (p.X < MinX) MinX = p.X;
         if (p.X > MaxX) MaxX = p.X;
         if (p.Y < MinY) MinY = p.Y;
         if (p.Y > MaxY) MaxY = p.Y;
-    }
-
-    private static async Task<byte[]> CaptureCroppedAsync(
-        Microsoft.Maui.Controls.GraphicsView view,
-        float minX, float minY,
-        float maxX, float maxY,
-        int extraPadding = 0)
-    {
-        if (view == null)
-            return null;
-
-        // Screenshot der gesamten GraphicsView
-        IScreenshotResult screenshot = await view.CaptureAsync();
-        if (screenshot == null)
-            return null;
-
-        // Bounding Box mit Padding
-        int left = (int)Math.Max(0, minX - extraPadding);
-        int top = (int)Math.Max(0, minY - extraPadding);
-        int right = (int)Math.Min(view.Width, maxX + extraPadding);
-        int bottom = (int)Math.Min(view.Height, maxY + extraPadding);
-
-        int width = right - left;
-        int height = bottom - top;
-        if (width <= 0 || height <= 0)
-            return null;
-
-        // Screenshot in MemoryStream kopieren
-        using var memStream = new MemoryStream();
-        await screenshot.CopyToAsync(memStream);
-        memStream.Position = 0;
-
-        // Plattformübergreifendes IImage laden
-        Microsoft.Maui.Graphics.IImage fullImage = PlatformImage.FromStream(memStream);
-        fullImage.Save(memStream, ImageFormat.Png);
-
-        // Als PNG exportieren
-        using var outputStream = new MemoryStream();
-        await fullImage.SaveAsync(outputStream, ImageFormat.Png);
-        return outputStream.ToArray();
     }
 }
