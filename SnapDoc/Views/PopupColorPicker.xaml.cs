@@ -16,7 +16,7 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private double workR, workG, workB;
     private double workH, workS, workV;
 
-    public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = true, string okText = "Ok")
+    public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
     {
 	    InitializeComponent();
         okButtonText.Text = okText;
