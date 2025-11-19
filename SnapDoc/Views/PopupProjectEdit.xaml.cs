@@ -19,7 +19,7 @@ public partial class PopupProjectEdit : Popup<string>
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(_entry!=text_entry.Text? text_entry.Text:null);
+        await CloseAsync(_entry!=text_entry.Text?text_entry.Text:null);
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

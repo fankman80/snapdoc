@@ -7,6 +7,7 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using System.Text.Json;
 
 namespace SnapDoc.Views;
 
@@ -141,29 +142,73 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnMoveClick(object sender, EventArgs e)
     {
         var popup = new PopupPlanSelector(PlanId);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
 
-        if (result.Result != null)
+        if (result.Result == null)
+            return;
+
+        await MoveOrCopyPinAsync(PinId, PlanId, result.Result.PlanTarget, result.Result.IsPinCopy);
+    }
+
+    private static async Task MoveOrCopyPinAsync(
+    string pinId,
+    string fromPlanId,
+    string toPlanId,
+    bool isCopy)
+    {
+        // 1) Sicherstellen, dass der Zielplan existiert
+        if (!GlobalJson.Data.Plans.TryGetValue(toPlanId, out Plan toPlan))
+            return;
+
+        // 2) Quelle prüfen
+        if (!GlobalJson.Data.Plans.TryGetValue(fromPlanId, out Plan fromPlan))
+            return;
+
+        if (!fromPlan.Pins.TryGetValue(pinId, out Pin originalPin))
+            return;
+
+        // 3) Deep Clone, damit keine Referenzen geteilt werden
+        Pin clonedPin = DeepClone(originalPin);
+
+        // 4) Neue ID erzeugen
+        string newId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+        clonedPin.SelfId = newId;
+        clonedPin.OnPlanId = toPlanId;
+
+        // 5) Sicherstellen, dass Ziel-Pins existieren
+        toPlan.Pins ??= [];
+
+        // 6) Pin einfügen
+        toPlan.Pins[newId] = clonedPin;
+        toPlan.PinCount++;
+
+        // 7) Falls Kopie → Fotos löschen
+        if (isCopy)
         {
-            // Sicherstellen, dass der Plan existiert
-            if (GlobalJson.Data.Plans.TryGetValue(result.Result, out Plan plan))
-            {
-                string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                var newPin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
-                newPin.OnPlanId = result.Result;
-                newPin.SelfId = currentDateTime;
-
-                plan.Pins ??= [];
-                plan.Pins[currentDateTime] = newPin;
-
-                GlobalJson.Data.Plans[result.Result].PinCount += 1;
-
-                DeletePinData(PinId);
-
-                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
-                await Shell.Current.GoToAsync($"///{result.Result}?pinMove={newPin.SelfId}");
-            }
+            clonedPin.Fotos?.Clear();
         }
+        else
+        {
+            // 8) Verschieben → Original entfernen
+            fromPlan.Pins.Remove(pinId);
+            fromPlan.PinCount--;
+
+            // Messaging
+            WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
+        }
+
+        // 9) Speichern
+        GlobalJson.SaveToFile();
+
+        // 10) Navigation zum neuen Plan mit neuer PinId
+        await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
+    }
+
+    private static T DeepClone<T>(T obj)
+    {
+        var json = JsonSerializer.Serialize(obj);
+        return JsonSerializer.Deserialize<T>(json);
     }
 
     private async void OnPinSelectClick(object sender, EventArgs e)

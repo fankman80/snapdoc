@@ -558,7 +558,7 @@ public partial class ExportReport
         );
     }
 
-    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, OXML.Drawing.SourceRectangle? crop = null)
+    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, OXML.Drawing.SourceRectangle crop = null)
     {
         crop ??= new OXML.Drawing.SourceRectangle();
 

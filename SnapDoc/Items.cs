@@ -93,6 +93,12 @@ namespace SnapDoc
         public int PenWidth { get; set; } = width;
     }
 
+    public class PlanSelectorReturn(string planTarget, bool isPinCopy)
+    {
+        public string PlanTarget { get; set; } = planTarget;
+        public bool IsPinCopy { get; set; } = isPinCopy;
+    }
+
     public class PlanEditReturn(string nameEntry, string descEntry, bool allowExport, int planRotate, string planColor)
     {
         public string NameEntry { get; set; } = nameEntry;
