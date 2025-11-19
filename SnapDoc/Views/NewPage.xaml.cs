@@ -11,6 +11,8 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
+using Microsoft.Maui.Layouts;
+
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -699,9 +701,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColors.Gray.WithAlpha(128),
                 StartPointColor = SKColors.Gray.WithAlpha(128),
-                LineThickness = (float)(lineWidth / PlanContainer.Scale),
-                HandleRadius = (float)(20 / PlanContainer.Scale),
-                PointRadius = (float)(8 / PlanContainer.Scale)
+                //LineThickness = (float)(lineWidth / PlanContainer.Scale),
+                //HandleRadius = (float)(20 / PlanContainer.Scale),
+                //PointRadius = (float)(8 / PlanContainer.Scale)
+                LineThickness = (float)(lineWidth * PlanContainer.Scale),
+                HandleRadius = (float)(20 * PlanContainer.Scale),
+                PointRadius = (float)(8 * PlanContainer.Scale)
             },
         };
 
@@ -709,29 +714,29 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             BackgroundColor = Colors.Transparent,
             EnableTouchEvents = true,
-            WidthRequest = PlanImage.Width,
-            HeightRequest = PlanImage.Height,
-            Scale = planContainer.Scale,
-            TranslationX = planContainer.TranslationX,
-            TranslationY = planContainer.TranslationY,
-            Rotation = planContainer.Rotation
+            HorizontalOptions = LayoutOptions.Fill,
+            VerticalOptions = LayoutOptions.Fill,
         };
 
-        // Zeichnen aktivieren
         drawingView.PaintSurface += OnPaintSurface;
-
-        // Touch-Event: ersetzt Start/Drag/EndInteraction
         drawingView.Touch += OnTouch;
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         absoluteLayout.Children.Add(drawingView);
+        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+
+        Dispatcher.Dispatch(() =>
+        {
+            drawingView.InvalidateMeasure();
+            drawingView.InvalidateSurface();
+        });
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
-
         combinedDrawable?.Draw(canvas);
     }
 
@@ -838,6 +843,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
+
+            if (!Directory.Exists(customPinPath))
+                Directory.CreateDirectory(customPinPath);
 
             SKRectI imageRect = await SaveCanvasAsCroppedPng(filePath);
 

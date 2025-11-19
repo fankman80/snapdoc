@@ -208,12 +208,25 @@
                         Clicked="OnFullScreenButtonClicked"/>
             </Grid>
 
-            <HorizontalStackLayout
+            <Button x:Name="SetPinBtn"
+                    Margin="0,0,20,20"
+                    ZIndex="10000"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    Clicked="SetPinClicked"/>
+
+            <VerticalStackLayout
                 x:Name="ToolBtns"
-                Margin="0,0,20,20"
-                Spacing="20"
+                Margin="20,0,0,20"
+                Spacing="16"
                 ZIndex="10000"
-                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button x:Name="EraseBtn"
                         IsVisible="False"
@@ -268,15 +281,7 @@
                         HeightRequest="60"
                         CornerRadius="30"
                         Clicked="DrawingClicked"/>
-                <Button x:Name="SetPinBtn"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="SetPinClicked"/>
-            </HorizontalStackLayout>
+            </VerticalStackLayout>
         </AbsoluteLayout>
 
         <AbsoluteLayout x:Name="SetPinFrame" IsVisible="false">
