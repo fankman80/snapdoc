@@ -689,13 +689,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             FreeDrawable = new InteractiveFreehandDrawable
             {
-                LineColor = SKColor.Parse(selectedColor.ToArgbHex()),
+                LineColor = selectedColor.ToSKColor(),
                 LineThickness = (float)(lineWidth / PlanContainer.Scale)
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
-                FillColor = SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()),
-                LineColor = SKColor.Parse(selectedColor.ToArgbHex()),
+                FillColor = selectedColor.ToSKColor(),
+                LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColors.Gray.WithAlpha(128),
                 StartPointColor = SKColors.Gray.WithAlpha(128),
                 LineThickness = (float)(lineWidth / PlanContainer.Scale),
@@ -927,12 +927,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (drawingView != null)
             {
                 // Freihand aktualisieren
-                combinedDrawable.FreeDrawable.LineColor = SKColor.Parse(selectedColor.ToArgbHex());
+                combinedDrawable.FreeDrawable.LineColor = selectedColor.ToSKColor();
                 combinedDrawable.FreeDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
 
                 // Polylinie aktualisieren
-                combinedDrawable.PolyDrawable.LineColor = SKColor.Parse(selectedColor.ToArgbHex());
-                combinedDrawable.PolyDrawable.FillColor = SKColor.Parse(selectedColor.WithAlpha(0.4f).ToArgbHex()); // optional
+                combinedDrawable.PolyDrawable.LineColor = selectedColor.ToSKColor();
+                combinedDrawable.PolyDrawable.FillColor = selectedColor.ToSKColor();
                 combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
 
                 drawingView.InvalidateSurface();  // neu rendern
@@ -1306,5 +1306,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             MinY = p.Y;
         if (p.Y > MaxY) 
             MaxY = p.Y;
+    }
+}
+
+public static class ColorExtensions
+{
+    public static SKColor ToSKColor(this Color color)
+    {
+        byte a = (byte)(color.Alpha * 255);
+        byte r = (byte)(color.Red * 255);
+        byte g = (byte)(color.Green * 255);
+        byte b = (byte)(color.Blue * 255);
+
+        return new SKColor(r, g, b, a);
     }
 }
