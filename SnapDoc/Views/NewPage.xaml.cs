@@ -699,7 +699,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 PointColor = SKColors.Gray.WithAlpha(128),
                 StartPointColor = SKColors.Gray.WithAlpha(128),
                 LineThickness = (float)(lineWidth / PlanContainer.Scale),
-                HandleRadius = (float)(15 / PlanContainer.Scale),
+                HandleRadius = (float)(20 / PlanContainer.Scale),
                 PointRadius = (float)(8 / PlanContainer.Scale)
             },
         };
@@ -738,27 +738,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var p = e.Location;
 
+        if (e.InContact)
+            ResizeBoundingBox(p);
+
         if (e.ActionType == SKTouchAction.Pressed)
-        {
             OnStartInteraction(p);
-        }
         else if (e.ActionType == SKTouchAction.Moved)
-        {
             OnDragInteraction(p);
-        }
         else if (e.ActionType == SKTouchAction.Released || e.ActionType == SKTouchAction.Cancelled)
-        {
             OnEndInteraction();
-        }
 
         e.Handled = true;
     }
 
     private void OnStartInteraction(SKPoint p)
     {
-        ResetBoundingBox();
-        ResizeBoundingBox(p);
-
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
@@ -786,7 +780,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnDragInteraction(SKPoint p)
     {
-        ResizeBoundingBox(p);
         if (drawMode == "poly")
         {
             if (activeIndex != null)
@@ -896,27 +889,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         canvas.Clear(SKColors.Transparent);
 
+        combinedDrawable.PolyDrawable.DisplayHandles = false; // Verstecke die Griffe vor dem Speichern
         combinedDrawable?.Draw(canvas);
 
         canvas.Flush();
 
-        // 5) Ganze Zeichnung als Bitmap holen
+        // Ganze Zeichnung als Bitmap holen
         using var fullImage = surface.Snapshot();
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
         var offset = (lineWidth / PlanContainer.Scale) / 2;
-        int crop_x = (int)Math.Floor(MinX - offset);
-        int crop_y = (int)Math.Floor(MinY - offset);
-        int crop_w = (int)Math.Ceiling(MaxX - MinX + offset * 2);
-        int crop_h = (int)Math.Ceiling(MaxY - MinY + offset * 2);
+        var cropRect = new SKRectI((int)(MinX - offset), (int)(MinY - offset), (int)(MaxX + offset), (int)(MaxY + offset));
 
-        var cropRect = new SKRectI(crop_x, crop_y, crop_x + crop_w, crop_y + crop_h);
-
-        // 7) Croppen
+        // Croppen
         var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
         fullBitmap.ExtractSubset(croppedBitmap, cropRect);
 
-        // 8) PNG speichern
+        // PNG speichern
         using var image = SKImage.FromBitmap(croppedBitmap);
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         using var stream = File.OpenWrite(filePath);
@@ -1309,9 +1298,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void ResizeBoundingBox(SKPoint p)
     {
-        if (p.X < MinX) MinX = p.X;
-        if (p.X > MaxX) MaxX = p.X;
-        if (p.Y < MinY) MinY = p.Y;
-        if (p.Y > MaxY) MaxY = p.Y;
+        if (p.X < MinX) 
+            MinX = p.X;
+        if (p.X > MaxX) 
+            MaxX = p.X;
+        if (p.Y < MinY) 
+            MinY = p.Y;
+        if (p.Y > MaxY) 
+            MaxY = p.Y;
     }
 }

@@ -6,6 +6,7 @@ public class InteractivePolylineDrawable
 {
     public List<SKPoint> Points { get; set; } = [];
     public float HandleRadius { get; set; } = 15f;
+    public bool DisplayHandles { get; set; } = true;
     public float PointRadius { get; set; } = 8f;
     public bool IsClosed { get; private set; } = false;
     public SKColor FillColor { get; set; } = SKColors.Red.WithAlpha(128);
@@ -58,16 +59,19 @@ public class InteractivePolylineDrawable
         }
 
         // Punkte
-        for (int i = 0; i < Points.Count; i++)
+        if (DisplayHandles)
         {
-            var color = i == 0 ? StartPointColor : PointColor;
-            using var pointPaint = new SKPaint
+            for (int i = 0; i < Points.Count; i++)
             {
-                Color = color,
-                IsStroke = false,
-                IsAntialias = true
-            };
-            canvas.DrawCircle(Points[i], PointRadius, pointPaint);
+                var color = i == 0 ? StartPointColor : PointColor;
+                using var pointPaint = new SKPaint
+                {
+                    Color = color,
+                    IsStroke = false,
+                    IsAntialias = true
+                };
+                canvas.DrawCircle(Points[i], PointRadius, pointPaint);
+            }
         }
     }
 
