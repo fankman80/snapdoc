@@ -4,7 +4,6 @@ using SnapDoc.Services;
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace SnapDoc.Views;
 
@@ -12,16 +11,19 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 {
     public ObservableCollection<ColorBoxItem> ColorsList { get; set; }
     public bool LineWidthVisibility { get; set; }
+    public bool FillOpacityVisibility { get; set; }
     private bool isUpdating = false;
     private double workR, workG, workB;
     private double workH, workS, workV;
 
-    public PopupColorPicker(int lineWidth, Color selectedColor, bool lineWidthVisibility = true, string okText = "Ok")
+    public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = true, string okText = "Ok")
     {
 	    InitializeComponent();
         okButtonText.Text = okText;
         LineWidthVisibility = lineWidthVisibility;
+        FillOpacityVisibility = fillOpacityVisibility;
         LineWidth = lineWidth;
+        FillOpacity = fillOpacity;
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
                     { BackgroundColor = Color.FromRgba(c) }))
@@ -68,7 +70,7 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), lineWidth));
+        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), lineWidth, fillOpacity));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -302,6 +304,20 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         }
     }
 
+    private byte fillOpacity;
+    public byte FillOpacity
+    {
+        get => fillOpacity;
+        set
+        {
+            if (fillOpacity != value)
+            {
+                fillOpacity = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private void UpdateSelectedColor_Work()
     {
         SelectedColor = Color.FromRgb(RedValue, GreenValue, BlueValue);
@@ -324,49 +340,5 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         workR = Color.FromHsla(workH, workS, workV).Red;
         workG = Color.FromHsla(workH, workS, workV).Green;
         workB = Color.FromHsla(workH, workS, workV).Blue;
-    }
-
-    public new event PropertyChangedEventHandler PropertyChanged;
-    protected new virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-}
-
-public partial class ColorBoxItem : INotifyPropertyChanged
-{
-    private Color backgroundColor;
-    public Color BackgroundColor
-    {
-        get => backgroundColor;
-        set
-        {
-            if (backgroundColor != value)
-            {
-                backgroundColor = value;
-                OnPropertyChanged(nameof(BackgroundColor));
-            }
-        }
-    }
-    public bool IsAddButton { get; set; }
-
-    private bool _isSelected;
-    public bool IsSelected
-    {
-        get => _isSelected;
-        set
-        {
-            if (_isSelected != value)
-            {
-                _isSelected = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    public event PropertyChangedEventHandler PropertyChanged;
-    protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
     }
 }

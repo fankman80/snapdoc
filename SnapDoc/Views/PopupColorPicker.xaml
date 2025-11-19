@@ -46,7 +46,7 @@
                             <GridItemsLayout Orientation="Vertical" Span="6"/>
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
-                            <DataTemplate x:DataType="views:ColorBoxItem">
+                            <DataTemplate x:DataType="local:ColorBoxItem">
                                 <Grid>
                                     <!-- Normales Farbfeld -->
                                     <mr:Border IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
@@ -133,7 +133,7 @@
                         </VerticalStackLayout>
                     </toolkit:Expander>
 
-                    <Label x:Name="sliderText"
+                    <Label x:Name="lineWidthText"
                            IsVisible="{Binding LineWidthVisibility}"
                            HorizontalOptions="Start"
                            Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
@@ -142,6 +142,19 @@
                             Maximum="60"
                             Minimum="1"
                             Value="{Binding LineWidth}"
+                            ThumbColor="{DynamicResource Primary}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                    <Label x:Name="fillOpacityText"
+                           IsVisible="{Binding FillOpacityVisibility}"
+                           HorizontalOptions="Start"
+                           Text="{Binding FillOpacity, StringFormat='Deckkraft für Füllungen: {0}'}"/>
+                    <Slider x:Name="FillOpacitySlider"
+                            IsVisible="{Binding FillOpacityVisibility}"
+                            Maximum="255"
+                            Minimum="0"
+                            Value="{Binding FillOpacity}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>

@@ -1,4 +1,5 @@
 ﻿#nullable disable
+#pragma warning disable MVVMTK0045
 
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
@@ -87,10 +88,11 @@ namespace SnapDoc
     }
 
 
-    public class ColorPickerReturn(string colorHex, int width)
+    public class ColorPickerReturn(string colorHex, int width, byte fillOpacity)
     {
         public string PenColorHex { get; set; } = colorHex;
         public int PenWidth { get; set; } = width;
+        public byte FillOpacity { get; set; } = fillOpacity;
     }
 
     public class PlanSelectorReturn(string planTarget, bool isPinCopy)
@@ -205,4 +207,13 @@ namespace SnapDoc
         public string ImageName { get; set; }
         public int PdfPage { get; set; }
     }
+
+    public partial class ColorBoxItem : ObservableObject
+    {
+        [ObservableProperty] private Color backgroundColor;
+
+        [ObservableProperty] private bool isSelected;
+        public bool IsAddButton { get; set; }
+    }
 }
+#pragma warning restore MVVMTK0045

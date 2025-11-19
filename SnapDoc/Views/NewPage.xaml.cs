@@ -33,6 +33,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly TransformViewModel planContainer;
     private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
+    private float selectedOpacity = 0.4f;
     bool isTappedHandled = false;
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
@@ -694,7 +695,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
-                FillColor = selectedColor.ToSKColor(),
+                FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
                 LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColors.Gray.WithAlpha(128),
                 StartPointColor = SKColors.Gray.WithAlpha(128),
@@ -916,12 +917,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(lineWidth, selectedColor, lineWidthVisibility: true);
+        var popup = new PopupColorPicker(lineWidth, selectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
         var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
             selectedColor = Color.FromArgb(result.Result.PenColorHex);
+            selectedOpacity = 1f / 255f * result.Result.FillOpacity;
             lineWidth = result.Result.PenWidth;
 
             if (drawingView != null)
@@ -932,7 +934,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                 // Polylinie aktualisieren
                 combinedDrawable.PolyDrawable.LineColor = selectedColor.ToSKColor();
-                combinedDrawable.PolyDrawable.FillColor = selectedColor.ToSKColor();
+                combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
                 combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
 
                 drawingView.InvalidateSurface();  // neu rendern
