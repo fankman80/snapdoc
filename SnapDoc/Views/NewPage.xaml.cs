@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp;
@@ -11,8 +12,6 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
-using Microsoft.Maui.Layouts;
-
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -693,7 +692,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             FreeDrawable = new InteractiveFreehandDrawable
             {
                 LineColor = selectedColor.ToSKColor(),
-                LineThickness = (float)(lineWidth / PlanContainer.Scale)
+                LineThickness = (float)lineWidth
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
@@ -701,12 +700,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColors.Gray.WithAlpha(128),
                 StartPointColor = SKColors.Gray.WithAlpha(128),
-                //LineThickness = (float)(lineWidth / PlanContainer.Scale),
-                //HandleRadius = (float)(20 / PlanContainer.Scale),
-                //PointRadius = (float)(8 / PlanContainer.Scale)
-                LineThickness = (float)(lineWidth * PlanContainer.Scale),
-                HandleRadius = (float)(20 * PlanContainer.Scale),
-                PointRadius = (float)(8 * PlanContainer.Scale)
+                LineThickness = (float)lineWidth,
+                HandleRadius = (float)20,
+                PointRadius = (float)8
             },
         };
 
@@ -759,6 +755,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnStartInteraction(SKPoint p)
     {
+        ResetBoundingBox();
+
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
@@ -829,13 +827,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawPolyBtn.CornerRadius = 8;
     }
 
-    private void RemoveDrawingView()
-    {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-        if (drawingView != null && absoluteLayout != null)
-            absoluteLayout.Children.Remove(drawingView);
-    }
-
     private async void CheckClicked(object sender, EventArgs e)
     {
         if (drawingView != null && !IsDrawingViewEmpty())
@@ -847,18 +838,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (!Directory.Exists(customPinPath))
                 Directory.CreateDirectory(customPinPath);
 
-            SKRectI imageRect = await SaveCanvasAsCroppedPng(filePath);
+            SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
-            SetPin(
-                new Point(
-                (imageRect.Left + (imageRect.Width) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Width * densityX,
-                (imageRect.Top + (imageRect.Height) / 2) / GlobalJson.Data.Plans[PlanId].ImageSize.Height * densityY),
-                customPinName,
-                imageRect.Width,
-                imageRect.Height,
-                new SKColor(selectedColor.ToUint()),
-                1
-            );
+            // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
+            var cx = imageRect.MidX;
+            var cy = imageRect.MidY;
+
+            var ox =  1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale) * densityX;
+            var oy = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale) * densityY;
+
+            // Pin setzen
+            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy), customPinName,
+                   (int)imageRect.Width,
+                   (int)imageRect.Height,
+                   new SKColor(selectedColor.ToUint()), 1 / planContainer.Scale);
         }
         RemoveDrawingView();
 
@@ -870,6 +863,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawFreeBtn.IsVisible = false;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawBtn.IsVisible = true;
+    }
+
+    private void RemoveDrawingView()
+    {
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+        if (drawingView != null && absoluteLayout != null)
+            absoluteLayout.Children.Remove(drawingView);
     }
 
     private bool IsDrawingViewEmpty()
@@ -900,6 +900,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         combinedDrawable.PolyDrawable.DisplayHandles = false; // Verstecke die Griffe vor dem Speichern
         combinedDrawable?.Draw(canvas);
+        combinedDrawable.PolyDrawable.DisplayHandles = true; // Zeige die Griffe wieder an
 
         canvas.Flush();
 
@@ -907,7 +908,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         using var fullImage = surface.Snapshot();
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
-        var offset = (lineWidth / PlanContainer.Scale) / 2;
+        var offset = lineWidth / 2;
         var cropRect = new SKRectI((int)(MinX - offset), (int)(MinY - offset), (int)(MaxX + offset), (int)(MaxY + offset));
 
         // Croppen
@@ -938,12 +939,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 // Freihand aktualisieren
                 combinedDrawable.FreeDrawable.LineColor = selectedColor.ToSKColor();
-                combinedDrawable.FreeDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
+                combinedDrawable.FreeDrawable.LineThickness = (float)lineWidth;
 
                 // Polylinie aktualisieren
                 combinedDrawable.PolyDrawable.LineColor = selectedColor.ToSKColor();
                 combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-                combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth / PlanContainer.Scale);
+                combinedDrawable.PolyDrawable.LineThickness = (float)lineWidth;
 
                 drawingView.InvalidateSurface();  // neu rendern
             }
