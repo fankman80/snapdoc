@@ -93,6 +93,7 @@ public partial class OpenProject : ContentPage
             GlobalJson.Data.Client_name = "";
             GlobalJson.Data.Object_address = "";
             GlobalJson.Data.Working_title = "";
+            GlobalJson.Data.Project_nr = "";
             GlobalJson.Data.Object_name = "";
             GlobalJson.Data.Creation_date = DateTime.Now;
             GlobalJson.Data.Project_manager = "";

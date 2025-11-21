@@ -40,6 +40,11 @@ internal class SettingsModel
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates
     public string? EditorTheme { get; set; } // Json Editor Thema
+    public float PolyLineHandleRadius { get; set; } // Radius der Griffe für Polylinien
+    public float PolyLineHandleTouchRadius { get; set; } // Touch-Radius der Griffe für Polylinien
+    public string? PolyLineHandleColor { get; set; } // Farbe der Griffe für Polylinien (Hex-Wert)
+    public string? PolyLineStartHandleColor { get; set; } // Farbe des Start-Griffs für Polylinien (Hex-Wert)
+    public byte PolyLineHandleAlpha { get; set; } // Alpha-Wert der Griffe für Polylinien (Hex-Wert)
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<string>? IconSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Icons
     public List<string>? PinSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Pins

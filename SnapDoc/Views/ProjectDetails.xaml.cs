@@ -18,6 +18,7 @@ public partial class ProjectDetails : ContentPage
         client_name.Text = GlobalJson.Data.Client_name;
         object_address.Text = GlobalJson.Data.Object_address;
         working_title.Text = GlobalJson.Data.Working_title;
+        project_nr.Text = GlobalJson.Data.Project_nr;
         object_name.Text = GlobalJson.Data.Object_name;
         project_manager.Text = GlobalJson.Data.Project_manager;
         creation_date.Date = GlobalJson.Data.Creation_date;
@@ -119,6 +120,7 @@ public partial class ProjectDetails : ContentPage
         GlobalJson.Data.Client_name = client_name.Text;
         GlobalJson.Data.Object_address = object_address.Text;
         GlobalJson.Data.Working_title = working_title.Text;
+        GlobalJson.Data.Project_nr = project_nr.Text;
         GlobalJson.Data.Object_name = object_name.Text;
         GlobalJson.Data.Project_manager = project_manager.Text;
         GlobalJson.Data.Creation_date = creation_date.Date ?? DateTime.Today;

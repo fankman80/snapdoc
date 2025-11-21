@@ -154,12 +154,16 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _titleExportSize = 90;
     [ObservableProperty] private int _pinPosExportSize = 25;
     [ObservableProperty] private int _pinPosCropExportSize = 300;
-
     [ObservableProperty] private List<string> _colorThemes;
     [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private string _editorTheme = "material-darker";
+    [ObservableProperty] private float _polyLineHandleRadius = 12f;
+    [ObservableProperty] private float _polyLineHandleTouchRadius = 24f;
+    [ObservableProperty] private string _polyLineHandleColor = "#808080";
+    [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
+    [ObservableProperty] private byte _polyLineHandleAlpha = 128;
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
 
@@ -265,6 +269,11 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
             EditorTheme = EditorTheme,
+            PolyLineHandleRadius = PolyLineHandleRadius,
+            PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
+            PolyLineHandleColor = PolyLineHandleColor,
+            PolyLineStartHandleColor = PolyLineStartHandleColor,
+            PolyLineHandleAlpha = PolyLineHandleAlpha,
             ColorList = ColorList,
             IconSortCrits = IconSortCrits,
             PinSortCrits = PinSortCrits,
@@ -327,6 +336,11 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
             EditorTheme = settings.EditorTheme ?? string.Empty;
+            PolyLineHandleRadius = settings.PolyLineHandleRadius;
+            PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
+            PolyLineHandleColor = settings.PolyLineHandleColor ?? string.Empty;
+            PolyLineStartHandleColor = settings.PolyLineStartHandleColor ?? string.Empty;
+            PolyLineHandleAlpha = settings.PolyLineHandleAlpha;
             ColorList = settings.ColorList ?? ColorList;
             IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
             PinSortCrits = settings.PinSortCrits ?? PinSortCrits;
@@ -380,6 +394,11 @@ public partial class SettingsService : ObservableObject
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
         EditorTheme = defaultSettings.EditorTheme;
+        PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
+        PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;
+        PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
+        PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
+        PolyLineHandleAlpha = defaultSettings.PolyLineHandleAlpha;
         ColorList = [.. defaultSettings.ColorList];
         IconSortCrits = [.. defaultSettings.IconSortCrits];
         PinSortCrits = [.. defaultSettings.PinSortCrits];

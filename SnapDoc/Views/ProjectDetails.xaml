@@ -38,10 +38,9 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="98" />
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="44" />
                     <RowDefinition Height="44" />
                     <RowDefinition Height="44" />
                 </Grid.RowDefinitions>
@@ -57,27 +56,25 @@
                 </Border>
 
                 <Button Grid.Column="1" Grid.Row="0"
-                        Text="Titelbild von Kamera"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
                         Clicked="OnTitleCaptureClicked"/>
-                <Button Grid.Column="1" Grid.Row="1"
-                        Text="Titelbild aus Galerie"
+                <Button Grid.Column="2" Grid.Row="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
                         Clicked="OnTitleOpenClicked"/>
-                <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2"
-                        Text="PDF-Seiten hinzufügen"
+                <Button Grid.Column="01" Grid.Row="1" Grid.ColumnSpan="2"
+                        Text="PDF hinzufügen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
                         Clicked="OnAddPdfClicked"/>
             </Grid>
 
-            <ScrollView Grid.Row="1" Margin="0,10,0,0">
-                <VerticalStackLayout>
+            <ScrollView Grid.Row="1" Margin="0,10,0,10">
+                <VerticalStackLayout Spacing="8">
                     <material:TextField
                         x:Name="client_name"
                         MaxLength="200"
@@ -118,6 +115,16 @@
                         Title="Projektvorgang"/>
 
                     <material:TextField
+                        x:Name="project_nr"
+                        MaxLength="200"
+                        TitleColor="{DynamicResource SecondaryBackground}"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        AllowClear="True"
+                        Title="Projektnummer"/>
+
+                    <material:TextField
                         x:Name="project_manager"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
@@ -125,7 +132,7 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         AllowClear="True"
-                        Title="Projektleiter"/>
+                        Title="Projektleitung"/>
 
                     <material:DatePickerField
                         x:Name="creation_date"

@@ -40,6 +40,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
 
+    private double density = DeviceDisplay.MainDisplayInfo.Density;
     private string drawMode = "none"; // "free" oder "poly"
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
@@ -491,7 +492,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         int customPinSizeWidth = 0,
                         int customPinSizeHeight = 0,
                         SKColor? pinColor = null,
-                        double customScale = 1)
+                        double customScale = 1,
+                        double _rotation = 0)
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage == null) return;
@@ -548,7 +550,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             DateTime = DateTime.Now,
             PinColor = (SKColor)pinColor,
             PinScale = _scale,
-            PinRotation = 0,
+            PinRotation = _rotation,
             GeoLocation = null, // noch nicht bekannt
             AllowExport = _isAllowExport,
         };
@@ -558,7 +560,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             plan.Pins ??= [];
             plan.Pins[currentDateTime] = newPinData;
-            GlobalJson.Data.Plans[PlanId].PinCount += 1;
+
+            // nur bei Standard-Pins die PinCount erhöhen
+            if (customName == null)
+                GlobalJson.Data.Plans[PlanId].PinCount += 1;
 
             GlobalJson.SaveToFile(); // initial speichern
 
@@ -614,7 +619,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
     {
 #if WINDOWS
-        if (mousePos.X <0 || !planContainer.IsPanningEnabled)
+        if (mousePos.X < 0 || !planContainer.IsPanningEnabled)
             return; // Ignore scroll events when mouse is onto the flyout
 
         // Dynamischer Zoomfaktor basierend auf der aktuellen Skalierung
@@ -687,6 +692,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawPolyBtn.IsVisible = true;
         DrawFreeBtn.IsVisible = true;
 
+        planContainer.Rotation = 0;
+        SettingsService.Instance.IsPlanRotateLocked = true;
+
         combinedDrawable = new CombinedDrawable
         {
             FreeDrawable = new InteractiveFreehandDrawable
@@ -698,11 +706,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
                 LineColor = selectedColor.ToSKColor(),
-                PointColor = SKColors.Gray.WithAlpha(128),
-                StartPointColor = SKColors.Gray.WithAlpha(128),
+                PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 LineThickness = (float)lineWidth,
-                HandleRadius = (float)20,
-                PointRadius = (float)8
+                HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density),
+                PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density)
             },
         };
 
@@ -727,6 +735,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             drawingView.InvalidateMeasure();
             drawingView.InvalidateSurface();
         });
+
+        ResetBoundingBox();
     }
 
     private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
@@ -759,6 +769,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             var poly = combinedDrawable.PolyDrawable;
             activeIndex = poly.FindPointIndex(p.X, p.Y);
+            
             if (poly.TryClosePolygon(p.X, p.Y))
             {
                 drawingView.InvalidateSurface();
@@ -811,20 +822,40 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
-        ResetBoundingBox();
         planContainer.IsPanningEnabled = false;
         drawMode = "free";
-        DrawFreeBtn.CornerRadius = 8;
-        DrawPolyBtn.CornerRadius = 30;
+        DrawPolyBtn.BorderWidth = 0;
+        DrawFreeBtn.BorderWidth = 2;
+        combinedDrawable.PolyDrawable.DisplayHandles = false;
+        drawingView.InvalidateSurface();
     }
 
     private void DrawPolyClicked(object sender, EventArgs e)
     {
-        ResetBoundingBox();
         planContainer.IsPanningEnabled = false;
         drawMode = "poly";
-        DrawFreeBtn.CornerRadius = 30;
-        DrawPolyBtn.CornerRadius = 8;
+        DrawPolyBtn.BorderWidth = 2;
+        DrawFreeBtn.BorderWidth = 0;
+        combinedDrawable.PolyDrawable.DisplayHandles = true;
+        drawingView.InvalidateSurface();
+    }
+
+    private void EraseClicked(object sender, EventArgs e)
+    {
+        drawMode = "none";
+        DrawPolyBtn.BorderWidth = 0;
+        DrawFreeBtn.BorderWidth = 0;
+        combinedDrawable.Reset();   // setzt beide Modi zurück
+        drawingView.InvalidateSurface();  // neu rendern
+        ResetBoundingBox();
+    }
+
+    private void OnFillOpacitySliderChanged(object sender, EventArgs e)
+    {
+        var sliderValue = (float)((Microsoft.Maui.Controls.Slider)sender).Value;
+        selectedOpacity = 1f / 255f * sliderValue;
+        combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
+        drawingView.InvalidateSurface();  // neu rendern
     }
 
     private async void CheckClicked(object sender, EventArgs e)
@@ -841,18 +872,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
             // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
-            var cx = imageRect.MidX;
-            var cy = imageRect.MidY;
+            var cx = imageRect.MidX / density * densityX;
+            var cy = imageRect.MidY / density * densityY;
 
-            var ox =  1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale) * densityX;
-            var oy = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale) * densityY;
+            var ox =  1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale);
+            var oy = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale);
 
             // Pin setzen
-            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy), customPinName,
+            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
+                   customPinName,
                    (int)imageRect.Width,
                    (int)imageRect.Height,
                    new SKColor(selectedColor.ToUint()),
-                   1 / planContainer.Scale * densityX);
+                   1 / planContainer.Scale / density * densityX);
         }
         RemoveDrawingView();
 
@@ -862,8 +894,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         EraseBtn.IsVisible = false;
         DrawPolyBtn.IsVisible = false;
         DrawFreeBtn.IsVisible = false;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.IsPlanRotateLocked = false;
     }
 
     private void RemoveDrawingView()
@@ -950,12 +983,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 drawingView.InvalidateSurface();  // neu rendern
             }
         }
-    }
-
-    private void EraseClicked(object sender, EventArgs e)
-    {
-        combinedDrawable.Reset();   // setzt beide Modi zurück
-        drawingView.InvalidateSurface();  // neu rendern
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)

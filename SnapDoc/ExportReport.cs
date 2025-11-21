@@ -34,6 +34,7 @@ public partial class ExportReport
             {"${client_name}", GlobalJson.Data.Client_name},
             {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "{linebreak}")},
             {"${working_title}", GlobalJson.Data.Working_title},
+            {"${project_nr}", GlobalJson.Data.Project_nr},
             {"${object_name}", GlobalJson.Data.Object_name},
             {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
             {"${project_manager}", GlobalJson.Data.Project_manager},

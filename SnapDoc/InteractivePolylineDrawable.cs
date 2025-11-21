@@ -63,7 +63,9 @@ public class InteractivePolylineDrawable
         {
             for (int i = 0; i < Points.Count; i++)
             {
-                var color = i == 0 ? StartPointColor : PointColor;
+                // Wenn das Polygon geschlossen ist, alle Punkte grau, sonst erster Punkt grün
+                var color = (i == 0 && !IsClosed) ? StartPointColor : PointColor;
+
                 using var pointPaint = new SKPaint
                 {
                     Color = color,

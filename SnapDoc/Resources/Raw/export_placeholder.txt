@@ -9,6 +9,9 @@ ${object_address}
 ${working_title}
 // Arbeitstitel des Projekts
 
+${project_nr}
+// Nummer des Projekts
+
 ${object_name}
 // Objektbezeichnung
 

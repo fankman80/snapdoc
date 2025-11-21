@@ -82,7 +82,6 @@
                   IsVisible="False"
                   AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                   AbsoluteLayout.LayoutFlags="All">
-
                 <Border
                     BackgroundColor="{DynamicResource Primary}"
                     StrokeThickness="0"
@@ -111,11 +110,11 @@
                         </Slider.Margin>
                     </Slider>
                 </Border>
-                
+
                 <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
                        HeightRequest="38"
                        Margin="36,0,0,113"
-                       ZIndex="10000"
+                       ZIndex="10001"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
                 <Label x:Name="percentLabel"
@@ -126,8 +125,7 @@
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,118"
-                       ZIndex="10000"/>
-
+                       ZIndex="10001"/>
                 <Border
                     BackgroundColor="{DynamicResource Primary}"
                     StrokeThickness="0"
@@ -161,7 +159,7 @@
                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_auto}}"
                        HeightRequest="38"
                        Margin="36,0,0,33"
-                       ZIndex="10000"
+                       ZIndex="10001"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
                 <Image x:Name="rotateAutoIcon"
@@ -169,7 +167,7 @@
                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
                        HeightRequest="38"
                        Margin="36,0,0,33"
-                       ZIndex="10000"
+                       ZIndex="10001"
                        HorizontalOptions="Start"
                        VerticalOptions="End"/>
                 <Image x:Name="rotateModeIcon"
@@ -177,7 +175,7 @@
                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Lock}}"
                        HeightRequest="38"
                        Margin="0,0,36,33"
-                       ZIndex="10000"
+                       ZIndex="10001"
                        HorizontalOptions="End"
                        VerticalOptions="End"/>
                 <Label x:Name="degreesLabel"
@@ -189,7 +187,7 @@
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,38"
-                       ZIndex="10000"/>
+                       ZIndex="10001"/>
                 <Label x:Name="degreesModeLabel"
                        Text=""
                        FontSize="12"
@@ -198,7 +196,7 @@
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,90,24"
-                       ZIndex="10000"/>
+                       ZIndex="10001"/>
 
                 <Button InputTransparent="False"
                         Visual="None"
@@ -242,6 +240,8 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Pentagon}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
+                        BorderColor="Red"
+                        BorderWidth="0"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -251,6 +251,8 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
+                        BorderColor="Red"
+                        BorderWidth="0"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"

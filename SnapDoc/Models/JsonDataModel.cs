@@ -11,6 +11,7 @@ public class JsonDataModel
     public string Client_name { get; set; }
     public string Object_address { get; set; }
     public string Working_title { get; set; }
+    public string Project_nr { get; set; }
     public string Object_name { get; set; }
     public DateTime Creation_date { get; set; }
     public string Project_manager { get; set; }
