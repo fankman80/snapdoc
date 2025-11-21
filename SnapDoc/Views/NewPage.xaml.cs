@@ -852,7 +852,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                    (int)imageRect.Width,
                    (int)imageRect.Height,
                    new SKColor(selectedColor.ToUint()),
-                   1 / planContainer.Scale);
+                   1 / planContainer.Scale * densityX);
         }
         RemoveDrawingView();
 
