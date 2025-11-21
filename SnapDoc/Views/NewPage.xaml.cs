@@ -755,8 +755,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnStartInteraction(SKPoint p)
     {
-        ResetBoundingBox();
-
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
@@ -813,6 +811,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
+        ResetBoundingBox();
         planContainer.IsPanningEnabled = false;
         drawMode = "free";
         DrawFreeBtn.CornerRadius = 8;
@@ -821,6 +820,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawPolyClicked(object sender, EventArgs e)
     {
+        ResetBoundingBox();
         planContainer.IsPanningEnabled = false;
         drawMode = "poly";
         DrawFreeBtn.CornerRadius = 30;
@@ -851,7 +851,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy), customPinName,
                    (int)imageRect.Width,
                    (int)imageRect.Height,
-                   new SKColor(selectedColor.ToUint()), 1 / planContainer.Scale);
+                   new SKColor(selectedColor.ToUint()),
+                   1 / planContainer.Scale);
         }
         RemoveDrawingView();
 
