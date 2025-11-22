@@ -68,7 +68,7 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
                         Clicked="OnTitleOpenClicked"/>
                 <Button Grid.Column="01" Grid.Row="1" Grid.ColumnSpan="2"
-                        Padding="6,0,6,0"
+                        Padding="10,0,10,0"
                         Text="PDF hinzufügen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
