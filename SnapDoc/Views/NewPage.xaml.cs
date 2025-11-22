@@ -32,10 +32,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
-    private int lineWidth = 6;
+    private int lineWidth = 16;
     private Color selectedColor = new(255, 0, 0);
-    private float selectedOpacity = 0.4f;
-    bool isTappedHandled = false;
+    private float selectedOpacity = 0.5f;
+    private bool isTappedHandled = false;
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
