@@ -58,7 +58,7 @@ public partial class PinList : ContentPage
                             if (!File.Exists(fullPath))
                             {
                                 // Lade Default-Icon falls Custom-Icon nicht existiert
-                                var iconItem = Settings.IconData.First();
+                                var iconItem = SettingsService.Instance.DefaultPinIcon;
                                 pin.PinIcon = iconItem.FileName;
                                 pin.Size = iconItem.IconSize;
                                 pin.IsLockRotate = iconItem.IsRotationLocked;
