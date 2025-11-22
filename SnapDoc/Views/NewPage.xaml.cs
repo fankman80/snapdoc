@@ -32,7 +32,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
-    private int lineWidth = 12;
+    private int lineWidth = 5;
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
@@ -713,7 +713,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                LineThickness = (float)lineWidth,
+                LineThickness = (float)lineWidth * density,
                 HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density),
                 PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density)
             },
@@ -947,7 +947,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         using var fullImage = surface.Snapshot();
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
-        var offset = lineWidth / 2;
+        var offset = (lineWidth * density) / 2;
         var cropRect = new SKRectI((int)(MinX - offset), (int)(MinY - offset), (int)(MaxX + offset), (int)(MaxY + offset));
 
         // Croppen
@@ -978,12 +978,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 // Freihand aktualisieren
                 combinedDrawable.FreeDrawable.LineColor = selectedColor.ToSKColor();
-                combinedDrawable.FreeDrawable.LineThickness = (float)lineWidth;
+                combinedDrawable.FreeDrawable.LineThickness = (float)(lineWidth * density);
 
                 // Polylinie aktualisieren
                 combinedDrawable.PolyDrawable.LineColor = selectedColor.ToSKColor();
                 combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-                combinedDrawable.PolyDrawable.LineThickness = (float)lineWidth;
+                combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth * density);
 
                 drawingView.InvalidateSurface();  // neu rendern
             }
