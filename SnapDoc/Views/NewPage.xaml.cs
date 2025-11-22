@@ -32,7 +32,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private readonly TransformViewModel planContainer;
-    private int lineWidth = 16;
+    private int lineWidth = 12;
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
@@ -40,7 +40,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
 
-    private double density = DeviceDisplay.MainDisplayInfo.Density;
+    private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
     private string drawMode = "none"; // "free" oder "poly"
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
@@ -503,9 +503,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SettingsService.Instance.IconCategories = iconCategories;
         Settings.IconData = iconItems;
 
-        string _newPin = Settings.IconData.First().FileName;
         string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string _newPin = SettingsService.Instance.DefaultPinIcon;
         var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
+        if (iconItem == null)
+        {
+            _newPin = Settings.IconData.First().FileName;
+            iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
+        }
 
         pinColor ??= SKColors.Red;
         Point _anchorPoint = iconItem.AnchorPoint;

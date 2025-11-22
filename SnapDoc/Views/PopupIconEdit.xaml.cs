@@ -3,6 +3,7 @@
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SkiaSharp;
+using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -32,6 +33,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
             deleteIconContainer.IsVisible = true;
+
+        setDefault.IsToggled = iconItem.IsDefaultIcon;
 
         BindingContext = this;
 
@@ -129,7 +132,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 allowRotate.IsToggled,
                 new SKColor((byte)(SelectedColor.Red * 255), (byte)(SelectedColor.Green * 255), (byte)(SelectedColor.Blue * 255)),
                 Math.Round(iconScale.Value / 100, 1),
-                iconCategory.Text
+                iconCategory.Text,
+                SettingsService.Instance.DefaultPinIcon == file
             );
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
             returnValue = file;
@@ -143,6 +147,12 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
                 returnValue = "deleted";
             }
+        }
+
+        if (setDefault.IsToggled)
+        {
+            SettingsService.Instance.DefaultPinIcon = file;
+            SettingsService.Instance.SaveSettings();
         }
         await CloseAsync(returnValue);
     }

@@ -159,7 +159,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
                 false,
                 new SKColor(255, 0, 0),
                 1,
-                "eigene Icons"
+                "eigene Icons",
+                false
             );
 
             var popup = new PopupIconEdit(updatedItem);

@@ -164,6 +164,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private string _polyLineHandleColor = "#808080";
     [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
     [ObservableProperty] private byte _polyLineHandleAlpha = 128;
+    [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
 
@@ -274,6 +275,7 @@ public partial class SettingsService : ObservableObject
             PolyLineHandleColor = PolyLineHandleColor,
             PolyLineStartHandleColor = PolyLineStartHandleColor,
             PolyLineHandleAlpha = PolyLineHandleAlpha,
+            DefaultPinIcon = DefaultPinIcon,
             ColorList = ColorList,
             IconSortCrits = IconSortCrits,
             PinSortCrits = PinSortCrits,
@@ -341,6 +343,7 @@ public partial class SettingsService : ObservableObject
             PolyLineHandleColor = settings.PolyLineHandleColor ?? string.Empty;
             PolyLineStartHandleColor = settings.PolyLineStartHandleColor ?? string.Empty;
             PolyLineHandleAlpha = settings.PolyLineHandleAlpha;
+            DefaultPinIcon = settings.DefaultPinIcon ?? string.Empty;
             ColorList = settings.ColorList ?? ColorList;
             IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
             PinSortCrits = settings.PinSortCrits ?? PinSortCrits;
@@ -399,6 +402,7 @@ public partial class SettingsService : ObservableObject
         PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
         PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
         PolyLineHandleAlpha = defaultSettings.PolyLineHandleAlpha;
+        DefaultPinIcon = defaultSettings.DefaultPinIcon;
         ColorList = [.. defaultSettings.ColorList];
         IconSortCrits = [.. defaultSettings.IconSortCrits];
         PinSortCrits = [.. defaultSettings.PinSortCrits];

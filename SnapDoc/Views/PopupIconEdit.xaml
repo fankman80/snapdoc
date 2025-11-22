@@ -134,6 +134,19 @@
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                         <Label Text="Icon löschen" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
+                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                        <controls:Switch x:Name="setDefault"
+                                         Grid.Column="0"
+                                         IsToggled="False"
+                                         HorizontalOptions="Start"
+                                         VerticalOptions="Center"
+                                         BorderColorOff ="Transparent"
+                                         KnobColorOn="White"
+                                         KnobColorOff="White"
+                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        <Label Text="Standard-Icon" Grid.Column="1" VerticalOptions="Center" />
+                    </Grid>
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>

@@ -18,7 +18,6 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         desc_entry.Text = desc;
         allow_export.IsToggled = export;
         SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
-        Transparency = String.IsNullOrEmpty(planColor) ? 0 : SelectedColor.Alpha;
 
         if (gray)
             grayscaleButtonText.Text = "Farben hinzufügen";
@@ -50,12 +49,11 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(0, SelectedColor, lineWidthVisibility: false);
+        var popup = new PopupColorPicker(0, SelectedColor, fillOpacity: (byte)(SelectedColor.Alpha * 255), lineWidthVisibility: false, fillOpacityVisibility: true);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
-            SelectedColor = Color.FromArgb(result.Result.PenColorHex);
-            Transparency = SelectedColor.Alpha;
+            SelectedColor = Color.FromArgb(result.Result.PenColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);
     }
 
     private void PlanRotateLeft(object sender, EventArgs e)
@@ -97,21 +95,6 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
             if (selectedColor != value)
             {
                 selectedColor = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private float transparency;
-    public float Transparency
-    {
-        get => transparency;
-        set
-        {
-            if (transparency != value)
-            {
-                SelectedColor = new Color(SelectedColor.Red, SelectedColor.Green, SelectedColor.Blue, value);
-                transparency = value;
                 OnPropertyChanged();
             }
         }

@@ -5,6 +5,7 @@
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+               xmlns:brush="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
                xmlns:views="clr-namespace:SnapDoc.Views"                 
                xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:local="clr-namespace:SnapDoc"
@@ -41,30 +42,26 @@
                                 BorderColor="{DynamicResource SecondaryBackground}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+
             <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        BorderWidth="1"
+                <Border HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10">
+                    <Image Source="pattern.png" Aspect="Center"/>
+                </Border>
+                <Border BackgroundColor="{Binding SelectedColor}"
+                        HeightRequest="44"                        
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"/>
+                <Button BorderWidth="1"
+                        HeightRequest="44"
                         BorderColor="Black"
-                        BackgroundColor="{Binding SelectedColor}"
+                        BackgroundColor="Transparent"
                         Text="Planfarbe"
                         TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
-                <VerticalStackLayout Grid.Column="1">
-                    <Label Text="{Binding Transparency, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Deckkraft: {0:0}%'}"/>
-                    <Slider x:Name="TransparencySlider"
-                            Value="{Binding Transparency}"
-                            Maximum="1"
-                            Minimum="0"
-                            Margin="0,-14,0,0"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                </VerticalStackLayout>
             </Grid>
+
             <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                 <controls:Switch x:Name="allow_export"
                                  Grid.Column="0"

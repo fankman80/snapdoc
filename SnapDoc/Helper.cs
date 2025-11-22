@@ -137,7 +137,8 @@ public class Helper
                         byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Blue")?.Value ?? "0")),
                     double.Parse(itemElement.Element("Scale")?.Value ?? "1.0", CultureInfo.InvariantCulture),
-                    itemElement.Element("Category")?.Value ?? string.Empty
+                    itemElement.Element("Category")?.Value ?? string.Empty,
+                    SettingsService.Instance.DefaultPinIcon==fileName
                 );
 
                 iconItems.Add(iconItem);

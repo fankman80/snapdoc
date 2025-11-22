@@ -8,7 +8,7 @@ using System.Globalization;
 
 namespace SnapDoc
 {
-    public class IconItem(string fileName, string displayName, Point anchorPoint, Size iconSize, bool isRotationLocked, SKColor pinColor, double iconScale, string category)
+    public partial class IconItem(string fileName, string displayName, Point anchorPoint, Size iconSize, bool isRotationLocked, SKColor pinColor, double iconScale, string category, bool isDefaultIcon)
     {
         public string FileName { get; set; } = fileName;
         public string DisplayName { get; set; } = displayName;
@@ -19,6 +19,7 @@ namespace SnapDoc
         public SKColor PinColor { get; set; } = pinColor;
         public double IconScale { get; set; } = iconScale;
         public string Category { get; set; } = category;
+        public  bool IsDefaultIcon { get; set; } = isDefaultIcon;
     }
 
     public class FileItem
