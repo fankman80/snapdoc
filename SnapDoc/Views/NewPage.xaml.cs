@@ -256,7 +256,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin) // Add Path for Custom Pin-Image
         {
             pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
-            _rotation = 0;
+            //_rotation = 0;
         }
         else if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
         {
