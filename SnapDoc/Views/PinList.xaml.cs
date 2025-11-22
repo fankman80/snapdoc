@@ -48,8 +48,8 @@ public partial class PinList : ContentPage
             {
                 foreach (var pin in plan.Value.Pins.Values)
                 {
-                    if (!pin.IsCustomPin)
-                    {
+                    //if (!pin.IsCustomPin)
+                    //{
                         var pinIcon = pin.PinIcon;
 
                         if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
@@ -71,7 +71,7 @@ public partial class PinList : ContentPage
                         var newPin = new PinItem(pin);
                         pinItems.Add(newPin);
                         pincounter++;
-                    }
+                    //}
                 }
             }
         }
