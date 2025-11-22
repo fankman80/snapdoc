@@ -159,11 +159,11 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private string _editorTheme = "material-darker";
-    [ObservableProperty] private float _polyLineHandleRadius = 12f;
-    [ObservableProperty] private float _polyLineHandleTouchRadius = 24f;
+    [ObservableProperty] private float _polyLineHandleRadius = 8f;
+    [ObservableProperty] private float _polyLineHandleTouchRadius = 18f;
     [ObservableProperty] private string _polyLineHandleColor = "#808080";
     [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
-    [ObservableProperty] private byte _polyLineHandleAlpha = 128;
+    [ObservableProperty] private byte _polyLineHandleAlpha = 100;
     [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
