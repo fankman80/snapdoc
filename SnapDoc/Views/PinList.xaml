@@ -171,6 +171,7 @@
                             
                             <!-- IconEdit-Button -->
                             <Image Grid.Column="0" Grid.Row="3"
+                                   IsVisible="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                                    Margin="14"
                                    ClassId="{Binding SelfId}"
                                    AutomationId = "{Binding OnPlanId}"

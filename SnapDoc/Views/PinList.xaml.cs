@@ -48,36 +48,33 @@ public partial class PinList : ContentPage
             {
                 foreach (var pin in plan.Value.Pins.Values)
                 {
-                    //if (!pin.IsCustomPin)
-                    //{
-                        var pinIcon = pin.PinIcon;
+                    var pinIcon = pin.PinIcon;
 
-                        if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                    if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var fullPath = Path.Combine(Settings.DataDirectory, pinIcon);
+                        if (!File.Exists(fullPath))
                         {
-                            var fullPath = Path.Combine(Settings.DataDirectory, pinIcon);
-                            if (!File.Exists(fullPath))
+                            // Lade Default-Icon falls Custom-Icon nicht existiert
+                            string _newPin = SettingsService.Instance.DefaultPinIcon;
+                            var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
+                            if (iconItem == null)
                             {
-                                // Lade Default-Icon falls Custom-Icon nicht existiert
-                                string _newPin = SettingsService.Instance.DefaultPinIcon;
-                                var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
-                                if (iconItem == null)
-                                {
-                                    _newPin = Settings.IconData.First().FileName;
-                                    iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
-                                }
-                                pin.PinIcon = iconItem.FileName;
-                                pin.Size = iconItem.IconSize;
-                                pin.IsLockRotate = iconItem.IsRotationLocked;
-                                pin.IsCustomPin = iconItem.IsCustomPin;
-                                pin.Anchor = iconItem.AnchorPoint;
-                                pin.PinScale = iconItem.IconScale;
-                                pin.PinColor = iconItem.PinColor;
+                                _newPin = Settings.IconData.First().FileName;
+                                iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
                             }
+                            pin.PinIcon = iconItem.FileName;
+                            pin.Size = iconItem.IconSize;
+                            pin.IsLockRotate = iconItem.IsRotationLocked;
+                            pin.IsCustomPin = iconItem.IsCustomPin;
+                            pin.Anchor = iconItem.AnchorPoint;
+                            pin.PinScale = iconItem.IconScale;
+                            pin.PinColor = iconItem.PinColor;
                         }
-                        var newPin = new PinItem(pin);
-                        pinItems.Add(newPin);
-                        pincounter++;
-                    //}
+                    }
+                    var newPin = new PinItem(pin);
+                    pinItems.Add(newPin);
+                    pincounter++;
                 }
             }
         }

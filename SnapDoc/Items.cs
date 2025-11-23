@@ -82,6 +82,19 @@ namespace SnapDoc
             }
         }
 
+        public bool IsCustomPin
+        {
+            get => _pin.IsCustomPin;
+            set
+            {
+                if (_pin.IsCustomPin != value)
+                {
+                    _pin.IsCustomPin = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
         public string PlanDisplay =>
                 string.IsNullOrWhiteSpace(GlobalJson.Data.Plans[OnPlanId].Name) || string.IsNullOrWhiteSpace(PinLocation)
                     ? GlobalJson.Data.Plans[OnPlanId].Name + PinLocation

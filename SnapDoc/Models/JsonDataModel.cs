@@ -49,7 +49,7 @@ public partial class Pin : ObservableObject
     public Size Size { get; set; }
     public bool IsLocked { get; set; }
     public bool IsLockRotate { get; set; }
-    public bool IsCustomPin { get; set; }
+
     public string PinName { get; set; }
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }
@@ -64,6 +64,7 @@ public partial class Pin : ObservableObject
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
 
+    [ObservableProperty] private bool _isCustomPin;
     [ObservableProperty] private bool _allowExport;
 }
 
