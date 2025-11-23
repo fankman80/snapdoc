@@ -705,7 +705,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             FreeDrawable = new InteractiveFreehandDrawable
             {
                 LineColor = selectedColor.ToSKColor(),
-                LineThickness = (float)lineWidth
+                LineThickness = (float)(lineWidth * density)
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
@@ -713,7 +713,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 LineColor = selectedColor.ToSKColor(),
                 PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                LineThickness = (float)lineWidth * density,
+                LineThickness = (float)(lineWidth * density),
                 HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density),
                 PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density)
             },
