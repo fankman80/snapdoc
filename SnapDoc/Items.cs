@@ -19,7 +19,7 @@ namespace SnapDoc
         public SKColor PinColor { get; set; } = pinColor;
         public double IconScale { get; set; } = iconScale;
         public string Category { get; set; } = category;
-        public  bool IsDefaultIcon { get; set; } = isDefaultIcon;
+        public bool IsDefaultIcon { get; set; } = isDefaultIcon;
     }
 
     public class FileItem
