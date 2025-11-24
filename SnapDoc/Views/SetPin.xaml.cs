@@ -219,6 +219,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
+        // save data to file
+        GlobalJson.SaveToFile();
+
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}&sender=setpin");
     }
 
