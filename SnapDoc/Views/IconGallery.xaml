@@ -105,28 +105,23 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="Start" Spacing="8">
-            <Label Text="Kategorie"
-                   FontSize="12"
-                   FontAttributes="Bold"
-                   VerticalTextAlignment="Center" />
-            <Border VerticalOptions="Center"
-                    HeightRequest="38"
-                    StrokeThickness="1"
-                    Stroke="{DynamicResource Primary}"
-                    StrokeShape="RoundRectangle 4">
-                <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                    <Picker x:Name="CategoryPicker"
-                            x:DataType="services:SettingsService"
-                            BindingContext="{x:Static services:SettingsService.Instance}"
-                            FontSize="10"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Fill"
-                            ItemsSource="{Binding IconCategories}"
-                            SelectedItem="{Binding IconCategory}" />
-                </Grid>
-            </Border>
-        </HorizontalStackLayout>
+        <Border Grid.Row="0" HorizontalOptions="Start"
+                VerticalOptions="Center"
+                HeightRequest="38"
+                StrokeThickness="1"
+                Stroke="{DynamicResource Primary}"
+                StrokeShape="RoundRectangle 4">
+            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
+                <Picker x:Name="CategoryPicker"
+                        x:DataType="services:SettingsService"
+                        BindingContext="{x:Static services:SettingsService.Instance}"
+                        FontSize="10"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill"
+                        ItemsSource="{Binding IconCategories}"
+                        SelectedItem="{Binding IconCategory}" />
+            </Grid>
+        </Border>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
             <Border Padding="6"
