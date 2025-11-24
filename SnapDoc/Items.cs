@@ -63,12 +63,60 @@ namespace SnapDoc
         // Grunddaten aus dem Modell
         public string SelfId => _pin.SelfId;
         public string OnPlanId => _pin.OnPlanId;
-        public string PinLocation => _pin.PinLocation;
-        public string PinDesc => _pin.PinDesc;
-        public string PinIcon => _pin.PinIcon;
-        public string PinName => _pin.PinName;
         public int PinPriority => _pin.PinPriority;
         public DateTime Time => _pin.DateTime;
+
+        public string PinName
+        {
+            get => _pin.PinName;
+            set
+            {
+                if (_pin.PinName != value)
+                {
+                    _pin.PinName = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string PinDesc
+        {
+            get => _pin.PinDesc;
+            set
+            {
+                if (_pin.PinDesc != value)
+                {
+                    _pin.PinDesc = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string PinLocation
+        {
+            get => _pin.PinLocation;
+            set
+            {
+                if (_pin.PinLocation != value)
+                {
+                    _pin.PinLocation = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public string PinIcon
+        {
+            get => _pin.PinIcon;
+            set
+            {
+                if (_pin.PinIcon != value)
+                {
+                    _pin.PinIcon = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
 
         public bool IsAllowExport
         {
@@ -114,7 +162,6 @@ namespace SnapDoc
                     ? GlobalJson.Data.Plans[OnPlanId].Name + PinLocation
                     : $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
     }
-
 
     public class ColorPickerReturn(string colorHex, int width, byte fillOpacity)
     {

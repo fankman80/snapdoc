@@ -14,12 +14,25 @@ namespace SnapDoc.Views;
 public partial class SetPin : ContentPage, IQueryAttributable
 {
     private readonly HashSet<Picker> _initializedPickers = [];
-    public ObservableCollection<FotoItem> Images { get; set; }
-    public int DynamicSpan { get; set; } = 3; // Standardwert
+    public int DynamicSpan { get; set; } = 3;
     public int DynamicSize;
     private string PlanId;
     private string PinId;
     private string SenderView;
+
+    private ObservableCollection<FotoItem> images;
+    public ObservableCollection<FotoItem> Images
+    {
+        get => images;
+        set
+        {
+            if (images != value)
+            {
+                images = value;
+                OnPropertyChanged(nameof(Images));
+            }
+        }
+    }
 
     private Color priorityColor;
     public Color PriorityColor
@@ -73,9 +86,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (query.TryGetValue("sender", out object value3))
             SenderView = value3 as string;
 
-        PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
-
-        MyView_Load();;
+        MyView_Load();
     }
 
     private void MyView_Load()
@@ -86,21 +97,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
                 AllowExport = img.Value.AllowExport,
                 DateTime = img.Value.DateTime
-            })
-            .ToObservableCollection();
-
-        priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
-        
-        var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
-        if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-            file = Path.Combine(Settings.DataDirectory, file);
-
-        this.Title = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName;
-        PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
-        PinLocation.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation;
-        PinImage.Source = file;
-        priorityPicker.SelectedIndex = Math.Max(0, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority);
-
+            }).ToObservableCollection();
+            
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
         {
             GeoLocButton.ImageSource = new FontImageSource
@@ -113,23 +111,30 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
         }
 
-        Pin = new PinItem(new Models.Pin())
+        var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
+        if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
+            file = Path.Combine(Settings.DataDirectory, file);
+
+        Pin = new PinItem(new Pin())
         {
+            PinName = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName,
+            PinDesc = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc,
+            PinLocation = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation,
+            PinIcon = file,
             IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
             IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
             IsLocked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked
         };
 
+        priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
+        priorityPicker.SelectedIndex = Math.Max(0, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority);
+
         if (priorityPicker.SelectedIndex == 0)
-        {
             PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark
                         ? (Color)Application.Current.Resources["PrimaryDarkText"]
                         : (Color)Application.Current.Resources["PrimaryText"];
-        }
         else
-        {
             PriorityColor = Color.FromArgb(SettingsService.Instance.PriorityItems[priorityPicker.SelectedIndex].Color);
-        }
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -170,52 +175,39 @@ public partial class SetPin : ContentPage, IQueryAttributable
     string toPlanId,
     bool isCopy)
     {
-        // 1) Sicherstellen, dass der Zielplan existiert
         if (!GlobalJson.Data.Plans.TryGetValue(toPlanId, out Plan toPlan))
             return;
 
-        // 2) Quelle prüfen
         if (!GlobalJson.Data.Plans.TryGetValue(fromPlanId, out Plan fromPlan))
             return;
 
         if (!fromPlan.Pins.TryGetValue(pinId, out Pin originalPin))
             return;
 
-        // 3) Deep Clone, damit keine Referenzen geteilt werden
         Pin clonedPin = DeepClone(originalPin);
 
-        // 4) Neue ID erzeugen
         string newId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
         clonedPin.SelfId = newId;
         clonedPin.OnPlanId = toPlanId;
 
-        // 5) Sicherstellen, dass Ziel-Pins existieren
         toPlan.Pins ??= [];
-
-        // 6) Pin einfügen
         toPlan.Pins[newId] = clonedPin;
         toPlan.PinCount++;
 
-        // 7) Falls Kopie → Fotos löschen
         if (isCopy)
         {
             clonedPin.Fotos?.Clear();
         }
         else
         {
-            // 8) Verschieben → Original entfernen
             fromPlan.Pins.Remove(pinId);
             fromPlan.PinCount--;
-
-            // Messaging
             WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
         }
 
-        // 9) Speichern
         GlobalJson.SaveToFile();
 
-        // 10) Navigation zum neuen Plan mit neuer PinId
         await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
     }
 
@@ -232,9 +224,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnOkayClick(object sender, EventArgs e)
     {
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = this.Title;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Pin.PinName;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = Pin.PinDesc;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = Pin.PinLocation;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = Pin.IsLocked;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport = Pin.IsAllowExport;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedIndex;
@@ -264,7 +256,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // remove custom pin image
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin)
         {
-            String file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon);
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon);
             if (File.Exists(file))
                 File.Delete(file);
         }
@@ -378,11 +370,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         if (sender is not Microsoft.Maui.Controls.Entry entry)
             return;
-
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Title;
-
-        // save data to file
-        GlobalJson.SaveToFile();
 
         // Fokus entfernen
         entry.Unfocus();

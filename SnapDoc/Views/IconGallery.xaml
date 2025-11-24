@@ -33,7 +33,7 @@
             <DataTemplate x:Key="IconListTemplate" x:DataType="local:IconItem">
                 <Grid HeightRequest="48">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="100" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="26" />
@@ -41,7 +41,7 @@
                     <Image Grid.Column="0"
                            Source="{Binding FileName}"
                            Aspect="AspectFit"
-                           Margin="6"/>
+                           Margin="5"/>
                     <Label Grid.Column="1"
                            Text="{Binding DisplayName}"
                            VerticalOptions="Center"

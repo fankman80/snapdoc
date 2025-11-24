@@ -16,7 +16,7 @@
              Title="Pin bearbeiten">
 
     <Shell.TitleView>
-        <Entry Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+        <Entry Text="{Binding Pin.PinName}"
                TextColor="{DynamicResource PrimaryDark}"
                Placeholder="(Titel eingeben...)"
                PlaceholderColor="{DynamicResource PrimaryDark}"
@@ -95,7 +95,7 @@
         </CollectionView>
 
         <VerticalStackLayout Grid.Row="1">
-            <material:TextField x:Name="PinLocation"
+            <material:TextField Text="{Binding Pin.PinLocation}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -103,7 +103,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"
                                 Title="Standort"/>
-            <material:EditorField x:Name="PinDesc"
+            <material:EditorField Text="{Binding Pin.PinDesc}"
                                   MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -152,8 +152,7 @@
                         BackgroundColor="White"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
-                    <ImageButton x:Name="PinImage"
-                                 Source="{Binding}"                                
+                    <ImageButton Source="{Binding Pin.PinIcon}"                                
                                  Aspect="AspectFit"
                                  Clicked="OnPinSelectClick"
                                  Padding="12"/>

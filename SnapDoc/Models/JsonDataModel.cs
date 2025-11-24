@@ -51,7 +51,6 @@ public partial class Pin : ObservableObject
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }
     public int PinPriority { get; set; }
-    public string PinIcon { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
     public string OnPlanId { get; set; }
     public string SelfId { get; set; }
@@ -61,6 +60,7 @@ public partial class Pin : ObservableObject
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
 
+    [ObservableProperty] private string _pinIcon;
     [ObservableProperty] private bool _isCustomPin;
     [ObservableProperty] private bool _isAllowExport;
     [ObservableProperty] private bool _isLocked;
