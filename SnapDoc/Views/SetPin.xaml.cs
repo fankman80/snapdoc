@@ -117,7 +117,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         {
             IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
             IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
-            IsLocked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin
+            IsLocked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked
         };
 
         if (priorityPicker.SelectedIndex == 0)
