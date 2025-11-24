@@ -94,7 +94,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <VerticalStackLayout Grid.Row="1" x:DataType="x:AppThemeBindingExtension">
+        <VerticalStackLayout Grid.Row="1">
             <material:TextField x:Name="PinLocation"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
@@ -121,8 +121,8 @@
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="0">
-                    <controls:Switch x:Name="AllowExport"
-                                     Grid.Column="0"
+                    <controls:Switch Grid.Column="0"
+                                     IsToggled="{Binding Pin.IsAllowExport}"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
                                      BorderColorOff ="Transparent"
@@ -133,8 +133,8 @@
                     <Label Text="Pin exportieren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
-                    <controls:Switch x:Name="LockSwitch"
-                                     Grid.Column="0"
+                    <controls:Switch Grid.Column="0"
+                                     IsToggled="{Binding Pin.IsLocked}"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
                                      BorderColorOff ="Transparent"
@@ -144,11 +144,8 @@
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     <Label Text="Position sperren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
-                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
-                        x:DataType="local:PinItem"
-                        BindingContext="{Binding Pin}"  
-                        IsVisible="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
-                        x:Name="PinImageContainer"
+                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"                      
+                        IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"

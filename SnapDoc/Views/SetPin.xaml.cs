@@ -15,7 +15,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
 {
     private readonly HashSet<Picker> _initializedPickers = [];
     public ObservableCollection<FotoItem> Images { get; set; }
-    public PinItem Pin { get; set; }
     public int DynamicSpan { get; set; } = 3; // Standardwert
     public int DynamicSize;
     private string PlanId;
@@ -36,9 +35,24 @@ public partial class SetPin : ContentPage, IQueryAttributable
         }
     }
 
+    private PinItem pin;
+    public PinItem Pin
+    {
+        get => pin;
+        set
+        {
+            if (pin != value)
+            {
+                pin = value;
+                OnPropertyChanged(nameof(Pin));
+            }
+        }
+    }
+
     public SetPin()
     {
         InitializeComponent();
+        BindingContext = this;
         UpdateSpan();
         SizeChanged += OnSizeChanged;;
     }
@@ -61,8 +75,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         PinImage.Source = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
 
-        MyView_Load();
-        BindingContext = this;
+        MyView_Load();;
     }
 
     private void MyView_Load()
@@ -86,8 +99,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         PinDesc.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc;
         PinLocation.Text = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation;
         PinImage.Source = file;
-        LockSwitch.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked;
-        AllowExport.IsToggled = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport;
         priorityPicker.SelectedIndex = Math.Max(0, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority);
 
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
@@ -104,14 +115,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         Pin = new PinItem(new Models.Pin())
         {
-            AllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport,
-            IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin
+            IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
+            IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
+            IsLocked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin
         };
-
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin)
-        {
-            //PinImageContainer.IsVisible = false;
-        }
 
         if (priorityPicker.SelectedIndex == 0)
         {
@@ -228,8 +235,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = this.Title;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = PinDesc.Text;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = PinLocation.Text;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = LockSwitch.IsToggled;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport = AllowExport.IsToggled;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = Pin.IsLocked;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport = Pin.IsAllowExport;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedIndex;
 
         // save data to file

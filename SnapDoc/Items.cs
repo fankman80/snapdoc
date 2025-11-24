@@ -44,8 +44,8 @@ namespace SnapDoc
             // UI-Update bei Änderungen am Modell
             _pin.PropertyChanged += (s, e) =>
             {
-                if (e.PropertyName == nameof(Pin.AllowExport))
-                    OnPropertyChanged(nameof(AllowExport));
+                if (e.PropertyName == nameof(Pin.IsAllowExport))
+                    OnPropertyChanged(nameof(IsAllowExport));
             };
         }
 
@@ -70,14 +70,14 @@ namespace SnapDoc
         public int PinPriority => _pin.PinPriority;
         public DateTime Time => _pin.DateTime;
 
-        public bool AllowExport
+        public bool IsAllowExport
         {
-            get => _pin.AllowExport;
+            get => _pin.IsAllowExport;
             set
             {
-                if (_pin.AllowExport != value)
+                if (_pin.IsAllowExport != value)
                 {
-                    _pin.AllowExport = value;
+                    _pin.IsAllowExport = value;
                     OnPropertyChanged();
                 }
             }
@@ -91,6 +91,19 @@ namespace SnapDoc
                 if (_pin.IsCustomPin != value)
                 {
                     _pin.IsCustomPin = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsLocked
+        {
+            get => _pin.IsLocked;
+            set
+            {
+                if (_pin.IsLocked != value)
+                {
+                    _pin.IsLocked = value;
                     OnPropertyChanged();
                 }
             }

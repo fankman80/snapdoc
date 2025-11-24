@@ -159,7 +159,7 @@
 
                             <!-- Allow Export-Button -->
                             <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
-                                    Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                    Text="{Binding IsAllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                     Padding="0,5,10,0"
                                     FontFamily="MaterialOutlined"
                                     FontSize="30"
@@ -184,7 +184,7 @@
 
                             <!-- This BoxView is used to control the opacity of the CollectionView-Item based on AllowExport property -->
                             <BoxView Grid.ColumnSpan="5" Grid.RowSpan="4"
-                                     IsVisible="{Binding AllowExport, Converter={StaticResource InvertedBoolConverter}}"
+                                     IsVisible="{Binding IsAllowExport, Converter={StaticResource InvertedBoolConverter}}"
                                      BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                                      Opacity="0.7"
                                      InputTransparent="True" />                            

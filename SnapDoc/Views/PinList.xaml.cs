@@ -97,11 +97,11 @@ public partial class PinList : ContentPage
 
     private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(PinItem.AllowExport))
+        if (e.PropertyName == nameof(PinItem.IsAllowExport))
         {
             var pinItem = (PinItem)sender;
 
-            GlobalJson.Data.Plans[pinItem.OnPlanId].Pins[pinItem.SelfId].AllowExport = pinItem.AllowExport;
+            GlobalJson.Data.Plans[pinItem.OnPlanId].Pins[pinItem.SelfId].IsAllowExport = pinItem.IsAllowExport;
 
             // save data to file
             GlobalJson.SaveToFile();
@@ -143,7 +143,7 @@ public partial class PinList : ContentPage
 
         if (item != null)
         {
-            item.AllowExport = !item.AllowExport;
+            item.IsAllowExport = !item.IsAllowExport;
 
             // save data to file
             GlobalJson.SaveToFile();
@@ -204,7 +204,7 @@ public partial class PinList : ContentPage
                     pinItems = [.. pinItems.OrderBy(pin => pin.PinName).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.AllowExport).ToList()];
+                    pinItems = [.. pinItems.OrderBy(pin => pin.IsAllowExport).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
                     pinItems = [.. pinItems.OrderBy(pin => pin.Time).ToList()];
@@ -231,7 +231,7 @@ public partial class PinList : ContentPage
                     pinItems = [.. pinItems.OrderByDescending(pin => pin.PinName).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.AllowExport).ToList()];
+                    pinItems = [.. pinItems.OrderByDescending(pin => pin.IsAllowExport).ToList()];
                     break;
                 case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
                     pinItems = [.. pinItems.OrderByDescending(pin => pin.Time).ToList()];

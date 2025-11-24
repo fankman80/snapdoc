@@ -561,7 +561,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinScale = _scale,
             PinRotation = _rotation,
             GeoLocation = null, // noch nicht bekannt
-            AllowExport = _isAllowExport,
+            IsAllowExport = _isAllowExport,
         };
 
         // Sicherstellen, dass der Plan existiert

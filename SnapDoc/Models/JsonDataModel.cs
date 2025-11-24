@@ -47,9 +47,6 @@ public partial class Pin : ObservableObject
     public Point Pos { get; set; }
     public Point Anchor { get; set; }
     public Size Size { get; set; }
-    public bool IsLocked { get; set; }
-    public bool IsLockRotate { get; set; }
-    public bool IsLockAutoScale { get; set; }
     public string PinName { get; set; }
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }
@@ -65,7 +62,10 @@ public partial class Pin : ObservableObject
     public GeoLocData GeoLocation { get; set; }
 
     [ObservableProperty] private bool _isCustomPin;
-    [ObservableProperty] private bool _allowExport;
+    [ObservableProperty] private bool _isAllowExport;
+    [ObservableProperty] private bool _isLocked;
+    [ObservableProperty] private bool _isLockRotate;
+    [ObservableProperty] private bool _isLockAutoScale;
 }
 
 public partial class Foto : ObservableObject

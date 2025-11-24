@@ -105,7 +105,7 @@ public partial class ExportReport
                 {
                     foreach (KeyValuePair<string, Pin> pin in GlobalJson.Data.Plans[plan.Key].Pins)
                     {
-                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport)
+                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
                         {
                             xml += $"<pos id='{i}'>{i}</pos>";
                             i += 1;
@@ -159,7 +159,7 @@ public partial class ExportReport
                         {
                             foreach (KeyValuePair<string, Pin> pin in GlobalJson.Data.Plans[plan.Key].Pins)
                             {
-                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport)
+                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
                                 {
                                     // Anzahl Spalten ermitteln
                                     int columnCount = table.Elements<TableRow>().FirstOrDefault()?.Elements<TableCell>().Count() ?? 0;
@@ -474,7 +474,7 @@ public partial class ExportReport
                                         {
                                             foreach (KeyValuePair<string, Pin> pin in GlobalJson.Data.Plans[plan.Key].Pins)
                                             {
-                                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].AllowExport)
+                                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
                                                 {
                                                     string pinImage = Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
                                                     Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
