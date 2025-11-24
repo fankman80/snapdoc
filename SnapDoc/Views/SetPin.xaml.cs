@@ -15,6 +15,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 {
     private readonly HashSet<Picker> _initializedPickers = [];
     public ObservableCollection<FotoItem> Images { get; set; }
+    public PinItem Pin { get; set; }
     public int DynamicSpan { get; set; } = 3; // Standardwert
     public int DynamicSize;
     private string PlanId;
@@ -101,9 +102,15 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
         }
 
+        Pin = new PinItem(new Models.Pin())
+        {
+            AllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].AllowExport,
+            IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin
+        };
+
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin)
         {
-            PinImageContainer.IsVisible = false;
+            //PinImageContainer.IsVisible = false;
         }
 
         if (priorityPicker.SelectedIndex == 0)

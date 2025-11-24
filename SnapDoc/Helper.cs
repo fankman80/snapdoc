@@ -132,6 +132,7 @@ public class Helper
                         double.Parse(itemElement.Element("Size")?.Attribute("Width")?.Value ?? "0", CultureInfo.InvariantCulture),
                         double.Parse(itemElement.Element("Size")?.Attribute("Height")?.Value ?? "0", CultureInfo.InvariantCulture)),
                     bool.Parse(itemElement.Element("RotationLocked")?.Value ?? "false"),
+                    bool.Parse(itemElement.Element("AutoScaleLocked")?.Value ?? "false"),
                     new SKColor(
                         byte.Parse(itemElement.Element("Color")?.Attribute("Red")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
@@ -170,6 +171,7 @@ public class Helper
                 itemElement.Element("Size").SetAttributeValue("Width", updatedIconItem.IconSize.Width.ToString());
                 itemElement.Element("Size").SetAttributeValue("Height", updatedIconItem.IconSize.Height.ToString());
                 itemElement.Element("RotationLocked").Value = updatedIconItem.IsRotationLocked.ToString();
+                itemElement.Element("AutoScaleLocked").Value = updatedIconItem.IsAutoScaleLocked.ToString();
                 itemElement.Element("Color").SetAttributeValue("Red", updatedIconItem.PinColor.Red.ToString());
                 itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
                 itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
@@ -189,6 +191,7 @@ public class Helper
                         new XAttribute("Width", updatedIconItem.IconSize.Width),
                         new XAttribute("Height", updatedIconItem.IconSize.Height)),
                     new XElement("RotationLocked", updatedIconItem.IsRotationLocked),
+                    new XElement("AutoScaleLocked", updatedIconItem.IsAutoScaleLocked),
                     new XElement("Color",
                         new XAttribute("Red", updatedIconItem.PinColor.Red),
                         new XAttribute("Green", updatedIconItem.PinColor.Green),

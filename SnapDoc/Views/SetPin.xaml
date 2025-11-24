@@ -31,6 +31,7 @@
     
     <ContentPage.Resources>
         <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
@@ -144,6 +145,9 @@
                     <Label Text="Position sperren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
+                        x:DataType="local:PinItem"
+                        BindingContext="{Binding Pin}"  
+                        IsVisible="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                         x:Name="PinImageContainer"
                         WidthRequest="100"
                         Stroke="Grey"

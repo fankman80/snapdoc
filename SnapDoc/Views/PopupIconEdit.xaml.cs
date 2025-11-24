@@ -29,6 +29,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         iconScale.Value = iconItem.IconScale * 100;
         sliderText.Text = "Voreinstellung Skalierung: " + (iconItem.IconScale * 100).ToString() + "%";
         allowRotate.IsToggled = iconItem.IsRotationLocked;
+        allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
         SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
 
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
@@ -130,6 +131,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 new Point(Anchor_X, Anchor_Y),
                 iconItem.IconSize,
                 allowRotate.IsToggled,
+                allowAutoScale.IsToggled,
                 new SKColor((byte)(SelectedColor.Red * 255), (byte)(SelectedColor.Green * 255), (byte)(SelectedColor.Blue * 255)),
                 Math.Round(iconScale.Value / 100, 1),
                 iconCategory.Text,

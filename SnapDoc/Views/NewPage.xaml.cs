@@ -219,10 +219,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
                 foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
                 {
-                    if (img.AutomationId != null & GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsCustomPin != true)
+                    if (img.AutomationId != null)
                     {
-                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
-                            img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
+                        if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockAutoScale)
+                            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
+                                img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
                         if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
                             img.Rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinRotation;
@@ -516,6 +517,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Point _anchorPoint = iconItem.AnchorPoint;
         Size _size = iconItem.IconSize;
         bool _isRotationLocked = iconItem.IsRotationLocked;
+        bool _isAutoScaleLocked = iconItem.IsAutoScaleLocked;
         bool _isPosLocked = false;
         bool _isCustomPin = false;
         bool _isAllowExport = true;
@@ -527,6 +529,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             _anchorPoint = new Point(0.5, 0.5);
             _size = new Size(customPinSizeWidth, customPinSizeHeight);
             _isRotationLocked = true;
+            _isAutoScaleLocked = true;
             _isPosLocked = true;
             _isCustomPin = true;
             _newPin = customName;
@@ -543,6 +546,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             Size = _size,
             IsLocked = _isPosLocked,
             IsLockRotate = _isRotationLocked,
+            IsLockAutoScale = _isAutoScaleLocked,
             IsCustomPin = _isCustomPin,
             PinName = _displayName,
             PinDesc = "",

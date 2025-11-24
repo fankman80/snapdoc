@@ -49,7 +49,7 @@ public partial class Pin : ObservableObject
     public Size Size { get; set; }
     public bool IsLocked { get; set; }
     public bool IsLockRotate { get; set; }
-
+    public bool IsLockAutoScale { get; set; }
     public string PinName { get; set; }
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }

@@ -66,6 +66,7 @@ public partial class PinList : ContentPage
                             pin.PinIcon = iconItem.FileName;
                             pin.Size = iconItem.IconSize;
                             pin.IsLockRotate = iconItem.IsRotationLocked;
+                            pin.IsLockAutoScale = iconItem.IsAutoScaleLocked;
                             pin.IsCustomPin = iconItem.IsCustomPin;
                             pin.Anchor = iconItem.AnchorPoint;
                             pin.PinScale = iconItem.IconScale;

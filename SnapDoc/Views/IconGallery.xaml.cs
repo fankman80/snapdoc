@@ -86,6 +86,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = iconItem.IsAutoScaleLocked;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = iconItem.PinColor;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = iconItem.IconScale;
         }
@@ -156,6 +157,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
                 "Neues Icon",
                 new Point(0.5, 0.5),
                 size,
+                false,
                 false,
                 new SKColor(255, 0, 0),
                 1,

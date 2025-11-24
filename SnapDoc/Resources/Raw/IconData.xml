@@ -6,6 +6,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -17,6 +18,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -28,6 +30,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -39,6 +42,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="112" Green="112" Blue="112" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -50,6 +54,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="252" Green="2" Blue="202" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -61,6 +66,7 @@
 		<AnchorPoint X="0.297" Y="0.97" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Stecknadeln</Category>
@@ -72,6 +78,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -83,6 +90,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -94,6 +102,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -105,6 +114,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="192" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -116,6 +126,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="192" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -127,6 +138,7 @@
 		<AnchorPoint X="0.0" Y="0.5" />
 		<Size Width="197" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -138,6 +150,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="121" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -149,6 +162,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="109" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -160,6 +174,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -171,6 +186,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="109" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -182,6 +198,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="160" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.8</Scale>
 		<Category>Brandschutz</Category>
@@ -193,6 +210,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="192" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -204,6 +222,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="192" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -215,6 +234,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="73" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -226,6 +246,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="102" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -237,6 +258,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -248,6 +270,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -259,6 +282,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -270,6 +294,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -281,6 +306,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -292,6 +318,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -303,6 +330,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="71" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -314,6 +342,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -325,6 +354,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="90" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -336,6 +366,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="144" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -347,6 +378,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="160" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.8</Scale>
 		<Category>Brandschutz</Category>
@@ -358,6 +390,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="111" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -369,6 +402,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="160" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.8</Scale>
 		<Category>Brandschutz</Category>
@@ -380,6 +414,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="160" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.8</Scale>
 		<Category>Brandschutz</Category>
@@ -391,6 +426,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="89" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -402,6 +438,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -413,6 +450,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -424,6 +462,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="160" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.8</Scale>
 		<Category>Brandschutz</Category>
@@ -435,6 +474,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="129" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -446,6 +486,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="185" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -457,6 +498,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="185" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -468,6 +510,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="121" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -479,6 +522,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -490,6 +534,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -501,6 +546,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="131" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -512,6 +558,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -523,6 +570,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -534,6 +582,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -545,6 +594,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -556,6 +606,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="192" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -567,6 +618,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="185" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.4</Scale>
 		<Category>Brandschutz</Category>
@@ -578,6 +630,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -589,6 +642,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -600,6 +654,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -611,6 +666,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -622,6 +678,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -633,6 +690,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -644,6 +702,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -655,6 +714,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="118" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -666,6 +726,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="64" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -677,6 +738,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="89" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -688,6 +750,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="141" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -699,6 +762,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="141" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -710,6 +774,7 @@
 		<AnchorPoint X="1.0" Y="0.5" />
 		<Size Width="89" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="0" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -721,6 +786,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -732,6 +798,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -743,6 +810,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -754,6 +822,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -765,6 +834,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -776,6 +846,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -787,6 +858,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -798,6 +870,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="128" Height="64" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>1.0</Scale>
 		<Category>Brandschutz</Category>
@@ -809,6 +882,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -820,6 +894,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -831,6 +906,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -842,6 +918,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -853,6 +930,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -864,6 +942,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -875,6 +954,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -886,6 +966,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -897,6 +978,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -908,6 +990,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -919,6 +1002,7 @@
 		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="96" Height="96" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="0" Green="83" Blue="134" />
 		<Scale>1.0</Scale>
 		<Category>Arbeitssicherheit</Category>
@@ -930,6 +1014,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -941,6 +1026,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -952,6 +1038,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -963,6 +1050,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -974,6 +1062,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -985,6 +1074,7 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
@@ -996,19 +1086,141 @@
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
 	</Item>	
-	
+
 	<Item>
 		<FileName>warnung_gasflaschen.png</FileName>
 		<Description>Warnung Gasflaschen</Description>
 		<AnchorPoint X="0.5" Y="0.66" />
 		<Size Width="96" Height="84" />
 		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>false</AutoScaleLocked>
 		<Color Red="242" Green="198" Blue="51" />
 		<Scale>1.0</Scale>
 		<Category>Gefährliche Stoffe</Category>
+	</Item>		
+	
+	<Item>
+		<FileName>tuer1.png</FileName>
+		<Description>Türe mit Türtschliesser</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="255" Green="255" Blue="255" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer2.png</FileName>
+		<Description>Türe</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="255" Green="255" Blue="255" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>tuer3.png</FileName>
+		<Description>EI30-Türe mit Türschliesser</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="255" Green="191" Blue="0" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer4.png</FileName>
+		<Description>EI30-Türe</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="255" Green="191" Blue="0" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer5.png</FileName>
+		<Description>E30-Türe mit Türschliesser</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="250" Green="186" Blue="252" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>tuer6.png</FileName>
+		<Description>E30-Türe</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="250" Green="186" Blue="252" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer7.png</FileName>
+		<Description>EI60-Türe mit Türschliesser</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="223" Green="113" Blue="0" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer8.png</FileName>
+		<Description>EI60-Türe</Description>
+		<AnchorPoint X="0" Y="0" />
+		<Size Width="192" Height="192" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="223" Green="113" Blue="0" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>	
+	
+	<Item>
+		<FileName>tuer9.png</FileName>
+		<Description>EI30-Schiebetüre</Description>
+		<AnchorPoint X="0" Y="1" />
+		<Size Width="192" Height="32" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="255" Green="191" Blue="0" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
+	</Item>
+	
+	<Item>
+		<FileName>tuer10.png</FileName>
+		<Description>E30-Schiebetüre</Description>
+		<AnchorPoint X="0" Y="1" />
+		<Size Width="192" Height="32" />
+		<RotationLocked>true</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<Color Red="250" Green="186" Blue="252" />
+		<Scale>0.4</Scale>
+		<Category>Türen und Tore</Category>
 	</Item>		
 </IconData>

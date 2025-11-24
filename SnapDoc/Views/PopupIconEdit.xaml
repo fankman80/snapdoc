@@ -121,6 +121,18 @@
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                         <Label Text="Rotation sperren" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
+                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                        <controls:Switch x:Name="allowAutoScale"
+                                         Grid.Column="0"
+                                         HorizontalOptions="Start"
+                                         VerticalOptions="Center"
+                                         BorderColorOff ="Transparent"
+                                         KnobColorOn="White"
+                                         KnobColorOff="White"
+                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        <Label Text="Auto-Skalierung sperren" Grid.Column="1" VerticalOptions="Center" />
+                    </Grid>                    
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40" x:Name="deleteIconContainer" IsVisible="False">
                         <controls:Switch x:Name="deleteIcon"
                                          Grid.Column="0"
