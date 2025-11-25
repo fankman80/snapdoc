@@ -159,11 +159,12 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private string _editorTheme = "material-darker";
-    [ObservableProperty] private float _polyLineHandleRadius = 8f;
-    [ObservableProperty] private float _polyLineHandleTouchRadius = 18f;
+    [ObservableProperty] private float _polyLineHandleRadius = 10f;
+    [ObservableProperty] private float _polyLineHandleTouchRadius = 20f;
+    [ObservableProperty] private int _doubleClickThresholdMs = 300;
     [ObservableProperty] private string _polyLineHandleColor = "#808080";
     [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
-    [ObservableProperty] private byte _polyLineHandleAlpha = 100;
+    [ObservableProperty] private byte _polyLineHandleAlpha = 200;
     [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
@@ -272,6 +273,7 @@ public partial class SettingsService : ObservableObject
             EditorTheme = EditorTheme,
             PolyLineHandleRadius = PolyLineHandleRadius,
             PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
+            DoubleClickThresholdMs = DoubleClickThresholdMs,
             PolyLineHandleColor = PolyLineHandleColor,
             PolyLineStartHandleColor = PolyLineStartHandleColor,
             PolyLineHandleAlpha = PolyLineHandleAlpha,
@@ -340,6 +342,7 @@ public partial class SettingsService : ObservableObject
             EditorTheme = settings.EditorTheme ?? string.Empty;
             PolyLineHandleRadius = settings.PolyLineHandleRadius;
             PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
+            DoubleClickThresholdMs = settings.DoubleClickThresholdMs;
             PolyLineHandleColor = settings.PolyLineHandleColor ?? string.Empty;
             PolyLineStartHandleColor = settings.PolyLineStartHandleColor ?? string.Empty;
             PolyLineHandleAlpha = settings.PolyLineHandleAlpha;
@@ -399,6 +402,7 @@ public partial class SettingsService : ObservableObject
         EditorTheme = defaultSettings.EditorTheme;
         PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
         PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;
+        DoubleClickThresholdMs = defaultSettings.DoubleClickThresholdMs;
         PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
         PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
         PolyLineHandleAlpha = defaultSettings.PolyLineHandleAlpha;

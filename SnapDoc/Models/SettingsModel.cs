@@ -42,6 +42,7 @@ internal class SettingsModel
     public string? EditorTheme { get; set; } // Json Editor Thema
     public float PolyLineHandleRadius { get; set; } // Radius der Griffe für Polylinien
     public float PolyLineHandleTouchRadius { get; set; } // Touch-Radius der Griffe für Polylinien
+    public int DoubleClickThresholdMs { get; set; } // Zeitspanne für Doppelklick-Erkennung in Millisekunden
     public string? PolyLineHandleColor { get; set; } // Farbe der Griffe für Polylinien (Hex-Wert)
     public string? PolyLineStartHandleColor { get; set; } // Farbe des Start-Griffs für Polylinien (Hex-Wert)
     public byte PolyLineHandleAlpha { get; set; } // Alpha-Wert der Griffe für Polylinien (Hex-Wert)

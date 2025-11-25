@@ -49,6 +49,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private float MinY = float.MaxValue;
     private float MaxX = float.MinValue;
     private float MaxY = float.MinValue;
+    private DateTime? lastClickTime = null;
+    private SKPoint? lastClickPosition = null;
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -693,11 +695,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         SetPinBtn.IsVisible = false;
         DrawBtn.IsVisible = false;
-        PenSettingsBtn.IsVisible = true;
-        CheckBtn.IsVisible = true;
-        EraseBtn.IsVisible = true;
-        DrawPolyBtn.IsVisible = true;
-        DrawFreeBtn.IsVisible = true;
+        ToolBtns.IsVisible = true;
 
         planContainer.Rotation = 0;
         SettingsService.Instance.IsPlanRotateLocked = true;
@@ -775,6 +773,26 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
+
+            // Doppelklick prüfen
+            var now = DateTime.Now;
+            if (lastClickTime.HasValue &&
+                (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
+                lastClickPosition.HasValue &&
+                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius)
+            {
+                // Doppelklick erkannt → Punkt löschen
+                DeletePointAt(p);
+                lastClickTime = null;
+                lastClickPosition = null;
+                drawingView.InvalidateSurface();
+                return;
+            }
+
+            // Kein Doppelklick → Klick merken
+            lastClickTime = now;
+            lastClickPosition = p;
+
             activeIndex = poly.FindPointIndex(p.X, p.Y);
             
             if (poly.TryClosePolygon(p.X, p.Y))
@@ -825,6 +843,34 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             combinedDrawable.FreeDrawable.EndStroke();
         }
+    }
+
+    private void DeletePointAt(SKPoint p)
+    {
+        var poly = combinedDrawable.PolyDrawable;
+
+        // Punkt unter Klick suchen und löschen
+        for (int i = 0; i < poly.Points.Count; i++)
+        {
+            if (Distance(p, poly.Points[i]) <= poly.HandleRadius)
+            {
+                poly.Points.RemoveAt(i);
+
+                // Wenn danach <=2 Punkte übrig, alles löschen
+                if (poly.Points.Count <= 2)
+                {
+                    poly.Reset(); // Löscht alle Punkte und setzt IsClosed zurück
+                }
+                return;
+            }
+        }
+    }
+
+    private float Distance(SKPoint a, SKPoint b)
+    {
+        var dx = a.X - b.X;
+        var dy = a.Y - b.Y;
+        return (float)Math.Sqrt(dx * dx + dy * dy);
     }
 
     private void DrawFreeClicked(object sender, EventArgs e)
@@ -896,11 +942,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         RemoveDrawingView();
 
         planContainer.IsPanningEnabled = true;
-        PenSettingsBtn.IsVisible = false;
-        CheckBtn.IsVisible = false;
-        EraseBtn.IsVisible = false;
-        DrawPolyBtn.IsVisible = false;
-        DrawFreeBtn.IsVisible = false;
+        ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         SettingsService.Instance.IsPlanRotateLocked = false;

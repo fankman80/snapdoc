@@ -14,11 +14,12 @@ public class InteractivePolylineDrawable
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
     public float LineThickness { get; set; } = 3f;
-    public bool HasContent => Points.Count > 1;
+    public bool HasContent => Points.Count > 0;
 
     public void Draw(SKCanvas canvas)
     {
-        if (Points.Count < 2) return;
+        if (Points.Count == 0)
+            return;
 
         // Polygon füllen, falls geschlossen
         if (IsClosed)
@@ -70,7 +71,9 @@ public class InteractivePolylineDrawable
                 {
                     Color = color,
                     IsStroke = false,
-                    IsAntialias = true
+                    IsAntialias = true,
+                    Style = SKPaintStyle.Stroke,
+                    StrokeWidth = 2
                 };
                 canvas.DrawCircle(Points[i], PointRadius, pointPaint);
             }

@@ -219,71 +219,79 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Clicked="SetPinClicked"/>
 
-            <VerticalStackLayout
-                x:Name="ToolBtns"
-                Margin="20,0,0,20"
-                Spacing="16"
-                ZIndex="10000"
-                AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button x:Name="EraseBtn"
-                        IsVisible="False"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="EraseClicked"/>
-                <Button x:Name="DrawPolyBtn"
-                        IsVisible="False"                        
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Pentagon}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        BorderColor="Red"
-                        BorderWidth="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="DrawPolyClicked"/>
-                <Button x:Name="DrawFreeBtn"
-                        IsVisible="False"                        
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        BorderColor="Red"
-                        BorderWidth="0"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="DrawFreeClicked"/>
-                <Button x:Name="PenSettingsBtn"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        IsVisible="False"
-                        Clicked="PenSettingsClicked"/>
-                <Button x:Name="CheckBtn"
-                        IsVisible="False"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="CheckClicked"/>
-                <Button x:Name="DrawBtn"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
-                        BackgroundColor="{DynamicResource Primary}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        Clicked="DrawingClicked"/>
-            </VerticalStackLayout>
+            <Button x:Name="DrawBtn"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
+                    Margin="20,0,0,20"
+                    ZIndex="10000"
+                    BackgroundColor="{DynamicResource Primary}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    Clicked="DrawingClicked"/>
+
+            <AbsoluteLayout x:Name="ToolBtns"
+                            IsVisible="False"
+                            AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                            AbsoluteLayout.LayoutFlags="PositionProportional"
+                            ZIndex="10000">
+                <VerticalStackLayout
+                    Margin="20,0,0,20"
+                    Spacing="16"
+                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional">
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            Clicked="EraseClicked"/>
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            Clicked="PenSettingsClicked"/>
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            Clicked="CheckClicked"/>
+
+                </VerticalStackLayout>
+                <HorizontalStackLayout
+                    Margin="96,0,0,20"
+                    Spacing="16"
+                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional">
+                    <Button x:Name="DrawPolyBtn"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Pentagon}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            BorderColor="Red"
+                            BorderWidth="0"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            Clicked="DrawPolyClicked"/>
+                    <Button x:Name="DrawFreeBtn"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            BorderColor="Red"
+                            BorderWidth="0"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            Clicked="DrawFreeClicked"/>                
+                </HorizontalStackLayout>
+            </AbsoluteLayout>
         </AbsoluteLayout>
 
         <AbsoluteLayout x:Name="SetPinFrame" IsVisible="false">
