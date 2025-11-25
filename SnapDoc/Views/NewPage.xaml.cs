@@ -1003,9 +1003,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
         activePin.Rotation = sliderValue;
-        degreesLabel.Text = $"{Math.Round(sliderValue)}°";
+        degreesLabel.Text = $"{sliderValue}°";
 
         if (sliderValue == 360)
         {
@@ -1027,7 +1027,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
         if (sliderValue == 360)
         {
@@ -1052,7 +1052,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnResizeSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
+
         var scale = 1 / PlanContainer.Scale;
         var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
 
@@ -1061,12 +1062,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else
             activePin.Scale = sliderValue / 100;
 
-        percentLabel.Text = $"{Math.Round(sliderValue)}%";
+        percentLabel.Text = $"{sliderValue}%";
     }
 
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = ((Microsoft.Maui.Controls.Slider)sender).Value;
+        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
         GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale = sliderValue / 100;
 

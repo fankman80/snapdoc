@@ -7,6 +7,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
+using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using DDW = DocumentFormat.OpenXml.Drawing.Wordprocessing;
@@ -213,12 +214,10 @@ public partial class ExportReport
                                                                                            planName);
 
                                                             Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
-                                                            string pinImage = Path.Combine(Settings.CacheDirectory,
-                                                                                           GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
+                                                            string pinImage = Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
                                                             Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
                                                             float pinRotation = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
                                                             Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
-
                                                             var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
                                                             var cropFactor = new Point((1 / planSize.Width * 300) / 2,
                                                                                        (1 / planSize.Height * 300) / 2);
@@ -246,16 +245,12 @@ public partial class ExportReport
                                                                          GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale
                                                             };
 
-                                                            var pinPoint = new Point
-                                                            {
-                                                                X = (exportSize.Width / 2) - (scaledPinSize.Width * pinAnchor.X),
-                                                                Y = (exportSize.Height / 2) - (scaledPinSize.Height * pinAnchor.Y)
-                                                            };
+                                                            PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), pinRotation, pinAnchor, scaledPinSize, exportSize);
 
                                                             newParagraph.Append(new Run(GetImageElement(mainPart, planPath, exportSize,
                                                                                                         new Point(0, 0), 0, "anchor", crop)));
                                                             newParagraph.Append(new Run(GetImageElement(mainPart, pinImage, scaledPinSize,
-                                                                                                        pinPoint, pinRotation, "anchor")));
+                                                                                                        posOnPlan, pinRotation, "anchor")));
                                                             newParagraph.Append(new Run(new Break()));
                                                         }
                                                         break;
@@ -477,27 +472,32 @@ public partial class ExportReport
                                                 if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
                                                 {
                                                     string pinImage = Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
-                                                    Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
-                                                    Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
-                                                    Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
+                                                    PointF pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
+                                                    PointF pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
+                                                    SizeF pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
                                                     SKColor pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-
+                                                    float pinRotation = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
                                                     var scaledPinSize = new SizeF
                                                     {
                                                         Width = (float)(pinSize.Width * scaledPlanSize.Width / planSize.Width * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale),
                                                         Height = (float)(pinSize.Height * scaledPlanSize.Height / planSize.Height * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)
                                                     };
 
-                                                    Point posOnPlan = new((pinPos.X * scaledPlanSize.Width) - (pinAnchor.X * scaledPinSize.Width),
-                                                                          (pinPos.Y * scaledPlanSize.Height) - (pinAnchor.Y * scaledPinSize.Height));
-                                                    float rotationAngle = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
+                                                    PointF posOnPlan = PivotRecalc(pinPos, pinRotation, pinAnchor, scaledPinSize, scaledPlanSize);
 
-                                                    run.Append(GetImageElement(mainPart, pinImage, new SizeF(scaledPinSize.Width, scaledPinSize.Height), posOnPlan, rotationAngle, "anchor"));
+                                                    run.Append(GetImageElement(
+                                                        mainPart,
+                                                        pinImage,
+                                                        scaledPinSize,
+                                                        posOnPlan,
+                                                        pinRotation,
+                                                        "anchor"
+                                                    ));
                                                     run.Append(CreateTextBoxWithShape(SettingsService.Instance.PinLabelPrefix,
                                                                                       i,
                                                                                       storeItemId,
                                                                                       $"/positions/pos[@id='{i}']",
-                                                                                      new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - scaledPinSize.Height), // offset 1mm to right
+                                                                                      new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - scaledPinSize.Height),
                                                                                       SettingsService.Instance.PinLabelFontSize,
                                                                                       pinColor.ToString()[3..]));
                                                     i++;
@@ -579,6 +579,35 @@ public partial class ExportReport
             return GetInlinePicture(relationshipId, size, rotationAngle, crop);
         else
             return GetAnchorPicture(relationshipId, size, pos, rotationAngle, crop);
+    }
+
+    private static PointF PivotRecalc(PointF pos, float angle, PointF anchor, SizeF scaledPinSize, SizeF scaledPlanSize)
+    {
+        float W = scaledPinSize.Width;
+        float H = scaledPinSize.Height;
+
+        // Pivot im Bild
+        float px = anchor.X * W;
+        float py = anchor.Y * H;
+
+        // Mitte des Bildes
+        float cx = W / 2;
+        float cy = H / 2;
+
+        // Offset Pivot → Mitte
+        float dx = px - cx;
+        float dy = py - cy;
+
+        // Rotierter Offset
+        float rad = angle * (float)Math.PI / 180;
+        float dxRot = dx * MathF.Cos(rad) - dy * MathF.Sin(rad);
+        float dyRot = dx * MathF.Sin(rad) + dy * MathF.Cos(rad);
+
+        // Final Position
+        float finalX = pos.X * scaledPlanSize.Width - cx - dxRot + cx - (W / 2);
+        float finalY = pos.Y * scaledPlanSize.Height - cy - dyRot + cy - (H / 2);
+
+        return new PointF(finalX, finalY);
     }
 
     private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, OXML.Drawing.SourceRectangle crop)
