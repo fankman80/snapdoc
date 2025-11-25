@@ -570,9 +570,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             plan.Pins ??= [];
             plan.Pins[currentDateTime] = newPinData;
 
-            // nur bei Standard-Pins die PinCount erhöhen
-            if (customName == null)
-                GlobalJson.Data.Plans[PlanId].PinCount += 1;
+            GlobalJson.Data.Plans[PlanId].PinCount += 1;
 
             GlobalJson.SaveToFile(); // initial speichern
 

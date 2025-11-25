@@ -49,7 +49,6 @@ public partial class PinList : ContentPage
                 foreach (var pin in plan.Value.Pins.Values)
                 {
                     var pinIcon = pin.PinIcon;
-
                     if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
                     {
                         var fullPath = Path.Combine(Settings.DataDirectory, pinIcon);
