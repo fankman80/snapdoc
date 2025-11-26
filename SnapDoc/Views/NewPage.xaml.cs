@@ -228,7 +228,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                                 img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
                         if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
-                            img.Rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinRotation;
+                            img.Rotation = PlanContainer.Rotation * -1;
                     }
                 }
             }
@@ -333,7 +333,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             activePin = smallImage;
             PinSizeSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale * 100;
-            PinRotateSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation;
+            PinRotateSlider.Value = Helper.ToSliderValue(GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation);
             planContainer.IsPanningEnabled = false;
             DrawBtn.IsVisible = false;
             SetPinBtn.IsVisible = false;
@@ -1075,14 +1075,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
             rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.Value = 0;
+
+            activePin.Rotation = planContainer.Rotation * -1;
         }
         else
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = -planContainer.Rotation;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
             rotateModeLabel.Text = Settings.PinEditRotateModeLock;
             rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
-            PinRotateSlider.Value = NormalizeRotation(-planContainer.Rotation);
+            PinRotateSlider.Value = Helper.ToSliderValue(-planContainer.Rotation);
         }
 
         // save data to file
@@ -1092,13 +1094,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
-        activePin.Rotation = sliderValue;
+
         degreesLabel.Text = $"{sliderValue}°";
+        activePin.Rotation = Helper.SliderToRotation(sliderValue);
     }
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
+        var sliderValue = Helper.SliderToRotation(Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0));
 
         if (sliderValue != 0)
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
@@ -1147,14 +1150,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
-    }
-
-    private static double NormalizeRotation(double rot)
-    {
-        rot %= 360;
-        if (rot < 0)
-            rot += 360;
-        return rot;
     }
 
     private async void OnEditClicked(object sender, EventArgs e)

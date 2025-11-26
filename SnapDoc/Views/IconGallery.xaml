@@ -86,7 +86,6 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-
     <ContentPage.ToolbarItems>
         <ToolbarItem x:Name="btnRows"
                      IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Table_rows}}"

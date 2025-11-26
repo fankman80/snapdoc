@@ -326,4 +326,33 @@ public class Helper
 
         return (e, n);
     }
+
+    // Hilfsmethoden für Rotation
+    public static double SliderToRotation(double sliderValue)
+    {
+        if (sliderValue >= 0)
+            return sliderValue;
+
+        return 360 + sliderValue;
+    }
+
+    public static double ToSliderValue(double angle)
+    {
+        angle = angle % 360;
+        if (angle < 0)
+            angle += 360;
+
+        if (angle > 180)
+            return angle - 360;
+
+        return angle;
+    }
+
+    public static double NormalizeAngle360(double angle)
+    {
+        angle %= 360;
+        if (angle < 0)
+            angle += 360;
+        return angle;
+    }
 }
