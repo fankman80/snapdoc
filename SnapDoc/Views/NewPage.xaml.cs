@@ -1082,7 +1082,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = -planContainer.Rotation;
             rotateModeLabel.Text = Settings.PinEditRotateModeLock;
             rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
-            PinRotateSlider.Value = -planContainer.Rotation;
+            PinRotateSlider.Value = NormalizeRotation(-planContainer.Rotation);
         }
 
         // save data to file
@@ -1147,6 +1147,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
+    }
+
+    private static double NormalizeRotation(double rot)
+    {
+        rot %= 360;
+        if (rot < 0)
+            rot += 360;
+        return rot;
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
