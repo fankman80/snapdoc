@@ -3,8 +3,34 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
-    public const string PinEditSliderRotateLock = "Autom. ausrichten ▶ ziehen";
-    public const string PinEditSliderRotateUnlock = "Autom. Ausrichtung aktiviert";
+    public const string PinEditSizeModeLock = "◀ Modus: Grösse fixiert";
+    public const string PinEditSizeModeUnlock = "◀ Modus: Automatische Grössenanpassung";
+    public const string PinEditRotateModeLock = "◀ Modus: Drehung fixiert";
+    public const string PinEditRotateModeUnlock = "◀ Modus: Automatische Drehung";
+    public static readonly FontImageSource PinEditRotateModeLockIcon = new()
+    {
+        FontFamily = "MaterialOutlined",
+        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock_reset,
+        Size = 40
+    };
+    public static readonly FontImageSource PinEditRotateModeUnlockIcon = new()
+    {
+        FontFamily = "MaterialOutlined",
+        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Rotate_auto,
+        Size = 40
+    };
+    public static readonly FontImageSource PinEditSizeModeLockIcon = new()
+    {
+        FontFamily = "MaterialOutlined",
+        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock,
+        Size = 40
+    };
+    public static readonly FontImageSource PinEditSizeModeUnlockIcon = new()
+    {
+        FontFamily = "MaterialOutlined",
+        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Pan_zoom,
+        Size = 40
+    };
 
 #if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");

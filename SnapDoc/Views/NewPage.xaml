@@ -111,12 +111,14 @@
                     </Slider>
                 </Border>
 
-                <Image Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Pan_zoom}}"
-                       HeightRequest="38"
-                       Margin="36,0,0,113"
-                       ZIndex="10001"
-                       HorizontalOptions="Start"
-                       VerticalOptions="End"/>
+                <Button x:Name="sizeModeBtn"
+                        BackgroundColor="Transparent"
+                        HeightRequest="60"
+                        Margin="20,0,0,100"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="OnSizeModeClicked"/>
                 <Label x:Name="percentLabel"
                        Text="100%"
                        FontSize="16"
@@ -125,20 +127,27 @@
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,118"
-                       ZIndex="10001"/>
-                <Border
-                    BackgroundColor="{DynamicResource Primary}"
-                    StrokeThickness="0"
-                    HeightRequest="60"
-                    VerticalOptions="End"
-                    Margin="20,0,20,20"
-                    ZIndex="10000">
+                       ZIndex="10001"/>                
+                <Label x:Name="sizeModeLabel"
+                       FontSize="12"
+                       VerticalTextAlignment="Start"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="90,0,0,104"
+                       ZIndex="10001"/>                
+                <Border BackgroundColor="{DynamicResource Primary}"
+                        StrokeThickness="0"
+                        HeightRequest="60"
+                        VerticalOptions="End"
+                        Margin="20,0,20,20"
+                        ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
                     <Slider x:Name="PinRotateSlider"
-                            Minimum="0"
-                            Maximum="360"
+                            Minimum="-180"
+                            Maximum="180"
                             Value="0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
@@ -154,30 +163,14 @@
                         </Slider.Margin>
                     </Slider>
                 </Border>
-                <Image x:Name="rotateLockIcon"
-                       IsVisible="True"
-                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_auto}}"
-                       HeightRequest="38"
-                       Margin="36,0,0,33"
-                       ZIndex="10001"
-                       HorizontalOptions="Start"
-                       VerticalOptions="End"/>
-                <Image x:Name="rotateAutoIcon"
-                       IsVisible="False"
-                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
-                       HeightRequest="38"
-                       Margin="36,0,0,33"
-                       ZIndex="10001"
-                       HorizontalOptions="Start"
-                       VerticalOptions="End"/>
-                <Image x:Name="rotateModeIcon"
-                       IsVisible="True"
-                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=40, Glyph={x:Static m:MaterialOutlined.Lock}}"
-                       HeightRequest="38"
-                       Margin="0,0,36,33"
-                       ZIndex="10001"
-                       HorizontalOptions="End"
-                       VerticalOptions="End"/>
+                <Button x:Name="rotateModeBtn"
+                        BackgroundColor="Transparent"
+                        HeightRequest="60"
+                        Margin="20,0,0,20"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="OnRotateModeClicked"/>
                 <Label x:Name="degreesLabel"
                        IsVisible="True"
                        Text="0°"
@@ -188,14 +181,13 @@
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,38"
                        ZIndex="10001"/>
-                <Label x:Name="degreesModeLabel"
-                       Text=""
+                <Label x:Name="rotateModeLabel"
                        FontSize="12"
-                       VerticalTextAlignment="End"
-                       HorizontalOptions="End"
+                       VerticalTextAlignment="Start"
+                       HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="0,0,90,24"
+                       Margin="90,0,0,24"
                        ZIndex="10001"/>
 
                 <Button InputTransparent="False"
@@ -271,7 +263,7 @@
                     AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional">
                     <Button x:Name="DrawPolyBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Pentagon}}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             BorderColor="Red"

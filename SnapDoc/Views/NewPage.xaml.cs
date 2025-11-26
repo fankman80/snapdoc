@@ -341,19 +341,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
             {
-                rotateLockIcon.IsVisible = false;
-                rotateAutoIcon.IsVisible = true;
-                rotateModeIcon.IsVisible = false;
-                degreesLabel.IsVisible = true;
-                degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
+                rotateModeLabel.Text = Settings.PinEditRotateModeLock;
+                rotateModeBtn.ImageSource = Settings.PinEditRotateModeLockIcon;
             }
             else
             {
-                rotateLockIcon.IsVisible = true;
-                rotateAutoIcon.IsVisible = false;
-                rotateModeIcon.IsVisible = true;
-                degreesLabel.IsVisible = false;
-                degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
+                rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
+                rotateModeBtn.ImageSource = Settings.PinEditRotateModeUnlockIcon;
+            }
+            if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
+            {
+                sizeModeLabel.Text = Settings.PinEditSizeModeLock;
+                sizeModeBtn.ImageSource = Settings.PinEditSizeModeLockIcon;
+            }
+            else
+            {
+                sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
+                sizeModeBtn.ImageSource = Settings.PinEditSizeModeUnlockIcon;
             }
         };
 
@@ -866,7 +870,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private float Distance(SKPoint a, SKPoint b)
+    private static float Distance(SKPoint a, SKPoint b)
     {
         var dx = a.X - b.X;
         var dy = a.Y - b.Y;
@@ -1043,44 +1047,66 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         activePin = null;
     }
 
+    private void OnSizeModeClicked(object sender, EventArgs e)
+    {
+        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = false;
+            sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
+            sizeModeBtn.ImageSource = Settings.PinEditSizeModeUnlockIcon;
+        }
+        else
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = true;
+            sizeModeLabel.Text = Settings.PinEditSizeModeLock;
+            sizeModeBtn.ImageSource = Settings.PinEditSizeModeLockIcon;
+        }
+
+        // save data to file
+        GlobalJson.SaveToFile();
+    }
+
+    private void OnRotateModeClicked(object sender, EventArgs e)
+    {
+        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
+            rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
+            rotateModeBtn.ImageSource = Settings.PinEditRotateModeUnlockIcon;
+            PinRotateSlider.Value = 0;
+        }
+        else
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = -planContainer.Rotation;
+            rotateModeLabel.Text = Settings.PinEditRotateModeLock;
+            rotateModeBtn.ImageSource = Settings.PinEditRotateModeLockIcon;
+            PinRotateSlider.Value = -planContainer.Rotation;
+        }
+
+        // save data to file
+        GlobalJson.SaveToFile();
+    }
+
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
         activePin.Rotation = sliderValue;
         degreesLabel.Text = $"{sliderValue}°";
-
-        if (sliderValue == 360)
-        {
-            rotateLockIcon.IsVisible = true;
-            rotateAutoIcon.IsVisible = false;
-            rotateModeIcon.IsVisible = true;
-            degreesLabel.IsVisible = false;
-            degreesModeLabel.Text = Settings.PinEditSliderRotateUnlock;
-        }
-        else
-        {
-            rotateLockIcon.IsVisible = false;
-            rotateAutoIcon.IsVisible = true;
-            rotateModeIcon.IsVisible = false;
-            degreesLabel.IsVisible = true;
-            degreesModeLabel.Text = Settings.PinEditSliderRotateLock;
-        }
     }
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
-        if (sliderValue == 360)
-        {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
-        }
-        else
-        {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
+        if (sliderValue != 0)
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
-        }
+
+        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
+        else
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
 
         // save data to file
         GlobalJson.SaveToFile();
