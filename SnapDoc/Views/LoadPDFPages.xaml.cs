@@ -24,6 +24,7 @@ public partial class LoadPDFPages : ContentPage
 
         LoadPreviewPDFImages();
     }
+
     protected override bool OnBackButtonPressed()
     {
         // Zurück-Taste ignorieren
@@ -253,21 +254,20 @@ public partial class LoadPDFPages : ContentPage
             DynamicSpan = 0;
             btnRows.IconImageSource = new FontImageSource
             {
+                Glyph = Settings.TableGridIcon,
                 FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
-                Color = (Color)Application.Current.Resources["PrimaryDark"]};
-            btnRows.Text = "Kacheln";
-
+                Color = (Color)Application.Current.Resources["PrimaryDark"]
+            };
         }
         else
         {
             DynamicSpan = 1;
             btnRows.IconImageSource = new FontImageSource
             {
+                Glyph = Settings.TableRowIcon,
                 FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
-                Color = (Color)Application.Current.Resources["PrimaryDark"]};
-            btnRows.Text = "Liste";
+                Color = (Color)Application.Current.Resources["PrimaryDark"]
+            };
         }
         UpdateSpan();
     }

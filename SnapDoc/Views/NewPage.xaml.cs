@@ -342,22 +342,22 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
             {
                 rotateModeLabel.Text = Settings.PinEditRotateModeLock;
-                rotateModeBtn.ImageSource = Settings.PinEditRotateModeLockIcon;
+                rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             }
             else
             {
                 rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
-                rotateModeBtn.ImageSource = Settings.PinEditRotateModeUnlockIcon;
+                rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             }
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
             {
                 sizeModeLabel.Text = Settings.PinEditSizeModeLock;
-                sizeModeBtn.ImageSource = Settings.PinEditSizeModeLockIcon;
+                sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
             }
             else
             {
                 sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
-                sizeModeBtn.ImageSource = Settings.PinEditSizeModeUnlockIcon;
+                sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
             }
         };
 
@@ -1053,13 +1053,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = false;
             sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
-            sizeModeBtn.ImageSource = Settings.PinEditSizeModeUnlockIcon;
+            sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
         else
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = true;
             sizeModeLabel.Text = Settings.PinEditSizeModeLock;
-            sizeModeBtn.ImageSource = Settings.PinEditSizeModeLockIcon;
+            sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
 
         // save data to file
@@ -1073,7 +1073,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
             rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
-            rotateModeBtn.ImageSource = Settings.PinEditRotateModeUnlockIcon;
+            rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.Value = 0;
         }
         else
@@ -1081,7 +1081,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = -planContainer.Rotation;
             rotateModeLabel.Text = Settings.PinEditRotateModeLock;
-            rotateModeBtn.ImageSource = Settings.PinEditRotateModeLockIcon;
+            rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             PinRotateSlider.Value = -planContainer.Rotation;
         }
 

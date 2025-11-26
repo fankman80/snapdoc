@@ -1,12 +1,13 @@
 ﻿#nullable disable
 
-using SnapDoc.Messages;
-using SnapDoc.Services;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SkiaSharp;
+using SnapDoc.Messages;
+using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using UraniumUI.Icons.MaterialSymbols;
 
 namespace SnapDoc.Views;
 
@@ -278,23 +279,17 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private void UpdateButton()
     {
         if (SettingsService.Instance.IconGalleryGridView)
-        {
-            btnRows.IconImageSource = new FontImageSource
-            {
+            btnRows.IconImageSource = new FontImageSource {
+                Glyph = Settings.TableGridIcon,
                 FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on,
-                Color = (Color)Application.Current.Resources["PrimaryDark"]};
-            btnRows.Text = "Kacheln";
-        }
+                Color = (Color)Application.Current.Resources["PrimaryDark"]
+            };
         else
-        {
-            btnRows.IconImageSource = new FontImageSource
-            {
+            btnRows.IconImageSource = new FontImageSource {
+                Glyph = Settings.TableRowIcon,
                 FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows,
-                Color = (Color)Application.Current.Resources["PrimaryDark"]};
-            btnRows.Text = "Liste";
-        }
+                Color = (Color)Application.Current.Resources["PrimaryDark"]
+            };
     }
 
     private void OnSizeChanged(object sender, EventArgs e)

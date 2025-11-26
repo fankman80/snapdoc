@@ -100,16 +100,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
             }).ToObservableCollection();
             
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
-        {
-            GeoLocButton.ImageSource = new FontImageSource
-            {
-                FontFamily = "MaterialOutlined",
-                Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote,
-                Color = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["PrimaryText"]
-                        : (Color)Application.Current.Resources["PrimaryDarkText"]
-            };
-        }
+            GeoLocButton.Text = Settings.GPSButtonOnIcon;
+        else
+            GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
 
         var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
         if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))

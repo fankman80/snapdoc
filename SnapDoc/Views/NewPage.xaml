@@ -112,13 +112,19 @@
                 </Border>
 
                 <Button x:Name="sizeModeBtn"
-                        BackgroundColor="Transparent"
-                        HeightRequest="60"
-                        Margin="20,0,0,100"
+                        FontSize="38"
+                        FontFamily="MaterialOutlined"
+                        TextColor="{DynamicResource Primary}"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        CornerRadius="30"
+                        Padding="0"
+                        Margin="25,0,0,105"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
-                        Clicked="OnSizeModeClicked"/>
+                        Clicked="OnSizeModeClicked"/>                
                 <Label x:Name="percentLabel"
                        Text="100%"
                        FontSize="16"
@@ -164,9 +170,15 @@
                     </Slider>
                 </Border>
                 <Button x:Name="rotateModeBtn"
-                        BackgroundColor="Transparent"
-                        HeightRequest="60"
-                        Margin="20,0,0,20"
+                        FontSize="38"
+                        FontFamily="MaterialOutlined"
+                        TextColor="{DynamicResource Primary}"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        CornerRadius="30"
+                        Padding="0"
+                        Margin="25,0,0,25"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"

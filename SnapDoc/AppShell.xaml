@@ -182,21 +182,21 @@
                        FontSize="11"
                        HorizontalTextAlignment="Center"/>
 
-                <Button x:DataType="model:GeolocationViewModel"
-                        BindingContext="{x:Static model:GeolocationViewModel.Instance}"
-                        Grid.Row="1" Grid.Column="0"
-                        FontSize="12"
-                        Text="GPS"      
-                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        BackgroundColor="Transparent"
-                        Command="{Binding ToggleGPSCommand}">
-                    <Button.ImageSource>
-                        <FontImageSource Glyph="{Binding GPSButtonIcon.Glyph}"
-                         FontFamily="MaterialOutlined"
-                         Size="26"
-                         Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
-                    </Button.ImageSource>
-                </Button>
+                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="0">
+                    <Button x:DataType="model:GeolocationViewModel"
+                            Text="{Binding GPSButtonIcon}"
+                            FontFamily="MaterialOutlined"
+                            FontSize="26"                               
+                            BindingContext="{x:Static model:GeolocationViewModel.Instance}"
+                            Grid.Row="1" Grid.Column="0"
+                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            BackgroundColor="Transparent"
+                            Command="{Binding ToggleGPSCommand}">
+                    </Button>
+                    <Label Text="GPS"
+                           VerticalTextAlignment="Center"
+                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                </HorizontalStackLayout>
 
                 <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="0" Margin="6">
                     <Label Text="SnapDoc"
@@ -279,14 +279,14 @@
                                    TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}" />
 
                             <Label Grid.Column="3"
-                                  Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                  HeightRequest="44"
-                                  WidthRequest="32"
-                                  VerticalTextAlignment="Center"
-                                  HorizontalTextAlignment="Center"
-                                  FontFamily="MaterialOutlined"
-                                  FontSize="18"
-                                  TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}">
+                                   Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                   HeightRequest="44"
+                                   WidthRequest="32"
+                                   VerticalTextAlignment="Center"
+                                   HorizontalTextAlignment="Center"
+                                   FontFamily="MaterialOutlined"
+                                   FontSize="18"
+                                   TextColor="{Binding AllowExport, Converter={StaticResource AllowExportToColorConverter}}">
                                 <Label.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnAllowExportClicked"/>
                                 </Label.GestureRecognizers>

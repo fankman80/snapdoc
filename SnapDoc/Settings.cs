@@ -3,37 +3,22 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
-    public const string PinEditSizeModeLock = "◀ Modus: Grösse fixiert";
-    public const string PinEditSizeModeUnlock = "◀ Modus: Automatische Grössenanpassung";
-    public const string PinEditRotateModeLock = "◀ Modus: Drehung fixiert";
-    public const string PinEditRotateModeUnlock = "◀ Modus: Automatische Drehung";
-    public static readonly FontImageSource PinEditRotateModeLockIcon = new()
-    {
-        FontFamily = "MaterialOutlined",
-        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock_reset,
-        Size = 40
-    };
-    public static readonly FontImageSource PinEditRotateModeUnlockIcon = new()
-    {
-        FontFamily = "MaterialOutlined",
-        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Rotate_auto,
-        Size = 40
-    };
-    public static readonly FontImageSource PinEditSizeModeLockIcon = new()
-    {
-        FontFamily = "MaterialOutlined",
-        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock,
-        Size = 40
-    };
-    public static readonly FontImageSource PinEditSizeModeUnlockIcon = new()
-    {
-        FontFamily = "MaterialOutlined",
-        Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Pan_zoom,
-        Size = 40
-    };
+    public const string PinEditSizeModeLock = "◀ Grösse fixiert";
+    public const string PinEditSizeModeUnlock = "◀ Automatische Grössenanpassung";
+    public const string PinEditRotateModeLock = "◀ Drehung fixiert";
+    public const string PinEditRotateModeUnlock = "◀ Automatische Drehung";
+    public const string PinEditRotateModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock_reset;
+    public const string PinEditRotateModeUnlockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Rotate_auto;
+    public const string PinEditSizeModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock;
+    public const string PinEditSizeModeUnlockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Zoom_out_map;
+    public const string GPSButtonOffIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off;
+    public const string GPSButtonOnIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote;
+    public const string GPSButtonUnknownIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Not_listed_location;
+    public const string TableRowIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows;
+    public const string TableGridIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on;
 
 #if WINDOWS
-    private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");
+private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");
 #endif
 #if ANDROID
     private static string dataDirectory = Path.Combine(FileSystem.AppDataDirectory, "SnapDoc");

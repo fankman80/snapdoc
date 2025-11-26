@@ -10,22 +10,14 @@ public partial class GeolocationViewModel : BaseViewModel
     private readonly string notAvailable = "not available";
     private CancellationTokenSource cts;
     private bool _isGpsActive = false;
-    private FontImageSource _gpsButtonIcon;
+    private string _gpsButtonIcon;
     private Location _lastKnownLocation;
 
     public GeolocationViewModel()
     {
         ToggleGPSCommand = new Command(async () => await OnToggleGPSAsync());
 
-        GPSButtonIcon = new FontImageSource
-        {
-            FontFamily = "MaterialOutlined",
-            Glyph = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off,
-            Color = Application.Current.RequestedTheme == AppTheme.Dark
-                    ? (Color)Application.Current.Resources["PrimaryDark"]
-                    : (Color)Application.Current.Resources["Primary"],
-            Size = 24
-        };
+        GPSButtonIcon = Settings.GPSButtonOffIcon;
     }
 
     public bool IsGpsActive
@@ -37,7 +29,7 @@ public partial class GeolocationViewModel : BaseViewModel
     public static bool IsListening => Geolocation.IsListeningForeground;
     public static bool IsNotListening => !IsListening;
 
-    public FontImageSource GPSButtonIcon
+    public String GPSButtonIcon
     {
         get => _gpsButtonIcon;
         set => SetProperty(ref _gpsButtonIcon, value);
@@ -122,17 +114,7 @@ public partial class GeolocationViewModel : BaseViewModel
 
     private void UpdateGPSButtonIcon()
     {
-        GPSButtonIcon = new FontImageSource
-        {
-            FontFamily = "MaterialOutlined",
-            Glyph = IsGpsActive
-                ? UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote
-                : UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off,
-            Color = Application.Current.RequestedTheme == AppTheme.Dark
-                    ? (Color)Application.Current.Resources["PrimaryDark"]
-                    : (Color)Application.Current.Resources["Primary"],
-            Size = 24
-        };
+        GPSButtonIcon = IsGpsActive ? Settings.GPSButtonOnIcon : Settings.GPSButtonOffIcon;
     }
 
     private async static Task<bool> IsSystemGpsEnabledAsync()
