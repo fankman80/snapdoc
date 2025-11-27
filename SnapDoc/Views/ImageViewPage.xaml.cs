@@ -18,7 +18,7 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId;
     public string PinIcon;
     public string ImgSource;
-    private int lineWidth = 15;
+    private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isCleared = false;
@@ -159,90 +159,6 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
-    //private async void PenSettingsClicked(object sender, EventArgs e)
-    //{
-    //    var popup = new PopupColorPicker(lineWidth, selectedColor);
-    //    var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
-
-    //    if (result.Result != null)
-    //    {
-    //        selectedColor = Color.FromArgb(result.Result.PenColorHex);
-    //        lineWidth = result.Result.PenWidth;
-    //    }
-
-    //    DrawView.LineColor = selectedColor;
-    //    DrawView.LineWidth = lineWidth;
-    //}
-
-    //private void DrawClicked(object sender, EventArgs e)
-    //{
-    //    imageViewContainer.IsPanningEnabled = false;
-    //    imageViewContainer.IsPinchingEnabled = false;
-    //    DrawView.WidthRequest = ImageViewContainer.Width;
-    //    DrawView.HeightRequest = ImageViewContainer.Height;
-
-    //    DrawView.InputTransparent = false;
-
-    //    PenSettingsBtn.IsVisible = true;
-    //    CheckBtn.IsVisible = true;
-    //    EraseBtn.IsVisible = true;
-    //    DrawBtn.IsVisible = false;
-    //}
-
-    //private void CheckClicked(object sender, EventArgs e)
-    //{
-    //    imageViewContainer.IsPanningEnabled = true;
-    //    imageViewContainer.IsPinchingEnabled = true;
-
-    //    DrawView.InputTransparent = true;
-
-    //    PenSettingsBtn.IsVisible = false;
-    //    CheckBtn.IsVisible = false;
-    //    EraseBtn.IsVisible = false;
-    //    DrawBtn.IsVisible = true;
-
-    //    var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
-    //    var origPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-    //    var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, ImgSource);
-
-    //    if (isCleared)
-    //    {
-    //        if (File.Exists(imgPath))
-    //            File.Delete(imgPath);
-    //        File.Move(origPath, imgPath);
-            
-    //        Thumbnail.Generate(imgPath, thumbPath);
-    //        GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
-    //    }
-    //    else
-    //    {
-    //        if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
-    //            Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
-
-    //        if (!File.Exists(origPath))
-    //            File.Copy(imgPath, origPath);
-    //        _ = SaveDrawingView(imgPath);
-
-    //        GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
-            
-    //        // save data to file
-    //        GlobalJson.SaveToFile();
-    //    }
-    //}
-
-    //private void EraseClicked(object sender, EventArgs e)
-    //{
-    //    DrawView.Clear();
-    //    if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
-    //    {
-    //        isCleared = true;
-    //        ImageView.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            
-    //        // save data to file
-    //        GlobalJson.SaveToFile();
-    //    }
-    //}
-
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
@@ -272,7 +188,12 @@ public partial class ImageViewPage : IQueryAttributable
             else
             {
                 // delete original image
-                string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+                string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+                if (File.Exists(file))
+                    File.Delete(file);
+
+                // delete overlay image
+                file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
                 if (File.Exists(file))
                     File.Delete(file);
 
@@ -291,64 +212,6 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    private async Task SaveDrawingView(string filePath)
-    {
-        // Eckpunkte für Boundingbox
-        var boundingBox = new DrawingLine
-        {
-            Points = [
-                new(0, 0),
-                new((float)DrawView.Width, 0),
-                new((float)DrawView.Width, (float)DrawView.Height),
-                new(0, (float)DrawView.Height),
-                new(0, 0)],
-            LineColor = Colors.Black,
-            LineWidth = 1f
-        };
-        DrawView.Lines.Add(boundingBox);
-
-        await using var imageStream = await DrawingViewService.GetImageStream(
-                                            ImageLineOptions.FullCanvas(DrawView.Lines,
-                                            new Size(DrawView.Width, DrawView.Height),
-                                            Brush.Transparent,
-                                            new Size(DrawView.Width, DrawView.Height)));
-
-        if (imageStream != null)
-        {
-            using var dwStream = new SKManagedStream(imageStream);
-            using var dwBitmap = SKBitmap.Decode(dwStream);
-            using var origStream = File.OpenRead(filePath);
-            using var origBitmap = SKBitmap.Decode(origStream);
-            var destRect = new SKRect(0, 0, (int)origBitmap.Width, (int)origBitmap.Height);
-
-            using var mergedBitmap = new SKBitmap((int)(origBitmap.Width), (int)(origBitmap.Height));
-            using var canvas = new SKCanvas(mergedBitmap);
-            canvas.DrawBitmap(origBitmap, new SKPoint(0,0));
-            canvas.DrawBitmap(dwBitmap, destRect);
-
-            canvas.Flush();
-
-            if (File.Exists(filePath))
-                File.Delete(filePath);
-
-            // Speichere das Bild als JPEG
-            var image = SKImage.FromBitmap(mergedBitmap);
-            var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
-            var newStream = File.Create(filePath);
-            data.SaveTo(newStream);
-            newStream.Close();
-
-            var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, ImgSource);
-            Thumbnail.Generate(filePath, thumbPath);
-        }
-    }
-
-
-
-
-
-    //////////////////////////////////
-    ///
     private void DrawingClicked(object sender, EventArgs e)
     {
         DrawBtn.IsVisible = false;
@@ -422,6 +285,8 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void OnStartInteraction(SKPoint p)
     {
+        isCleared = false;
+
         if (drawMode == "poly")
         {
             var poly = combinedDrawable.PolyDrawable;
@@ -527,22 +392,44 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
-        photoContainer.IsPanningEnabled = false;
-        drawMode = "free";
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 2;
-        combinedDrawable.PolyDrawable.DisplayHandles = false;
-        drawingView.InvalidateSurface();
+        if (drawMode == "poly" || drawMode == "none")
+        {
+            photoContainer.IsPanningEnabled = false;
+            drawMode = "free";
+            DrawPolyBtn.BorderWidth = 0;
+            DrawFreeBtn.BorderWidth = 2;
+            combinedDrawable.PolyDrawable.DisplayHandles = false;
+            drawingView.InvalidateSurface();
+        }
+        else
+        {
+            photoContainer.IsPanningEnabled = true;
+            drawMode = "none";
+            DrawFreeBtn.BorderWidth = 0;
+            combinedDrawable.PolyDrawable.DisplayHandles = false;
+            drawingView.InvalidateSurface();
+        }
     }
 
     private void DrawPolyClicked(object sender, EventArgs e)
     {
-        photoContainer.IsPanningEnabled = false;
-        drawMode = "poly";
-        DrawPolyBtn.BorderWidth = 2;
-        DrawFreeBtn.BorderWidth = 0;
-        combinedDrawable.PolyDrawable.DisplayHandles = true;
-        drawingView.InvalidateSurface();
+        if (drawMode == "free" || drawMode == "none")
+        {
+            photoContainer.IsPanningEnabled = false;
+            drawMode = "poly";
+            DrawPolyBtn.BorderWidth = 2;
+            DrawFreeBtn.BorderWidth = 0;
+            combinedDrawable.PolyDrawable.DisplayHandles = true;
+            drawingView.InvalidateSurface();
+        }
+        else
+        {
+            photoContainer.IsPanningEnabled = true;
+            drawMode = "none";
+            DrawPolyBtn.BorderWidth = 0;
+            combinedDrawable.PolyDrawable.DisplayHandles = false;
+            drawingView.InvalidateSurface();
+        }
     }
 
     private void EraseClicked(object sender, EventArgs e)
@@ -553,7 +440,7 @@ public partial class ImageViewPage : IQueryAttributable
         combinedDrawable.Reset();   // setzt beide Modi zurück
         drawingView.InvalidateSurface();  // neu rendern
 
-                if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
             PhotoImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
@@ -565,7 +452,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView != null && !IsDrawingViewEmpty())
+        if (drawingView != null && !IsDrawingViewEmpty() || isCleared == true)
         {
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
             var origPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
@@ -588,7 +475,7 @@ public partial class ImageViewPage : IQueryAttributable
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
                 await SavePhotoWithOverlay(
-                        photoPath: origPath,
+                        photoPath: imgPath,
                         outputPath: imgPath
                     );
 
@@ -602,6 +489,9 @@ public partial class ImageViewPage : IQueryAttributable
         }
         RemoveDrawingView();
 
+        drawMode = "none";
+        DrawPolyBtn.BorderWidth = 0;
+        DrawFreeBtn.BorderWidth = 0;
         photoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
@@ -669,35 +559,6 @@ public partial class ImageViewPage : IQueryAttributable
         using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
         using var output = File.Create(outputPath);
         data.SaveTo(output);
-    }
-
-    public async Task SaveCanvasAsPngBAK(string filePath)
-    {
-        int width = (int)drawingView.CanvasSize.Width;
-        int height = (int)drawingView.CanvasSize.Height;
-        var info = new SKImageInfo(width, height);
-
-        using var surface = SKSurface.Create(info);
-        var canvas = surface.Canvas;
-
-        // Hintergrund leeren
-        canvas.Clear(SKColors.Transparent);
-
-        // Griffe ausblenden
-        combinedDrawable.PolyDrawable.DisplayHandles = false;
-        combinedDrawable?.Draw(canvas);
-        combinedDrawable.PolyDrawable.DisplayHandles = true;
-
-        canvas.Flush();
-
-        // Gesamtes Bild exportieren
-        using var fullImage = surface.Snapshot();
-        using var fullBitmap = SKBitmap.FromImage(fullImage);
-        using var image = SKImage.FromBitmap(fullBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-
-        using var stream = File.OpenWrite(filePath);
-        data.SaveTo(stream);
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)

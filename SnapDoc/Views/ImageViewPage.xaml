@@ -57,46 +57,19 @@
             DoubleTapped="OnDoubleTapped"
             ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="PhotoContainer"
-				Scale="{Binding Scale}"
-				TranslationX="{Binding TranslationX}"
-				TranslationY="{Binding TranslationY}"
-                AnchorX="{Binding AnchorX}"
-				AnchorY="{Binding AnchorY}">
+				            Scale="{Binding Scale}"
+				            TranslationX="{Binding TranslationX}"
+				            TranslationY="{Binding TranslationY}"
+                            AnchorX="{Binding AnchorX}"
+				            AnchorY="{Binding AnchorY}">
                 <Image x:Name="PhotoImage"/>
-                <mct:DrawingView
-                    x:Name="DrawView"
-                    BackgroundColor="Transparent"
-                    IsMultiLineModeEnabled="True"
-                    DrawingLineStarted="OnDrawing"
-                    LineColor="#FF0000"/>
+                <mct:DrawingView x:Name="DrawView"
+                                 BackgroundColor="Transparent"
+                                 IsMultiLineModeEnabled="True"
+                                 DrawingLineStarted="OnDrawing"
+                                 LineColor="#FF0000"/>
             </AbsoluteLayout>
         </mr:ContentView>
-
-        <Button x:Name="EraseBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
-                BackgroundColor="{DynamicResource Primary}"
-                TextColor="{DynamicResource PrimaryDarkText}"
-                Margin="0,0,180,20"
-                WidthRequest="60"
-                HeightRequest="60"
-                CornerRadius="30"
-                IsVisible="False"
-                ZIndex="10000"
-                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
-                Clicked="EraseClicked"/>
-
-        <Button x:Name="PenSettingsBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
-                BackgroundColor="{DynamicResource Primary}"
-                TextColor="{DynamicResource PrimaryDarkText}"
-                Margin="0,0,100,20"
-                WidthRequest="60"
-                HeightRequest="60"
-                CornerRadius="30"
-                IsVisible="False"
-                ZIndex="10000"
-                AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
-                Clicked="PenSettingsClicked"/>
 
         <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
                 BackgroundColor="{DynamicResource Primary}"
@@ -105,7 +78,6 @@
                 WidthRequest="60"
                 HeightRequest="60"
                 CornerRadius="30"
-                IsVisible="True"
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
@@ -116,11 +88,10 @@
                         AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                         AbsoluteLayout.LayoutFlags="PositionProportional"
                         ZIndex="10000">
-            <VerticalStackLayout
-                    Margin="20,0,0,20"
-                    Spacing="16"
-                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional">
+            <VerticalStackLayout Spacing="16"
+                                 Margin="20,0,0,20"
+                                 AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                 AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
@@ -144,11 +115,10 @@
                         Clicked="CheckClicked"/>
 
             </VerticalStackLayout>
-            <HorizontalStackLayout
-                    Margin="96,0,0,20"
-                    Spacing="16"
-                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional">
+            <HorizontalStackLayout Spacing="16"
+                                   Margin="96,0,0,20"
+                                   AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                   AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button x:Name="DrawPolyBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
                         BackgroundColor="{DynamicResource Primary}"
