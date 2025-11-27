@@ -12,8 +12,10 @@
              x:Name="ThisPage">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Label x:DataType="views:ImageViewPage"
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   x:DataType="views:ImageViewPage"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -21,20 +23,28 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"
+                    Text="{x:Static m:MaterialOutlined.Fit_screen}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="ImageFit"/>
+            <Button Grid.Column="2"
+                    Text="{x:Static m:MaterialOutlined.Delete}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnDeleteButtonClicked"/>
+        </Grid>
     </Shell.TitleView>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem
-            x:Name ="btnImageFit"
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Fit_screen}}"
-            Text="Grösse anpassen"
-            Clicked="ImageFit"/>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}"
-            Text="Delete"
-            Clicked="OnDeleteButtonClicked"/>
-    </ContentPage.ToolbarItems>
 
     <AbsoluteLayout IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
         <mr:ContentView

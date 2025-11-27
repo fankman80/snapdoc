@@ -15,8 +15,10 @@
                 Title="swisstopo Karte">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Label x:DataType="views:MapView"
+        <Grid ColumnDefinitions="*,Auto"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   x:DataType="views:MapView"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -24,14 +26,18 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"
+                    Text="{x:Static m:MaterialOutlined.Moved_location}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="KmlExportClicked"/>
+        </Grid>
     </Shell.TitleView>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Moved_location}}"
-                     Text="KML exportieren"
-                     Clicked="KmlExportClicked"/>
-    </ContentPage.ToolbarItems>
 
     <Grid>
         <AbsoluteLayout>

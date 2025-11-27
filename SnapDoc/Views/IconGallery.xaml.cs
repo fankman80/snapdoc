@@ -24,7 +24,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     public IconGallery()
     {
         InitializeComponent(); 
-
+        UpdateButton();
         BindingContext = this;
     }
 
@@ -37,7 +37,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         CategoryPicker.SelectedIndexChanged += OnCategoryPickerChanged;
 
         SetIconGridView();
-        UpdateButton();
+
         UpdateSpan();
         IconSorting(OrderDirection);
     }
@@ -279,17 +279,9 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private void UpdateButton()
     {
         if (SettingsService.Instance.IconGalleryGridView)
-            btnRows.IconImageSource = new FontImageSource {
-                Glyph = Settings.TableGridIcon,
-                FontFamily = "MaterialOutlined",
-                Color = (Color)Application.Current.Resources["PrimaryDark"]
-            };
+            btnRows.Text = Settings.TableGridIcon;
         else
-            btnRows.IconImageSource = new FontImageSource {
-                Glyph = Settings.TableRowIcon,
-                FontFamily = "MaterialOutlined",
-                Color = (Color)Application.Current.Resources["PrimaryDark"]
-            };
+            btnRows.Text = Settings.TableRowIcon;
     }
 
     private void OnSizeChanged(object sender, EventArgs e)

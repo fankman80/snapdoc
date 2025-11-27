@@ -13,28 +13,32 @@
              Title="PDF Seiten hinzufügen">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+        <Grid ColumnDefinitions="*,Auto"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"
+                    x:Name="btnRows"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnChangeRowsClicked"/>            
+        </Grid>
     </Shell.TitleView>
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem
-            x:Name="btnRows"
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Grid_on}}"
-            Text="Kacheln"
-            Clicked="OnChangeRowsClicked"/>
-    </ContentPage.ToolbarItems>
 
     <Grid>
         <Grid>

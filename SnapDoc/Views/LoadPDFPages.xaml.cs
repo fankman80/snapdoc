@@ -15,6 +15,7 @@ public partial class LoadPDFPages : ContentPage
     {
         InitializeComponent();
         SizeChanged += OnSizeChanged;
+        btnRows.Text = Settings.TableGridIcon;
         BindingContext = this;
     }
 
@@ -252,22 +253,12 @@ public partial class LoadPDFPages : ContentPage
         if (DynamicSpan == 1)
         {
             DynamicSpan = 0;
-            btnRows.IconImageSource = new FontImageSource
-            {
-                Glyph = Settings.TableGridIcon,
-                FontFamily = "MaterialOutlined",
-                Color = (Color)Application.Current.Resources["PrimaryDark"]
-            };
+            btnRows.Text = Settings.TableGridIcon;
         }
         else
         {
             DynamicSpan = 1;
-            btnRows.IconImageSource = new FontImageSource
-            {
-                Glyph = Settings.TableRowIcon,
-                FontFamily = "MaterialOutlined",
-                Color = (Color)Application.Current.Resources["PrimaryDark"]
-            };
+            btnRows.Text = Settings.TableRowIcon;
         }
         UpdateSpan();
     }

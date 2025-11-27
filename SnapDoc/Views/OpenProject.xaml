@@ -12,8 +12,10 @@
              Title="Projektliste">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Label x:DataType="views:OpenProject"
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   x:DataType="views:OpenProject"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -21,19 +23,28 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"                    
+                    Text="{x:Static m:MaterialOutlined.Folder_zip}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnUploadClicked"/>
+            <Button Grid.Column="2"                    
+                    Text="{x:Static m:MaterialOutlined.Add}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnNewClicked"/>
+        </Grid>
     </Shell.TitleView>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
-            Text="Importieren"
-            Clicked="OnUploadClicked"/>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Add}}"
-            Text="Neu"
-            Clicked="OnNewClicked"/>
-    </ContentPage.ToolbarItems>
 
     <Grid>
         <Grid Margin="10">

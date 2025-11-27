@@ -16,19 +16,43 @@
              Title="Pin bearbeiten">
 
     <Shell.TitleView>
-        <Entry Text="{Binding Pin.PinName}"
-               TextColor="{DynamicResource PrimaryDark}"
-               Placeholder="(Titel eingeben...)"
-               PlaceholderColor="{DynamicResource PrimaryDark}"
-               IsSpellCheckEnabled="False"
-               Background="Transparent"
-               BackgroundColor="Transparent"
-               FontSize="18"
-               VerticalOptions="Center"
-               Completed="OnTitleChanged"
-               Unfocused="OnTitleChanged"/>
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              VerticalOptions="Center">
+            <Entry Grid.Column="0" 
+                   Text="{Binding Pin.PinName}"                
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Placeholder="(Titel eingeben...)"
+                   PlaceholderColor="{DynamicResource PrimaryDark}"
+                   IsSpellCheckEnabled="False"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   Completed="OnTitleChanged"
+                   Unfocused="OnTitleChanged"/>
+            <Button Grid.Column="1"
+                    Text="{x:Static m:MaterialOutlined.Move_down}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnMoveClick"/>
+            <Button Grid.Column="2"
+                    Text="{x:Static m:MaterialOutlined.Delete}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnDeleteClick"/>            
+        </Grid>
     </Shell.TitleView>
-    
+
     <ContentPage.Resources>
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
@@ -36,17 +60,6 @@
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
-
-    <ContentPage.ToolbarItems>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Move_down}}" 
-            Text="Auf anderen Plan verschieben"
-            Clicked="OnMoveClick"/>
-        <ToolbarItem
-            IconImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDark}, Glyph={x:Static m:MaterialOutlined.Delete}}"
-            Text="Pin löschen"
-            Clicked="OnDeleteClick"/>
-    </ContentPage.ToolbarItems>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>
