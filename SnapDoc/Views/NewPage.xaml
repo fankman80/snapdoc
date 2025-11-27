@@ -9,11 +9,11 @@
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:local="clr-namespace:SnapDoc"
+             BackgroundColor="DimGrey"             
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              x:Class="SnapDoc.Views.NewPage"
              x:DataType="views:NewPage"
              x:Name="ThisPage"
-             BackgroundColor="DimGrey"
              Title="{Binding PageTitle}">
 
     <Shell.TitleView>

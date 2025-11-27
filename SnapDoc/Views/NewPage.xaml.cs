@@ -60,9 +60,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public NewPage(string planId)
     {
         InitializeComponent();
-        BindingContext = new TransformViewModel();
+        planContainer = new TransformViewModel();
+        BindingContext = planContainer;
+
         PlanId = planId;
-        planContainer = (TransformViewModel)PlanContainer.BindingContext;
+
         PageTitle = GlobalJson.Data.Plans[PlanId].Name;
 
         // Überwache Sichtbarkeit des SetPin-Buttons
@@ -695,6 +697,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else
             return GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
     }
+
     private void DrawingClicked(object sender, EventArgs e)
     {
         SetPinBtn.IsVisible = false;
@@ -905,14 +908,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         combinedDrawable.Reset();   // setzt beide Modi zurück
         drawingView.InvalidateSurface();  // neu rendern
         ResetBoundingBox();
-    }
-
-    private void OnFillOpacitySliderChanged(object sender, EventArgs e)
-    {
-        var sliderValue = (float)((Microsoft.Maui.Controls.Slider)sender).Value;
-        selectedOpacity = 1f / 255f * sliderValue;
-        combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-        drawingView.InvalidateSurface();  // neu rendern
     }
 
     private async void CheckClicked(object sender, EventArgs e)
