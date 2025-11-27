@@ -3,10 +3,13 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
+    // Text-Strings
     public const string PinEditSizeModeLock = "◀ Grösse fixiert";
     public const string PinEditSizeModeUnlock = "◀ Automatische Grössenanpassung";
     public const string PinEditRotateModeLock = "◀ Drehung fixiert";
     public const string PinEditRotateModeUnlock = "◀ Automatische Drehung";
+
+    // Icondefinitionen
     public const string PinEditRotateModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock_reset;
     public const string PinEditRotateModeUnlockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Rotate_auto;
     public const string PinEditSizeModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock;

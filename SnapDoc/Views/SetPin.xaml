@@ -39,6 +39,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="auf einen anderen Plan kopieren/verschieben"
                     Clicked="OnMoveClick"/>
             <Button Grid.Column="2"
                     Text="{x:Static m:MaterialOutlined.Delete}"
@@ -49,6 +50,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="Plan löschen"                    
                     Clicked="OnDeleteClick"/>            
         </Grid>
     </Shell.TitleView>
@@ -205,7 +207,8 @@
                         Padding="0"
                         MinimumWidthRequest="50"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        ToolTipProperties.Text="Pin auf swisstopo-Karte anzeigen"                        
                         Clicked="ShowGeoLoc"/>
                 <Button Grid.Column="2"
                         Padding="0"
@@ -213,13 +216,14 @@
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
+                        ToolTipProperties.Text="Foto aufnehmen"                        
                         Clicked="TakePhoto"/>
                 <Button Grid.Column="3"
                         Padding="0"
                         Text="OK"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                       
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         Clicked="OnOkayClick"/>
             </Grid>
         </VerticalStackLayout>

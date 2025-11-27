@@ -35,6 +35,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="KML-Datei exportieren"                    
                     Clicked="KmlExportClicked"/>
         </Grid>
     </Shell.TitleView>

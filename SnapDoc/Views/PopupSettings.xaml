@@ -243,8 +243,8 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
-                            <Button Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                                    Text="Dokument"
+                            <Button Grid.Column="0" Grid.Row="0"
+                                    Text="Projekt"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                    
                                     Clicked="OpenDocEditor"/>
@@ -263,12 +263,14 @@
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                                    ToolTipProperties.Text="Programmeinstellungen zurücksetzen"
                                     Clicked="ResetPrg"/>
                             <Button Grid.Column="1" Grid.Row="2"
                                     Padding="0"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                                    ToolTipProperties.Text="Icondefinitionen zurücksetzen"
                                     Clicked="ResetIcon"/> 
                             
                         </Grid>

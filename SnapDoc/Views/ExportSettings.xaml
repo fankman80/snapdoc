@@ -59,18 +59,21 @@
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Help}}"
-                                Clicked="OnHelpClicked"/>                           
+                                ToolTipProperties.Text="zeige Platzhalter-Definitionen"                                
+                                Clicked="OnHelpClicked"/>
                         <Button Grid.Column="2"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
+                                ToolTipProperties.Text="neue Vorlage hochladen"                                
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="3"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                ToolTipProperties.Text="Vorlage löschen"                                
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
                     <VerticalStackLayout Spacing="0">

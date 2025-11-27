@@ -32,9 +32,10 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="Projektdatei importieren"
                     Clicked="OnUploadClicked"/>
             <Button Grid.Column="2"                    
-                    Text="{x:Static m:MaterialOutlined.Add}"
+                    Text="{x:Static m:MaterialOutlined.Add_home}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -42,6 +43,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="neues Projekt erstellen"
                     Clicked="OnNewClicked"/>
         </Grid>
     </Shell.TitleView>

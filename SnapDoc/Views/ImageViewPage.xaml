@@ -32,6 +32,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="Foto auf Fenster grösse zoomen"
                     Clicked="ImageFit"/>
             <Button Grid.Column="2"
                     Text="{x:Static m:MaterialOutlined.Delete}"
@@ -42,6 +43,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
+                    ToolTipProperties.Text="Foto löschen"
                     Clicked="OnDeleteButtonClicked"/>
         </Grid>
     </Shell.TitleView>
