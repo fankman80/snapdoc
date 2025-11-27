@@ -63,7 +63,7 @@ public partial class Pin : ObservableObject
     [ObservableProperty] private string _pinIcon;
     [ObservableProperty] private bool _isCustomPin;
     [ObservableProperty] private bool _isAllowExport;
-    [ObservableProperty] private bool _isLocked;
+    [ObservableProperty] private bool _isLockPosition;
     [ObservableProperty] private bool _isLockRotate;
     [ObservableProperty] private bool _isLockAutoScale;
 }

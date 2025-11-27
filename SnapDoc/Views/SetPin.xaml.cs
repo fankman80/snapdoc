@@ -116,7 +116,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             PinIcon = file,
             IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
             IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
-            IsLocked = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked
+            IsLockPosition = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockPosition
         };
 
         priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
@@ -223,7 +223,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Pin.PinName;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = Pin.PinDesc;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = Pin.PinLocation;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLocked = Pin.IsLocked;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockPosition = Pin.IsLockPosition;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport = Pin.IsAllowExport;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedIndex;
 

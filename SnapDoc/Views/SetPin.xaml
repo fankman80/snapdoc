@@ -134,7 +134,7 @@
                 </Grid>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
                     <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding Pin.IsLocked}"
+                                     IsToggled="{Binding Pin.IsLockPosition}"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
                                      BorderColorOff ="Transparent"

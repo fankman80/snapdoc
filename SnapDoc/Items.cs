@@ -144,14 +144,14 @@ namespace SnapDoc
             }
         }
 
-        public bool IsLocked
+        public bool IsLockPosition
         {
-            get => _pin.IsLocked;
+            get => _pin.IsLockPosition;
             set
             {
-                if (_pin.IsLocked != value)
+                if (_pin.IsLockPosition != value)
                 {
-                    _pin.IsLocked = value;
+                    _pin.IsLockPosition = value;
                     OnPropertyChanged();
                 }
             }

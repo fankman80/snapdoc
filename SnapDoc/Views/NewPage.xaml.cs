@@ -294,14 +294,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         smallImage.Down += (s, e) =>
         {
-            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true) return;
+            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLockPosition == true) return;
             planContainer.IsPanningEnabled = false;
             activePin = smallImage;
         };
 
         smallImage.Up += (s, e) =>
         {
-            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLocked == true) return;
+            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLockPosition == true) return;
             planContainer.IsPanningEnabled = true;
             activePin = null;
 
@@ -550,7 +550,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             Pos = _pos,
             Anchor = _anchorPoint,
             Size = _size,
-            IsLocked = _isPosLocked,
+            IsLockPosition = _isPosLocked,
             IsLockRotate = _isRotationLocked,
             IsLockAutoScale = _isAutoScaleLocked,
             IsCustomPin = _isCustomPin,
