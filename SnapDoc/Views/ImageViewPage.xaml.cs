@@ -50,6 +50,7 @@ public partial class ImageViewPage : IQueryAttributable
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        
         PhotoContainer.SizeChanged -= ImageViewContainer_SizeChanged;
     }
 
