@@ -69,11 +69,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Überwache Sichtbarkeit des SetPin-Buttons
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        SettingsService.Instance.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == nameof(SettingsService.PinPlaceMode))
-                SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        };
+        SettingsService.Instance.PropertyChanged += SettingsService_PropertyChanged;
     }
 
     protected override bool OnBackButtonPressed()
@@ -166,7 +162,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         base.OnDisappearing();
 
+        SettingsService.Instance.PropertyChanged -= SettingsService_PropertyChanged;
         PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
+        PlanContainer.PropertyChanged -= PlanContainer_PropertyChanged;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -189,6 +187,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (image == null && isFirstLoad == false)
                 AddPin(pinId, GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon);
         }
+    }
+
+    private void SettingsService_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsService.PinPlaceMode))
+            SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
     }
 
     private Task AddPlan()
@@ -959,6 +963,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         if (drawingView != null && absoluteLayout != null)
             absoluteLayout.Children.Remove(drawingView);
+        
+        drawingView.PaintSurface -= OnPaintSurface;
+        drawingView.Touch -= OnTouch;
     }
 
     private bool IsDrawingViewEmpty()
