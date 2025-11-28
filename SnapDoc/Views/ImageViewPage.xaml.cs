@@ -47,6 +47,12 @@ public partial class ImageViewPage : IQueryAttributable
         DrawView.LineWidth = lineWidth;
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        PhotoContainer.SizeChanged -= ImageViewContainer_SizeChanged;
+    }
+
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
         if (hasFittedImage)
