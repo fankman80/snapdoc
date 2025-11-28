@@ -73,7 +73,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-
         SizeChanged -= OnSizeChanged;;
     }
 
