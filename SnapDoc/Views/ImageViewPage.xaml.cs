@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using CommunityToolkit.Maui.Core.Views;
 using CommunityToolkit.Maui.Extensions;
 using Microsoft.Maui.Layouts;
 using MR.Gestures;
@@ -17,7 +16,7 @@ public partial class ImageViewPage : IQueryAttributable
     public string PlanId;
     public string PinId;
     public string PinIcon;
-    public string ImgSource;
+    public string ImgSource = null;
     private int lineWidth = 6;
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
@@ -69,7 +68,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (query.TryGetValue("imgSource", out object value4))
         {
-            ImgSource = value4 as string;
+            ImgSource ??= value4 as string;
 
             string imgPath;
             if (ImgSource == "showTitle")
@@ -96,6 +95,13 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPinching(object sender, PinchEventArgs e)
     {
         photoContainer.IsPanningEnabled = false;
+
+        if (combinedDrawable != null && drawMode == "poly")
+        {
+            combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
+            combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
+            drawingView.InvalidateSurface();
+        }
     }
 
     public void OnPinched(object sender, PinchEventArgs e)
@@ -142,6 +148,13 @@ public partial class ImageViewPage : IQueryAttributable
         photoContainer.TranslationX -= deltaTranslationX;
         photoContainer.TranslationY -= deltaTranslationY;
         photoContainer.Scale = targetScale;
+
+        if (combinedDrawable != null && drawMode == "poly")
+        {
+            combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
+            combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
+            drawingView.InvalidateSurface();
+        }
     }
 
     private void ImageFit(object sender, EventArgs e)
@@ -234,8 +247,8 @@ public partial class ImageViewPage : IQueryAttributable
                 PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 LineThickness = (float)(lineWidth * density),
-                HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density),
-                PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density)
+                HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale),
+                PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale)
             },
         };
 
@@ -464,6 +477,13 @@ public partial class ImageViewPage : IQueryAttributable
                     File.Delete(imgPath);
                 File.Move(origPath, imgPath);
 
+                //  
+                imgPath = await FileRenamer(imgPath, true);
+                thumbPath = await FileRenamer(thumbPath, true);
+                _ = await FileRenamer(origPath, true);
+
+                PhotoImage.Source = imgPath;
+
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
@@ -474,16 +494,31 @@ public partial class ImageViewPage : IQueryAttributable
 
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
-                await SavePhotoWithOverlay(
-                        photoPath: imgPath,
-                        outputPath: imgPath
-                    );
+                await SavePhotoWithOverlay(imgPath, imgPath);
+
+                // Dateinamen anpassen
+                imgPath = await FileRenamer(imgPath);
+                thumbPath = await FileRenamer(thumbPath);
+                _ = await FileRenamer(origPath);
 
                 PhotoImage.Source = imgPath;
 
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
+
+
+            // ändere Json-Key
+            var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
+            if (fotos.TryGetValue(ImgSource, out var value))
+            {
+                fotos.Remove(ImgSource);
+                fotos[Path.GetFileName(imgPath)] = value;
+                ImgSource = Path.GetFileName(imgPath);
+            }
+
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
+
             // save data to file
             GlobalJson.SaveToFile();
         }
@@ -495,6 +530,34 @@ public partial class ImageViewPage : IQueryAttributable
         photoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
+    }
+
+    private static async Task<string> FileRenamer(string filePath, bool isReset = false)
+    {
+        var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
+        var onlyPath = Path.GetDirectoryName(filePath);
+        string newFileName;
+        var extension = Path.GetExtension(filePath);
+
+        if (name.Length == 3)
+            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{1}" + extension;
+        else if (isReset)
+            newFileName = $"{name[0]}_{name[1]}_{name[2]}" + extension;
+        else
+        {
+            if (Int32.TryParse(name[3], out int i))
+                newFileName = $"{name[0]}_{name[1]}_{name[2]}_{i + 1}" + extension;
+            else
+                newFileName = $"{name[0]}_{name[1]}_{name[2]}_{0}" + extension;
+        }
+
+        if (File.Exists(Path.Combine(filePath)))
+        {
+            File.Move(filePath, Path.Combine(onlyPath, newFileName));
+            return Path.Combine(onlyPath, newFileName);
+        }
+        else
+            return filePath;
     }
 
     private void RemoveDrawingView()
