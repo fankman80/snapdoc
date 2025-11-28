@@ -21,6 +21,7 @@ public partial class ImageViewPage : IQueryAttributable
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isCleared = false;
+    private bool hasFittedImage = false;
     private readonly TransformViewModel photoContainer;
 
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
@@ -48,11 +49,18 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
-        if (PhotoContainer.Width > 0 && PhotoContainer.Height > 0)
+        if (hasFittedImage)
+            return;
+
+        if (PhotoContainer.Width < 10 || PhotoContainer.Height < 10)
+            return;
+
+        hasFittedImage = true;
+
+        Dispatcher.Dispatch(() =>
         {
-            PhotoContainer.SizeChanged -= ImageViewContainer_SizeChanged;
             ImageFit(null, null);
-        }
+        });
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -478,9 +486,9 @@ public partial class ImageViewPage : IQueryAttributable
                 File.Move(origPath, imgPath);
 
                 //  
-                imgPath = await FileRenamer(imgPath, true);
-                thumbPath = await FileRenamer(thumbPath, true);
-                _ = await FileRenamer(origPath, true);
+                imgPath = await FileRenamer(imgPath);
+                thumbPath = await FileRenamer(thumbPath);
+                _ = await FileRenamer(origPath);
 
                 PhotoImage.Source = imgPath;
 
@@ -507,7 +515,6 @@ public partial class ImageViewPage : IQueryAttributable
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
 
-
             // ändere Json-Key
             var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
             if (fotos.TryGetValue(ImgSource, out var value))
@@ -532,7 +539,7 @@ public partial class ImageViewPage : IQueryAttributable
         DrawBtn.IsVisible = true;
     }
 
-    private static async Task<string> FileRenamer(string filePath, bool isReset = false)
+    private static async Task<string> FileRenamer(string filePath)
     {
         var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
         var onlyPath = Path.GetDirectoryName(filePath);
@@ -541,8 +548,6 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (name.Length == 3)
             newFileName = $"{name[0]}_{name[1]}_{name[2]}_{1}" + extension;
-        else if (isReset)
-            newFileName = $"{name[0]}_{name[1]}_{name[2]}" + extension;
         else
         {
             if (Int32.TryParse(name[3], out int i))
@@ -603,6 +608,11 @@ public partial class ImageViewPage : IQueryAttributable
 
             overlayCanvas.Clear(SKColors.Transparent);
 
+            float scaleX = width / drawingView.CanvasSize.Width;
+            float scaleY = height / drawingView.CanvasSize.Height;
+
+            overlayCanvas.Scale(scaleX, scaleY);
+
             combinedDrawable.PolyDrawable.DisplayHandles = false;
             combinedDrawable?.Draw(overlayCanvas);
             combinedDrawable.PolyDrawable.DisplayHandles = true;
@@ -610,7 +620,6 @@ public partial class ImageViewPage : IQueryAttributable
             overlayCanvas.Flush();
 
             using var overlayImage = overlaySurface.Snapshot();
-
             var destRect = new SKRect(0, 0, width, height);
 
             canvas.DrawImage(overlayImage, destRect);
@@ -623,6 +632,7 @@ public partial class ImageViewPage : IQueryAttributable
         using var output = File.Create(outputPath);
         data.SaveTo(output);
     }
+
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
