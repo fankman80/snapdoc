@@ -162,6 +162,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         appShell?.HighlightCurrentPlan(this.PlanId);
     }
 
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("pinZoom", out object value1))
