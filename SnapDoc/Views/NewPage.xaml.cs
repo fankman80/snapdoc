@@ -195,6 +195,27 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
     }
 
+    private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == "Scale" || e.PropertyName == "Rotation")
+        {
+            var scale = 1 / PlanContainer.Scale;
+            var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
+            foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
+            {
+                if (img.AutomationId != null)
+                {
+                    if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockAutoScale)
+                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
+                            img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
+
+                    if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
+                        img.Rotation = PlanContainer.Rotation * -1;
+                }
+            }
+        }
+    }
+
     private Task AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
@@ -225,27 +246,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-
-        PlanContainer.PropertyChanged += (s, e) =>
-        {
-            if (e.PropertyName == "Scale" || e.PropertyName == "Rotation")
-            {
-                var scale = 1 / PlanContainer.Scale;
-                var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
-                foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
-                {
-                    if (img.AutomationId != null)
-                    {
-                        if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockAutoScale)
-                            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
-                                img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
-
-                        if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
-                            img.Rotation = PlanContainer.Rotation * -1;
-                    }
-                }
-            }
-        };
+        
+        PlanContainer.PropertyChanged += PlanContainer_PropertyChanged;
+        
         return Task.CompletedTask;
     }
 
