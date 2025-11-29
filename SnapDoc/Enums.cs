@@ -12,6 +12,6 @@ namespace SnapDoc
         Delete,
         Zip,
         Folder,
-        Greyscale
+        Grayscale
     }
 }
