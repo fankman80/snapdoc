@@ -227,10 +227,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
-
-        photoContainer.Rotation = 0;
-        SettingsService.Instance.IsPlanRotateLocked = true;
-
+        
         combinedDrawable = new CombinedDrawable
         {
             FreeDrawable = new InteractiveFreehandDrawable
