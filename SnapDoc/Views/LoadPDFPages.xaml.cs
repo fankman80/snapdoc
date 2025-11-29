@@ -14,7 +14,7 @@ public partial class LoadPDFPages : ContentPage
     public LoadPDFPages()
     {
         InitializeComponent();
-        SizeChanged += OnSizeChanged;
+
         btnRows.Text = Settings.TableGridIcon;
         BindingContext = this;
     }
@@ -23,7 +23,15 @@ public partial class LoadPDFPages : ContentPage
     {
         base.OnAppearing();
 
+        SizeChanged += OnSizeChanged;
         LoadPreviewPDFImages();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        SizeChanged -= OnSizeChanged;
     }
 
     protected override bool OnBackButtonPressed()

@@ -39,9 +39,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinChangedRegistered = false;
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
-
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
-    private string drawMode = "none"; // "free" oder "poly"
+    enum DrawMode { None, Free, Poly }
+    private DrawMode drawMode = DrawMode.None;
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
     private int? activeIndex = null;
@@ -199,7 +199,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (e.PropertyName == "Scale" || e.PropertyName == "Rotation")
         {
-            var scale = 1 / PlanContainer.Scale;
+            var scale = 1.0 / PlanContainer.Scale;
             var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
             foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
             {
@@ -459,8 +459,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (isPinSet)
         {
-            var x = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X * densityX;
-            var y = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
+            var x = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X * densityX;
+            var y = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
 
             SetPin(new Point(x, y));
 
@@ -474,8 +474,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
-            var x = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X  * densityX;
-            var y = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
+            var x = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * e.Center.X  * densityX;
+            var y = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * e.Center.Y * densityY;
 
             SetPin(new Point(x, y));
         }
@@ -490,7 +490,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnPanning(object sender, PanEventArgs e)
     {
-        var scaleSpeed = 1 / PlanContainer.Scale;
+        var scaleSpeed = 1.0 / PlanContainer.Scale;
         double angle = PlanContainer.Rotation * Math.PI / 180.0;
         double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
         double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
@@ -505,8 +505,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.TranslationX += deltaX * scaleSpeed;
             planContainer.TranslationY += deltaY * scaleSpeed;
 
-            planContainer.AnchorX = 1 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
-            planContainer.AnchorY = 1 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
+            planContainer.AnchorX = 1.0 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
+            planContainer.AnchorY = 1.0 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
         }
     }
 
@@ -661,8 +661,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;  // Moderate Zoom-Änderung
 
         double targetScale = PlanContainer.Scale * zoomFactor; ;
-        double newAnchorX = 1 / PlanContainer.Width * (mousePos.X - planContainer.TranslationX);
-        double newAnchorY = 1 / PlanContainer.Height * (mousePos.Y - planContainer.TranslationY);
+        double newAnchorX = 1.0 / PlanContainer.Width * (mousePos.X - planContainer.TranslationX);
+        double newAnchorY = 1.0 / PlanContainer.Height * (mousePos.Y - planContainer.TranslationY);
         double deltaTranslationX = (PlanContainer.Width * (newAnchorX - planContainer.AnchorX)) * (targetScale / planContainer.Scale - 1);
         double deltaTranslationY = (PlanContainer.Height * (newAnchorY - planContainer.AnchorY)) * (targetScale / planContainer.Scale - 1);
 
@@ -693,15 +693,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.Scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
         planContainer.TranslationX = (this.Width - PlanContainer.Width) / 2;
         planContainer.TranslationY = (this.Height - PlanContainer.Height) / 2;
-        planContainer.AnchorX = 1 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
-        planContainer.AnchorY = 1 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
+        planContainer.AnchorX = 1.0 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
+        planContainer.AnchorY = 1.0 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
     }
 
     private double PinScaling(string pinId)
     {
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin != true)
         {
-            var scale = 1 / planContainer.Scale;
+            var scale = 1.0 / planContainer.Scale;
             var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
             if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
                 return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
@@ -791,7 +791,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnStartInteraction(SKPoint p)
     {
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             var poly = combinedDrawable.PolyDrawable;
 
@@ -828,7 +828,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 drawingView.InvalidateSurface();
             }
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             var free = combinedDrawable.FreeDrawable;
             free.StartStroke();
@@ -839,7 +839,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnDragInteraction(SKPoint p)
     {
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             if (activeIndex != null)
             {
@@ -847,7 +847,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 drawingView.InvalidateSurface();
             }
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             combinedDrawable.FreeDrawable.AddPoint(p);
             drawingView.InvalidateSurface();
@@ -856,11 +856,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnEndInteraction()
     {
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             activeIndex = null;
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             combinedDrawable.FreeDrawable.EndStroke();
         }
@@ -897,7 +897,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawFreeClicked(object sender, EventArgs e)
     {
         planContainer.IsPanningEnabled = false;
-        drawMode = "free";
+        drawMode = DrawMode.Free;
         DrawPolyBtn.BorderWidth = 0;
         DrawFreeBtn.BorderWidth = 2;
         combinedDrawable.PolyDrawable.DisplayHandles = false;
@@ -907,7 +907,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawPolyClicked(object sender, EventArgs e)
     {
         planContainer.IsPanningEnabled = false;
-        drawMode = "poly";
+        drawMode = DrawMode.Poly;
         DrawPolyBtn.BorderWidth = 2;
         DrawFreeBtn.BorderWidth = 0;
         combinedDrawable.PolyDrawable.DisplayHandles = true;
@@ -916,7 +916,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        drawMode = "none";
+        drawMode = DrawMode.None;
         DrawPolyBtn.BorderWidth = 0;
         DrawFreeBtn.BorderWidth = 0;
         combinedDrawable.Reset();   // setzt beide Modi zurück
@@ -941,8 +941,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cx = imageRect.MidX / density * densityX;
             var cy = imageRect.MidY / density * densityY;
 
-            var ox =  1 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale);
-            var oy = 1 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale);
+            var ox =  1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale);
+            var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale);
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
@@ -952,6 +952,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                    new SKColor(selectedColor.ToUint()),
                    1 / planContainer.Scale / density * densityX);
         }
+
+        drawingView.PaintSurface -= OnPaintSurface;
+        drawingView.Touch -= OnTouch;
         RemoveDrawingView();
 
         planContainer.IsPanningEnabled = true;
@@ -1137,7 +1140,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
-        var scale = 1 / PlanContainer.Scale;
+        var scale = 1.0 / PlanContainer.Scale;
         var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
 
         if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
@@ -1347,7 +1350,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnPlanContainerReady(object sender, EventArgs e)
     {
-        PlanContainer.SizeChanged -= OnPlanContainerReady; // einmalig
+        PlanContainer.SizeChanged -= OnPlanContainerReady;
         ImageFit(null, null);
     }
 

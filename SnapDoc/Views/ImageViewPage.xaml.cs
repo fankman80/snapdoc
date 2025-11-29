@@ -23,9 +23,9 @@ public partial class ImageViewPage : IQueryAttributable
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private readonly TransformViewModel photoContainer;
-
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
-    private string drawMode = "none"; // "free" oder "poly"
+    enum DrawMode { None, Free, Poly }
+    private DrawMode drawMode = DrawMode.None;
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
     private int? activeIndex = null;
@@ -35,6 +35,7 @@ public partial class ImageViewPage : IQueryAttributable
     public ImageViewPage()
     {
         InitializeComponent();
+        PhotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         photoContainer = new TransformViewModel();
         BindingContext = photoContainer;
     }
@@ -43,15 +44,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         base.OnAppearing();
 
-        PhotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         DrawView.LineWidth = lineWidth;
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        
-        PhotoContainer.SizeChanged -= ImageViewContainer_SizeChanged;
     }
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
@@ -305,7 +298,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         isCleared = false;
 
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             var poly = combinedDrawable.PolyDrawable;
 
@@ -342,7 +335,7 @@ public partial class ImageViewPage : IQueryAttributable
                 drawingView.InvalidateSurface();
             }
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             var free = combinedDrawable.FreeDrawable;
             free.StartStroke();
@@ -353,7 +346,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void OnDragInteraction(SKPoint p)
     {
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             if (activeIndex != null)
             {
@@ -361,7 +354,7 @@ public partial class ImageViewPage : IQueryAttributable
                 drawingView.InvalidateSurface();
             }
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             combinedDrawable.FreeDrawable.AddPoint(p);
             drawingView.InvalidateSurface();
@@ -370,11 +363,11 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void OnEndInteraction()
     {
-        if (drawMode == "poly")
+        if (drawMode == DrawMode.Poly)
         {
             activeIndex = null;
         }
-        else if (drawMode == "free")
+        else if (drawMode == DrawMode.Free)
         {
             combinedDrawable.FreeDrawable.EndStroke();
         }
@@ -382,7 +375,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void ResizePolyHandles()
     {
-        if (combinedDrawable != null && drawMode == "poly")
+        if (combinedDrawable != null && drawMode == DrawMode.Poly)
         {
             combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
             combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
@@ -420,10 +413,10 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
-        if (drawMode == "poly" || drawMode == "none")
+        if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
         {
             photoContainer.IsPanningEnabled = false;
-            drawMode = "free";
+            drawMode = DrawMode.Free;
             DrawPolyBtn.BorderWidth = 0;
             DrawFreeBtn.BorderWidth = 2;
             combinedDrawable.PolyDrawable.DisplayHandles = false;
@@ -432,7 +425,7 @@ public partial class ImageViewPage : IQueryAttributable
         else
         {
             photoContainer.IsPanningEnabled = true;
-            drawMode = "none";
+            drawMode = DrawMode.None;
             DrawFreeBtn.BorderWidth = 0;
             combinedDrawable.PolyDrawable.DisplayHandles = false;
             drawingView.InvalidateSurface();
@@ -441,10 +434,10 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void DrawPolyClicked(object sender, EventArgs e)
     {
-        if (drawMode == "free" || drawMode == "none")
+        if (drawMode == DrawMode.Free || drawMode == DrawMode.None)
         {
             photoContainer.IsPanningEnabled = false;
-            drawMode = "poly";
+            drawMode = DrawMode.Poly;
             DrawPolyBtn.BorderWidth = 2;
             DrawFreeBtn.BorderWidth = 0;
             combinedDrawable.PolyDrawable.DisplayHandles = true;
@@ -454,7 +447,7 @@ public partial class ImageViewPage : IQueryAttributable
         else
         {
             photoContainer.IsPanningEnabled = true;
-            drawMode = "none";
+            drawMode = DrawMode.None;
             DrawPolyBtn.BorderWidth = 0;
             combinedDrawable.PolyDrawable.DisplayHandles = false;
             drawingView.InvalidateSurface();
@@ -463,7 +456,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        drawMode = "none";
+        drawMode = DrawMode.None;
         DrawPolyBtn.BorderWidth = 0;
         DrawFreeBtn.BorderWidth = 0;
         combinedDrawable.Reset();   // setzt beide Modi zurück
@@ -537,9 +530,12 @@ public partial class ImageViewPage : IQueryAttributable
             // save data to file
             GlobalJson.SaveToFile();
         }
+
+        drawingView.PaintSurface -= OnPaintSurface;
+        drawingView.Touch -= OnTouch;
         RemoveDrawingView();
 
-        drawMode = "none";
+        drawMode = DrawMode.None;
         DrawPolyBtn.BorderWidth = 0;
         DrawFreeBtn.BorderWidth = 0;
         photoContainer.IsPanningEnabled = true;

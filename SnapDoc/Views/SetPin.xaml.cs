@@ -73,7 +73,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         base.OnAppearing();
 
         UpdateSpan();
-        
         SizeChanged += OnSizeChanged;;
     }
 
