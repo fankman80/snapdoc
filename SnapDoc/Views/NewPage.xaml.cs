@@ -40,7 +40,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
-    enum DrawMode { None, Free, Poly }
     private DrawMode drawMode = DrawMode.None;
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
