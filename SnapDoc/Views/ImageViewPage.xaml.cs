@@ -634,7 +634,6 @@ public partial class ImageViewPage : IQueryAttributable
         data.SaveTo(output);
     }
 
-
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(lineWidth, selectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
