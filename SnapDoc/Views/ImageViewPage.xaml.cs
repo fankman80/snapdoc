@@ -24,7 +24,6 @@ public partial class ImageViewPage : IQueryAttributable
     private bool hasFittedImage = false;
     private readonly TransformViewModel photoContainer;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
-    enum DrawMode { None, Free, Poly }
     private DrawMode drawMode = DrawMode.None;
     private CombinedDrawable combinedDrawable;
     private SKCanvasView drawingView;
