@@ -111,12 +111,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         photoContainer.IsPanningEnabled = false;
 
-        if (combinedDrawable != null && drawMode == "poly")
-        {
-            combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
-            combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
-            drawingView.InvalidateSurface();
-        }
+        ResizePolyHandles();
     }
 
     public void OnPinched(object sender, PinchEventArgs e)
@@ -164,12 +159,7 @@ public partial class ImageViewPage : IQueryAttributable
         photoContainer.TranslationY -= deltaTranslationY;
         photoContainer.Scale = targetScale;
 
-        if (combinedDrawable != null && drawMode == "poly")
-        {
-            combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
-            combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
-            drawingView.InvalidateSurface();
-        }
+        ResizePolyHandles();
     }
 
     private void ImageFit(object sender, EventArgs e)
@@ -390,6 +380,16 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private void ResizePolyHandles()
+    {
+        if (combinedDrawable != null && drawMode == "poly")
+        {
+            combinedDrawable.PolyDrawable.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / photoContainer.Scale);
+            combinedDrawable.PolyDrawable.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / photoContainer.Scale);
+            drawingView.InvalidateSurface();
+        }
+    }
+
     private void DeletePointAt(SKPoint p)
     {
         var poly = combinedDrawable.PolyDrawable;
@@ -448,6 +448,7 @@ public partial class ImageViewPage : IQueryAttributable
             DrawPolyBtn.BorderWidth = 2;
             DrawFreeBtn.BorderWidth = 0;
             combinedDrawable.PolyDrawable.DisplayHandles = true;
+            ResizePolyHandles();
             drawingView.InvalidateSurface();
         }
         else
