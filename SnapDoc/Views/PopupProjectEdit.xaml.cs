@@ -29,16 +29,16 @@ public partial class PopupProjectEdit : Popup<string>
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync("delete");
+        await CloseAsync(PopupReturn.Delete);
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        await CloseAsync("zip");
+        await CloseAsync(PopupReturn.Zip);
     }
 
     private async void OnOpenFolderClicked(object sender, EventArgs e)
     {
-        await CloseAsync("folder");
+        await CloseAsync(PopupReturn.Folder);
     }
 }
