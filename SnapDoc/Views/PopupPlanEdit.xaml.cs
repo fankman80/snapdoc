@@ -20,7 +20,7 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
 
         if (gray)
-            grayscaleButtonText.Text = "Farben hinzufügen";
+            grayscaleButtonText.Text = "Farben hinzufÃ¼gen";
         else
             grayscaleButtonText.Text = "Farben entfernen";
 
@@ -39,12 +39,12 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("delete", null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn(PopupReturn.Delete, null, true, PlanRotate, SelectedColor.ToArgbHex()));
     }
 
     private async void OnGrayscaleClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn(PopupReturn.Grayscale, null, true, PlanRotate, SelectedColor.ToArgbHex()));
     }
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
