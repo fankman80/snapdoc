@@ -82,11 +82,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         base.OnAppearing();
 
+        PlanImage.PropertyChanged += PlanImage_PropertyChanged;
+
         if (isFirstLoad)
-        {
             await AddPlan();
-            PlanImage.PropertyChanged += PlanImage_PropertyChanged;
-        }
         else
         {
             if (PinZoom != null)
