@@ -212,7 +212,7 @@ public partial class OpenProject : ContentPage
 
         switch (_result.Result)
         {
-            case "delete":
+            case PopupReturn.Delete:
                 var popup1 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich löschen?", okText: "Löschen", alert: true);
                 var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
                 if (result1.Result == "Ok")
@@ -240,7 +240,7 @@ public partial class OpenProject : ContentPage
                 }
                 break;
 
-            case "zip":
+            case PopupReturn.Zip:
                 var popup2 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich als Zip exportieren?");
                 var result2 = await this.ShowPopupAsync<string>(popup2, Settings.PopupOptions);
                 if (result2.Result == "Ok")
@@ -277,7 +277,7 @@ public partial class OpenProject : ContentPage
                 }
                 break;
 
-            case "folder":
+            case PopupReturn.Folder:
                 var directoryPath = Path.GetDirectoryName((Path.Combine(Settings.DataDirectory,item.FilePath)));
                 if (Directory.Exists(directoryPath))
                 {
