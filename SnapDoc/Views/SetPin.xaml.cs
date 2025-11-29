@@ -66,7 +66,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         InitializeComponent();
         BindingContext = this;
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
+
         UpdateSpan();
+        
         SizeChanged += OnSizeChanged;;
     }
 
