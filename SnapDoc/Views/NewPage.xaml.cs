@@ -164,13 +164,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SettingsService.Instance.PropertyChanged -= SettingsService_PropertyChanged;
         PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
         PlanContainer.PropertyChanged -= PlanContainer_PropertyChanged;
-
-        // Messenger abmelden!
-        WeakReferenceMessenger.Default.Unregister<PinChangedMessage>(this);
-        WeakReferenceMessenger.Default.Unregister<PinDeletedMessage>(this);
-
-        isPinChangedRegistered = false;
-        isPinDeletedRegistered = false;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
