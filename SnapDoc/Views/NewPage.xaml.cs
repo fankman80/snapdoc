@@ -82,6 +82,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         base.OnAppearing();
 
         PlanImage.PropertyChanged += PlanImage_PropertyChanged;
+        PlanContainer.PropertyChanged += PlanContainer_PropertyChanged;
 
         if (isFirstLoad)
             await AddPlan();
@@ -244,8 +245,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-        
-        PlanContainer.PropertyChanged += PlanContainer_PropertyChanged;
         
         return Task.CompletedTask;
     }
