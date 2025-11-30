@@ -39,12 +39,12 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn(PopupReturn.Delete, null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex()));
     }
 
     private async void OnGrayscaleClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn(PopupReturn.Grayscale, null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex()));
     }
 
     private async void OnColorPickerClicked(object sender, EventArgs e)

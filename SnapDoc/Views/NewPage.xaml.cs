@@ -1178,11 +1178,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             switch (result.Result.NameEntry)
             {
-                case PopupReturn.Delete:
+                case "Delete":
                     OnDeleteClick();
                     break;
 
-                case PopupReturn.Grayscale:
+                case "Grayscale":
                     OnGrayscaleClick();
                     break;
 

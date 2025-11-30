@@ -6,12 +6,4 @@ namespace SnapDoc
         Free,
         Poly
     }
-    
-    public enum PopupReturn
-    {
-        Delete,
-        Zip,
-        Folder,
-        Grayscale
-    }
 }
