@@ -12,6 +12,7 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
+using static SnapDoc.Helper;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -36,8 +37,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
-    private bool isPinChangedRegistered = false;
-    private bool isPinDeletedRegistered = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
     private DrawMode drawMode = DrawMode.None;
@@ -50,6 +49,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private float MaxY = float.MinValue;
     private DateTime? lastClickTime = null;
     private SKPoint? lastClickPosition = null;
+    private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
 
 #if WINDOWS
     private bool shiftKeyDown = false;
@@ -69,6 +69,45 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // Überwache Sichtbarkeit des SetPin-Buttons
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         SettingsService.Instance.PropertyChanged += SettingsService_PropertyChanged;
+
+        WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
+        {
+            var pinId = m.Value;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (_pinLookup.TryGetValue(pinId, out var image))
+                {
+                    PlanContainer.Remove(image);
+                    _pinLookup.Remove(pinId);
+                }
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<PinChangedMessage>(this, (r, m) =>
+        {
+            var pinId = m.Value;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (_pinLookup.TryGetValue(pinId, out var image))
+                {
+                    var pinData = GlobalJson.Data.Plans[PlanId].Pins[pinId];
+                    var pinIcon = pinData.PinIcon;
+
+                    if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                        pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
+
+                    image.Source = pinIcon;
+                    image.AnchorX = pinData.Anchor.X;
+                    image.AnchorY = pinData.Anchor.Y;
+                    image.Rotation = pinData.IsLockRotate
+                        ? pinData.PinRotation
+                        : PlanContainer.Rotation * -1 + pinData.PinRotation;
+                    image.Scale = PinScaling(pinId);
+
+                    AdjustImagePosition(image);
+                }
+            });
+        });
     }
 
     protected override bool OnBackButtonPressed()
@@ -93,63 +132,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 ZoomToPin(PinZoom);
                 PinZoom = null;
             }
-        }
-
-        // aktualisiere PinIcons
-        if (!isPinChangedRegistered)
-        {
-            WeakReferenceMessenger.Default.Register<PinChangedMessage>(this, (r, m) =>
-            {
-                var pinId = m.Value;
-
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    var image = PlanContainer.Children
-                        .OfType<MR.Gestures.Image>()
-                        .FirstOrDefault(i => i.AutomationId == pinId);
-
-                    if (image != null)
-                    {
-                        var pinData = GlobalJson.Data.Plans[PlanId].Pins[pinId];
-                        var pinIcon = pinData.PinIcon;
-
-                        if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
-                            pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
-
-                        image.Source = pinIcon;
-                        image.AnchorX = pinData.Anchor.X;
-                        image.AnchorY = pinData.Anchor.Y;
-                        image.Rotation = pinData.IsLockRotate
-                            ? pinData.PinRotation
-                            : PlanContainer.Rotation * -1 + pinData.PinRotation;
-                        image.Scale = PinScaling(pinId);
-
-                        AdjustImagePosition(image);
-                    }
-                });
-            });
-            isPinChangedRegistered = true;
-        }
-
-        // lösche Pins
-        if (!isPinDeletedRegistered)
-        {
-            WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
-            {
-                var pinId = m.Value;
-
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    // remove pin-icon on plan
-                    var image = PlanContainer.Children
-                        .OfType<MR.Gestures.Image>()
-                        .FirstOrDefault(i => i.AutomationId == pinId);
-
-                    if (image != null)
-                        PlanContainer.Remove(image);
-                });
-            });
-            isPinDeletedRegistered = true;
         }
 
         // Setze den Titel der Seite und markiere den Plan im ShellManü
@@ -179,11 +161,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinZoom = value2 as string;
 
             // add pin-icon on plan
-            var image = PlanContainer.Children
-                .OfType<MR.Gestures.Image>()
-                .FirstOrDefault(i => i.AutomationId == pinId);
-
-            if (image == null && isFirstLoad == false)
+            if (!_pinLookup.ContainsKey(pinId) && !isFirstLoad)
                 AddPin(pinId, GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon);
         }
     }
@@ -380,6 +358,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                                            GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Height) / 2);
 
         PlanContainer.Children.Add(smallImage);
+        _pinLookup[pinId] = smallImage;
+
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
     }
 
@@ -525,12 +505,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string _newPin = SettingsService.Instance.DefaultPinIcon;
-        var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
-        if (iconItem == null)
-        {
-            _newPin = Settings.IconData.First().FileName;
-            iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(_newPin, StringComparison.OrdinalIgnoreCase));
-        }
+        var iconItem = IconLookup.Get(_newPin);
 
         pinColor ??= SKColors.Red;
         Point _anchorPoint = iconItem.AnchorPoint;
@@ -1326,10 +1301,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             foreach (var pinId in GlobalJson.Data.Plans[PlanId].Pins.Keys)
             {
-                var delPin = PlanContainer.Children
-                    .OfType<MR.Gestures.Image>()
-                    .FirstOrDefault(i => i.AutomationId == pinId);
-                PlanContainer.Remove(delPin);
+                if (_pinLookup.TryGetValue(pinId, out var delPin))
+                {
+                    PlanContainer.Remove(delPin);
+                    _pinLookup.Remove(pinId);
+                }
 
                 GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos = RotatePin(GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos, angle);
 

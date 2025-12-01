@@ -1,5 +1,7 @@
 ﻿using SnapDoc.Services;
 using UraniumUI;
+using static SnapDoc.Helper;
+
 
 #if ANDROID
 using Android.OS;
@@ -59,6 +61,7 @@ public partial class App : Application
         var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
         Settings.IconData = iconItems;
+        IconLookup.Initialize(Settings.IconData);
 
         // lade Einstellungen
         SettingsService.Instance.LoadSettings();

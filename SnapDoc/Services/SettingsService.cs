@@ -133,6 +133,8 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _maxPdfPixelCount = 30000000;
     [ObservableProperty] private int _mapIconSize = 85;
     [ObservableProperty] private int _mapIcon = 0;
+    [ObservableProperty] private int _mapOverlay1 = 1;
+    [ObservableProperty] private int _mapOverlay2 = 5;
     [ObservableProperty] private int _pinPlaceMode = 0;
     [ObservableProperty] private string _iconSortCrit;
     [ObservableProperty] private string _pinSortCrit;
@@ -237,6 +239,8 @@ public partial class SettingsService : ObservableObject
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
             MapIcon = MapIcon,
+            MapOverlay1 = MapOverlay1,
+            MapOverlay2 = MapOverlay2,
             PinPlaceMode = PinPlaceMode,
             IsPlanRotateLocked = IsPlanRotateLocked,
             MaxPdfPixelCount = MaxPdfPixelCount,
@@ -303,6 +307,8 @@ public partial class SettingsService : ObservableObject
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
             MapIcon = settings.MapIcon;
+            MapOverlay1 = settings.MapOverlay1;
+            MapOverlay2 = settings.MapOverlay2;
             PinPlaceMode = settings.PinPlaceMode;
             IsPlanRotateLocked = settings.IsPlanRotateLocked;
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
@@ -366,6 +372,8 @@ public partial class SettingsService : ObservableObject
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;
         MapIcon = defaultSettings.MapIcon;
+        MapOverlay1 = defaultSettings.MapOverlay1;
+        MapOverlay2 = defaultSettings.MapOverlay2;
         PinPlaceMode = defaultSettings.PinPlaceMode;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
         MaxPdfPixelCount = defaultSettings.MaxPdfPixelCount;

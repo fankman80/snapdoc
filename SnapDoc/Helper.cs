@@ -338,7 +338,7 @@ public class Helper
 
     public static double ToSliderValue(double angle)
     {
-        angle = angle % 360;
+        angle %= 360;
         if (angle < 0)
             angle += 360;
 
@@ -354,5 +354,41 @@ public class Helper
         if (angle < 0)
             angle += 360;
         return angle;
+    }
+
+    public static class IconLookup
+    {
+        private static readonly Dictionary<string, IconItem> _icons =
+            new(StringComparer.OrdinalIgnoreCase);
+
+        private static IconItem _fallback;
+
+        private static bool _initialized = false;
+
+        public static void Initialize(IEnumerable<IconItem> icons)
+        {
+            if (_initialized)
+                return;
+
+            // Dictionary befüllen
+            foreach (var icon in icons)
+            {
+                if (!_icons.ContainsKey(icon.FileName))
+                    _icons[icon.FileName] = icon;
+            }
+
+            // Fallback = erstes Icon
+            _fallback = _icons.Values.FirstOrDefault();
+
+            _initialized = true;
+        }
+
+        public static IconItem Get(string fileName)
+        {
+            if (_icons.TryGetValue(fileName, out var icon))
+                return icon;
+
+            return _fallback;
+        }
     }
 }

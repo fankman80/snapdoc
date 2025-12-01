@@ -7,7 +7,7 @@ using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using UraniumUI.Icons.MaterialSymbols;
+using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -80,7 +80,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
 
         // Suche Icon-Daten
-        var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Contains(fileName, StringComparison.OrdinalIgnoreCase));
+        var iconItem = IconLookup.Get(fileName);
         if (iconItem != null)
         {
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
@@ -107,8 +107,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         var fileName = button.AutomationId;
 
         // Suche Icon-Daten
-        var iconItem = Settings.IconData.FirstOrDefault(item => item.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase));
-
+        var iconItem = IconLookup.Get(fileName);
         var popup = new PopupIconEdit(iconItem);
         var result1 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 

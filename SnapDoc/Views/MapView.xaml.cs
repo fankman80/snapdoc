@@ -5,7 +5,6 @@ using Android.Webkit;
 #endif
 
 using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Models;
 using SnapDoc.Services;
@@ -352,14 +351,14 @@ public partial class MapView : IQueryAttributable
 
     private void OnMapLayerColorClicked(object sender, EventArgs e)
     {
-        var layer = Settings.SwissTopoLayers[1].Id; //ch.swisstopo.pixelkarte-farbe
+        var layer = Settings.SwissTopoLayers[SettingsService.Instance.MapOverlay1].Id; //ch.swisstopo.pixelkarte-farbe
         var script = $"changeMapLayer('{layer}');";
         GeoAdminWebView.EvaluateJavaScriptAsync(script);
     }
 
     private void OnMapLayerRealClicked(object sender, EventArgs e)
     {
-        var layer = Settings.SwissTopoLayers[5].Id; //ch.swisstopo.swissimage
+        var layer = Settings.SwissTopoLayers[SettingsService.Instance.MapOverlay2].Id; //ch.swisstopo.swissimage
         var script = $"changeMapLayer('{layer}');";
         GeoAdminWebView.EvaluateJavaScriptAsync(script);
     }
