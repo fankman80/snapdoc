@@ -7,7 +7,6 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
-using System.Numerics;
 using System.Text;
 using System.Text.RegularExpressions;
 using DDW = DocumentFormat.OpenXml.Drawing.Wordprocessing;

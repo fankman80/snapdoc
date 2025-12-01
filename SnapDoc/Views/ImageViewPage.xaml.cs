@@ -319,6 +319,13 @@ public partial class ImageViewPage : IQueryAttributable
 
             activeIndex = poly.FindPointIndex(p.X, p.Y);
 
+            // Wenn ein Handle getroffen wurde → Pan & Pinch AUS
+            if (activeIndex != null)
+            {
+                photoContainer.IsPanningEnabled = false;
+                photoContainer.IsPinchingEnabled = false;
+            }
+
             if (poly.TryClosePolygon(p.X, p.Y))
             {
                 drawingView.InvalidateSurface();
@@ -362,6 +369,10 @@ public partial class ImageViewPage : IQueryAttributable
         if (drawMode == DrawMode.Poly)
         {
             activeIndex = null;
+
+            // Sobald losgelassen → Pan & Pinch wieder aktivieren
+            photoContainer.IsPanningEnabled = true;
+            photoContainer.IsPinchingEnabled = true;
         }
         else if (drawMode == DrawMode.Free)
         {
