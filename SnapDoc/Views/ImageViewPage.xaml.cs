@@ -42,8 +42,6 @@ public partial class ImageViewPage : IQueryAttributable
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
-        DrawView.LineWidth = lineWidth;
     }
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
