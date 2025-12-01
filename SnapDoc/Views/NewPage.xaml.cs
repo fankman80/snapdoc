@@ -5,7 +5,6 @@ using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp;
-using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -32,23 +31,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double densityX, densityY;
     private bool isFirstLoad = true;
     private Point mousePos;
-    private readonly TransformViewModel planContainer;
     private int lineWidth = 5;
     private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
+    private readonly TransformViewModel planContainer;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
-    private DrawMode drawMode = DrawMode.None;
-    private CombinedDrawable combinedDrawable;
+
+    // --- DrawingController + Canvas ---
+    private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
-    private int? activeIndex = null;
-    private float MinX = float.MaxValue;
-    private float MinY = float.MaxValue;
-    private float MaxX = float.MinValue;
-    private float MaxY = float.MinValue;
-    private DateTime? lastClickTime = null;
-    private SKPoint? lastClickPosition = null;
+
+    // UI state
+    private DrawMode drawMode = DrawMode.None;
+
     private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
 
 #if WINDOWS
@@ -61,6 +58,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         InitializeComponent();
         planContainer = new TransformViewModel();
         BindingContext = planContainer;
+
+        drawingController = new DrawingController(planContainer, DeviceDisplay.MainDisplayInfo.Density);
 
         PlanId = planId;
 
@@ -693,170 +692,29 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.Rotation = 0;
         SettingsService.Instance.IsPlanRotateLocked = true;
 
-        combinedDrawable = new CombinedDrawable
-        {
-            FreeDrawable = new InteractiveFreehandDrawable
-            {
-                LineColor = selectedColor.ToSKColor(),
-                LineThickness = (float)(lineWidth * density)
-            },
-            PolyDrawable = new InteractivePolylineDrawable
-            {
-                FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
-                LineColor = selectedColor.ToSKColor(),
-                PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                LineThickness = (float)(lineWidth * density),
-                HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density),
-                PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density)
-            },
-        };
-
-        drawingView = new SKCanvasView
-        {
-            BackgroundColor = Colors.Transparent,
-            EnableTouchEvents = true,
-            HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Fill,
-        };
-
-        drawingView.PaintSurface += OnPaintSurface;
-        drawingView.Touch += OnTouch;
-
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+
+        // 1) Canvas erzeugen und anhängen
+        drawingView = drawingController.CreateCanvasView();
         absoluteLayout.Children.Add(drawingView);
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-        Dispatcher.Dispatch(() =>
-        {
-            drawingView.InvalidateMeasure();
-            drawingView.InvalidateSurface();
-        });
+        // 2) DrawingController initialisieren
+        drawingController.InitializeDrawing(
+            selectedColor.ToSKColor(),
+            lineWidth,
+            selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
+            (float)SettingsService.Instance.PolyLineHandleTouchRadius,
+            (float)SettingsService.Instance.PolyLineHandleRadius,
+            SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+            SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+            false
+        );
 
-        ResetBoundingBox();
-    }
-
-    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
-    {
-        var canvas = e.Surface.Canvas;
-        canvas.Clear(SKColors.Transparent);
-        combinedDrawable?.Draw(canvas);
-    }
-
-    private void OnTouch(object sender, SKTouchEventArgs e)
-    {
-        var p = e.Location;
-
-        if (e.InContact)
-            ResizeBoundingBox(p);
-
-        if (e.ActionType == SKTouchAction.Pressed)
-            OnStartInteraction(p);
-        else if (e.ActionType == SKTouchAction.Moved)
-            OnDragInteraction(p);
-        else if (e.ActionType == SKTouchAction.Released || e.ActionType == SKTouchAction.Cancelled)
-            OnEndInteraction();
-
-        e.Handled = true;
-    }
-
-    private void OnStartInteraction(SKPoint p)
-    {
-        if (drawMode == DrawMode.Poly)
-        {
-            var poly = combinedDrawable.PolyDrawable;
-
-            // Doppelklick prüfen
-            var now = DateTime.Now;
-            if (lastClickTime.HasValue &&
-                (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
-                lastClickPosition.HasValue &&
-                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius)
-            {
-                // Doppelklick erkannt → Punkt löschen
-                DeletePointAt(p);
-                lastClickTime = null;
-                lastClickPosition = null;
-                drawingView.InvalidateSurface();
-                return;
-            }
-
-            // Kein Doppelklick → Klick merken
-            lastClickTime = now;
-            lastClickPosition = p;
-
-            activeIndex = poly.FindPointIndex(p.X, p.Y);
-            
-            if (poly.TryClosePolygon(p.X, p.Y))
-            {
-                drawingView.InvalidateSurface();
-                return;
-            }
-
-            if (activeIndex == null && !poly.IsClosed)
-            {
-                poly.Points.Add(p);
-                drawingView.InvalidateSurface();
-            }
-        }
-        else if (drawMode == DrawMode.Free)
-        {
-            var free = combinedDrawable.FreeDrawable;
-            free.StartStroke();
-            free.AddPoint(p);
-            drawingView.InvalidateSurface();
-        }
-    }
-
-    private void OnDragInteraction(SKPoint p)
-    {
-        if (drawMode == DrawMode.Poly)
-        {
-            if (activeIndex != null)
-            {
-                combinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
-                drawingView.InvalidateSurface();
-            }
-        }
-        else if (drawMode == DrawMode.Free)
-        {
-            combinedDrawable.FreeDrawable.AddPoint(p);
-            drawingView.InvalidateSurface();
-        }
-    }
-
-    private void OnEndInteraction()
-    {
-        if (drawMode == DrawMode.Poly)
-        {
-            activeIndex = null;
-        }
-        else if (drawMode == DrawMode.Free)
-        {
-            combinedDrawable.FreeDrawable.EndStroke();
-        }
-    }
-
-    private void DeletePointAt(SKPoint p)
-    {
-        var poly = combinedDrawable.PolyDrawable;
-
-        // Punkt unter Klick suchen und löschen
-        for (int i = 0; i < poly.Points.Count; i++)
-        {
-            if (Distance(p, poly.Points[i]) <= poly.HandleRadius)
-            {
-                poly.Points.RemoveAt(i);
-
-                // Wenn danach <=2 Punkte übrig, alles löschen
-                if (poly.Points.Count <= 2)
-                {
-                    poly.Reset(); // Löscht alle Punkte und setzt IsClosed zurück
-                }
-                return;
-            }
-        }
+        // 3) initialer Modus (Poly standard)
+        drawingController.DrawMode = DrawMode.None;
+        drawMode = DrawMode.None;
     }
 
     private static float Distance(SKPoint a, SKPoint b)
@@ -868,22 +726,48 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawFreeClicked(object sender, EventArgs e)
     {
-        planContainer.IsPanningEnabled = false;
-        drawMode = DrawMode.Free;
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 2;
-        combinedDrawable.PolyDrawable.DisplayHandles = false;
-        drawingView.InvalidateSurface();
+        if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
+        {
+            planContainer.IsPanningEnabled = false;
+            drawMode = DrawMode.Free;
+            drawingController.DrawMode = DrawMode.Free;
+            DrawPolyBtn.BorderWidth = 0;
+            DrawFreeBtn.BorderWidth = 2;
+            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
+            drawingView?.InvalidateSurface();
+        }
+        else
+        {
+            planContainer.IsPanningEnabled = true;
+            drawMode = DrawMode.None;
+            drawingController.DrawMode = DrawMode.None;
+            DrawFreeBtn.BorderWidth = 0;
+            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
+            drawingView?.InvalidateSurface();
+        }
     }
 
     private void DrawPolyClicked(object sender, EventArgs e)
     {
-        planContainer.IsPanningEnabled = false;
-        drawMode = DrawMode.Poly;
-        DrawPolyBtn.BorderWidth = 2;
-        DrawFreeBtn.BorderWidth = 0;
-        combinedDrawable.PolyDrawable.DisplayHandles = true;
-        drawingView.InvalidateSurface();
+        if (drawMode == DrawMode.Free || drawMode == DrawMode.None)
+        {
+            planContainer.IsPanningEnabled = false;
+            drawMode = DrawMode.Poly;
+            drawingController.DrawMode = DrawMode.Poly;
+            DrawPolyBtn.BorderWidth = 2;
+            DrawFreeBtn.BorderWidth = 0;
+            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
+            drawingView?.InvalidateSurface();
+        }
+        else
+        {
+            planContainer.IsPanningEnabled = true;
+            drawMode = DrawMode.None;
+            drawingController.DrawMode = DrawMode.None;
+            DrawPolyBtn.BorderWidth = 0;
+            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
+            drawingView?.InvalidateSurface();
+        }
     }
 
     private void EraseClicked(object sender, EventArgs e)
@@ -891,15 +775,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = DrawMode.None;
         DrawPolyBtn.BorderWidth = 0;
         DrawFreeBtn.BorderWidth = 0;
-        combinedDrawable.Reset();   // setzt beide Modi zurück
-        drawingView.InvalidateSurface();  // neu rendern
-        ResetBoundingBox();
+        drawingController.Reset();
+        drawingView?.InvalidateSurface();
     }
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView != null && !IsDrawingViewEmpty())
+        if (drawingView != null && !drawingController.IsEmpty())
         {
+            if ((drawingView == null || drawingController.IsEmpty()))
+                return;
+
             var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
             var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
             string filePath = Path.Combine(customPinPath, customPinName);
@@ -918,20 +804,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
-                   customPinName,
-                   (int)imageRect.Width,
-                   (int)imageRect.Height,
-                   new SKColor(selectedColor.ToUint()),
-                   1 / planContainer.Scale / density * densityX);
+                    customPinName,
+                    (int)imageRect.Width,
+                    (int)imageRect.Height,
+                    new SKColor(selectedColor.ToUint()),
+                    1 / planContainer.Scale / density * densityX);
         }
 
-        drawingView.PaintSurface -= OnPaintSurface;
-        drawingView.Touch -= OnTouch;
+        // Cleanup drawing canvas
+        drawingController.Detach();
         RemoveDrawingView();
 
+        drawMode = DrawMode.None;
+        DrawPolyBtn.BorderWidth = 0;
+        DrawFreeBtn.BorderWidth = 0;
         planContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
+
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         SettingsService.Instance.IsPlanRotateLocked = false;
     }
@@ -940,26 +830,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
         if (drawingView != null && absoluteLayout != null)
+        {
             absoluteLayout.Children.Remove(drawingView);
-        
-        drawingView.PaintSurface -= OnPaintSurface;
-        drawingView.Touch -= OnTouch;
-    }
-
-    private bool IsDrawingViewEmpty()
-    {
-        if (combinedDrawable == null)
-            return true;
-
-        // Prüfe PolyDrawables
-        if (combinedDrawable.PolyDrawable != null && combinedDrawable.PolyDrawable.Points.Count > 0)
-            return false;
-
-        // Prüfe FreeDrawables
-        if (combinedDrawable.FreeDrawable != null && combinedDrawable.FreeDrawable.Strokes.Count > 0)
-            return false;
-
-        return true; // Nichts gezeichnet
+            drawingView = null;
+        }
     }
 
     public async Task<SKRectI> SaveCanvasAsCroppedPng(string filePath)
@@ -972,9 +846,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         canvas.Clear(SKColors.Transparent);
 
-        combinedDrawable.PolyDrawable.DisplayHandles = false; // Verstecke die Griffe vor dem Speichern
-        combinedDrawable?.Draw(canvas);
-        combinedDrawable.PolyDrawable.DisplayHandles = true; // Zeige die Griffe wieder an
+        // Zeichne ohne Handles auf canvas
+        drawingController.DrawWithoutHandles(canvas);
 
         canvas.Flush();
 
@@ -983,7 +856,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
         var offset = (lineWidth * density) / 2;
-        var cropRect = new SKRectI((int)(MinX - offset), (int)(MinY - offset), (int)(MaxX + offset), (int)(MaxY + offset));
+        var boundingBox = drawingController.GetBoundingBoxRect();
+        var cropRect = new SKRectI((int)(boundingBox.Value.Left - offset), (int)(boundingBox.Value.Top - offset), (int)(boundingBox.Value.Right + offset), (int)(boundingBox.Value.Bottom + offset));
 
         // Croppen
         var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
@@ -1003,25 +877,33 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var popup = new PopupColorPicker(lineWidth, selectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
         var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
-        if (result.Result != null)
+        if (result.Result == null) return;
+
+        selectedColor = Color.FromArgb(result.Result.PenColorHex);
+        selectedOpacity = 1f / 255f * result.Result.FillOpacity;
+        lineWidth = result.Result.PenWidth;
+
+        // Update drawingController drawables (wenn initialisiert)
+        if (drawingController?.CombinedDrawable != null)
         {
-            selectedColor = Color.FromArgb(result.Result.PenColorHex);
-            selectedOpacity = 1f / 255f * result.Result.FillOpacity;
-            lineWidth = result.Result.PenWidth;
-
-            if (drawingView != null)
+            // Freehand aktualisieren
+            var free = drawingController.CombinedDrawable.FreeDrawable;
+            if (free != null)
             {
-                // Freihand aktualisieren
-                combinedDrawable.FreeDrawable.LineColor = selectedColor.ToSKColor();
-                combinedDrawable.FreeDrawable.LineThickness = (float)(lineWidth * density);
-
-                // Polylinie aktualisieren
-                combinedDrawable.PolyDrawable.LineColor = selectedColor.ToSKColor();
-                combinedDrawable.PolyDrawable.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-                combinedDrawable.PolyDrawable.LineThickness = (float)(lineWidth * density);
-
-                drawingView.InvalidateSurface();  // neu rendern
+                free.LineColor = selectedColor.ToSKColor();
+                free.LineThickness = (float)(lineWidth * density);
             }
+
+            // Polyline aktualisieren
+            var poly = drawingController.CombinedDrawable.PolyDrawable;
+            if (poly != null)
+            {
+                poly.LineColor = selectedColor.ToSKColor();
+                poly.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
+                poly.LineThickness = (float)(lineWidth * density);
+            }
+
+            drawingView?.InvalidateSurface();
         }
     }
 
@@ -1392,26 +1274,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
 #endif
-    }
-
-    private void ResetBoundingBox()
-    {
-        MinX = float.MaxValue;
-        MinY = float.MaxValue;
-        MaxX = float.MinValue;
-        MaxY = float.MinValue;
-    }
-
-    private void ResizeBoundingBox(SKPoint p)
-    {
-        if (p.X < MinX) 
-            MinX = p.X;
-        if (p.X > MaxX) 
-            MaxX = p.X;
-        if (p.Y < MinY) 
-            MinY = p.Y;
-        if (p.Y > MaxY) 
-            MaxY = p.Y;
     }
 }
 

@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
 			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-             xmlns:mct="clr-namespace:CommunityToolkit.Maui.Views;assembly=CommunityToolkit.Maui"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"			 
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"             
@@ -63,11 +62,6 @@
                             AnchorX="{Binding AnchorX}"
 				            AnchorY="{Binding AnchorY}">
                 <Image x:Name="PhotoImage"/>
-                <mct:DrawingView x:Name="DrawView"
-                                 BackgroundColor="Transparent"
-                                 IsMultiLineModeEnabled="True"
-                                 DrawingLineStarted="OnDrawing"
-                                 LineColor="#FF0000"/>
             </AbsoluteLayout>
         </mr:ContentView>
 
