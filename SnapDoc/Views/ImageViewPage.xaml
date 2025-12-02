@@ -48,13 +48,12 @@
     </Shell.TitleView>
 
     <AbsoluteLayout x:Name="ImageView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-        <mr:ContentView
-            PinchingCommand="{Binding PinchingCommand}"
-            Panning="OnPanning"
-            Pinching="OnPinching"
-            Pinched="OnPinched"
-            DoubleTapped="OnDoubleTapped"
-            ScrollWheelChanged="OnMouseScroll">
+        <mr:ContentView PinchingCommand="{Binding PinchingCommand}"
+                        Panning="OnPanning"
+                        Pinching="OnPinching"
+                        Pinched="OnPinched"
+                        DoubleTapped="OnDoubleTapped"
+                        ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="PhotoContainer"
 				            Scale="{Binding Scale}"
 				            TranslationX="{Binding TranslationX}"
@@ -107,7 +106,6 @@
                         HeightRequest="60"
                         CornerRadius="30"
                         Clicked="CheckClicked"/>
-
             </VerticalStackLayout>
             <HorizontalStackLayout Spacing="16"
                                    Margin="96,0,0,20"
@@ -117,8 +115,6 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        BorderColor="Red"
-                        BorderWidth="0"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -127,8 +123,6 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        BorderColor="Red"
-                        BorderWidth="0"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"

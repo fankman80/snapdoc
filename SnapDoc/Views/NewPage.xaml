@@ -55,24 +55,16 @@
                     Clicked="OnEditClicked"/>
         </Grid>
     </Shell.TitleView>
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
+    
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-            <mr:ContentView
-                AutomationId="PlanContainer"
-                PinchingCommand="{Binding PinchingCommand}"
-                RotatingCommand="{Binding RotatingCommand}"
-                Panning="OnPanning"
-                Pinching="OnPinching"
-                Pinched="OnPinched"
-                MouseMoved="OnMouseMoved"
-                ScrollWheelChanged="OnMouseScroll">
+            <mr:ContentView PinchingCommand="{Binding PinchingCommand}"
+                            RotatingCommand="{Binding RotatingCommand}"
+                            Panning="OnPanning"
+                            Pinching="OnPinching"
+                            Pinched="OnPinched"
+                            MouseMoved="OnMouseMoved"
+                            ScrollWheelChanged="OnMouseScroll">
                 <mr:AbsoluteLayout x:Name="PlanContainer"
                                    LongPressing="OnLongPressing"
                                    Tapped="OnTapped"
@@ -215,7 +207,6 @@
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="90,0,0,24"
                        ZIndex="10001"/>
-
                 <Button InputTransparent="False"
                         Visual="None"
                         CornerRadius="0"
@@ -255,11 +246,10 @@
                             AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                             AbsoluteLayout.LayoutFlags="PositionProportional"
                             ZIndex="10000">
-                <VerticalStackLayout
-                    Margin="20,0,0,20"
-                    Spacing="16"
-                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional">
+                <VerticalStackLayout Spacing="16"
+                                     Margin="20,0,0,20"
+                                     AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                     AbsoluteLayout.LayoutFlags="PositionProportional">
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
@@ -281,19 +271,15 @@
                             HeightRequest="60"
                             CornerRadius="30"
                             Clicked="CheckClicked"/>
-
                 </VerticalStackLayout>
-                <HorizontalStackLayout
-                    Margin="96,0,0,20"
-                    Spacing="16"
-                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                    AbsoluteLayout.LayoutFlags="PositionProportional">
+                <HorizontalStackLayout Spacing="16"
+                                       Margin="96,0,0,20"
+                                       AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                       AbsoluteLayout.LayoutFlags="PositionProportional">
                     <Button x:Name="DrawPolyBtn"
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
-                            BorderColor="Red"
-                            BorderWidth="0"
                             WidthRequest="60"
                             HeightRequest="60"
                             CornerRadius="30"
@@ -302,8 +288,6 @@
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
-                            BorderColor="Red"
-                            BorderWidth="0"
                             WidthRequest="60"
                             HeightRequest="60"
                             CornerRadius="30"

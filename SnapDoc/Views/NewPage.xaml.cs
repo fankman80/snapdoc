@@ -59,7 +59,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer = new TransformViewModel();
         BindingContext = planContainer;
 
-        drawingController = new DrawingController(planContainer, DeviceDisplay.MainDisplayInfo.Density);
+        drawingController = new DrawingController(planContainer, density);
 
         PlanId = planId;
 
@@ -724,8 +724,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Free;
             drawingController.DrawMode = DrawMode.Free;
-            DrawPolyBtn.BorderWidth = 0;
-            DrawFreeBtn.BorderWidth = 2;
+            DrawPolyBtn.CornerRadius = 30;
+            DrawFreeBtn.CornerRadius = 10;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -734,7 +734,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
-            DrawFreeBtn.BorderWidth = 0;
+            DrawFreeBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -747,8 +747,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Poly;
             drawingController.DrawMode = DrawMode.Poly;
-            DrawPolyBtn.BorderWidth = 2;
-            DrawFreeBtn.BorderWidth = 0;
+            DrawPolyBtn.CornerRadius = 10;
+            DrawFreeBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
             drawingView?.InvalidateSurface();
         }
@@ -757,7 +757,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
-            DrawPolyBtn.BorderWidth = 0;
+            DrawPolyBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -766,8 +766,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void EraseClicked(object sender, EventArgs e)
     {
         drawMode = DrawMode.None;
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 0;
+        DrawPolyBtn.CornerRadius = 30;
+        DrawFreeBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
     }
@@ -809,8 +809,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         RemoveDrawingView();
 
         drawMode = DrawMode.None;
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 0;
+        DrawPolyBtn.CornerRadius = 30;
+        DrawFreeBtn.CornerRadius = 30;
         planContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;

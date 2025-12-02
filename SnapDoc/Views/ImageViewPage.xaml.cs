@@ -38,7 +38,7 @@ public partial class ImageViewPage : IQueryAttributable
         photoContainer = new TransformViewModel();
         BindingContext = photoContainer;
 
-        drawingController = new DrawingController(photoContainer, DeviceDisplay.MainDisplayInfo.Density);
+        drawingController = new DrawingController(photoContainer, density);
     }
 
     protected override void OnAppearing()
@@ -217,8 +217,8 @@ public partial class ImageViewPage : IQueryAttributable
             photoContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Free;
             drawingController.DrawMode = DrawMode.Free;
-            DrawPolyBtn.BorderWidth = 0;
-            DrawFreeBtn.BorderWidth = 2;
+            DrawPolyBtn.CornerRadius = 30;
+            DrawFreeBtn.CornerRadius = 10;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -227,7 +227,7 @@ public partial class ImageViewPage : IQueryAttributable
             photoContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
-            DrawFreeBtn.BorderWidth = 0;
+            DrawFreeBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -240,8 +240,8 @@ public partial class ImageViewPage : IQueryAttributable
             photoContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Poly;
             drawingController.DrawMode = DrawMode.Poly;
-            DrawPolyBtn.BorderWidth = 2;
-            DrawFreeBtn.BorderWidth = 0;
+            DrawPolyBtn.CornerRadius = 10;
+            DrawFreeBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
             drawingController.ResizePolyHandles();
             drawingView?.InvalidateSurface();
@@ -251,7 +251,7 @@ public partial class ImageViewPage : IQueryAttributable
             photoContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
-            DrawPolyBtn.BorderWidth = 0;
+            DrawPolyBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -260,8 +260,8 @@ public partial class ImageViewPage : IQueryAttributable
     private void EraseClicked(object sender, EventArgs e)
     {
         drawMode = DrawMode.None;
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 0;
+        DrawPolyBtn.CornerRadius = 30;
+        DrawFreeBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
 
@@ -330,8 +330,8 @@ public partial class ImageViewPage : IQueryAttributable
         RemoveDrawingView();
 
         drawMode = DrawMode.None;
-        DrawPolyBtn.BorderWidth = 0;
-        DrawFreeBtn.BorderWidth = 0;
+        DrawPolyBtn.CornerRadius = 30;
+        DrawFreeBtn.CornerRadius = 30;
         photoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
