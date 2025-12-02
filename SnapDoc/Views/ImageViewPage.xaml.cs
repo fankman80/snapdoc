@@ -205,7 +205,7 @@ public partial class ImageViewPage : IQueryAttributable
             SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha)
         );
 
-        // 3) initialer Modus (Poly standard)
+        // 3) initialer Modus
         drawingController.DrawMode = DrawMode.None;
         drawMode = DrawMode.None;
     }

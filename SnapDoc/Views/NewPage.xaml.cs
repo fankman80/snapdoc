@@ -712,7 +712,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             false
         );
 
-        // 3) initialer Modus (Poly standard)
+        // 3) initialer Modus
         drawingController.DrawMode = DrawMode.None;
         drawMode = DrawMode.None;
     }
