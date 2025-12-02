@@ -809,7 +809,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     (int)imageRect.Width,
                     (int)imageRect.Height,
                     new SKColor(SelectedColor.ToUint()),
-                    1 / planContainer.Scale / density * densityX);
+                    1 / planContainer.Scale / density * densityX,
+                    Helper.NormalizeAngle360(-planContainer.Rotation));
         }
 
         // Cleanup drawing canvas
