@@ -717,13 +717,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = DrawMode.None;
     }
 
-    private static float Distance(SKPoint a, SKPoint b)
-    {
-        var dx = a.X - b.X;
-        var dy = a.Y - b.Y;
-        return (float)Math.Sqrt(dx * dx + dy * dy);
-    }
-
     private void DrawFreeClicked(object sender, EventArgs e)
     {
         if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
@@ -883,28 +876,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         selectedOpacity = 1f / 255f * result.Result.FillOpacity;
         lineWidth = result.Result.PenWidth;
 
-        // Update drawingController drawables (wenn initialisiert)
-        if (drawingController?.CombinedDrawable != null)
-        {
-            // Freehand aktualisieren
-            var free = drawingController.CombinedDrawable.FreeDrawable;
-            if (free != null)
-            {
-                free.LineColor = selectedColor.ToSKColor();
-                free.LineThickness = (float)(lineWidth * density);
-            }
-
-            // Polyline aktualisieren
-            var poly = drawingController.CombinedDrawable.PolyDrawable;
-            if (poly != null)
-            {
-                poly.LineColor = selectedColor.ToSKColor();
-                poly.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-                poly.LineThickness = (float)(lineWidth * density);
-            }
-
-            drawingView?.InvalidateSurface();
-        }
+        drawingController?.UpdateDrawingStyles(
+            selectedColor.ToSKColor(),
+            lineWidth,
+            selectedOpacity
+        );
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)

@@ -74,8 +74,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 PointColor = pointColor,
                 StartPointColor = startPointColor,
                 LineThickness = lineThickness * (float)density,
-                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
-                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius
+                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale * (float)density : handleRadius * (float)density,
+                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density
             }
         };
 
@@ -117,7 +117,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (lastClickTime.HasValue &&
                 (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
                 lastClickPosition.HasValue &&
-                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius)
+                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius * (float)density)
             {
                 DeletePointAt(p);
                 lastClickTime = null;
@@ -203,8 +203,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
 
         if (scaleHandlesWithTransform)
         {
-            poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density / transformVm.Scale);
-            poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density / transformVm.Scale);
+            poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
+            poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
         }
         else
         {
@@ -233,6 +233,31 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 return;
             }
         }
+    }
+
+    public void UpdateDrawingStyles(SKColor lineColor, float lineWidth, float fillOpacity)
+    {
+        if (CombinedDrawable == null)
+            return;
+
+        // Freehand aktualisieren
+        var free = CombinedDrawable.FreeDrawable;
+        if (free != null)
+        {
+            free.LineColor = lineColor;
+            free.LineThickness = lineWidth * (float)density;
+        }
+
+        // Polyline aktualisieren
+        var poly = CombinedDrawable.PolyDrawable;
+        if (poly != null)
+        {
+            poly.LineColor = lineColor;
+            poly.FillColor = lineColor.WithAlpha((byte)(fillOpacity * 255));
+            poly.LineThickness = lineWidth * (float)density;
+        }
+
+        canvasView?.InvalidateSurface();
     }
 
     private static float Distance(SKPoint a, SKPoint b)

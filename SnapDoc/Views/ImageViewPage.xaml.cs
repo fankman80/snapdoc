@@ -427,28 +427,10 @@ public partial class ImageViewPage : IQueryAttributable
         selectedOpacity = 1f / 255f * result.Result.FillOpacity;
         lineWidth = result.Result.PenWidth;
 
-        // Update drawingController drawables (wenn initialisiert)
-        if (drawingController?.CombinedDrawable != null)
-        {
-            // Freehand aktualisieren
-            var free = drawingController.CombinedDrawable.FreeDrawable;
-            if (free != null)
-            {
-                free.LineColor = selectedColor.ToSKColor();
-                free.LineThickness = (float)(lineWidth * density);
-            }
-
-            // Polyline aktualisieren
-            var poly = drawingController.CombinedDrawable.PolyDrawable;
-            if (poly != null)
-            {
-                poly.LineColor = selectedColor.ToSKColor();
-                poly.FillColor = selectedColor.WithAlpha(selectedOpacity).ToSKColor();
-                poly.LineThickness = (float)(lineWidth * density);
-                drawingController.ResizePolyHandles();
-            }
-
-            drawingView?.InvalidateSurface();
-        }
+        drawingController?.UpdateDrawingStyles(
+            selectedColor.ToSKColor(),
+            lineWidth,
+            selectedOpacity
+        );
     }
 }
