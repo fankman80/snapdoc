@@ -32,7 +32,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private int lineWidth = 5;
-    private Color selectedColor = new(255, 0, 0);
+
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
@@ -45,6 +45,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     // UI state
     private DrawMode drawMode = DrawMode.None;
+
+    private Color selectedColor = new(255, 0, 0);
+    public Color SelectedColor
+    {
+        get => selectedColor;
+        set
+        {
+            selectedColor = value;
+            OnPropertyChanged();
+        }
+    }
 
     private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
 
@@ -689,9 +700,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
 
-        planContainer.Rotation = 0;
-        SettingsService.Instance.IsPlanRotateLocked = true;
-
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
 
         // 1) Canvas erzeugen und anhängen
@@ -702,9 +710,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // 2) DrawingController initialisieren
         drawingController.InitializeDrawing(
-            selectedColor.ToSKColor(),
+            SelectedColor.ToSKColor(),
             lineWidth,
-            selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
+            SelectedColor.WithAlpha(selectedOpacity).ToSKColor(),
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
@@ -800,7 +808,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     customPinName,
                     (int)imageRect.Width,
                     (int)imageRect.Height,
-                    new SKColor(selectedColor.ToUint()),
+                    new SKColor(SelectedColor.ToUint()),
                     1 / planContainer.Scale / density * densityX);
         }
 
@@ -816,7 +824,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = true;
 
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        SettingsService.Instance.IsPlanRotateLocked = false;
     }
 
     private void RemoveDrawingView()
@@ -867,17 +874,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(lineWidth, selectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(lineWidth, SelectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
         var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
 
-        selectedColor = Color.FromArgb(result.Result.PenColorHex);
+        SelectedColor = Color.FromArgb(result.Result.PenColorHex);
         selectedOpacity = 1f / 255f * result.Result.FillOpacity;
         lineWidth = result.Result.PenWidth;
 
         drawingController?.UpdateDrawingStyles(
-            selectedColor.ToSKColor(),
+            SelectedColor.ToSKColor(),
             lineWidth,
             selectedOpacity
         );

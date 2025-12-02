@@ -17,7 +17,6 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinIcon;
     public string ImgSource = null;
     private int lineWidth = 6;
-    private Color selectedColor = new(255, 0, 0);
     private float selectedOpacity = 0.5f;
     private bool isCleared = false;
     private bool hasFittedImage = false;
@@ -30,6 +29,17 @@ public partial class ImageViewPage : IQueryAttributable
 
     // UI state
     private DrawMode drawMode = DrawMode.None;
+
+    private Color selectedColor = new(255, 0, 0);
+    public Color SelectedColor
+    {
+        get => selectedColor;
+        set
+        {
+            selectedColor = value;
+            OnPropertyChanged();
+        }
+    }
 
     public ImageViewPage()
     {
@@ -196,9 +206,9 @@ public partial class ImageViewPage : IQueryAttributable
 
         // 2) DrawingController initialisieren
         drawingController.InitializeDrawing(
-            selectedColor.ToSKColor(),
+            SelectedColor.ToSKColor(),
             lineWidth,
-            selectedColor.WithAlpha(selectedOpacity).ToSKColor(),
+            SelectedColor.WithAlpha(selectedOpacity).ToSKColor(),
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
@@ -339,6 +349,16 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
+    private void RemoveDrawingView()
+    {
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PhotoContainer");
+        if (drawingView != null && absoluteLayout != null)
+        {
+            absoluteLayout.Children.Remove(drawingView);
+            drawingView = null;
+        }
+    }
+
     private static async Task<string> FileRenamer(string filePath)
     {
         var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
@@ -363,16 +383,6 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
             return filePath;
-    }
-
-    private void RemoveDrawingView()
-    {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PhotoContainer");
-        if (drawingView != null && absoluteLayout != null)
-        {
-            absoluteLayout.Children.Remove(drawingView);
-            drawingView = null;
-        }
     }
 
     public async Task SavePhotoWithOverlay(string photoPath, string outputPath)
@@ -418,17 +428,17 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(lineWidth, selectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(lineWidth, SelectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
         var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
 
-        selectedColor = Color.FromArgb(result.Result.PenColorHex);
+        SelectedColor = Color.FromArgb(result.Result.PenColorHex);
         selectedOpacity = 1f / 255f * result.Result.FillOpacity;
         lineWidth = result.Result.PenWidth;
 
         drawingController?.UpdateDrawingStyles(
-            selectedColor.ToSKColor(),
+            SelectedColor.ToSKColor(),
             lineWidth,
             selectedOpacity
         );

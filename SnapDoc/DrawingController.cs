@@ -102,7 +102,13 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             case SKTouchAction.Cancelled: OnEndInteraction(); break;
         }
 
-        e.Handled = true;
+        // Event nur als handled markieren, wenn Free-Modus oder Poly-Modus und Punkt aktiv
+        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null))
+            e.Handled = true; // blockiert andere Views
+        else
+            e.Handled = false; // lässt Touch durchgehen
+
+        canvasView?.InvalidateSurface();
     }
 
     private void OnStartInteraction(SKPoint p)
