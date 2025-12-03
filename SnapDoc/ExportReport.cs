@@ -65,7 +65,7 @@ public partial class ExportReport
             if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
                 CopyImageToDirectory(Settings.CacheDirectory, Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
             else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
-                CopyImageToDirectory(Path.Combine(Settings.CacheDirectory, "customicons"), "customicons", Path.GetFileName(icon));
+                CopyImageToDirectory(Settings.CacheDirectory, "customicons", Path.GetFileName(icon));
             else
                 await MauiResourceLoader.CopyAppPackageFileAsync(Settings.CacheDirectory, icon);
 
@@ -914,7 +914,10 @@ public partial class ExportReport
                     foreach (Pin pin in plan.Pins.Values)
                     {
                         if (!string.IsNullOrEmpty(pin.PinIcon))
-                            uniquePinIcons.Add(pin.PinIcon);
+                            if (pin.IsCustomIcon)
+                                uniquePinIcons.Add(Path.Combine("customicons", pin.PinIcon));
+                            else
+                                uniquePinIcons.Add(pin.PinIcon);
                     }
                 }
             }

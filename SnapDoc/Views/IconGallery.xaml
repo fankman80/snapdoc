@@ -63,7 +63,7 @@
                         <ColumnDefinition Width="26" />
                     </Grid.ColumnDefinitions>
                     <Image Grid.Column="0"
-                           Source="{Binding FileName}"
+                           Source="{Binding DisplayIconPath}"
                            Aspect="AspectFit"
                            Margin="5"/>
                     <Label Grid.Column="1"
@@ -95,7 +95,7 @@
             <!-- Template für Grid (Label unsichtbar) -->
             <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
                 <Grid>
-                    <Image Source="{Binding FileName}"
+                    <Image Source="{Binding DisplayIconPath}"
                            Aspect="AspectFit"
                            Margin="6"/>
                     <mr:Button AutomationId = "{Binding FileName}"

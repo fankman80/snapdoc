@@ -3,7 +3,6 @@
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -49,26 +48,6 @@ public partial class PinList : ContentPage
             {
                 foreach (var pin in plan.Value.Pins.Values)
                 {
-                    if (pin.IsCustomIcon)
-                    {
-                        var fullPath = Path.Combine(Settings.DataDirectory, "customicons", pin.PinIcon);
-                        pin.PinIcon = fullPath;
-                        if (!File.Exists(fullPath))
-                        {
-                            // Lade Default-Icon falls Custom-Icon nicht existiert
-                            string _newPin = SettingsService.Instance.DefaultPinIcon;
-                            var iconItem = IconLookup.Get(_newPin);
-                            pin.PinIcon = iconItem.FileName;
-                            pin.Size = iconItem.IconSize;
-                            pin.IsLockRotate = iconItem.IsRotationLocked;
-                            pin.IsLockAutoScale = iconItem.IsAutoScaleLocked;
-                            pin.IsCustomPin = iconItem.IsCustomPin;
-                            pin.IsCustomIcon = iconItem.IsCustomIcon;
-                            pin.Anchor = iconItem.AnchorPoint;
-                            pin.PinScale = iconItem.IconScale;
-                            pin.PinColor = iconItem.PinColor;
-                        }
-                    }
                     var newPin = new PinItem(pin);
                     pinItems.Add(newPin);
                     pincounter++;

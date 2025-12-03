@@ -47,20 +47,19 @@ public partial class Pin : ObservableObject
     public Point Pos { get; set; }
     public Point Anchor { get; set; }
     public Size Size { get; set; }
+    public double PinScale { get; set; }
     public string PinName { get; set; }
     public string PinDesc { get; set; }
     public string PinLocation { get; set; }
     public int PinPriority { get; set; }
-    public Dictionary<string, Foto> Fotos { get; set; }
     public string OnPlanId { get; set; }
     public string SelfId { get; set; }
     public DateTime DateTime { get; set; }
     public SKColor PinColor { get; set; }
-    public double PinScale { get; set; }
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
     public bool IsCustomIcon { get; set; }
-
+    public Dictionary<string, Foto> Fotos { get; set; }
     [ObservableProperty] private string _pinIcon;
     [ObservableProperty] private bool _isCustomPin;
     [ObservableProperty] private bool _isAllowExport;

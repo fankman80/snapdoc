@@ -20,7 +20,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     {
         InitializeComponent();
         iconItem = _iconItem;
-        iconImage.Source = iconItem.FileName;
+        iconImage.Source = iconItem.DisplayIconPath;
         iconName.Text = iconItem.DisplayName;
         iconCategory.Text = iconItem.Category;
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
@@ -115,7 +115,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        // Falls CustomIcon, dann wird Pfad relativ gesetzt
         var file = Path.GetFileName(iconItem.FileName);
         string returnValue = null;
 
@@ -134,36 +133,39 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 iconCategory.Text,
                 SettingsService.Instance.DefaultPinIcon == file
             );
+
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
-
-            // Icon-Daten einlesen
-            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
-            SettingsService.Instance.IconCategories = iconCategories;
-            IconLookup.Initialize(Settings.IconData);
-
+            IconLookup.AddOrUpdate(updatedItem);
             returnValue = file;
+
+            if (setDefault.IsToggled)
+            {
+                SettingsService.Instance.DefaultPinIcon = file;
+                SettingsService.Instance.SaveSettings();
+            }
         }
         else
         {
             var iconFile = Path.Combine(Settings.DataDirectory, "customicons", file);
             if (File.Exists(iconFile))
             {
-                if (IconLookup.Get(iconItem.FileName).IsDefaultIcon)
+                if (iconItem.IsDefaultIcon)
                 {
-                    SettingsService.Instance.DefaultPinIcon = Settings.IconData.First().FileName;
+                    SettingsService.Instance.DefaultPinIcon = Settings.IconData.FirstOrDefault().FileName;
                     SettingsService.Instance.SaveSettings();
                 }
                 File.Delete(iconFile);
+
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
+                IconLookup.Remove(file);
                 returnValue = "deleted";
             }
         }
 
-        if (setDefault.IsToggled)
-        {
-            SettingsService.Instance.DefaultPinIcon = file;
-            SettingsService.Instance.SaveSettings();
-        }
+        // Icon-Daten einlesen
+        Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+        SettingsService.Instance.IconCategories = iconCategories;
+        IconLookup.Initialize(Settings.IconData);
 
         await CloseAsync(returnValue);
     }

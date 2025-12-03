@@ -167,7 +167,7 @@
                         BackgroundColor="White"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
-                    <ImageButton Source="{Binding Pin.PinIcon}"                                
+                    <ImageButton Source="{Binding Pin.DisplayIconPath}"
                                  Aspect="AspectFit"
                                  Clicked="OnPinSelectClick"
                                  Padding="12"/>
@@ -182,6 +182,7 @@
                     <Picker Grid.Column="0"
                             x:Name="priorityPicker"
                             BackgroundColor="Transparent"
+                            SelectedIndex="{Binding Pin.PinPriority}"
                             SelectedIndexChanged="OnSelectedItemChanged"/>
                     <Label Grid.Column="1" Text="{x:Static m:MaterialOutlined.Traffic}"
                            WidthRequest="60"

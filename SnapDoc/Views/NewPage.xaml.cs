@@ -257,7 +257,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[pinId].Size;
         Double _rotation = PlanContainer.Rotation * -1 + GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation;
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin) // Add Path for Custom Pin-Image
+        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin)
         {
             _rotation = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation;
             pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
@@ -495,74 +495,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             planContainer.AnchorX = 1.0 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);
             planContainer.AnchorY = 1.0 / PlanContainer.Height * ((this.Height / 2) - planContainer.TranslationY);
-        }
-    }
-
-    private void SetPinBAK(
-    Point pos,
-    string customName = null,
-    int customPinSizeWidth = 0,
-    int customPinSizeHeight = 0,
-    SKColor? pinColor = null,
-    double customScale = 1,
-    double rotation = 0)
-    {
-        if (Shell.Current.CurrentPage is not NewPage)
-            return;
-
-        // Icon-Daten laden
-        var iconItems = Helper.LoadIconItems(
-            Path.Combine(Settings.TemplateDirectory, "IconData.xml"),
-            out List<string> iconCategories);
-
-        SettingsService.Instance.IconCategories = iconCategories;
-        Settings.IconData = iconItems;
-
-        string id = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        string pinKey = SettingsService.Instance.DefaultPinIcon;
-
-        // Standard-Icondaten laden
-        var icon = IconLookup.Get(pinKey);
-
-        // Wenn Custom-Pin: Defaults überschreiben
-        bool isCustom = customName != null;
-
-        var pin = new Pin
-        {
-            Pos = pos,
-            Anchor = isCustom ? new Point(0.5, 0.5) : icon.AnchorPoint,
-            Size = isCustom ? new Size(customPinSizeWidth, customPinSizeHeight) : icon.IconSize,
-            IsLockPosition = isCustom,
-            IsLockRotate = isCustom || icon.IsRotationLocked,
-            IsLockAutoScale = isCustom || icon.IsAutoScaleLocked,
-            IsCustomPin = isCustom,
-            PinName = isCustom ? "" : icon.DisplayName,
-            PinDesc = "",
-            PinPriority = 0,
-            PinLocation = "",
-            PinIcon = isCustom ? customName : pinKey,
-            Fotos = [],
-            OnPlanId = PlanId,
-            SelfId = id,
-            DateTime = DateTime.Now,
-            PinColor = pinColor ?? SKColors.Red,
-            PinScale = isCustom ? customScale : icon.IconScale,
-            PinRotation = rotation,
-            GeoLocation = null,
-            IsAllowExport = true
-        };
-
-        // Plan schreiben
-        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
-        {
-            plan.Pins ??= [];
-            plan.Pins[id] = pin;
-            plan.PinCount++;
-
-            GlobalJson.SaveToFile();
-
-            AddPin(id, pin.PinIcon);
-            _ = UpdatePinLocationAsync(pin);
         }
     }
 

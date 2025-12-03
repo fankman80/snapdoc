@@ -110,23 +110,11 @@ public partial class SetPin : ContentPage, IQueryAttributable
         else
             GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
 
-        Pin = new PinItem(new Pin())
-        {
-            PinName = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName,
-            PinDesc = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc,
-            PinLocation = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation,
-            PinIcon = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon
-                        ? Path.Combine(Settings.DataDirectory, "customicons", GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon)
-                        : GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon,
-            IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
-            IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
-            IsLockPosition = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockPosition
-        };
-
         priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
-        priorityPicker.SelectedIndex = Math.Max(0, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority);
+        
+        Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
 
-        if (priorityPicker.SelectedIndex == 0)
+        if (Pin.PinPriority == 0)
             PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark
                         ? (Color)Application.Current.Resources["PrimaryDarkText"]
                         : (Color)Application.Current.Resources["PrimaryText"];
@@ -224,13 +212,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnOkayClick(object sender, EventArgs e)
     {
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = Pin.PinName;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc = Pin.PinDesc;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation = Pin.PinLocation;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockPosition = Pin.IsLockPosition;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport = Pin.IsAllowExport;
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinPriority = priorityPicker.SelectedIndex;
-
         // save data to file
         GlobalJson.SaveToFile();
 

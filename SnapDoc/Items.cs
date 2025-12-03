@@ -4,7 +4,9 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using SnapDoc.Models;
+using SnapDoc.Services;
 using System.Globalization;
+using static SnapDoc.Helper;
 
 namespace SnapDoc
 {
@@ -22,6 +24,28 @@ namespace SnapDoc
         public double IconScale { get; set; } = iconScale;
         public string Category { get; set; } = category;
         public bool IsDefaultIcon { get; set; } = isDefaultIcon;
+        public string DisplayIconPath
+        {
+            get
+            {
+                if (IsCustomIcon)
+                {
+                    string fullPath = Path.Combine(Settings.DataDirectory, "customicons", FileName);
+
+                    if (!File.Exists(fullPath))
+                    {
+                        // Lade Default-Icon falls CustomIcon nicht existiert
+                        string newPin = SettingsService.Instance.DefaultPinIcon;
+                        var iconItem = IconLookup.Get(newPin);
+                        return iconItem.FileName;
+                    }
+
+                    return fullPath;
+                }
+
+                return FileName;
+            }
+        }
     }
 
     public class FileItem
@@ -54,8 +78,20 @@ namespace SnapDoc
         {
             get
             {
-                if (PinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
-                    return Path.Combine(Settings.DataDirectory, PinIcon);
+                if (_pin.IsCustomIcon)
+                {
+                    if (!File.Exists(Path.Combine(Settings.DataDirectory, "customicons", PinIcon)))
+                    {
+                        // Lade Default-Icon falls CustomIcon nicht existiert
+                        string _newPin = SettingsService.Instance.DefaultPinIcon;
+                        var iconItem = IconLookup.Get(_newPin);
+                        return iconItem.FileName;
+                    }
+                    else
+                        return Path.Combine(Settings.DataDirectory, "customicons", PinIcon);
+                }
+                else if (_pin.IsCustomPin)
+                    return "shapes64.png";
 
                 return PinIcon;
             }

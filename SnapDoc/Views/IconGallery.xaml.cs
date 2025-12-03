@@ -77,7 +77,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         if (iconItem != null)
         {
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = Path.GetFileName(fileName);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = iconItem.FileName;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;
@@ -103,6 +103,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
         // Suche Icon-Daten
         var iconItem = IconLookup.Get(fileName);
+        iconItem.IsDefaultIcon = iconItem.FileName == SettingsService.Instance.DefaultPinIcon;
         var popup = new PopupIconEdit(iconItem);
         var result1 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 

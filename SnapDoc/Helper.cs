@@ -117,12 +117,6 @@ public class Helper
                 }
 
                 var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
-                bool isCustomIcon = bool.TryParse(itemElement.Element("CustomIcon")?.Value, out var result) && result;
-                if (isCustomIcon)
-                {
-                    fileName = Path.Combine(Settings.DataDirectory, "customicons", fileName);
-                }
-
                 var iconItem = new IconItem(
                     fileName,
                     itemElement.Element("Description")?.Value ?? string.Empty,
@@ -365,34 +359,75 @@ public class Helper
         private static readonly Dictionary<string, IconItem> _icons =
             new(StringComparer.OrdinalIgnoreCase);
 
+        private static readonly object _lock = new();
+
         private static IconItem _fallback;
 
-        private static bool _initialized = false;
-
+        /// <summary>
+        /// Lädt die Icon-Liste komplett neu.
+        /// </summary>
         public static void Initialize(IEnumerable<IconItem> icons)
         {
-            if (_initialized)
-                return;
-
-            // Dictionary befüllen
-            foreach (var icon in icons)
+            lock (_lock)
             {
-                if (!_icons.ContainsKey(icon.FileName))
+                _icons.Clear();
+
+                foreach (var icon in icons)
                     _icons[icon.FileName] = icon;
+
+                // Fallback = erstes Icon (falls vorhanden)
+                _fallback = _icons.Values.FirstOrDefault();
             }
-
-            // Fallback = erstes Icon
-            _fallback = _icons.Values.FirstOrDefault();
-
-            _initialized = true;
         }
 
+        /// <summary>
+        /// Entfernt alle Icons.
+        /// </summary>
+        public static void Reset()
+        {
+            lock (_lock)
+            {
+                _icons.Clear();
+                _fallback = null;
+            }
+        }
+
+        /// <summary>
+        /// Fügt ein Icon hinzu oder aktualisiert es.
+        /// </summary>
+        public static void AddOrUpdate(IconItem icon)
+        {
+            lock (_lock)
+            {
+                _icons[icon.FileName] = icon;
+
+                if (_fallback == null)
+                    _fallback = icon;
+            }
+        }
+
+        public static void Remove(string fileName)
+        {
+            if (_icons.ContainsKey(fileName))
+                _icons.Remove(fileName);
+
+            // Fallback neu setzen, falls das gelöschte Icon der Fallback war
+            if (_fallback != null && _fallback.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
+                _fallback = _icons.Values.FirstOrDefault();
+        }
+
+        /// <summary>
+        /// Holt ein Icon; wenn nicht gefunden, gibt das Fallback zurück.
+        /// </summary>
         public static IconItem Get(string fileName)
         {
-            if (_icons.TryGetValue(fileName, out var icon))
-                return icon;
+            lock (_lock)
+            {
+                if (_icons.TryGetValue(fileName, out var icon))
+                    return icon;
 
-            return _fallback;
+                return _fallback;
+            }
         }
     }
 }
