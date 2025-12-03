@@ -8,7 +8,6 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 

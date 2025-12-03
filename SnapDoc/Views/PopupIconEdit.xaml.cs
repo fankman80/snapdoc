@@ -6,6 +6,7 @@ using SkiaSharp;
 using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -30,11 +31,10 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         allowRotate.IsToggled = iconItem.IsRotationLocked;
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
         SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
+        setDefault.IsToggled = iconItem.IsDefaultIcon;
 
         if (iconItem.IsCustomIcon)
             deleteIconContainer.IsVisible = true;
-
-        setDefault.IsToggled = iconItem.IsDefaultIcon;
 
         BindingContext = this;
 
@@ -116,7 +116,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     private async void OnOkClicked(object sender, EventArgs e)
     {
         // Falls CustomIcon, dann wird Pfad relativ gesetzt
-        var file = iconItem.FileName;
+        var file = Path.GetFileName(iconItem.FileName);
         string returnValue = null;
 
         if (deleteIcon.IsToggled == false)
@@ -135,13 +135,24 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 SettingsService.Instance.DefaultPinIcon == file
             );
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
+
+            // Icon-Daten einlesen
+            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+            SettingsService.Instance.IconCategories = iconCategories;
+            IconLookup.Initialize(Settings.IconData);
+
             returnValue = file;
         }
         else
         {
-            var iconFile = Path.Combine(Settings.DataDirectory, file);
+            var iconFile = Path.Combine(Settings.DataDirectory, "customicons", file);
             if (File.Exists(iconFile))
             {
+                if (IconLookup.Get(iconItem.FileName).IsDefaultIcon)
+                {
+                    SettingsService.Instance.DefaultPinIcon = Settings.IconData.First().FileName;
+                    SettingsService.Instance.SaveSettings();
+                }
                 File.Delete(iconFile);
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
                 returnValue = "deleted";
@@ -153,6 +164,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             SettingsService.Instance.DefaultPinIcon = file;
             SettingsService.Instance.SaveSettings();
         }
+
         await CloseAsync(returnValue);
     }
 

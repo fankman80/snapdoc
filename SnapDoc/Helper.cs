@@ -174,7 +174,7 @@ public class Helper
                 itemElement.Element("Size").SetAttributeValue("Height", updatedIconItem.IconSize.Height.ToString());
                 itemElement.Element("RotationLocked").Value = updatedIconItem.IsRotationLocked.ToString();
                 itemElement.Element("AutoScaleLocked").Value = updatedIconItem.IsAutoScaleLocked.ToString();
-                itemElement.Element("CustomIcon").Value = updatedIconItem.IsAutoScaleLocked.ToString();
+                itemElement.Element("CustomIcon").Value = updatedIconItem.IsCustomIcon.ToString();
                 itemElement.Element("Color").SetAttributeValue("Red", updatedIconItem.PinColor.Red.ToString());
                 itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
                 itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
@@ -195,7 +195,7 @@ public class Helper
                         new XAttribute("Height", updatedIconItem.IconSize.Height)),
                     new XElement("RotationLocked", updatedIconItem.IsRotationLocked),
                     new XElement("AutoScaleLocked", updatedIconItem.IsAutoScaleLocked),
-                    new XElement("CustomIcon", updatedIconItem.IsAutoScaleLocked),
+                    new XElement("CustomIcon", updatedIconItem.IsCustomIcon),
                     new XElement("Color",
                         new XAttribute("Red", updatedIconItem.PinColor.Red),
                         new XAttribute("Green", updatedIconItem.PinColor.Green),

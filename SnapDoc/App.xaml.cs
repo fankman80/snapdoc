@@ -58,9 +58,8 @@ public partial class App : Application
         await Task.WhenAll(copyTasks);
 
         // Icon-Daten einlesen
-        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+        Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
-        Settings.IconData = iconItems;
         IconLookup.Initialize(Settings.IconData);
 
         // lade Einstellungen

@@ -1,9 +1,10 @@
 ﻿#nullable disable
 
+using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using FFImageLoading.Maui;
 using SnapDoc.Services;
-using CommunityToolkit.Maui.Extensions;
+using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -36,9 +37,10 @@ public partial class PopupSettings : Popup, IQueryAttributable
                 GlobalJson.LoadFromFile(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile));
             if (value as string == "Icon")
             {
-                var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+                // Icon-Daten einlesen
+                Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
                 SettingsService.Instance.IconCategories = iconCategories;
-                Settings.IconData = iconItems;
+                IconLookup.Initialize(Settings.IconData);
             }
         }
     }
@@ -121,9 +123,9 @@ public partial class PopupSettings : Popup, IQueryAttributable
             await Helper.CopyFileFromResourcesAsync("IconData.xml", Path.Combine(Settings.TemplateDirectory, "IconData.xml"));
 
             // Icon-Daten einlesen
-            var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
+            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
             SettingsService.Instance.IconCategories = iconCategories;
-            Settings.IconData = iconItems;
+            IconLookup.Initialize(Settings.IconData);
         }
     }
 

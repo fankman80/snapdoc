@@ -70,14 +70,14 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
 
         var button = sender as Button;
-        var fileName = Path.GetFileName(button.AutomationId);
+        var fileName = button.AutomationId;
 
         // Suche Icon-Daten
         var iconItem = IconLookup.Get(fileName);
         if (iconItem != null)
         {
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = Path.GetFileName(fileName);
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;
@@ -99,7 +99,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     {
         isLongPressed = true;
         var button = sender as Button;
-        var fileName = Path.GetFileName(button.AutomationId);
+        var fileName = button.AutomationId;
 
         // Suche Icon-Daten
         var iconItem = IconLookup.Get(fileName);
@@ -148,7 +148,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             var size = await Task.Run(() => GetImageSize(localPath));
 
             var updatedItem = new IconItem(
-                Path.GetFileName(fileName),
+                fileName,
                 "Neues Icon",
                 new Point(0.5, 0.5),
                 size,
@@ -165,7 +165,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             var result2 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
             if (result2.Result == null)
-                File.Delete(localPath);  // Delete temporary Icon-File
+                File.Delete(localPath);
 
             IconSorting(OrderDirection);
         }
@@ -215,11 +215,10 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     {
         if (SortPicker.SelectedItem == null) return;
 
-        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, CategoryPicker.SelectedItem.ToString());
+        Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, CategoryPicker.SelectedItem.ToString());
         SettingsService.Instance.IconCategories = iconCategories;
         SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
         SettingsService.Instance.IconCategory = CategoryPicker.SelectedItem.ToString();
-        Settings.IconData = iconItems;
 
         CategoryPicker.ItemsSource = iconCategories;
 
