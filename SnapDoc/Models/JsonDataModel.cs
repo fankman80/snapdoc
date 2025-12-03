@@ -59,6 +59,7 @@ public partial class Pin : ObservableObject
     public double PinScale { get; set; }
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
+    public bool IsCustomIcon { get; set; }
 
     [ObservableProperty] private string _pinIcon;
     [ObservableProperty] private bool _isCustomPin;

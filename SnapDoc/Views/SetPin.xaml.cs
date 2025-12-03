@@ -8,6 +8,7 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -110,16 +111,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
         else
             GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
 
-        var file = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon;
-        if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-            file = Path.Combine(Settings.DataDirectory, file);
-
         Pin = new PinItem(new Pin())
         {
             PinName = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName,
             PinDesc = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinDesc,
             PinLocation = GlobalJson.Data.Plans[PlanId].Pins[PinId].PinLocation,
-            PinIcon = file,
+            PinIcon = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon
+                        ? Path.Combine(Settings.DataDirectory, "customicons", GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon)
+                        : GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon,
             IsAllowExport = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsAllowExport,
             IsCustomPin = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomPin,
             IsLockPosition = GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockPosition

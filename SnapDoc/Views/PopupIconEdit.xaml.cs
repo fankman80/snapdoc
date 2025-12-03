@@ -19,8 +19,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     {
         InitializeComponent();
         iconItem = _iconItem;
-        var file = iconItem.FileName;
-        iconImage.Source = file;
+        iconImage.Source = iconItem.FileName;
         iconName.Text = iconItem.DisplayName;
         iconCategory.Text = iconItem.Category;
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
@@ -32,7 +31,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
         SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
 
-        if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
+        if (iconItem.IsCustomIcon)
             deleteIconContainer.IsVisible = true;
 
         setDefault.IsToggled = iconItem.IsDefaultIcon;
@@ -119,9 +118,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         // Falls CustomIcon, dann wird Pfad relativ gesetzt
         var file = iconItem.FileName;
         string returnValue = null;
-        int index = file.IndexOf("customicons", StringComparison.OrdinalIgnoreCase);
-        if (index >= 0)
-            file = file[index..];
 
         if (deleteIcon.IsToggled == false)
         {
@@ -132,6 +128,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 iconItem.IconSize,
                 allowRotate.IsToggled,
                 allowAutoScale.IsToggled,
+                iconItem.IsCustomIcon,
                 new SKColor((byte)(SelectedColor.Red * 255), (byte)(SelectedColor.Green * 255), (byte)(SelectedColor.Blue * 255)),
                 Math.Round(iconScale.Value / 100, 1),
                 iconCategory.Text,

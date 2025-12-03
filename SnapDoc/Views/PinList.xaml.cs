@@ -49,10 +49,10 @@ public partial class PinList : ContentPage
             {
                 foreach (var pin in plan.Value.Pins.Values)
                 {
-                    var pinIcon = pin.PinIcon;
-                    if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                    if (pin.IsCustomIcon)
                     {
-                        var fullPath = Path.Combine(Settings.DataDirectory, pinIcon);
+                        var fullPath = Path.Combine(Settings.DataDirectory, "customicons", pin.PinIcon);
+                        pin.PinIcon = fullPath;
                         if (!File.Exists(fullPath))
                         {
                             // Lade Default-Icon falls Custom-Icon nicht existiert
@@ -63,6 +63,7 @@ public partial class PinList : ContentPage
                             pin.IsLockRotate = iconItem.IsRotationLocked;
                             pin.IsLockAutoScale = iconItem.IsAutoScaleLocked;
                             pin.IsCustomPin = iconItem.IsCustomPin;
+                            pin.IsCustomIcon = iconItem.IsCustomIcon;
                             pin.Anchor = iconItem.AnchorPoint;
                             pin.PinScale = iconItem.IconScale;
                             pin.PinColor = iconItem.PinColor;

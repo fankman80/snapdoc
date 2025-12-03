@@ -117,9 +117,10 @@ public class Helper
                 }
 
                 var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
-                if (fileName.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+                bool isCustomIcon = bool.TryParse(itemElement.Element("CustomIcon")?.Value, out var result) && result;
+                if (isCustomIcon)
                 {
-                    fileName = Path.Combine(Settings.DataDirectory, fileName);
+                    fileName = Path.Combine(Settings.DataDirectory, "customicons", fileName);
                 }
 
                 var iconItem = new IconItem(
@@ -133,6 +134,7 @@ public class Helper
                         double.Parse(itemElement.Element("Size")?.Attribute("Height")?.Value ?? "0", CultureInfo.InvariantCulture)),
                     bool.Parse(itemElement.Element("RotationLocked")?.Value ?? "false"),
                     bool.Parse(itemElement.Element("AutoScaleLocked")?.Value ?? "false"),
+                    bool.Parse(itemElement.Element("CustomIcon")?.Value ?? "false"),
                     new SKColor(
                         byte.Parse(itemElement.Element("Color")?.Attribute("Red")?.Value ?? "0"),
                         byte.Parse(itemElement.Element("Color")?.Attribute("Green")?.Value ?? "0"),
@@ -172,6 +174,7 @@ public class Helper
                 itemElement.Element("Size").SetAttributeValue("Height", updatedIconItem.IconSize.Height.ToString());
                 itemElement.Element("RotationLocked").Value = updatedIconItem.IsRotationLocked.ToString();
                 itemElement.Element("AutoScaleLocked").Value = updatedIconItem.IsAutoScaleLocked.ToString();
+                itemElement.Element("CustomIcon").Value = updatedIconItem.IsAutoScaleLocked.ToString();
                 itemElement.Element("Color").SetAttributeValue("Red", updatedIconItem.PinColor.Red.ToString());
                 itemElement.Element("Color").SetAttributeValue("Green", updatedIconItem.PinColor.Green.ToString());
                 itemElement.Element("Color").SetAttributeValue("Blue", updatedIconItem.PinColor.Blue.ToString());
@@ -192,6 +195,7 @@ public class Helper
                         new XAttribute("Height", updatedIconItem.IconSize.Height)),
                     new XElement("RotationLocked", updatedIconItem.IsRotationLocked),
                     new XElement("AutoScaleLocked", updatedIconItem.IsAutoScaleLocked),
+                    new XElement("CustomIcon", updatedIconItem.IsAutoScaleLocked),
                     new XElement("Color",
                         new XAttribute("Red", updatedIconItem.PinColor.Red),
                         new XAttribute("Green", updatedIconItem.PinColor.Green),

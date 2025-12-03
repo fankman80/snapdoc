@@ -79,7 +79,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             }
         };
 
-        ResetBoundingBox();
         canvasView?.InvalidateSurface();
     }
 
@@ -145,14 +144,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (!poly.IsClosed)
             {
                 if (poly.Points.Count > 2 && Distance(p, poly.Points[0]) <= poly.HandleRadius)
-                {
                     poly.TryClosePolygon(p.X, p.Y);
-                }
                 else if (activeIndex == null)
-                {
                     poly.Points.Add(p);
-                    ResizeBoundingBox(p);
-                }
             }
 
             canvasView?.InvalidateSurface();
@@ -162,7 +156,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             var free = CombinedDrawable.FreeDrawable;
             free.StartStroke();
             free.AddPoint(p);
-            ResizeBoundingBox(p);
             canvasView?.InvalidateSurface();
         }
     }
@@ -172,15 +165,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (CombinedDrawable == null) return;
 
         if (DrawMode == DrawMode.Poly && activeIndex != null)
-        {
             CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
-            ResizeBoundingBox(p);
-        }
         else if (DrawMode == DrawMode.Free)
-        {
             CombinedDrawable.FreeDrawable.AddPoint(p);
-            ResizeBoundingBox(p);
-        }
 
         canvasView?.InvalidateSurface();
     }
@@ -233,9 +220,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 poly.Points.RemoveAt(i);
                 if (poly.Points.Count <= 2)
                     poly.Reset();
-                ResetBoundingBox();
-                foreach (var pt in poly.Points)
-                    ResizeBoundingBox(pt);
                 return;
             }
         }
@@ -287,37 +271,61 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     public void Reset()
     {
         CombinedDrawable?.Reset();
-        ResetBoundingBox();
         canvasView?.InvalidateSurface();
     }
 
-    // ================= BoundingBox =================
-    private void ResetBoundingBox()
+    public SKRect? CalculateBoundingBox()
     {
-        MinX = float.MaxValue;
-        MinY = float.MaxValue;
-        MaxX = float.MinValue;
-        MaxY = float.MinValue;
-    }
+        if (CombinedDrawable == null)
+            return null;
 
-    private void ResizeBoundingBox(SKPoint p)
-    {
-        if (p.X < MinX) MinX = p.X;
-        if (p.X > MaxX) MaxX = p.X;
-        if (p.Y < MinY) MinY = p.Y;
-        if (p.Y > MaxY) MaxY = p.Y;
+        float minX = float.MaxValue;
+        float minY = float.MaxValue;
+        float maxX = float.MinValue;
+        float maxY = float.MinValue;
+
+        bool hasPoints = false;
+
+        // === Polyline Punkte ===
+        var poly = CombinedDrawable.PolyDrawable;
+        if (poly != null && poly.Points.Count > 0)
+        {
+            foreach (var pt in poly.Points)
+            {
+                hasPoints = true;
+                if (pt.X < minX) minX = pt.X;
+                if (pt.X > maxX) maxX = pt.X;
+                if (pt.Y < minY) minY = pt.Y;
+                if (pt.Y > maxY) maxY = pt.Y;
+            }
+        }
+
+        // === Freehand Punkte ===
+        var free = CombinedDrawable.FreeDrawable;
+        if (free != null && free.Strokes.Count > 0)
+        {
+            foreach (var stroke in free.Strokes)
+            {
+                foreach (var pt in stroke)
+                {
+                    hasPoints = true;
+                    if (pt.X < minX) minX = pt.X;
+                    if (pt.X > maxX) maxX = pt.X;
+                    if (pt.Y < minY) minY = pt.Y;
+                    if (pt.Y > maxY) maxY = pt.Y;
+                }
+            }
+        }
+
+        if (!hasPoints)
+            return null;
+
+        return new SKRect(minX, minY, maxX, maxY);
     }
 
     public void Dispose()
     {
         Detach();
         GC.SuppressFinalize(this);
-    }
-
-    public SKRect? GetBoundingBoxRect()
-    {
-        if (MinX == float.MaxValue || MinY == float.MaxValue || MaxX == float.MinValue || MaxY == float.MinValue)
-            return null; // keine Punkte vorhanden
-        return new SKRect(MinX, MinY, MaxX, MaxY);
     }
 }

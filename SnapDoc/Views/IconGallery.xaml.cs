@@ -70,26 +70,21 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
 
         var button = sender as Button;
-        var fileName = button.AutomationId;
-
-        // Falls CustomIcon, dann wird Pfad relativ gesetzt
-        int index = fileName.IndexOf("customicons", StringComparison.OrdinalIgnoreCase);
-        if (index >= 0)
-            fileName = fileName[index..];
-
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
+        var fileName = Path.GetFileName(button.AutomationId);
 
         // Suche Icon-Daten
         var iconItem = IconLookup.Get(fileName);
         if (iconItem != null)
         {
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = fileName;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = iconItem.IsAutoScaleLocked;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = iconItem.PinColor;
             GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = iconItem.IconScale;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = iconItem.IsCustomIcon;
         }
 
         // save data to file
@@ -104,7 +99,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     {
         isLongPressed = true;
         var button = sender as Button;
-        var fileName = button.AutomationId;
+        var fileName = Path.GetFileName(button.AutomationId);
 
         // Suche Icon-Daten
         var iconItem = IconLookup.Get(fileName);
@@ -153,12 +148,13 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             var size = await Task.Run(() => GetImageSize(localPath));
 
             var updatedItem = new IconItem(
-                Path.Combine("customicons", fileName),
+                Path.GetFileName(fileName),
                 "Neues Icon",
                 new Point(0.5, 0.5),
                 size,
                 false,
                 false,
+                true,
                 new SKColor(255, 0, 0),
                 1,
                 "eigene Icons",

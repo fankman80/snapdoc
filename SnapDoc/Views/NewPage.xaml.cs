@@ -103,8 +103,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     var pinData = GlobalJson.Data.Plans[PlanId].Pins[pinId];
                     var pinIcon = pinData.PinIcon;
 
-                    if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
-                        pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
+                    if (pinData.IsCustomIcon)
+                        pinIcon = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
 
                     image.Source = pinIcon;
                     image.AnchorX = pinData.Anchor.X;
@@ -259,18 +259,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin) // Add Path for Custom Pin-Image
         {
+            _rotation = GlobalJson.Data.Plans[PlanId].Pins[pinId].PinRotation;
             pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
-            //_rotation = 0;
         }
-        else if (pinIcon.StartsWith("customicons", StringComparison.OrdinalIgnoreCase))
+        else if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomIcon)
         {
-            var _pinIcon = Path.Combine(Settings.DataDirectory, pinIcon);
+            var _pinIcon = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
             if (File.Exists(_pinIcon))
                 pinIcon = _pinIcon;
             else
             {
                 // Lade Default-Icon falls Custom-Icon nicht existiert
-                var iconItem = Settings.IconData.First();
+                string _newPin = SettingsService.Instance.DefaultPinIcon;
+                var iconItem = IconLookup.Get(_newPin);
                 pinIcon = iconItem.FileName;
                 _originAnchor = iconItem.AnchorPoint;
                 _pinSize = iconItem.IconSize;
@@ -497,6 +498,74 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
+    private void SetPinBAK(
+    Point pos,
+    string customName = null,
+    int customPinSizeWidth = 0,
+    int customPinSizeHeight = 0,
+    SKColor? pinColor = null,
+    double customScale = 1,
+    double rotation = 0)
+    {
+        if (Shell.Current.CurrentPage is not NewPage)
+            return;
+
+        // Icon-Daten laden
+        var iconItems = Helper.LoadIconItems(
+            Path.Combine(Settings.TemplateDirectory, "IconData.xml"),
+            out List<string> iconCategories);
+
+        SettingsService.Instance.IconCategories = iconCategories;
+        Settings.IconData = iconItems;
+
+        string id = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string pinKey = SettingsService.Instance.DefaultPinIcon;
+
+        // Standard-Icondaten laden
+        var icon = IconLookup.Get(pinKey);
+
+        // Wenn Custom-Pin: Defaults überschreiben
+        bool isCustom = customName != null;
+
+        var pin = new Pin
+        {
+            Pos = pos,
+            Anchor = isCustom ? new Point(0.5, 0.5) : icon.AnchorPoint,
+            Size = isCustom ? new Size(customPinSizeWidth, customPinSizeHeight) : icon.IconSize,
+            IsLockPosition = isCustom,
+            IsLockRotate = isCustom || icon.IsRotationLocked,
+            IsLockAutoScale = isCustom || icon.IsAutoScaleLocked,
+            IsCustomPin = isCustom,
+            PinName = isCustom ? "" : icon.DisplayName,
+            PinDesc = "",
+            PinPriority = 0,
+            PinLocation = "",
+            PinIcon = isCustom ? customName : pinKey,
+            Fotos = [],
+            OnPlanId = PlanId,
+            SelfId = id,
+            DateTime = DateTime.Now,
+            PinColor = pinColor ?? SKColors.Red,
+            PinScale = isCustom ? customScale : icon.IconScale,
+            PinRotation = rotation,
+            GeoLocation = null,
+            IsAllowExport = true
+        };
+
+        // Plan schreiben
+        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
+        {
+            plan.Pins ??= [];
+            plan.Pins[id] = pin;
+            plan.PinCount++;
+
+            GlobalJson.SaveToFile();
+
+            AddPin(id, pin.PinIcon);
+            _ = UpdatePinLocationAsync(pin);
+        }
+    }
+
     private void SetPin(Point _pos,
                         string customName = null,
                         int customPinSizeWidth = 0,
@@ -507,11 +576,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage == null) return;
-
-        // Icon-Daten einlesen
-        var iconItems = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
-        SettingsService.Instance.IconCategories = iconCategories;
-        Settings.IconData = iconItems;
 
         string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string _newPin = SettingsService.Instance.DefaultPinIcon;
@@ -524,6 +588,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         bool _isAutoScaleLocked = iconItem.IsAutoScaleLocked;
         bool _isPosLocked = false;
         bool _isCustomPin = false;
+        bool _isCustomIcon = iconItem.IsCustomIcon;
         bool _isAllowExport = true;
         string _displayName = iconItem.DisplayName;
         double _scale = iconItem.IconScale;
@@ -536,6 +601,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             _isAutoScaleLocked = true;
             _isPosLocked = true;
             _isCustomPin = true;
+            _isCustomIcon = false;
             _newPin = customName;
             _displayName = "";
             _isAllowExport = true;
@@ -552,6 +618,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             IsLockRotate = _isRotationLocked,
             IsLockAutoScale = _isAutoScaleLocked,
             IsCustomPin = _isCustomPin,
+            IsCustomIcon = _isCustomIcon,
             PinName = _displayName,
             PinDesc = "",
             PinPriority = 0,
@@ -800,8 +867,31 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cx = imageRect.MidX / density * densityX;
             var cy = imageRect.MidY / density * densityY;
 
-            var ox =  1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * ((cx - (drawingView.Width / 2)) / planContainer.Scale);
-            var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * ((cy - (drawingView.Height / 2)) / planContainer.Scale);
+            // Mittelpunkt der DrawingView
+            double centerX = drawingView.Width / 2;
+            double centerY = drawingView.Height / 2;
+
+            // Punkt relativ zum Zentrum
+            double rx = cx - centerX;
+            double ry = cy - centerY;
+
+            // Inverse Rotation anwenden
+            double angle = -planContainer.Rotation * (Math.PI / 180.0);
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
+
+            double ux = rx * cos - ry * sin;   // zurückrotierte X-Koordinate
+            double uy = rx * sin + ry * cos;   // zurückrotierte Y-Koordinate
+
+            // Jetzt wieder zurück in absolute Koordinate
+            double fx = ux + centerX;
+            double fy = uy + centerY;
+
+            var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
+                     ((fx - drawingView.Width / 2) / planContainer.Scale);
+
+            var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
+                     ((fy - drawingView.Height / 2) / planContainer.Scale);
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
@@ -857,7 +947,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
         var offset = (lineWidth * density) / 2;
-        var boundingBox = drawingController.GetBoundingBoxRect();
+        var boundingBox = drawingController.CalculateBoundingBox();
         var cropRect = new SKRectI((int)(boundingBox.Value.Left - offset), (int)(boundingBox.Value.Top - offset), (int)(boundingBox.Value.Right + offset), (int)(boundingBox.Value.Bottom + offset));
 
         // Croppen
