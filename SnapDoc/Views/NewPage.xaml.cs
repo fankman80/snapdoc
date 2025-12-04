@@ -29,6 +29,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null;
     private double densityX, densityY;
+    private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
     private Point mousePos;
     private int lineWidth = 5;
@@ -212,17 +213,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PlanImage.DownsampleWidth = SettingsService.Instance.MaxPdfImageSizeW;
             PlanImage.DownsampleHeight = SettingsService.Instance.MaxPdfImageSizeH;
 
-            var scaleFac = Math.Min(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height) /
+            oversizeScaleFac = Math.Min(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height) /
                            Math.Max(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height);
 
             if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > GlobalJson.Data.Plans[PlanId].ImageSize.Height)
             {
                 PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW;
-                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * scaleFac;
+                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * oversizeScaleFac;
             }
             else
             {
-                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * scaleFac;
+                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * oversizeScaleFac;
                 PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH;
             }
         }
@@ -796,8 +797,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
             // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
-            var cx = imageRect.MidX / density * densityX;
-            var cy = imageRect.MidY / density * densityY;
+            var cx = imageRect.MidX / density * densityX * oversizeScaleFac;   // evtl. "* oversizeScaleFac" wieder enfernen
+            var cy = imageRect.MidY / density * densityY * oversizeScaleFac;   // evtl. "* oversizeScaleFac" wieder enfernen
 
             // Mittelpunkt der DrawingView
             double centerX = drawingView.Width / 2;
@@ -812,18 +813,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             double cos = Math.Cos(angle);
             double sin = Math.Sin(angle);
 
-            double ux = rx * cos - ry * sin;   // zurückrotierte X-Koordinate
-            double uy = rx * sin + ry * cos;   // zurückrotierte Y-Koordinate
+            double ux = rx * cos - ry * sin;
+            double uy = rx * sin + ry * cos;
 
             // Jetzt wieder zurück in absolute Koordinate
             double fx = ux + centerX;
             double fy = uy + centerY;
 
             var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
-                     ((fx - drawingView.Width / 2) / planContainer.Scale);
+                     ((fx - drawingView.Width / 2) / planContainer.Scale / density * densityX * oversizeScaleFac); // evtl. "/ density * densityX * oversizeScaleFac" wieder entfernen
 
             var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
-                     ((fy - drawingView.Height / 2) / planContainer.Scale);
+                     ((fy - drawingView.Height / 2) / planContainer.Scale / density * densityY * oversizeScaleFac); // evtl. "/ density * densityY * oversizeScaleFac" wieder entfernen
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
@@ -831,7 +832,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     (int)imageRect.Width,
                     (int)imageRect.Height,
                     new SKColor(SelectedColor.ToUint()),
-                    1 / planContainer.Scale / density * densityX,
+                    1 / planContainer.Scale / density * densityX * oversizeScaleFac,
                     Helper.NormalizeAngle360(-planContainer.Rotation));
         }
 
