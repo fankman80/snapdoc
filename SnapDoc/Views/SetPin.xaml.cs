@@ -14,8 +14,11 @@ namespace SnapDoc.Views;
 public partial class SetPin : ContentPage, IQueryAttributable
 {
     private readonly HashSet<Picker> _initializedPickers = [];
+    
+    public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
     public int DynamicSpan { get; set; } = 3;
     public int DynamicSize;
+
     private string PlanId;
     private string PinId;
     private string SenderView;
@@ -30,20 +33,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
             {
                 images = value;
                 OnPropertyChanged(nameof(Images));
-            }
-        }
-    }
-
-    private Color priorityColor;
-    public Color PriorityColor
-    {
-        get => priorityColor;
-        set
-        {
-            if (priorityColor != value)
-            {
-                priorityColor = value;
-                OnPropertyChanged(nameof(PriorityColor));
             }
         }
     }
@@ -110,16 +99,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         else
             GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
 
-        priorityPicker.ItemsSource = SettingsService.Instance.PriorityItems.Select(item => item.Key).ToList();
-        
         Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
-
-        if (Pin.PinPriority == 0)
-            PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark
-                        ? (Color)Application.Current.Resources["PrimaryDarkText"]
-                        : (Color)Application.Current.Resources["PrimaryText"];
-        else
-            PriorityColor = Color.FromArgb(SettingsService.Instance.PriorityItems[priorityPicker.SelectedIndex].Color);
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -307,9 +287,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             return;
 
         if (_initializedPickers.Add(picker) == false)
-        {
-            PriorityColor = Color.FromArgb(SettingsService.Instance.PriorityItems[picker.SelectedIndex].Color);
-        }
+            Pin.PinPriority = picker.SelectedIndex;
     }
 
     private void OnReorderCompleted(object sender, EventArgs e)

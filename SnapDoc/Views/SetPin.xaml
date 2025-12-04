@@ -180,8 +180,8 @@
                     StrokeShape="RoundRectangle 8">
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0">
                     <Picker Grid.Column="0"
-                            x:Name="priorityPicker"
                             BackgroundColor="Transparent"
+                            ItemsSource="{Binding PinPriorites}"
                             SelectedIndex="{Binding Pin.PinPriority}"
                             SelectedIndexChanged="OnSelectedItemChanged"/>
                     <Label Grid.Column="1" Text="{x:Static m:MaterialOutlined.Traffic}"
@@ -189,7 +189,7 @@
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
                            FontFamily="MaterialOutlined"
-                           TextColor="{Binding PriorityColor}"
+                           TextColor="{Binding Pin.PriorityColor}"
                            FontSize="34"/>
                 </Grid>
             </Border>

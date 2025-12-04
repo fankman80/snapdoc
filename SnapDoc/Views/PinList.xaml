@@ -44,7 +44,7 @@
 
         <Border Grid.Row="0" HorizontalOptions="Start"
                 MinimumWidthRequest="140"
-                Padding="3,-2,3,0"
+                Padding="0"
                 HeightRequest="38"
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
@@ -52,6 +52,7 @@
             <Entry x:Name="SearchEntry"
                     FontSize="12"
                     VerticalTextAlignment="Center"
+                    VerticalOptions="Center"
                     Placeholder="Suche..."
                     TextChanged="SearchEntry_TextChanged"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
@@ -100,6 +101,7 @@
                     <DataTemplate x:DataType="local:PinItem">
                         <Grid RowSpacing="0" ColumnSpacing="0">
                             <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="80" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="50" />
@@ -112,34 +114,44 @@
                                 <RowDefinition Height="Auto"/>
                             </Grid.RowDefinitions>
 
-                            <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
-                                   Margin="14,6,0,0"
+                            <!-- Priority Color -->
+                            <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="4"
+                                    Margin="4"
+                                    BackgroundColor="{Binding PriorityColor}"
+                                    StrokeThickness="0"
+                                    StrokeShape="RoundRectangle 4"/>
+
+                            <!-- Plan und Position-->
+                            <Label Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
+                                   Margin="6,6,0,0"
                                    FontSize="12"
                                    LineBreakMode="TailTruncation"
                                    Text="{Binding PlanDisplay}"/>
-                            <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
-                                   Margin="14,0,0,0"
+
+                            <!-- Pinname -->
+                            <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
+                                   Margin="6,0,0,0"
                                    FontSize="12"
                                    LineBreakMode="TailTruncation"
                                    Text="{Binding PinName}"/>
                             
                             <!-- Trennlinie -->
-                            <BoxView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4"
+                            <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                      HeightRequest="1"
-                                     Margin="10,2,10,2"/>
-                            
+                                     Margin="4,2,10,2"/>
+
                             <!-- Pinbeschreibung -->
-                            <Label Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
+                            <Label Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3"
                                    MaxLines="4"
                                    LineBreakMode="TailTruncation"
                                    MinimumHeightRequest="80"
                                    FontSize="12"
                                    Margin="6,4,10,4"
                                    Text="{Binding PinDesc}"/>
-
+                            
                             <!-- PinEdit-Button -->
-                            <Button Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="4" Grid.RowSpan="4"
+                            <Button Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="5" Grid.RowSpan="4"
                                     ClassId="{Binding SelfId}"
                                     AutomationId = "{Binding OnPlanId}"
                                     BorderWidth="0"
@@ -148,8 +160,21 @@
                                     Opacity="0.5"
                                     Clicked="OnEditClicked"/>
                             
+                            <!-- IconEdit-Button -->
+                            <Image Grid.Column="1" Grid.Row="3"
+                                   IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
+                                   Margin="6"
+                                   ClassId="{Binding SelfId}"
+                                   AutomationId = "{Binding OnPlanId}"
+                                   Source="{Binding DisplayIconPath}"
+                                   Aspect="AspectFit">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnPinIconClicked"/>
+                                </Image.GestureRecognizers>
+                            </Image>
+
                             <!-- Zoom to Pin-Button -->
-                            <Button Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
+                            <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
                                     Padding="0,5,0,0"
                                     ClassId="{Binding SelfId}"
                                     AutomationId = "{Binding OnPlanId}"
@@ -158,7 +183,7 @@
                                     Clicked="OnPinClicked"/>
 
                             <!-- Allow Export-Button -->
-                            <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                            <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
                                     Text="{Binding IsAllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                     Padding="0,5,10,0"
                                     FontFamily="MaterialOutlined"
@@ -169,19 +194,6 @@
                                     TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Clicked="OnAllowExportClicked"/>
                             
-                            <!-- IconEdit-Button -->
-                            <Image Grid.Column="0" Grid.Row="3"
-                                   IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
-                                   Margin="14"
-                                   ClassId="{Binding SelfId}"
-                                   AutomationId = "{Binding OnPlanId}"
-                                   Source="{Binding DisplayIconPath}"
-                                   Aspect="AspectFit">
-                                <Image.GestureRecognizers>
-                                    <TapGestureRecognizer Tapped="OnPinIconClicked"/>
-                                </Image.GestureRecognizers>
-                            </Image>
-
                             <!-- This BoxView is used to control the opacity of the CollectionView-Item based on AllowExport property -->
                             <BoxView Grid.ColumnSpan="5" Grid.RowSpan="4"
                                      IsVisible="{Binding IsAllowExport, Converter={StaticResource InvertedBoolConverter}}"
@@ -193,7 +205,7 @@
                             <Border Grid.ColumnSpan="5" Grid.RowSpan="4"
                                     StrokeThickness="1"
                                     Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    StrokeShape="RoundRectangle 10"/>
+                                    StrokeShape="RoundRectangle 4"/>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

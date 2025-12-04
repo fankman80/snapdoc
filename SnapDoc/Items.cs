@@ -72,7 +72,13 @@ namespace SnapDoc
                 if (e.PropertyName == nameof(Pin.IsAllowExport))
                     OnPropertyChanged(nameof(IsAllowExport));
             };
+            UpdatePriorityColor();
         }
+
+        // Grunddaten aus dem Modell
+        public string SelfId => _pin.SelfId;
+        public string OnPlanId => _pin.OnPlanId;
+        public DateTime Time => _pin.DateTime;
 
         public string DisplayIconPath
         {
@@ -96,12 +102,6 @@ namespace SnapDoc
                 return PinIcon;
             }
         }
-
-        // Grunddaten aus dem Modell
-        public string SelfId => _pin.SelfId;
-        public string OnPlanId => _pin.OnPlanId;
-        public int PinPriority => _pin.PinPriority;
-        public DateTime Time => _pin.DateTime;
 
         public string PinName
         {
@@ -191,6 +191,50 @@ namespace SnapDoc
                     _pin.IsLockPosition = value;
                     OnPropertyChanged();
                 }
+            }
+        }
+
+        public int PinPriority
+        {
+            get => _pin.PinPriority;
+            set
+            {
+                if (_pin.PinPriority != value)
+                {
+                    _pin.PinPriority = value;
+                    OnPropertyChanged();
+
+                    // Hier neue Farbe laden
+                    UpdatePriorityColor();
+                }
+            }
+        }
+
+        private Color _priorityColor;
+        public Color PriorityColor
+        {
+            get => _priorityColor;
+            set
+            {
+                if (_priorityColor != value)
+                {
+                    _priorityColor = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        private void UpdatePriorityColor()
+        {
+            var items = SettingsService.Instance.PriorityItems;
+
+            if (PinPriority > 0 && PinPriority < items.Count)
+                PriorityColor = Color.FromArgb(items[PinPriority].Color);
+            else
+            {
+                PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark
+                              ? (Color)Application.Current.Resources["PrimaryDarkText"]
+                              : (Color)Application.Current.Resources["PrimaryText"];
             }
         }
 
