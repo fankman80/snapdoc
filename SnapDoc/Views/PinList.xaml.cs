@@ -37,7 +37,6 @@ public partial class PinList : ContentPage
 
     private void LoadPins()
     {
-        int pincounter = 0;
         pinListView.ItemsSource = null;
         pinItems.Clear();
         bool saveRequested = false;
@@ -50,7 +49,6 @@ public partial class PinList : ContentPage
                 {
                     var newPin = new PinItem(pin);
                     pinItems.Add(newPin);
-                    pincounter++;
                 }
             }
         }

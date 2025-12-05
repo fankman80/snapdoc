@@ -143,7 +143,10 @@ public class Helper
         }
         catch (Exception ex)
         {
-            Toast.Make($"Fehler in der Icon-Datenbank." + ex.Message).Show();
+            if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                Application.Current.Windows[0].Page.DisplayAlertAsync("", $"Fehler in der Icon-Datenbank." + ex.Message, "OK");
+            else
+                Toast.Make($"Fehler in der Icon-Datenbank." + ex.Message).Show();
         }
 
         allCategories = [.. categories];
@@ -359,13 +362,11 @@ public class Helper
         private static readonly Dictionary<string, IconItem> _icons =
             new(StringComparer.OrdinalIgnoreCase);
 
-        private static readonly object _lock = new();
+        private static readonly Lock _lock = new();
 
         private static IconItem _fallback;
 
-        /// <summary>
-        /// Lädt die Icon-Liste komplett neu.
-        /// </summary>
+        // Lädt die Icon-Liste komplett neu.
         public static void Initialize(IEnumerable<IconItem> icons)
         {
             lock (_lock)
@@ -380,9 +381,7 @@ public class Helper
             }
         }
 
-        /// <summary>
-        /// Entfernt alle Icons.
-        /// </summary>
+        // Entfernt alle Icons.
         public static void Reset()
         {
             lock (_lock)
@@ -392,33 +391,26 @@ public class Helper
             }
         }
 
-        /// <summary>
-        /// Fügt ein Icon hinzu oder aktualisiert es.
-        /// </summary>
+        // Fügt ein Icon hinzu oder aktualisiert es.
         public static void AddOrUpdate(IconItem icon)
         {
             lock (_lock)
             {
                 _icons[icon.FileName] = icon;
-
-                if (_fallback == null)
-                    _fallback = icon;
+                _fallback ??= icon;
             }
         }
 
         public static void Remove(string fileName)
         {
-            if (_icons.ContainsKey(fileName))
-                _icons.Remove(fileName);
+            _icons.Remove(fileName);
 
             // Fallback neu setzen, falls das gelöschte Icon der Fallback war
             if (_fallback != null && _fallback.FileName.Equals(fileName, StringComparison.OrdinalIgnoreCase))
                 _fallback = _icons.Values.FirstOrDefault();
         }
 
-        /// <summary>
-        /// Holt ein Icon; wenn nicht gefunden, gibt das Fallback zurück.
-        /// </summary>
+        // Holt ein Icon; wenn nicht gefunden, gibt das Fallback zurück.
         public static IconItem Get(string fileName)
         {
             lock (_lock)

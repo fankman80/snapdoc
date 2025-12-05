@@ -172,7 +172,10 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
         catch (Exception ex)
         {
-            Toast.Make("Fehler beim Importieren des Bildes: " + ex.Message);
+            if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Fehler beim Importieren des Bildes: " + ex.Message, "OK");
+            else
+                await Toast.Make("Fehler beim Importieren des Bildes: " + ex.Message).Show();
         }
     }
 

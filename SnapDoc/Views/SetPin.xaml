@@ -164,10 +164,11 @@
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"
-                        BackgroundColor="White"
+                        BackgroundColor="Transparent"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
                     <ImageButton Source="{Binding Pin.DisplayIconPath}"
+                                 BackgroundColor="Transparent"
                                  Aspect="AspectFit"
                                  Clicked="OnPinSelectClick"
                                  Padding="12"/>

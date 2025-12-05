@@ -122,32 +122,50 @@ public partial class OpenProject : ContentPage
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
+        // 1. BusyIndicator SOFORT einschalten
+        // Damit ist er sichtbar, sobald der Picker sich schließt und der Download läuft
+        busyOverlay.BusyMessage = "Warte auf Datei...";
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+
         try
         {
-            // Öffne den FilePicker nur für PDF-Dateien
+            // 2. FilePicker öffnen
+            // Der Code "wartet" hier, während der User wählt UND während das OS herunterlädt
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = "Bitte wähle eine Zip-Datei aus"
             });
 
-            var targetDirectory = Settings.DataDirectory;
             if (fileResult != null)
             {
-                busyOverlay.IsOverlayVisible = true;
-                busyOverlay.IsActivityRunning = true;
+                // Optional: Nachricht aktualisieren, dass der Download fertig ist und nun verarbeitet wird
                 busyOverlay.BusyMessage = "Projekt wird importiert...";
-                // Hintergrundoperation (nicht UI-Operationen)
-                await Task.Run(() => { Helper.UnpackDirectory(fileResult.FullPath, targetDirectory); });
-                busyOverlay.IsActivityRunning = false;
-                busyOverlay.IsOverlayVisible = false;
+
+                var targetDirectory = Settings.DataDirectory;
+
+                // Hintergrundoperation
+                await Task.Run(() =>
+                {
+                    Helper.UnpackDirectory(fileResult.FullPath, targetDirectory);
+                });
 
                 LoadJsonFiles();
             }
         }
         catch (Exception ex)
         {
-            // Fehlerbehandlung (z.B. wenn der Benutzer den Picker abbricht)
             Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
+            if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("Fehler", "Die Datei konnte nicht importiert werden.", "OK");
+            else
+                await Toast.Make($"Die Datei konnte nicht importiert werden.").Show();
+        }
+        finally
+        {
+            // 3. Aufräumen (Wird IMMER ausgeführt, auch bei Fehler oder Abbrechen)
+            busyOverlay.IsActivityRunning = false;
+            busyOverlay.IsOverlayVisible = false;
         }
     }
 
@@ -156,6 +174,7 @@ public partial class OpenProject : ContentPage
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = "Projekt wird geladen...";
+
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(() =>
         {
@@ -263,9 +282,9 @@ public partial class OpenProject : ContentPage
                     {
                         var fileSaveResult = await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(item.FileName) + ".zip", saveStream);
                         if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                            await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Zip wurde exportiert", "OK");
+                            await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Zip wurde exportiert.", "OK");
                         else
-                            await Toast.Make($"Zip wurde exportiert").Show();
+                            await Toast.Make($"Zip wurde exportiert.").Show();
                     }
                     finally
                     {

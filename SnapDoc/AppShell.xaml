@@ -198,7 +198,7 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                 </HorizontalStackLayout>
 
-                <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="0" Margin="6">
+                <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="0" VerticalOptions="Center">
                     <Label Text="SnapDoc"
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontAttributes="Bold"
@@ -220,7 +220,7 @@
                     <ImageButton.Source>
                         <FontImageSource Glyph="{x:Static m:MaterialOutlined.Settings}"
                          FontFamily="MaterialOutlined"
-                         Size="24"
+                         Size="26"
                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     </ImageButton.Source>
                 </ImageButton>

@@ -63,16 +63,16 @@ public partial class ExportSettings : ContentPage
         {
             await ShareFileAsync(outputPath);
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde geteilt", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde geteilt.", "OK");
             else
-                await Toast.Make($"Bericht wurde geteilt").Show();
+                await Toast.Make($"Bericht wurde geteilt.").Show();
         }
         catch
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht geteilt", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht geteilt.", "OK");
             else
-                await Toast.Make($"Bericht wurde nicht geteilt").Show();
+                await Toast.Make($"Bericht wurde nicht geteilt.").Show();
         }
 
         if (File.Exists(outputPath))
@@ -109,16 +109,16 @@ public partial class ExportSettings : ContentPage
         if (fileSaveResult.IsSuccessful)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde gespeichert", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde gespeichert.", "OK");
             else
-                await Toast.Make($"Bericht wurde gespeichert").Show();
+                await Toast.Make($"Bericht wurde gespeichert.").Show();
         }
         else
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht gespeichert", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht gespeichert.", "OK");
             else
-                await Toast.Make($"Bericht wurde nicht gespeichert").Show();
+                await Toast.Make($"Bericht wurde nicht gespeichert.").Show();
         }
         saveStream.Close();
 

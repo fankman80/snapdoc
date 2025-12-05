@@ -332,16 +332,16 @@ public partial class MapView : IQueryAttributable
         if (fileSaveResult.IsSuccessful)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde gespeichert", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde gespeichert.", "OK");
             else
-                await Toast.Make($"KML-Datei wurde gespeichert").Show();
+                await Toast.Make($"KML-Datei wurde gespeichert.").Show();
         }
         else
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde nicht gespeichert", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde nicht gespeichert.", "OK");
             else
-                await Toast.Make($"KML-Datei wurde nicht gespeichert").Show();
+                await Toast.Make($"KML-Datei wurde nicht gespeichert.").Show();
         }
         saveStream.Close();
 
