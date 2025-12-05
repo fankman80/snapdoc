@@ -79,6 +79,7 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                 this.Title = "Titelbild";
+                DrawBtn.IsVisible = false;
             }
             else
             {
