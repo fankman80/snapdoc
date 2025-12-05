@@ -256,6 +256,15 @@ public partial class MapView : IQueryAttributable
 
     private async void SetPosClicked(object sender, EventArgs e)
     {
+        if (!geoViewModel.IsGpsActive)
+        {
+            if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("Standortdienste deaktiviert", "Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.", "OK");
+            else
+                await Toast.Make($"Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.").Show();
+            return;
+        }
+        
         Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
 
         lon = location.Longitude;
