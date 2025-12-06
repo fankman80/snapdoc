@@ -81,7 +81,7 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:PhotoItem">
                     <VerticalStackLayout>
-                        <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
+                        <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                             <views:SquareView Margin="4">
                                 <Image Source="{Binding ImagePath}" Aspect="AspectFill">
                                     <Image.GestureRecognizers>
