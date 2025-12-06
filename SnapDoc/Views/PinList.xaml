@@ -101,7 +101,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PinItem" >
                         <Grid RowSpacing="0" ColumnSpacing="0"
-                              Opacity="{Binding IsAllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
+                              Opacity="{Binding IsAllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="64" />
