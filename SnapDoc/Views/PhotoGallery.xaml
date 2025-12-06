@@ -11,7 +11,7 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
-             x:Class="SnapDoc.Views.PhotoGalleryView"
+             x:Class="SnapDoc.Views.FotoGalleryView"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Title="Foto Galerie">
@@ -19,7 +19,7 @@
     <Shell.TitleView>
         <HorizontalStackLayout>
             <Label Grid.Column="0"
-                   x:DataType="views:PhotoGalleryView"
+                   x:DataType="views:FotoGalleryView"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -45,7 +45,7 @@
         </Grid.RowDefinitions>
 
         <Grid Grid.Row="0" HorizontalOptions="Start"
-              x:DataType="views:PhotoGalleryView"
+              x:DataType="views:FotoGalleryView"
               ColumnDefinitions="50, Auto"
               HeightRequest="40">
             <controls:Switch Grid.Column="0"
@@ -57,7 +57,7 @@
                              KnobColorOff="White"
                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-            <Label Text="nur aktive Fotos anzeigen" Grid.Column="1" VerticalOptions="Center" />
+            <Label Text="inaktive Fotos ausblenden" Grid.Column="1" VerticalOptions="Center" />
         </Grid>
 
         <Border Grid.Row="0" HorizontalOptions="End" 
@@ -75,15 +75,15 @@
             </Image>
         </Border>
 
-        <Grid x:DataType="views:PhotoGalleryView" Grid.Row="1">
+        <Grid x:DataType="views:FotoGalleryView" Grid.Row="1">
             <CollectionView Grid.Row="0"
-                            x:Name="PhotoGallery"
-                            ItemsSource="{Binding Photos}">
+                            x:Name="FotoGallery"
+                            ItemsSource="{Binding Fotos}">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
             </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:PhotoItem">
+                    <DataTemplate x:DataType="local:FotoItem">
                         <VerticalStackLayout>
                             <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                                 <views:SquareView Margin="4">
@@ -121,5 +121,8 @@
                 </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
+        <Label Grid.Row="2"
+               x:Name="FotoCounterLabel"
+               FontSize="12"/>
     </Grid>
 </ContentPage>

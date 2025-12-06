@@ -16,7 +16,7 @@ public partial class AppShell : Shell
         InitializeComponent();
         Routing.RegisterRoute("open_project", typeof(OpenProject));
         Routing.RegisterRoute("icongallery", typeof(IconGallery));
-        Routing.RegisterRoute("photogallery", typeof(PhotoGalleryView));
+        Routing.RegisterRoute("fotogallery", typeof(FotoGalleryView));
         Routing.RegisterRoute("setpin", typeof(SetPin));
         Routing.RegisterRoute("imageview", typeof(ImageViewPage));
         Routing.RegisterRoute("project_details", typeof(ProjectDetails));

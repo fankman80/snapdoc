@@ -131,6 +131,6 @@ public partial class ProjectDetails : ContentPage
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"imageview?imgSource=showTitle");
+        await Shell.Current.GoToAsync($"imageview?imgSource=showTitle&gotoBtn=false");
     }
 }

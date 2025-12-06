@@ -344,7 +344,7 @@ namespace SnapDoc
         [ObservableProperty] private bool _isSelected;
     }
 
-    public partial class PhotoItem : ObservableObject
+    public partial class FotoItem : ObservableObject
     {
         public string ImagePath { get; set; }
         public DateTime DateTime { get; set; }

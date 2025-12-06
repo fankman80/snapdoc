@@ -7,6 +7,7 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace SnapDoc.Views;
 
@@ -20,7 +21,7 @@ public partial class ImageViewPage : IQueryAttributable
     private float selectedOpacity = 0.5f;
     private bool isCleared = false;
     private bool hasFittedImage = false;
-    private readonly TransformViewModel photoContainer;
+    private readonly TransformViewModel fotoContainer;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
 
     // --- DrawingController + Canvas ---
@@ -29,6 +30,17 @@ public partial class ImageViewPage : IQueryAttributable
 
     // UI state
     private DrawMode drawMode = DrawMode.None;
+
+    private bool isGotoPinBtnVisible = false;
+    public bool IsGotoPinBtnVisible
+    {
+        get => isGotoPinBtnVisible;
+        set
+        {
+            isGotoPinBtnVisible = value;
+            OnPropertyChanged();
+        }
+    }
 
     private Color selectedColor = new(255, 0, 0);
     public Color SelectedColor
@@ -44,11 +56,13 @@ public partial class ImageViewPage : IQueryAttributable
     public ImageViewPage()
     {
         InitializeComponent();
-        PhotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
-        photoContainer = new TransformViewModel();
-        BindingContext = photoContainer;
 
-        drawingController = new DrawingController(photoContainer, density);
+        BindingContext = this;
+
+        fotoContainer = new TransformViewModel();
+        FotoContainer.BindingContext = fotoContainer;
+        FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
+        drawingController = new DrawingController(fotoContainer, density);
     }
 
     protected override void OnAppearing()
@@ -59,7 +73,7 @@ public partial class ImageViewPage : IQueryAttributable
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
         if (hasFittedImage) return;
-        if (PhotoContainer.Width < 10 || PhotoContainer.Height < 10) return;
+        if (FotoContainer.Width < 10 || FotoContainer.Height < 10) return;
 
         hasFittedImage = true;
         Dispatcher.Dispatch(() => ImageFit(null, null));
@@ -70,7 +84,6 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("planId", out object value1)) PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2)) PinId = value2 as string;
         if (query.TryGetValue("pinIcon", out object value3)) PinIcon = value3 as string;
-
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource ??= value4 as string;
@@ -84,39 +97,41 @@ public partial class ImageViewPage : IQueryAttributable
             else
             {
                 imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
-                var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].DateTime;
+                var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
                 string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                 this.Title = formattedDate;
             }
-            PhotoImage.Source = imgPath;
+            FotoImage.Source = imgPath;
         }
+        if (query.TryGetValue("gotoBtn", out var value5))
+            IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
     }
 
     public void OnDoubleTapped(object sender, EventArgs e) => ImageFit(null, null);
 
     public void OnPinching(object sender, PinchEventArgs e)
     {
-        photoContainer.IsPanningEnabled = false;
+        fotoContainer.IsPanningEnabled = false;
         drawingController.ResizePolyHandles();
     }
 
     public void OnPinched(object sender, PinchEventArgs e)
     {
-        photoContainer.IsPanningEnabled = true;
+        fotoContainer.IsPanningEnabled = true;
     }
 
     public void OnPanning(object sender, PanEventArgs e)
     {
-        if (!photoContainer.IsPanningEnabled) return;
+        if (!fotoContainer.IsPanningEnabled) return;
 
-        var scaleSpeed = 1 / PhotoContainer.Scale;
-        double angle = PhotoContainer.Rotation * Math.PI / 180.0;
+        var scaleSpeed = 1 / FotoContainer.Scale;
+        double angle = FotoContainer.Rotation * Math.PI / 180.0;
         double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
         double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
-        photoContainer.TranslationX += deltaX * scaleSpeed;
-        photoContainer.TranslationY += deltaY * scaleSpeed;
-        photoContainer.AnchorX = 1 / PhotoContainer.Width * ((this.Width / 2) - photoContainer.TranslationX);
-        photoContainer.AnchorY = 1 / PhotoContainer.Height * ((this.Height / 2) - photoContainer.TranslationY);
+        fotoContainer.TranslationX += deltaX * scaleSpeed;
+        fotoContainer.TranslationY += deltaY * scaleSpeed;
+        fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX);
+        fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY);
     }
 
     private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
@@ -124,36 +139,41 @@ public partial class ImageViewPage : IQueryAttributable
         var mousePos = e.Center;
 
         double zoomFactor;
-        if (photoContainer.Scale > 2)
+        if (fotoContainer.Scale > 2)
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.05 : 0.95;
-        else if (photoContainer.Scale > 1)
+        else if (fotoContainer.Scale > 1)
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.1 : 0.9;
         else
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;
 
-        double targetScale = photoContainer.Scale * zoomFactor;
-        double newAnchorX = 1 / PhotoContainer.Width * (mousePos.X - photoContainer.TranslationX);
-        double newAnchorY = 1 / PhotoContainer.Height * (mousePos.Y - photoContainer.TranslationY);
-        double deltaTranslationX = (PhotoContainer.Width * (newAnchorX - photoContainer.AnchorX)) * (targetScale / photoContainer.Scale - 1);
-        double deltaTranslationY = (PhotoContainer.Height * (newAnchorY - photoContainer.AnchorY)) * (targetScale / photoContainer.Scale - 1);
+        double targetScale = fotoContainer.Scale * zoomFactor;
+        double newAnchorX = 1 / FotoContainer.Width * (mousePos.X - fotoContainer.TranslationX);
+        double newAnchorY = 1 / FotoContainer.Height * (mousePos.Y - fotoContainer.TranslationY);
+        double deltaTranslationX = (FotoContainer.Width * (newAnchorX - fotoContainer.AnchorX)) * (targetScale / fotoContainer.Scale - 1);
+        double deltaTranslationY = (FotoContainer.Height * (newAnchorY - fotoContainer.AnchorY)) * (targetScale / fotoContainer.Scale - 1);
 
-        photoContainer.AnchorX = newAnchorX;
-        photoContainer.AnchorY = newAnchorY;
-        photoContainer.TranslationX -= deltaTranslationX;
-        photoContainer.TranslationY -= deltaTranslationY;
-        photoContainer.Scale = targetScale;
+        fotoContainer.AnchorX = newAnchorX;
+        fotoContainer.AnchorY = newAnchorY;
+        fotoContainer.TranslationX -= deltaTranslationX;
+        fotoContainer.TranslationY -= deltaTranslationY;
+        fotoContainer.Scale = targetScale;
 
         drawingController.ResizePolyHandles();
     }
 
+    private async void OnEditClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}&sender=pinList");
+    }
+
     private void ImageFit(object sender, EventArgs e)
     {
-        var scale = Math.Min(this.Width / PhotoContainer.Width, this.Height / PhotoContainer.Height);
-        photoContainer.Scale = scale;
-        photoContainer.TranslationX = (this.Width - PhotoContainer.Width) / 2;
-        photoContainer.TranslationY = (this.Height - PhotoContainer.Height) / 2;
-        photoContainer.AnchorX = 1 / PhotoContainer.Width * ((this.Width / 2) - photoContainer.TranslationX);
-        photoContainer.AnchorY = 1 / PhotoContainer.Height * ((this.Height / 2) - photoContainer.TranslationY);
+        var scale = Math.Min(this.Width / FotoContainer.Width, this.Height / FotoContainer.Height);
+        fotoContainer.Scale = scale;
+        fotoContainer.TranslationX = (this.Width - FotoContainer.Width) / 2;
+        fotoContainer.TranslationY = (this.Height - FotoContainer.Height) / 2;
+        fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX);
+        fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY);
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
@@ -177,16 +197,16 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos.Remove(ImgSource);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
             GlobalJson.SaveToFile();
             await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
         }
@@ -197,7 +217,7 @@ public partial class ImageViewPage : IQueryAttributable
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
 
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PhotoContainer");
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
         // 1) Canvas erzeugen und anhängen
         drawingView = drawingController.CreateCanvasView();
@@ -225,7 +245,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
         {
-            photoContainer.IsPanningEnabled = false;
+            fotoContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Free;
             drawingController.DrawMode = DrawMode.Free;
             DrawPolyBtn.CornerRadius = 30;
@@ -235,7 +255,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
         {
-            photoContainer.IsPanningEnabled = true;
+            fotoContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
             DrawFreeBtn.CornerRadius = 30;
@@ -248,7 +268,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         if (drawMode == DrawMode.Free || drawMode == DrawMode.None)
         {
-            photoContainer.IsPanningEnabled = false;
+            fotoContainer.IsPanningEnabled = false;
             drawMode = DrawMode.Poly;
             drawingController.DrawMode = DrawMode.Poly;
             DrawPolyBtn.CornerRadius = 10;
@@ -259,7 +279,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
         {
-            photoContainer.IsPanningEnabled = true;
+            fotoContainer.IsPanningEnabled = true;
             drawMode = DrawMode.None;
             drawingController.DrawMode = DrawMode.None;
             DrawPolyBtn.CornerRadius = 30;
@@ -276,10 +296,10 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.Reset();
         drawingView?.InvalidateSurface();
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay)
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
-            PhotoImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            FotoImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
             GlobalJson.SaveToFile();
         }
     }
@@ -301,9 +321,9 @@ public partial class ImageViewPage : IQueryAttributable
                 thumbPath = await FileRenamer(thumbPath);
                 _ = await FileRenamer(origPath);
 
-                PhotoImage.Source = imgPath;
+                FotoImage.Source = imgPath;
                 Thumbnail.Generate(imgPath, thumbPath);
-                GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay = false;
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
             else
             {
@@ -313,26 +333,26 @@ public partial class ImageViewPage : IQueryAttributable
                 if (!File.Exists(origPath)) File.Copy(imgPath, origPath);
 
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
-                await SavePhotoWithOverlay(imgPath, imgPath);
+                await SaveFotoWithOverlay(imgPath, imgPath);
 
                 imgPath = await FileRenamer(imgPath);
                 thumbPath = await FileRenamer(thumbPath);
                 _ = await FileRenamer(origPath);
 
-                PhotoImage.Source = imgPath;
+                FotoImage.Source = imgPath;
                 Thumbnail.Generate(imgPath, thumbPath);
-                GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay = true;
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
 
             // ändere Json-Key
-            var photos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos;
-            if (photos.TryGetValue(ImgSource, out var value))
+            var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
+            if (fotos.TryGetValue(ImgSource, out var value))
             {
-                photos.Remove(ImgSource);
-                photos[Path.GetFileName(imgPath)] = value;
+                fotos.Remove(ImgSource);
+                fotos[Path.GetFileName(imgPath)] = value;
                 ImgSource = Path.GetFileName(imgPath);
             }
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File = Path.GetFileName(imgPath);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
             GlobalJson.SaveToFile();
         }
 
@@ -343,7 +363,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
-        photoContainer.IsPanningEnabled = true;
+        fotoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
 
@@ -352,7 +372,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void RemoveDrawingView()
     {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PhotoContainer");
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
         if (drawingView != null && absoluteLayout != null)
         {
             absoluteLayout.Children.Remove(drawingView);
@@ -386,18 +406,18 @@ public partial class ImageViewPage : IQueryAttributable
             return filePath;
     }
 
-    public async Task SavePhotoWithOverlay(string photoPath, string outputPath)
+    public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
-        using var photoStream = File.OpenRead(photoPath);
-        using var photoBitmap = SKBitmap.Decode(photoStream);
+        using var fotoStream = File.OpenRead(fotoPath);
+        using var fotoBitmap = SKBitmap.Decode(fotoStream);
 
-        int width = photoBitmap.Width;
-        int height = photoBitmap.Height;
+        int width = fotoBitmap.Width;
+        int height = fotoBitmap.Height;
 
         var info = new SKImageInfo(width, height);
         using var surface = SKSurface.Create(info);
         var canvas = surface.Canvas;
-        canvas.DrawBitmap(photoBitmap, new SKPoint(0, 0));
+        canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0));
 
         // Overlay erstellen (ohne Handles)
         using (var overlaySurface = SKSurface.Create(info))

@@ -136,13 +136,13 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Views\PhotoGallery.xaml.cs">
-	    <DependentUpon>PhotoGallery.xaml</DependentUpon>
+	  <Compile Update="Views\FotoGallery.xaml.cs">
+	    <DependentUpon>FotoGallery.xaml</DependentUpon>
 	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Views\PhotoGallery.xaml">
+	  <MauiXaml Update="Views\FotoGallery.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

@@ -59,7 +59,7 @@ public partial class Pin : ObservableObject
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
     public bool IsCustomIcon { get; set; }
-    public Dictionary<string, Photo> Photos { get; set; }
+    public Dictionary<string, Foto> Fotos { get; set; }
     [ObservableProperty] private string _pinIcon;
     [ObservableProperty] private bool _isCustomPin;
     [ObservableProperty] private bool _isAllowExport;
@@ -68,7 +68,7 @@ public partial class Pin : ObservableObject
     [ObservableProperty] private bool _isLockAutoScale;
 }
 
-public partial class Photo : ObservableObject
+public partial class Foto : ObservableObject
 {
     public string File { get; set; }
     public bool HasOverlay { get; set; }

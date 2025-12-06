@@ -12,7 +12,7 @@ class Thumbnail
         string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath);
 
         // Zielgröße festlegen (keine Kante kürzer als 150 Pixel)
-        int minSize = SettingsService.Instance.PhotoThumbSize;
+        int minSize = SettingsService.Instance.FotoThumbSize;
 
         // Berechne den Skalierungsfaktor basierend auf der kürzeren Seite
         float scale = minSize / (float)Math.Min(skBitmap.Width, skBitmap.Height);
@@ -28,7 +28,7 @@ class Thumbnail
 
         // Speichere das verkleinerte Bild als JPEG
         var image = SKImage.FromBitmap(resizedBitmap);
-        var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.PhotoThumbQuality); // 90 = Qualität
+        var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoThumbQuality); // 90 = Qualität
         var newStream = File.Create(thumbFilePath);
         data.SaveTo(newStream);
         newStream.Close();

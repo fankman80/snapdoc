@@ -24,16 +24,16 @@ public class CapturePicture
 
         try
         {
-            var photo = await MediaPicker.Default.CapturePhotoAsync();
+            var foto = await MediaPicker.Default.CapturePhotoAsync();
 
-            if (photo == null)
+            if (foto == null)
             {
                 Console.WriteLine("Keine Datei zurückgegeben (Picker evtl. abgebrochen).");
                 return (null, new Size(0, 0));
             }
 
-            using var stream = await photo.OpenReadAsync();
-            string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}{Path.GetExtension(photo.FileName)}";
+            using var stream = await foto.OpenReadAsync();
+            string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}{Path.GetExtension(foto.FileName)}";
             string resultPath = null;
 
             if (filepath != null)
@@ -50,9 +50,9 @@ public class CapturePicture
                 Thumbnail.Generate(resultPath, thumbFilePath);
             }
 
-            if (!string.IsNullOrEmpty(photo.FullPath) && File.Exists(photo.FullPath))
+            if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
             {
-                File.Delete(photo.FullPath);
+                File.Delete(foto.FullPath);
             }
 
             if (resultPath != null)

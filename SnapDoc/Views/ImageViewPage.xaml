@@ -11,10 +11,10 @@
              x:Name="ThisPage">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+              x:DataType="views:ImageViewPage"
               VerticalOptions="Center">
             <Label Grid.Column="0"
-                   x:DataType="views:ImageViewPage"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -23,6 +23,18 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
+                    IsVisible="{Binding IsGotoPinBtnVisible}"
+                    Text="{x:Static m:MaterialOutlined.Recenter}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="Zu Pin wechseln"
+                    Clicked="OnEditClicked"/>
+            <Button Grid.Column="2"
                     Text="{x:Static m:MaterialOutlined.Fit_screen}"
                     FontSize="24"
                     Padding="0"
@@ -33,7 +45,7 @@
                     HorizontalOptions="End"
                     ToolTipProperties.Text="Foto auf Fenster grösse zoomen"
                     Clicked="ImageFit"/>
-            <Button Grid.Column="2"
+            <Button Grid.Column="3"
                     Text="{x:Static m:MaterialOutlined.Delete}"
                     FontSize="24"
                     Padding="0"
@@ -54,13 +66,13 @@
                         Pinched="OnPinched"
                         DoubleTapped="OnDoubleTapped"
                         ScrollWheelChanged="OnMouseScroll">
-            <AbsoluteLayout x:Name="PhotoContainer"
+            <AbsoluteLayout x:Name="FotoContainer"
 				            Scale="{Binding Scale}"
 				            TranslationX="{Binding TranslationX}"
 				            TranslationY="{Binding TranslationY}"
                             AnchorX="{Binding AnchorX}"
 				            AnchorY="{Binding AnchorY}">
-                <Image x:Name="PhotoImage"/>
+                <Image x:Name="FotoImage"/>
             </AbsoluteLayout>
         </mr:ContentView>
 

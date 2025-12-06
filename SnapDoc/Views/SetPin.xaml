@@ -79,7 +79,7 @@
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="local:PhotoItem">
+                <DataTemplate x:DataType="local:FotoItem">
                     <VerticalStackLayout>
                         <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                             <views:SquareView Margin="4">
@@ -218,7 +218,7 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
                         ToolTipProperties.Text="Foto aufnehmen"                        
-                        Clicked="TakePhoto"/>
+                        Clicked="TakeFoto"/>
                 <Button Grid.Column="3"
                         Padding="0"
                         Text="OK"

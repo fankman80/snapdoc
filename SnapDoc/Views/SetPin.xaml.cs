@@ -23,8 +23,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private string PinId;
     private string SenderView;
 
-    private ObservableCollection<PhotoItem> images;
-    public ObservableCollection<PhotoItem> Images
+    private ObservableCollection<FotoItem> images;
+    public ObservableCollection<FotoItem> Images
     {
         get => images;
         set
@@ -87,8 +87,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void MyView_Load()
     {
-        Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos
-            .Select(img => new PhotoItem
+        Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
+            .Select(img => new FotoItem
             {
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
                 AllowExport = img.Value.AllowExport,
@@ -109,7 +109,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         var filePath = ((FileImageSource)tappedImage.Source).File;
         var fileName = new FileResult(filePath).FileName;
 
-        await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={PlanId}&pinId={PinId}");
+        await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={PlanId}&pinId={PinId}&gotoBtn=false");
     }
 
     private async void OnDeleteClick(object sender, EventArgs e)
@@ -163,7 +163,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         if (isCopy)
         {
-            clonedPin.Photos?.Clear();
+            clonedPin.Fotos?.Clear();
         }
         else
         {
@@ -203,14 +203,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private void DeletePinData(string pinId)
     {
         // delete all images
-        foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos)
+        foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos)
         {
             string file;
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos[del_image.Key].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
             if (File.Exists(file))
                 File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos[del_image.Key].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
             if (File.Exists(file))
                 File.Delete(file);
         }
@@ -238,13 +238,13 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"mapview?planId={PlanId}&pinId={PinId}");
     }
 
-    private async void TakePhoto(object sender, EventArgs e)
+    private async void TakeFoto(object sender, EventArgs e)
     {
         (FileResult path, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
         if (path != null)
         {
-            Photo newImageData = new()
+            Foto newImageData = new()
             {
                 AllowExport = true,
                 File = path.FileName,
@@ -253,9 +253,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
 
             var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
-            pin.Photos[path.FileName] = newImageData;
+            pin.Fotos[path.FileName] = newImageData;
 
-            Images.Add(new PhotoItem
+            Images.Add(new FotoItem
             {
                 ImagePath = path.FullPath,
                 AllowExport = true,
@@ -293,17 +293,17 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnReorderCompleted(object sender, EventArgs e)
     {
-        if ((sender as CollectionView).ItemsSource is ObservableCollection<PhotoItem> reorderedItems)
+        if ((sender as CollectionView).ItemsSource is ObservableCollection<FotoItem> reorderedItems)
         {
-            var newPhotosDict = reorderedItems
-                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Photo
+            var newFotosDict = reorderedItems
+                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Foto
                 {
                     File = Path.GetFileName(Path.GetFileName(img.ImagePath)),
                     AllowExport = img.AllowExport,
                     DateTime = img.DateTime
                 });
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos = newPhotosDict;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
             GlobalJson.SaveToFile();
         }
     }
@@ -312,14 +312,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         var button = sender as Button;
 
-        PhotoItem item = (PhotoItem)button.BindingContext;
+        FotoItem item = (FotoItem)button.BindingContext;
 
         if (item != null)
         {
             item.AllowExport = !item.AllowExport;
 
             var fileName = Path.GetFileName(item.ImagePath);
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[fileName].AllowExport;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport;
 
             // save data to file
             GlobalJson.SaveToFile();

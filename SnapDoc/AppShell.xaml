@@ -126,7 +126,7 @@
                     <!-- Foto Galerie -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="photogallery" />
+                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="fotogallery" />
                         </Grid.GestureRecognizers>
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Photo_library}"

@@ -20,9 +20,9 @@ internal class SettingsModel
     public bool IsPosImageExport { get; set; } // Positionsbilder im Bericht exportieren
     public bool IsPinIconExport { get; set; } // Pin-Icons im Bericht exportieren
     public bool IsImageExport { get; set; } // Fotos im Bericht exportieren
-    public bool IsPhotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
-    public bool IsPhotoCompressed { get; set; } // Fotos im Worddokument komprimieren
-    public int PhotoCompressValue { get; set; } // Kompressionsqualität der Fotos im Worddokument (0-100)
+    public bool IsFotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
+    public bool IsFotoCompressed { get; set; } // Fotos im Worddokument komprimieren
+    public int FotoCompressValue { get; set; } // Kompressionsqualität der Fotos im Worddokument (0-100)
     public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
     public double PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
     public double PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter
@@ -33,9 +33,9 @@ internal class SettingsModel
     public bool IconGalleryGridView { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
     public int MaxPdfImageSizeW { get; set; } // Maximale Breite eines PDF-Bildes beim Import
     public int MaxPdfImageSizeH { get; set; } // Maximale Höhe eines PDF-Bildes beim Import
-    public int PhotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
-    public int PhotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
-    public int PhotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
+    public int FotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
+    public int FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
+    public int FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
     public int PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
     public int IconPreviewSize { get; set; } // Grösse der Icons in der Icon-Auswahl
     public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins

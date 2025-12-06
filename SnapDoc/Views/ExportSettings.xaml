@@ -139,7 +139,7 @@
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsPhotoCompressed}"
+                                             IsToggled="{Binding IsFotoCompressed}"
                                              HorizontalOptions="Start"
                                              VerticalOptions="Center"
                                              BorderColorOff ="Transparent"
@@ -151,16 +151,16 @@
                         </Grid>
                     </VerticalStackLayout>
 
-                    <Label Text="{Binding PhotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
+                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
                            Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsPhotoCompressed}"/>
+                           IsVisible="{Binding IsFotoCompressed}"/>
                     <Slider Maximum="100"
                             Minimum="1"
-                            IsVisible="{Binding IsPhotoCompressed}"
+                            IsVisible="{Binding IsFotoCompressed}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PhotoCompressValue}"/>
+                            Value="{Binding FotoCompressValue}"/>
 
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="Pinbeschriftung"

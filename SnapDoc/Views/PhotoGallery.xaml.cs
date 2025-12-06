@@ -5,16 +5,15 @@ using System.Collections.ObjectModel;
 
 namespace SnapDoc.Views;
 
-public partial class PhotoGalleryView : ContentPage
+public partial class FotoGalleryView : ContentPage
 {
-    public ObservableCollection<PhotoItem> Photos { get; set; }
-    private List<PhotoItem> AllPhotos;
+    public ObservableCollection<FotoItem> Fotos { get; set; }
+    private List<FotoItem> AllFotos;
 
     private string OrderDirection = "asc";
     public int DynamicSpan { get; set; } = 3;
     public int DynamicSize;
     private bool _isActiveToggle;
-    private PhotoItem _lastVisibleItem;
     public bool IsActiveToggle
     {
         get => _isActiveToggle;
@@ -29,7 +28,7 @@ public partial class PhotoGalleryView : ContentPage
         }
     }
 
-    public PhotoGalleryView()
+    public FotoGalleryView()
     {
         InitializeComponent();
         BindingContext = this;
@@ -42,7 +41,7 @@ public partial class PhotoGalleryView : ContentPage
         SizeChanged += OnSizeChanged;
 
         UpdateSpan();
-        PhotoLoader();
+        FotoLoader();
         ApplyFilterAndSorting();
     }
 
@@ -53,9 +52,9 @@ public partial class PhotoGalleryView : ContentPage
         SizeChanged -= OnSizeChanged;
     }
 
-    private void PhotoLoader()
+    private void FotoLoader()
     {
-        var list = new List<PhotoItem>();
+        var list = new List<FotoItem>();
 
         foreach (var planEntry in GlobalJson.Data.Plans)
         {
@@ -70,25 +69,25 @@ public partial class PhotoGalleryView : ContentPage
                 var pinId = pinEntry.Key;
                 var pin = pinEntry.Value;
 
-                if (pin?.Photos == null)
+                if (pin?.Fotos == null)
                     continue;
 
-                foreach (var photoEntry in pin.Photos)
+                foreach (var fotoEntry in pin.Fotos)
                 {
-                    var photo = photoEntry.Value;
+                    var foto = fotoEntry.Value;
 
-                    if (photo == null || string.IsNullOrWhiteSpace(photo.File))
+                    if (foto == null || string.IsNullOrWhiteSpace(foto.File))
                         continue;
 
-                    list.Add(new PhotoItem
+                    list.Add(new FotoItem
                     {
                         ImagePath = SafeCombine(
                             Settings.DataDirectory,
                             GlobalJson.Data.ProjectPath,
                             GlobalJson.Data.ThumbnailPath,
-                            photo.File),
-                        DateTime = photo.DateTime,
-                        AllowExport = photo.AllowExport,
+                            foto.File),
+                        DateTime = foto.DateTime,
+                        AllowExport = foto.AllowExport,
                         OnPlanId = planId,
                         OnPinId = pinId
                     });
@@ -96,7 +95,7 @@ public partial class PhotoGalleryView : ContentPage
             }
         }
 
-        AllPhotos = list;
+        AllFotos = list;
         ApplyFilterAndSorting();
     }
 
@@ -113,14 +112,14 @@ public partial class PhotoGalleryView : ContentPage
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
         var button = sender as Button;
-        PhotoItem item = (PhotoItem)button.BindingContext;
+        FotoItem item = (FotoItem)button.BindingContext;
 
         if (item != null)
         {
             item.AllowExport = !item.AllowExport;
 
             var fileName = Path.GetFileName(item.ImagePath);
-            GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Photos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Photos[fileName].AllowExport;
+            GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport;
 
             // save data to file
             GlobalJson.SaveToFile();
@@ -130,7 +129,7 @@ public partial class PhotoGalleryView : ContentPage
     private async void OnEditClicked(object sender, EventArgs e)
     {
         var tappedButton = sender as Button;
-        PhotoItem item = (PhotoItem)tappedButton.BindingContext;
+        FotoItem item = (FotoItem)tappedButton.BindingContext;
 
         await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.OnPinId}&sender=pinList");
     }
@@ -140,9 +139,9 @@ public partial class PhotoGalleryView : ContentPage
         var tappedImage = sender as Image;
         var filePath = ((FileImageSource)tappedImage.Source).File;
         var fileName = new FileResult(filePath).FileName;
-        PhotoItem item = (PhotoItem)tappedImage.BindingContext;
+        FotoItem item = (FotoItem)tappedImage.BindingContext;
 
-        await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={item.OnPlanId}&pinId={item.OnPinId}");
+        await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={item.OnPlanId}&pinId={item.OnPinId}&gotoBtn=true");
     }
 
     private void OnSortPickerChanged(object sender, EventArgs e)
@@ -152,10 +151,10 @@ public partial class PhotoGalleryView : ContentPage
 
     private void ApplyFilterAndSorting()
     {
-        if (AllPhotos == null)
+        if (AllFotos == null)
             return;
 
-        var filtered = AllPhotos
+        var filtered = AllFotos
             .Where(p => !IsActiveToggle || p.AllowExport);
 
         if (OrderDirection == "asc")
@@ -163,8 +162,9 @@ public partial class PhotoGalleryView : ContentPage
         else
             filtered = filtered.OrderByDescending(p => p.DateTime);
 
-        Photos = new ObservableCollection<PhotoItem>(filtered);
-        PhotoGallery.ItemsSource = Photos;
+        Fotos = new ObservableCollection<FotoItem>(filtered);
+        FotoGallery.ItemsSource = Fotos;
+        FotoCounterLabel.Text = $"Fotos: {Fotos.Count}";
     }
 
     private void OnFilterToggleChanged(object sender, ToggledEventArgs e)
