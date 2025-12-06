@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:local="clr-namespace:SnapDoc"
+             x:Name="ThisPage"
+             x:Class="SnapDoc.Views.PhotoGalleryView"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Title="Foto Galerie">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout>
+            <Label Grid.Column="0"
+                   x:DataType="views:PhotoGalleryView"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
+    <Grid RowSpacing="10" Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" HorizontalOptions="Start"
+              x:DataType="views:PhotoGalleryView"
+              ColumnDefinitions="50, Auto"
+              HeightRequest="40">
+            <controls:Switch Grid.Column="0"
+                             IsToggled="{Binding IsActiveToggle}"
+                             HorizontalOptions="Start"
+                             VerticalOptions="Center"
+                             BorderColorOff ="Transparent"
+                             KnobColorOn="White"
+                             KnobColorOff="White"
+                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+            <Label Text="nur aktive Fotos anzeigen" Grid.Column="1" VerticalOptions="Center" />
+        </Grid>
+
+        <Border Grid.Row="0" HorizontalOptions="End" 
+                Padding="6"
+                HeightRequest="38"
+                WidthRequest="38"
+                StrokeThickness="1"
+                Stroke="{DynamicResource Primary}"
+                StrokeShape="RoundRectangle 4">
+            <Image x:Name="SortDirection"
+                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}">
+                <Image.GestureRecognizers>
+                    <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
+                </Image.GestureRecognizers>
+            </Image>
+        </Border>
+
+        <Grid x:DataType="views:PhotoGalleryView" Grid.Row="1">
+            <CollectionView Grid.Row="0"
+                            x:Name="PhotoGallery"
+                            ItemsSource="{Binding Photos}">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+            </CollectionView.ItemsLayout>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="local:PhotoItem">
+                        <VerticalStackLayout>
+                            <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
+                                <views:SquareView Margin="4">
+                                    <Image Source="{Binding ImagePath}" Aspect="AspectFill">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnImageTapped" />
+                                        </Image.GestureRecognizers>
+                                    </Image>
+                                </views:SquareView>
+                                <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                        FontFamily="MaterialOutlined"
+                                        Padding="6"
+                                        FontSize="24"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="End"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        Clicked="OnAllowExportClicked"/>
+                                <Button Text="{x:Static m:MaterialOutlined.Recenter}"
+                                        FontFamily="MaterialOutlined"
+                                        Padding="6"
+                                        FontSize="24"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="End"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        Clicked="OnEditClicked"/>
+                            </Grid>
+                            <Label Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy \\/ HH:mm}'}"
+                                   FontSize="12"
+                                   HorizontalTextAlignment="Center"
+                                   Margin="0,-15,0,8"/>
+                        </VerticalStackLayout>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Grid>
+    </Grid>
+</ContentPage>

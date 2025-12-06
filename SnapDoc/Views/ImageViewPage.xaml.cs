@@ -84,7 +84,7 @@ public partial class ImageViewPage : IQueryAttributable
             else
             {
                 imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
-                var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
+                var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].DateTime;
                 string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                 this.Title = formattedDate;
             }
@@ -177,16 +177,16 @@ public partial class ImageViewPage : IQueryAttributable
         }
         else
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File);
             if (File.Exists(file)) File.Delete(file);
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos.Remove(ImgSource);
             GlobalJson.SaveToFile();
             await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
         }
@@ -276,7 +276,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.Reset();
         drawingView?.InvalidateSurface();
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay)
         {
             isCleared = true;
             PhotoImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
@@ -303,7 +303,7 @@ public partial class ImageViewPage : IQueryAttributable
 
                 PhotoImage.Source = imgPath;
                 Thumbnail.Generate(imgPath, thumbPath);
-                GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay = false;
             }
             else
             {
@@ -321,18 +321,18 @@ public partial class ImageViewPage : IQueryAttributable
 
                 PhotoImage.Source = imgPath;
                 Thumbnail.Generate(imgPath, thumbPath);
-                GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
+                GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].HasOverlay = true;
             }
 
             // ändere Json-Key
-            var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
-            if (fotos.TryGetValue(ImgSource, out var value))
+            var photos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos;
+            if (photos.TryGetValue(ImgSource, out var value))
             {
-                fotos.Remove(ImgSource);
-                fotos[Path.GetFileName(imgPath)] = value;
+                photos.Remove(ImgSource);
+                photos[Path.GetFileName(imgPath)] = value;
                 ImgSource = Path.GetFileName(imgPath);
             }
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[ImgSource].File = Path.GetFileName(imgPath);
             GlobalJson.SaveToFile();
         }
 

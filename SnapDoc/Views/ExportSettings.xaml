@@ -127,7 +127,7 @@
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40" IsVisible="{Binding IsImageExport}">
                             <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsFotoOverlayExport}"
+                                             IsToggled="{Binding IsvotoOverlayExport}"
                                              HorizontalOptions="Start"
                                              VerticalOptions="Center"
                                              BorderColorOff ="Transparent"
@@ -139,7 +139,7 @@
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsFotoCompressed}"
+                                             IsToggled="{Binding IsPhotoCompressed}"
                                              HorizontalOptions="Start"
                                              VerticalOptions="Center"
                                              BorderColorOff ="Transparent"
@@ -151,16 +151,16 @@
                         </Grid>
                     </VerticalStackLayout>
 
-                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
+                    <Label Text="{Binding PhotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
                            Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsFotoCompressed}"/>
+                           IsVisible="{Binding IsPhotoCompressed}"/>
                     <Slider Maximum="100"
                             Minimum="1"
-                            IsVisible="{Binding IsFotoCompressed}"
+                            IsVisible="{Binding IsPhotoCompressed}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding FotoCompressValue}"/>
+                            Value="{Binding PhotoCompressValue}"/>
 
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="Pinbeschriftung"

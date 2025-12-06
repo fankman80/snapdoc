@@ -557,7 +557,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinPriority = 0,
             PinLocation = "",
             PinIcon = _newPin,
-            Fotos = [],
+            Photos = [],
             OnPlanId = PlanId,
             SelfId = currentDateTime,
             DateTime = DateTime.Now,

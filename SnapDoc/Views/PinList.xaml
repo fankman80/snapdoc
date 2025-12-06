@@ -32,6 +32,7 @@
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -98,8 +99,9 @@
                     <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="10" Span="1"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:PinItem">
-                        <Grid RowSpacing="0" ColumnSpacing="0">
+                    <DataTemplate x:DataType="local:PinItem" >
+                        <Grid RowSpacing="0" ColumnSpacing="0"
+                              Opacity="{Binding IsAllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="64" />
@@ -193,13 +195,6 @@
                                     BackgroundColor="Transparent"
                                     TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Clicked="OnAllowExportClicked"/>
-
-                            <!-- This BoxView is used to control the opacity of the CollectionView-Item based on AllowExport property -->
-                            <BoxView Grid.ColumnSpan="5" Grid.RowSpan="4"
-                                     IsVisible="{Binding IsAllowExport, Converter={StaticResource InvertedBoolConverter}}"
-                                     BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                                     Opacity="0.7"
-                                     InputTransparent="True" />
 
                             <!-- Outlined Border -->
                             <Border Grid.ColumnSpan="5" Grid.RowSpan="4"

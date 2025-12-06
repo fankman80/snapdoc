@@ -134,6 +134,18 @@
 		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.13.0" />
 		<PackageReference Include="UraniumUI.Material" Version="2.13.0" />
 	</ItemGroup>
+
+	<ItemGroup>
+	  <Compile Update="Views\PhotoGallery.xaml.cs">
+	    <DependentUpon>PhotoGallery.xaml</DependentUpon>
+	  </Compile>
+	</ItemGroup>
+
+	<ItemGroup>
+	  <MauiXaml Update="Views\PhotoGallery.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	</ItemGroup>
 	
 	<ItemGroup>
 	  <None Update="Resources\AppIcon\appicon.png">

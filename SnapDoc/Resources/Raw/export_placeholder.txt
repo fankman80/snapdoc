@@ -39,7 +39,7 @@ ${pin_planName}
 ${pin_posImage}
 // Position des Pins im Bildkoordinatensystem
 
-${pin_fotoList}
+${pin_photoList}
 // Zugehörige Fotos des Pins
 
 ${pin_name}

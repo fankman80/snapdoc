@@ -50,7 +50,7 @@ public partial class ExportReport
             {"${pin_nr}", "${pin_nr}"},                     //bereinige splitted runs
             {"${pin_planName}", "${pin_planName}"},         //bereinige splitted runs
             {"${pin_posImage}", "${pin_posImage}"},         //bereinige splitted runs
-            {"${pin_fotoList}", "${pin_fotoList}"},         //bereinige splitted runs
+            {"${pin_photoList}", "${pin_photoList}"},         //bereinige splitted runs
             {"${pin_name}", "${pin_name}"},                 //bereinige splitted runs
             {"${pin_desc}", "${pin_desc}"},                 //bereinige splitted runs
             {"${pin_location}", "${pin_location}"},         //bereinige splitted runs
@@ -254,10 +254,10 @@ public partial class ExportReport
                                                         }
                                                         break;
 
-                                                    case "${pin_fotoList}":
+                                                    case "${pin_photoList}":
                                                         if (SettingsService.Instance.IsImageExport)
                                                         {
-                                                            foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos)
+                                                            foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Photos)
                                                             {
                                                                 if (!img.Value.AllowExport) continue;
 
@@ -266,7 +266,7 @@ public partial class ExportReport
                                                                                               GlobalJson.Data.ImagePath,
                                                                                               img.Value.File);
 
-                                                                if (!SettingsService.Instance.IsFotoOverlayExport &&
+                                                                if (!SettingsService.Instance.IsPhotoOverlayExport &&
                                                                     img.Value.HasOverlay)
                                                                 {
                                                                     imgPath = Path.Combine(Settings.DataDirectory,
@@ -283,12 +283,12 @@ public partial class ExportReport
                                                                     Height = SettingsService.Instance.ImageExportSize / factor
                                                                 };
 
-                                                                if (SettingsService.Instance.IsFotoCompressed)
+                                                                if (SettingsService.Instance.IsPhotoCompressed)
                                                                 {
                                                                     var newPath = Path.Combine(Settings.CacheDirectory,
                                                                                                Path.GetFileName(img.Value.File));
                                                                     Helper.BitmapResizer(imgPath, newPath,
-                                                                                         SettingsService.Instance.FotoCompressValue / 100f);
+                                                                                         SettingsService.Instance.PhotoCompressValue / 100f);
                                                                     imgPath = newPath;
                                                                 }
 

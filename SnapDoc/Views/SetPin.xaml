@@ -79,11 +79,10 @@
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
-                <DataTemplate x:DataType="local:FotoItem">
+                <DataTemplate x:DataType="local:PhotoItem">
                     <VerticalStackLayout>
-                        <Grid>
-                            <views:SquareView Margin="4"
-                                              Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
+                        <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.3'}">
+                            <views:SquareView Margin="4">
                                 <Image Source="{Binding ImagePath}" Aspect="AspectFill">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />

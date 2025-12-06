@@ -344,10 +344,12 @@ namespace SnapDoc
         [ObservableProperty] private bool _isSelected;
     }
 
-    public partial class FotoItem : ObservableObject
+    public partial class PhotoItem : ObservableObject
     {
         public string ImagePath { get; set; }
         public DateTime DateTime { get; set; }
+        public string OnPlanId { get; set; }
+        public string OnPinId { get; set; }
 
         [ObservableProperty] private bool _allowExport;
     }

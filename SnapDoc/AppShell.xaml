@@ -76,7 +76,6 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="open_project" />
                         </Grid.GestureRecognizers>
-
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Folder_open}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
@@ -90,7 +89,6 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="project_details" />
                         </Grid.GestureRecognizers>
-
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Home_work}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
@@ -104,7 +102,6 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="mapview" />
                         </Grid.GestureRecognizers>
-
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Map}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
@@ -118,7 +115,6 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="pinList" />
                         </Grid.GestureRecognizers>
-
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Format_list_numbered}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
@@ -127,12 +123,24 @@
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
+                    <!-- Foto Galerie -->
+                    <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="photogallery" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="0"
+                               Text="{x:Static m:MaterialOutlined.Photo_library}"
+                               FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
+                        <Label Grid.Column="1" Text="Foto Galerie" FontSize="14" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
+                    </Grid>
+
                     <!-- Bericht exportieren -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="exportSettings" />
                         </Grid.GestureRecognizers>
-
                         <Label Grid.Column="0"
                                Text="{x:Static m:MaterialOutlined.Convert_to_text}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"

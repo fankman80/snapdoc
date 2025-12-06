@@ -23,8 +23,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private string PinId;
     private string SenderView;
 
-    private ObservableCollection<FotoItem> images;
-    public ObservableCollection<FotoItem> Images
+    private ObservableCollection<PhotoItem> images;
+    public ObservableCollection<PhotoItem> Images
     {
         get => images;
         set
@@ -61,8 +61,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
-        UpdateSpan();
         SizeChanged += OnSizeChanged;;
+
+        UpdateSpan();
     }
 
     protected override void OnDisappearing()
@@ -86,8 +87,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void MyView_Load()
     {
-        Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
-            .Select(img => new FotoItem
+        Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos
+            .Select(img => new PhotoItem
             {
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
                 AllowExport = img.Value.AllowExport,
@@ -162,7 +163,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         if (isCopy)
         {
-            clonedPin.Fotos?.Clear();
+            clonedPin.Photos?.Clear();
         }
         else
         {
@@ -202,14 +203,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private void DeletePinData(string pinId)
     {
         // delete all images
-        foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos)
+        foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos)
         {
             string file;
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos[del_image.Key].File);
             if (File.Exists(file))
                 File.Delete(file);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Photos[del_image.Key].File);
             if (File.Exists(file))
                 File.Delete(file);
         }
@@ -242,8 +243,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         (FileResult path, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
         if (path != null)
-        {      
-            Foto newImageData = new()
+        {
+            Photo newImageData = new()
             {
                 AllowExport = true,
                 File = path.FileName,
@@ -252,9 +253,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
 
             var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
-            pin.Fotos[path.FileName] = newImageData;
+            pin.Photos[path.FileName] = newImageData;
 
-            Images.Add(new FotoItem
+            Images.Add(new PhotoItem
             {
                 ImagePath = path.FullPath,
                 AllowExport = true,
@@ -292,17 +293,17 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnReorderCompleted(object sender, EventArgs e)
     {
-        if ((sender as CollectionView).ItemsSource is ObservableCollection<FotoItem> reorderedItems)
+        if ((sender as CollectionView).ItemsSource is ObservableCollection<PhotoItem> reorderedItems)
         {
-            var newFotosDict = reorderedItems
-                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Foto
+            var newPhotosDict = reorderedItems
+                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Photo
                 {
                     File = Path.GetFileName(Path.GetFileName(img.ImagePath)),
                     AllowExport = img.AllowExport,
                     DateTime = img.DateTime
                 });
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos = newPhotosDict;
             GlobalJson.SaveToFile();
         }
     }
@@ -311,14 +312,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         var button = sender as Button;
 
-        FotoItem item = (FotoItem)button.BindingContext;
+        PhotoItem item = (PhotoItem)button.BindingContext;
 
         if (item != null)
         {
             item.AllowExport = !item.AllowExport;
 
             var fileName = Path.GetFileName(item.ImagePath);
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Photos[fileName].AllowExport;
 
             // save data to file
             GlobalJson.SaveToFile();
