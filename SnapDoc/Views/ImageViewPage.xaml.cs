@@ -71,6 +71,8 @@ public partial class ImageViewPage : IQueryAttributable
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
+        Helper.RemoveAllDuplicatePages();
     }
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
