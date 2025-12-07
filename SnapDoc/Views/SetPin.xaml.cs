@@ -196,8 +196,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
-        SenderView ??= $"//{PlanId}";
-        await Shell.Current.GoToAsync($"{SenderView}");
+        //SenderView ??= $"//{PlanId}";
+        //await Shell.Current.GoToAsync($"{SenderView}");
+        await Shell.Current.GoToAsync("..");
     }
 
     private void DeletePinData(string pinId)
