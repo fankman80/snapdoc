@@ -15,6 +15,10 @@
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
              Title="Pin bearbeiten">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
               VerticalOptions="Center">
