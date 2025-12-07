@@ -61,6 +61,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
+        Helper.RemoveAllDuplicatePages();
+
         SizeChanged += OnSizeChanged;;
 
         UpdateSpan();
