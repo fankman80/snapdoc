@@ -422,34 +422,4 @@ public class Helper
             }
         }
     }
-    
-    public static class RemoveAllDuplicatePages()
-    {
-        var nav = Shell.Current?.Navigation;
-        if (nav == null) return;
-
-        var stack = nav.NavigationStack;
-
-        if (stack.Count < 2)
-            return;
-
-        // Set für Page-Typen, die schon gesehen wurden
-        HashSet<Type> seen = new HashSet<Type>();
-
-        // Von unten (erste Seite) nach oben (aktuelle Seite)
-        for (int i = stack.Count - 1; i >= 0; i--)
-        {
-            var pageType = stack[i].GetType();
-
-            if (seen.Contains(pageType))
-            {
-                // Entferne frühere Duplikate
-                nav.RemovePage(stack[i]);
-            }
-            else
-            {
-                seen.Add(pageType);
-            }
-        }
-    }
 }

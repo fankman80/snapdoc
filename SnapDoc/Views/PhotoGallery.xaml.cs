@@ -38,8 +38,6 @@ public partial class FotoGalleryView : ContentPage
     {
         base.OnAppearing();
 
-        Helper.RemoveAllDuplicatePages();
-
         SizeChanged += OnSizeChanged;
 
         UpdateSpan();

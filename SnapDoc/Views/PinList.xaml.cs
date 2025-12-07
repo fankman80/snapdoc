@@ -24,8 +24,6 @@ public partial class PinList : ContentPage
     {
         base.OnAppearing();
 
-        Helper.RemoveAllDuplicatePages();
-
         LoadPins();
         SortPicker.SelectedIndexChanged += OnSortPickerChanged;
     }

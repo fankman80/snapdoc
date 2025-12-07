@@ -3,7 +3,6 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using SnapDoc.Models;
 using SnapDoc.Services;
 
 #if WINDOWS
@@ -21,8 +20,6 @@ public partial class OpenProject : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
-        Helper.RemoveAllDuplicatePages();
 
         LoadJsonFiles();
     }

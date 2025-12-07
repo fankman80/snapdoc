@@ -7,7 +7,6 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using static SkiaSharp.HarfBuzz.SKShaper;
 
 namespace SnapDoc.Views;
 
@@ -71,8 +70,6 @@ public partial class ImageViewPage : IQueryAttributable
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
-        Helper.RemoveAllDuplicatePages();
     }
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
