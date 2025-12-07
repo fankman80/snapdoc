@@ -32,6 +32,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
+        Helper.RemoveAllDuplicatePages();
+
         SizeChanged += OnSizeChanged;
         SortPicker.SelectedIndexChanged += OnSortPickerChanged;
         CategoryPicker.SelectedIndexChanged += OnCategoryPickerChanged;
