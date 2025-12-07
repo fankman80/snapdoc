@@ -127,7 +127,7 @@
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40" IsVisible="{Binding IsImageExport}">
                             <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsvotoOverlayExport}"
+                                             IsToggled="{Binding IsFotoOverlayExport}"
                                              HorizontalOptions="Start"
                                              VerticalOptions="Center"
                                              BorderColorOff ="Transparent"
