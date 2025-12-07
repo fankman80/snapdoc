@@ -92,7 +92,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
         WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
 
-        await Shell.Current.GoToAsync($"{SenderView}?planId={PlanId}&pinId={PinId}");
+        //await Shell.Current.GoToAsync($"{SenderView}?planId={PlanId}&pinId={PinId}");
+        await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
     }
 
     private async void OnLongPressed(object sender, EventArgs e)
