@@ -41,7 +41,8 @@
                             x:DataType="local:Views.PopupPlanSelector"
                             ItemsSource="{Binding PlanItems}"
                             CanReorderItems="False"
-                            SelectionMode="Single">
+                            SelectionMode="Single"
+                            ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PlanItem">
                         <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44">

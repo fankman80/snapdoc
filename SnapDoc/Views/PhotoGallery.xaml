@@ -78,7 +78,8 @@
         <Grid x:DataType="views:FotoGalleryView" Grid.Row="1">
             <CollectionView Grid.Row="0"
                             x:Name="FotoGallery"
-                            ItemsSource="{Binding Fotos}">
+                            ItemsSource="{Binding Fotos}"
+                            ItemsUpdatingScrollMode="KeepItemsInView">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
             </CollectionView.ItemsLayout>
@@ -102,7 +103,7 @@
                                         BackgroundColor="Transparent"
                                         TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                         Clicked="OnAllowExportClicked"/>
-                                <Button Text="{x:Static m:MaterialOutlined.Recenter}"
+                                <Button Text="{x:Static m:MaterialOutlined.Keep}"
                                         FontFamily="MaterialOutlined"
                                         Padding="6"
                                         FontSize="24"

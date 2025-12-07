@@ -94,7 +94,8 @@
             <CollectionView x:Name="pinListView"
                             SelectionMode="Single"
                             ItemSizingStrategy="MeasureFirstItem"
-                            VerticalScrollBarVisibility="Always">
+                            VerticalScrollBarVisibility="Always"
+                            ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="10" Span="1"/>
                 </CollectionView.ItemsLayout>

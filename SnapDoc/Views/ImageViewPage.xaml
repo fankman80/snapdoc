@@ -24,7 +24,7 @@
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
                     IsVisible="{Binding IsGotoPinBtnVisible}"
-                    Text="{x:Static m:MaterialOutlined.Recenter}"
+                    Text="{x:Static m:MaterialOutlined.Keep}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -60,7 +60,8 @@
     </Shell.TitleView>
 
     <AbsoluteLayout x:Name="ImageView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-        <mr:ContentView PinchingCommand="{Binding PinchingCommand}"
+        <mr:ContentView x:Name="GestureContainer"
+                        PinchingCommand="{Binding PinchingCommand}"
                         Panning="OnPanning"
                         Pinching="OnPinching"
                         Pinched="OnPinched"

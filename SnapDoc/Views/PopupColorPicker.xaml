@@ -40,8 +40,8 @@
                 <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
                     <Label Text="zum Löschen gedrückt halten" FontSize="12" Margin="0,0,0,8"/>
                     <CollectionView x:Name="ColorListPicker" Margin="-3"
-                                        ItemsSource="{Binding ColorsList}"
-                                        SelectionMode="None">
+                                    ItemsSource="{Binding ColorsList}"
+                                    SelectionMode="None">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="6"/>
                         </CollectionView.ItemsLayout>

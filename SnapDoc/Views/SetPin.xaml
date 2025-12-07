@@ -74,7 +74,8 @@
                         Margin="-4"
                         ItemsSource="{Binding Images}"
                         CanReorderItems="True"
-                        ReorderCompleted="OnReorderCompleted">
+                        ReorderCompleted="OnReorderCompleted"
+                        ItemsUpdatingScrollMode="KeepItemsInView">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
             </CollectionView.ItemsLayout>

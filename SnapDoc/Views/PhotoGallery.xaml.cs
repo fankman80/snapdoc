@@ -131,7 +131,7 @@ public partial class FotoGalleryView : ContentPage
         var tappedButton = sender as Button;
         FotoItem item = (FotoItem)tappedButton.BindingContext;
 
-        await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.OnPinId}&sender=pinList");
+        await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.OnPinId}&sender=fotogallery");
     }
 
     private async void OnImageTapped(object sender, EventArgs e)

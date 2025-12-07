@@ -58,10 +58,13 @@ public partial class ImageViewPage : IQueryAttributable
         InitializeComponent();
 
         BindingContext = this;
-
         fotoContainer = new TransformViewModel();
+
         FotoContainer.BindingContext = fotoContainer;
+        GestureContainer.BindingContext = fotoContainer;
+
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
+
         drawingController = new DrawingController(fotoContainer, density);
     }
 
@@ -163,7 +166,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}&sender=pinList");
+        await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}&sender=fotogallery");
     }
 
     private void ImageFit(object sender, EventArgs e)

@@ -56,7 +56,8 @@
             </Grid.RowDefinitions>
             <CollectionView x:Name="FileListView" Grid.Row="0"
                             ItemsLayout="VerticalGrid, 1"
-                            SelectionMode="Single">
+                            SelectionMode="Single"
+                            ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">
                         <Grid Padding="6">

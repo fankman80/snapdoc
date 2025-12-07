@@ -130,9 +130,9 @@
 		<PackageReference Include="PDFtoImage" Version="5.2.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2-preview.1" />
-		<PackageReference Include="UraniumUI" Version="2.13.0" />
-		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.13.0" />
-		<PackageReference Include="UraniumUI.Material" Version="2.13.0" />
+		<PackageReference Include="UraniumUI" Version="2.14.0" />
+		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.14.0" />
+		<PackageReference Include="UraniumUI.Material" Version="2.14.0" />
 	</ItemGroup>
 
 	<ItemGroup>
