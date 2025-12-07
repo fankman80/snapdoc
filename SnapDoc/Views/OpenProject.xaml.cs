@@ -22,6 +22,8 @@ public partial class OpenProject : ContentPage
     {
         base.OnAppearing();
 
+        Helper.RemoveAllDuplicatePages();
+
         LoadJsonFiles();
     }
 
