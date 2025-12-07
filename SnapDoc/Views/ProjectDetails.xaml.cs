@@ -15,6 +15,8 @@ public partial class ProjectDetails : ContentPage
     {
         base.OnAppearing();
 
+        Helper.RemoveAllDuplicatePages();
+
         client_name.Text = GlobalJson.Data.Client_name;
         object_address.Text = GlobalJson.Data.Object_address;
         working_title.Text = GlobalJson.Data.Working_title;
