@@ -57,6 +57,11 @@ public partial class SetPin : ContentPage, IQueryAttributable
         BindingContext = this;
     }
 
+    protected override bool OnBackButtonPressed()
+    {
+        return true; // Back blockiert
+    }
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
