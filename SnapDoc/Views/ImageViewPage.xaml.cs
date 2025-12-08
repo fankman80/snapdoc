@@ -165,7 +165,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}&sender=fotogallery");
+        await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
     }
 
     private void ImageFit(object sender, EventArgs e)

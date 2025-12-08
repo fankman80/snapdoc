@@ -7,6 +7,7 @@ using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
@@ -16,7 +17,6 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     public ObservableCollection<IconItem> Icons { get; set; }
     private string PlanId;
     private string PinId;
-    private string SenderView;
     private bool isLongPressed = false;
     private string OrderDirection = "asc";
     public int DynamicSpan { get; set; } = 1; // Standardwert
@@ -57,8 +57,6 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
-        if (query.TryGetValue("sender", out object value3))
-            SenderView = value3 as string;
     }
 
     private async void OnIconClicked(object sender, EventArgs e)
@@ -92,7 +90,6 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
         WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
 
-        //await Shell.Current.GoToAsync($"{SenderView}?planId={PlanId}&pinId={PinId}");
         await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
     }
 

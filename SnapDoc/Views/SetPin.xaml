@@ -72,22 +72,22 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
         <CollectionView Grid.Row="0"
                         x:Name="ImageGallery"
-                        Margin="-4"
                         ItemsSource="{Binding Images}"
+                        ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="True"
                         ReorderCompleted="OnReorderCompleted"
-                        ItemsUpdatingScrollMode="KeepItemsInView">
+                        ItemSizingStrategy="MeasureFirstItem"
+                        SelectionMode="None">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:FotoItem">
                     <VerticalStackLayout>
                         <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
-                            <views:SquareView Margin="4">
+                            <views:SquareView>
                                 <Image Source="{Binding ImagePath}" Aspect="AspectFill">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />
@@ -95,19 +95,16 @@
                                 </Image>
                             </views:SquareView>
                             <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                    CornerRadius="0"
+                                    Padding="0"
                                     FontFamily="MaterialOutlined"
-                                    Padding="6"
                                     FontSize="24"
+                                    VerticalOptions="End"                                    
                                     HorizontalOptions="End"
-                                    VerticalOptions="End"
                                     BackgroundColor="Transparent"
                                     TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Clicked="OnAllowExportClicked"/>
                         </Grid>
-                        <Label Text="{Binding DateTime, StringFormat='{}{0:dd.MM.yy \\/ HH:mm}'}"
-                               FontSize="12"
-                               HorizontalTextAlignment="Center"
-                               Margin="0,-15,0,8"/>
                     </VerticalStackLayout>
                 </DataTemplate>
             </CollectionView.ItemTemplate>

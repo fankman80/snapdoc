@@ -96,7 +96,7 @@ public partial class PinList : ContentPage
         string planId = button.AutomationId;
         string pinId = button.ClassId;
 
-        await Shell.Current.GoToAsync($"icongallery?planId={planId}&pinId={pinId}&sender=pinList");
+        await Shell.Current.GoToAsync($"icongallery?planId={planId}&pinId={pinId}");
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
@@ -105,7 +105,7 @@ public partial class PinList : ContentPage
         string planId = button.AutomationId;
         string pinId = button.ClassId;
 
-        await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}&sender=pinList");
+        await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");
     }
 
     private void OnAllowExportClicked(object sender, EventArgs e)

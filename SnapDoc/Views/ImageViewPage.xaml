@@ -24,7 +24,7 @@
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
                     IsVisible="{Binding IsGotoPinBtnVisible}"
-                    Text="{x:Static m:MaterialOutlined.Keep}"
+                    Text="{x:Static m:MaterialOutlined.Step_into}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"

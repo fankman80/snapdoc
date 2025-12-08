@@ -169,9 +169,11 @@
         <Grid x:DataType="views:IconGallery" Grid.Row="1">
             <CollectionView x:Name="IconCollectionView"
                             ItemsSource="{Binding Icons}"
-                            SelectionMode="Single"
                             ItemTemplate="{StaticResource IconListTemplate}"
-                            ItemsUpdatingScrollMode="KeepItemsInView">
+                            ItemsUpdatingScrollMode="KeepItemsInView"
+                            CanReorderItems="False"
+                            ItemSizingStrategy="MeasureFirstItem"
+                            SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}"/>
                 </CollectionView.ItemsLayout>

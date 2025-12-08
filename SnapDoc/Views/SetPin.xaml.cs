@@ -18,10 +18,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
     public int DynamicSpan { get; set; } = 3;
     public int DynamicSize;
-
     private string PlanId;
     private string PinId;
-    private string SenderView;
 
     private ObservableCollection<FotoItem> images;
     public ObservableCollection<FotoItem> Images
@@ -84,8 +82,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
             PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
-        if (query.TryGetValue("sender", out object value3))
-            SenderView = value3 as string;
 
         MyView_Load();
     }
@@ -193,7 +189,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
-        await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}&sender=setpin");
+        await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
     }
 
     private async void OnOkayClick(object sender, EventArgs e)
@@ -201,8 +197,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
-        //SenderView ??= $"//{PlanId}";
-        //await Shell.Current.GoToAsync($"{SenderView}");
         await Shell.Current.GoToAsync("..");
     }
 
@@ -374,15 +368,5 @@ public partial class SetPin : ContentPage, IQueryAttributable
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
 #endif
-    }
-}
-
-public partial class SquareView : ContentView
-{
-    protected override async void OnSizeAllocated(double width, double height)
-    {
-        base.OnSizeAllocated(width, height);
-        await Task.Yield();
-        HeightRequest = Width;
     }
 }
