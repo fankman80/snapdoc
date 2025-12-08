@@ -81,7 +81,6 @@
                             ItemsSource="{Binding Fotos}"                            
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
-                            ItemSizingStrategy="MeasureFirstItem"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
