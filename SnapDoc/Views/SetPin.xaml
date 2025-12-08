@@ -78,7 +78,6 @@
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="True"
                         ReorderCompleted="OnReorderCompleted"
-                        ItemSizingStrategy="MeasureFirstItem"
                         SelectionMode="None">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
