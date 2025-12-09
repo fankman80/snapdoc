@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using DocumentFormat.OpenXml.Wordprocessing;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 
@@ -7,9 +8,11 @@ namespace SnapDoc.Views;
 
 public partial class FotoGalleryView : ContentPage
 {
-    public ObservableCollection<FotoItem> Fotos { get; set; }
     private List<FotoItem> AllFotos;
-
+    public ObservableCollection<FotoItem> Fotos { get; set; } = [];
+    private int _page = 0;
+    private const int PageSize = 40;
+    private bool _isLoading = false;
     private string OrderDirection = "asc";
     public int DynamicSpan { get; set; } = 3;
     public int DynamicSize;
@@ -149,7 +152,7 @@ public partial class FotoGalleryView : ContentPage
         ApplyFilterAndSorting();
     }
 
-    private void ApplyFilterAndSorting()
+    private async void ApplyFilterAndSorting()
     {
         if (AllFotos == null)
             return;
@@ -157,14 +160,49 @@ public partial class FotoGalleryView : ContentPage
         var filtered = AllFotos
             .Where(p => !IsActiveToggle || p.AllowExport);
 
-        if (OrderDirection == "asc")
-            filtered = filtered.OrderBy(p => p.DateTime);
-        else
-            filtered = filtered.OrderByDescending(p => p.DateTime);
+        filtered = OrderDirection == "asc"
+            ? filtered.OrderBy(p => p.DateTime)
+            : filtered.OrderByDescending(p => p.DateTime);
 
-        Fotos = new ObservableCollection<FotoItem>(filtered);
-        FotoGallery.ItemsSource = Fotos;
-        FotoCounterLabel.Text = $"Fotos: {Fotos.Count}";
+        // gefilterte Gesamtliste speichern
+        AllFotos = [.. filtered];
+
+        FotoCounterLabel.Text = $"{AllFotos.Count} Fotos";
+
+        // UI-Liste leeren
+        Fotos.Clear();
+        _page = 0;
+
+        // erste Seite laden
+        await LoadMoreAsync();
+    }
+
+    private async void CollectionView_RemainingItemsThresholdReached(object sender, EventArgs e)
+    {
+        await LoadMoreAsync();
+    }
+
+    public async Task LoadMoreAsync()
+    {
+        if (_isLoading)
+            return;
+
+        _isLoading = true;
+
+        await Task.Delay(50); // kleine Verzögerung für Butterweiches Scrollen
+
+        var start = _page * PageSize;
+
+        var newItems = AllFotos
+            .Skip(start)
+            .Take(PageSize)
+            .ToList();
+
+        foreach (var item in newItems)
+            Fotos.Add(item);
+
+        _page++;
+        _isLoading = false;
     }
 
     private void OnFilterToggleChanged(object sender, ToggledEventArgs e)

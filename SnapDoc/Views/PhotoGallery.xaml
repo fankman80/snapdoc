@@ -81,7 +81,9 @@
                             ItemsSource="{Binding Fotos}"                            
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
-                            SelectionMode="None">
+                            SelectionMode="None"
+                            RemainingItemsThreshold="20"
+                            RemainingItemsThresholdReached="CollectionView_RemainingItemsThresholdReached">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
                 </CollectionView.ItemsLayout>
