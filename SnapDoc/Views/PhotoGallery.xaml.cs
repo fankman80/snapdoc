@@ -2,6 +2,7 @@
 
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using FFImageLoading.Maui;
 
 namespace SnapDoc.Views;
 
@@ -135,7 +136,7 @@ public partial class FotoGalleryView : ContentPage
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        var tappedImage = sender as Image;
+        var tappedImage = sender as CachedImage;
         var filePath = ((FileImageSource)tappedImage.Source).File;
         var fileName = new FileResult(filePath).FileName;
         FotoItem item = (FotoItem)tappedImage.BindingContext;

@@ -4,6 +4,7 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:views="clr-namespace:SnapDoc.Views"                 
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -87,11 +88,18 @@
                     <VerticalStackLayout>
                         <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                             <views:SquareView>
-                                <Image Source="{Binding ImagePath}" Aspect="AspectFill">
-                                    <Image.GestureRecognizers>
+                                <ff:CachedImage Source="{Binding ImagePath}"
+                                                Aspect="AspectFill"
+                                                BitmapOptimizations="True"
+                                                CacheType="Memory"
+                                                FadeAnimationEnabled="False"
+                                                FadeAnimationForCachedImages="False"
+                                                RetryCount="2"
+                                                RetryDelay="100">
+                                    <ff:CachedImage.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />
-                                    </Image.GestureRecognizers>
-                                </Image>
+                                    </ff:CachedImage.GestureRecognizers>
+                                </ff:CachedImage>
                             </views:SquareView>
                             <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                     CornerRadius="0"
