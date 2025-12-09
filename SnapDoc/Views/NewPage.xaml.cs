@@ -11,7 +11,6 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
-using static SnapDoc.Helper;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -272,7 +271,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 // Lade Default-Icon falls Custom-Icon nicht existiert
                 string _newPin = SettingsService.Instance.DefaultPinIcon;
-                var iconItem = IconLookup.Get(_newPin);
+                var iconItem = Helper.IconLookup.Get(_newPin);
                 pinIcon = iconItem.FileName;
                 _originAnchor = iconItem.AnchorPoint;
                 _pinSize = iconItem.IconSize;
@@ -512,7 +511,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
         string _newPin = SettingsService.Instance.DefaultPinIcon;
-        var iconItem = IconLookup.Get(_newPin);
+        var iconItem = Helper.IconLookup.Get(_newPin);
 
         pinColor ??= SKColors.Red;
         Point _anchorPoint = iconItem.AnchorPoint;
@@ -797,8 +796,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
             // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
-            var cx = imageRect.MidX / density * densityX * oversizeScaleFac;   // evtl. "* oversizeScaleFac" wieder enfernen
-            var cy = imageRect.MidY / density * densityY * oversizeScaleFac;   // evtl. "* oversizeScaleFac" wieder enfernen
+            var cx = imageRect.MidX / density * densityX;
+            var cy = imageRect.MidY / density * densityY;
 
             // Mittelpunkt der DrawingView
             double centerX = drawingView.Width / 2;
@@ -821,10 +820,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             double fy = uy + centerY;
 
             var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
-                     ((fx - drawingView.Width / 2) / planContainer.Scale / density * densityX * oversizeScaleFac); // evtl. "/ density * densityX * oversizeScaleFac" wieder entfernen
+                     ((fx - drawingView.Width / 2) / planContainer.Scale);
 
             var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
-                     ((fy - drawingView.Height / 2) / planContainer.Scale / density * densityY * oversizeScaleFac); // evtl. "/ density * densityY * oversizeScaleFac" wieder entfernen
+                     ((fy - drawingView.Height / 2) / planContainer.Scale);
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),

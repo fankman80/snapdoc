@@ -49,10 +49,10 @@
                         StrokeThickness="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         StrokeShape="RoundRectangle 8">
+                    <Image Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill"/>
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnImageTapped"/>
                     </Border.GestureRecognizers>
-                        <Image Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill"/>
                 </Border>
 
                 <Button Grid.Column="1" Grid.Row="0"
