@@ -6,6 +6,7 @@
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
+             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -81,9 +82,7 @@
                             ItemsSource="{Binding Fotos}"                            
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
-                            SelectionMode="None"
-                            RemainingItemsThreshold="20"
-                            RemainingItemsThresholdReached="CollectionView_RemainingItemsThresholdReached">
+                            SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
                 </CollectionView.ItemsLayout>
@@ -92,11 +91,18 @@
                         <VerticalStackLayout>
                             <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                                 <views:SquareView>
-                                    <Image Source="{Binding ImagePath}" Aspect="AspectFill">
-                                        <Image.GestureRecognizers>
+                                    <ff:CachedImage Source="{Binding ImagePath}"
+                                                    Aspect="AspectFill"
+                                                    BitmapOptimizations="True"
+                                                    CacheType="Memory"
+                                                    FadeAnimationEnabled="False"
+                                                    FadeAnimationForCachedImages="False"
+                                                    RetryCount="2"
+                                                    RetryDelay="100">
+                                        <ff:CachedImage.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnImageTapped" />
-                                        </Image.GestureRecognizers>
-                                    </Image>
+                                        </ff:CachedImage.GestureRecognizers>
+                                    </ff:CachedImage>
                                 </views:SquareView>
                                 <Button Text="{x:Static m:MaterialOutlined.Step_into}"
                                         CornerRadius="0"
