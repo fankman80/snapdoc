@@ -21,9 +21,15 @@ public class Helper
 
         // aktualisiere das Thumbnail Bild
         if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
-            SettingsService.Instance.FlyoutHeaderImage = "banner_thumbnail.png";
+        {
+            SettingsService.Instance.FlyoutHeaderImage = "";
+            SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
+        }
         else
-            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
+        {
+            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+            SettingsService.Instance.FlyoutHeaderImageThumb = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
+        }
 
 #if WINDOWS
         // zwinge das UI zum Aktualisieren

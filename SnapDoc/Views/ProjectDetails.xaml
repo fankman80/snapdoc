@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
@@ -26,60 +27,58 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
-        <Grid Margin="16">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Image Grid.Row="0"
+               HeightRequest="100"
+               IsVisible="{Binding FlyoutHeaderImage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+               Source="{Binding FlyoutHeaderImage}"
+               Aspect="AspectFill"
+               HorizontalOptions="Fill"
+               VerticalOptions="Fill" />
+
+        <Grid Grid.Row="0" Margin="16, 10, 0, 0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Button Grid.Column="0"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
+                    ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
+                    Clicked="OnTitleCaptureClicked"/>
+            <Button Grid.Column="1"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
+                    ToolTipProperties.Text="Titelbild von der Festplatte hochladen"
+                    Clicked="OnTitleOpenClicked"/>
+        </Grid>        
+        <Grid Grid.Row="1" Margin="16,0,16,16">
+            <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
 
-            <Grid Grid.Row="0" RowSpacing="10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="98" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="44" />
-                    <RowDefinition Height="44" />
-                </Grid.RowDefinitions>
-
-                <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="2"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        StrokeShape="RoundRectangle 8">
-                    <Image Source="{Binding FlyoutHeaderImage}" Aspect="AspectFill"/>
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="OnImageTapped"/>
-                    </Border.GestureRecognizers>
-                </Border>
-
-                <Button Grid.Column="1" Grid.Row="0"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
-                        ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
-                        Clicked="OnTitleCaptureClicked"/>
-                <Button Grid.Column="2" Grid.Row="0"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
-                        ToolTipProperties.Text="Titelbild von der Festplatte hochladen"
-                        Clicked="OnTitleOpenClicked"/>
-                <Button Grid.Column="01" Grid.Row="1" Grid.ColumnSpan="2"
-                        Padding="10,0,10,0"
-                        Text="PDF hinzufügen"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
-                        ToolTipProperties.Text="PDF-Seiten hinzufügen"
-                        Clicked="OnAddPdfClicked"/>
-            </Grid>
-
-            <ScrollView Grid.Row="1" Margin="0,10,0,10">
+            <ScrollView Grid.Row="0" Margin="0,10,0,10">
                 <VerticalStackLayout Spacing="8">
                     <material:TextField
                         x:Name="client_name"
@@ -153,12 +152,21 @@
                 </VerticalStackLayout>
             </ScrollView>
 
-            <Grid Grid.Row="2">
+            <Grid Grid.Row="1">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
+                        Padding="0"
+                        MinimumWidthRequest="100"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
+                        ToolTipProperties.Text="PDF-Seiten hinzufügen"
+                        Clicked="OnAddPdfClicked"/>
+                <Button Grid.Column="2"
                         Text="OK"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

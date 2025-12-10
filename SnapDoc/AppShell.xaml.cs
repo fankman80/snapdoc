@@ -78,7 +78,10 @@ public partial class AppShell : Shell
                 Shell.Current.FlyoutIsPresented = false;
 #endif
                 // vermeide Navigation auf bestimmte Seiten wenn keine Pläne vorhanden sind
-                if (GlobalJson.Data.Plans == null && (parameter == "exportSettings" || parameter == "pinList" || parameter == "mapview"))
+                if (GlobalJson.Data.Plans == null && (parameter == "exportSettings" ||
+                                                        parameter == "pinList" ||
+                                                        parameter == "mapview" ||
+                                                        parameter == "fotogallery"))
                 {
                     var popup = new PopupAlert("Es sind noch keine Pläne vorhanden. Importieren zuerst eine oder mehrere PDF-Seiten in der Projektverwaltung.");
                     await this.ShowPopupAsync(popup, Settings.PopupOptions);

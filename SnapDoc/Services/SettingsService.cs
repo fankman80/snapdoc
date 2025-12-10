@@ -109,7 +109,8 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
     [ObservableProperty] private string _flyoutHeaderDesc = "SnapDoc";
-    [ObservableProperty] private string _flyoutHeaderImage = "banner_thumbnail.png";
+    [ObservableProperty] private string _flyoutHeaderImageThumb = "banner_thumbnail.png";
+    [ObservableProperty] private string _flyoutHeaderImage = "";
     [ObservableProperty] private bool _iconGalleryGridView = false;
 
     // --- Größe und Export ---

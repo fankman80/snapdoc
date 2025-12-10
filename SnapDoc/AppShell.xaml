@@ -46,7 +46,7 @@
                              Grid.RowSpan="2"
                              Aspect="AspectFill"
                              BackgroundColor="Transparent"
-                             Source="{Binding FlyoutHeaderImage}"
+                             Source="{Binding FlyoutHeaderImageThumb}"
                              Clicked="OnTitleClicked"/>
                 <Label Grid.Column="1"
                        Grid.Row="0"
