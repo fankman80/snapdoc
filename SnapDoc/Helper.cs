@@ -363,35 +363,6 @@ public class Helper
         return angle;
     }
 
-    public static Point GetAbsolutePosition(VisualElement view)
-    {
-        if (view.Handler?.PlatformView == null)
-            return new Point(0, 0);
-
-#if ANDROID
-        var nativeView = (Android.Views.View)view.Handler.PlatformView;
-
-        int[] location = new int[2];
-        nativeView.GetLocationOnScreen(location);
-
-        return new Point(location[0], location[1]);
-#elif WINDOWS
-    var nativeView = (Microsoft.UI.Xaml.FrameworkElement)view.Handler.PlatformView;
-
-    var transform = nativeView.TransformToVisual(null);
-    var p = transform.TransformPoint(new Windows.Foundation.Point(0, 0));
-
-    return new Point(p.X, p.Y);
-#elif IOS || MACCATALYST
-    var nativeView = (UIKit.UIView)view.Handler.PlatformView;
-    var p = nativeView.ConvertPointToView(nativeView.Bounds.Location, null);
-    return new Point(p.X, p.Y);
-#else
-    // Fallback für nicht unterstützte Plattformen
-    return new Point(0, 0);
-#endif
-    }
-
     public static class IconLookup
     {
         private static readonly Dictionary<string, IconItem> _icons =

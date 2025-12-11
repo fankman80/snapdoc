@@ -799,9 +799,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cx = imageRect.MidX / density * densityX;
             var cy = imageRect.MidY / density * densityY;
 
+            // Statusbar + Shell TitleView + evtl. SafeAreaInset Fix
+            var abs = drawingView.GetAbsolutePosition();
+            cx += abs.X;
+            cy += abs.Y;
+
             // Mittelpunkt der DrawingView
-            double centerX = drawingView.Width / 2 + Helper.GetAbsolutePosition(drawingView).X; //evtl. wieder entfernen
-            double centerY = drawingView.Height / 2 + Helper.GetAbsolutePosition(drawingView).Y; //evtl. wieder entfernen
+            double centerX = drawingView.Width / 2;
+            double centerY = drawingView.Height / 2;
 
             // Punkt relativ zum Zentrum
             double rx = cx - centerX;
@@ -833,15 +838,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     new SKColor(SelectedColor.ToUint()),
                     1 / planContainer.Scale / density * densityX * oversizeScaleFac,
                     Helper.NormalizeAngle360(-planContainer.Rotation));
-
-            string popupText =
-    $"drawingView.Y: {Helper.GetAbsolutePosition(drawingView)}\n" +
-    $"PlanView.Y: {Helper.GetAbsolutePosition(PlanView)}\n" +
-    $"PlanImage.Y: {Helper.GetAbsolutePosition(PlanImage)}\n" +
-    $"PlanContainer.Y: {Helper.GetAbsolutePosition(PlanContainer)}";
-
-            var popup = new PopupAlert(popupText);
-            await this.ShowPopupAsync(popup, Settings.PopupOptions);
         }
 
         // Cleanup drawing canvas
