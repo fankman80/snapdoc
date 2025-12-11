@@ -799,11 +799,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cx = imageRect.MidX / density * densityX;
             var cy = imageRect.MidY / density * densityY;
 
-            // Statusbar + Shell TitleView + evtl. SafeAreaInset Fix
-            var abs = drawingView.GetAbsolutePosition();
-            cx += abs.X;
-            cy += abs.Y;
-
             // Mittelpunkt der DrawingView
             double centerX = drawingView.Width / 2;
             double centerY = drawingView.Height / 2;
@@ -824,14 +819,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             double fx = ux + centerX;
             double fy = uy + centerY;
 
+            // In Bild-Koordinaten umrechnen
             var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
                      ((fx - drawingView.Width / 2) / planContainer.Scale);
 
             var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
                      ((fy - drawingView.Height / 2) / planContainer.Scale);
 
+            // Statusbar + Shell TitleView + SafeAreaInset Offset berechnen
+            var abs = drawingView.GetAbsolutePosition();
+            abs = new Point(1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * abs.X,
+                            1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * abs.Y);
+
             // Pin setzen
-            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
+            SetPin(new Point(PlanContainer.AnchorX + ox - abs.X, PlanContainer.AnchorY + oy - abs.Y),
                     customPinName,
                     (int)imageRect.Width,
                     (int)imageRect.Height,
