@@ -800,8 +800,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cy = imageRect.MidY / density * densityY;
 
             // Mittelpunkt der DrawingView
-            double centerX = drawingView.Width / 2;
-            double centerY = drawingView.Height / 2;
+            double centerX = drawingView.Width / 2 + Helper.GetAbsolutePosition(drawingView).X; //evtl. wieder entfernen
+            double centerY = drawingView.Height / 2 + Helper.GetAbsolutePosition(drawingView).Y; //evtl. wieder entfernen
 
             // Punkt relativ zum Zentrum
             double rx = cx - centerX;
