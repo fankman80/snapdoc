@@ -828,8 +828,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             // Statusbar + Shell TitleView + SafeAreaInset Offset berechnen
             var abs = drawingView.GetAbsolutePosition();
-            abs = new Point(1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * abs.X,
-                            1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * abs.Y);
+            abs = new Point(1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * abs.X / planContainer.Scale,
+                            1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * abs.Y / planContainer.Scale);
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox - abs.X, PlanContainer.AnchorY + oy - abs.Y),
