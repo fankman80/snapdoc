@@ -833,6 +833,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     new SKColor(SelectedColor.ToUint()),
                     1 / planContainer.Scale / density * densityX * oversizeScaleFac,
                     Helper.NormalizeAngle360(-planContainer.Rotation));
+
+            string popupText =
+    $"drawingView.Y: {Helper.GetAbsolutePosition(drawingView)}\n" +
+    $"PlanView.Y: {Helper.GetAbsolutePosition(PlanView)}\n" +
+    $"PlanImage.Y: {Helper.GetAbsolutePosition(PlanImage)}\n" +
+    $"PlanContainer.Y: {Helper.GetAbsolutePosition(PlanContainer)}";
+
+            var popup = new PopupAlert(popupText);
+            await this.ShowPopupAsync(popup, Settings.PopupOptions);
         }
 
         // Cleanup drawing canvas
