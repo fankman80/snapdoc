@@ -11,7 +11,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ProjectDetails"
-             x:Name="ThisPage"
+             x:Name="ThisPage"             
              Title="Projektverwaltung">
 
     <Shell.TitleView>
@@ -39,39 +39,30 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <Image Grid.Row="0"
-               HeightRequest="100"
-               IsVisible="{Binding FlyoutHeaderImage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
-               Source="{Binding FlyoutHeaderImage}"
-               Aspect="AspectFill"
-               HorizontalOptions="Fill"
-               VerticalOptions="Fill" />
+        <ImageButton Grid.Row="0"
+                     HeightRequest="100"
+                     IsVisible="{Binding FlyoutHeaderImage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                     Source="{Binding FlyoutHeaderImage}"
+                     Aspect="AspectFill"
+                     HorizontalOptions="Fill"
+                     VerticalOptions="Fill"
+                     Clicked="OnImageTapped"/>
 
-        <Grid Grid.Row="0" Margin="16, 10, 0, 0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
-            <Button Grid.Column="0"
-                    Padding="0"
+        <HorizontalStackLayout Grid.Row="0" Margin="16, 10, 0, 0" HorizontalOptions="Start" VerticalOptions="Start">
+            <Button Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
                     ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
                     Clicked="OnTitleCaptureClicked"/>
-            <Button Grid.Column="1"
-                    Padding="0"
+            <Button Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
                     ToolTipProperties.Text="Titelbild von der Festplatte hochladen"
                     Clicked="OnTitleOpenClicked"/>
-        </Grid>        
+        </HorizontalStackLayout>
+        
         <Grid Grid.Row="1" Margin="16,0,16,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />

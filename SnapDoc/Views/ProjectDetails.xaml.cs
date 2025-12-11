@@ -50,6 +50,7 @@ public partial class ProjectDetails : ContentPage
                 File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
             if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
                 File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+            
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
             GlobalJson.SaveToFile();
