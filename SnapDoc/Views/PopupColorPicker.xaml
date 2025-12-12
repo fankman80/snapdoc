@@ -148,7 +148,7 @@
                            Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
                     <Slider x:Name="LineWidthSlider"
                             IsVisible="{Binding LineWidthVisibility}"
-                            Maximum="40"
+                            Maximum="20"
                             Minimum="0"
                             Value="{Binding LineWidth}"
                             ThumbColor="{DynamicResource Primary}"
