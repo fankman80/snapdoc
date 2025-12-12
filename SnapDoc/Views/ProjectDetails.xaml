@@ -52,26 +52,27 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
+            <toolkit:MultiConverter x:Key="HeightConverter">
+                <toolkit:IsStringNotNullOrEmptyConverter />
+                <toolkit:MathExpressionConverter />
+            </toolkit:MultiConverter>
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}" RowSpacing="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
+            <RowDefinition Height="{Binding FlyoutHeaderImage, Converter={StaticResource HeightConverter}, ConverterParameter='x==true?100:0'}" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <ImageButton Grid.Row="0"
-                     HeightRequest="100"
-                     IsVisible="{Binding FlyoutHeaderImage, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
                      Source="{Binding FlyoutHeaderImage}"
                      Aspect="AspectFill"
                      HorizontalOptions="Fill"
                      VerticalOptions="Fill"
                      Clicked="OnImageTapped"/>
 
-        <Grid Grid.Row="1" Margin="16,0,16,16">
+        <Grid Grid.Row="1" Margin="16,6,16,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
