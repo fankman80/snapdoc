@@ -48,6 +48,7 @@ internal class SettingsModel
     public string? PolyLineHandleColor { get; set; } // Farbe der Griffe für Polylinien (Hex-Wert)
     public string? PolyLineStartHandleColor { get; set; } // Farbe des Start-Griffs für Polylinien (Hex-Wert)
     public byte PolyLineHandleAlpha { get; set; } // Alpha-Wert der Griffe für Polylinien (Hex-Wert)
+    public Point CustomPinOffset { get; set; } // Offset für die CustomPins unterschiedlich nach Betriebssystem
     public string? DefaultPinIcon { get; set; } // Standard Pin Icon
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<string>? IconSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Icons

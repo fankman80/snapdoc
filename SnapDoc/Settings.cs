@@ -20,6 +20,14 @@ public static class Settings
     public const string TableRowIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows;
     public const string TableGridIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on;
 
+#if ANDROID
+    public static readonly Point DefaultCustomPinOffset = new(0, -8);
+#elif IOS
+    public static readonly Point DefaultCustomPinOffset = new(0, -10);
+#else
+    public static readonly Point DefaultCustomPinOffset = new(0, 0);
+#endif
+
 #if WINDOWS
 private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");
 #endif

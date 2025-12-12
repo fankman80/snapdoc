@@ -804,8 +804,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             double centerY = drawingView.Height / 2;
 
             // Punkt relativ zum Zentrum
-            double rx = cx - centerX;
-            double ry = cy - centerY;
+            double rx = cx - centerX + SettingsService.Instance.CustomPinOffset.X;
+            double ry = cy - centerY + SettingsService.Instance.CustomPinOffset.Y;
 
             // Inverse Rotation anwenden
             double angle = -planContainer.Rotation * (Math.PI / 180.0);
@@ -826,13 +826,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
                      ((fy - drawingView.Height / 2) / planContainer.Scale);
 
-            // Statusbar + Shell TitleView + SafeAreaInset Offset berechnen
-            var abs = drawingView.GetAbsolutePosition();
-            abs = new Point(1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width * abs.X,
-                            1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height * abs.Y);
-
             // Pin setzen
-            SetPin(new Point(PlanContainer.AnchorX + ox - abs.X, PlanContainer.AnchorY + oy - abs.Y),
+            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
                     customPinName,
                     (int)imageRect.Width,
                     (int)imageRect.Height,

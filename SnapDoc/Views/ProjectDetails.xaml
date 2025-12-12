@@ -15,8 +15,9 @@
              Title="Projektverwaltung">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
-            <Label x:DataType="views:ProjectDetails"
+        <Grid ColumnDefinitions="*, Auto,Auto">
+            <Label Grid.Row="0"
+                   x:DataType="views:ProjectDetails"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -24,7 +25,29 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"                    
+                    Text="{x:Static m:MaterialOutlined.Photo_camera}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
+                    Clicked="OnTitleCaptureClicked"/>
+            <Button Grid.Column="2"                    
+                    Text="{x:Static m:MaterialOutlined.Image_search}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="Titelbild von der Festplatte hochladen"
+                    Clicked="OnTitleOpenClicked"/>
+        </Grid>
     </Shell.TitleView>
 
     <ContentPage.Resources>
@@ -48,21 +71,6 @@
                      VerticalOptions="Fill"
                      Clicked="OnImageTapped"/>
 
-        <HorizontalStackLayout Grid.Row="0" Margin="16, 10, 0, 0" HorizontalOptions="Start" VerticalOptions="Start">
-            <Button Padding="0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
-                    ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
-                    Clicked="OnTitleCaptureClicked"/>
-            <Button Padding="0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Image_search}}"
-                    ToolTipProperties.Text="Titelbild von der Festplatte hochladen"
-                    Clicked="OnTitleOpenClicked"/>
-        </HorizontalStackLayout>
-        
         <Grid Grid.Row="1" Margin="16,0,16,16">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
