@@ -18,7 +18,6 @@
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
@@ -50,9 +49,9 @@
                             Value="{Binding PinMaxScaleLimit}"/>
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0} MP', Converter={StaticResource MathExpressionConverter}, ConverterParameter='x/1000000'}" />
-                    <Slider Maximum="50000000"
-                            Minimum="1000000"
+                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0} MP'}" />
+                    <Slider Maximum="50"
+                            Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"

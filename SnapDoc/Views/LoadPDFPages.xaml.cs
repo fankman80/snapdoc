@@ -85,7 +85,7 @@ public partial class LoadPDFPages : ContentPage
                         int height72dpi = probeBitmap.Height;
 
                         // Schritt 2: DPI berechnen anhand MaxPixelCount
-                        int targetDpi = CalculateMaxDpiFromPixelLimit(width72dpi, height72dpi, SettingsService.Instance.MaxPdfPixelCount);
+                        int targetDpi = CalculateMaxDpiFromPixelLimit(width72dpi, height72dpi, SettingsService.Instance.MaxPdfPixelCount * 1000000);
 
                         pdfImages.Add(new PdfItem
                         {

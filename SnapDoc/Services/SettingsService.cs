@@ -131,7 +131,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private bool _isPlanRotateLocked = false;
     [ObservableProperty] private int _pinMinScaleLimit = 80;
     [ObservableProperty] private int _pinMaxScaleLimit = 100;
-    [ObservableProperty] private int _maxPdfPixelCount = 30000000;
+    [ObservableProperty] private int _maxPdfPixelCount = 30;
     [ObservableProperty] private int _mapIconSize = 85;
     [ObservableProperty] private int _mapIcon = 0;
     [ObservableProperty] private int _mapOverlay1 = 1;
@@ -283,6 +283,7 @@ public partial class SettingsService : ObservableObject
             PolyLineHandleColor = PolyLineHandleColor,
             PolyLineStartHandleColor = PolyLineStartHandleColor,
             PolyLineHandleAlpha = PolyLineHandleAlpha,
+            CustomPinOffset = CustomPinOffset,
             DefaultPinIcon = DefaultPinIcon,
             ColorList = ColorList,
             IconSortCrits = IconSortCrits,
@@ -354,6 +355,7 @@ public partial class SettingsService : ObservableObject
             PolyLineHandleColor = settings.PolyLineHandleColor ?? string.Empty;
             PolyLineStartHandleColor = settings.PolyLineStartHandleColor ?? string.Empty;
             PolyLineHandleAlpha = settings.PolyLineHandleAlpha;
+            CustomPinOffset = settings.CustomPinOffset;
             DefaultPinIcon = settings.DefaultPinIcon ?? string.Empty;
             ColorList = settings.ColorList ?? ColorList;
             IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
@@ -416,6 +418,7 @@ public partial class SettingsService : ObservableObject
         PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
         PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
         PolyLineHandleAlpha = defaultSettings.PolyLineHandleAlpha;
+        CustomPinOffset = defaultSettings.CustomPinOffset;
         DefaultPinIcon = defaultSettings.DefaultPinIcon;
         ColorList = [.. defaultSettings.ColorList];
         IconSortCrits = [.. defaultSettings.IconSortCrits];

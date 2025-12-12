@@ -31,8 +31,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
     private Point mousePos;
-    private int lineWidth = 5;
-
+    private int lineWidth = 4;
     private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
@@ -211,7 +210,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PlanImage.DownsampleHeight = SettingsService.Instance.MaxPdfImageSizeH;
 
             oversizeScaleFac = Math.Min(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height) /
-                           Math.Max(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height);
+                               Math.Max(GlobalJson.Data.Plans[PlanId].ImageSize.Width, GlobalJson.Data.Plans[PlanId].ImageSize.Height);
 
             if (GlobalJson.Data.Plans[PlanId].ImageSize.Width > GlobalJson.Data.Plans[PlanId].ImageSize.Height)
             {
@@ -435,7 +434,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (SettingsService.Instance.PinPlaceMode == 1)
         {
-            ToolBtns.IsVisible = false;
+            DrawBtn.IsVisible = false;
             SetPinFrame.IsVisible = true;
             isPinSet = true;
         }
@@ -450,7 +449,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             SetPin(new Point(x, y));
 
-            ToolBtns.IsVisible = true;
+            DrawBtn.IsVisible = true;
             SetPinFrame.IsVisible = false;
             isPinSet = false;
         }
@@ -469,7 +468,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnPinSetCancelClicked(object sender, EventArgs e)
     {
-        ToolBtns.IsVisible = true;
+        DrawBtn.IsVisible = true;
         SetPinFrame.IsVisible = false;
         isPinSet = false;
     }
@@ -794,8 +793,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
             // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
-            var cx = imageRect.MidX / density * densityX;
-            var cy = imageRect.MidY / density * densityY;
+            var cx = imageRect.MidX / density;
+            var cy = imageRect.MidY / density;
 
             // Mittelpunkt der DrawingView
             double centerX = drawingView.Width / 2;
@@ -830,7 +829,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     (int)imageRect.Width,
                     (int)imageRect.Height,
                     new SKColor(SelectedColor.ToUint()),
-                    1 / planContainer.Scale / density * densityX * oversizeScaleFac,
+                    1 / planContainer.Scale / density,
                     Helper.NormalizeAngle360(-planContainer.Rotation));
         }
 
