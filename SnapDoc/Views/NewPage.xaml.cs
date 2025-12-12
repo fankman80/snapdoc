@@ -71,9 +71,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         BindingContext = planContainer;
 
         drawingController = new DrawingController(planContainer, density);
-
         PlanId = planId;
-
         PageTitle = GlobalJson.Data.Plans[PlanId].Name;
 
         // Überwache Sichtbarkeit des SetPin-Buttons
