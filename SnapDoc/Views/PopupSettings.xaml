@@ -243,12 +243,12 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Button Grid.Column="0" Grid.Row="0"
-                                    Text="Projekt"
+                                    Text="Projektdaten"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                    
                                     Clicked="OpenDocEditor"/>
                             <Button Grid.Column="0" Grid.Row="1"
-                                    Text="Programm"
+                                    Text="App-Settings"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                           
                                     Clicked="OpenPrgEditor"/>
