@@ -87,6 +87,7 @@
                 ZIndex="10000"
                 AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
                 AbsoluteLayout.LayoutFlags="PositionProportional"
+                ToolTipProperties.Text="Formen zeichnen"
                 Clicked="DrawingClicked"/>
 
         <AbsoluteLayout x:Name="ToolBtns"
@@ -104,6 +105,7 @@
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
+                        ToolTipProperties.Text="Zeichnung löschen"
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout>
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
@@ -112,6 +114,7 @@
                                 WidthRequest="60"
                                 HeightRequest="60"
                                 CornerRadius="30"
+                                ToolTipProperties.Text="Farbe und Stiftbreite wählen"
                                 Clicked="PenSettingsClicked"/>
                     <Border x:DataType="views:ImageViewPage"
                                 WidthRequest="22"
@@ -137,6 +140,7 @@
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
+                        ToolTipProperties.Text="Zeichnung speichern"
                         Clicked="CheckClicked"/>
             </VerticalStackLayout>
             <HorizontalStackLayout Spacing="16"
@@ -150,6 +154,7 @@
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
+                        ToolTipProperties.Text="Polylinie zeichnen"
                         Clicked="DrawPolyClicked"/>
                 <Button x:Name="DrawFreeBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
@@ -158,6 +163,7 @@
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
+                        ToolTipProperties.Text="Freihandlinie zeichnen"
                         Clicked="DrawFreeClicked"/>
             </HorizontalStackLayout>
         </AbsoluteLayout>
