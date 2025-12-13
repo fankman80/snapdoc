@@ -30,7 +30,7 @@ public static class Settings
 #endif
 #if IOS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapDoc");
-    public static readonly Point DefaultCustomPinOffset = new(0, -10);
+    public static readonly Point DefaultCustomPinOffset = new(0, -8);
 #endif
 
     public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
