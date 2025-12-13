@@ -317,7 +317,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         smallImage.Tapped += async (s, e) =>
         {
-            if (isTappedHandled)
+            if (isTappedHandled || isPinSet)
                 return;
 
             isTappedHandled = true;
