@@ -55,7 +55,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="Plan löschen"                    
+                    ToolTipProperties.Text="Pin löschen"                    
                     Clicked="OnDeleteClick"/>            
         </Grid>
     </Shell.TitleView>
