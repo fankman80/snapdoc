@@ -161,6 +161,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
+    [ObservableProperty] private bool _isGpsActive = false;
     [ObservableProperty] private string _editorTheme = "material-darker";
     [ObservableProperty] private float _polyLineHandleRadius = 10f;
     [ObservableProperty] private float _polyLineHandleTouchRadius = 20f;
@@ -276,6 +277,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinZoom = DefaultPinZoom,
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
+            IsGpsActive = IsGpsActive,
             EditorTheme = EditorTheme,
             PolyLineHandleRadius = PolyLineHandleRadius,
             PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
@@ -348,6 +350,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinZoom = settings.DefaultPinZoom;
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
+            IsGpsActive = settings.IsGpsActive;
             EditorTheme = settings.EditorTheme ?? string.Empty;
             PolyLineHandleRadius = settings.PolyLineHandleRadius;
             PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
@@ -411,6 +414,7 @@ public partial class SettingsService : ObservableObject
         DefaultPinZoom = defaultSettings.DefaultPinZoom;
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
+        IsGpsActive = defaultSettings.IsGpsActive;
         EditorTheme = defaultSettings.EditorTheme;
         PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
         PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;

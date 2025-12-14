@@ -1,6 +1,7 @@
 ﻿#nullable disable
-using System.Windows.Input;
 using SnapDoc.Services;
+using System.ComponentModel;
+using System.Windows.Input;
 
 namespace SnapDoc.ViewModels;
 
@@ -9,7 +10,6 @@ public partial class GeolocationViewModel : BaseViewModel
     public static GeolocationViewModel Instance { get; } = new GeolocationViewModel();
     private readonly string notAvailable = "not available";
     private CancellationTokenSource cts;
-    private bool _isGpsActive = false;
     private string _gpsButtonIcon;
     private Location _lastKnownLocation;
 
@@ -17,13 +17,26 @@ public partial class GeolocationViewModel : BaseViewModel
     {
         ToggleGPSCommand = new Command(async () => await OnToggleGPSAsync());
 
-        GPSButtonIcon = Settings.GPSButtonOffIcon;
+        SettingsService.Instance.PropertyChanged += Settings_PropertyChanged;
+
+        UpdateGPSButtonIcon();
     }
 
     public bool IsGpsActive
     {
-        get => _isGpsActive;
-        private set => SetProperty(ref _isGpsActive, value);
+        get => SettingsService.Instance.IsGpsActive;
+        set
+        {
+            if (SettingsService.Instance.IsGpsActive != value)
+            {
+                SettingsService.Instance.IsGpsActive = value;
+                OnPropertyChanged();
+                UpdateGPSButtonIcon();
+
+                // Einstellungen speichern
+                SettingsService.Instance.SaveSettings();
+            }
+        }
     }
 
     public static bool IsListening => Geolocation.IsListeningForeground;
@@ -41,8 +54,19 @@ public partial class GeolocationViewModel : BaseViewModel
         private set => SetProperty(ref _lastKnownLocation, value);
     }
 
-    public string ListeningLocation { get; private set; }
-    public string ListeningLocationStatus { get; private set; }
+    private string _listeningLocationStatus;
+    public string ListeningLocationStatus
+    {
+        get => _listeningLocationStatus;
+        set => SetProperty(ref _listeningLocationStatus, value);
+    }
+
+    private string _listeningLocation;
+    public string ListeningLocation
+    {
+        get => _listeningLocation;
+        set => SetProperty(ref _listeningLocation, value);
+    }
 
     public ICommand ToggleGPSCommand { get; }
 
@@ -51,32 +75,30 @@ public partial class GeolocationViewModel : BaseViewModel
     // ----------------------------------------------------------------------
     public async Task OnToggleGPSAsync()
     {
-        // Wenn GPS ausgeschaltet werden soll:
         if (IsGpsActive)
         {
             IsGpsActive = false;
-            UpdateGPSButtonIcon();
             StopListening();
             return;
         }
 
-        // Prüfen, ob Standortberechtigung erlaubt ist
+        // Berechtigung prüfen
         var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
         if (status != PermissionStatus.Granted)
         {
             status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
             if (status != PermissionStatus.Granted)
             {
-                await Shell.Current.DisplayAlertAsync("GPS deaktiviert",
+                await Shell.Current.DisplayAlertAsync(
+                    "GPS deaktiviert",
                     "Standortberechtigung wurde nicht erteilt. GPS kann nicht aktiviert werden.",
                     "OK");
-                return; // Abbrechen
+                return;
             }
         }
 
-        // Prüfen, ob das System-GPS aktiv ist
-        bool isGpsEnabled = await IsSystemGpsEnabledAsync();
-        if (!isGpsEnabled)
+        // System-GPS prüfen
+        if (!await IsSystemGpsEnabledAsync())
         {
             bool openSettings = await Shell.Current.DisplayAlertAsync(
                 "GPS ist deaktiviert",
@@ -84,31 +106,35 @@ public partial class GeolocationViewModel : BaseViewModel
                 "Einstellungen öffnen",
                 "Abbrechen");
 
+#if ANDROID
             if (openSettings)
             {
-#if ANDROID
-            // Systemeinstellungen öffnen
-            var intent = new Android.Content.Intent(Android.Provider.Settings.ActionLocationSourceSettings);
-            intent.AddFlags(Android.Content.ActivityFlags.NewTask);
-            Android.App.Application.Context.StartActivity(intent);
-#endif
+                var intent = new Android.Content.Intent(Android.Provider.Settings.ActionLocationSourceSettings);
+                intent.AddFlags(Android.Content.ActivityFlags.NewTask);
+                Android.App.Application.Context.StartActivity(intent);
             }
-
-            // GPS bleibt deaktiviert → Toggle bleibt aus
+#endif
             return;
         }
 
-        // Jetzt darf GPS aktiviert werden
+        // jetzt erst aktivieren
         IsGpsActive = true;
-        UpdateGPSButtonIcon();
         await StartListeningAsync();
 
-        // Erste Position abfragen
         if (LastKnownLocation == null)
         {
             var location = await GetCurrentLocationAsync();
             if (location != null)
                 LastKnownLocation = location;
+        }
+    }
+
+    private void Settings_PropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsService.IsGpsActive))
+        {
+            OnPropertyChanged(nameof(IsGpsActive));
+            UpdateGPSButtonIcon();
         }
     }
 
@@ -142,7 +168,7 @@ public partial class GeolocationViewModel : BaseViewModel
     // ----------------------------------------------------------------------
     public async Task<Location> GetCurrentLocationAsync()
     {
-        if (!IsGpsActive)
+        if (!SettingsService.Instance.IsGpsActive)
             return null;
 
         try
@@ -232,7 +258,6 @@ public partial class GeolocationViewModel : BaseViewModel
     {
         LastKnownLocation = e.Location;
         ListeningLocation = FormatLocation(e.Location);
-        OnPropertyChanged(nameof(ListeningLocation));
     }
 
     private string FormatLocation(Location location)

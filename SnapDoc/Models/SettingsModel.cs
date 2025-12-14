@@ -41,6 +41,7 @@ internal class SettingsModel
     public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates
+    public bool IsGpsActive { get; set; } // GPS Ein/Aus
     public string? EditorTheme { get; set; } // Json Editor Thema
     public float PolyLineHandleRadius { get; set; } // Radius der Griffe für Polylinien
     public float PolyLineHandleTouchRadius { get; set; } // Touch-Radius der Griffe für Polylinien

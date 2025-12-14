@@ -159,7 +159,7 @@ public partial class MapView : IQueryAttributable
                 lat = pin.GeoLocation.WGS84.Latitude;
                 zoom = 18;
             }
-            else if (geoViewModel.IsGpsActive)
+            else if (SettingsService.Instance.IsGpsActive)
             {
                 Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
 
@@ -169,7 +169,7 @@ public partial class MapView : IQueryAttributable
                 zoom = 18;
             }
         }
-        else if (geoViewModel.IsGpsActive)
+        else if (SettingsService.Instance.IsGpsActive)
         {
             Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
 
@@ -256,7 +256,7 @@ public partial class MapView : IQueryAttributable
 
     private async void SetPosClicked(object sender, EventArgs e)
     {
-        if (!geoViewModel.IsGpsActive)
+        if (!SettingsService.Instance.IsGpsActive)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
                 await Application.Current.Windows[0].Page.DisplayAlertAsync("Standortdienste deaktiviert", "Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.", "OK");

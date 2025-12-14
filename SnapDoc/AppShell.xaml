@@ -191,8 +191,7 @@
                        HorizontalTextAlignment="Center"/>
 
                 <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="0">
-                    <Button x:DataType="model:GeolocationViewModel"
-                            Text="{Binding GPSButtonIcon}"
+                    <Button Text="{Binding GPSButtonIcon}"
                             FontFamily="MaterialOutlined"
                             FontSize="26"                               
                             BindingContext="{x:Static model:GeolocationViewModel.Instance}"
