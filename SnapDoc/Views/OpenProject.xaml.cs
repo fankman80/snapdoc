@@ -31,6 +31,13 @@ public partial class OpenProject : ContentPage
         List<FileItem> foundFiles = [];
         string searchPattern = "*.json"; // Alle JSON-Dateien suchen
 
+        // Prüfen welche Datei schon geladen ist
+        string activeFilePath = GlobalJson.Data?.JsonFile != null
+                                ? Path.Combine(Settings.DataDirectory,
+                                               GlobalJson.Data.ProjectPath,
+                                               GlobalJson.Data.JsonFile)
+                                : null;
+
         // Alle Unterverzeichnisse und das Hauptverzeichnis durchsuchen
         try
         {
@@ -51,7 +58,8 @@ public partial class OpenProject : ContentPage
                     FilePath = file,
                     FileDate = File.GetLastWriteTime(file),
                     ImagePath = thumbImg,
-                    ThumbnailPath = thumbImg
+                    ThumbnailPath = thumbImg,
+                    IsActive = file == activeFilePath
                 });
             }
         }
@@ -174,50 +182,68 @@ public partial class OpenProject : ContentPage
         busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = "Projekt wird geladen...";
 
-        // Hintergrundoperation (nicht UI-Operationen)
-        await Task.Run(() =>
+        try
         {
             var button = sender as Button;
-            if (button.BindingContext is FileItem item)
+            if (button?.BindingContext is not FileItem item)
+                return;
+
+            if (item.IsActive)
             {
-                // Alle UI-Änderungen im Haupt-Thread
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    SettingsService.Instance.IsProjectLoaded = true;
-                    LoadDataToView.ResetData();
-                    GlobalJson.LoadFromFile(item.FilePath);
-                    LoadDataToView.LoadData(new FileResult(item.FilePath));
-                    Helper.HeaderUpdate();  // UI-Aktualisierung
-
-                    // Check Pin Count, if not correct, repair it
-                    if (GlobalJson.Data.Plans != null)
-                    {
-                        var repairCount = false;
-                        foreach (var plan in GlobalJson.Data.Plans)
-                        {
-                            var i = 0;
-                            if (GlobalJson.Data.Plans[plan.Key].Pins != null)
-                                foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
-                                    i += 1;
-                            if (GlobalJson.Data.Plans[plan.Key].PinCount != i)
-                            {
-                                GlobalJson.Data.Plans[plan.Key].PinCount = i;
-                                repairCount = true;
-                            }
-                        }
-                        if (repairCount)
-                            GlobalJson.SaveToFile();
-                    }
-
-                    await Shell.Current.GoToAsync("project_details");
-#if ANDROID
-                    Shell.Current.FlyoutIsPresented = false;
-#endif  
-                });
+                busyOverlay.IsActivityRunning = false;
+                busyOverlay.IsOverlayVisible = false;
+                return;
             }
-        });
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
+
+            // ⭐ Aktives Projekt setzen
+            if (FileListView.ItemsSource is IEnumerable<FileItem> items)
+            {
+                foreach (var f in items)
+                    f.IsActive = false;
+
+                item.IsActive = true;
+            }
+
+            SettingsService.Instance.IsProjectLoaded = true;
+            LoadDataToView.ResetData();
+
+            // Laden kann im UI-Thread bleiben
+            GlobalJson.LoadFromFile(item.FilePath);
+            LoadDataToView.LoadData(new FileResult(item.FilePath));
+            Helper.HeaderUpdate();
+
+            // Repair-Check (unverändert)
+            if (GlobalJson.Data.Plans != null)
+            {
+                var repairCount = false;
+                foreach (var plan in GlobalJson.Data.Plans)
+                {
+                    var i = 0;
+                    if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+                        foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                            i++;
+
+                    if (GlobalJson.Data.Plans[plan.Key].PinCount != i)
+                    {
+                        GlobalJson.Data.Plans[plan.Key].PinCount = i;
+                        repairCount = true;
+                    }
+                }
+                if (repairCount)
+                    GlobalJson.SaveToFile();
+            }
+
+            await Shell.Current.GoToAsync("project_details");
+
+#if ANDROID
+            Shell.Current.FlyoutIsPresented = false;
+#endif
+        }
+        finally
+        {
+            busyOverlay.IsActivityRunning = false;
+            busyOverlay.IsOverlayVisible = false;
+        }
     }
 
     private async void OnEditClicked(object sender, EventArgs e)

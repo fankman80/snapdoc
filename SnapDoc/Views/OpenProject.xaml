@@ -5,12 +5,19 @@
              xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:local="clr-namespace:SnapDoc"
+             xmlns:services="clr-namespace:SnapDoc.Services"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.OpenProject"
              x:Name="ThisPage"
              Title="Projektliste">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+    
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
               VerticalOptions="Center">
@@ -70,13 +77,22 @@
                                 <RowDefinition Height="25" />
                                 <RowDefinition Height="35" />
                             </Grid.RowDefinitions>
-                            <Label Grid.Column="1" Grid.Row="0"
-                                   VerticalTextAlignment="End"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                   FontSize="14"
-                                   Text="{Binding FileName}"/>
+                            <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6">
+                                <Label Text="{x:Static m:MaterialOutlined.Check_circle}"
+                                       FontFamily="MaterialOutlined"
+                                       FontSize="20"
+                                       VerticalTextAlignment="Center"
+                                       IsVisible="{Binding IsActive}" />
+                                <Label FontSize="14"
+                                       VerticalTextAlignment="Center"
+                                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                       FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                                       Text="{Binding FileName}"/>
+                            </HorizontalStackLayout>
                             <Label Grid.Column="1" Grid.Row="1"
                                    FontSize="12"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
                                    Text="{Binding DateTimeDisplay}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"

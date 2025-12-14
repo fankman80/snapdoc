@@ -5,7 +5,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
+using System.ComponentModel;
 using System.Globalization;
+using System.Runtime.CompilerServices;
 using static SnapDoc.Helper;
 
 namespace SnapDoc
@@ -56,6 +58,23 @@ namespace SnapDoc
         public string DateTimeDisplay => FileDate.ToString("dd. MMMM yyyy' / 'HH:mm", new CultureInfo("de-DE"));
         public required string ImagePath { get; set; }
         public required string ThumbnailPath { get; set; }
+        private bool _isActive;
+        public bool IsActive
+        {
+            get => _isActive;
+            set
+            {
+                if (_isActive != value)
+                {
+                    _isActive = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged([CallerMemberName] string name = null)
+            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
     }
 
     public partial class PinItem : ObservableObject
