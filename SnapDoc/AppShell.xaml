@@ -227,9 +227,9 @@
                              Clicked="OnSettingsClicked">
                     <ImageButton.Source>
                         <FontImageSource Glyph="{x:Static m:MaterialOutlined.Settings}"
-                         FontFamily="MaterialOutlined"
-                         Size="26"
-                         Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                                         FontFamily="MaterialOutlined"
+                                         Size="26"
+                                         Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     </ImageButton.Source>
                 </ImageButton>
             </Grid>

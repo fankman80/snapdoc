@@ -155,10 +155,7 @@
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <Label x:Name="fillOpacityText"
-                           IsVisible="{Binding FillOpacityVisibility}"
-                           HorizontalOptions="Start"
-                           Text="{Binding FillOpacity, StringFormat='Deckkraft: {0}'}"/>
+                    <Label Text="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255', StringFormat='{0:F0}%'}" />
                     <Slider x:Name="FillOpacitySlider"
                             IsVisible="{Binding FillOpacityVisibility}"
                             Maximum="255"
