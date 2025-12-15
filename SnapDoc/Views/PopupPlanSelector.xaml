@@ -21,8 +21,6 @@
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
-            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
-            <services:AllowExportToColorConverter x:Key="AllowExportToColorConverter"/>
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 

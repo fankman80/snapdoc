@@ -302,11 +302,11 @@
                        FontSize="11"
                        HorizontalTextAlignment="Center"/>
 
-                <HorizontalStackLayout Grid.Row="1" Grid.Column="0" Spacing="0">
+                <HorizontalStackLayout x:DataType="model:GeolocationViewModel" BindingContext="{x:Static model:GeolocationViewModel.Instance}"
+                                       Grid.Row="1" Grid.Column="0" Spacing="0">
                     <Button Text="{Binding GPSButtonIcon}"
                             FontFamily="MaterialOutlined"
                             FontSize="26"                               
-                            BindingContext="{x:Static model:GeolocationViewModel.Instance}"
                             Grid.Row="1" Grid.Column="0"
                             TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             BackgroundColor="Transparent"
