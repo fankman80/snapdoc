@@ -72,7 +72,7 @@ public partial class LoadPDFPages : ContentPage
                         var probeRenderOptions = new RenderOptions
                         {
                             AntiAliasing = PdfAntiAliasing.None,
-                            Dpi = 72,
+                            Dpi = SettingsService.Instance.PdfThumbDpi,
                             WithAnnotations = false,
                             WithFormFill = false,
                         };
@@ -124,7 +124,6 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        //List<ImageItem> pdfImages = [];
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = "PDF wird konvertiert...";
@@ -137,7 +136,6 @@ public partial class LoadPDFPages : ContentPage
             foreach (var item in fileListView.ItemsSource.Cast<PdfItem>())
             {
                 byte[] bytearray = File.ReadAllBytes(item.PdfPath);
-                //int pagecount = Conversion.GetPageCount(bytearray);
                 string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
 
                 var renderOptions = new RenderOptions()
@@ -153,9 +151,6 @@ public partial class LoadPDFPages : ContentPage
                 var stream = File.OpenRead(imgPath);
                 var skBitmap = SKBitmap.Decode(stream);
                 Size _imgSize = new(skBitmap.Width, skBitmap.Height);
-
-                if (File.Exists(item.PreviewPath))
-                    File.Delete(item.PreviewPath);
             }
         });
 
@@ -216,6 +211,10 @@ public partial class LoadPDFPages : ContentPage
                 string fileName = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i + ".jpg";
                 string planId = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i;
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
+                string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
+
+                if (!Path.Exists(Path.Combine(imageDirectory, "thumbnails")))
+                    Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
                 var stream = File.OpenRead(Path.Combine(Settings.CacheDirectory, item.ImagePath));
                 var skBitmap = SKBitmap.Decode(stream);
@@ -236,13 +235,20 @@ public partial class LoadPDFPages : ContentPage
                 GlobalJson.Data.Plans ??= [];
                 GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
 
+                // kopiere Plan_Image in das Projektverzeichnis
                 File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
+
+                // kopiere Plan-Thumbnail in das Projektverzeichnis
+                File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
+
                 i += 1;
 
-                // fügr neue Pläne hinzu
+                // fügt neue Pläne hinzu
                 var newPlan = new KeyValuePair<string, Models.Plan>(planId, plan);
                 LoadDataToView.AddPlan(newPlan);
             }
+            if (File.Exists(item.PreviewPath))
+                File.Delete(item.PreviewPath);
         }
 
         GlobalJson.SaveToFile();

@@ -318,6 +318,7 @@ namespace SnapDoc
 
         public string PlanId { get; set; } = string.Empty;
         public string PlanRoute { get; set; } = string.Empty;
+        public string Thumbnail { get; set; } = string.Empty;
 
         public bool AllowExport
         {

@@ -194,7 +194,7 @@
                         <uranium:ExpanderView.Header>
                             <Label Text="Oberfläche"/>
                         </uranium:ExpanderView.Header>
-                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto">
+                        <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
                             <Label Grid.Column="0" Grid.Row="0"
                                     VerticalTextAlignment="Center"
                                     Text="App-Modus"/>
@@ -219,6 +219,19 @@
                                         SelectedItem="{Binding SelectedColorTheme}"
                                         SelectedIndexChanged="OnThemeChanged"/>
                             </Border>
+                            <Grid Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"
+                                  ColumnDefinitions="50, Auto" HeightRequest="40">
+                                <controls:Switch Grid.Column="0"
+                                     IsToggled="{Binding IsPlanListThumbnails}"
+                                     HorizontalOptions="Start"
+                                     VerticalOptions="Center"
+                                     BorderColorOff ="Transparent"
+                                     KnobColorOn="White"
+                                     KnobColorOff="White"
+                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                                <Label Text="Vorschaubilder in Planliste" Grid.Column="1" VerticalOptions="Center" />
+                            </Grid>
                         </Grid>
                     </uranium:ExpanderView>
                 </Border>

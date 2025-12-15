@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Extensions;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace SnapDoc;
 
@@ -29,6 +30,23 @@ public partial class AppShell : Shell
         PlanItems = [];
 
         BindingContext = this;
+
+        SettingsService.Instance.PropertyChanged += OnSettingsChanged;
+
+        ApplyPlanTemplate();
+    }
+
+    private void ApplyPlanTemplate()
+    {
+        if (PlanCollectionView == null)
+            return;
+
+        PlanCollectionView.ItemTemplate =
+            SettingsService.Instance.IsPlanListThumbnails
+                ? (DataTemplate)Resources["PlanThumbnailTemplate"]
+                : (DataTemplate)Resources["PlanListTemplate"];
+
+        RebuildFlyout();
     }
 
     public void RebuildFlyout()
@@ -46,6 +64,14 @@ public partial class AppShell : Shell
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Flyout rebuild failed: {ex.Message}");
+        }
+    }
+
+    private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(SettingsService.IsPlanListThumbnails))
+        {
+            MainThread.BeginInvokeOnMainThread(ApplyPlanTemplate);
         }
     }
 

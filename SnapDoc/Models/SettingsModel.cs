@@ -13,7 +13,9 @@ internal class SettingsModel
     public int PinSortCrit { get; set; } // Kriterium zur Sortierung der Pins
     public int IconCategory { get; set; } // Icon-Kategorie
     public bool IsPlanRotateLocked { get; set; } // Planrotation sperren
+    public bool IsPlanListThumbnails { get; set; } // Planliste mit Thumbnails anzeigen
     public int MaxPdfPixelCount { get; set; } // Maximale Pixelanzahl eines PDF-Bildes beim Import
+    public int PdfThumbDpi { get; set; } // DPI der PDF-Thumbnails im Import-Dialog
     public int SelectedColorTheme { get; set; } // App-Farbschema
     public int SelectedAppTheme { get; set; } // App-Design (Hell/Dunkel)
     public bool IsPlanExport { get; set; } // Pläne im Bericht exportieren

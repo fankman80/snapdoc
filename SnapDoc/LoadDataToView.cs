@@ -21,6 +21,7 @@ public partial class LoadDataToView
     {
         string planId = plan.Key;
         string planTitle = plan.Value.Name;
+        string thumbnail = plan.Value.File;
 
         // Neue Plan-Seite mit Übergabe der ID erstellen
         var newPage = new Views.NewPage(planId)
@@ -47,6 +48,7 @@ public partial class LoadDataToView
             Title = planTitle,
             PlanId = planId,
             PlanRoute = planId,
+            Thumbnail = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thumbnail)
         });
     }
 

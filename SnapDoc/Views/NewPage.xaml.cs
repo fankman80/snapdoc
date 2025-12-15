@@ -1086,6 +1086,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (File.Exists(file))
                 File.Delete(file);
 
+            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", GlobalJson.Data.Plans[PlanId].File);
+            if (File.Exists(file))
+                File.Delete(file);
+
             GlobalJson.Data.Plans.Remove(PlanId);
 
             // save data to file

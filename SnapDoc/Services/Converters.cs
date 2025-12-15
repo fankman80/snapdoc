@@ -79,26 +79,6 @@ public class SelectedToGlyphConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
-public class AllowExportToColorConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        // Hole aktives Theme
-        var isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
-
-        // Hole passende Farbe aus Ressourcen
-        var resourceKey = isDark ? "PrimaryDark" : "Primary";
-        var baseColor = Application.Current.Resources.TryGetValue(resourceKey, out var raw)
-            && raw is Color color ? color : Colors.Black;
-
-        var disabledColor = baseColor.WithAlpha(0.3f);
-        return (value is bool b && b) ? baseColor : disabledColor;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotImplementedException();
-}
-
 public class BoolToFontAttributesConverter : IValueConverter
 {
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)

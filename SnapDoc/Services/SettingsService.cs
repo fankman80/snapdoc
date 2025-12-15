@@ -129,9 +129,11 @@ public partial class SettingsService : ObservableObject
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
     [ObservableProperty] private bool _isPlanRotateLocked = false;
+    [ObservableProperty] private bool _isPlanListThumbnails = false;
     [ObservableProperty] private int _pinMinScaleLimit = 80;
     [ObservableProperty] private int _pinMaxScaleLimit = 100;
     [ObservableProperty] private int _maxPdfPixelCount = 30;
+    [ObservableProperty] private int _pdfThumbDpi = 72;
     [ObservableProperty] private int _mapIconSize = 85;
     [ObservableProperty] private int _mapIcon = 0;
     [ObservableProperty] private int _mapOverlay1 = 1;
@@ -246,7 +248,9 @@ public partial class SettingsService : ObservableObject
             MapOverlay2 = MapOverlay2,
             PinPlaceMode = PinPlaceMode,
             IsPlanRotateLocked = IsPlanRotateLocked,
+            IsPlanListThumbnails = IsPlanListThumbnails,
             MaxPdfPixelCount = MaxPdfPixelCount,
+            PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
             SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
             IconSortCrit = IconSortCrits.IndexOf(IconSortCrit),
@@ -316,15 +320,14 @@ public partial class SettingsService : ObservableObject
             MapOverlay2 = settings.MapOverlay2;
             PinPlaceMode = settings.PinPlaceMode;
             IsPlanRotateLocked = settings.IsPlanRotateLocked;
+            IsPlanListThumbnails = settings.IsPlanListThumbnails;
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
-
+            PdfThumbDpi = settings.PdfThumbDpi;
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
             SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
-
             IconSortCrit = (settings.IconSortCrit < IconSortCrits.Count) ? IconSortCrits[settings.IconSortCrit] : IconSortCrits[0];
             PinSortCrit = (settings.PinSortCrit < PinSortCrits.Count) ? PinSortCrits[settings.PinSortCrit] : PinSortCrits[0];
             IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0) ? IconCategories[settings.IconCategory] : IconCategories[0];
-
             IsPlanExport = settings.IsPlanExport;
             IsPosImageExport = settings.IsPosImageExport;
             IsPinIconExport = settings.IsPinIconExport;
@@ -383,7 +386,9 @@ public partial class SettingsService : ObservableObject
         MapOverlay2 = defaultSettings.MapOverlay2;
         PinPlaceMode = defaultSettings.PinPlaceMode;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
+        IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
         MaxPdfPixelCount = defaultSettings.MaxPdfPixelCount;
+        PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;
         SelectedAppTheme = defaultSettings.SelectedAppTheme;
         IconSortCrit = defaultSettings.IconSortCrit;

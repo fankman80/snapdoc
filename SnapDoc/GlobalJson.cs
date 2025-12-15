@@ -98,6 +98,7 @@ public static class GlobalJson
                 Directory.CreateDirectory(Path.Combine(directoryPath, "images"));
                 Directory.CreateDirectory(Path.Combine(directoryPath, "images", "originals"));
                 Directory.CreateDirectory(Path.Combine(directoryPath, "plans"));
+                Directory.CreateDirectory(Path.Combine(directoryPath, "plans", "thumbnails"));
                 Directory.CreateDirectory(Path.Combine(directoryPath, "thumbnails"));
             }
 
