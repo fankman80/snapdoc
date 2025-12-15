@@ -34,7 +34,7 @@
                             StrokeThickness="0"/>
                     <Label Grid.Column="0"
                            Text="{Binding IsSelected, Converter={StaticResource SelectedToGlyphConverter}}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            FontFamily="MaterialOutlined"
                            FontSize="22" 
                            HorizontalOptions="Center"
@@ -42,7 +42,7 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="1"
                            Text="{Binding Title}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            Margin="12,0,0,0"
                            FontAttributes="{Binding IsSelected, Converter={StaticResource BoolToFontAttributesConverter}}"
                            FontSize="14"
@@ -50,9 +50,8 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="2"
                            Text="{Binding PinCount}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            IsVisible="{Binding PinCount, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x>0?true:false'}"
-                           HeightRequest="44"
                            WidthRequest="32"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"
@@ -61,8 +60,7 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="3"
                            Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
-                           HeightRequest="44"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            WidthRequest="32"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"
@@ -86,15 +84,19 @@
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
                     </Grid.GestureRecognizers>
-                    <Border Grid.Column="0" Grid.ColumnSpan="4"
+                    <Border Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="2"
                             BackgroundColor="{Binding PlanColor}"
                             StrokeThickness="0"/>
-                    <Image Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4"
-                           Source="{Binding Thumbnail}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}" />
+                    <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Margin="12,0,12,12"
+                            Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
+                            Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            StrokeThickness="1"
+                            StrokeShape="RoundRectangle 6">
+                        <Image Source="{Binding Thumbnail}"/>
+                    </Border>
                     <Label Grid.Column="0" Grid.Row="0"
                            Text="{Binding IsSelected, Converter={StaticResource SelectedToGlyphConverter}}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            FontFamily="MaterialOutlined"
                            FontSize="22" 
                            HorizontalOptions="Center"
@@ -102,7 +104,7 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="1" Grid.Row="0"
                            Text="{Binding Title}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"                           
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"                           
                            Margin="12,0,0,0"
                            FontAttributes="{Binding IsSelected, Converter={StaticResource BoolToFontAttributesConverter}}"
                            FontSize="14"
@@ -110,9 +112,8 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="2" Grid.Row="0"
                            Text="{Binding PinCount}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            IsVisible="{Binding PinCount, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x>0?true:false'}"
-                           HeightRequest="44"
                            WidthRequest="32"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"
@@ -121,8 +122,7 @@
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     <Label Grid.Column="3" Grid.Row="0"
                            Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0.5'}"
-                           HeightRequest="44"
+                           Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
                            WidthRequest="32"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"

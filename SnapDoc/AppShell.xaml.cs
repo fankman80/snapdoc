@@ -70,9 +70,7 @@ public partial class AppShell : Shell
     private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsService.IsPlanListThumbnails))
-        {
             MainThread.BeginInvokeOnMainThread(ApplyPlanTemplate);
-        }
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)
