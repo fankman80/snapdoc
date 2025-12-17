@@ -8,6 +8,7 @@
              BackgroundColor="DimGrey"
              x:DataType="views:LoadPDFPages"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              x:Class="SnapDoc.Views.LoadPDFPages"
              x:Name="ThisPage"
              Title="PDF Seiten hinzufügen">

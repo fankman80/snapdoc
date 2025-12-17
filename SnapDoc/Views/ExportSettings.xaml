@@ -10,6 +10,7 @@
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ExportSettings"
              Title="Bericht exportieren">

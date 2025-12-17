@@ -9,6 +9,7 @@
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ProjectDetails"
              x:Name="ThisPage"             

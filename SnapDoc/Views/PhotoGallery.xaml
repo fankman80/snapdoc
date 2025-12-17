@@ -13,8 +13,9 @@
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.FotoGalleryView"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Title="Foto Galerie">
 
     <Shell.TitleView>

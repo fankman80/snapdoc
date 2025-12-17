@@ -51,21 +51,6 @@ public partial class PopupSettings : Popup, IQueryAttributable
         CloseAsync();
     }
 
-    private void OnThemeChanged(object sender, EventArgs e)
-    {
-        if (sender is not Picker picker)
-            return;
-
-        if (_initializedPickers.Add(picker) == false)
-        {
-            if (Application.Current?.Windows.Count > 0 &&
-                Application.Current.Windows[0].Page is AppShell shell)
-            {
-                shell.RebuildFlyout();
-            }
-        }
-    }
-
     private async void OpenPrgEditor(object sender, EventArgs e)
     {
         var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");

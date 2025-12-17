@@ -11,6 +11,7 @@
              xmlns:local="clr-namespace:SnapDoc"
              BackgroundColor="DimGrey"             
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              x:Class="SnapDoc.Views.NewPage"
              x:DataType="views:NewPage"
              x:Name="ThisPage"

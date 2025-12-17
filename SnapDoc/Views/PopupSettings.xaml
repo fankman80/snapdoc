@@ -58,7 +58,7 @@
                             Value="{Binding MaxPdfPixelCount}"/>
                 </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
                     <controls:Switch Grid.Column="0"
                                      IsToggled="{Binding IsPlanRotateLocked}"
                                      HorizontalOptions="Start"
@@ -71,7 +71,7 @@
                     <Label Text="Planrotation sperren" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
 
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
+                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
                     <controls:Switch Grid.Column="0"
                                      IsToggled="{Binding IsPlanListThumbnails}"
                                      HorizontalOptions="Start"
@@ -84,6 +84,19 @@
                     <Label Text="Planliste mit Vorschau" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
 
+                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
+                    <controls:Switch Grid.Column="0"
+                                     IsToggled="{Binding IsHideInactivePlans}"
+                                     HorizontalOptions="Start"
+                                     VerticalOptions="Center"
+                                     BorderColorOff ="Transparent"
+                                     KnobColorOn="White"
+                                     KnobColorOff="White"
+                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Label Text="Inaktive Pläne ausblenden" Grid.Column="1" VerticalOptions="Center" />
+                </Grid>
+                
             <Border Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8"
@@ -117,13 +130,13 @@
                                                   HorizontalOptions="Start" />
                         </material:RadioButtonGroupView>
                     </uranium:ExpanderView>
-            </Border>
+                </Border>
 
-            <Border Stroke="{DynamicResource SecondaryBackground}"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="8"
-                    Margin="0,0,0,10">
+                <Border Stroke="{DynamicResource SecondaryBackground}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
                             <Label Text="swisstopo Karten-Pins"/>
@@ -217,8 +230,7 @@
                                     StrokeShape="RoundRectangle 8">
                                 <Picker x:Name="darkModePicker"
                                         ItemsSource="{Binding AppThemes}"
-                                        SelectedItem="{Binding SelectedAppTheme}"
-                                        SelectedIndexChanged="OnThemeChanged"/>
+                                        SelectedItem="{Binding SelectedAppTheme}"/>
                             </Border>
                             <Label Grid.Column="0" Grid.Row="1"
                                    VerticalTextAlignment="Center"
@@ -229,8 +241,7 @@
                                     StrokeShape="RoundRectangle 8">
                                 <Picker x:Name="colorThemePicker"
                                         ItemsSource="{Binding ColorThemes}"
-                                        SelectedItem="{Binding SelectedColorTheme}"
-                                        SelectedIndexChanged="OnThemeChanged"/>
+                                        SelectedItem="{Binding SelectedColorTheme}"/>
                             </Border>
                         </Grid>
                     </uranium:ExpanderView>

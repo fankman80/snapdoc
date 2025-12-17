@@ -13,6 +13,7 @@
              x:Class="SnapDoc.Views.SetPin"
              x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
              Title="Pin bearbeiten">
 

@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Extensions;
+using DocumentFormat.OpenXml.Wordprocessing;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
@@ -10,7 +11,51 @@ namespace SnapDoc;
 
 public partial class AppShell : Shell
 {
+    public List<PlanItem> AllPlanItems { get; set; }
     public ObservableCollection<PlanItem> PlanItems { get; set; }
+
+    private bool _isActiveToggle;
+    public bool IsActiveToggle
+    {
+        get => _isActiveToggle;
+        set
+        {
+            if (_isActiveToggle == value)
+                return;
+
+            _isActiveToggle = value;
+            OnPropertyChanged();
+            ApplyFilterAndSorting();
+        }
+    }
+
+    private PlanItem _selectedPlanItem;
+    public PlanItem SelectedPlanItem
+    {
+        get => _selectedPlanItem;
+        set
+        {
+            if (_selectedPlanItem != value)
+            {
+                _selectedPlanItem?.IsSelected = false;
+
+                _selectedPlanItem = value;
+
+                _selectedPlanItem?.IsSelected = true;
+            }
+        }
+    }
+
+    private string _infoText = "Pläne umsortieren: Gedrückt halten und ziehen";
+    public string InfoText
+    {
+        get => _infoText;
+        set
+        {
+            _infoText = value;
+            OnPropertyChanged();
+        }
+    }
 
     public AppShell()
     {
@@ -27,7 +72,10 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("mapview", typeof(MapView));
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
 
+        AllPlanItems = [];
         PlanItems = [];
+
+        PlanCollectionView.ItemsSource = PlanItems;
 
         BindingContext = this;
 
@@ -46,31 +94,35 @@ public partial class AppShell : Shell
                 ? (DataTemplate)Resources["PlanThumbnailTemplate"]
                 : (DataTemplate)Resources["PlanListTemplate"];
 
-        RebuildFlyout();
+        //RebuildFlyout();
     }
 
-    public void RebuildFlyout()
+    public void ApplyFilterAndSorting()
     {
-        try
-        {
-            // FlyoutContent neu aufbauen
-            if (PlanCollectionView != null)
-            {
-                var items = PlanCollectionView.ItemsSource;
-                PlanCollectionView.ItemsSource = null;
-                PlanCollectionView.ItemsSource = items;
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Flyout rebuild failed: {ex.Message}");
-        }
+        if (AllPlanItems == null)
+            return;
+
+        var filtered = AllPlanItems
+            .Where(p => !SettingsService.Instance.IsHideInactivePlans || p.AllowExport)
+            .ToList();
+
+        PlanItems.Clear();
+        foreach (var item in filtered)
+            PlanItems.Add(item);
+
+        if (SettingsService.Instance.IsHideInactivePlans)
+            InfoText = $"{AllPlanItems.Count - PlanItems.Count} ausgeblendete Pläne";
+        else
+            InfoText = "Pläne umsortieren: Gedrückt halten und ziehen";
     }
 
     private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsService.IsPlanListThumbnails))
             MainThread.BeginInvokeOnMainThread(ApplyPlanTemplate);
+
+        if (e.PropertyName == nameof(SettingsService.IsHideInactivePlans))
+            MainThread.BeginInvokeOnMainThread(ApplyFilterAndSorting);
     }
 
     private async void OnSettingsClicked(object sender, EventArgs e)
@@ -135,16 +187,22 @@ public partial class AppShell : Shell
         }
     }
 
-    private void OnReorderCompleted(object sender, EventArgs e)
+    private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        if ((sender as CollectionView).ItemsSource is ObservableCollection<PlanItem> reorderedItems)
-        {
-            var updatedPlans = reorderedItems.Select(item => item.PlanRoute).ToList();
-            AppShell.UpdatePlansOrder(updatedPlans);
+        var button = sender as Label;
 
-            // Speichern
-            GlobalJson.SaveToFile();
-        }
+        PlanItem item = (PlanItem)button.BindingContext;
+        if (item == null)
+            return;
+
+        item.AllowExport = !item.AllowExport;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Neu filtern und anzeigen, falls HideInactivePlans aktiv ist
+        if (SettingsService.Instance.IsHideInactivePlans)
+            ApplyFilterAndSorting();
     }
 
     private static void UpdatePlansOrder(List<string> updatedPlanOrder)
@@ -158,36 +216,26 @@ public partial class AppShell : Shell
         GlobalJson.Data.Plans = reorderedPlans.ToDictionary(p => p.Key, p => p.Value);
     }
 
-    private void OnAllowExportClicked(object sender, EventArgs e)
+    private void OnReorderCompleted(object sender, EventArgs e)
     {
-        var button = sender as Label;
+        if ((sender as CollectionView)?.ItemsSource is not ObservableCollection<PlanItem> reorderedItems)
+            return;
 
-        PlanItem item = (PlanItem)button.BindingContext;
+        var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
 
-        if (item != null)
-        {
-            item.AllowExport = !item.AllowExport;
+        // Reorder AllPlanItems anhand der Masterliste, nicht der gefilterten Liste
+        AllPlanItems =
+        [
+            .. orderedIds.Select(id => AllPlanItems.First(p => p.PlanId == id)),
+            .. AllPlanItems.Where(p => !orderedIds.Contains(p.PlanId)),
+        ];
 
-            // save data to file
-            GlobalJson.SaveToFile();
-        }
-    }
+        UpdatePlansOrder(orderedIds); // Reihenfolge in JSON aktualisieren
 
-    private PlanItem _selectedPlanItem;
-    public PlanItem SelectedPlanItem
-    {
-        get => _selectedPlanItem;
-        set
-        {
-            if (_selectedPlanItem != value)
-            {
-                _selectedPlanItem?.IsSelected = false;
+        ApplyFilterAndSorting(); // Filter wieder anwenden
 
-                _selectedPlanItem = value;
-
-                _selectedPlanItem?.IsSelected = true;
-            }
-        }
+        // save data to file
+        GlobalJson.SaveToFile();
     }
 
     private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)

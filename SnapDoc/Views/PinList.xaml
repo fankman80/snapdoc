@@ -12,6 +12,7 @@
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.PinList"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              Title="Pin Liste">
 

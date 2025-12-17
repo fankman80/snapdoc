@@ -130,6 +130,7 @@ public partial class SettingsService : ObservableObject
     ];
     [ObservableProperty] private bool _isPlanRotateLocked = false;
     [ObservableProperty] private bool _isPlanListThumbnails = false;
+    [ObservableProperty] private bool _isHideInactivePlans = false;
     [ObservableProperty] private int _pinMinScaleLimit = 80;
     [ObservableProperty] private int _pinMaxScaleLimit = 100;
     [ObservableProperty] private int _maxPdfPixelCount = 30;
@@ -249,6 +250,7 @@ public partial class SettingsService : ObservableObject
             PinPlaceMode = PinPlaceMode,
             IsPlanRotateLocked = IsPlanRotateLocked,
             IsPlanListThumbnails = IsPlanListThumbnails,
+            IsHideInactivePlans = IsHideInactivePlans,
             MaxPdfPixelCount = MaxPdfPixelCount,
             PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
@@ -321,6 +323,7 @@ public partial class SettingsService : ObservableObject
             PinPlaceMode = settings.PinPlaceMode;
             IsPlanRotateLocked = settings.IsPlanRotateLocked;
             IsPlanListThumbnails = settings.IsPlanListThumbnails;
+            IsHideInactivePlans = settings.IsHideInactivePlans;
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
             PdfThumbDpi = settings.PdfThumbDpi;
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
@@ -387,6 +390,7 @@ public partial class SettingsService : ObservableObject
         PinPlaceMode = defaultSettings.PinPlaceMode;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
         IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
+        IsHideInactivePlans = defaultSettings.IsHideInactivePlans;
         MaxPdfPixelCount = defaultSettings.MaxPdfPixelCount;
         PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;

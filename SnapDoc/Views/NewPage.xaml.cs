@@ -293,7 +293,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         smallImage.Down += (s, e) =>
         {
-            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLockPosition == true) return;
+            if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsLockPosition == true)
+                return;
+
             planContainer.IsPanningEnabled = false;
             activePin = smallImage;
         };
@@ -388,33 +390,33 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void PlanImage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (isFirstLoad)
+        if (!isFirstLoad)
+            return;
+
+        // Warte darauf, dass Width und Height gültige Werte haben
+        if (e.PropertyName == nameof(PlanImage.Width) || e.PropertyName == nameof(PlanImage.Height))
         {
-            // Warte darauf, dass Width und Height gültige Werte haben
-            if (e.PropertyName == nameof(PlanImage.Width) || e.PropertyName == nameof(PlanImage.Height))
+            if (PlanImage.Width > 0 && PlanImage.Height > 0)
             {
-                if (PlanImage.Width > 0 && PlanImage.Height > 0)
+                // Größe des Bildes ist korrekt gesetzt
+                densityX = GlobalJson.Data.Plans[PlanId].ImageSize.Width / PlanImage.Width;
+                densityY = GlobalJson.Data.Plans[PlanId].ImageSize.Height / PlanImage.Height;
+
+                // Entferne das Event-Handler, damit es nicht mehr ausgelöst wird
+                PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
+
+                // Rufe AddPins auf, wenn die Berechnung abgeschlossen ist
+                isFirstLoad = false;
+                ImageFit(null, null);
+                AddPins();
+
+                if (PinZoom != null)
                 {
-                    // Größe des Bildes ist korrekt gesetzt
-                    densityX = GlobalJson.Data.Plans[PlanId].ImageSize.Width / PlanImage.Width;
-                    densityY = GlobalJson.Data.Plans[PlanId].ImageSize.Height / PlanImage.Height;
-
-                    // Entferne das Event-Handler, damit es nicht mehr ausgelöst wird
-                    PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
-
-                    // Rufe AddPins auf, wenn die Berechnung abgeschlossen ist
-                    isFirstLoad = false;
-                    ImageFit(null, null);
-                    AddPins();
-
-                    if (PinZoom != null)
-                    {
-                        ZoomToPin(PinZoom);
-                        PinZoom = null;
-                    }
+                    ZoomToPin(PinZoom);
+                    PinZoom = null;
                 }
             }
-        }
+        } 
     }
 
     private void OnPinching(object sender, PinchEventArgs e)
@@ -1057,9 +1059,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                     // Rotate Plan
                     if (result.Result.PlanRotate != 0)
-                    {
                         PlanRotate(result.Result.PlanRotate);
-                    }
 
                     // save data to file
                     GlobalJson.SaveToFile();
@@ -1070,31 +1070,55 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void OnDeleteClick()
     {
-        var popup = new PopupDualResponse("Wollen Sie diesen Plan wirklich löschen?", okText: "Löschen", alert: true);
+        var popup = new PopupDualResponse(
+            "Wollen Sie diesen Plan wirklich löschen?",
+            okText: "Löschen",
+            alert: true);
+
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
-        {
-            var menuitem = (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId);
-            if (menuitem != null)
-                (Application.Current.Windows[0].Page as AppShell).PlanItems.Remove(menuitem);
+        if (result.Result == null)
+            return;
 
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[PlanId].File);
-            if (File.Exists(file))
-                File.Delete(file);
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + GlobalJson.Data.Plans[PlanId].File);
-            if (File.Exists(file))
-                File.Delete(file);
+        // Shell-Navigation entfernen
+        var shellContent = shell
+            .FindByName<ShellContent>(PlanId);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", GlobalJson.Data.Plans[PlanId].File);
-            if (File.Exists(file))
-                File.Delete(file);
+        if (shellContent?.Parent is ShellSection section)
+            section.Items.Remove(shellContent);
 
-            GlobalJson.Data.Plans.Remove(PlanId);
+        // Masterliste bereinigen
+        var masterItem = shell.AllPlanItems
+            .FirstOrDefault(p => p.PlanId == PlanId);
 
-            // save data to file
-            GlobalJson.SaveToFile();
-        }
+        if (masterItem != null)
+            shell.AllPlanItems.Remove(masterItem);
+
+        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
+            return;
+
+        // JSON + Files löschen
+        plan = GlobalJson.Data.Plans[PlanId];
+
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+
+        GlobalJson.Data.Plans.Remove(PlanId);
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Anzeige neu aufbauen
+        shell.ApplyFilterAndSorting();
+    }
+
+    private static void DeleteIfExists(string path)
+    {
+        if (File.Exists(path))
+            File.Delete(path);
     }
 
     private void OnGrayscaleClick()

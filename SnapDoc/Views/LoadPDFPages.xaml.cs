@@ -1,8 +1,9 @@
 ﻿#nullable disable
 
-using SnapDoc.Models;
+using Microsoft.Maui.Controls;
 using PDFtoImage;
 using SkiaSharp;
+using SnapDoc.Models;
 using SnapDoc.Services;
 
 namespace SnapDoc.Views;
@@ -251,13 +252,18 @@ public partial class LoadPDFPages : ContentPage
                 File.Delete(item.PreviewPath);
         }
 
-        GlobalJson.SaveToFile();
-
         var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
         foreach (var cacheFile in cacheFiles)
         {
             File.Delete(cacheFile);
         }
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Shell aktualisieren
+        var shell = Application.Current.Windows[0].Page as AppShell;
+        shell.ApplyFilterAndSorting();
 
         await Shell.Current.GoToAsync("project_details");
     }

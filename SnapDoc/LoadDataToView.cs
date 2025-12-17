@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using Microsoft.Maui.Controls;
+
 namespace SnapDoc;
 
 public partial class LoadDataToView
@@ -8,13 +10,17 @@ public partial class LoadDataToView
         if (path == null || string.IsNullOrEmpty(path.FullPath))
             return;
 
-        if (GlobalJson.Data.Plans == null)
+        if (Application.Current.Windows[0].Page is not AppShell shell)
             return;
+
+        shell.AllPlanItems.Clear();
 
         foreach (var plan in GlobalJson.Data.Plans)
         {
             AddPlan(plan);
         }
+
+        shell.ApplyFilterAndSorting();
     }
 
     public static void AddPlan(KeyValuePair<string, Models.Plan> plan)
@@ -23,7 +29,10 @@ public partial class LoadDataToView
         string planTitle = plan.Value.Name;
         string thumbnail = plan.Value.File;
 
-        // Neue Plan-Seite mit Übergabe der ID erstellen
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
+
+        // Neue Plan-Seite
         var newPage = new Views.NewPage(planId)
         {
             Title = planTitle,
@@ -31,25 +40,31 @@ public partial class LoadDataToView
             PlanId = planId,
         };
 
-        // ShellContent erzeugen und mit eindeutiger Route versehen
+        // ShellContent erzeugen
         var shellContent = new ShellContent
         {
             Content = newPage,
             Route = planId,
-            Title = planTitle
+            Title = planTitle,
+            AutomationId = planId
         };
 
-        // Seite zur Shell dynamisch hinzufügen
-        (Application.Current.Windows[0].Page as AppShell).Items.Add(shellContent);
+        shell.Items.Add(shellContent);
 
-        // PlanItem für ein Flyout- oder Menü-Item hinzufügen
-        (Application.Current.Windows[0].Page as AppShell).PlanItems.Add(new PlanItem(GlobalJson.Data.Plans[plan.Key])
+        var item = new PlanItem(plan.Value)
         {
             Title = planTitle,
             PlanId = planId,
             PlanRoute = planId,
-            Thumbnail = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thumbnail)
-        });
+            Thumbnail = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.PlanPath,
+                "thumbnails",
+                thumbnail)
+        };
+
+        shell.AllPlanItems.Add(item);
     }
 
     public static void ResetData()
