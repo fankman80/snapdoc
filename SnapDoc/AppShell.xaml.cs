@@ -38,9 +38,7 @@ public partial class AppShell : Shell
             if (_selectedPlanItem != value)
             {
                 _selectedPlanItem?.IsSelected = false;
-
                 _selectedPlanItem = value;
-
                 _selectedPlanItem?.IsSelected = true;
             }
         }
