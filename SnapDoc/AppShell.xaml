@@ -285,18 +285,8 @@
                 </Grid.ColumnDefinitions>
 
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                       IsVisible="{Binding IsProjectLoaded, Source={x:Static services:SettingsService.Instance}}"
                        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
                        Text="{Binding InfoText}" 
-                       TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                       FontSize="11"
-                       HorizontalTextAlignment="Center"/>
-
-                <Label x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                       Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
-                       IsVisible="{Binding IsProjectLoaded, Converter={StaticResource InvertedBoolConverter}}"
-                       BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
-                       Text="Kein Projekt geladen" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontSize="11"
                        HorizontalTextAlignment="Center"/>
