@@ -91,8 +91,6 @@ public partial class AppShell : Shell
             SettingsService.Instance.IsPlanListThumbnails
                 ? (DataTemplate)Resources["PlanThumbnailTemplate"]
                 : (DataTemplate)Resources["PlanListTemplate"];
-
-        //RebuildFlyout();
     }
 
     public void ApplyFilterAndSorting()
