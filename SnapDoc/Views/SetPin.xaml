@@ -103,13 +103,18 @@
                                 </ff:CachedImage>
                             </views:SquareView>
                             <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                    CornerRadius="0"
+                                    WidthRequest="36"
+                                    HeightRequest="36"
+                                    MinimumWidthRequest="36"
+                                    MinimumHeightRequest="36"
+                                    CornerRadius="18"
                                     Padding="0"
+                                    Margin="6"
                                     FontFamily="MaterialOutlined"
                                     FontSize="24"
                                     VerticalOptions="End"                                    
                                     HorizontalOptions="End"
-                                    BackgroundColor="Transparent"
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                                     TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Clicked="OnAllowExportClicked"/>
                         </Grid>

@@ -87,33 +87,13 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    public string AppVersion { get; set; } = AppInfo.VersionString;
-    // --- Observable Properties ---
-    [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
-    [ObservableProperty] private List<string> _iconSortCrits = ["nach Name", "nach Farbe"];
-    [ObservableProperty]
-    private List<string> _pinSortCrits =
-    [
-        "nach Plan", "nach Pin", "nach Standort", "nach Bezeichnung", "nach aktiv/inaktiv", "nach Aufnahmedatum", "nach Priorität"
-    ];
-    [ObservableProperty]
-    private List<PriorityItem> _priorityItems =
-    [
-        new() { Key = "", Color = "#000000" },
-        new() { Key = "Empfehlung", Color = "#92D050" },
-        new() { Key = "Wichtig", Color = "#FFC000" },
-        new() { Key = "Kritisch", Color = "#FF0000" }
-    ];
-    public List<string> IconCategories { get; set; }
-
+    [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
     [ObservableProperty] private string _flyoutHeaderDesc = "SnapDoc";
     [ObservableProperty] private string _flyoutHeaderImageThumb = "banner_thumbnail.png";
     [ObservableProperty] private string _flyoutHeaderImage = "";
     [ObservableProperty] private bool _iconGalleryGridView = false;
-
-    // --- Größe und Export ---
     [ObservableProperty] private int _maxPdfImageSizeW = 8192;
     [ObservableProperty] private int _maxPdfImageSizeH = 8192;
     [ObservableProperty] private int _fotoThumbSize = 150;
@@ -122,12 +102,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _planPreviewSize = 150;
     [ObservableProperty] private int _iconPreviewSize = 64;
     [ObservableProperty] private double _defaultPinZoom = 2;
-    [ObservableProperty]
-    private List<string> _colorList =
-    [
-        "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
-        "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
-    ];
     [ObservableProperty] private bool _isPlanRotateLocked = false;
     [ObservableProperty] private bool _isPlanListThumbnails = false;
     [ObservableProperty] private bool _isHideInactivePlans = false;
@@ -143,8 +117,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private string _iconSortCrit;
     [ObservableProperty] private string _pinSortCrit;
     [ObservableProperty] private string _iconCategory;
-
-    // Export Settings
     [ObservableProperty] private int _imageExportQuality = 80;
     [ObservableProperty] private double _pinLabelFontSize = 4;
     [ObservableProperty] private string _pinLabelPrefix = "Pos. ";
@@ -160,8 +132,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _titleExportSize = 90;
     [ObservableProperty] private int _pinPosExportSize = 25;
     [ObservableProperty] private int _pinPosCropExportSize = 300;
-    [ObservableProperty] private List<string> _colorThemes;
-    [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private bool _isGpsActive = false;
@@ -174,8 +144,41 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private byte _polyLineHandleAlpha = 200;
     [ObservableProperty] private Point _customPinOffset = Settings.DefaultCustomPinOffset;
     [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
-    [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private string _selectedTemplate;
+    [ObservableProperty] private ObservableCollection<string> _templates = [];
+    [ObservableProperty] private List<string> _colorThemes;
+    [ObservableProperty] private List<string> _appThemes;
+    [ObservableProperty] private List<string> _iconCategories;
+    [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
+
+    // Lists
+    [ObservableProperty] private List<string> _iconSortCrits =
+    [
+        "nach Name",
+        "nach Farbe"
+    ];
+    [ObservableProperty] private List<string> _pinSortCrits =
+    [
+        "nach Plan",
+        "nach Pin",
+        "nach Standort",
+        "nach Bezeichnung",
+        "nach aktiv/inaktiv",
+        "nach Aufnahmedatum",
+        "nach Priorität"
+    ];
+    [ObservableProperty] private List<PriorityItem> _priorityItems =
+    [
+        new() { Key = "", Color = "#000000" },
+        new() { Key = "Empfehlung", Color = "#92D050" },
+        new() { Key = "Wichtig", Color = "#FFC000" },
+        new() { Key = "Kritisch", Color = "#FF0000" }
+    ];
+    [ObservableProperty] private List<string> _colorList =
+    [
+        "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
+        "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
+    ];
 
     // --- Selected ColorTheme ---
     private string _selectedColorTheme;
@@ -184,7 +187,8 @@ public partial class SettingsService : ObservableObject
         get => _selectedColorTheme;
         set
         {
-            if (_selectedColorTheme == value) return;
+            if (_selectedColorTheme == value)
+                return;
             _selectedColorTheme = value;
             ApplyColorThemeSafe(value);
         }
@@ -192,14 +196,17 @@ public partial class SettingsService : ObservableObject
 
     private static void ApplyColorThemeSafe(string theme)
     {
-        if (App.Current == null) return;
+        if (App.Current == null)
+            return;
         ApplyColorTheme(theme);
     }
 
     public static void ApplyColorTheme(string theme)
     {
-        if (theme == null) return;
-        if (!ColorThemeMapping.TryGetValue(theme, out var colors)) return;
+        if (theme == null)
+            return;
+        if (!ColorThemeMapping.TryGetValue(theme, out var colors))
+            return;
 
         foreach (var kvp in colors)
             Application.Current?.Resources?[kvp.Key] = Color.FromArgb(kvp.Value);
@@ -218,7 +225,8 @@ public partial class SettingsService : ObservableObject
         get => _selectedAppTheme;
         set
         {
-            if (_selectedAppTheme == value) return;
+            if (_selectedAppTheme == value)
+                return;
             _selectedAppTheme = value;
             ApplyAppThemeSafe(value);
         }
@@ -226,7 +234,8 @@ public partial class SettingsService : ObservableObject
 
     private static void ApplyAppThemeSafe(string theme)
     {
-        if (App.Current == null) return;
+        if (App.Current == null)
+            return;
         App.Current.UserAppTheme = theme == "Hell" ? AppTheme.Light : AppTheme.Dark;
     }
 

@@ -17,7 +17,6 @@
 
     <Shell.Resources>
         <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
@@ -275,7 +274,7 @@
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}"
                   RowSpacing="0">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="20" />
+                    <RowDefinition Height="24" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
@@ -289,7 +288,8 @@
                        Text="{Binding InfoText}" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontSize="11"
-                       HorizontalTextAlignment="Center"/>
+                       HorizontalTextAlignment="Center"
+                       VerticalTextAlignment="Center"/>
 
                 <HorizontalStackLayout x:DataType="model:GeolocationViewModel" BindingContext="{x:Static model:GeolocationViewModel.Instance}"
                                        Grid.Row="1" Grid.Column="0" Spacing="0">

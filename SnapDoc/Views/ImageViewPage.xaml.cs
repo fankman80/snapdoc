@@ -16,30 +16,17 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId;
     public string PinIcon;
     public string ImgSource = null;
-    private int lineWidth = 6;
-    private float selectedOpacity = 0.5f;
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private readonly TransformViewModel fotoContainer;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
 
-    // --- DrawingController + Canvas ---
+    // --- DrawingController ---
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
-
-    // UI state
     private DrawMode drawMode = DrawMode.None;
-
-    private bool isGotoPinBtnVisible = false;
-    public bool IsGotoPinBtnVisible
-    {
-        get => isGotoPinBtnVisible;
-        set
-        {
-            isGotoPinBtnVisible = value;
-            OnPropertyChanged();
-        }
-    }
+    private float selectedOpacity = 0.5f;
+    private int lineWidth = 6;
 
     private Color selectedColor = new(255, 0, 0);
     public Color SelectedColor
@@ -48,6 +35,17 @@ public partial class ImageViewPage : IQueryAttributable
         set
         {
             selectedColor = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private bool isGotoPinBtnVisible = false;
+    public bool IsGotoPinBtnVisible
+    {
+        get => isGotoPinBtnVisible;
+        set
+        {
+            isGotoPinBtnVisible = value;
             OnPropertyChanged();
         }
     }
@@ -183,7 +181,8 @@ public partial class ImageViewPage : IQueryAttributable
         var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        if (result.Result == null) return;
+        if (result.Result == null)
+            return;
 
         if (ImgSource == "showTitle")
         {

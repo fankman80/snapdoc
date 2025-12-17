@@ -1,7 +1,6 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Extensions;
-using DocumentFormat.OpenXml.Wordprocessing;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
@@ -44,7 +43,7 @@ public partial class AppShell : Shell
         }
     }
 
-    private string _infoText = "Pläne umsortieren: Gedrückt halten und ziehen";
+    private string _infoText;
     public string InfoText
     {
         get => _infoText;
@@ -72,8 +71,6 @@ public partial class AppShell : Shell
 
         AllPlanItems = [];
         PlanItems = [];
-        InfoText = "Kein Projekt geladen";
-
         PlanCollectionView.ItemsSource = PlanItems;
 
         BindingContext = this;
@@ -107,7 +104,9 @@ public partial class AppShell : Shell
         foreach (var item in filtered)
             PlanItems.Add(item);
 
-        if (SettingsService.Instance.IsHideInactivePlans)
+        if (!SettingsService.Instance.IsProjectLoaded)
+            InfoText = "Kein Projekt geladen";
+        else if (SettingsService.Instance.IsHideInactivePlans)
             InfoText = $"{AllPlanItems.Count - PlanItems.Count} ausgeblendete Pläne";
         else
             InfoText = "Pläne umsortieren: Gedrückt halten und ziehen";

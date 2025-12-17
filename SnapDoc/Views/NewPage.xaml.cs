@@ -31,19 +31,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
     private Point mousePos;
-    private int lineWidth = 4;
-    private float selectedOpacity = 0.5f;
     private bool isTappedHandled = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
     private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
 
-    // --- DrawingController + Canvas ---
+    // --- DrawingController ---
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
-
-    // UI state
     private DrawMode drawMode = DrawMode.None;
+    private float selectedOpacity = 0.5f;
+    private int lineWidth = 4;
 
     private Color selectedColor = new(255, 0, 0);
     public Color SelectedColor
