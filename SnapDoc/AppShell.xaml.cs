@@ -20,7 +20,7 @@ public partial class AppShell : Shell
         get => _isActiveToggle;
         set
         {
-            if (_isActiveToggle == value)
+            if (_isActiveToggle ==value)
                 return;
 
             _isActiveToggle = value;
@@ -72,6 +72,7 @@ public partial class AppShell : Shell
 
         AllPlanItems = [];
         PlanItems = [];
+        InfoText = "Kein Projekt geladen";
 
         PlanCollectionView.ItemsSource = PlanItems;
 
@@ -237,9 +238,7 @@ public partial class AppShell : Shell
     private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection != null && e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is PlanItem selected)
-        {
             SelectedPlanItem = selected;
-        }
     }
 
     public void HighlightCurrentPlan(string planId)
