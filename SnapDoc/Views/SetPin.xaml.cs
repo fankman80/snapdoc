@@ -17,8 +17,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private readonly HashSet<Picker> _initializedPickers = [];
     
     public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
-    public int DynamicSpan { get; set; } = 3;
-    public int DynamicSize;
     private string PlanId;
     private string PinId;
 
@@ -46,6 +44,20 @@ public partial class SetPin : ContentPage, IQueryAttributable
             {
                 pin = value;
                 OnPropertyChanged(nameof(Pin));
+            }
+        }
+    }
+
+    private int dynamicSpan = 3;
+    public int DynamicSpan
+    {
+        get => dynamicSpan;
+        set
+        {
+            if (dynamicSpan != value)
+            {
+                dynamicSpan = value;
+                OnPropertyChanged(nameof(DynamicSpan));
             }
         }
     }
@@ -268,21 +280,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         }
     }
 
-    private void OnSizeChanged(object sender, EventArgs e)
-    {
-        UpdateSpan();
-    }
-
-    private void UpdateSpan()
-    {
-        double screenWidth = this.Width;
-        double imageWidth = SettingsService.Instance.FotoPreviewSize;
-        DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
-        DynamicSize = (int)(screenWidth / DynamicSpan);
-        OnPropertyChanged(nameof(DynamicSpan));
-        OnPropertyChanged(nameof(DynamicSize));
-    }
-
     private void OnSelectedItemChanged(object sender, EventArgs e)
     {
         if (sender is not Picker picker)
@@ -369,5 +366,17 @@ public partial class SetPin : ContentPage, IQueryAttributable
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
 #endif
+    }
+
+    private void OnSizeChanged(object sender, EventArgs e)
+    {
+        UpdateSpan();
+    }
+
+    private void UpdateSpan()
+    {
+        double screenWidth = this.Width;
+        double imageWidth = SettingsService.Instance.FotoPreviewSize;
+        DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
     }
 }

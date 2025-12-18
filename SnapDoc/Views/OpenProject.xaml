@@ -94,7 +94,7 @@
                                    FontSize="12"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                   Text="{Binding FileDate, StringFormat='{0:dddd dd. MMMM yyyy | HH:mm}'}"/>
+                                   Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>

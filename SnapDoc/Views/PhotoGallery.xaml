@@ -48,8 +48,8 @@
         <ResourceDictionary>
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-
-            <!-- Template für Listen-Galerie -->
+            
+            <!-- Template für Liste -->
             <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
                 <Grid HeightRequest="72"
                       Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
@@ -74,12 +74,13 @@
                                     RetryCount="2"
                                     RetryDelay="100">
                     </ff:CachedImage>
-                    <Label Grid.Column="1"
-                           Text="{Binding DateTime, StringFormat='{0:dddd dd. MMMM yyyy | HH:mm}'}"
-                           VerticalOptions="Center"/>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
+                        <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"/>
+                        <Label Text="{Binding DateTime, StringFormat='Zeit: {0:HH:mm}'}"/>
+                    </VerticalStackLayout>
                     <Button Grid.Column="2"
                             Text="{x:Static m:MaterialOutlined.Keep}"
-                            Padding="0,5,10,0"
+                            Padding="0"
                             FontFamily="MaterialOutlined"
                             FontSize="30"
                             HorizontalOptions="Center"
@@ -89,7 +90,7 @@
                             Clicked="OnEditClicked"/>
                     <Button Grid.Column="3"
                             Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                            Padding="0,5,10,0"
+                            Padding="0"
                             FontFamily="MaterialOutlined"
                             FontSize="30"
                             HorizontalOptions="Center"
@@ -100,7 +101,7 @@
                 </Grid>
             </DataTemplate>            
             
-            <!-- Template für Raster-Galerie -->
+            <!-- Template für Grid -->
             <DataTemplate x:Key="GalleryGridTemplate" x:DataType="local:FotoItem">
                 <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                     <views:SquareView Margin="6">
@@ -166,7 +167,6 @@
                             ItemTemplate="{StaticResource GalleryGridTemplate}"
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
-                            ItemSizingStrategy="MeasureFirstItem"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}"/>

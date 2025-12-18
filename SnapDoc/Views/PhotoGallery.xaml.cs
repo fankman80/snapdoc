@@ -11,8 +11,6 @@ public partial class FotoGalleryView : ContentPage
     private List<FotoItem> AllFotos;
     public ObservableCollection<FotoItem> Fotos { get; set; } = [];
     private string OrderDirection = "asc";
-    public int DynamicSpan { get; set; } = 3;
-    public int DynamicSize;
     private bool _isActiveToggle;
     public bool IsActiveToggle
     {
@@ -25,6 +23,20 @@ public partial class FotoGalleryView : ContentPage
             _isActiveToggle = value;
             OnPropertyChanged();
             ApplyFilterAndSorting();
+        }
+    }
+
+    private int dynamicSpan = 3;
+    public int DynamicSpan
+    {
+        get => dynamicSpan;
+        set
+        {
+            if (dynamicSpan != value)
+            {
+                dynamicSpan = value;
+                OnPropertyChanged(nameof(DynamicSpan));
+            }
         }
     }
 
@@ -220,14 +232,12 @@ public partial class FotoGalleryView : ContentPage
 
     private void UpdateSpan()
     {
+        double screenWidth = this.Width;
+        double imageWidth = SettingsService.Instance.FotoPreviewSize;
+
         if (SettingsService.Instance.PhotoGalleryGridView)
-        {
-            double screenWidth = this.Width;
-            double imageWidth = SettingsService.Instance.FotoPreviewSize; // Mindestbreite in Pixeln
-            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
-        }
+            DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
         else
             DynamicSpan = 1;
-        OnPropertyChanged(nameof(DynamicSpan));
     }
 }
