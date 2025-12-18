@@ -54,6 +54,8 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
+            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>            
+            
             <!-- Template für Liste (Label sichtbar) -->
             <DataTemplate x:Key="IconListTemplate" x:DataType="local:IconItem">
                 <Grid HeightRequest="48">
@@ -107,7 +109,6 @@
                                Tapped="OnIconClicked"/>
                 </Grid>
             </DataTemplate>
-            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>
         </ResourceDictionary>
     </ContentPage.Resources>
 

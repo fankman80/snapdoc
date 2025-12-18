@@ -34,12 +34,14 @@ internal class SettingsModel
     public int PinPosCropExportSize { get; set; } // Größe der zugeschnittenen Pin-Position-Bilder im Bericht
     public int TitleExportSize { get; set; } // Grösse vom Titelbild im Bericht
     public bool IconGalleryGridView { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
+    public bool PhotoGalleryGridView { get; set; } // Modus der Foto-Galerie (Raster oder Liste)
     public int MaxPdfImageSizeW { get; set; } // Maximale Breite eines PDF-Bildes beim Import
     public int MaxPdfImageSizeH { get; set; } // Maximale Höhe eines PDF-Bildes beim Import
     public int FotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
     public int FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
     public int FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
     public int PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
+    public int FotoPreviewSize { get; set; } // Grösse Fotovorschau in der Foto-Galerie
     public int IconPreviewSize { get; set; } // Grösse der Icons in der Icon-Auswahl
     public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten

@@ -64,7 +64,7 @@
             </Grid.RowDefinitions>
             <CollectionView x:Name="FileListView" Grid.Row="0"
                             ItemsLayout="VerticalGrid, 1"
-                            SelectionMode="Single"
+                            SelectionMode="None"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">
@@ -94,7 +94,7 @@
                                    FontSize="12"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                   Text="{Binding DateTimeDisplay}"/>
+                                   Text="{Binding FileDate, StringFormat='{0:dddd dd. MMMM yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>

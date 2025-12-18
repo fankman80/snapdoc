@@ -276,7 +276,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private void UpdateSpan()
     {
         double screenWidth = this.Width;
-        double imageWidth = SettingsService.Instance.PlanPreviewSize;
+        double imageWidth = SettingsService.Instance.FotoPreviewSize;
         DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
         DynamicSize = (int)(screenWidth / DynamicSpan);
         OnPropertyChanged(nameof(DynamicSpan));

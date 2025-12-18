@@ -31,6 +31,7 @@ public partial class FotoGalleryView : ContentPage
     public FotoGalleryView()
     {
         InitializeComponent();
+        UpdateButton();
         BindingContext = this;
     }
 
@@ -39,6 +40,8 @@ public partial class FotoGalleryView : ContentPage
         base.OnAppearing();
 
         SizeChanged += OnSizeChanged;
+
+        SetIconGridView();
 
         UpdateSpan();
         FotoLoader();
@@ -136,12 +139,16 @@ public partial class FotoGalleryView : ContentPage
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        var tappedImage = sender as CachedImage;
-        var filePath = ((FileImageSource)tappedImage.Source).File;
-        var fileName = new FileResult(filePath).FileName;
-        FotoItem item = (FotoItem)tappedImage.BindingContext;
+        if (sender is not VisualElement element)
+            return;
 
-        await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={item.OnPlanId}&pinId={item.OnPinId}&gotoBtn=true");
+        if (element.BindingContext is not FotoItem item)
+            return;
+
+        var fileName = Path.GetFileName(item.ImagePath);
+
+        await Shell.Current.GoToAsync(
+            $"imageview?imgSource={fileName}&planId={item.OnPlanId}&pinId={item.OnPinId}&gotoBtn=true");
     }
 
     private void OnSortPickerChanged(object sender, EventArgs e)
@@ -181,6 +188,31 @@ public partial class FotoGalleryView : ContentPage
         ApplyFilterAndSorting();
     }
 
+    private void OnChangeRowsClicked(object sender, EventArgs e)
+    {
+        SettingsService.Instance.PhotoGalleryGridView = !SettingsService.Instance.PhotoGalleryGridView;
+        SettingsService.Instance.SaveSettings();
+        SetIconGridView();
+        UpdateButton();
+        UpdateSpan();
+    }
+
+    private void SetIconGridView()
+    {
+        if (SettingsService.Instance.PhotoGalleryGridView)
+            FotoGallery.ItemTemplate = (DataTemplate)Resources["GalleryGridTemplate"];
+        else
+            FotoGallery.ItemTemplate = (DataTemplate)Resources["GalleryListTemplate"];
+    }
+
+    private void UpdateButton()
+    {
+        if (SettingsService.Instance.PhotoGalleryGridView)
+            btnRows.Text = Settings.TableGridIcon;
+        else
+            btnRows.Text = Settings.TableRowIcon;
+    }
+
     private void OnSizeChanged(object sender, EventArgs e)
     {
         UpdateSpan();
@@ -188,11 +220,14 @@ public partial class FotoGalleryView : ContentPage
 
     private void UpdateSpan()
     {
-        double screenWidth = this.Width;
-        double imageWidth = SettingsService.Instance.PlanPreviewSize;
-        DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
-        DynamicSize = (int)(screenWidth / DynamicSpan);
+        if (SettingsService.Instance.PhotoGalleryGridView)
+        {
+            double screenWidth = this.Width;
+            double imageWidth = SettingsService.Instance.FotoPreviewSize; // Mindestbreite in Pixeln
+            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
+        }
+        else
+            DynamicSpan = 1;
         OnPropertyChanged(nameof(DynamicSpan));
-        OnPropertyChanged(nameof(DynamicSize));
     }
 }

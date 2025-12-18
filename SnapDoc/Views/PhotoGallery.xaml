@@ -19,7 +19,8 @@
              Title="Foto Galerie">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
+        <Grid ColumnDefinitions="*,Auto"
+              VerticalOptions="Center">
             <Label Grid.Column="0"
                    x:DataType="views:FotoGalleryView"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
@@ -29,13 +30,95 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-        </HorizontalStackLayout>
+            <Button Grid.Column="1"
+                    x:Name="btnRows"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="Raster/Liste umschalten"
+                    Clicked="OnChangeRowsClicked"/>            
+        </Grid>
     </Shell.TitleView>
 
     <ContentPage.Resources>
         <ResourceDictionary>
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+
+            <!-- Template für Listen-Galerie -->
+            <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
+                <Grid HeightRequest="72"
+                      Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}"
+                      Padding="6">
+                    <Grid.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnImageTapped" />
+                    </Grid.GestureRecognizers>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <ff:CachedImage Grid.Column="0"
+                                    Source="{Binding ImagePath}"
+                                    Aspect="AspectFill"
+                                    BitmapOptimizations="True"
+                                    CacheType="Memory"
+                                    FadeAnimationEnabled="False"
+                                    FadeAnimationForCachedImages="False"
+                                    RetryCount="2"
+                                    RetryDelay="100">
+                    </ff:CachedImage>
+                    <Label Grid.Column="1"
+                           Text="{Binding DateTime, StringFormat='{0:dddd dd. MMMM yyyy | HH:mm}'}"
+                           VerticalOptions="Center"/>
+                    <Button Grid.Column="2"
+                            Text="{x:Static m:MaterialOutlined.Keep}"
+                            Padding="0,5,10,0"
+                            FontFamily="MaterialOutlined"
+                            FontSize="30"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            Clicked="OnEditClicked"/>
+                    <Button Grid.Column="3"
+                            Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                            Padding="0,5,10,0"
+                            FontFamily="MaterialOutlined"
+                            FontSize="30"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            BackgroundColor="Transparent"
+                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            Clicked="OnAllowExportClicked"/>
+                </Grid>
+            </DataTemplate>            
+            
+            <!-- Template für Raster-Galerie -->
+            <DataTemplate x:Key="GalleryGridTemplate" x:DataType="local:FotoItem">
+                <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
+                    <views:SquareView Margin="6">
+                        <ff:CachedImage Source="{Binding ImagePath}"
+                                        Aspect="AspectFill"
+                                        BitmapOptimizations="True"
+                                        CacheType="Memory"
+                                        FadeAnimationEnabled="False"
+                                        FadeAnimationForCachedImages="False"
+                                        RetryCount="2"
+                                        RetryDelay="100">
+                            <ff:CachedImage.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnImageTapped" />
+                            </ff:CachedImage.GestureRecognizers>
+                        </ff:CachedImage>
+                    </views:SquareView>
+                </Grid>
+            </DataTemplate>
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -78,65 +161,16 @@
         </Border>
 
         <Grid x:DataType="views:FotoGalleryView" Grid.Row="1">
-            <CollectionView Grid.Row="0"
-                            x:Name="FotoGallery"
-                            ItemsSource="{Binding Fotos}"                            
+            <CollectionView x:Name="FotoGallery"
+                            ItemsSource="{Binding Fotos}"                             
+                            ItemTemplate="{StaticResource GalleryGridTemplate}"
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
+                            ItemSizingStrategy="MeasureFirstItem"
                             SelectionMode="None">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
+                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}"/>
                 </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:FotoItem">
-                        <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
-                            <views:SquareView>
-                                <ff:CachedImage Source="{Binding ImagePath}"
-                                                Aspect="AspectFill"
-                                                BitmapOptimizations="True"
-                                                CacheType="Memory"
-                                                FadeAnimationEnabled="False"
-                                                FadeAnimationForCachedImages="False"
-                                                RetryCount="2"
-                                                RetryDelay="100">
-                                    <ff:CachedImage.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnImageTapped" />
-                                    </ff:CachedImage.GestureRecognizers>
-                                </ff:CachedImage>
-                            </views:SquareView>
-                            <Button Text="{x:Static m:MaterialOutlined.Jump_to_element}"
-                                    WidthRequest="36"
-                                    HeightRequest="36"
-                                    MinimumWidthRequest="36"
-                                    MinimumHeightRequest="36"
-                                    CornerRadius="18"
-                                    Padding="0"
-                                    Margin="6"
-                                    FontFamily="MaterialOutlined"
-                                    FontSize="24"
-                                    VerticalOptions="End"
-                                    HorizontalOptions="Start"
-                                    BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    Clicked="OnEditClicked"/>
-                            <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                    WidthRequest="36"
-                                    HeightRequest="36"
-                                    MinimumWidthRequest="36"
-                                    MinimumHeightRequest="36"
-                                    CornerRadius="18"
-                                    Padding="0"
-                                    Margin="6"
-                                    FontFamily="MaterialOutlined"
-                                    FontSize="24"
-                                    VerticalOptions="End"
-                                    HorizontalOptions="End"
-                                    BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    Clicked="OnAllowExportClicked"/>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
             </CollectionView>
         </Grid>
         <Label Grid.Row="2"

@@ -55,7 +55,6 @@ namespace SnapDoc
         public required string FileName { get; set; }
         public required string FilePath { get; set; }
         public required DateTime FileDate { get; set; }
-        public string DateTimeDisplay => FileDate.ToString("dd. MMMM yyyy' / 'HH:mm", new CultureInfo("de-DE"));
         public required string ImagePath { get; set; }
         public required string ThumbnailPath { get; set; }
         private bool _isActive;

@@ -5,6 +5,7 @@ using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using UraniumUI;
+using System.Globalization;
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
@@ -16,6 +17,11 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
+        // Culture global setzen (de-CH)
+        var culture = new CultureInfo("de-CH");
+        CultureInfo.DefaultThreadCurrentCulture = culture;
+        CultureInfo.DefaultThreadCurrentUICulture = culture;
+
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
