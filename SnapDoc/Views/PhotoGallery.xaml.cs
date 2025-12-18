@@ -126,25 +126,28 @@ public partial class FotoGalleryView : ContentPage
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        FotoItem item = (FotoItem)button.BindingContext;
+        var tappedButton = sender as Button;
+        FotoItem item = (FotoItem)tappedButton.BindingContext;
 
-        if (item != null)
-        {
-            item.AllowExport = !item.AllowExport;
+        if (item == null)
+            return;
 
-            var fileName = Path.GetFileName(item.ImagePath);
-            GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport;
+        item.AllowExport = !item.AllowExport;
 
-            // save data to file
-            GlobalJson.SaveToFile();
-        }
+        var fileName = Path.GetFileName(item.ImagePath);
+        GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport;
+
+        // save data to file
+        GlobalJson.SaveToFile();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
         var tappedButton = sender as Button;
         FotoItem item = (FotoItem)tappedButton.BindingContext;
+
+        if (item == null)
+            return;
 
         await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.OnPinId}");
     }

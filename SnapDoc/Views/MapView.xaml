@@ -17,6 +17,7 @@
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
                    x:DataType="views:MapView"

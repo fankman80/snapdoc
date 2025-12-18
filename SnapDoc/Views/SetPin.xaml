@@ -23,6 +23,7 @@
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
+              ColumnSpacing="0"
               VerticalOptions="Center">
             <Entry Grid.Column="0" 
                    Text="{Binding Pin.PinName}"                

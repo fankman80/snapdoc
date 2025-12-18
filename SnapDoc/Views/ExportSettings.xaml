@@ -16,7 +16,7 @@
              Title="Bericht exportieren">
 
     <Shell.TitleView>
-        <HorizontalStackLayout>
+        <HorizontalStackLayout Spacing="0">
             <Label x:DataType="views:ExportSettings"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"

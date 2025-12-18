@@ -21,6 +21,7 @@
     
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
+              ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
                    x:DataType="views:OpenProject"
@@ -99,13 +100,13 @@
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
                             <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
-                                   Background="Transparent"
-                                   Clicked="OnProjectClicked"/>
+                                    Background="Transparent"
+                                    Clicked="OnProjectClicked"/>
                             <Button Grid.Column="2" Grid.RowSpan="2"
-                                   Padding="6"
-                                   Background="Transparent"
-                                   ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Edit_square}}"
-                                   Clicked="OnEditClicked"/>
+                                    Padding="6"
+                                    Background="Transparent"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Edit_square}}"
+                                    Clicked="OnEditClicked"/>
                         </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>

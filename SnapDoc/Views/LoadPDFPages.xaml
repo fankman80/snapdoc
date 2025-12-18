@@ -15,6 +15,7 @@
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"

@@ -16,7 +16,8 @@
              Title="Projektverwaltung">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*, Auto,Auto">
+        <Grid ColumnDefinitions="*, Auto,Auto"
+              ColumnSpacing="0">
             <Label Grid.Row="0"
                    x:DataType="views:ProjectDetails"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
