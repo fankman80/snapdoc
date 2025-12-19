@@ -10,6 +10,7 @@
        xmlns:model="clr-namespace:SnapDoc.ViewModels"
        xmlns:local="clr-namespace:SnapDoc"
        x:Class="SnapDoc.AppShell"
+       x:Name="AppShellRoot"
        FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}">
@@ -282,7 +283,8 @@
                     <ColumnDefinition Width="100" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                <Label x:DataType="local:AppShell"
+                       Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
                        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
                        Text="{Binding InfoText}" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
