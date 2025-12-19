@@ -6,13 +6,14 @@
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ExportSettings"
-             Title="Bericht exportieren">
+             Title="{x:Static res:AppResources.bericht_exportieren}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
@@ -44,7 +45,7 @@
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
                         <VerticalStackLayout Grid.Column="0" Spacing="4">
-                            <Label Text="Export-Vorlage" FontSize="12" Margin="8,0,0,0"/>
+                            <Label Text="{x:Static res:AppResources.export_vorlage}" FontSize="12" Margin="8,0,0,0"/>
                             <Border Grid.Column="1"
                                 Stroke="{DynamicResource SecondaryBackground}"
                                 StrokeThickness="1"
@@ -59,21 +60,21 @@
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Help}}"
-                                ToolTipProperties.Text="zeige Platzhalter-Definitionen"                                
+                                ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"                                
                                 Clicked="OnHelpClicked"/>
                         <Button Grid.Column="2"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Note_add}}"
-                                ToolTipProperties.Text="neue Vorlage hochladen"                                
+                                ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"                                
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="3"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
                                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Delete}}"
-                                ToolTipProperties.Text="Vorlage löschen"                                
+                                ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
                     <VerticalStackLayout Spacing="0">
@@ -87,7 +88,7 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Exportiere Pläne" Grid.Column="1" VerticalOptions="Center" />
+                            <Label Text="{x:Static res:AppResources.exportiere_plaene}" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
@@ -99,7 +100,7 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Exportiere Positionsbilder" Grid.Column="1" VerticalOptions="Center" />
+                            <Label Text="{x:Static res:AppResources.exportiere_positionsbilder}" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
@@ -111,7 +112,7 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Exportiere Pin-Icons" Grid.Column="1" VerticalOptions="Center" />
+                            <Label Text="{x:Static res:AppResources.exportiere_pin_icons}" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
@@ -123,7 +124,7 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Exportiere Fotos" Grid.Column="1" VerticalOptions="Center" />
+                            <Label Text="{x:Static res:AppResources.exportiere_fotos}" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40" IsVisible="{Binding IsImageExport}">
                             <controls:Switch Grid.Column="0"
@@ -135,7 +136,7 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Exportiere Foto-Overlays" Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding IsImageExport}"/>
+                            <Label Text="{x:Static res:AppResources.exportiere_foto_overlays}" Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding IsImageExport}"/>
                         </Grid>
                         <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                             <controls:Switch Grid.Column="0"
@@ -147,13 +148,14 @@
                                              KnobColorOff="White"
                                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="Bildkomprimierung" Grid.Column="1" VerticalOptions="Center" />
+                            <Label Text="{x:Static res:AppResources.bildkomprimierung}" Grid.Column="1" VerticalOptions="Center" />
                         </Grid>
                     </VerticalStackLayout>
 
-                    <Label Text="{Binding FotoCompressValue, StringFormat='Bildkomprimierung: {0}%'}"
-                           Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsFotoCompressed}"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsFotoCompressed}">
+                        <Label Text="{x:Static res:AppResources.bildkomprimierung}"/>
+                        <Label Text="{Binding FotoCompressValue, StringFormat=': {0}%'}"/>
+                    </HorizontalStackLayout>                        
                     <Slider Maximum="100"
                             Minimum="1"
                             IsVisible="{Binding IsFotoCompressed}"
@@ -163,7 +165,7 @@
                             Value="{Binding FotoCompressValue}"/>
 
                     <material:TextField Grid.Column="0" Grid.Row="1"
-                            Title="Pinbeschriftung"
+                            Title="{x:Static res:AppResources.pinbeschriftung}"
                             MaxLength="20"
                             Text="{Binding PinLabelPrefix}"
                             TitleColor="{DynamicResource SecondaryBackground}"
@@ -171,8 +173,11 @@
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
-
-                    <Label Text="{Binding PinLabelFontSize, StringFormat='Grösse Pinbeschriftung: {0:0.#} pt'}" Margin="0, 0, 0, -12"/>
+                    
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
+                        <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}"/>
+                        <Label Text="{Binding PinLabelFontSize, StringFormat=': {0:0.#} pt'}"/>
+                    </HorizontalStackLayout>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -180,7 +185,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinLabelFontSize}"/>
 
-                    <Label Text="{Binding PinExportSize, StringFormat='Pin-Icon (Breite + Höhe): {0:0.#} mm'}" Margin="0, 0, 0, -12"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
+                        <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}"/>
+                        <Label Text="{Binding PinExportSize, StringFormat=': {0:0.#} mm'}" Margin="0, 0, 0, -12"/>                        
+                    </HorizontalStackLayout>                        
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -188,9 +196,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinExportSize}"/>
 
-                    <Label Text="{Binding ImageExportSize, StringFormat='Foto (Breite): {0} mm'}"
-                           Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsImageExport}"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsImageExport}">
+                        <Label Text="{x:Static res:AppResources.foto_breite}"/>
+                        <Label Text="{Binding ImageExportSize, StringFormat=': {0} mm'}"/>
+                    </HorizontalStackLayout>
                     <Slider Maximum="160"
                             Minimum="10"
                             IsVisible="{Binding IsImageExport}"
@@ -199,9 +208,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding ImageExportSize}"/>
 
-                    <Label Text="{Binding PinPosExportSize, StringFormat='Positionsbilder (Breite + Höhe): {0} mm'}"
-                           Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsPosImageExport}"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsPosImageExport}">
+                        <Label Text="{x:Static res:AppResources.positionsbilder_breite_hoehe}"/>
+                        <Label Text="{Binding PinPosExportSize, StringFormat=': {0} mm'}"/>
+                    </HorizontalStackLayout>
                     <Slider Maximum="160"
                             Minimum="10"
                             IsVisible="{Binding IsPosImageExport}"
@@ -210,9 +220,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosExportSize}"/>
 
-                    <Label Text="{Binding PinPosCropExportSize, StringFormat='Positionsbilder Zuschnitt: {0} Pixel'}"
-                           Margin="0, 0, 0, -12"
-                           IsVisible="{Binding IsPosImageExport}"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsPosImageExport}">
+                        <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}"/>
+                        <Label Text="{Binding PinPosCropExportSize, StringFormat=': {0} Pixel'}"/>
+                    </HorizontalStackLayout>
                     <Slider Maximum="1000"
                             Minimum="100"
                             IsVisible="{Binding IsPosImageExport}"
@@ -221,7 +232,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosCropExportSize}"/>
 
-                    <Label Text="{Binding TitleExportSize, StringFormat='Titelbild (Höhe): {0} mm'}" Margin="0, 0, 0, -12"/>
+                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
+                        <Label Text="{x:Static res:AppResources.titelbild_hoehe}"/>
+                        <Label Text="{Binding TitleExportSize, StringFormat=': {0} mm'}" Margin="0, 0, 0, -12"/>
+                    </HorizontalStackLayout>
                     <Slider Maximum="300"
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"

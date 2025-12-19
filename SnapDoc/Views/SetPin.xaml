@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:SnapDoc.Views"                 
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:DataType="views:SetPin"
              x:Class="SnapDoc.Views.SetPin"
@@ -14,7 +15,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
-             Title="Pin bearbeiten">
+             Title="{x:Static res:AppResources.pin_bearbeiten}">
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
@@ -45,7 +46,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="auf einen anderen Plan kopieren/verschieben"
+                    ToolTipProperties.Text="{x:Static res:AppResources.auf_einen_anderen_plan_kopieren_verschieben}"
                     Clicked="OnMoveClick"/>
             <Button Grid.Column="2"
                     Text="{x:Static local:MaterialIcons.Delete}"
@@ -56,7 +57,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="Pin löschen"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.pin_loeschen}"                    
                     Clicked="OnDeleteClick"/>            
         </Grid>
     </Shell.TitleView>
@@ -131,14 +132,14 @@
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"
-                                Title="Standort"/>
+                                Title="{x:Static res:AppResources.standort}"/>
             <material:EditorField Text="{Binding Pin.PinDesc}"
                                   MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                   AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                  Title="Beschreibung"/>
+                                  Title="{x:Static res:AppResources.beschreibung}"/>
             <Grid RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -159,7 +160,7 @@
                                      KnobColorOff="White"
                                      SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Pin exportieren" Grid.Column="1" VerticalOptions="Center" />
+                    <Label Text="{x:Static res:AppResources.pin_exportieren}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
                     <controls:Switch Grid.Column="0"
@@ -171,7 +172,7 @@
                                      KnobColorOff="White"
                                      SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Position sperren" Grid.Column="1" VerticalOptions="Center" />
+                    <Label Text="{x:Static res:AppResources.position_sperren}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"                      
                         IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
@@ -224,7 +225,7 @@
                         MinimumWidthRequest="50"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ToolTipProperties.Text="Pin auf swisstopo-Karte anzeigen"                        
+                        ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_swisstopo_karte_anzeigen}"                        
                         Clicked="ShowGeoLoc"/>
                 <Button Grid.Column="2"
                         Padding="0"
@@ -232,7 +233,7 @@
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Photo_camera}}"
-                        ToolTipProperties.Text="Foto aufnehmen"                        
+                        ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
                         Clicked="TakeFoto"/>
                 <Button Grid.Column="3"
                         Padding="0"
