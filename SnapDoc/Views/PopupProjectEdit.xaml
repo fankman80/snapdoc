@@ -26,16 +26,16 @@
             <Button Text="Zip Exportieren"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Folder_zip}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_zip}}"
                     Clicked="OnSaveClicked" />
 
             <Button x:Name="openFolderBtn"
                     Padding="0"
                     Text="Verzeichnis öffnen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
                     Clicked="OnOpenFolderClicked">
                 <Button.IsVisible>
                     <OnPlatform x:TypeArguments="x:Boolean">
@@ -49,8 +49,8 @@
             <Button Text="Projekt löschen"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Delete}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
                     Clicked="OnDeleteClicked" />
 
             <Grid Margin="0,16,0,0">
@@ -62,13 +62,13 @@
                         x:Name="cancelButtonText"
                         Text="Abbrechen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
                         Text="Ok"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />
             </Grid>
         </VerticalStackLayout>

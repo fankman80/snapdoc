@@ -87,14 +87,14 @@
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnCancelClicked" />
             <Button Grid.Column="1"
                     x:DataType="views:PopupPlanSelector"
                     x:Name="okButtonText"
                     Text="{Binding ActionText}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnOkClicked" />
         </Grid>
     </Grid>

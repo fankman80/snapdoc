@@ -269,30 +269,30 @@
                             <Button Grid.Column="0" Grid.Row="0"
                                     Text="Projektdaten"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                    
+                                    TextColor="{DynamicResource PrimaryDarkText}"                                                    
                                     Clicked="OpenDocEditor"/>
                             <Button Grid.Column="0" Grid.Row="1"
                                     Text="App-Settings"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                           
+                                    TextColor="{DynamicResource PrimaryDarkText}"                                                           
                                     Clicked="OpenPrgEditor"/>
                             <Button Grid.Column="0" Grid.Row="2"
                                     Text="Icondefinitionen"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                                                            
+                                    TextColor="{DynamicResource PrimaryDarkText}"                                                            
                                     Clicked="OpenIconEditor"/>
                             <Button Grid.Column="1" Grid.Row="1"
                                     Padding="0"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                                    TextColor="{DynamicResource PrimaryDarkText}"                        
                                     ToolTipProperties.Text="Programmeinstellungen zurücksetzen"
                                     Clicked="ResetPrg"/>
                             <Button Grid.Column="1" Grid.Row="2"
                                     Padding="0"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"                        
+                                    TextColor="{DynamicResource PrimaryDarkText}"                        
                                     ToolTipProperties.Text="Icondefinitionen zurücksetzen"
                                     Clicked="ResetIcon"/> 
                             
@@ -311,7 +311,7 @@
                     Text="OK"
                     MinimumWidthRequest="100"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnOkClicked" />
         </Grid>
     </Grid>

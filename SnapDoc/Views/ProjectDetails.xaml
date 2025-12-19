@@ -163,15 +163,15 @@
                         Padding="0"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
                         ToolTipProperties.Text="PDF-Seiten hinzufügen"
                         Clicked="OnAddPdfClicked"/>
                 <Button Grid.Column="2"
                         Text="OK"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkayClicked"/>
             </Grid>
         </Grid>

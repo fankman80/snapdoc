@@ -129,7 +129,7 @@
                             VerticalOptions="End"
                             HorizontalOptions="End"
                             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            TextColor="{DynamicResource Primary}"
                             Clicked="OnAllowExportClicked"/>
                 </Grid>
             </DataTemplate>

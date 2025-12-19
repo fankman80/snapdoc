@@ -86,12 +86,12 @@
                 <Button Grid.Column="1"
                         Text="Abbrechen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked"/>
                 <Button Grid.Column="2"
                         Text="Seiten hinzufügen"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnPagesAddClicked"/>
             </Grid>
         </Grid>
