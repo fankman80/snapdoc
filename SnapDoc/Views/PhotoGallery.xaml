@@ -175,18 +175,19 @@
             </Image>
         </Border>
 
-        <Grid x:DataType="views:FotoGalleryView" Grid.Row="1">
-            <CollectionView x:Name="FotoGallery"
-                            ItemsSource="{Binding Fotos}"                             
-                            ItemTemplate="{StaticResource GalleryGridTemplate}"
-                            ItemsUpdatingScrollMode="KeepItemsInView"
-                            CanReorderItems="False"
-                            SelectionMode="None">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
-                </CollectionView.ItemsLayout>
-            </CollectionView>
-        </Grid>
+        <CollectionView Grid.Row="1"
+                        x:Name="FotoGallery"
+                        x:DataType="views:FotoGalleryView"
+                        ItemsSource="{Binding Fotos}"                             
+                        ItemTemplate="{StaticResource GalleryGridTemplate}"
+                        ItemsUpdatingScrollMode="KeepItemsInView"
+                        CanReorderItems="False"
+                        SelectionMode="None">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
+            </CollectionView.ItemsLayout>
+        </CollectionView>
+
         <Label Grid.Row="2"
                x:Name="FotoCounterLabel"
                FontSize="12"/>
