@@ -10,15 +10,15 @@ public static class Settings
     public const string PinEditRotateModeUnlock = "◀ Automatische Drehung";
 
     // Icondefinitionen
-    public const string PinEditRotateModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock_reset;
-    public const string PinEditRotateModeUnlockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Rotate_auto;
-    public const string PinEditSizeModeLockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Lock;
-    public const string PinEditSizeModeUnlockIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Zoom_out_map;
-    public const string GPSButtonOffIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Location_off;
-    public const string GPSButtonOnIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Where_to_vote;
-    public const string GPSButtonUnknownIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Not_listed_location;
-    public const string TableRowIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Table_rows;
-    public const string TableGridIcon = UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Grid_on;
+    public const string PinEditRotateModeLockIcon = MaterialIcons.Lock_reset;
+    public const string PinEditRotateModeUnlockIcon = MaterialIcons.Rotate_auto;
+    public const string PinEditSizeModeLockIcon = MaterialIcons.Lock;
+    public const string PinEditSizeModeUnlockIcon = MaterialIcons.Zoom_out_map;
+    public const string GPSButtonOffIcon = MaterialIcons.Location_off;
+    public const string GPSButtonOnIcon = MaterialIcons.Where_to_vote;
+    public const string GPSButtonUnknownIcon = MaterialIcons.Not_listed_location;
+    public const string TableRowIcon = MaterialIcons.Table_rows;
+    public const string TableGridIcon = MaterialIcons.Grid_on;
 
 #if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");

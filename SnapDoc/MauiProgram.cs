@@ -34,7 +34,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
                 fonts.AddFont("OpenSans-Semibold.ttf", "OpenSansSemibold");
-                fonts.AddMaterialSymbolsFonts();
+                fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
             });
 
         // Registriere die AppShell

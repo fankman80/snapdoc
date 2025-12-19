@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:services="clr-namespace:SnapDoc.Services"
@@ -33,7 +32,7 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"                    
-                    Text="{x:Static m:MaterialOutlined.Folder_zip}"
+                    Text="{x:Static local:MaterialIcons.Folder_zip}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -44,7 +43,7 @@
                     ToolTipProperties.Text="Projektdatei importieren"
                     Clicked="OnUploadClicked"/>
             <Button Grid.Column="2"                    
-                    Text="{x:Static m:MaterialOutlined.Add_home}"
+                    Text="{x:Static local:MaterialIcons.Add_home}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -82,7 +81,7 @@
                                 <RowDefinition Height="35" />
                             </Grid.RowDefinitions>
                             <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6">
-                                <Label Text="{x:Static m:MaterialOutlined.Check_circle}"
+                                <Label Text="{x:Static local:MaterialIcons.Check_circle}"
                                        FontFamily="MaterialOutlined"
                                        FontSize="20"
                                        VerticalTextAlignment="Center"
@@ -107,7 +106,7 @@
                             <Button Grid.Column="2" Grid.RowSpan="2"
                                     Padding="6"
                                     Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static m:MaterialOutlined.Edit_square}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static local:MaterialIcons.Edit_square}}"
                                     Clicked="OnEditClicked"/>
                         </Grid>
                     </DataTemplate>

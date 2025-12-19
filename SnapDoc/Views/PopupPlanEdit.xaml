@@ -4,7 +4,6 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:brush="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
                xmlns:views="clr-namespace:SnapDoc.Views"                 
                xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -93,12 +92,12 @@
                 <Button Grid.Column="1"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Rotate_left}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Rotate_left}}"
                         Clicked="PlanRotateLeft"/>
                 <Button Grid.Column="2"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Rotate_right}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Rotate_right}}"
                         Clicked="PlanRotateRight" />
             </Grid>
 
@@ -107,14 +106,14 @@
                     Text="Farben entfernen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Invert_colors}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
                     Clicked="OnGrayscaleClicked" />
 
             <Button Text="Plan löschen"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Delete}}"
                     Clicked="OnDeleteClicked" />
 
             <Grid Margin="0,16,0,0">

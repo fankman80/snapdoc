@@ -4,7 +4,6 @@
                 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-                xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                 xmlns:views="clr-namespace:SnapDoc.Views"             
                 xmlns:services="clr-namespace:SnapDoc.Services"
                 xmlns:controls="clr-namespace:SnapDoc.Controls"             
@@ -29,7 +28,7 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
-                    Text="{x:Static m:MaterialOutlined.Moved_location}"
+                    Text="{x:Static local:MaterialIcons.Moved_location}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -85,7 +84,7 @@
                         <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
                     </Border.Shadow>
                 </Border>
-                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Save}}"
+                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Save}}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"

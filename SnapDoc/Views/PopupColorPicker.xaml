@@ -5,7 +5,6 @@
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                xmlns:views="clr-namespace:SnapDoc.Views"                  
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:local="clr-namespace:SnapDoc"
@@ -69,7 +68,7 @@
                                             BackgroundColor="Transparent"
                                             Stroke="Black"
                                             Padding="10">
-                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static m:MaterialOutlined.Add}}"/>
+                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static local:MaterialIcons.Add}}"/>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnAddTapped" />
                                         </Border.GestureRecognizers>

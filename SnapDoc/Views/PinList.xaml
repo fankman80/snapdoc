@@ -4,7 +4,6 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:SnapDoc.Views"    
              xmlns:services="clr-namespace:SnapDoc.Services"             
              xmlns:models="clr-namespace:SnapDoc.Models"
@@ -68,7 +67,7 @@
                     Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
                 <Image x:Name="SortDirection"
-                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static m:MaterialOutlined.Sort}}">
+                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}">
                     <Image.GestureRecognizers>
                         <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
                     </Image.GestureRecognizers>
@@ -183,7 +182,7 @@
                                     ClassId="{Binding SelfId}"
                                     AutomationId = "{Binding OnPlanId}"
                                     Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Recenter}}"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Recenter}}"
                                     Clicked="OnPinClicked"/>
 
                             <!-- Allow Export-Button -->

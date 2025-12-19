@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"                
@@ -34,7 +33,7 @@
                    Completed="OnTitleChanged"
                    Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"                    
-                    Text="{x:Static m:MaterialOutlined.Fit_screen}"
+                    Text="{x:Static local:MaterialIcons.Fit_screen}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -45,7 +44,7 @@
                     ToolTipProperties.Text="Plan auf Fenstergrösse zoomen"                    
                     Clicked="ImageFit"/>
             <Button Grid.Column="2"                    
-                    Text="{x:Static m:MaterialOutlined.Edit_square}"
+                    Text="{x:Static local:MaterialIcons.Edit_square}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -220,7 +219,7 @@
             <Button x:Name="SetPinBtn"
                     Margin="0,0,20,20"
                     ZIndex="10000"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Add_location_alt}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
                     BackgroundColor="{DynamicResource Primary}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     WidthRequest="60"
@@ -232,7 +231,7 @@
                     Clicked="SetPinClicked"/>
 
             <Button x:Name="DrawBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
                     Margin="20,0,0,20"
                     ZIndex="10000"
                     BackgroundColor="{DynamicResource Primary}"
@@ -254,7 +253,7 @@
                                      Margin="20,0,0,20"
                                      AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                      AbsoluteLayout.LayoutFlags="PositionProportional">
-                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
@@ -263,7 +262,7 @@
                             ToolTipProperties.Text="Zeichnung löschen"
                             Clicked="EraseClicked"/>
                     <AbsoluteLayout>
-                        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
+                        <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                                 BackgroundColor="{DynamicResource Primary}"
                                 TextColor="{DynamicResource PrimaryDarkText}"
                                 WidthRequest="60"
@@ -289,7 +288,7 @@
                             </Border.Shadow>
                         </Border>
                     </AbsoluteLayout>
-                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
@@ -303,7 +302,7 @@
                                        AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                        AbsoluteLayout.LayoutFlags="PositionProportional">
                     <Button x:Name="DrawPolyBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
@@ -312,7 +311,7 @@
                             ToolTipProperties.Text="Polylinie zeichnen"
                             Clicked="DrawPolyClicked"/>
                     <Button x:Name="DrawFreeBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
@@ -339,7 +338,7 @@
                     HeightRequest="60"
                     CornerRadius="30"
                     BackgroundColor="Red"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static m:MaterialOutlined.Cancel}}"                    
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static local:MaterialIcons.Cancel}}"                    
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>
         </AbsoluteLayout>

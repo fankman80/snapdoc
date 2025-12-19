@@ -60,7 +60,7 @@ public class ExportToGlyphConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         bool allow = value is bool b && b;
-        return allow ? UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Visibility : UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Visibility_off;
+        return allow ? MaterialIcons.Visibility : MaterialIcons.Visibility_off;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
@@ -72,7 +72,7 @@ public class SelectedToGlyphConverter : IValueConverter
     public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
     {
         bool allow = value is bool b && b;
-        return allow ? UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Check_box : UraniumUI.Icons.MaterialSymbols.MaterialOutlined.Layers;
+        return allow ? MaterialIcons.Check_box : MaterialIcons.Layers;
     }
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
 			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"			 
+			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"		 
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
-             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:views="clr-namespace:SnapDoc.Views"        
+             xmlns:local="clr-namespace:SnapDoc"
 			 BackgroundColor="DimGrey"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
@@ -26,7 +26,7 @@
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
                     IsVisible="{Binding IsGotoPinBtnVisible}"
-                    Text="{x:Static m:MaterialOutlined.Keep}"
+                    Text="{x:Static local:MaterialIcons.Keep}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -37,7 +37,7 @@
                     ToolTipProperties.Text="Zu Pin wechseln"
                     Clicked="OnEditClicked"/>
             <Button Grid.Column="2"
-                    Text="{x:Static m:MaterialOutlined.Fit_screen}"
+                    Text="{x:Static local:MaterialIcons.Fit_screen}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -48,7 +48,7 @@
                     ToolTipProperties.Text="Foto auf Fenster grösse zoomen"
                     Clicked="ImageFit"/>
             <Button Grid.Column="3"
-                    Text="{x:Static m:MaterialOutlined.Delete}"
+                    Text="{x:Static local:MaterialIcons.Delete}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -79,7 +79,7 @@
             </AbsoluteLayout>
         </mr:ContentView>
 
-        <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Draw}}"
+        <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"
                 Margin="0,0,20,20"
@@ -101,7 +101,7 @@
                                  Margin="20,0,0,20"
                                  AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                  AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Ink_eraser}}"
+                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -110,7 +110,7 @@
                         ToolTipProperties.Text="Zeichnung löschen"
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout>
-                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Palette}}"
+                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                                 BackgroundColor="{DynamicResource Primary}"
                                 TextColor="{DynamicResource PrimaryDarkText}"
                                 WidthRequest="60"
@@ -136,7 +136,7 @@
                         </Border.Shadow>
                     </Border>
                 </AbsoluteLayout>
-                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Check}}"
+                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -150,7 +150,7 @@
                                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button x:Name="DrawPolyBtn"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static m:MaterialOutlined.Polyline}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -159,7 +159,7 @@
                         ToolTipProperties.Text="Polylinie zeichnen"
                         Clicked="DrawPolyClicked"/>
                 <Button x:Name="DrawFreeBtn"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static m:MaterialOutlined.Gesture}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"

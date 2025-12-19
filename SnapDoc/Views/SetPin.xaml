@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:views="clr-namespace:SnapDoc.Views"                 
              xmlns:services="clr-namespace:SnapDoc.Services"
@@ -38,7 +37,7 @@
                    Completed="OnTitleChanged"
                    Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"
-                    Text="{x:Static m:MaterialOutlined.Move_down}"
+                    Text="{x:Static local:MaterialIcons.Move_down}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -49,7 +48,7 @@
                     ToolTipProperties.Text="auf einen anderen Plan kopieren/verschieben"
                     Clicked="OnMoveClick"/>
             <Button Grid.Column="2"
-                    Text="{x:Static m:MaterialOutlined.Delete}"
+                    Text="{x:Static local:MaterialIcons.Delete}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -200,7 +199,7 @@
                             ItemsSource="{Binding PinPriorites}"
                             SelectedIndex="{Binding Pin.PinPriority}"
                             SelectedIndexChanged="OnSelectedItemChanged"/>
-                    <Label Grid.Column="1" Text="{x:Static m:MaterialOutlined.Traffic}"
+                    <Label Grid.Column="1" Text="{x:Static local:MaterialIcons.Traffic}"
                            WidthRequest="60"
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
@@ -232,7 +231,7 @@
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Photo_camera}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Photo_camera}}"
                         ToolTipProperties.Text="Foto aufnehmen"                        
                         Clicked="TakeFoto"/>
                 <Button Grid.Column="3"

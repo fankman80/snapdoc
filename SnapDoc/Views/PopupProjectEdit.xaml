@@ -4,7 +4,6 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-               xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
                Margin="16"
@@ -27,7 +26,7 @@
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Folder_zip}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Folder_zip}}"
                     Clicked="OnSaveClicked" />
 
             <Button x:Name="openFolderBtn"
@@ -35,7 +34,7 @@
                     Text="Verzeichnis öffnen"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Folder_open}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
                     Clicked="OnOpenFolderClicked">
                 <Button.IsVisible>
                     <OnPlatform x:TypeArguments="x:Boolean">
@@ -50,7 +49,7 @@
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Delete}}"
                     Clicked="OnDeleteClicked" />
 
             <Grid Margin="0,16,0,0">

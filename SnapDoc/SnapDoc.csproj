@@ -22,7 +22,7 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.18362.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.18362.0</TargetPlatformMinVersion>
-		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">14.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
@@ -131,7 +131,6 @@
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.2-preview.1" />
 		<PackageReference Include="UraniumUI" Version="2.14.0" />
-		<PackageReference Include="UraniumUI.Icons.MaterialSymbols" Version="2.14.0" />
 		<PackageReference Include="UraniumUI.Material" Version="2.14.0" />
 	</ItemGroup>
 

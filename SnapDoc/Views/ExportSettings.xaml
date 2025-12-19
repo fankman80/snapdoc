@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -59,21 +58,21 @@
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Help}}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Help}}"
                                 ToolTipProperties.Text="zeige Platzhalter-Definitionen"                                
                                 Clicked="OnHelpClicked"/>
                         <Button Grid.Column="2"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Note_add}}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Note_add}}"
                                 ToolTipProperties.Text="neue Vorlage hochladen"                                
                                 Clicked="OnAddDocument" />
                         <Button Grid.Column="3"
                                 Padding="0"
                                 VerticalOptions="End"
                                 BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static m:MaterialOutlined.Delete}}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Delete}}"
                                 ToolTipProperties.Text="Vorlage löschen"                                
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
@@ -243,14 +242,14 @@
                         Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Share}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Share}}"
                         Clicked="OnShareClicked" />
                 <Button Grid.Column="2"
                         MinimumWidthRequest="100"
                         Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined,Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Save}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined,Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Save}}"
                         Clicked="OnSaveClicked" />
             </Grid>
         </Grid>

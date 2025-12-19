@@ -4,7 +4,6 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:m="clr-namespace:UraniumUI.Icons.MaterialSymbols;assembly=UraniumUI.Icons.MaterialSymbols"
              xmlns:views="clr-namespace:SnapDoc.Views"            
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:local="clr-namespace:SnapDoc"
@@ -28,7 +27,7 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"                    
-                    Text="{x:Static m:MaterialOutlined.Photo_camera}"
+                    Text="{x:Static local:MaterialIcons.Photo_camera}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -39,7 +38,7 @@
                     ToolTipProperties.Text="Titelbild mit der Kamera erstellen"
                     Clicked="OnTitleCaptureClicked"/>
             <Button Grid.Column="2"                    
-                    Text="{x:Static m:MaterialOutlined.Image_search}"
+                    Text="{x:Static local:MaterialIcons.Image_search}"
                     FontSize="24"
                     Padding="0"
                     TextColor="{DynamicResource PrimaryDark}"
@@ -147,7 +146,7 @@
                         BorderColor="{DynamicResource SecondaryBackground}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static m:MaterialOutlined.Calendar_month}}"                        
+                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"                        
                         AllowClear="False"
                         Title="Datum">
                     </material:DatePickerField>
@@ -165,7 +164,7 @@
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static m:MaterialOutlined.Picture_as_pdf}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
                         ToolTipProperties.Text="PDF-Seiten hinzufügen"
                         Clicked="OnAddPdfClicked"/>
                 <Button Grid.Column="2"
