@@ -159,20 +159,23 @@
             <Label Text="inaktive Fotos ausblenden" Grid.Column="1" VerticalOptions="Center" />
         </Grid>
 
-        <Border Grid.Row="0" HorizontalOptions="End" 
-                Padding="6"
+        <Button x:Name="SortDirection"
+                Text="{x:Static local:MaterialIcons.Sort}"
+                FontSize="36"
+                FontFamily="MaterialOutlined"
+                TextColor="{DynamicResource Primary}"
+                CornerRadius="4"
+                Padding="0"            
                 HeightRequest="38"
                 WidthRequest="38"
-                StrokeThickness="1"
-                Stroke="{DynamicResource Primary}"
-                StrokeShape="RoundRectangle 4">
-            <Image x:Name="SortDirection"
-                       Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}">
-                <Image.GestureRecognizers>
-                    <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
-                </Image.GestureRecognizers>
-            </Image>
-        </Border>
+                MinimumHeightRequest="38"
+                MinimumWidthRequest="38"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                BorderColor="{DynamicResource Primary}"
+                BorderWidth="1"
+                BackgroundColor="Transparent"
+                Clicked="OnSortDirectionClicked"/>
 
         <CollectionView Grid.Row="1"
                         x:Name="FotoGallery"

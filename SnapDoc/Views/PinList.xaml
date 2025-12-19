@@ -60,32 +60,36 @@
         </Border>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
-            <Border Padding="6"
+            <Button x:Name="SortDirection"
+                    Text="{x:Static local:MaterialIcons.Sort}"
+                    FontSize="36"
+                    FontFamily="MaterialOutlined"
+                    TextColor="{DynamicResource Primary}"
+                    CornerRadius="4"
+                    Padding="0"            
                     HeightRequest="38"
                     WidthRequest="38"
+                    MinimumHeightRequest="38"
+                    MinimumWidthRequest="38"
+                    HorizontalOptions="End"
+                    VerticalOptions="Center"
+                    BorderColor="{DynamicResource Primary}"
+                    BorderWidth="1"
+                    BackgroundColor="Transparent"
+                    Clicked="OnSortDirectionClicked"/>
+            <Border VerticalOptions="Center"
+                    HeightRequest="38"
                     StrokeThickness="1"
                     Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
-                <Image x:Name="SortDirection"
-                        Source="{FontImageSource FontFamily=MaterialOutlined, Size=44, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}">
-                    <Image.GestureRecognizers>
-                        <TapGestureRecognizer Tapped = "OnSortDirectionClicked"/>
-                    </Image.GestureRecognizers>
-                </Image>
-            </Border>
-            <Border VerticalOptions="Center"
-                        HeightRequest="38"
-                        StrokeThickness="1"
-                        Stroke="{DynamicResource Primary}"
-                        StrokeShape="RoundRectangle 4">
                 <Grid VerticalOptions="Center" HorizontalOptions="Fill">
                     <Picker x:Name="SortPicker"
-                                x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                FontSize="10"
-                                VerticalOptions="Center"
-                                HorizontalOptions="Fill"
-                                ItemsSource="{Binding PinSortCrits}"
-                                SelectedItem="{Binding PinSortCrit}"/>
+                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                            FontSize="10"
+                            VerticalOptions="Center"
+                            HorizontalOptions="Fill"
+                            ItemsSource="{Binding PinSortCrits}"
+                            SelectedItem="{Binding PinSortCrit}"/>
                 </Grid>
             </Border>
         </HorizontalStackLayout>
