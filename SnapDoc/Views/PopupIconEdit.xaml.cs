@@ -27,7 +27,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
         IconScale = iconItem.IconScale;
-        sliderText.Text = "Voreinstellung Skalierung: " + (iconItem.IconScale * 100).ToString() + "%";
         allowRotate.IsToggled = iconItem.IsRotationLocked;
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
         SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
