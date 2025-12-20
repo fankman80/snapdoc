@@ -28,7 +28,7 @@
             <Entry Grid.Column="0" 
                    Text="{Binding Pin.PinName}"                
                    TextColor="{DynamicResource PrimaryDark}"
-                   Placeholder="(Titel eingeben...)"
+                   Placeholder="{x:Static res:AppResources.titel_eingeben}"
                    PlaceholderColor="{DynamicResource PrimaryDark}"
                    IsSpellCheckEnabled="False"
                    Background="Transparent"

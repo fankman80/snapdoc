@@ -4,8 +4,9 @@ using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
-using UraniumUI;
+using SnapDoc.Services;
 using System.Globalization;
+using UraniumUI;
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
@@ -17,8 +18,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        // Culture global setzen (de-CH)
-        var culture = new CultureInfo("en");
+        var culture = new CultureInfo("fr");
+
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
 

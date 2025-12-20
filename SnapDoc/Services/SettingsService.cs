@@ -87,6 +87,7 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
+    [ObservableProperty] private string _languageCode = "de-CH";
     [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
@@ -252,6 +253,7 @@ public partial class SettingsService : ObservableObject
     {
         var settings = new SettingsModel
         {
+            LanguageCode = LanguageCode,
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
@@ -327,6 +329,7 @@ public partial class SettingsService : ObservableObject
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
             if (settings == null) return;
 
+            LanguageCode = settings.LanguageCode ?? string.Empty;
             PinMinScaleLimit = settings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
@@ -396,6 +399,7 @@ public partial class SettingsService : ObservableObject
     {
         // Einfach den Konstruktor einmal wieder aufrufen
         var defaultSettings = new SettingsService();
+        LanguageCode = defaultSettings.LanguageCode;
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;

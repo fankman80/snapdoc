@@ -2,6 +2,7 @@
 
 internal class SettingsModel
 {
+    public string? LanguageCode { get; set; } // Sprachcode der App (z.B. "de-CH", "en")
     public int PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
     public int PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
     public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo

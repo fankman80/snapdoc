@@ -5,6 +5,7 @@ using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc;
 
@@ -105,11 +106,11 @@ public partial class AppShell : Shell
             PlanItems.Add(item);
 
         if (!SettingsService.Instance.IsProjectLoaded)
-            InfoText = "Kein Projekt geladen";
+            InfoText = AppResources.kein_projekt_geladen;
         else if (SettingsService.Instance.IsHideInactivePlans)
-            InfoText = $"{AllPlanItems.Count - PlanItems.Count} ausgeblendete Pläne";
+            InfoText = $"{AllPlanItems.Count - PlanItems.Count} {AppResources.ausgeblendete_plaene}";
         else
-            InfoText = "Pläne umsortieren: Gedrückt halten und ziehen";
+            InfoText = AppResources.plaene_umsortieren_gedrueckt_halten_und_ziehen;
     }
 
     private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)

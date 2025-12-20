@@ -21,9 +21,9 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
 
         if (gray)
-            grayscaleButtonText.Text = "Farben hinzufügen";
+            grayscaleButtonText.Text = AppResources.farben_hinzufuegen;
         else
-            grayscaleButtonText.Text = "Farben entfernen";
+            grayscaleButtonText.Text = AppResources.farben_entfernen;
 
         BindingContext = this;
     }

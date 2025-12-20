@@ -118,420 +118,420 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="auf_einen_anderen_plan_kopieren_verschieben" xml:space="preserve">
-    <value>Copy/move to another plan</value>
+    <value>Copier/déplacer vers un autre plan</value>
   </data>
   <data name="bericht_exportieren" xml:space="preserve">
-    <value>Export report</value>
+    <value>Exporter le rapport</value>
   </data>
   <data name="beschreibung" xml:space="preserve">
     <value>Description</value>
   </data>
   <data name="bildkomprimierung" xml:space="preserve">
-    <value>Image compression:</value>
+    <value>Compression d'image :</value>
   </data>
   <data name="datum" xml:space="preserve">
     <value>Date</value>
   </data>
   <data name="exportiere_fotos" xml:space="preserve">
-    <value>Export photos</value>
+    <value>Exporter les photos</value>
   </data>
   <data name="exportiere_foto_overlays" xml:space="preserve">
-    <value>Export photo overlays</value>
+    <value>Exporter les superpositions de photos</value>
   </data>
   <data name="exportiere_pin_icons" xml:space="preserve">
-    <value>Export pin icons</value>
+    <value>Exporter les icônes de pin's</value>
   </data>
   <data name="exportiere_plaene" xml:space="preserve">
-    <value>Export plans</value>
+    <value>Exporter les plans</value>
   </data>
   <data name="exportiere_positionsbilder" xml:space="preserve">
-    <value>Export position images</value>
+    <value>Exporter les images de position</value>
   </data>
   <data name="export_vorlage" xml:space="preserve">
-    <value>Export template</value>
+    <value>Modèle d'exportation</value>
   </data>
   <data name="farbe_und_stiftbreite_waehlen" xml:space="preserve">
-    <value>Select color and pen width</value>
+    <value>Choisir la couleur et l'épaisseur du trait</value>
   </data>
   <data name="formen_zeichnen" xml:space="preserve">
-    <value>Draw shapes</value>
+    <value>Dessiner des formes</value>
   </data>
   <data name="foto_aufnehmen" xml:space="preserve">
-    <value>Take photo</value>
+    <value>Prendre une photo</value>
   </data>
   <data name="foto_auf_fenstergroesse_zoomen" xml:space="preserve">
-    <value>Zoom photo to window size</value>
+    <value>Zoomer la photo à la taille de la fenêtre</value>
   </data>
   <data name="foto_breite" xml:space="preserve">
-    <value>Photo (width):</value>
+    <value>Photo (largeur) :</value>
   </data>
   <data name="foto_galerie" xml:space="preserve">
-    <value>Photo gallery</value>
+    <value>Galerie de photos</value>
   </data>
   <data name="foto_loeschen" xml:space="preserve">
-    <value>Delete photo</value>
+    <value>Supprimer la photo</value>
   </data>
   <data name="freihandlinie_zeichnen" xml:space="preserve">
-    <value>Draw freehand line</value>
+    <value>Dessin à main levée</value>
   </data>
   <data name="gedrückt_halten_um_Icon_zu_editieren" xml:space="preserve">
-    <value>Press and hold to edit icon.</value>
+    <value>Maintenir enfoncé pour modifier l'icône.</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
-    <value>Pin label size:</value>
+    <value>Taille de l'étiquette du pin's :</value>
   </data>
   <data name="icon_auswählen" xml:space="preserve">
-    <value>Select icon</value>
+    <value>Sélectionner l'icône</value>
   </data>
   <data name="inaktive_fotos_ausblenden" xml:space="preserve">
-    <value>Hide inactive photos</value>
+    <value>Masquer les photos inactives</value>
   </data>
   <data name="kml_datei_exportieren" xml:space="preserve">
-    <value>Export KML file</value>
+    <value>Exporter le fichier KML</value>
   </data>
   <data name="kunde_bauherrschaft" xml:space="preserve">
-    <value>Client/Owner</value>
+    <value>Client/Maître d'ouvrage</value>
   </data>
   <data name="neues_icon_erstellen" xml:space="preserve">
-    <value>Create new icon</value>
+    <value>Créer une nouvelle icône</value>
   </data>
   <data name="neues_projekt_erstellen" xml:space="preserve">
-    <value>Create new project</value>
+    <value>Créer un nouveau projet</value>
   </data>
   <data name="neue_vorlage_hochladen" xml:space="preserve">
-    <value>Upload new template</value>
+    <value>Charger un nouveau modèle</value>
   </data>
   <data name="neu_setzen" xml:space="preserve">
-    <value>Reset/Place new</value>
+    <value>Réinitialiser/Placer à nouveau</value>
   </data>
   <data name="objektbezeichnung" xml:space="preserve">
-    <value>Object designation</value>
+    <value>Désignation de l'objet</value>
   </data>
   <data name="ok" xml:space="preserve">
     <value>OK</value>
   </data>
   <data name="pdf_seiten_hinzufügen" xml:space="preserve">
-    <value>Add PDF pages</value>
+    <value>Ajouter des pages PDF</value>
   </data>
   <data name="pin_liste" xml:space="preserve">
-    <value>Pin list</value>
+    <value>Liste des pin's</value>
   </data>
   <data name="pinbeschriftung" xml:space="preserve">
-    <value>Pin labeling</value>
+    <value>Étiquetage des pin's</value>
   </data>
   <data name="pin_auf_swisstopo_karte_anzeigen" xml:space="preserve">
-    <value>Show pin on swisstopo map</value>
+    <value>Afficher le pin's sur la carte swisstopo</value>
   </data>
   <data name="pin_bearbeiten" xml:space="preserve">
-    <value>Edit pin</value>
+    <value>Modifier le pin's</value>
   </data>
   <data name="pin_exportieren" xml:space="preserve">
-    <value>Export pin</value>
+    <value>Exporter le pin's</value>
   </data>
   <data name="pin_icon_breite_hoehe" xml:space="preserve">
-    <value>Pin icon (width + height):</value>
+    <value>Icône du pin's (largeur + hauteur) :</value>
   </data>
   <data name="pin_loeschen" xml:space="preserve">
-    <value>Delete pin</value>
+    <value>Supprimer le pin's</value>
   </data>
   <data name="pin_setzen" xml:space="preserve">
-    <value>Set pin</value>
+    <value>Placer le pin's</value>
   </data>
   <data name="plan_auf_fenstergroesse_zoomen" xml:space="preserve">
-    <value>Zoom plan to window size</value>
+    <value>Zoomer le plan à la taille de la fenêtre</value>
   </data>
   <data name="plan_bearbeiten" xml:space="preserve">
-    <value>Edit plan</value>
+    <value>Modifier le plan</value>
   </data>
   <data name="polylinie_zeichnen" xml:space="preserve">
-    <value>Draw polyline</value>
+    <value>Dessiner une polyligne</value>
   </data>
   <data name="positionsbilder_breite_hoehe" xml:space="preserve">
-    <value>Position images (width + height):</value>
+    <value>Images de position (largeur + hauteur) :</value>
   </data>
   <data name="positionsbilder_zuschnitt" xml:space="preserve">
-    <value>Position images cropping:</value>
+    <value>Recadrage des images de position :</value>
   </data>
   <data name="position_sperren" xml:space="preserve">
-    <value>Lock position</value>
+    <value>Verrouiller la position</value>
   </data>
   <data name="projektdatei_importieren" xml:space="preserve">
-    <value>Import project file</value>
+    <value>Importer le fichier projet</value>
   </data>
   <data name="projektleitung" xml:space="preserve">
-    <value>Project management</value>
+    <value>Direction de projet</value>
   </data>
   <data name="projektliste" xml:space="preserve">
-    <value>Project list</value>
+    <value>Liste des projets</value>
   </data>
   <data name="projektnummer" xml:space="preserve">
-    <value>Project number</value>
+    <value>N° de projet</value>
   </data>
   <data name="projektverwaltung" xml:space="preserve">
-    <value>Project management</value>
+    <value>Gestion de projet</value>
   </data>
   <data name="projektvorgang" xml:space="preserve">
-    <value>Project process</value>
+    <value>Processus du projet</value>
   </data>
   <data name="raster_liste_umschalten" xml:space="preserve">
-    <value>Toggle grid/list</value>
+    <value>Basculer grille/liste</value>
   </data>
   <data name="seiten_hinzufuegen" xml:space="preserve">
-    <value>Add pages</value>
+    <value>Ajouter des pages</value>
   </data>
   <data name="standort" xml:space="preserve">
-    <value>Location</value>
+    <value>Emplacement</value>
   </data>
   <data name="suche" xml:space="preserve">
-    <value>Search...</value>
+    <value>Recherche...</value>
   </data>
   <data name="swisstopo_karte" xml:space="preserve">
-    <value>swisstopo map</value>
+    <value>Carte swisstopo</value>
   </data>
   <data name="titelbild_hoehe" xml:space="preserve">
-    <value>Cover image (height):</value>
+    <value>Image de titre (hauteur) :</value>
   </data>
   <data name="titelbild_mit_der_kamera_erstellen" xml:space="preserve">
-    <value>Create cover image with camera</value>
+    <value>Créer l'image de titre avec l'appareil photo</value>
   </data>
   <data name="titelbild_von_der_festplatte_hochladen" xml:space="preserve">
-    <value>Upload cover image from disk</value>
+    <value>Charger l'image de titre depuis le disque</value>
   </data>
   <data name="vorlage_loeschen" xml:space="preserve">
-    <value>Delete template</value>
+    <value>Supprimer le modèle</value>
   </data>
   <data name="zeichnung_loeschen" xml:space="preserve">
-    <value>Delete drawing</value>
+    <value>Supprimer le dessin</value>
   </data>
   <data name="zeichnung_speichern" xml:space="preserve">
-    <value>Save drawing</value>
+    <value>Enregistrer le dessin</value>
   </data>
   <data name="zeige_platzhalter_definitionen" xml:space="preserve">
-    <value>Show placeholder definitions</value>
+    <value>Afficher les définitions des espaces réservés</value>
   </data>
   <data name="zeit" xml:space="preserve">
-    <value>Time:</value>
+    <value>Heure :</value>
   </data>
   <data name="zu_pin_wechseln" xml:space="preserve">
-    <value>Switch to pin</value>
+    <value>Passer au pin's</value>
   </data>
   <data name="planrotation_sperren" xml:space="preserve">
-    <value>Lock plan rotation</value>
+    <value>Verrouiller la rotation du plan</value>
   </data>
   <data name="planliste_mit_vorschau" xml:space="preserve">
-    <value>Plan list with preview</value>
+    <value>Liste des plans avec aperçu</value>
   </data>
   <data name="inaktive_plaene_ausblenden" xml:space="preserve">
-    <value>Hide inactive plans</value>
+    <value>Masquer les plans inactifs</value>
   </data>
   <data name="modus_fuer_pinplatzierung" xml:space="preserve">
-    <value>Pin placement mode</value>
+    <value>Mode de placement des pin's</value>
   </data>
   <data name="pin_in_die_bildmitte_setzen" xml:space="preserve">
-    <value>Set pin to center of image</value>
+    <value>Placer le pin's au centre de l'image</value>
   </data>
   <data name="pin_durch_antippen_setzen" xml:space="preserve">
-    <value>Set pin by tapping</value>
+    <value>Placer le pin's en appuyant</value>
   </data>
   <data name="pin_durch_gedrueckthalten_setzen" xml:space="preserve">
-    <value>Set pin by pressing and holding</value>
+    <value>Placer le pin's en maintenant enfoncé</value>
   </data>
   <data name="swisstopo_karten_pins" xml:space="preserve">
-    <value>swisstopo map pins</value>
+    <value>Pin's de la carte swisstopo</value>
   </data>
   <data name="farbschema" xml:space="preserve">
-    <value>Color scheme</value>
+    <value>Schéma de couleurs</value>
   </data>
   <data name="app_modus" xml:space="preserve">
-    <value>App mode</value>
+    <value>Mode de l'application</value>
   </data>
   <data name="farb_thema" xml:space="preserve">
-    <value>Color theme</value>
+    <value>Thème de couleur</value>
   </data>
   <data name="erweiterte_einstellungen" xml:space="preserve">
-    <value>Advanced settings</value>
+    <value>Paramètres avancés</value>
   </data>
   <data name="projektdaten" xml:space="preserve">
-    <value>Project data</value>
+    <value>Données du projet</value>
   </data>
   <data name="app_settings" xml:space="preserve">
-    <value>App settings</value>
+    <value>Paramètres de l'application</value>
   </data>
   <data name="icondefinitionen" xml:space="preserve">
-    <value>Icon definitions</value>
+    <value>Définitions d'icônes</value>
   </data>
   <data name="programmeinstellungen_zuruecksetzen" xml:space="preserve">
-    <value>Reset program settings</value>
+    <value>Réinitialiser les paramètres du programme</value>
   </data>
   <data name="icondefinitionen_zuruecksetzen" xml:space="preserve">
-    <value>Reset icon definitions</value>
+    <value>Réinitialiser les définitions d'icônes</value>
   </data>
   <data name="max_pingroesse_limitieren" xml:space="preserve">
-    <value>Limit max. pin size:</value>
+    <value>Limiter la taille max du pin's :</value>
   </data>
   <data name="min_pingroesse_limitieren" xml:space="preserve">
-    <value>Limit min. pin size:</value>
+    <value>Limiter la taille min du pin's :</value>
   </data>
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
-    <value>PDF conversion resolution:</value>
+    <value>Résolution conversion PDF :</value>
   </data>
   <data name="pingroesse" xml:space="preserve">
-    <value>Pin size:</value>
+    <value>Taille du pin's :</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
-    <value>Project title</value>
+    <value>Titre du projet</value>
   </data>
   <data name="zip_exportieren" xml:space="preserve">
-    <value>Export Zip</value>
+    <value>Exporter en Zip</value>
   </data>
   <data name="verzeichnis_oeffnen" xml:space="preserve">
-    <value>Open directory</value>
+    <value>Ouvrir le répertoire</value>
   </data>
   <data name="projekt_loeschen" xml:space="preserve">
-    <value>Delete project</value>
+    <value>Supprimer le projet</value>
   </data>
   <data name="kopie_erstellen" xml:space="preserve">
-    <value>Create copy</value>
+    <value>Créer une copie</value>
   </data>
   <data name="planbezeichnung" xml:space="preserve">
-    <value>Plan designation</value>
+    <value>Désignation du plan</value>
   </data>
   <data name="planfarbe" xml:space="preserve">
-    <value>Plan color</value>
+    <value>Couleur du plan</value>
   </data>
   <data name="plan_exportieren" xml:space="preserve">
-    <value>Export plan</value>
+    <value>Exporter le plan</value>
   </data>
   <data name="plan_drehung" xml:space="preserve">
-    <value>Plan rotation:</value>
+    <value>Rotation du plan :</value>
   </data>
   <data name="farben_entfernen" xml:space="preserve">
-    <value>Remove colors</value>
+    <value>Supprimer les couleurs</value>
   </data>
   <data name="plan_loeschen" xml:space="preserve">
-    <value>Delete plan</value>
+    <value>Supprimer le plan</value>
   </data>
   <data name="abbrechen" xml:space="preserve">
-    <value>Cancel</value>
+    <value>Annuler</value>
   </data>
   <data name="zum_loeschen_gedrueckt_halten" xml:space="preserve">
-    <value>Press and hold to delete</value>
+    <value>Maintenir pour supprimer</value>
   </data>
   <data name="farbdefinition" xml:space="preserve">
-    <value>▼      Color Definition      ▼</value>
+    <value>▼      Définition de couleur      ▼</value>
   </data>
   <data name="rot_r" xml:space="preserve">
-    <value>Red (R):</value>
+    <value>Rouge (R) :</value>
   </data>
   <data name="gruen_g" xml:space="preserve">
-    <value>Green (G):</value>
+    <value>Vert (G) :</value>
   </data>
   <data name="blau_b" xml:space="preserve">
-    <value>Blue (B):</value>
+    <value>Bleu (B) :</value>
   </data>
   <data name="farbwert_h" xml:space="preserve">
-    <value>Hue (H):</value>
+    <value>Teinte (H) :</value>
   </data>
   <data name="saettigung_s" xml:space="preserve">
-    <value>Saturation (S):</value>
+    <value>Saturation (S) :</value>
   </data>
   <data name="helligkeit_l" xml:space="preserve">
-    <value>Lightness (L):</value>
+    <value>Luminosité (L) :</value>
   </data>
   <data name="pinselgroesse" xml:space="preserve">
-    <value>Brush size:</value>
+    <value>Taille du pinceau :</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
-    <value>Opacity:</value>
+    <value>Opacité :</value>
   </data>
   <data name="anker_x" xml:space="preserve">
-    <value>Anchor X</value>
+    <value>Ancre X</value>
   </data>
   <data name="anker_y" xml:space="preserve">
-    <value>Anchor Y</value>
+    <value>Ancre Y</value>
   </data>
   <data name="kategorie" xml:space="preserve">
-    <value>Category</value>
+    <value>Catégorie</value>
   </data>
   <data name="bezeichnung" xml:space="preserve">
-    <value>Designation</value>
+    <value>Désignation</value>
   </data>
   <data name="farbe_waehlen" xml:space="preserve">
-    <value>Select color</value>
+    <value>Choisir la couleur</value>
   </data>
   <data name="voreinstellung_skalierung" xml:space="preserve">
-    <value>Scaling preset:</value>
+    <value>Préréglage de mise à l'échelle :</value>
   </data>
   <data name="rotation_sperren" xml:space="preserve">
-    <value>Lock rotation</value>
+    <value>Verrouiller la rotation</value>
   </data>
   <data name="auto_skalierung_sperren" xml:space="preserve">
-    <value>Lock auto-scaling</value>
+    <value>Verrouiller la mise à l'échelle auto</value>
   </data>
   <data name="icon_loeschen" xml:space="preserve">
-    <value>Delete icon</value>
+    <value>Supprimer l'icône</value>
   </data>
   <data name="standard_icon" xml:space="preserve">
-    <value>Standard icon</value>
+    <value>Icône standard</value>
   </data>
   <data name="automatische_drehung" xml:space="preserve">
-    <value>◀ Automatic rotation</value>
+    <value>◀ Rotation automatique</value>
   </data>
   <data name="drehung_fixiert" xml:space="preserve">
-    <value>◀ Rotation fixed</value>
+    <value>◀ Rotation fixée</value>
   </data>
   <data name="automatische_groessenanpassung" xml:space="preserve">
-    <value>◀ Automatic resizing</value>
+    <value>◀ Redimensionnement automatique</value>
   </data>
   <data name="groesse_fixiert" xml:space="preserve">
-    <value>◀ Size fixed</value>
+    <value>◀ Taille fixée</value>
   </data>
   <data name="adresse" xml:space="preserve">
-    <value>Address</value>
+    <value>Adresse</value>
   </data>
   <data name="wollen_sie_diese_vorlage_wirklich_loeschen" xml:space="preserve">
-    <value>Are you sure you want to delete this template?</value>
+    <value>Voulez-vous vraiment supprimer ce modèle ?</value>
   </data>
   <data name="wollen_sie_dieses_bild_wirklich_loeschen" xml:space="preserve">
-    <value>Are you sure you want to delete this image?</value>
+    <value>Voulez-vous vraiment supprimer cette image ?</value>
   </data>
   <data name="wollen_sie_diesen_plan_wirklich_loeschen" xml:space="preserve">
-    <value>Do you really want to delete this plan?</value>
+    <value>Voulez-vous vraiment supprimer ce plan ?</value>
   </data>
   <data name="loeschen" xml:space="preserve">
-    <value>Delete</value>
+    <value>Supprimer</value>
   </data>
   <data name="wollen_sie_diesen_pin_wirklich_loeschen" xml:space="preserve">
-    <value>Are you sure you want to delete this pin?</value>
+    <value>Voulez-vous vraiment supprimer ce pin's ?</value>
   </data>
   <data name="wollen_sie_dieses_projekt_wirklich_loeschen" xml:space="preserve">
-    <value>Do you really want to delete this project?</value>
+    <value>Voulez-vous vraiment supprimer ce projet ?</value>
   </data>
   <data name="projekte" xml:space="preserve">
-    <value>Projects</value>
+    <value>Projets</value>
   </data>
   <data name="pins" xml:space="preserve">
-    <value>Pins</value>
+    <value>Pin's</value>
   </data>
   <data name="fotos" xml:space="preserve">
-    <value>Images</value>
+    <value>Photos</value>
   </data>
   <data name="farben_hinzufuegen" xml:space="preserve">
-    <value>Add colors</value>
+    <value>Ajouter des couleurs</value>
   </data>
   <data name="plaene_umsortieren_gedrueckt_halten_und_ziehen" xml:space="preserve">
-    <value>Rearrange plans: Press and hold, then drag</value>
+    <value>Glisser-déposer pour réorganiser</value>
   </data>
   <data name="ausgeblendete_plaene" xml:space="preserve">
-    <value>Hidden plans</value>
+    <value>Plans cachés</value>
   </data>
   <data name="kein_projekt_geladen" xml:space="preserve">
-    <value>No project loaded</value>
+    <value>Aucun projet chargé</value>
   </data>
   <data name="projekt_wird_geladen" xml:space="preserve">
-    <value>Project is loading...</value>
+    <value>Le projet est en cours de chargement...</value>
   </data>
   <data name="titel_eingeben" xml:space="preserve">
-    <value>(Enter title...)</value>
+    <value>(Saisissez le titre...)</value>
   </data>
 </root>

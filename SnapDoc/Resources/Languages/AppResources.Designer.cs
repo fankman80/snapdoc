@@ -133,6 +133,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die ausgeblendete Pläne ähnelt.
+        /// </summary>
+        internal static string ausgeblendete_plaene {
+            get {
+                return ResourceManager.GetString("ausgeblendete_plaene", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Auto-Skalierung sperren ähnelt.
         /// </summary>
         internal static string auto_skalierung_sperren {
@@ -340,6 +349,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farben hinzufügen ähnelt.
+        /// </summary>
+        internal static string farben_hinzufuegen {
+            get {
+                return ResourceManager.GetString("farben_hinzufuegen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Farbschema ähnelt.
         /// </summary>
         internal static string farbschema {
@@ -534,6 +552,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string kategorie {
             get {
                 return ResourceManager.GetString("kategorie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kein Projekt geladen ähnelt.
+        /// </summary>
+        internal static string kein_projekt_geladen {
+            get {
+                return ResourceManager.GetString("kein_projekt_geladen", resourceCulture);
             }
         }
         
@@ -790,6 +817,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pläne umsortieren: Gedrückt halten und ziehen ähnelt.
+        /// </summary>
+        internal static string plaene_umsortieren_gedrueckt_halten_und_ziehen {
+            get {
+                return ResourceManager.GetString("plaene_umsortieren_gedrueckt_halten_und_ziehen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Plan auf Fenstergrösse zoomen ähnelt.
         /// </summary>
         internal static string plan_auf_fenstergroesse_zoomen {
@@ -930,6 +966,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string projekt_titel {
             get {
                 return ResourceManager.GetString("projekt_titel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird geladen... ähnelt.
+        /// </summary>
+        internal static string projekt_wird_geladen {
+            get {
+                return ResourceManager.GetString("projekt_wird_geladen", resourceCulture);
             }
         }
         

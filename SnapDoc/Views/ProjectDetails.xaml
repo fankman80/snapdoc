@@ -129,7 +129,7 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         AllowClear="True"
-                        Title="Projektnummer"/>
+                        Title="{x:Static res:AppResources.projektnummer}"/>
 
                     <material:TextField
                         x:Name="project_manager"

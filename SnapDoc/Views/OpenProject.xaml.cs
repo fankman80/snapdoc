@@ -181,7 +181,7 @@ public partial class OpenProject : ContentPage
     {
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "Projekt wird geladen...";
+        busyOverlay.BusyMessage = AppResources.projekt_wird_geladen;
 
         try
         {
