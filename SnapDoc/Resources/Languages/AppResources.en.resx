@@ -534,4 +534,10 @@
   <data name="titel_eingeben" xml:space="preserve">
     <value>(Enter title...)</value>
   </data>
+  <data name="sprache" xml:space="preserve">
+    <value>Language</value>
+  </data>
+  <data name="die_sprache_wird_erst_nach_einem_neustart_gewechselt" xml:space="preserve">
+    <value>The language will only be changed after a restart.</value>
+  </data>
 </root>

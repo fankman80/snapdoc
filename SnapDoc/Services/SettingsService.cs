@@ -79,6 +79,7 @@ public partial class SettingsService : ObservableObject
 
         ColorThemes = [.. ColorThemeMapping.Keys];
         AppThemes = ["Hell", "Dunkel"];
+        AppLanguages = [.. Settings.Languages.Values];
         IconCategories = ["alle Icons"];
         SelectedColorTheme = ColorThemes[0];
         SelectedAppTheme = AppThemes[0];
@@ -87,7 +88,7 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    [ObservableProperty] private string _languageCode = "de-CH";
+    [ObservableProperty] private string _selectedAppLanguage = "system";
     [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
@@ -151,6 +152,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private ObservableCollection<string> _templates = [];
     [ObservableProperty] private List<string> _colorThemes;
     [ObservableProperty] private List<string> _appThemes;
+    [ObservableProperty] private List<string> _appLanguages;
     [ObservableProperty] private List<string> _iconCategories;
     [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
 
@@ -253,7 +255,6 @@ public partial class SettingsService : ObservableObject
     {
         var settings = new SettingsModel
         {
-            LanguageCode = LanguageCode,
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
@@ -268,6 +269,7 @@ public partial class SettingsService : ObservableObject
             PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
             SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
+            SelectedAppLanguage = AppLanguages.IndexOf(SelectedAppLanguage),
             IconSortCrit = IconSortCrits.IndexOf(IconSortCrit),
             PinSortCrit = PinSortCrits.IndexOf(PinSortCrit),
             IconCategory = IconCategories.IndexOf(IconCategory),
@@ -329,7 +331,6 @@ public partial class SettingsService : ObservableObject
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
             if (settings == null) return;
 
-            LanguageCode = settings.LanguageCode ?? string.Empty;
             PinMinScaleLimit = settings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
@@ -343,6 +344,7 @@ public partial class SettingsService : ObservableObject
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
             PdfThumbDpi = settings.PdfThumbDpi;
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
+            SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
             SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
             IconSortCrit = (settings.IconSortCrit < IconSortCrits.Count) ? IconSortCrits[settings.IconSortCrit] : IconSortCrits[0];
             PinSortCrit = (settings.PinSortCrit < PinSortCrits.Count) ? PinSortCrits[settings.PinSortCrit] : PinSortCrits[0];
@@ -399,7 +401,6 @@ public partial class SettingsService : ObservableObject
     {
         // Einfach den Konstruktor einmal wieder aufrufen
         var defaultSettings = new SettingsService();
-        LanguageCode = defaultSettings.LanguageCode;
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;
@@ -414,6 +415,7 @@ public partial class SettingsService : ObservableObject
         PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;
         SelectedAppTheme = defaultSettings.SelectedAppTheme;
+        SelectedAppLanguage = defaultSettings.SelectedAppLanguage;
         IconSortCrit = defaultSettings.IconSortCrit;
         PinSortCrit = defaultSettings.PinSortCrit;
         IconCategory = defaultSettings.IconCategory;

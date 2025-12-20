@@ -1,5 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
+using DocumentFormat.OpenXml.Wordprocessing;
 using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
@@ -18,10 +19,8 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        var culture = new CultureInfo("fr");
-
-        CultureInfo.DefaultThreadCurrentCulture = culture;
-        CultureInfo.DefaultThreadCurrentUICulture = culture;
+        // Sprache setzen
+        SetLanguage();
 
         var builder = MauiApp.CreateBuilder();
         builder
@@ -112,5 +111,53 @@ public static class MauiProgram
 #endif
 
         return builder.Build();
+    }
+
+    private static void SetLanguage()
+    {
+        string iniPath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
+        string lang = "system"; // Standardwert auf "system" ändern
+
+        if (File.Exists(iniPath))
+        {
+            try
+            {
+                using var reader = new StreamReader(iniPath);
+                string? line;
+                while ((line = reader.ReadLine()) != null)
+                {
+                    if (line.Contains("\"SelectedAppLanguage\":", StringComparison.OrdinalIgnoreCase))
+                    {
+                        var parts = line.Split(':');
+                        if (parts.Length > 1)
+                        {
+                            string cleanValue = parts[1].Replace("\"", "").Replace(",", "").Trim();
+                            if (int.TryParse(cleanValue, out int index))
+                                if (index >= 0 && index < Settings.Languages.Count)
+                                    lang = Settings.Languages.Keys.ElementAt(index);
+                        }
+                        break;
+                    }
+                }
+            }
+            catch
+            {
+                lang = "system";
+            }
+        }
+
+        // Wenn NICHT "system" eingestellt ist, erzwinge die Sprache aus der Datei
+        if (lang != "system" && !string.IsNullOrWhiteSpace(lang))
+        {
+            try
+            {
+                var culture = new CultureInfo(lang);
+                CultureInfo.DefaultThreadCurrentCulture = culture;
+                CultureInfo.DefaultThreadCurrentUICulture = culture;
+            }
+            catch
+            {
+            }
+        }
     }
 }

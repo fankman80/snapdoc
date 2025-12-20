@@ -2,7 +2,6 @@
 
 internal class SettingsModel
 {
-    public string? LanguageCode { get; set; } // Sprachcode der App (z.B. "de-CH", "en")
     public int PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
     public int PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
     public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo
@@ -20,6 +19,7 @@ internal class SettingsModel
     public int PdfThumbDpi { get; set; } // DPI der PDF-Thumbnails im Import-Dialog
     public int SelectedColorTheme { get; set; } // App-Farbschema
     public int SelectedAppTheme { get; set; } // App-Design (Hell/Dunkel)
+    public int SelectedAppLanguage { get; set; } // App-Sprache
     public bool IsPlanExport { get; set; } // Pläne im Bericht exportieren
     public bool IsPosImageExport { get; set; } // Positionsbilder im Bericht exportieren
     public bool IsPinIconExport { get; set; } // Pin-Icons im Bericht exportieren

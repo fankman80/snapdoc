@@ -75,6 +75,14 @@ public static class Settings
         "mappin4a.png"
     ];
 
+    public static readonly Dictionary<string, string> Languages =
+    new () {
+        ["system"] = "System",
+            ["de"] = "Deutsch",
+            ["en"] = "English",
+            ["fr"] = "Français",
+    };
+
     public static readonly PopupOptions PopupOptions = new()
     {
         CanBeDismissedByTappingOutsideOfPopup = false,

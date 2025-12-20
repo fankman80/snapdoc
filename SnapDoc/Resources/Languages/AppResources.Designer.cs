@@ -232,6 +232,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Die Sprache wird erst nach einem Neustart gewechselt. ähnelt.
+        /// </summary>
+        internal static string die_sprache_wird_erst_nach_einem_neustart_gewechselt {
+            get {
+                return ResourceManager.GetString("die_sprache_wird_erst_nach_einem_neustart_gewechselt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Drehung fixiert ähnelt.
         /// </summary>
         internal static string drehung_fixiert {
@@ -1092,6 +1101,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string seiten_hinzufuegen {
             get {
                 return ResourceManager.GetString("seiten_hinzufuegen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Sprache ähnelt.
+        /// </summary>
+        internal static string sprache {
+            get {
+                return ResourceManager.GetString("sprache", resourceCulture);
             }
         }
         

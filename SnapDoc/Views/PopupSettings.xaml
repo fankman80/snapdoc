@@ -266,6 +266,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Button Grid.Column="0" Grid.Row="0"
                                     Text="{x:Static res:AppResources.projektdaten}"
@@ -295,7 +296,27 @@
                                     BackgroundColor="Red"
                                     TextColor="{DynamicResource PrimaryDarkText}"                        
                                     ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
-                                    Clicked="ResetIcon"/> 
+                                    Clicked="ResetIcon"/>
+                            <Grid Grid.Column="0" Grid.ColumnSpan="2" Grid.Row="4">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="Auto" />
+                                </Grid.RowDefinitions>
+                                <Label Grid.Column="0" Grid.Row="0" Text="{x:Static res:AppResources.sprache}" VerticalOptions="Center"/>
+                                <Border Grid.Column="1" Stroke="{DynamicResource SecondaryBackground}"
+                                        VerticalOptions="Fill"
+                                        StrokeThickness="1"
+                                        StrokeShape="RoundRectangle 8">
+                                    <Picker x:Name="languagePicker"
+                                            ItemsSource="{Binding AppLanguages}"
+                                            SelectedItem="{Binding SelectedAppLanguage}"/>
+                                </Border>
+                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
+                            </Grid>
                         </Grid>
                     </uranium:ExpanderView>
                 </Border>                        

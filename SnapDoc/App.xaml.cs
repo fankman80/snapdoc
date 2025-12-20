@@ -27,10 +27,6 @@ public partial class App : Application
     {
         base.OnStart();
 
-        System.Globalization.CultureInfo.CurrentCulture = new System.Globalization.CultureInfo("de-DE");
-        System.Globalization.CultureInfo.CurrentUICulture = new System.Globalization.CultureInfo("de-DE");
-
-        // Asynchronen Initialisierungsprozess starten
         await InitializeAsync();
     }
 

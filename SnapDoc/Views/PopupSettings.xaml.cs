@@ -12,17 +12,10 @@ public partial class PopupSettings : Popup, IQueryAttributable
 {
     public SvgCachedImage PinSvgImage;
 
-    private readonly HashSet<Picker> _initializedPickers = [];
-
     public PopupSettings()
     {
         InitializeComponent();
 
-        darkModePicker.ItemsSource = SettingsService.Instance.AppThemes;
-        colorThemePicker.ItemsSource = SettingsService.Instance.ColorThemes;
-        darkModePicker.SelectedItem = SettingsService.Instance.SelectedAppTheme;
-        colorThemePicker.SelectedItem = SettingsService.Instance.SelectedColorTheme;
-        
         string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
         svgIcon.Source = LoadSvgWithColor("customcolor.svg", hexColor);
     }
