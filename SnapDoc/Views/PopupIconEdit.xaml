@@ -101,15 +101,15 @@
                         Clicked="OnColorPickerClicked"/>
 
                 <VerticalStackLayout Spacing="0">
-                    <Label x:Name="sliderText" Text="{x:Static res:AppResources.voreinstellung_skalierung}"/>
-                    <Slider x:Name="iconScale"
-                            Maximum="100"
+                    <controls:LocalizedLabel ResourceKey="{x:Static res:AppResources.voreinstellung_skalierung}"
+                                             Value="{Binding IconScale, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
+                                             ValueFormat="{}{0:0}%"/>
+                    <Slider Maximum="0"
                             Minimum="1"
-                            Value="100"
+                            Value="{Binding IconScale, Mode=TwoWay}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            ValueChanged="OnSliderValueChanged"/>
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                         <controls:Switch x:Name="allowRotate"
                                          Grid.Column="0"
