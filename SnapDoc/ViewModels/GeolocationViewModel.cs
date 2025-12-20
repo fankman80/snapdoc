@@ -104,7 +104,7 @@ public partial class GeolocationViewModel : BaseViewModel
                 "GPS ist deaktiviert",
                 "Um die Standorterkennung zu aktivieren, bitte GPS in den Systemeinstellungen einschalten.",
                 "Einstellungen öffnen",
-                "Abbrechen");
+                "{x:Static res:AppResources.abbrechen}");
 
 #if ANDROID
             if (openSettings)

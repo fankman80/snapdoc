@@ -7,6 +7,7 @@
                xmlns:brush="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
                xmlns:views="clr-namespace:SnapDoc.Views"                 
                xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
@@ -26,7 +27,7 @@
     <Grid x:DataType="views:PopupPlanEdit">
         <VerticalStackLayout>
             <material:TextField x:Name="name_entry"
-                                Title="Planbezeichnung"
+                                Title="{x:Static res:AppResources.planbezeichnung}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"
@@ -35,7 +36,7 @@
                                 AllowClear="True"/>
 
             <material:EditorField x:Name="desc_entry"
-                                Title="Beschreibung"
+                                Title="{x:Static res:AppResources.beschreibung}"
                                 MaxLength="2000"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"
@@ -56,7 +57,7 @@
                         HeightRequest="44"
                         BorderColor="Black"
                         BackgroundColor="Transparent"
-                        Text="Planfarbe"
+                        Text="{x:Static res:AppResources.planfarbe}"
                         TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
             </Grid>
@@ -71,7 +72,7 @@
                                  KnobColorOff="White"
                                  SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                  SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                <Label Text="Plan exportieren" Grid.Column="1" VerticalOptions="Center" />
+                <Label Text="{x:Static res:AppResources.plan_exportieren}" Grid.Column="1" VerticalOptions="Center" />
             </Grid>
 
             <Grid>
@@ -80,15 +81,12 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Label Grid.Column="0" VerticalTextAlignment="Center">
-                    <Label.FormattedText>
-                        <FormattedString>
-                            <Span Text="Plan-Drehung: " />
-                            <Span Text="{Binding PlanRotate}" />
-                            <Span Text="°" />
-                        </FormattedString>
-                    </Label.FormattedText>
-                </Label>
+
+                <controls:LocalizedLabel Grid.Column="0"
+                                         VerticalTextAlignment="Center"
+                                         ResourceKey="plan_drehung"
+                                         Value="{Binding PlanRotate}"
+                                         ValueFormat="{}{0}°"/>
                 <Button Grid.Column="1"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
@@ -103,13 +101,13 @@
 
             <Button x:Name="grayscaleButtonText"
                     Padding="0"
-                    Text="Farben entfernen"
+                    Text="{x:Static res:AppResources.farben_entfernen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
                     Clicked="OnGrayscaleClicked" />
 
-            <Button Text="Plan löschen"
+            <Button Text="{x:Static res:AppResources.plan_loeschen}"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
@@ -123,13 +121,13 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
-                        Text="Abbrechen"
+                        Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
-                        Text="Ok"
+                        Text="{x:Static res:AppResources.ok}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />

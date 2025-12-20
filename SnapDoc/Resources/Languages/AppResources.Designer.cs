@@ -61,11 +61,47 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Abbrechen ähnelt.
+        /// </summary>
+        internal static string abbrechen {
+            get {
+                return ResourceManager.GetString("abbrechen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die App-Modus ähnelt.
+        /// </summary>
+        internal static string app_modus {
+            get {
+                return ResourceManager.GetString("app_modus", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die App-Settings ähnelt.
+        /// </summary>
+        internal static string app_settings {
+            get {
+                return ResourceManager.GetString("app_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die auf einen anderen Plan kopieren/verschieben ähnelt.
         /// </summary>
         internal static string auf_einen_anderen_plan_kopieren_verschieben {
             get {
                 return ResourceManager.GetString("auf_einen_anderen_plan_kopieren_verschieben", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auflösung PDF-Umwandlung: ähnelt.
+        /// </summary>
+        internal static string aufloesung_pdf_umwandlung {
+            get {
+                return ResourceManager.GetString("aufloesung_pdf_umwandlung", resourceCulture);
             }
         }
         
@@ -88,11 +124,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Bildkomprimierung ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bildkomprimierung: ähnelt.
         /// </summary>
         internal static string bildkomprimierung {
             get {
                 return ResourceManager.GetString("bildkomprimierung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Datum ähnelt.
+        /// </summary>
+        internal static string datum {
+            get {
+                return ResourceManager.GetString("datum", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Erweiterte Einstellungen ähnelt.
+        /// </summary>
+        internal static string erweiterte_einstellungen {
+            get {
+                return ResourceManager.GetString("erweiterte_einstellungen", resourceCulture);
             }
         }
         
@@ -151,6 +205,60 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farb-Thema ähnelt.
+        /// </summary>
+        internal static string farb_thema {
+            get {
+                return ResourceManager.GetString("farb_thema", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farbe und Stiftbreite wählen ähnelt.
+        /// </summary>
+        internal static string farbe_und_stiftbreite_waehlen {
+            get {
+                return ResourceManager.GetString("farbe_und_stiftbreite_waehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farben entfernen ähnelt.
+        /// </summary>
+        internal static string farben_entfernen {
+            get {
+                return ResourceManager.GetString("farben_entfernen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farbschema ähnelt.
+        /// </summary>
+        internal static string farbschema {
+            get {
+                return ResourceManager.GetString("farbschema", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Formen zeichnen ähnelt.
+        /// </summary>
+        internal static string formen_zeichnen {
+            get {
+                return ResourceManager.GetString("formen_zeichnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Foto auf Fenstergrösse zoomen ähnelt.
+        /// </summary>
+        internal static string foto_auf_fenstergroesse_zoomen {
+            get {
+                return ResourceManager.GetString("foto_auf_fenstergroesse_zoomen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Foto aufnehmen ähnelt.
         /// </summary>
         internal static string foto_aufnehmen {
@@ -160,7 +268,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Foto (Breite) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Foto (Breite): ähnelt.
         /// </summary>
         internal static string foto_breite {
             get {
@@ -169,11 +277,155 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Grösse Pinbeschriftung ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Foto Galerie ähnelt.
+        /// </summary>
+        internal static string foto_galerie {
+            get {
+                return ResourceManager.GetString("foto_galerie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Foto löschen ähnelt.
+        /// </summary>
+        internal static string foto_loeschen {
+            get {
+                return ResourceManager.GetString("foto_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Freihandlinie zeichnen ähnelt.
+        /// </summary>
+        internal static string freihandlinie_zeichnen {
+            get {
+                return ResourceManager.GetString("freihandlinie_zeichnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gedrückt halten um Icon zu editieren. ähnelt.
+        /// </summary>
+        internal static string gedrückt_halten_um_Icon_zu_editieren {
+            get {
+                return ResourceManager.GetString("gedrückt_halten_um_Icon_zu_editieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Grösse Pinbeschriftung: ähnelt.
         /// </summary>
         internal static string groesse_pinbeschriftung {
             get {
                 return ResourceManager.GetString("groesse_pinbeschriftung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Icon auswählen ähnelt.
+        /// </summary>
+        internal static string icon_auswählen {
+            get {
+                return ResourceManager.GetString("icon_auswählen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Icondefinitionen ähnelt.
+        /// </summary>
+        internal static string icondefinitionen {
+            get {
+                return ResourceManager.GetString("icondefinitionen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Icondefinitionen zurücksetzen ähnelt.
+        /// </summary>
+        internal static string icondefinitionen_zuruecksetzen {
+            get {
+                return ResourceManager.GetString("icondefinitionen_zuruecksetzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die inaktive Fotos ausblenden ähnelt.
+        /// </summary>
+        internal static string inaktive_fotos_ausblenden {
+            get {
+                return ResourceManager.GetString("inaktive_fotos_ausblenden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Inaktive Pläne ausblenden ähnelt.
+        /// </summary>
+        internal static string inaktive_plaene_ausblenden {
+            get {
+                return ResourceManager.GetString("inaktive_plaene_ausblenden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die KML-Datei exportieren ähnelt.
+        /// </summary>
+        internal static string kml_datei_exportieren {
+            get {
+                return ResourceManager.GetString("kml_datei_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kopie erstellen ähnelt.
+        /// </summary>
+        internal static string kopie_erstellen {
+            get {
+                return ResourceManager.GetString("kopie_erstellen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kunde/Bauherrschaft ähnelt.
+        /// </summary>
+        internal static string kunde_bauherrschaft {
+            get {
+                return ResourceManager.GetString("kunde_bauherrschaft", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Max. Pingrösse limitieren: ähnelt.
+        /// </summary>
+        internal static string max_pingroesse_limitieren {
+            get {
+                return ResourceManager.GetString("max_pingroesse_limitieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Min. Pingrösse limitieren: ähnelt.
+        /// </summary>
+        internal static string min_pingroesse_limitieren {
+            get {
+                return ResourceManager.GetString("min_pingroesse_limitieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Modus für Pinplatzierung ähnelt.
+        /// </summary>
+        internal static string modus_fuer_pinplatzierung {
+            get {
+                return ResourceManager.GetString("modus_fuer_pinplatzierung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Neu setzen ähnelt.
+        /// </summary>
+        internal static string neu_setzen {
+            get {
+                return ResourceManager.GetString("neu_setzen", resourceCulture);
             }
         }
         
@@ -183,6 +435,51 @@ namespace SnapDoc.Resources.Languages {
         internal static string neue_vorlage_hochladen {
             get {
                 return ResourceManager.GetString("neue_vorlage_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die neues Icon erstellen ähnelt.
+        /// </summary>
+        internal static string neues_icon_erstellen {
+            get {
+                return ResourceManager.GetString("neues_icon_erstellen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die neues Projekt erstellen ähnelt.
+        /// </summary>
+        internal static string neues_projekt_erstellen {
+            get {
+                return ResourceManager.GetString("neues_projekt_erstellen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Objektbezeichnung ähnelt.
+        /// </summary>
+        internal static string objektbezeichnung {
+            get {
+                return ResourceManager.GetString("objektbezeichnung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die OK ähnelt.
+        /// </summary>
+        internal static string ok {
+            get {
+                return ResourceManager.GetString("ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Seiten hinzufügen ähnelt.
+        /// </summary>
+        internal static string pdf_seiten_hinzufügen {
+            get {
+                return ResourceManager.GetString("pdf_seiten_hinzufügen", resourceCulture);
             }
         }
         
@@ -205,6 +502,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin durch Antippen setzen ähnelt.
+        /// </summary>
+        internal static string pin_durch_antippen_setzen {
+            get {
+                return ResourceManager.GetString("pin_durch_antippen_setzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin durch Gedrückthalten setzen ähnelt.
+        /// </summary>
+        internal static string pin_durch_gedrueckthalten_setzen {
+            get {
+                return ResourceManager.GetString("pin_durch_gedrueckthalten_setzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin exportieren ähnelt.
         /// </summary>
         internal static string pin_exportieren {
@@ -214,11 +529,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pin-Icon (Breite + Höhe) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin-Icon (Breite + Höhe): ähnelt.
         /// </summary>
         internal static string pin_icon_breite_hoehe {
             get {
                 return ResourceManager.GetString("pin_icon_breite_hoehe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin in die Bildmitte setzen ähnelt.
+        /// </summary>
+        internal static string pin_in_die_bildmitte_setzen {
+            get {
+                return ResourceManager.GetString("pin_in_die_bildmitte_setzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin Liste ähnelt.
+        /// </summary>
+        internal static string pin_liste {
+            get {
+                return ResourceManager.GetString("pin_liste", resourceCulture);
             }
         }
         
@@ -232,11 +565,119 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin setzen ähnelt.
+        /// </summary>
+        internal static string pin_setzen {
+            get {
+                return ResourceManager.GetString("pin_setzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pinbeschriftung ähnelt.
         /// </summary>
         internal static string pinbeschriftung {
             get {
                 return ResourceManager.GetString("pinbeschriftung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pingrösse: ähnelt.
+        /// </summary>
+        internal static string pingroesse {
+            get {
+                return ResourceManager.GetString("pingroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan auf Fenstergrösse zoomen ähnelt.
+        /// </summary>
+        internal static string plan_auf_fenstergroesse_zoomen {
+            get {
+                return ResourceManager.GetString("plan_auf_fenstergroesse_zoomen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan bearbeiten ähnelt.
+        /// </summary>
+        internal static string plan_bearbeiten {
+            get {
+                return ResourceManager.GetString("plan_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan-Drehung: ähnelt.
+        /// </summary>
+        internal static string plan_drehung {
+            get {
+                return ResourceManager.GetString("plan_drehung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan exportieren ähnelt.
+        /// </summary>
+        internal static string plan_exportieren {
+            get {
+                return ResourceManager.GetString("plan_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan löschen ähnelt.
+        /// </summary>
+        internal static string plan_loeschen {
+            get {
+                return ResourceManager.GetString("plan_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planbezeichnung ähnelt.
+        /// </summary>
+        internal static string planbezeichnung {
+            get {
+                return ResourceManager.GetString("planbezeichnung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planfarbe ähnelt.
+        /// </summary>
+        internal static string planfarbe {
+            get {
+                return ResourceManager.GetString("planfarbe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planliste mit Vorschau ähnelt.
+        /// </summary>
+        internal static string planliste_mit_vorschau {
+            get {
+                return ResourceManager.GetString("planliste_mit_vorschau", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planrotation sperren ähnelt.
+        /// </summary>
+        internal static string planrotation_sperren {
+            get {
+                return ResourceManager.GetString("planrotation_sperren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Polylinie zeichnen ähnelt.
+        /// </summary>
+        internal static string polylinie_zeichnen {
+            get {
+                return ResourceManager.GetString("polylinie_zeichnen", resourceCulture);
             }
         }
         
@@ -250,7 +691,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Positionsbilder (Breite + Höhe) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Positionsbilder (Breite + Höhe): ähnelt.
         /// </summary>
         internal static string positionsbilder_breite_hoehe {
             get {
@@ -259,11 +700,119 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Positionsbilder Zuschnitt ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Positionsbilder Zuschnitt: ähnelt.
         /// </summary>
         internal static string positionsbilder_zuschnitt {
             get {
                 return ResourceManager.GetString("positionsbilder_zuschnitt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Programmeinstellungen zurücksetzen ähnelt.
+        /// </summary>
+        internal static string programmeinstellungen_zuruecksetzen {
+            get {
+                return ResourceManager.GetString("programmeinstellungen_zuruecksetzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt löschen ähnelt.
+        /// </summary>
+        internal static string projekt_loeschen {
+            get {
+                return ResourceManager.GetString("projekt_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt Titel ähnelt.
+        /// </summary>
+        internal static string projekt_titel {
+            get {
+                return ResourceManager.GetString("projekt_titel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektdatei importieren ähnelt.
+        /// </summary>
+        internal static string projektdatei_importieren {
+            get {
+                return ResourceManager.GetString("projektdatei_importieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektdaten ähnelt.
+        /// </summary>
+        internal static string projektdaten {
+            get {
+                return ResourceManager.GetString("projektdaten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektleitung ähnelt.
+        /// </summary>
+        internal static string projektleitung {
+            get {
+                return ResourceManager.GetString("projektleitung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektliste ähnelt.
+        /// </summary>
+        internal static string projektliste {
+            get {
+                return ResourceManager.GetString("projektliste", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektnummer ähnelt.
+        /// </summary>
+        internal static string projektnummer {
+            get {
+                return ResourceManager.GetString("projektnummer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektverwaltung ähnelt.
+        /// </summary>
+        internal static string projektverwaltung {
+            get {
+                return ResourceManager.GetString("projektverwaltung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektvorgang ähnelt.
+        /// </summary>
+        internal static string projektvorgang {
+            get {
+                return ResourceManager.GetString("projektvorgang", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Raster/Liste umschalten ähnelt.
+        /// </summary>
+        internal static string raster_liste_umschalten {
+            get {
+                return ResourceManager.GetString("raster_liste_umschalten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Seiten hinzufügen ähnelt.
+        /// </summary>
+        internal static string seiten_hinzufuegen {
+            get {
+                return ResourceManager.GetString("seiten_hinzufuegen", resourceCulture);
             }
         }
         
@@ -277,6 +826,33 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Suche... ähnelt.
+        /// </summary>
+        internal static string suche {
+            get {
+                return ResourceManager.GetString("suche", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die swisstopo Karte ähnelt.
+        /// </summary>
+        internal static string swisstopo_karte {
+            get {
+                return ResourceManager.GetString("swisstopo_karte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die swisstopo Karten-Pins ähnelt.
+        /// </summary>
+        internal static string swisstopo_karten_pins {
+            get {
+                return ResourceManager.GetString("swisstopo_karten_pins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die (Titel eingeben...) ähnelt.
         /// </summary>
         internal static string titel_eingeben {
@@ -286,11 +862,38 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild (Höhe) ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild (Höhe): ähnelt.
         /// </summary>
         internal static string titelbild_hoehe {
             get {
                 return ResourceManager.GetString("titelbild_hoehe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild mit der Kamera erstellen ähnelt.
+        /// </summary>
+        internal static string titelbild_mit_der_kamera_erstellen {
+            get {
+                return ResourceManager.GetString("titelbild_mit_der_kamera_erstellen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild von der Festplatte hochladen ähnelt.
+        /// </summary>
+        internal static string titelbild_von_der_festplatte_hochladen {
+            get {
+                return ResourceManager.GetString("titelbild_von_der_festplatte_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verzeichnis öffnen ähnelt.
+        /// </summary>
+        internal static string verzeichnis_oeffnen {
+            get {
+                return ResourceManager.GetString("verzeichnis_oeffnen", resourceCulture);
             }
         }
         
@@ -304,11 +907,56 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zeichnung löschen ähnelt.
+        /// </summary>
+        internal static string zeichnung_loeschen {
+            get {
+                return ResourceManager.GetString("zeichnung_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zeichnung speichern ähnelt.
+        /// </summary>
+        internal static string zeichnung_speichern {
+            get {
+                return ResourceManager.GetString("zeichnung_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die zeige Platzhalter-Definitionen ähnelt.
         /// </summary>
         internal static string zeige_platzhalter_definitionen {
             get {
                 return ResourceManager.GetString("zeige_platzhalter_definitionen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zeit: ähnelt.
+        /// </summary>
+        internal static string zeit {
+            get {
+                return ResourceManager.GetString("zeit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zip Exportieren ähnelt.
+        /// </summary>
+        internal static string zip_exportieren {
+            get {
+                return ResourceManager.GetString("zip_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zu Pin wechseln ähnelt.
+        /// </summary>
+        internal static string zu_pin_wechseln {
+            get {
+                return ResourceManager.GetString("zu_pin_wechseln", resourceCulture);
             }
         }
     }

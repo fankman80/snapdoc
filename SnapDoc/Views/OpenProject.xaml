@@ -2,15 +2,16 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:views="clr-namespace:SnapDoc.Views"                
-             xmlns:local="clr-namespace:SnapDoc"
+             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.OpenProject"
              x:Name="ThisPage"
-             Title="Projektliste">
+             Title="{x:Static res:AppResources.projektliste}">
 
     <ContentPage.Resources>
         <ResourceDictionary>
@@ -40,7 +41,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="Projektdatei importieren"
+                    ToolTipProperties.Text="{x:Static res:AppResources.projektdatei_importieren}"
                     Clicked="OnUploadClicked"/>
             <Button Grid.Column="2"                    
                     Text="{x:Static local:MaterialIcons.Add_home}"
@@ -51,7 +52,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="neues Projekt erstellen"
+                    ToolTipProperties.Text="{x:Static res:AppResources.neues_projekt_erstellen}"
                     Clicked="OnNewClicked"/>
         </Grid>
     </Shell.TitleView>

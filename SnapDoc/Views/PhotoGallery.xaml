@@ -9,13 +9,14 @@
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.FotoGalleryView"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             Title="Foto Galerie">
+             Title="{x:Static res:AppResources.foto_galerie}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
@@ -39,7 +40,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="Raster/Liste umschalten"
+                    ToolTipProperties.Text="{x:Static res:AppResources.raster_liste_umschalten}"
                     Clicked="OnChangeRowsClicked"/>            
         </Grid>
     </Shell.TitleView>
@@ -74,7 +75,7 @@
                     </ff:CachedImage>
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
                         <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"/>
-                        <Label Text="{Binding DateTime, StringFormat='Zeit: {0:HH:mm}'}" FontSize="12"/>
+                        <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}{0:HH:mm:ss}' FontSize="12"/>
                     </VerticalStackLayout>
                     <HorizontalStackLayout Grid.Column="2" Spacing="0">
                         <Button Text="{x:Static local:MaterialIcons.Keep}"
@@ -156,7 +157,7 @@
                              KnobColorOff="White"
                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-            <Label Text="inaktive Fotos ausblenden" Grid.Column="1" VerticalOptions="Center" />
+            <Label Text="{x:Static res:AppResources.inaktive_fotos_ausblenden}" Grid.Column="1" VerticalOptions="Center" />
         </Grid>
 
         <Button x:Name="SortDirection"

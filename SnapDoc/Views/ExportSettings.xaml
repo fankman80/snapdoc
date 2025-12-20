@@ -152,10 +152,11 @@
                         </Grid>
                     </VerticalStackLayout>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsFotoCompressed}">
-                        <Label Text="{x:Static res:AppResources.bildkomprimierung}"/>
-                        <Label Text="{Binding FotoCompressValue, StringFormat=': {0}%'}"/>
-                    </HorizontalStackLayout>                        
+                    <controls:LocalizedLabel ResourceKey="bildkomprimierung"
+                                             Value="{Binding FotoCompressValue}"
+                                             ValueFormat="{}{0}%"
+                                             Margin="0, 0, 0, -12"
+                                             IsVisible="{Binding IsFotoCompressed}"/>
                     <Slider Maximum="100"
                             Minimum="1"
                             IsVisible="{Binding IsFotoCompressed}"
@@ -173,11 +174,11 @@
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
-                    
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
-                        <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}"/>
-                        <Label Text="{Binding PinLabelFontSize, StringFormat=': {0:0.#} pt'}"/>
-                    </HorizontalStackLayout>
+
+                    <controls:LocalizedLabel ResourceKey="groesse_pinbeschriftung"
+                                             Value="{Binding PinLabelFontSize}"
+                                             ValueFormat="{}{0:0.#} pt"
+                                             Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -185,21 +186,23 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinLabelFontSize}"/>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
-                        <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}"/>
-                        <Label Text="{Binding PinExportSize, StringFormat=': {0:0.#} mm'}" Margin="0, 0, 0, -12"/>                        
-                    </HorizontalStackLayout>                        
+                    <controls:LocalizedLabel ResourceKey="pin_icon_breite_hoehe"
+                                             Value="{Binding PinExportSize}"
+                                             ValueFormat="{}{0:0.#} mm"
+                                             Margin="0, 0, 0, -12"
+                                             IsVisible="{Binding IsPinIconExport}"/>
                     <Slider Maximum="20"
                             Minimum="1"
+                            IsVisible="{Binding IsPinIconExport}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinExportSize}"/>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsImageExport}">
-                        <Label Text="{x:Static res:AppResources.foto_breite}"/>
-                        <Label Text="{Binding ImageExportSize, StringFormat=': {0} mm'}"/>
-                    </HorizontalStackLayout>
+                    <controls:LocalizedLabel ResourceKey="foto_breite"
+                                             Value="{Binding ImageExportSize}"
+                                             ValueFormat="{}{0} mm" Margin="0, 0, 0, -12"
+                                             IsVisible="{Binding IsImageExport}"/>
                     <Slider Maximum="160"
                             Minimum="10"
                             IsVisible="{Binding IsImageExport}"
@@ -208,10 +211,11 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding ImageExportSize}"/>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsPosImageExport}">
-                        <Label Text="{x:Static res:AppResources.positionsbilder_breite_hoehe}"/>
-                        <Label Text="{Binding PinPosExportSize, StringFormat=': {0} mm'}"/>
-                    </HorizontalStackLayout>
+                    <controls:LocalizedLabel ResourceKey="positionsbilder_breite_hoehe"
+                                             Value="{Binding PinPosExportSize}"
+                                             ValueFormat="{}{0} mm" 
+                                             Margin="0, 0, 0, -12"
+                                             IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="160"
                             Minimum="10"
                             IsVisible="{Binding IsPosImageExport}"
@@ -220,10 +224,11 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosExportSize}"/>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12" IsVisible="{Binding IsPosImageExport}">
-                        <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}"/>
-                        <Label Text="{Binding PinPosCropExportSize, StringFormat=': {0} Pixel'}"/>
-                    </HorizontalStackLayout>
+                    <controls:LocalizedLabel ResourceKey="positionsbilder_zuschnitt"
+                                             Value="{Binding PinPosCropExportSize}"
+                                             ValueFormat="{}{0} Pixel"
+                                             Margin="0, 0, 0, -12"
+                                             IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="1000"
                             Minimum="100"
                             IsVisible="{Binding IsPosImageExport}"
@@ -232,10 +237,10 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinPosCropExportSize}"/>
 
-                    <HorizontalStackLayout Spacing="0" Margin="0, 0, 0, -12">
-                        <Label Text="{x:Static res:AppResources.titelbild_hoehe}"/>
-                        <Label Text="{Binding TitleExportSize, StringFormat=': {0} mm'}" Margin="0, 0, 0, -12"/>
-                    </HorizontalStackLayout>
+                    <controls:LocalizedLabel ResourceKey="titelbild_hoehe"
+                                             Value="{Binding TitleExportSize}"
+                                             ValueFormat="{}{0} mm"
+                                             Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
                             Minimum="10"
                             ThumbColor="{DynamicResource Primary}"

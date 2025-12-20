@@ -236,7 +236,7 @@
                         Clicked="TakeFoto"/>
                 <Button Grid.Column="3"
                         Padding="0"
-                        Text="OK"
+                        Text="{x:Static res:AppResources.ok}"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"

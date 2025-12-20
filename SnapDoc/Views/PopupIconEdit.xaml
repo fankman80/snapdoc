@@ -7,6 +7,7 @@
                xmlns:views="clr-namespace:SnapDoc.Views"               
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
@@ -170,13 +171,13 @@
             </Grid.ColumnDefinitions>
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
-                    Text="Abbrechen"
+                    Text="{x:Static res:AppResources.abbrechen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnCancelClicked" />
             <Button Grid.Column="1"
                     x:Name="okButtonText"
-                    Text="Ok"
+                    Text="{x:Static res:AppResources.ok}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnOkClicked" />

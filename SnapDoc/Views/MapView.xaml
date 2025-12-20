@@ -6,13 +6,14 @@
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                 xmlns:views="clr-namespace:SnapDoc.Views"             
                 xmlns:services="clr-namespace:SnapDoc.Services"
-                xmlns:controls="clr-namespace:SnapDoc.Controls"             
+                xmlns:controls="clr-namespace:SnapDoc.Controls"
+                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                 xmlns:local="clr-namespace:SnapDoc"
                 Shell.TitleColor="{DynamicResource PrimaryDark}"
                 Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
                 x:Class="SnapDoc.Views.MapView"
                 x:Name="ThisPage"
-                Title="swisstopo Karte">
+                Title="{x:Static res:AppResources.swisstopo_karte}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
@@ -36,7 +37,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="KML-Datei exportieren"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.kml_datei_exportieren}"                    
                     Clicked="KmlExportClicked"/>
         </Grid>
     </Shell.TitleView>
@@ -117,7 +118,7 @@
                                Grid.Column="0"
                                Source="{AppThemeBinding Light=ic_pin_dark.png, Dark=ic_pin_light.png}" />
                         <Label Grid.Column="1"
-                               Text="Neu setzen"
+                               Text="{x:Static res:AppResources.neu_setzen}"
                                HorizontalTextAlignment="Center"
                                VerticalTextAlignment="Center"
                                TextColor="{DynamicResource PrimaryDarkText}" />

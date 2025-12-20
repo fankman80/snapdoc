@@ -1,5 +1,64 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <root>
+  <!-- 
+    Microsoft ResX Schema 
+    
+    Version 2.0
+    
+    The primary goals of this format is to allow a simple XML format 
+    that is mostly human readable. The generation and parsing of the 
+    various data types are done through the TypeConverter classes 
+    associated with the data types.
+    
+    Example:
+    
+    ... ado.net/XML headers & schema ...
+    <resheader name="resmimetype">text/microsoft-resx</resheader>
+    <resheader name="version">2.0</resheader>
+    <resheader name="reader">System.Resources.ResXResourceReader, System.Windows.Forms, ...</resheader>
+    <resheader name="writer">System.Resources.ResXResourceWriter, System.Windows.Forms, ...</resheader>
+    <data name="Name1"><value>this is my long string</value><comment>this is a comment</comment></data>
+    <data name="Color1" type="System.Drawing.Color, System.Drawing">Blue</data>
+    <data name="Bitmap1" mimetype="application/x-microsoft.net.object.binary.base64">
+        <value>[base64 mime encoded serialized .NET Framework object]</value>
+    </data>
+    <data name="Icon1" type="System.Drawing.Icon, System.Drawing" mimetype="application/x-microsoft.net.object.bytearray.base64">
+        <value>[base64 mime encoded string representing a byte array form of the .NET Framework object]</value>
+        <comment>This is a comment</comment>
+    </data>
+                
+    There are any number of "resheader" rows that contain simple 
+    name/value pairs.
+    
+    Each data row contains a name, and value. The row also contains a 
+    type or mimetype. Type corresponds to a .NET class that support 
+    text/value conversion through the TypeConverter architecture. 
+    Classes that don't support this are serialized and stored with the 
+    mimetype set.
+    
+    The mimetype is used for serialized objects, and tells the 
+    ResXResourceReader how to depersist the object. This is currently not 
+    extensible. For a given mimetype the value must be set accordingly:
+    
+    Note - application/x-microsoft.net.object.binary.base64 is the format 
+    that the ResXResourceWriter will generate, however the reader can 
+    read any of the formats listed below.
+    
+    mimetype: application/x-microsoft.net.object.binary.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Binary.BinaryFormatter
+            : and then encoded with base64 encoding.
+    
+    mimetype: application/x-microsoft.net.object.soap.base64
+    value   : The object must be serialized with 
+            : System.Runtime.Serialization.Formatters.Soap.SoapFormatter
+            : and then encoded with base64 encoding.
+
+    mimetype: application/x-microsoft.net.object.bytearray.base64
+    value   : The object must be serialized into a byte array 
+            : using a System.ComponentModel.TypeConverter
+            : and then encoded with base64 encoding.
+    -->
   <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
     <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
     <xsd:element name="root" msdata:IsDataSet="true">
@@ -68,7 +127,10 @@
     <value>Beschreibung</value>
   </data>
   <data name="bildkomprimierung" xml:space="preserve">
-    <value>Bildkomprimierung</value>
+    <value>Bildkomprimierung:</value>
+  </data>
+  <data name="datum" xml:space="preserve">
+    <value>Datum</value>
   </data>
   <data name="exportiere_fotos" xml:space="preserve">
     <value>Exportiere Fotos</value>
@@ -88,17 +150,71 @@
   <data name="export_vorlage" xml:space="preserve">
     <value>Export-Vorlage</value>
   </data>
+  <data name="farbe_und_stiftbreite_waehlen" xml:space="preserve">
+    <value>Farbe und Stiftbreite wählen</value>
+  </data>
+  <data name="formen_zeichnen" xml:space="preserve">
+    <value>Formen zeichnen</value>
+  </data>
   <data name="foto_aufnehmen" xml:space="preserve">
     <value>Foto aufnehmen</value>
   </data>
+  <data name="foto_auf_fenstergroesse_zoomen" xml:space="preserve">
+    <value>Foto auf Fenstergrösse zoomen</value>
+  </data>
   <data name="foto_breite" xml:space="preserve">
-    <value>Foto (Breite)</value>
+    <value>Foto (Breite):</value>
+  </data>
+  <data name="foto_galerie" xml:space="preserve">
+    <value>Foto Galerie</value>
+  </data>
+  <data name="foto_loeschen" xml:space="preserve">
+    <value>Foto löschen</value>
+  </data>
+  <data name="freihandlinie_zeichnen" xml:space="preserve">
+    <value>Freihandlinie zeichnen</value>
+  </data>
+  <data name="gedrückt_halten_um_Icon_zu_editieren" xml:space="preserve">
+    <value>Gedrückt halten um Icon zu editieren.</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
-    <value>Grösse Pinbeschriftung</value>
+    <value>Grösse Pinbeschriftung:</value>
+  </data>
+  <data name="icon_auswählen" xml:space="preserve">
+    <value>Icon auswählen</value>
+  </data>
+  <data name="inaktive_fotos_ausblenden" xml:space="preserve">
+    <value>inaktive Fotos ausblenden</value>
+  </data>
+  <data name="kml_datei_exportieren" xml:space="preserve">
+    <value>KML-Datei exportieren</value>
+  </data>
+  <data name="kunde_bauherrschaft" xml:space="preserve">
+    <value>Kunde/Bauherrschaft</value>
+  </data>
+  <data name="neues_icon_erstellen" xml:space="preserve">
+    <value>neues Icon erstellen</value>
+  </data>
+  <data name="neues_projekt_erstellen" xml:space="preserve">
+    <value>neues Projekt erstellen</value>
   </data>
   <data name="neue_vorlage_hochladen" xml:space="preserve">
     <value>neue Vorlage hochladen</value>
+  </data>
+  <data name="neu_setzen" xml:space="preserve">
+    <value>Neu setzen</value>
+  </data>
+  <data name="objektbezeichnung" xml:space="preserve">
+    <value>Objektbezeichnung</value>
+  </data>
+  <data name="ok" xml:space="preserve">
+    <value>OK</value>
+  </data>
+  <data name="pdf_seiten_hinzufügen" xml:space="preserve">
+    <value>PDF-Seiten hinzufügen</value>
+  </data>
+  <data name="pin_liste" xml:space="preserve">
+    <value>Pin Liste</value>
   </data>
   <data name="pinbeschriftung" xml:space="preserve">
     <value>Pinbeschriftung</value>
@@ -113,25 +229,73 @@
     <value>Pin exportieren</value>
   </data>
   <data name="pin_icon_breite_hoehe" xml:space="preserve">
-    <value>Pin-Icon (Breite + Höhe)</value>
+    <value>Pin-Icon (Breite + Höhe):</value>
   </data>
   <data name="pin_loeschen" xml:space="preserve">
     <value>Pin löschen</value>
   </data>
+  <data name="pin_setzen" xml:space="preserve">
+    <value>Pin setzen</value>
+  </data>
+  <data name="plan_auf_fenstergroesse_zoomen" xml:space="preserve">
+    <value>Plan auf Fenstergrösse zoomen</value>
+  </data>
+  <data name="plan_bearbeiten" xml:space="preserve">
+    <value>Plan bearbeiten</value>
+  </data>
+  <data name="polylinie_zeichnen" xml:space="preserve">
+    <value>Polylinie zeichnen</value>
+  </data>
   <data name="positionsbilder_breite_hoehe" xml:space="preserve">
-    <value>Positionsbilder (Breite + Höhe)</value>
+    <value>Positionsbilder (Breite + Höhe):</value>
   </data>
   <data name="positionsbilder_zuschnitt" xml:space="preserve">
-    <value>Positionsbilder Zuschnitt</value>
+    <value>Positionsbilder Zuschnitt:</value>
   </data>
   <data name="position_sperren" xml:space="preserve">
     <value>Position sperren</value>
   </data>
+  <data name="projektdatei_importieren" xml:space="preserve">
+    <value>Projektdatei importieren</value>
+  </data>
+  <data name="projektleitung" xml:space="preserve">
+    <value>Projektleitung</value>
+  </data>
+  <data name="projektliste" xml:space="preserve">
+    <value>Projektliste</value>
+  </data>
+  <data name="projektnummer" xml:space="preserve">
+    <value>Projektnummer</value>
+  </data>
+  <data name="projektverwaltung" xml:space="preserve">
+    <value>Projektverwaltung</value>
+  </data>
+  <data name="projektvorgang" xml:space="preserve">
+    <value>Projektvorgang</value>
+  </data>
+  <data name="raster_liste_umschalten" xml:space="preserve">
+    <value>Raster/Liste umschalten</value>
+  </data>
+  <data name="seiten_hinzufuegen" xml:space="preserve">
+    <value>Seiten hinzufügen</value>
+  </data>
   <data name="standort" xml:space="preserve">
     <value>Standort</value>
   </data>
+  <data name="suche" xml:space="preserve">
+    <value>Suche...</value>
+  </data>
+  <data name="swisstopo_karte" xml:space="preserve">
+    <value>swisstopo Karte</value>
+  </data>
   <data name="titelbild_hoehe" xml:space="preserve">
-    <value>Titelbild (Höhe)</value>
+    <value>Titelbild (Höhe):</value>
+  </data>
+  <data name="titelbild_mit_der_kamera_erstellen" xml:space="preserve">
+    <value>Titelbild mit der Kamera erstellen</value>
+  </data>
+  <data name="titelbild_von_der_festplatte_hochladen" xml:space="preserve">
+    <value>Titelbild von der Festplatte hochladen</value>
   </data>
   <data name="titel_eingeben" xml:space="preserve">
     <value>(Titel eingeben...)</value>
@@ -139,7 +303,118 @@
   <data name="vorlage_loeschen" xml:space="preserve">
     <value>Vorlage löschen</value>
   </data>
+  <data name="zeichnung_loeschen" xml:space="preserve">
+    <value>Zeichnung löschen</value>
+  </data>
+  <data name="zeichnung_speichern" xml:space="preserve">
+    <value>Zeichnung speichern</value>
+  </data>
   <data name="zeige_platzhalter_definitionen" xml:space="preserve">
     <value>zeige Platzhalter-Definitionen</value>
+  </data>
+  <data name="zeit" xml:space="preserve">
+    <value>Zeit:</value>
+  </data>
+  <data name="zu_pin_wechseln" xml:space="preserve">
+    <value>Zu Pin wechseln</value>
+  </data>
+  <data name="planrotation_sperren" xml:space="preserve">
+    <value>Planrotation sperren</value>
+  </data>
+  <data name="planliste_mit_vorschau" xml:space="preserve">
+    <value>Planliste mit Vorschau</value>
+  </data>
+  <data name="inaktive_plaene_ausblenden" xml:space="preserve">
+    <value>Inaktive Pläne ausblenden</value>
+  </data>
+  <data name="modus_fuer_pinplatzierung" xml:space="preserve">
+    <value>Modus für Pinplatzierung</value>
+  </data>
+  <data name="pin_in_die_bildmitte_setzen" xml:space="preserve">
+    <value>Pin in die Bildmitte setzen</value>
+  </data>
+  <data name="pin_durch_antippen_setzen" xml:space="preserve">
+    <value>Pin durch Antippen setzen</value>
+  </data>
+  <data name="pin_durch_gedrueckthalten_setzen" xml:space="preserve">
+    <value>Pin durch Gedrückthalten setzen</value>
+  </data>
+  <data name="swisstopo_karten_pins" xml:space="preserve">
+    <value>swisstopo Karten-Pins</value>
+  </data>
+  <data name="farbschema" xml:space="preserve">
+    <value>Farbschema</value>
+  </data>
+  <data name="app_modus" xml:space="preserve">
+    <value>App-Modus</value>
+  </data>
+  <data name="farb_thema" xml:space="preserve">
+    <value>Farb-Thema</value>
+  </data>
+  <data name="erweiterte_einstellungen" xml:space="preserve">
+    <value>Erweiterte Einstellungen</value>
+  </data>
+  <data name="projektdaten" xml:space="preserve">
+    <value>Projektdaten</value>
+  </data>
+  <data name="app_settings" xml:space="preserve">
+    <value>App-Settings</value>
+  </data>
+  <data name="icondefinitionen" xml:space="preserve">
+    <value>Icondefinitionen</value>
+  </data>
+  <data name="programmeinstellungen_zuruecksetzen" xml:space="preserve">
+    <value>Programmeinstellungen zurücksetzen</value>
+  </data>
+  <data name="icondefinitionen_zuruecksetzen" xml:space="preserve">
+    <value>Icondefinitionen zurücksetzen</value>
+  </data>
+  <data name="max_pingroesse_limitieren" xml:space="preserve">
+    <value>Max. Pingrösse limitieren:</value>
+  </data>
+  <data name="min_pingroesse_limitieren" xml:space="preserve">
+    <value>Min. Pingrösse limitieren:</value>
+  </data>
+  <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
+    <value>Auflösung PDF-Umwandlung:</value>
+  </data>
+  <data name="pingroesse" xml:space="preserve">
+    <value>Pingrösse:</value>
+  </data>
+  <data name="projekt_titel" xml:space="preserve">
+    <value>Projekt Titel</value>
+  </data>
+  <data name="zip_exportieren" xml:space="preserve">
+    <value>Zip Exportieren</value>
+  </data>
+  <data name="verzeichnis_oeffnen" xml:space="preserve">
+    <value>Verzeichnis öffnen</value>
+  </data>
+  <data name="projekt_loeschen" xml:space="preserve">
+    <value>Projekt löschen</value>
+  </data>
+  <data name="kopie_erstellen" xml:space="preserve">
+    <value>Kopie erstellen</value>
+  </data>
+  <data name="planbezeichnung" xml:space="preserve">
+    <value>Planbezeichnung</value>
+  </data>
+  <data name="planfarbe" xml:space="preserve">
+    <value>Planfarbe</value>
+  </data>
+  <data name="plan_exportieren" xml:space="preserve">
+    <value>Plan exportieren</value>
+  </data>
+  <data name="plan_drehung" xml:space="preserve">
+    <value>Plan-Drehung:</value>
+  </data>
+  <data name="farben_entfernen" xml:space="preserve">
+    <value>Farben entfernen</value>
+  </data>
+  <data name="plan_loeschen" xml:space="preserve">
+    <value>Plan löschen</value>
+  </data>
+  <data name="abbrechen" xml:space="preserve">
+    <value>Abbrechen</value>
   </data>
 </root>

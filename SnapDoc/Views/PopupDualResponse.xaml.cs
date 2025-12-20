@@ -1,6 +1,7 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -9,12 +10,12 @@ public partial class PopupDualResponse : Popup<string>
     private int countdown = 5;
     private readonly string OkText;
 
-    public PopupDualResponse(string title, string okText = "Ok", string cancelText = "Abbrechen", bool alert = false)
+    public PopupDualResponse(string title, string okText = null, string cancelText = null, bool alert = false)
 	{
 		InitializeComponent();
         titleText.Text = title;
-        okButtonText.Text = okText;
-        cancelButtonText.Text = cancelText;
+        okButtonText.Text = okText ?? AppResources.ok;
+        cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         OkText = okText;
         if (alert)
             StartTimer();

@@ -1,6 +1,7 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -39,12 +40,12 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         }
     }
 
-    public PopupPlanSelector(string planId, string cancelText = "Abbrechen")
+    public PopupPlanSelector(string planId, string cancelText = null)
     {
         InitializeComponent();
 
         okButtonText.IsVisible = false;
-        cancelButtonText.Text = cancelText;
+        cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
 
         if (Application.Current.Windows[0].Page is AppShell shell)
             PlanItems = new ObservableCollection<PlanItem>(shell.PlanItems);

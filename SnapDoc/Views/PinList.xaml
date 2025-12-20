@@ -7,13 +7,14 @@
              xmlns:views="clr-namespace:SnapDoc.Views"    
              xmlns:services="clr-namespace:SnapDoc.Services"             
              xmlns:models="clr-namespace:SnapDoc.Models"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
              x:Class="SnapDoc.Views.PinList"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             Title="Pin Liste">
+             Title="{x:Static res:AppResources.pin_liste}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
@@ -54,7 +55,7 @@
                     FontSize="12"
                     VerticalTextAlignment="Center"
                     VerticalOptions="Center"
-                    Placeholder="Suche..."
+                    Placeholder="{x:Static res:AppResources.suche}"
                     TextChanged="SearchEntry_TextChanged"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>

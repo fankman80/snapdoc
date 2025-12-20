@@ -4,6 +4,7 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
@@ -16,14 +17,14 @@
     <Grid>
         <VerticalStackLayout>
             <material:TextField x:Name="text_entry"
-                                Title="Projekt Titel"
+                                Title="{x:Static res:AppResources.projekt_titel}"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"/>
 
-            <Button Text="Zip Exportieren"
+            <Button Text="{x:Static res:AppResources.zip_exportieren}"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
@@ -32,7 +33,7 @@
 
             <Button x:Name="openFolderBtn"
                     Padding="0"
-                    Text="Verzeichnis öffnen"
+                    Text="{x:Static res:AppResources.verzeichnis_oeffnen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
@@ -46,7 +47,7 @@
                 </Button.IsVisible>
             </Button>
 
-            <Button Text="Projekt löschen"
+            <Button Text="{x:Static res:AppResources.projekt_loeschen}"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
@@ -60,13 +61,13 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
-                        Text="Abbrechen"
+                        Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
-                        Text="Ok"
+                        Text="{x:Static res:AppResources.ok}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />

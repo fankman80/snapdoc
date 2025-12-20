@@ -1,17 +1,18 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
 public partial class PopupProjectEdit : Popup<string>
 {
     private readonly string _entry;
-    public PopupProjectEdit(string entry, string okText = "Ok", string cancelText = "Abbrechen")
+    public PopupProjectEdit(string entry, string okText = null, string cancelText = null)
     {
         InitializeComponent();
-        okButtonText.Text = okText;
-        cancelButtonText.Text = cancelText;
+        okButtonText.Text = okText ?? AppResources.ok;
+        cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         text_entry.Text = entry;
 
         _entry = entry; 

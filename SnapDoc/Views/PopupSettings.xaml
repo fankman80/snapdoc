@@ -7,6 +7,7 @@
                xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                Padding="0"
@@ -29,7 +30,7 @@
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout Margin="0,0,0,10">
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding PinMinScaleLimit, StringFormat='Min. Pingrösse limitieren: {0}%'}" />
+                    <controls:LocalizedLabel ResourceKey="min_pingroesse_limitieren" Value="{Binding PinMinScaleLimit}" ValueFormat="{}{0}%"/>
                     <Slider x:Name="MinScaleSlider"
                             Maximum="{Binding PinMaxScaleLimit}"
                             Minimum="1"
@@ -39,7 +40,7 @@
                             Value="{Binding PinMinScaleLimit}"/>
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding PinMaxScaleLimit, StringFormat='Max. Pingrösse limitieren: {0}%'}" />
+                    <controls:LocalizedLabel ResourceKey="max_pingroesse_limitieren" Value="{Binding PinMaxScaleLimit}" ValueFormat="{}{0}%"/>
                     <Slider x:Name="MaxScaleSlider"
                             Maximum="100"
                             Minimum="{Binding PinMinScaleLimit}"
@@ -49,7 +50,7 @@
                             Value="{Binding PinMaxScaleLimit}"/>
                 </VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
-                    <Label Text="{Binding MaxPdfPixelCount, StringFormat='Auflösung PDF-Umwandlung: {0} MP'}" />
+                    <controls:LocalizedLabel ResourceKey="aufloesung_pdf_umwandlung" Value="{Binding MaxPdfPixelCount}" ValueFormat="{}{0} MP"/>
                     <Slider Maximum="50"
                             Minimum="1"
                             ThumbColor="{DynamicResource Primary}"
@@ -68,7 +69,7 @@
                                      KnobColorOff="White"
                                      SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Planrotation sperren" Grid.Column="1" VerticalOptions="Center" />
+                    <Label Text="{x:Static res:AppResources.planrotation_sperren}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
 
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
@@ -81,7 +82,7 @@
                                      KnobColorOff="White"
                                      SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Planliste mit Vorschau" Grid.Column="1" VerticalOptions="Center" />
+                    <Label Text="{x:Static res:AppResources.planliste_mit_vorschau}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
 
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
@@ -94,7 +95,7 @@
                                      KnobColorOff="White"
                                      SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                      SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="Inaktive Pläne ausblenden" Grid.Column="1" VerticalOptions="Center" />
+                    <Label Text="{x:Static res:AppResources.inaktive_plaene_ausblenden}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 
             <Border Stroke="{DynamicResource SecondaryBackground}"
@@ -104,26 +105,26 @@
                     Margin="0,0,0,10">
                 <uranium:ExpanderView Margin="6,6,6,6">
                     <uranium:ExpanderView.Header>
-                        <Label Text="Modus für Pinplatzierung"/>
+                            <Label Text="{x:Static res:AppResources.modus_fuer_pinplatzierung}"/>
                     </uranium:ExpanderView.Header>
                         <material:RadioButtonGroupView Spacing="10"
                                                        SelectedIndex="{Binding PinPlaceMode, Mode=TwoWay}"
                                                        HorizontalOptions="Start"
                                                        Orientation="Vertical">
                             <material:RadioButton Value="0"
-                                                  Text="Pin in die Bildmitte setzen"
+                                                  Text="{x:Static res:AppResources.pin_in_die_bildmitte_setzen}"
                                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                   HorizontalOptions="Start" />
                             <material:RadioButton Value="1"
-                                                  Text="Pin durch Antippen setzen"
+                                                  Text="{x:Static res:AppResources.pin_durch_antippen_setzen}"
                                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                   HorizontalOptions="Start" />
                             <material:RadioButton Value="2"
-                                                  Text="Pin durch Gedrückthalten setzen"
+                                                  Text="{x:Static res:AppResources.pin_durch_gedrueckthalten_setzen}"
                                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
@@ -139,7 +140,7 @@
                         Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
-                            <Label Text="swisstopo Karten-Pins"/>
+                            <Label Text="{x:Static res:AppResources.swisstopo_karten_pins}"/>
                         </uranium:ExpanderView.Header>
                         <VerticalStackLayout Spacing="0">
                             <material:RadioButtonGroupView Spacing="24"
@@ -200,7 +201,7 @@
                                        Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
                             </HorizontalStackLayout>
 
-                            <Label Text="{Binding MapIconSize, StringFormat='Pingrösse: {0:0.##}%'}"/>
+                            <controls:LocalizedLabel ResourceKey="pingroesse" Value="{Binding MapIconSize}" ValueFormat="{}{0:0.##}%"/>
                             <Slider Maximum="100"
                                     Minimum="1"
                                     ThumbColor="{DynamicResource Primary}"
@@ -218,12 +219,12 @@
                     Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
-                            <Label Text="Farbschema"/>
+                            <Label Text="{x:Static res:AppResources.farbschema}"/>
                         </uranium:ExpanderView.Header>
                         <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
                             <Label Grid.Column="0" Grid.Row="0"
                                     VerticalTextAlignment="Center"
-                                    Text="App-Modus"/>
+                                    Text="{x:Static res:AppResources.app_modus}"/>
                             <Border Grid.Column="1" Grid.Row="0"
                                     Stroke="{DynamicResource SecondaryBackground}"
                                     StrokeThickness="1"
@@ -234,7 +235,7 @@
                             </Border>
                             <Label Grid.Column="0" Grid.Row="1"
                                    VerticalTextAlignment="Center"
-                                   Text="Farb-Thema"/>                                
+                                   Text="{x:Static res:AppResources.farb_thema}"/>                                
                             <Border Grid.Column="1" Grid.Row="1"
                                     Stroke="{DynamicResource SecondaryBackground}"
                                     StrokeThickness="1"
@@ -254,7 +255,7 @@
                     Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
-                            <Label Text="Erweiterte Einstellungen"/>
+                            <Label Text="{x:Static res:AppResources.erweiterte_einstellungen}"/>
                         </uranium:ExpanderView.Header>
                         <Grid>
                             <Grid.ColumnDefinitions>
@@ -267,17 +268,17 @@
                                 <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Button Grid.Column="0" Grid.Row="0"
-                                    Text="Projektdaten"
+                                    Text="{x:Static res:AppResources.projektdaten}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{DynamicResource PrimaryDarkText}"                                                    
                                     Clicked="OpenDocEditor"/>
                             <Button Grid.Column="0" Grid.Row="1"
-                                    Text="App-Settings"
+                                    Text="{x:Static res:AppResources.app_settings}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{DynamicResource PrimaryDarkText}"                                                           
                                     Clicked="OpenPrgEditor"/>
                             <Button Grid.Column="0" Grid.Row="2"
-                                    Text="Icondefinitionen"
+                                    Text="{x:Static res:AppResources.icondefinitionen}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{DynamicResource PrimaryDarkText}"                                                            
                                     Clicked="OpenIconEditor"/>
@@ -286,16 +287,15 @@
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{DynamicResource PrimaryDarkText}"                        
-                                    ToolTipProperties.Text="Programmeinstellungen zurücksetzen"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.programmeinstellungen_zuruecksetzen}"
                                     Clicked="ResetPrg"/>
                             <Button Grid.Column="1" Grid.Row="2"
                                     Padding="0"
                                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{DynamicResource PrimaryDarkText}"                        
-                                    ToolTipProperties.Text="Icondefinitionen zurücksetzen"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
                                     Clicked="ResetIcon"/> 
-                            
                         </Grid>
                     </uranium:ExpanderView>
                 </Border>                        
@@ -308,7 +308,7 @@
                 <ColumnDefinition Width="Auto" />
             </Grid.ColumnDefinitions>
             <Button Grid.Column="1"
-                    Text="OK"
+                    Text="{x:Static res:AppResources.ok}"
                     MinimumWidthRequest="100"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"

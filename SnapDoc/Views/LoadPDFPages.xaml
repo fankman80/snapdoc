@@ -2,7 +2,8 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:views="clr-namespace:SnapDoc.Views"                 
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              BackgroundColor="DimGrey"
              x:DataType="views:LoadPDFPages"
@@ -33,7 +34,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="Raster/Liste umschalten"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.raster_liste_umschalten}"                    
                     Clicked="OnChangeRowsClicked"/>            
         </Grid>
     </Shell.TitleView>
@@ -84,12 +85,12 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
-                        Text="Abbrechen"
+                        Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked"/>
                 <Button Grid.Column="2"
-                        Text="Seiten hinzufügen"
+                        Text="{x:Static res:AppResources.seiten_hinzufuegen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnPagesAddClicked"/>

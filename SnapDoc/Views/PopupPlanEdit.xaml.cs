@@ -2,6 +2,7 @@
 
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Resources.Languages;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -9,11 +10,11 @@ namespace SnapDoc.Views;
 
 public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChanged
 {
-    public PopupPlanEdit(string name, string desc, bool gray, string planColor, bool export = true, string okText = "Ok", string cancelText = "Abbrechen")
+    public PopupPlanEdit(string name, string desc, bool gray, string planColor, bool export = true, string okText = null, string cancelText = null)
     {
         InitializeComponent();
-        okButtonText.Text = okText;
-        cancelButtonText.Text = cancelText;
+        okButtonText.Text = okText ?? AppResources.ok;
+        cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         name_entry.Text = name;
         desc_entry.Text = desc;
         allow_export.IsToggled = export;
