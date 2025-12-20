@@ -18,7 +18,7 @@ public static class MauiProgram
     public static MauiApp CreateMauiApp()
     {
         // Culture global setzen (de-CH)
-        var culture = new CultureInfo("de-CH");
+        var culture = new CultureInfo("en");
         CultureInfo.DefaultThreadCurrentCulture = culture;
         CultureInfo.DefaultThreadCurrentUICulture = culture;
 

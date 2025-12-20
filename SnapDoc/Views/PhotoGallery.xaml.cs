@@ -2,6 +2,7 @@
 
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -185,7 +186,7 @@ public partial class FotoGalleryView : ContentPage
 
         Fotos = new ObservableCollection<FotoItem>(filtered);
         FotoGallery.ItemsSource = Fotos;
-        FotoCounterLabel.Text = $"Fotos: {Fotos.Count}";
+        FotoCounterLabel.Text = $"{AppResources.fotos}: {Fotos.Count}";
     }
 
     private void OnFilterToggleChanged(object sender, ToggledEventArgs e)

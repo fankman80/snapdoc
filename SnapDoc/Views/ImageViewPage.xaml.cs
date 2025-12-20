@@ -7,6 +7,7 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -178,7 +179,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
-        var popup = new PopupDualResponse("Wollen Sie dieses Bild wirklich löschen?");
+        var popup = new PopupDualResponse(AppResources.wollen_sie_dieses_bild_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result == null)

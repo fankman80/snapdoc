@@ -7,6 +7,7 @@
                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                xmlns:views="clr-namespace:SnapDoc.Views"                  
                xmlns:services="clr-namespace:SnapDoc.Services"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
@@ -38,7 +39,7 @@
             </Grid.RowDefinitions>
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
                 <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
-                    <Label Text="zum Löschen gedrückt halten" FontSize="12" Margin="0,0,0,8"/>
+                    <Label Text="{x:Static res:AppResources.zum_loeschen_gedrueckt_halten}" FontSize="12" Margin="0,0,0,8"/>
                     <CollectionView x:Name="ColorListPicker" Margin="-3"
                                     ItemsSource="{Binding ColorsList}"
                                     SelectionMode="None">
@@ -88,8 +89,8 @@
                                 <Border BackgroundColor="{Binding SelectedColor}"
                                         StrokeThickness="0"
                                         Opacity="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='1/255*x'}"
-                                        HeightRequest="40"/>                                
-                                <Label Text="▼      Farbdefinition      ▼"
+                                        HeightRequest="40"/>
+                                <Label Text="{x:Static res:AppResources.farbdefinition}"
                                        TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                                        HorizontalTextAlignment="Center"
                                        VerticalTextAlignment="Center"
@@ -99,42 +100,57 @@
                         </toolkit:Expander.Header>
                         <VerticalStackLayout Spacing="0">
                             <!-- Slider for Red -->
-                            <Label Text="{Binding RedValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Rot (R): {0:0}'}" TextColor="Red"/>
+                            <controls:LocalizedLabel ResourceKey="rot_r"
+                                                     Value="{Binding RedValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
+                                                     ValueFormat="{}{0:0}"
+                                                     TextColor="Red"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                             <!-- Slider for Green -->
-                            <Label Text="{Binding GreenValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Grün (G): {0:0}'}" TextColor="Green"/>
+                            <controls:LocalizedLabel ResourceKey="gruen_g"
+                                                     Value="{Binding GreenValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
+                                                     ValueFormat="{}{0:0}"
+                                                     TextColor="Green"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                             <!-- Slider for Blue -->
-                            <Label Text="{Binding BlueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255', StringFormat='Blau (B): {0:0}'}" TextColor="Blue"/>
+                            <controls:LocalizedLabel ResourceKey="blau_b"
+                                                     Value="{Binding BlueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
+                                                     ValueFormat="{}{0:0}"
+                                                     TextColor="Blue"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                             <!-- Slider for Hue -->
-                            <Label Text="{Binding HueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*360', StringFormat='Farbwert (H): {0:0}°'}"/>
+                            <controls:LocalizedLabel ResourceKey="farbwert_h"
+                                                     Value="{Binding HueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*360'}"
+                                                     ValueFormat="{}{0:0}°"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                             <!-- Slider for Saturation -->
-                            <Label Text="{Binding SaturationValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Sättigung (S): {0:0}%'}"/>
+                            <controls:LocalizedLabel ResourceKey="saettigung_s"
+                                                     Value="{Binding SaturationValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
+                                                     ValueFormat="{}{0:0}%"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                             <!-- Slider for Brightness -->
-                            <Label Text="{Binding BrightnessValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100', StringFormat='Helligkeit (L): {0:0}%'}"/>
+                            <controls:LocalizedLabel ResourceKey="helligkeit_l"
+                                                     Value="{Binding BrightnessValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
+                                                     ValueFormat="{}{0:0}%"/>
                             <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
                                     ThumbColor="{DynamicResource Primary}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
@@ -142,10 +158,11 @@
                         </VerticalStackLayout>
                     </toolkit:Expander>
 
-                    <Label x:Name="lineWidthText"
-                           IsVisible="{Binding LineWidthVisibility}"
-                           HorizontalOptions="Start"
-                           Text="{Binding LineWidth, StringFormat='Pinselgrösse: {0}'}"/>
+                    <controls:LocalizedLabel x:Name="lineWidthText"
+                                             ResourceKey="pinselgroesse"
+                                             Value="{Binding LineWidth}"
+                                             ValueFormat="{}{0}"
+                                             IsVisible="{Binding LineWidthVisibility}"/>
                     <Slider x:Name="LineWidthSlider"
                             IsVisible="{Binding LineWidthVisibility}"
                             Maximum="20"
@@ -155,7 +172,10 @@
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <Label Text="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255', StringFormat='{0:F0}%'}" />
+                    <controls:LocalizedLabel ResourceKey="deckkraft"
+                                             Value="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255'}"
+                                             ValueFormat="{}{0:F0}%"
+                                             IsVisible="{Binding LineWidthVisibility}"/>
                     <Slider x:Name="FillOpacitySlider"
                             IsVisible="{Binding FillOpacityVisibility}"
                             Maximum="255"

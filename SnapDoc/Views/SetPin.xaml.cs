@@ -9,6 +9,7 @@ using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 using FFImageLoading.Maui;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -128,7 +129,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnDeleteClick(object sender, EventArgs e)
     {
-        var popup = new PopupDualResponse("Wollen Sie diesen Pin wirklich löschen?");
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_pin_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {

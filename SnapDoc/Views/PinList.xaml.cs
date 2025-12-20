@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -60,7 +61,7 @@ public partial class PinList : ContentPage
         filteredPinItems = [.. pinItems];
 
         pinListView.ItemsSource = pinItems;
-        PinCounterLabel.Text = $"Pins: {pinItems.Count}";
+        PinCounterLabel.Text =  $"{AppResources.pins}: {pinItems.Count}";
 
         IconSorting(OrderDirection);
 
@@ -243,6 +244,6 @@ public partial class PinList : ContentPage
             filteredPinItems = [.. originalPinItems];
 
         pinListView.ItemsSource = filteredPinItems;
-        PinCounterLabel.Text = $"Pins: {filteredPinItems.Count}";
+        PinCounterLabel.Text = $"{AppResources.pins}: {filteredPinItems.Count}";
     }
 }

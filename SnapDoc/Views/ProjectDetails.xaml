@@ -109,7 +109,7 @@
                         BorderColor="{DynamicResource SecondaryBackground}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        Title="Adresse"/>
+                        Title="{x:Static res:AppResources.adresse}"/>
 
                     <material:TextField
                         x:Name="working_title"

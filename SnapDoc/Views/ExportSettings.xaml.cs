@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Services;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -180,7 +181,7 @@ public partial class ExportSettings : ContentPage
 
     private async void OnDeleteDocument(object sender, EventArgs e)
     {
-        var popup = new PopupDualResponse("Wollen Sie diese Vorlage wirklich löschen?");
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {

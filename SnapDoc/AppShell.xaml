@@ -8,6 +8,7 @@
        xmlns:views="clr-namespace:SnapDoc.Views"
        xmlns:services="clr-namespace:SnapDoc.Services"
        xmlns:model="clr-namespace:SnapDoc.ViewModels"
+       xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
        xmlns:local="clr-namespace:SnapDoc"
        x:Class="SnapDoc.AppShell"
        x:Name="AppShellRoot"
@@ -191,7 +192,7 @@
                                Text="{x:Static local:MaterialIcons.Folder_open}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Projektliste" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.projektliste}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
@@ -204,7 +205,7 @@
                                Text="{x:Static local:MaterialIcons.Home_work}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Projektverwaltung" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.projektverwaltung}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
@@ -217,7 +218,7 @@
                                Text="{x:Static local:MaterialIcons.Map}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="swisstopo Karte" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.swisstopo_karte}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
@@ -230,7 +231,7 @@
                                Text="{x:Static local:MaterialIcons.Format_list_numbered}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Pin Liste" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.pin_liste}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
@@ -243,7 +244,7 @@
                                Text="{x:Static local:MaterialIcons.Photo_library}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Foto Galerie" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.foto_galerie}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
@@ -256,7 +257,7 @@
                                Text="{x:Static local:MaterialIcons.Convert_to_text}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="Bericht exportieren" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.bericht_exportieren}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
                     

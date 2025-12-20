@@ -11,6 +11,7 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
+using SnapDoc.Resources.Languages;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -340,22 +341,22 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
             {
-                rotateModeLabel.Text = Settings.PinEditRotateModeLock;
+                rotateModeLabel.Text = AppResources.drehung_fixiert;
                 rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             }
             else
             {
-                rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
+                rotateModeLabel.Text = AppResources.automatische_drehung;
                 rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             }
             if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
             {
-                sizeModeLabel.Text = Settings.PinEditSizeModeLock;
+                sizeModeLabel.Text = AppResources.groesse_fixiert;
                 sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
             }
             else
             {
-                sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
+                sizeModeLabel.Text = AppResources.automatische_groessenanpassung;
                 sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
             }
         };
@@ -925,13 +926,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = false;
-            sizeModeLabel.Text = Settings.PinEditSizeModeUnlock;
+            sizeModeLabel.Text = AppResources.automatische_groessenanpassung;
             sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
         else
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = true;
-            sizeModeLabel.Text = Settings.PinEditSizeModeLock;
+            sizeModeLabel.Text = AppResources.groesse_fixiert;
             sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
 
@@ -945,7 +946,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
-            rotateModeLabel.Text = Settings.PinEditRotateModeUnlock;
+            rotateModeLabel.Text = AppResources.automatische_drehung;
             rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.Value = 0;
 
@@ -955,7 +956,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
             GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
-            rotateModeLabel.Text = Settings.PinEditRotateModeLock;
+            rotateModeLabel.Text = AppResources.drehung_fixiert;
             rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             PinRotateSlider.Value = Helper.ToSliderValue(-planContainer.Rotation);
         }
@@ -1068,10 +1069,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void OnDeleteClick()
     {
-        var popup = new PopupDualResponse(
-            "Wollen Sie diesen Plan wirklich löschen?",
-            okText: "Löschen",
-            alert: true);
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
 
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result == null)

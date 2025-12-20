@@ -59,14 +59,14 @@
                     </AbsoluteLayout>
 
                     <VerticalStackLayout Grid.Column="1">
-                        <material:TextField Title="Anker X"
+                        <material:TextField Title="{x:Static res:AppResources.anker_x}"
                                             Text="{Binding Anchor_X}"
                                             TitleColor="{DynamicResource SecondaryBackground}"
                                             BorderColor="{DynamicResource SecondaryBackground}"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                        <material:TextField Title="Anker Y"
+                        <material:TextField Title="{x:Static res:AppResources.anker_y}"
                                             Text="{Binding Anchor_Y}"
                                             TitleColor="{DynamicResource SecondaryBackground}"
                                             BorderColor="{DynamicResource SecondaryBackground}"
@@ -76,7 +76,7 @@
                 </Grid>
 
                 <material:TextField x:Name="iconName"
-                                    Title="Bezeichnung"
+                                    Title="{x:Static res:AppResources.bezeichnung}"
                                     MaxLength="200"
                                     TitleColor="{DynamicResource SecondaryBackground}"
                                     BorderColor="{DynamicResource SecondaryBackground}"
@@ -86,14 +86,14 @@
 
                 <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                                 x:Name="iconCategory"
-                                                Title="Kategorie"
+                                                Title="{x:Static res:AppResources.kategorie}"
                                                 TitleColor="{DynamicResource SecondaryBackground}"
                                                 BorderColor="{DynamicResource SecondaryBackground}"
                                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                                 ItemsSource="{Binding IconCategories}"/>
 
-                <Button Text="Farbe wählen"
+                <Button Text="{x:Static res:AppResources.farbe_waehlen}"
                         BorderWidth="1"
                         BorderColor="Black"
                         BackgroundColor="{Binding SelectedColor}"
@@ -101,7 +101,7 @@
                         Clicked="OnColorPickerClicked"/>
 
                 <VerticalStackLayout Spacing="0">
-                    <Label x:Name="sliderText" Text="Voreinstellung Skalierung: "/>
+                    <Label x:Name="sliderText" Text="{x:Static res:AppResources.voreinstellung_skalierung}"/>
                     <Slider x:Name="iconScale"
                             Maximum="100"
                             Minimum="1"
@@ -120,7 +120,7 @@
                                          KnobColorOff="White"
                                          SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="Rotation sperren" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text="{x:Static res:AppResources.rotation_sperren}" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                         <controls:Switch x:Name="allowAutoScale"
@@ -132,7 +132,7 @@
                                          KnobColorOff="White"
                                          SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="Auto-Skalierung sperren" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text="{x:Static res:AppResources.auto_skalierung_sperren}" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>                    
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40" x:Name="deleteIconContainer" IsVisible="False">
                         <controls:Switch x:Name="deleteIcon"
@@ -145,7 +145,7 @@
                                          KnobColorOff="White"
                                          SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="Icon löschen" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text="{x:Static res:AppResources.icon_loeschen}" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
                     <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
                         <controls:Switch x:Name="setDefault"
@@ -158,7 +158,7 @@
                                          KnobColorOff="White"
                                          SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="Standard-Icon" Grid.Column="1" VerticalOptions="Center" />
+                        <Label Text="{x:Static res:AppResources.standard_icon}" Grid.Column="1" VerticalOptions="Center" />
                     </Grid>
                 </VerticalStackLayout>
             </VerticalStackLayout>

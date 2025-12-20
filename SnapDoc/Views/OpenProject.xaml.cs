@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Services;
+using SnapDoc.Resources.Languages;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -257,7 +258,7 @@ public partial class OpenProject : ContentPage
         switch (_result.Result)
         {
             case "Delete":
-                var popup1 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich löschen?", okText: "Löschen", alert: true);
+                var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
                 var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
                 if (result1.Result == "Ok")
                 {
@@ -265,7 +266,7 @@ public partial class OpenProject : ContentPage
                     tmp_list.Remove(item);
                     FileListView.ItemsSource = null;
                     FileListView.ItemsSource = tmp_list;
-                    FileListView.Footer = tmp_list.Count + " Projekte";
+                    FileListView.Footer = tmp_list.Count + " " + AppResources.projekte;
 
                     // Rekursives Löschen von Dateien in allen Unterverzeichnissen
                     string[] files = Directory.GetFiles(Path.GetDirectoryName(item.FilePath), "*", SearchOption.AllDirectories);

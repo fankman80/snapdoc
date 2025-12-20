@@ -3,12 +3,6 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
-    // Text-Strings
-    public const string PinEditSizeModeLock = "◀ Grösse fixiert";
-    public const string PinEditSizeModeUnlock = "◀ Automatische Grössenanpassung";
-    public const string PinEditRotateModeLock = "◀ Drehung fixiert";
-    public const string PinEditRotateModeUnlock = "◀ Automatische Drehung";
-
     // Icondefinitionen
     public const string PinEditRotateModeLockIcon = MaterialIcons.Lock_reset;
     public const string PinEditRotateModeUnlockIcon = MaterialIcons.Rotate_auto;
