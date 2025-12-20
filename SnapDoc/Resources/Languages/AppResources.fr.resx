@@ -325,28 +325,28 @@
     <value>Masquer les plans inactifs</value>
   </data>
   <data name="modus_fuer_pinplatzierung" xml:space="preserve">
-    <value>Mode de placement des pin's</value>
+    <value>Placement des pin's</value>
   </data>
   <data name="pin_in_die_bildmitte_setzen" xml:space="preserve">
-    <value>Placer le pin's au centre de l'image</value>
+    <value>Placer au centre de l'image</value>
   </data>
   <data name="pin_durch_antippen_setzen" xml:space="preserve">
-    <value>Placer le pin's en appuyant</value>
+    <value>Placer en appuyant</value>
   </data>
   <data name="pin_durch_gedrueckthalten_setzen" xml:space="preserve">
-    <value>Placer le pin's en maintenant enfoncé</value>
+    <value>Placer en maintenant enfoncé</value>
   </data>
   <data name="swisstopo_karten_pins" xml:space="preserve">
     <value>Pin's de la carte swisstopo</value>
   </data>
   <data name="farbschema" xml:space="preserve">
-    <value>Schéma de couleurs</value>
+    <value>Thème</value>
   </data>
   <data name="app_modus" xml:space="preserve">
-    <value>Mode de l'application</value>
+    <value>Affichage</value>
   </data>
   <data name="farb_thema" xml:space="preserve">
-    <value>Thème de couleur</value>
+    <value>Couleurs</value>
   </data>
   <data name="erweiterte_einstellungen" xml:space="preserve">
     <value>Paramètres avancés</value>
