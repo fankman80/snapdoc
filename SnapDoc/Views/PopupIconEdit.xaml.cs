@@ -26,7 +26,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
-        iconScale.Value = iconItem.IconScale * 100;
+        IconScale = iconItem.IconScale;
         sliderText.Text = "Voreinstellung Skalierung: " + (iconItem.IconScale * 100).ToString() + "%";
         allowRotate.IsToggled = iconItem.IsRotationLocked;
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
@@ -113,6 +113,20 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         }
     }
 
+    private double iconScale;
+    public double IconScale
+    {
+        get => iconScale;
+        set
+        {
+            if (iconScale != value)
+            {
+                iconScale = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
         var file = Path.GetFileName(iconItem.FileName);
@@ -129,7 +143,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 allowAutoScale.IsToggled,
                 iconItem.IsCustomIcon,
                 new SKColor((byte)(SelectedColor.Red * 255), (byte)(SelectedColor.Green * 255), (byte)(SelectedColor.Blue * 255)),
-                Math.Round(iconScale.Value / 100, 1),
+                IconScale,
                 iconCategory.Text,
                 SettingsService.Instance.DefaultPinIcon == file
             );
@@ -174,13 +188,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     {
         await CloseAsync(null);
     }
-
-    private void OnSliderValueChanged(object sender, EventArgs e)
-    {
-        var sliderValue = ((Slider)sender).Value;
-        sliderText.Text = "Voreinstellung Skalierung: " + Math.Round(sliderValue, 0).ToString() + "%";
-    }
-
 
     public new event PropertyChangedEventHandler PropertyChanged;
     protected new virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
