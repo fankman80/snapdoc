@@ -316,7 +316,7 @@
     <value>Passer au pin's</value>
   </data>
   <data name="planrotation_sperren" xml:space="preserve">
-    <value>Verrouiller la rotation du plan</value>
+    <value>Verrouiller rotation</value>
   </data>
   <data name="planliste_mit_vorschau" xml:space="preserve">
     <value>Liste des plans avec aperçu</value>
