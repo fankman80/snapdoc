@@ -72,7 +72,7 @@ public partial class OpenProject : ContentPage
 
         // Liste der JSON-Dateien dem ListView zuweisen        
         FileListView.ItemsSource = foundFiles;
-        ProjectCounterLabel.Text = "Projekte: " + foundFiles.Count ;
+        ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";    
 
         // nach Datum sortieren
         FileListView.ItemsSource = foundFiles.OrderByDescending(f => f.FileDate).ToList();
@@ -80,7 +80,7 @@ public partial class OpenProject : ContentPage
 
     private async void OnNewClicked(object sender, EventArgs e)
     {
-        var popup = new PopupEntry(title: "Neues Projekt eröffnen...", okText: "Erstellen");
+        var popup = new PopupEntry(title: AppResources.neues_projekt_eroeffnen, okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
@@ -132,7 +132,7 @@ public partial class OpenProject : ContentPage
     {
         // 1. BusyIndicator SOFORT einschalten
         // Damit ist er sichtbar, sobald der Picker sich schließt und der Download läuft
-        busyOverlay.BusyMessage = "Warte auf Datei...";
+        busyOverlay.BusyMessage = AppResources.warte_auf_datei;
         busyOverlay.IsActivityRunning = true;
         busyOverlay.IsOverlayVisible = true;
 
@@ -142,13 +142,13 @@ public partial class OpenProject : ContentPage
             // Der Code "wartet" hier, während der User wählt UND während das OS herunterlädt
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
-                PickerTitle = "Bitte wähle eine Zip-Datei aus"
+                PickerTitle = AppResources.bitte_waehle_zip
             });
 
             if (fileResult != null)
             {
                 // Optional: Nachricht aktualisieren, dass der Download fertig ist und nun verarbeitet wird
-                busyOverlay.BusyMessage = "Projekt wird importiert...";
+                busyOverlay.BusyMessage = AppResources.projekt_wird_importiert;
 
                 var targetDirectory = Settings.DataDirectory;
 
@@ -165,9 +165,9 @@ public partial class OpenProject : ContentPage
         {
             Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("Fehler", "Die Datei konnte nicht importiert werden.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.fehler, AppResources.datei_konnte_nicht_importiert_werden, AppResources.ok);
             else
-                await Toast.Make($"Die Datei konnte nicht importiert werden.").Show();
+                await Toast.Make(AppResources.datei_konnte_nicht_importiert_werden).Show();
         }
         finally
         {
@@ -266,7 +266,7 @@ public partial class OpenProject : ContentPage
                     tmp_list.Remove(item);
                     FileListView.ItemsSource = null;
                     FileListView.ItemsSource = tmp_list;
-                    FileListView.Footer = tmp_list.Count + " " + AppResources.projekte;
+                    FileListView.Footer = $"{tmp_list.Count} {AppResources.projekte}";
 
                     // Rekursives Löschen von Dateien in allen Unterverzeichnissen
                     string[] files = Directory.GetFiles(Path.GetDirectoryName(item.FilePath), "*", SearchOption.AllDirectories);
@@ -286,7 +286,7 @@ public partial class OpenProject : ContentPage
                 break;
 
             case "Zip":
-                var popup2 = new PopupDualResponse("Wollen Sie dieses Projekt wirklich als Zip exportieren?");
+                var popup2 = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
                 var result2 = await this.ShowPopupAsync<string>(popup2, Settings.PopupOptions);
                 if (result2.Result == "Ok")
                 {
@@ -295,7 +295,7 @@ public partial class OpenProject : ContentPage
 
                     busyOverlay.IsOverlayVisible = true;
                     busyOverlay.IsActivityRunning = true;
-                    busyOverlay.BusyMessage = "Daten werden komprimiert...";
+                    busyOverlay.BusyMessage = AppResources.daten_werden_komprimiert;
 
                     // Hintergrundoperation (nicht UI-Operationen)
                     await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
@@ -308,9 +308,9 @@ public partial class OpenProject : ContentPage
                     {
                         var fileSaveResult = await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(item.FileName) + ".zip", saveStream);
                         if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                            await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Zip wurde exportiert.", "OK");
+                            await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.zip_wurde_exportiert, AppResources.ok);
                         else
-                            await Toast.Make($"Zip wurde exportiert.").Show();
+                            await Toast.Make(AppResources.zip_wurde_exportiert).Show();
                     }
                     finally
                     {

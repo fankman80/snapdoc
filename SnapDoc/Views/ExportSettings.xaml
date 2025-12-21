@@ -154,7 +154,7 @@
 
                     <controls:LocalizedLabel ResourceKey="bildkomprimierung"
                                              Value="{Binding FotoCompressValue}"
-                                             ValueFormat="{}{0}%"
+                                             ValueFormat="{}: {0}%"
                                              Margin="0, 0, 0, -12"
                                              IsVisible="{Binding IsFotoCompressed}"/>
                     <Slider Maximum="100"
@@ -177,7 +177,7 @@
 
                     <controls:LocalizedLabel ResourceKey="groesse_pinbeschriftung"
                                              Value="{Binding PinLabelFontSize}"
-                                             ValueFormat="{}{0:0.#} pt"
+                                             ValueFormat="{}: {0:0.#} pt"
                                              Margin="0, 0, 0, -12"/>
                     <Slider Maximum="20"
                             Minimum="1"
@@ -188,7 +188,7 @@
 
                     <controls:LocalizedLabel ResourceKey="pin_icon_breite_hoehe"
                                              Value="{Binding PinExportSize}"
-                                             ValueFormat="{}{0:0.#} mm"
+                                             ValueFormat="{}: {0:0.#} mm"
                                              Margin="0, 0, 0, -12"
                                              IsVisible="{Binding IsPinIconExport}"/>
                     <Slider Maximum="20"
@@ -201,7 +201,7 @@
 
                     <controls:LocalizedLabel ResourceKey="foto_breite"
                                              Value="{Binding ImageExportSize}"
-                                             ValueFormat="{}{0} mm" Margin="0, 0, 0, -12"
+                                             ValueFormat="{}: {0} mm" Margin="0, 0, 0, -12"
                                              IsVisible="{Binding IsImageExport}"/>
                     <Slider Maximum="160"
                             Minimum="10"
@@ -213,7 +213,7 @@
 
                     <controls:LocalizedLabel ResourceKey="positionsbilder_breite_hoehe"
                                              Value="{Binding PinPosExportSize}"
-                                             ValueFormat="{}{0} mm" 
+                                             ValueFormat="{}: {0} mm" 
                                              Margin="0, 0, 0, -12"
                                              IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="160"
@@ -226,7 +226,7 @@
 
                     <controls:LocalizedLabel ResourceKey="positionsbilder_zuschnitt"
                                              Value="{Binding PinPosCropExportSize}"
-                                             ValueFormat="{}{0} Pixel"
+                                             ValueFormat="{}: {0} Pixel"
                                              Margin="0, 0, 0, -12"
                                              IsVisible="{Binding IsPosImageExport}"/>
                     <Slider Maximum="1000"
@@ -239,7 +239,7 @@
 
                     <controls:LocalizedLabel ResourceKey="titelbild_hoehe"
                                              Value="{Binding TitleExportSize}"
-                                             ValueFormat="{}{0} mm"
+                                             ValueFormat="{}: {0} mm"
                                              Margin="0, 0, 0, -12"/>
                     <Slider Maximum="300"
                             Minimum="10"

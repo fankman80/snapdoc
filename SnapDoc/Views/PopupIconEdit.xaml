@@ -101,11 +101,11 @@
                         Clicked="OnColorPickerClicked"/>
 
                 <VerticalStackLayout Spacing="0">
-                    <controls:LocalizedLabel ResourceKey="{x:Static res:AppResources.voreinstellung_skalierung}"
+                    <controls:LocalizedLabel ResourceKey="voreinstellung_skalierung"
                                              Value="{Binding IconScale, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
-                                             ValueFormat="{}{0:0}%"/>
-                    <Slider Maximum="0"
-                            Minimum="1"
+                                             ValueFormat="{}: {0:0}%"/>
+                    <Slider Minimum="0"
+                            Maximum="1"
                             Value="{Binding IconScale, Mode=TwoWay}"
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"

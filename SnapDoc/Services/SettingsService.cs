@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SnapDoc.Models;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Services;
 
@@ -159,25 +160,25 @@ public partial class SettingsService : ObservableObject
     // Lists
     [ObservableProperty] private List<string> _iconSortCrits =
     [
-        "nach Name",
-        "nach Farbe"
+        AppResources.nach_name,
+        AppResources.nach_farbe
     ];
     [ObservableProperty] private List<string> _pinSortCrits =
     [
-        "nach Plan",
-        "nach Pin",
-        "nach Standort",
-        "nach Bezeichnung",
-        "nach aktiv/inaktiv",
-        "nach Aufnahmedatum",
-        "nach Priorität"
+        AppResources.nach_plan,
+        AppResources.nach_pin,
+        AppResources.nach_standort,
+        AppResources.nach_bezeichnung,
+        AppResources.nach_aktiv_inaktiv,
+        AppResources.nach_aufnahmedatum,
+        AppResources.nach_prioritaet
     ];
     [ObservableProperty] private List<PriorityItem> _priorityItems =
     [
         new() { Key = "", Color = "#000000" },
-        new() { Key = "Empfehlung", Color = "#92D050" },
-        new() { Key = "Wichtig", Color = "#FFC000" },
-        new() { Key = "Kritisch", Color = "#FF0000" }
+        new() { Key = AppResources.empfehlung, Color = "#92D050" },
+        new() { Key = AppResources.wichtig, Color = "#FFC000" },
+        new() { Key = AppResources.kritisch, Color = "#FF0000" }
     ];
     [ObservableProperty] private List<string> _colorList =
     [

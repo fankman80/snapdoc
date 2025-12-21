@@ -51,7 +51,7 @@ public partial class ExportSettings : ContentPage
 
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "Bericht wird geteilt...";
+        busyOverlay.BusyMessage = AppResources.bericht_wird_geteilt;
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
@@ -64,16 +64,16 @@ public partial class ExportSettings : ContentPage
         {
             await ShareFileAsync(outputPath);
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde geteilt.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_geteilt, AppResources.ok);
             else
-                await Toast.Make($"Bericht wurde geteilt.").Show();
+                await Toast.Make(AppResources.bericht_wurde_geteilt).Show();
         }
         catch
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht geteilt.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_nicht_geteilt, AppResources.ok);
             else
-                await Toast.Make($"Bericht wurde nicht geteilt.").Show();
+                await Toast.Make(AppResources.bericht_wurde_nicht_geteilt).Show();
         }
 
         if (File.Exists(outputPath))
@@ -86,7 +86,7 @@ public partial class ExportSettings : ContentPage
     {
         if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupAlert("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
+            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
             await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             return;
         }
@@ -96,7 +96,7 @@ public partial class ExportSettings : ContentPage
 
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "Bericht wird gespeichert...";
+        busyOverlay.BusyMessage = AppResources.bericht_wird_gespeichert;
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
@@ -110,16 +110,16 @@ public partial class ExportSettings : ContentPage
         if (fileSaveResult.IsSuccessful)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde gespeichert.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_gespeichert, AppResources.ok);
             else
-                await Toast.Make($"Bericht wurde gespeichert.").Show();
+                await Toast.Make(AppResources.bericht_wurde_gespeichert).Show();
         }
         else
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Bericht wurde nicht gespeichert.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_nicht_gespeichert, AppResources.ok);
             else
-                await Toast.Make($"Bericht wurde nicht gespeichert.").Show();
+                await Toast.Make(AppResources.bericht_wurde_nicht_gespeichert).Show();
         }
         saveStream.Close();
 
@@ -160,7 +160,7 @@ public partial class ExportSettings : ContentPage
 
         var result = await FilePicker.Default.PickAsync(new PickOptions
         {
-            PickerTitle = "Wähle ein Word-Dokument",
+            PickerTitle = AppResources.waehle_word_dokument,
             FileTypes = customFileType
         });
 

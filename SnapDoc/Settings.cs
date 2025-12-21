@@ -78,9 +78,9 @@ public static class Settings
     public static readonly Dictionary<string, string> Languages =
     new () {
         ["system"] = "System",
-            ["de"] = "Deutsch",
-            ["en"] = "English",
-            ["fr"] = "Français",
+        ["de"] = "Deutsch",
+        ["en"] = "English",
+        ["fr"] = "Français",
     };
 
     public static readonly PopupOptions PopupOptions = new()

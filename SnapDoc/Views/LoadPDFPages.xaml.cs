@@ -4,6 +4,7 @@ using Microsoft.Maui.Controls;
 using PDFtoImage;
 using SkiaSharp;
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 
 namespace SnapDoc.Views;
@@ -49,7 +50,7 @@ public partial class LoadPDFPages : ContentPage
             List<PdfItem> pdfImages = [];
             busyOverlay.IsOverlayVisible = true;
             busyOverlay.IsActivityRunning = true;
-            busyOverlay.BusyMessage = "Lade PDF Seiten...";
+            busyOverlay.BusyMessage = AppResources.lade_pdf_seiten;
 
             await Task.Run(() =>
             {
@@ -127,7 +128,7 @@ public partial class LoadPDFPages : ContentPage
     {
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
-        busyOverlay.BusyMessage = "PDF wird konvertiert...";
+        busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert;
 
         if (!Directory.Exists(Settings.CacheDirectory))
             Directory.CreateDirectory(Settings.CacheDirectory);

@@ -127,7 +127,7 @@
     <value>Description</value>
   </data>
   <data name="bildkomprimierung" xml:space="preserve">
-    <value>Compression d'image :</value>
+    <value>Compression d'image</value>
   </data>
   <data name="datum" xml:space="preserve">
     <value>Date</value>
@@ -163,7 +163,7 @@
     <value>Zoomer la photo à la taille de la fenêtre</value>
   </data>
   <data name="foto_breite" xml:space="preserve">
-    <value>Photo (largeur) :</value>
+    <value>Photo (largeur)</value>
   </data>
   <data name="foto_galerie" xml:space="preserve">
     <value>Galerie de photos</value>
@@ -178,7 +178,7 @@
     <value>Maintenir enfoncé pour modifier l'icône.</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
-    <value>Taille de l'étiquette du pin's :</value>
+    <value>Taille de l'étiquette du pin's</value>
   </data>
   <data name="icon_auswählen" xml:space="preserve">
     <value>Sélectionner l'icône</value>
@@ -229,7 +229,7 @@
     <value>Exporter le pin's</value>
   </data>
   <data name="pin_icon_breite_hoehe" xml:space="preserve">
-    <value>Icône du pin's (largeur + hauteur) :</value>
+    <value>Icône du pin's (largeur + hauteur)</value>
   </data>
   <data name="pin_loeschen" xml:space="preserve">
     <value>Supprimer le pin's</value>
@@ -247,10 +247,10 @@
     <value>Dessiner une polyligne</value>
   </data>
   <data name="positionsbilder_breite_hoehe" xml:space="preserve">
-    <value>Images de position (largeur + hauteur) :</value>
+    <value>Images de position (largeur + hauteur)</value>
   </data>
   <data name="positionsbilder_zuschnitt" xml:space="preserve">
-    <value>Recadrage des images de position :</value>
+    <value>Recadrage des images de position</value>
   </data>
   <data name="position_sperren" xml:space="preserve">
     <value>Verrouiller la position</value>
@@ -289,7 +289,7 @@
     <value>Carte swisstopo</value>
   </data>
   <data name="titelbild_hoehe" xml:space="preserve">
-    <value>Image de titre (hauteur) :</value>
+    <value>Image de titre (hauteur)</value>
   </data>
   <data name="titelbild_mit_der_kamera_erstellen" xml:space="preserve">
     <value>Créer l'image de titre avec l'appareil photo</value>
@@ -310,7 +310,7 @@
     <value>Afficher les définitions des espaces réservés</value>
   </data>
   <data name="zeit" xml:space="preserve">
-    <value>Heure :</value>
+    <value>Heure</value>
   </data>
   <data name="zu_pin_wechseln" xml:space="preserve">
     <value>Passer au pin's</value>
@@ -367,16 +367,16 @@
     <value>Réinitialiser les définitions d'icônes</value>
   </data>
   <data name="max_pingroesse_limitieren" xml:space="preserve">
-    <value>Limiter la taille max du pin's :</value>
+    <value>Limiter la taille max du pin's</value>
   </data>
   <data name="min_pingroesse_limitieren" xml:space="preserve">
-    <value>Limiter la taille min du pin's :</value>
+    <value>Limiter la taille min du pin's</value>
   </data>
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
-    <value>Résolution conversion PDF :</value>
+    <value>Résolution conversion PDF</value>
   </data>
   <data name="pingroesse" xml:space="preserve">
-    <value>Taille du pin's :</value>
+    <value>Taille du pin's</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Titre du projet</value>
@@ -421,28 +421,28 @@
     <value>▼      Définition de couleur      ▼</value>
   </data>
   <data name="rot_r" xml:space="preserve">
-    <value>Rouge (R) :</value>
+    <value>Rouge (R)</value>
   </data>
   <data name="gruen_g" xml:space="preserve">
-    <value>Vert (G) :</value>
+    <value>Vert (G)</value>
   </data>
   <data name="blau_b" xml:space="preserve">
-    <value>Bleu (B) :</value>
+    <value>Bleu (B)</value>
   </data>
   <data name="farbwert_h" xml:space="preserve">
-    <value>Teinte (H) :</value>
+    <value>Teinte (H)</value>
   </data>
   <data name="saettigung_s" xml:space="preserve">
-    <value>Saturation (S) :</value>
+    <value>Saturation (S)</value>
   </data>
   <data name="helligkeit_l" xml:space="preserve">
-    <value>Luminosité (L) :</value>
+    <value>Luminosité (L)</value>
   </data>
   <data name="pinselgroesse" xml:space="preserve">
-    <value>Taille du pinceau :</value>
+    <value>Taille du pinceau</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
-    <value>Opacité :</value>
+    <value>Opacité</value>
   </data>
   <data name="anker_x" xml:space="preserve">
     <value>Ancre X</value>
@@ -460,13 +460,13 @@
     <value>Choisir la couleur</value>
   </data>
   <data name="voreinstellung_skalierung" xml:space="preserve">
-    <value>Préréglage de mise à l'échelle :</value>
+    <value>Préréglage de mise à l'échelle</value>
   </data>
   <data name="rotation_sperren" xml:space="preserve">
     <value>Verrouiller la rotation</value>
   </data>
   <data name="auto_skalierung_sperren" xml:space="preserve">
-    <value>Verrouiller la mise à l'échelle auto</value>
+    <value>Verrouiller zoom auto</value>
   </data>
   <data name="icon_loeschen" xml:space="preserve">
     <value>Supprimer l'icône</value>
@@ -539,5 +539,104 @@
   </data>
   <data name="die_sprache_wird_erst_nach_einem_neustart_gewechselt" xml:space="preserve">
     <value>La langue ne sera modifiée qu'après un redémarrage.</value>
+  </data>
+  <data name="nach_name" xml:space="preserve">
+    <value>par nom</value>
+  </data>
+  <data name="nach_farbe" xml:space="preserve">
+    <value>par couleur</value>
+  </data>
+  <data name="nach_plan" xml:space="preserve">
+    <value>par plan</value>
+  </data>
+  <data name="nach_pin" xml:space="preserve">
+    <value>par pin</value>
+  </data>
+  <data name="nach_standort" xml:space="preserve">
+    <value>par emplacement</value>
+  </data>
+  <data name="nach_bezeichnung" xml:space="preserve">
+    <value>par désignation</value>
+  </data>
+  <data name="nach_aktiv_inaktiv" xml:space="preserve">
+    <value>par état (actif/inactif)</value>
+  </data>
+  <data name="nach_aufnahmedatum" xml:space="preserve">
+    <value>par date de prise</value>
+  </data>
+  <data name="nach_prioritaet" xml:space="preserve">
+    <value>par priorité</value>
+  </data>
+  <data name="empfehlung" xml:space="preserve">
+    <value>Recommandation</value>
+  </data>
+  <data name="wichtig" xml:space="preserve">
+    <value>Important</value>
+  </data>
+  <data name="kritisch" xml:space="preserve">
+    <value>Critique</value>
+  </data>
+  <data name="neues_projekt_eroeffnen" xml:space="preserve">
+    <value>Créer un nouveau projet...</value>
+  </data>
+  <data name="erstellen" xml:space="preserve">
+    <value>Créer</value>
+  </data>
+  <data name="bericht_wird_gespeichert" xml:space="preserve">
+    <value>Enregistrement du rapport...</value>
+  </data>
+  <data name="bericht_wird_geteilt" xml:space="preserve">
+    <value>Partage du rapport...</value>
+  </data>
+  <data name="lade_pdf_seiten" xml:space="preserve">
+    <value>Chargement des pages PDF...</value>
+  </data>
+  <data name="pdf_wird_konvertiert" xml:space="preserve">
+    <value>Conversion du PDF...</value>
+  </data>
+  <data name="warte_auf_datei" xml:space="preserve">
+    <value>En attente du fichier...</value>
+  </data>
+  <data name="rojekt_wird_importiert" xml:space="preserve">
+    <value>Importation du projet...</value>
+  </data>
+  <data name="daten_werden_komprimiert" xml:space="preserve">
+    <value>Compression des données...</value>
+  </data>
+  <data name="bitte_waehle_zip" xml:space="preserve">
+    <value>Veuillez sélectionner un fichier Zip</value>
+  </data>
+  <data name="wollen_sie_projekt_als_zip_exportieren" xml:space="preserve">
+    <value>Voulez-vous vraiment exporter ce projet en Zip ?</value>
+  </data>
+  <data name="zip_wurde_exportiert" xml:space="preserve">
+    <value>Zip exporté avec succès.</value>
+  </data>
+  <data name="datei_konnte_nicht_importiert_werden" xml:space="preserve">
+    <value>Impossible d'importer le fichier.</value>
+  </data>
+  <data name="fehler" xml:space="preserve">
+    <value>Erreur</value>
+  </data>
+  <data name="bericht_wurde_geteilt" xml:space="preserve">
+    <value>Rapport partagé avec succès.</value>
+  </data>
+  <data name="bericht_wurde_nicht_geteilt" xml:space="preserve">
+    <value>Le rapport n'a pas été partagé.</value>
+  </data>
+  <data name="exportvorlage_waehlen_oder_importieren" xml:space="preserve">
+    <value>Sélectionnez un modèle d'exportation ou importez-en un nouveau.</value>
+  </data>
+  <data name="bericht_wurde_gespeichert" xml:space="preserve">
+    <value>Rapport enregistré avec succès.</value>
+  </data>
+  <data name="bericht_wurde_nicht_gespeichert" xml:space="preserve">
+    <value>Le rapport n'a pas été enregistré.</value>
+  </data>
+  <data name="waehle_word_dokument" xml:space="preserve">
+    <value>Sélectionnez un document Word</value>
+  </data>
+  <data name="projekt_wird_importiert" xml:space="preserve">
+    <value>Importation du projet...</value>
   </data>
 </root>

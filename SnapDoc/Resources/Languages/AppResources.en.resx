@@ -127,7 +127,7 @@
     <value>Description</value>
   </data>
   <data name="bildkomprimierung" xml:space="preserve">
-    <value>Image compression:</value>
+    <value>Image compression</value>
   </data>
   <data name="datum" xml:space="preserve">
     <value>Date</value>
@@ -163,7 +163,7 @@
     <value>Zoom photo to window size</value>
   </data>
   <data name="foto_breite" xml:space="preserve">
-    <value>Photo (width):</value>
+    <value>Photo (width)</value>
   </data>
   <data name="foto_galerie" xml:space="preserve">
     <value>Photo gallery</value>
@@ -178,7 +178,7 @@
     <value>Press and hold to edit icon.</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
-    <value>Pin label size:</value>
+    <value>Pin label size</value>
   </data>
   <data name="icon_auswählen" xml:space="preserve">
     <value>Select icon</value>
@@ -229,7 +229,7 @@
     <value>Export pin</value>
   </data>
   <data name="pin_icon_breite_hoehe" xml:space="preserve">
-    <value>Pin icon (width + height):</value>
+    <value>Pin icon (width + height)</value>
   </data>
   <data name="pin_loeschen" xml:space="preserve">
     <value>Delete pin</value>
@@ -247,10 +247,10 @@
     <value>Draw polyline</value>
   </data>
   <data name="positionsbilder_breite_hoehe" xml:space="preserve">
-    <value>Position images (width + height):</value>
+    <value>Position images (width + height)</value>
   </data>
   <data name="positionsbilder_zuschnitt" xml:space="preserve">
-    <value>Position images cropping:</value>
+    <value>Position images cropping</value>
   </data>
   <data name="position_sperren" xml:space="preserve">
     <value>Lock position</value>
@@ -289,7 +289,7 @@
     <value>swisstopo map</value>
   </data>
   <data name="titelbild_hoehe" xml:space="preserve">
-    <value>Cover image (height):</value>
+    <value>Cover image (height)</value>
   </data>
   <data name="titelbild_mit_der_kamera_erstellen" xml:space="preserve">
     <value>Create cover image with camera</value>
@@ -310,7 +310,7 @@
     <value>Show placeholder definitions</value>
   </data>
   <data name="zeit" xml:space="preserve">
-    <value>Time:</value>
+    <value>Time</value>
   </data>
   <data name="zu_pin_wechseln" xml:space="preserve">
     <value>Switch to pin</value>
@@ -367,16 +367,16 @@
     <value>Reset icon definitions</value>
   </data>
   <data name="max_pingroesse_limitieren" xml:space="preserve">
-    <value>Limit max. pin size:</value>
+    <value>Limit max. pin size</value>
   </data>
   <data name="min_pingroesse_limitieren" xml:space="preserve">
-    <value>Limit min. pin size:</value>
+    <value>Limit min. pin size</value>
   </data>
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
-    <value>PDF conversion resolution:</value>
+    <value>PDF conversion resolution</value>
   </data>
   <data name="pingroesse" xml:space="preserve">
-    <value>Pin size:</value>
+    <value>Pin size</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Project title</value>
@@ -421,28 +421,28 @@
     <value>▼      Color Definition      ▼</value>
   </data>
   <data name="rot_r" xml:space="preserve">
-    <value>Red (R):</value>
+    <value>Red (R)</value>
   </data>
   <data name="gruen_g" xml:space="preserve">
-    <value>Green (G):</value>
+    <value>Green (G)</value>
   </data>
   <data name="blau_b" xml:space="preserve">
-    <value>Blue (B):</value>
+    <value>Blue (B)</value>
   </data>
   <data name="farbwert_h" xml:space="preserve">
-    <value>Hue (H):</value>
+    <value>Hue (H)</value>
   </data>
   <data name="saettigung_s" xml:space="preserve">
-    <value>Saturation (S):</value>
+    <value>Saturation (S)</value>
   </data>
   <data name="helligkeit_l" xml:space="preserve">
-    <value>Lightness (L):</value>
+    <value>Lightness (L)</value>
   </data>
   <data name="pinselgroesse" xml:space="preserve">
-    <value>Brush size:</value>
+    <value>Brush size</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
-    <value>Opacity:</value>
+    <value>Opacity</value>
   </data>
   <data name="anker_x" xml:space="preserve">
     <value>Anchor X</value>
@@ -460,7 +460,7 @@
     <value>Select color</value>
   </data>
   <data name="voreinstellung_skalierung" xml:space="preserve">
-    <value>Scaling preset:</value>
+    <value>Scaling preset</value>
   </data>
   <data name="rotation_sperren" xml:space="preserve">
     <value>Lock rotation</value>
@@ -539,5 +539,104 @@
   </data>
   <data name="die_sprache_wird_erst_nach_einem_neustart_gewechselt" xml:space="preserve">
     <value>The language will only be changed after a restart.</value>
+  </data>
+  <data name="nach_name" xml:space="preserve">
+    <value>by name</value>
+  </data>
+  <data name="nach_farbe" xml:space="preserve">
+    <value>by color</value>
+  </data>
+  <data name="nach_plan" xml:space="preserve">
+    <value>by plan</value>
+  </data>
+  <data name="nach_pin" xml:space="preserve">
+    <value>by pin</value>
+  </data>
+  <data name="nach_standort" xml:space="preserve">
+    <value>by location</value>
+  </data>
+  <data name="nach_bezeichnung" xml:space="preserve">
+    <value>by designation</value>
+  </data>
+  <data name="nach_aktiv_inaktiv" xml:space="preserve">
+    <value>by status</value>
+  </data>
+  <data name="nach_aufnahmedatum" xml:space="preserve">
+    <value>by date taken</value>
+  </data>
+  <data name="nach_prioritaet" xml:space="preserve">
+    <value>by priority</value>
+  </data>
+  <data name="empfehlung" xml:space="preserve">
+    <value>Recommendation</value>
+  </data>
+  <data name="wichtig" xml:space="preserve">
+    <value>Important</value>
+  </data>
+  <data name="kritisch" xml:space="preserve">
+    <value>Critical</value>
+  </data>
+  <data name="neues_projekt_eroeffnen" xml:space="preserve">
+    <value>Create new project...</value>
+  </data>
+  <data name="erstellen" xml:space="preserve">
+    <value>Create</value>
+  </data>
+  <data name="bericht_wird_gespeichert" xml:space="preserve">
+    <value>Saving report...</value>
+  </data>
+  <data name="bericht_wird_geteilt" xml:space="preserve">
+    <value>Sharing report...</value>
+  </data>
+  <data name="lade_pdf_seiten" xml:space="preserve">
+    <value>Loading PDF pages...</value>
+  </data>
+  <data name="pdf_wird_konvertiert" xml:space="preserve">
+    <value>Converting PDF...</value>
+  </data>
+  <data name="warte_auf_datei" xml:space="preserve">
+    <value>Waiting for file...</value>
+  </data>
+  <data name="rojekt_wird_importiert" xml:space="preserve">
+    <value>Importing project...</value>
+  </data>
+  <data name="daten_werden_komprimiert" xml:space="preserve">
+    <value>Compressing data...</value>
+  </data>
+  <data name="bitte_waehle_zip" xml:space="preserve">
+    <value>Please select a Zip file</value>
+  </data>
+  <data name="wollen_sie_projekt_als_zip_exportieren" xml:space="preserve">
+    <value>Do you really want to export this project as a Zip?</value>
+  </data>
+  <data name="zip_wurde_exportiert" xml:space="preserve">
+    <value>Zip exported successfully.</value>
+  </data>
+  <data name="datei_konnte_nicht_importiert_werden" xml:space="preserve">
+    <value>The file could not be imported.</value>
+  </data>
+  <data name="fehler" xml:space="preserve">
+    <value>Error</value>
+  </data>
+  <data name="bericht_wurde_geteilt" xml:space="preserve">
+    <value>Report shared successfully.</value>
+  </data>
+  <data name="bericht_wurde_nicht_geteilt" xml:space="preserve">
+    <value>Report was not shared.</value>
+  </data>
+  <data name="exportvorlage_waehlen_oder_importieren" xml:space="preserve">
+    <value>Select an export template or import a new one.</value>
+  </data>
+  <data name="bericht_wurde_gespeichert" xml:space="preserve">
+    <value>Report saved successfully.</value>
+  </data>
+  <data name="bericht_wurde_nicht_gespeichert" xml:space="preserve">
+    <value>Report was not saved.</value>
+  </data>
+  <data name="waehle_word_dokument" xml:space="preserve">
+    <value>Select a Word document</value>
+  </data>
+  <data name="projekt_wird_importiert" xml:space="preserve">
+    <value>Importing project...</value>
   </data>
 </root>
