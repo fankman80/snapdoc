@@ -202,7 +202,7 @@
     <value>Upload new template</value>
   </data>
   <data name="neu_setzen" xml:space="preserve">
-    <value>Reset/Place new</value>
+    <value>Reposition</value>
   </data>
   <data name="objektbezeichnung" xml:space="preserve">
     <value>Object designation</value>
