@@ -171,7 +171,6 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            // 3. Aufräumen (Wird IMMER ausgeführt, auch bei Fehler oder Abbrechen)
             busyOverlay.IsActivityRunning = false;
             busyOverlay.IsOverlayVisible = false;
         }
@@ -196,7 +195,7 @@ public partial class OpenProject : ContentPage
                 return;
             }
 
-            // ⭐ Aktives Projekt setzen
+            // Aktives Projekt setzen
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
             {
                 foreach (var f in items)
@@ -213,7 +212,7 @@ public partial class OpenProject : ContentPage
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
 
-            // Repair-Check (unverändert)
+            // Repair-Check
             if (GlobalJson.Data.Plans != null)
             {
                 var repairCount = false;
