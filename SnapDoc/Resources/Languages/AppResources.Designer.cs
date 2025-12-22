@@ -79,6 +79,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die alle Icons ähnelt.
+        /// </summary>
+        internal static string alle_icons {
+            get {
+                return ResourceManager.GetString("alle_icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Anker X ähnelt.
         /// </summary>
         internal static string anker_x {
@@ -336,6 +345,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string drehung_fixiert {
             get {
                 return ResourceManager.GetString("drehung_fixiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Dunkel ähnelt.
+        /// </summary>
+        internal static string dunkel {
+            get {
+                return ResourceManager.GetString("dunkel", resourceCulture);
             }
         }
         
@@ -633,6 +651,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string gruen_g {
             get {
                 return ResourceManager.GetString("gruen_g", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hell ähnelt.
+        /// </summary>
+        internal static string hell {
+            get {
+                return ResourceManager.GetString("hell", resourceCulture);
             }
         }
         

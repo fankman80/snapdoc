@@ -79,9 +79,9 @@ public partial class SettingsService : ObservableObject
         _selectedTemplate = string.Empty;
 
         ColorThemes = [.. ColorThemeMapping.Keys];
-        AppThemes = ["Hell", "Dunkel"];
+        AppThemes = [AppResources.hell, AppResources.dunkel];
         AppLanguages = [.. Settings.Languages.Values];
-        IconCategories = ["alle Icons"];
+        IconCategories = [AppResources.alle_icons];
         SelectedColorTheme = ColorThemes[0];
         SelectedAppTheme = AppThemes[0];
         IconSortCrit = IconSortCrits[0];
@@ -242,7 +242,7 @@ public partial class SettingsService : ObservableObject
     {
         if (App.Current == null)
             return;
-        App.Current.UserAppTheme = theme == "Hell" ? AppTheme.Light : AppTheme.Dark;
+        App.Current.UserAppTheme = theme == AppResources.hell ? AppTheme.Light : AppTheme.Dark;
     }
 
     public void ApplyAppThemeAfterAppStart()

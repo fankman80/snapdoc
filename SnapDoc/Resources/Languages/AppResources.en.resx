@@ -690,4 +690,13 @@
   <data name="eigene_icons" xml:space="preserve">
     <value>Custom icons</value>
   </data>
+  <data name="alle_icons" xml:space="preserve">
+    <value>All icons</value>
+  </data>
+  <data name="hell" xml:space="preserve">
+    <value>Light</value>
+  </data>
+  <data name="dunkel" xml:space="preserve">
+    <value>Dark</value>
+  </data>
 </root>

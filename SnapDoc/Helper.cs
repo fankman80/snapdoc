@@ -8,6 +8,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc;
 
@@ -98,14 +99,15 @@ public class Helper
         await stream.CopyToAsync(fileStream);
     }
 
-    public static List<IconItem> LoadIconItems(string filePath, out List<string> allCategories, string category = "alle Icons")
+    public static List<IconItem> LoadIconItems(string filePath, out List<string> allCategories, string category = null)
     {
         var iconItems = new List<IconItem>();
         var categories = new HashSet<string>();
+        category = category ?? AppResources.alle_icons;
 
         try
         {
-            categories.Add("alle Icons");
+            categories.Add(AppResources.alle_icons);
             XDocument doc = XDocument.Load(filePath);
             foreach (var itemElement in doc.Descendants("Item"))
             {
@@ -117,7 +119,7 @@ public class Helper
                 }
 
                 // Wenn eine Kategorie zum Filtern übergeben wurde
-                if (category != "alle Icons" && !categoryValue.Equals(category, StringComparison.OrdinalIgnoreCase))
+                if (category != AppResources.alle_icons && !categoryValue.Equals(category, StringComparison.OrdinalIgnoreCase))
                 {
                     continue; // Springe zum nächsten Element, wenn die Kategorie nicht übereinstimmt
                 }
