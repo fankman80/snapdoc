@@ -181,7 +181,7 @@
         function initMarkersFromBridge(center, zoom, icon, scale, markers) { initialCenter = center; initialZoom = zoom; initialIcon = icon; initialIconScale = scale; if (!map) initMap(); if (markers && markers.length > 0) setMultipleMarkers(markers); }
 
         function formatLength(line) { const length = ol.sphere.getLength(line); return length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m'; }
-        function formatArea(polygon) { const area = ol.sphere.getArea(polygon); return area > 10000 ? (area / 1000000).toFixed(2) + ' km�' : area.toFixed(2) + ' m�'; }
+        function formatArea(polygon) { const area = ol.sphere.getArea(polygon); return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²'; }
 
         const baseStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.3)' }), image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: '#999999' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) }) });
         const labelStyle = new ol.style.Style({ text: new ol.style.Text({ font: 'bold 14px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), stroke: new ol.style.Stroke({ color: '#333', width: 3 }), overflow: true }) });
@@ -229,7 +229,7 @@
                     const coordinates = feature.getGeometry().getCoordinates();
                     currentPinkey = feature.get('pinkey'); currentPlankey = feature.get('plankey');
                     let content = '';
-                    if (feature.get('pinname')) content += `<h4 class="popup-header">D�signation:</h4><p>${feature.get('pinname')}</p><hr class="solid">`;
+                    if (feature.get('pinname')) content += `<h4 class="popup-header">Désignation:</h4><p>${feature.get('pinname')}</p><hr class="solid">`;
                     if (feature.get('pinlocation')) content += `<h4 class="popup-header">Emplacement:</h4><p>${feature.get('pinlocation')}</p><hr class="solid">`;
                     if (feature.get('pindesc')) content += `<h4 class="popup-header">Description:</h4><p>${feature.get('pindesc')}</p>`;
                     if (!content) content = `<h4 class="popup-header">Note:</h4><p>Aucune information disponible pour ce pin.</p>`;
@@ -241,8 +241,8 @@
 
         function addInteraction(type) {
             const drawType = type === 'area' ? 'Polygon' : 'LineString';
-            const activeTip = 'Cliquer pour continuer � dessiner ' + (drawType === 'Polygon' ? 'le polygone' : 'la ligne');
-            const idleTip = 'Cliquer pour d�marrer la mesure';
+            const activeTip = 'Cliquer pour continuer à dessiner ' + (drawType === 'Polygon' ? 'le polygone' : 'la ligne');
+            const idleTip = 'Cliquer pour démarrer la mesure';
             let tip = idleTip;
             if (draw) { map.removeInteraction(draw); draw = null; }
             draw = new ol.interaction.Draw({ source: vectorSource, type: drawType, style: function (feature) { return styleFunction(feature, document.getElementById('segments').checked, drawType, tip); } });
