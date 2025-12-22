@@ -40,7 +40,7 @@ public partial class ExportSettings : ContentPage
     {
         if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupDualResponse("Wählen Sie eine Exportvorlage oder importieren Sie eine neue.");
+            var popup = new PopupDualResponse(AppResources.exportvorlage_waehlen_oder_importieren);
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             if (result.Result != null)
                 return;

@@ -12,7 +12,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
     public ObservableCollection<PlanItem> PlanItems { get; set; }
     private static string selectedPlan;
 
-    string actionText = "Verschieben";
+    string actionText = AppResources.verschieben;
     public string ActionText
     {
         get => actionText;
@@ -26,7 +26,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         }
     }
 
-    private string infoText = "Ziel auswählen:";
+    private string infoText = AppResources.ziel_auswaehlen + ":";
     public string InfoText
     {
         get => infoText;
@@ -73,10 +73,10 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 
     private void OnCheckChanged(object sender, EventArgs e)
     {
-        ActionText = copyCheckBox.IsChecked ? "Kopieren" : "Verschieben";
+        ActionText = copyCheckBox.IsChecked ? AppResources.kopieren : AppResources.verschieben;
 
         if (okButtonText.IsVisible)
-            InfoText = $"Pin auf folgenden Plan {ActionText.ToLower()}:";
+            InfoText = ActionText;
     }
 
     private void OnPlanTapped(object sender, EventArgs e)
@@ -97,7 +97,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 
             selectedPlan = tappedItem.CommandParameter?.ToString();
 
-            InfoText = $"Pin auf folgenden Plan {ActionText.ToLower()}:";
+            InfoText = copyCheckBox.IsChecked ? AppResources.pin_auf_plan_kopieren + ":" : AppResources.pin_auf_plan_verschieben + ":";
 
             okButtonText.IsVisible = true;
         }

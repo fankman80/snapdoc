@@ -7,8 +7,8 @@ using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using System.Windows.Input;
 using static SnapDoc.Helper;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -116,7 +116,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             var result = await FilePicker.Default.PickAsync(new PickOptions
             {
                 FileTypes = FilePickerFileType.Images,
-                PickerTitle = "Wähle ein Bild aus"
+                PickerTitle = AppResources.waehle_bild_aus
             });
 
             if (result == null)
@@ -148,7 +148,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
             var updatedItem = new IconItem(
                 fileName,
-                "Neues Icon",
+                AppResources.neues_icon,
                 new Point(0.5, 0.5),
                 size,
                 false,
@@ -156,7 +156,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
                 true,
                 new SKColor(255, 0, 0),
                 1,
-                "eigene Icons",
+                AppResources.eigene_icons,
                 false
             );
 
@@ -171,9 +171,9 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         catch (Exception ex)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Fehler beim Importieren des Bildes: " + ex.Message, "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.fehler_bild_import + ": " + ex.Message, AppResources.ok);
             else
-                await Toast.Make("Fehler beim Importieren des Bildes: " + ex.Message).Show();
+                await Toast.Make(AppResources.fehler_bild_import + ": " + ex.Message).Show();
         }
     }
 

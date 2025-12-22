@@ -58,7 +58,5 @@ internal class SettingsModel
     public Point CustomPinOffset { get; set; } // Offset für die CustomPins unterschiedlich nach Betriebssystem
     public string? DefaultPinIcon { get; set; } // Standard Pin Icon
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
-    public List<string>? IconSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Icons
-    public List<string>? PinSortCrits { get; set; } // Liste der verfügbaren Sortierkriterien für Pins
     public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
 }

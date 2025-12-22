@@ -259,6 +259,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wähle ein Bild aus... ähnelt.
+        /// </summary>
+        internal static string bitte_waehle_bild {
+            get {
+                return ResourceManager.GetString("bitte_waehle_bild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wähle eine Zip-Datei aus ähnelt.
         /// </summary>
         internal static string bitte_waehle_zip {
@@ -327,6 +336,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string drehung_fixiert {
             get {
                 return ResourceManager.GetString("drehung_fixiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Eigene Icons ähnelt.
+        /// </summary>
+        internal static string eigene_icons {
+            get {
+                return ResourceManager.GetString("eigene_icons", resourceCulture);
             }
         }
         
@@ -498,6 +516,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string fehler {
             get {
                 return ResourceManager.GetString("fehler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fehler beim Importieren des Bildes ähnelt.
+        /// </summary>
+        internal static string fehler_bild_import {
+            get {
+                return ResourceManager.GetString("fehler_bild_import", resourceCulture);
             }
         }
         
@@ -700,11 +727,38 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die KML-Datei wurde gespeichert. ähnelt.
+        /// </summary>
+        internal static string kml_gespeichert {
+            get {
+                return ResourceManager.GetString("kml_gespeichert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die KML-Datei wurde nicht gespeichert. ähnelt.
+        /// </summary>
+        internal static string kml_nicht_gespeichert {
+            get {
+                return ResourceManager.GetString("kml_nicht_gespeichert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kopie erstellen ähnelt.
         /// </summary>
         internal static string kopie_erstellen {
             get {
                 return ResourceManager.GetString("kopie_erstellen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kopieren ähnelt.
+        /// </summary>
+        internal static string kopieren {
+            get {
+                return ResourceManager.GetString("kopieren", resourceCulture);
             }
         }
         
@@ -871,6 +925,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Neues Icon ähnelt.
+        /// </summary>
+        internal static string neues_icon {
+            get {
+                return ResourceManager.GetString("neues_icon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die neues Icon erstellen ähnelt.
         /// </summary>
         internal static string neues_icon_erstellen {
@@ -916,6 +979,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Eine oder mehrere PDF-Dateien auswählen ähnelt.
+        /// </summary>
+        internal static string pdf_dateien_auswaehlen {
+            get {
+                return ResourceManager.GetString("pdf_dateien_auswaehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Seiten hinzufügen ähnelt.
         /// </summary>
         internal static string pdf_seiten_hinzufügen {
@@ -930,6 +1002,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string pdf_wird_konvertiert {
             get {
                 return ResourceManager.GetString("pdf_wird_konvertiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf folgenden Plan kopieren ähnelt.
+        /// </summary>
+        internal static string pin_auf_plan_kopieren {
+            get {
+                return ResourceManager.GetString("pin_auf_plan_kopieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf folgenden Plan verschieben ähnelt.
+        /// </summary>
+        internal static string pin_auf_plan_verschieben {
+            get {
+                return ResourceManager.GetString("pin_auf_plan_verschieben", resourceCulture);
             }
         }
         
@@ -1011,6 +1101,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string pin_loeschen {
             get {
                 return ResourceManager.GetString("pin_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Die Positionen aller Pins auf der Karte wurden aktualisiert. ähnelt.
+        /// </summary>
+        internal static string pin_positionen_aktualisiert {
+            get {
+                return ResourceManager.GetString("pin_positionen_aktualisiert", resourceCulture);
             }
         }
         
@@ -1375,11 +1474,38 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Standardeinstellungen laden? ähnelt.
+        /// </summary>
+        internal static string standardeinstellungen_laden {
+            get {
+                return ResourceManager.GetString("standardeinstellungen_laden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Standort ähnelt.
         /// </summary>
         internal static string standort {
             get {
                 return ResourceManager.GetString("standort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können. ähnelt.
+        /// </summary>
+        internal static string standortdienste_aktivieren_aufforderung {
+            get {
+                return ResourceManager.GetString("standortdienste_aktivieren_aufforderung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Standortdienste deaktiviert ähnelt.
+        /// </summary>
+        internal static string standortdienste_deaktiviert {
+            get {
+                return ResourceManager.GetString("standortdienste_deaktiviert", resourceCulture);
             }
         }
         
@@ -1447,6 +1573,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verschieben ähnelt.
+        /// </summary>
+        internal static string verschieben {
+            get {
+                return ResourceManager.GetString("verschieben", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Verzeichnis öffnen ähnelt.
         /// </summary>
         internal static string verzeichnis_oeffnen {
@@ -1470,6 +1605,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string vorlage_loeschen {
             get {
                 return ResourceManager.GetString("vorlage_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wähle ein Bild aus ähnelt.
+        /// </summary>
+        internal static string waehle_bild_aus {
+            get {
+                return ResourceManager.GetString("waehle_bild_aus", resourceCulture);
             }
         }
         
@@ -1587,6 +1731,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string zeit {
             get {
                 return ResourceManager.GetString("zeit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ziel auswählen ähnelt.
+        /// </summary>
+        internal static string ziel_auswaehlen {
+            get {
+                return ResourceManager.GetString("ziel_auswaehlen", resourceCulture);
             }
         }
         

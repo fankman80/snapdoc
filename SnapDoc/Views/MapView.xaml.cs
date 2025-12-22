@@ -7,9 +7,11 @@ using Android.Webkit;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Globalization;
+using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -218,8 +220,7 @@ public partial class MapView : IQueryAttributable
 
     private static string LoadHtmlFromFile()
     {
-        var assembly = typeof(MapView).Assembly;
-        using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.index.html")!;
+        using var stream = LoadLocalizedHtml("index");
         using var reader = new StreamReader(stream);
         string htmlContent = reader.ReadToEnd();
         htmlContent = htmlContent.Replace("#999999", ((Color)Application.Current.Resources["Primary"]).ToRgbaHex());
@@ -259,9 +260,9 @@ public partial class MapView : IQueryAttributable
         if (!SettingsService.Instance.IsGpsActive)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("Standortdienste deaktiviert", "Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.standortdienste_deaktiviert, AppResources.standortdienste_aktivieren_aufforderung, AppResources.ok);
             else
-                await Toast.Make($"Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.").Show();
+                await Toast.Make(AppResources.standortdienste_aktivieren_aufforderung).Show();
             return;
         }
         
@@ -305,9 +306,9 @@ public partial class MapView : IQueryAttributable
             GlobalJson.SaveToFile();
 
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "Die Positionen aller Pins auf der Karte wurden aktualisiert.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.pin_positionen_aktualisiert, AppResources.ok);
             else
-                await Toast.Make($"Die Positionen aller Pins auf der Karte wurden aktualisiert.").Show();
+                await Toast.Make(AppResources.pin_positionen_aktualisiert).Show();
         }
     }
 
@@ -341,16 +342,16 @@ public partial class MapView : IQueryAttributable
         if (fileSaveResult.IsSuccessful)
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde gespeichert.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.kml_gespeichert, AppResources.ok);
             else
-                await Toast.Make($"KML-Datei wurde gespeichert.").Show();
+                await Toast.Make(AppResources.kml_gespeichert).Show();
         }
         else
         {
             if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", "KML-Datei wurde nicht gespeichert.", "OK");
+                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.kml_nicht_gespeichert, AppResources.ok);
             else
-                await Toast.Make($"KML-Datei wurde nicht gespeichert.").Show();
+                await Toast.Make(AppResources.kml_nicht_gespeichert).Show();
         }
         saveStream.Close();
 
@@ -370,6 +371,25 @@ public partial class MapView : IQueryAttributable
         var layer = Settings.SwissTopoLayers[SettingsService.Instance.MapOverlay2].Id; //ch.swisstopo.swissimage
         var script = $"changeMapLayer('{layer}');";
         GeoAdminWebView.EvaluateJavaScriptAsync(script);
+    }
+    public static Stream LoadLocalizedHtml(string baseName)
+    {
+        var lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
+
+        lang = lang switch
+        {
+            "de" => "de",
+            "fr" => "fr",
+            "en" => "en",
+            _ => "de" // Fallback
+        };
+
+        var assembly = Assembly.GetExecutingAssembly();
+        var resourceName = $"SnapDoc.Resources.Raw.{baseName}_{lang}.html";
+
+        var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException(
+                $"HTML-Ressource nicht gefunden: {resourceName}");
+        return stream;
     }
 }
 

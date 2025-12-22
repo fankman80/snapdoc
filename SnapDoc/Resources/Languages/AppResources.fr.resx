@@ -639,4 +639,55 @@
   <data name="projekt_wird_importiert" xml:space="preserve">
     <value>Importation du projet...</value>
   </data>
+  <data name="bitte_waehle_bild" xml:space="preserve">
+    <value>Veuillez sélectionner une image...</value>
+  </data>
+  <data name="standardeinstellungen_laden" xml:space="preserve">
+    <value>Charger les paramètres par défaut?</value>
+  </data>
+  <data name="verschieben" xml:space="preserve">
+    <value>Déplacer</value>
+  </data>
+  <data name="ziel_auswaehlen" xml:space="preserve">
+    <value>Choisir la destination</value>
+  </data>
+  <data name="kopieren" xml:space="preserve">
+    <value>&gt;Copier</value>
+  </data>
+  <data name="pin_auf_plan_kopieren" xml:space="preserve">
+    <value>Copier le pin sur le plan suivant</value>
+  </data>
+  <data name="pin_auf_plan_verschieben" xml:space="preserve">
+    <value>Déplacer le pin sur le plan suivant</value>
+  </data>
+  <data name="standortdienste_deaktiviert" xml:space="preserve">
+    <value>Services de localisation désactivés</value>
+  </data>
+  <data name="standortdienste_aktivieren_aufforderung" xml:space="preserve">
+    <value>Veuillez activer les services de localisation dans le système et l'application pour utiliser les données de position.</value>
+  </data>
+  <data name="pin_positionen_aktualisiert" xml:space="preserve">
+    <value>Les positions de tous les pins sur la carte ont été mises à jour.</value>
+  </data>
+  <data name="kml_gespeichert" xml:space="preserve">
+    <value>Le fichier KML a été enregistré.</value>
+  </data>
+  <data name="kml_nicht_gespeichert" xml:space="preserve">
+    <value>Le fichier KML n'a pas été enregistré.</value>
+  </data>
+  <data name="pdf_dateien_auswaehlen" xml:space="preserve">
+    <value>Sélectionner un ou plusieurs fichiers PDF</value>
+  </data>
+  <data name="waehle_bild_aus" xml:space="preserve">
+    <value>Sélectionner une image</value>
+  </data>
+  <data name="fehler_bild_import" xml:space="preserve">
+    <value>Erreur lors de l'importation de l'image</value>
+  </data>
+  <data name="neues_icon" xml:space="preserve">
+    <value>Nouvelle icône</value>
+  </data>
+  <data name="eigene_icons" xml:space="preserve">
+    <value>Icônes personnalisées</value>
+  </data>
 </root>

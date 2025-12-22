@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoAdmin Map</title>
+    <script src="https://cdn.jsdelivr.net/npm/ol@latest/dist/ol.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/ol@latest/ol.css">
+    <style>
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+        }
+
+        #popup {
+            position: absolute;
+            background-color: white;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 5px 5px 12px rgba(0, 0, 0, 0.5);
+            width: 250px;
+            font-family: "Aptos", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            font-size: 14px;
+            display: none;
+            word-wrap: break-word;
+            z-index: 9999;
+            border: 1px solid gray;
+        }
+
+        #popupContent {
+            margin-bottom: 10px;
+        }
+
+        #sendButton {
+            display: block;
+            margin-left: auto;
+            margin-right: 0;
+            padding: 6px 10px;
+            font-size: 14px;
+            border-radius: 4px;
+            border: none;
+            background-color: #999999;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        #popup::before {
+            content: "";
+            position: absolute;
+            left: -11px;
+            top: 40px;
+            border-top: 11px solid transparent;
+            border-bottom: 11px solid transparent;
+            border-right: 11px solid gray;
+        }
+
+        #popup::after {
+            content: "";
+            position: absolute;
+            left: -10px;
+            top: 41px;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-right: 10px solid white;
+        }
+
+        #popup h4 {
+            font-weight: bold;
+            margin: 5px;
+            color: #999999;
+        }
+
+        #popup p {
+            margin: 5px 5px 15px 5px;
+        }
+
+        .popup-header {
+            font-size: 14px;
+            margin: 5px;
+        }
+
+        hr.solid {
+            border: none;
+            border-top: 1px solid #999999;
+            margin: 10px 0;
+        }
+
+        .ol-scale-line {
+            background: rgba(255,255,255,1);
+            border: 1px solid #999;
+            border-radius: 4px;
+            padding: 2px 8px;
+            bottom: 14px;
+            left: 10px;
+            font-family: "Aptos", sans-serif;
+            font-size: 14px;
+            color: #333;
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .ol-zoom, .ol-rotate {
+            border: 1px solid #999;
+            border-radius: 4px;
+            background-color: rgba(255,255,255,0.8);
+            box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .ol-zoom {
+            top: 10px;
+            left: 10px;
+        }
+
+        .ol-rotate {
+            top: 110px;
+            left: 10px;
+            right: auto !important;
+        }
+
+        .measure-buttons {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            z-index: 1000;
+        }
+
+            .measure-buttons button {
+                background: white;
+                border: 1px solid #999;
+                border-radius: 4px;
+                padding: 6px 8px;
+                cursor: pointer;
+                font-size: 13px;
+                font-family: "Segoe UI", sans-serif;
+                box-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            }
+
+                .measure-buttons button.active {
+                    background: #999999;
+                    color: white;
+                }
+
+        #measureOptions {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div id="map"></div>
+    <div id="popup">
+        <div id="popupContent"></div>
+        <button id="sendButton">Edit</button>
+    </div>
+
+    <div class="measure-buttons">
+        <button id="startMeasure">Measurement</button>
+        <div id="measureOptions" style="display:none; flex-direction: column; gap: 6px;">
+            <button id="measureDistance">Measure distance</button>
+            <button id="measureArea">Measure area</button>
+            <button id="clearMeasure">Clear</button>
+        </div>
+    </div>
+
+    <select id="type" style="display:none;">
+        <option value="LineString">Line</option>
+        <option value="Polygon">Polygon</option>
+    </select>
+    <input type="checkbox" id="segments" checked style="display:none;">
+
+    <script>
+        /* Scrip-Logik bleibt gleich, Texte in Funktionen werden angepasst */
+        let map, raster, vectorSource, vectorLayer, pinSource, pinLayer, draw = null, modify = null, tipPoint = null, mapReady = false, pendingPositions = [], currentPinkey = null, currentPlankey = null, initialCenter = [0, 0], initialZoom = 1, initialIcon = 'https://upload.wikimedia.org/wikipedia/commons/e/ec/RedDot.svg', initialIconScale = 1;
+
+        function initMarkersFromBridge(center, zoom, icon, scale, markers) { initialCenter = center; initialZoom = zoom; initialIcon = icon; initialIconScale = scale; if (!map) initMap(); if (markers && markers.length > 0) setMultipleMarkers(markers); }
+
+        function formatLength(line) { const length = ol.sphere.getLength(line); return length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m'; }
+        function formatArea(polygon) { const area = ol.sphere.getArea(polygon); return area > 10000 ? (area / 1000000).toFixed(2) + ' km�' : area.toFixed(2) + ' m�'; }
+
+        const baseStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.3)' }), image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: '#999999' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) }) });
+        const labelStyle = new ol.style.Style({ text: new ol.style.Text({ font: 'bold 14px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), stroke: new ol.style.Stroke({ color: '#333', width: 3 }), overflow: true }) });
+        const tipStyle = new ol.style.Style({ text: new ol.style.Text({ font: '12px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), padding: [2, 2, 2, 2], textAlign: 'left', offsetX: 18, offsetY: 0 }) });
+        const modifyStyle = new ol.style.Style({ image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), stroke: new ol.style.Stroke({ color: '#333', width: 1 }) }), text: new ol.style.Text({ text: 'Drag to edit', font: '12px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), padding: [2, 2, 2, 2], textAlign: 'left', offsetX: 18, offsetY: 0 }) });
+        const lineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }) });
+        const lineOutlineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#ffffff', width: 5 }) });
+        const polygonStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }), fill: new ol.style.Fill({ color: '#99999926' }) });
+        const polygonOutlineStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#ffffff', width: 5 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0)' }) });
+
+        function styleFunction(feature, segments, drawType, tip) {
+            const styles = []; const geometry = feature.getGeometry(); const type = geometry.getType(); let point, label, line;
+            if (type === 'LineString') { styles.push(lineOutlineStyle); styles.push(lineStyle); point = new ol.geom.Point(geometry.getLastCoordinate()); label = formatLength(geometry); line = geometry; }
+            else if (type === 'Polygon') { styles.push(polygonOutlineStyle); styles.push(polygonStyle); point = geometry.getInteriorPoint(); label = formatArea(geometry); line = null; }
+            else if (!drawType || drawType === type || type === 'Point') { styles.push(baseStyle); }
+            if (segments && line) {
+                const coords = line.getCoordinates();
+                for (let i = 0; i < coords.length - 1; i++) {
+                    const segment = new ol.geom.LineString([coords[i], coords[i+1]]);
+                    const midpoint = segment.getCoordinateAt(0.5);
+                    const length = formatLength(segment);
+                    styles.push(new ol.style.Style({ geometry: new ol.geom.Point(midpoint), text: new ol.style.Text({ text: length, font: '12px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), padding: [2, 2, 2, 2], textBaseline: 'bottom', offsetY: -12 }), image: new ol.style.RegularShape({ radius: 6, points: 3, angle: Math.PI, displacement: [0, 8], fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }) }) }));
+                }
+            }
+            if (label) { labelStyle.setGeometry(point); labelStyle.getText().setText(label); labelStyle.getText().setOffsetY(-18); styles.push(labelStyle); }
+            if (tip && type === 'Point' && !modify.getOverlay().getSource().getFeatures().length) { tipPoint = geometry; tipStyle.getText().setText(tip); styles.push(tipStyle); }
+            return styles;
+        }
+
+        function initMap() {
+            vectorSource = new ol.source.Vector(); vectorLayer = new ol.layer.Vector({ source: vectorSource, style: function (f) { return styleFunction(f, document.getElementById('segments').checked); } });
+            pinSource = new ol.source.Vector(); pinLayer = new ol.layer.Vector({ source: pinSource });
+            raster = new ol.layer.Tile({ source: new ol.source.TileWMS({ url: 'https://wms.geo.admin.ch/', params: { LAYERS: 'ch.swisstopo.pixelkarte-farbe', TILED: true }, serverType: 'mapserver' }) });
+            map = new ol.Map({ target: 'map', layers: [raster, vectorLayer, pinLayer], view: new ol.View({ center: ol.proj.fromLonLat(initialCenter), zoom: initialZoom }) });
+            const popupElement = document.getElementById('popup'); const popupContent = document.getElementById('popupContent');
+            const popup = new ol.Overlay({ element: popupElement, positioning: 'bottom-center', stopEvent: true, offset: [30, -50] });
+            map.addOverlay(popup);
+            map.addInteraction(new ol.interaction.Modify({ hitDetection: pinLayer, source: pinSource }));
+            map.addControl(new ol.control.ScaleLine({ units: 'metric', bar: false, steps: 6, text: true, minWidth: 80, maxWidth: 140 }));
+            modify = new ol.interaction.Modify({ source: vectorSource, style: modifyStyle }); map.addInteraction(modify);
+            mapReady = true; if (pendingPositions.length > 0) { pendingPositions.forEach(p => setMarkerPosition(p.lon, p.lat, p.pinname, p.pinlocation, p.pindesc, p.plankey, p.pinkey)); pendingPositions = []; }
+            map.on('click', function (evt) {
+                const feature = map.forEachFeatureAtPixel(evt.pixel, f => f);
+                if (feature && feature.get('pinname') !== undefined) {
+                    const coordinates = feature.getGeometry().getCoordinates();
+                    currentPinkey = feature.get('pinkey'); currentPlankey = feature.get('plankey');
+                    let content = '';
+                    if (feature.get('pinname')) content += `<h4 class="popup-header">Title:</h4><p>${feature.get('pinname')}</p><hr class="solid">`;
+                    if (feature.get('pinlocation')) content += `<h4 class="popup-header">Location:</h4><p>${feature.get('pinlocation')}</p><hr class="solid">`;
+                    if (feature.get('pindesc')) content += `<h4 class="popup-header">Description:</h4><p>${feature.get('pindesc')}</p>`;
+                    if (!content) content = `<h4 class="popup-header">Note:</h4><p>No information available for this pin.</p>`;
+                    else content = content.replace(/<hr class="solid">$/, '');
+                    popupContent.innerHTML = content; popupElement.style.display = 'block'; popup.setPosition(coordinates);
+                } else { popupElement.style.display = 'none'; currentPinkey = null; currentPlankey = null; }
+            });
+        }
+
+        function addInteraction(type) {
+            const drawType = type === 'area' ? 'Polygon' : 'LineString';
+            const activeTip = 'Click to continue drawing the ' + (drawType === 'Polygon' ? 'polygon' : 'line');
+            const idleTip = 'Click to start measurement';
+            let tip = idleTip;
+            if (draw) { map.removeInteraction(draw); draw = null; }
+            draw = new ol.interaction.Draw({ source: vectorSource, type: drawType, style: function (feature) { return styleFunction(feature, document.getElementById('segments').checked, drawType, tip); } });
+            draw.on('drawstart', function () { modify.setActive(false); tip = activeTip; });
+            draw.on('drawend', function () { map.removeInteraction(draw); draw = null; modify.setActive(true); tip = idleTip; });
+            modify.setActive(false); map.addInteraction(draw);
+        }
+
+        function setMarkerPosition(lon, lat, pinname, pinlocation, pindesc, plankey, pinkey) {
+            if (!mapReady) { pendingPositions.push({ lon, lat, pinname, pinlocation, pindesc, plankey, pinkey }); return; }
+            const marker = new ol.Feature({ geometry: new ol.geom.Point(ol.proj.fromLonLat([lon, lat])), pinname, pinlocation, pindesc, plankey, pinkey });
+            let iconSrc = initialIcon.trim();
+            if (iconSrc.startsWith("<svg") || iconSrc.startsWith("<?xml") || iconSrc.startsWith("<!DOCTYPE svg")) iconSrc = 'data:image/svg+xml;utf8,' + encodeURIComponent(iconSrc);
+            marker.setStyle(new ol.style.Style({ image: new ol.style.Icon({ src: iconSrc, scale: initialIconScale, anchor: [0.5, 1], anchorXUnits: 'fraction', anchorYUnits: 'fraction' }) }));
+            pinSource.addFeature(marker);
+        }
+
+        function setMultipleMarkers(positions) { positions.forEach(p => setMarkerPosition(p.lon, p.lat, p.pinname, p.pinlocation, p.pindesc, p.plankey, p.pinkey)); }
+        function changeMapLayer(layer) { raster.getSource().updateParams({ LAYERS: layer, CACHEBUSTER: new Date().getTime() }); raster.getSource().refresh(); }
+        function getMarkerCoordinates() { var features = pinSource.getFeatures(); return features.length ? JSON.stringify(features.map(f => { var c = ol.proj.toLonLat(f.getGeometry().getCoordinates()); return { lon: c[0], lat: c[1], pinkey: f.get('pinkey'), plankey: f.get('plankey') }; })) : null; }
+
+        window.onload = function () {
+            document.getElementById('sendButton').addEventListener('click', function () {
+                if (!currentPinkey || !currentPlankey) return;
+                const payload = { pinkey: currentPinkey, plankey: currentPlankey };
+                if (window.jsBridge?.invokeAction) window.jsBridge.invokeAction(JSON.stringify(payload));
+                else if (window.chrome?.webview?.postMessage) window.chrome.webview.postMessage(JSON.stringify(payload));
+                else alert("Bridge not available!");
+            });
+        };
+
+        const startMeasureBtn = document.getElementById('startMeasure'); const measureOptions = document.getElementById('measureOptions');
+        const distanceBtn = document.getElementById('measureDistance'); const areaBtn = document.getElementById('measureArea'); const clearBtn = document.getElementById('clearMeasure');
+        function deactivateButtons() { document.querySelectorAll('#measureOptions button').forEach(b => b.classList.remove('active')); }
+        function activateButton(btn) { deactivateButtons(); btn.classList.add('active'); }
+        startMeasureBtn.addEventListener('click', () => { startMeasureBtn.style.display = 'none'; measureOptions.style.display = 'flex'; });
+        distanceBtn.addEventListener('click', () => { activateButton(distanceBtn); addInteraction('length'); });
+        areaBtn.addEventListener('click', () => { activateButton(areaBtn); addInteraction('area'); });
+        clearBtn.addEventListener('click', () => { vectorSource.clear(); if (draw) map.removeInteraction(draw); deactivateButtons(); measureOptions.style.display = 'none'; startMeasureBtn.style.display = 'block'; });
+    </script>
+</body>
+</html>

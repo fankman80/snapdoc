@@ -639,4 +639,55 @@
   <data name="projekt_wird_importiert" xml:space="preserve">
     <value>Importing project...</value>
   </data>
+  <data name="bitte_waehle_bild" xml:space="preserve">
+    <value>Please select an image...</value>
+  </data>
+  <data name="standardeinstellungen_laden" xml:space="preserve">
+    <value>Load default settings?</value>
+  </data>
+  <data name="verschieben" xml:space="preserve">
+    <value>Move</value>
+  </data>
+  <data name="ziel_auswaehlen" xml:space="preserve">
+    <value>Select destination</value>
+  </data>
+  <data name="kopieren" xml:space="preserve">
+    <value>Copy</value>
+  </data>
+  <data name="pin_auf_plan_kopieren" xml:space="preserve">
+    <value>Copy pin to the following plan</value>
+  </data>
+  <data name="pin_auf_plan_verschieben" xml:space="preserve">
+    <value>Move pin to the following plan</value>
+  </data>
+  <data name="standortdienste_deaktiviert" xml:space="preserve">
+    <value>Location services disabled</value>
+  </data>
+  <data name="standortdienste_aktivieren_aufforderung" xml:space="preserve">
+    <value>Please enable location services in your system and app settings to use position data.</value>
+  </data>
+  <data name="pin_positionen_aktualisiert" xml:space="preserve">
+    <value>The positions of all pins on the map have been updated.</value>
+  </data>
+  <data name="kml_gespeichert" xml:space="preserve">
+    <value>KML file saved successfully.</value>
+  </data>
+  <data name="kml_nicht_gespeichert" xml:space="preserve">
+    <value>KML file was not saved.</value>
+  </data>
+  <data name="pdf_dateien_auswaehlen" xml:space="preserve">
+    <value>Select one or more PDF files</value>
+  </data>
+  <data name="waehle_bild_aus" xml:space="preserve">
+    <value>Select an image</value>
+  </data>
+  <data name="fehler_bild_import" xml:space="preserve">
+    <value>Error importing the image</value>
+  </data>
+  <data name="neues_icon" xml:space="preserve">
+    <value>New icon</value>
+  </data>
+  <data name="eigene_icons" xml:space="preserve">
+    <value>Custom icons</value>
+  </data>
 </root>

@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using SkiaSharp;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -64,7 +65,7 @@ public partial class ProjectDetails : ContentPage
         {
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
-                PickerTitle = "Bitte wähle ein Bild aus...",
+                PickerTitle = AppResources.bitte_waehle_bild,
                 FileTypes = FilePickerFileType.Jpeg
             });
 

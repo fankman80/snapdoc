@@ -639,4 +639,55 @@
   <data name="projekt_wird_importiert" xml:space="preserve">
     <value>Projekt wird importiert...</value>
   </data>
+  <data name="bitte_waehle_bild" xml:space="preserve">
+    <value>Bitte wähle ein Bild aus...</value>
+  </data>
+  <data name="standardeinstellungen_laden" xml:space="preserve">
+    <value>Standardeinstellungen laden?</value>
+  </data>
+  <data name="verschieben" xml:space="preserve">
+    <value>Verschieben</value>
+  </data>
+  <data name="ziel_auswaehlen" xml:space="preserve">
+    <value>Ziel auswählen</value>
+  </data>
+  <data name="kopieren" xml:space="preserve">
+    <value>Kopieren</value>
+  </data>
+  <data name="pin_auf_plan_kopieren" xml:space="preserve">
+    <value>Pin auf folgenden Plan kopieren</value>
+  </data>
+  <data name="pin_auf_plan_verschieben" xml:space="preserve">
+    <value>Pin auf folgenden Plan verschieben</value>
+  </data>
+  <data name="standortdienste_deaktiviert" xml:space="preserve">
+    <value>Standortdienste deaktiviert</value>
+  </data>
+  <data name="standortdienste_aktivieren_aufforderung" xml:space="preserve">
+    <value>Bitte aktivieren Sie die Standortdienste im System und in der App, um Positionsdaten nutzen zu können.</value>
+  </data>
+  <data name="pin_positionen_aktualisiert" xml:space="preserve">
+    <value>Die Positionen aller Pins auf der Karte wurden aktualisiert.</value>
+  </data>
+  <data name="kml_gespeichert" xml:space="preserve">
+    <value>KML-Datei wurde gespeichert.</value>
+  </data>
+  <data name="kml_nicht_gespeichert" xml:space="preserve">
+    <value>KML-Datei wurde nicht gespeichert.</value>
+  </data>
+  <data name="pdf_dateien_auswaehlen" xml:space="preserve">
+    <value>Eine oder mehrere PDF-Dateien auswählen</value>
+  </data>
+  <data name="waehle_bild_aus" xml:space="preserve">
+    <value>Wähle ein Bild aus</value>
+  </data>
+  <data name="fehler_bild_import" xml:space="preserve">
+    <value>Fehler beim Importieren des Bildes</value>
+  </data>
+  <data name="neues_icon" xml:space="preserve">
+    <value>Neues Icon</value>
+  </data>
+  <data name="eigene_icons" xml:space="preserve">
+    <value>Eigene Icons</value>
+  </data>
 </root>

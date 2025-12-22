@@ -166,7 +166,7 @@ public partial class LoadPDFPages : ContentPage
         {
             var fileResult = await FilePicker.Default.PickMultipleAsync(new PickOptions
             {
-                PickerTitle = "Eine oder mehrere PDF-Dateien auswählen",
+                PickerTitle = AppResources.pdf_dateien_auswaehlen,
                 FileTypes = FilePickerFileType.Pdf // Nur PDF-Dateien anzeigen
             });
 

@@ -89,7 +89,7 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    [ObservableProperty] private string _selectedAppLanguage = "system";
+    [ObservableProperty] private string _selectedAppLanguage = Settings.Languages.First().Value;
     [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
@@ -312,8 +312,6 @@ public partial class SettingsService : ObservableObject
             CustomPinOffset = CustomPinOffset,
             DefaultPinIcon = DefaultPinIcon,
             ColorList = ColorList,
-            IconSortCrits = IconSortCrits,
-            PinSortCrits = PinSortCrits,
             PriorityItems = PriorityItems,
         };
         File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
@@ -345,10 +343,8 @@ public partial class SettingsService : ObservableObject
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
             PdfThumbDpi = settings.PdfThumbDpi;
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
-            SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
             SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
-            IconSortCrit = (settings.IconSortCrit < IconSortCrits.Count) ? IconSortCrits[settings.IconSortCrit] : IconSortCrits[0];
-            PinSortCrit = (settings.PinSortCrit < PinSortCrits.Count) ? PinSortCrits[settings.PinSortCrit] : PinSortCrits[0];
+            SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
             IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0) ? IconCategories[settings.IconCategory] : IconCategories[0];
             IsPlanExport = settings.IsPlanExport;
             IsPosImageExport = settings.IsPosImageExport;
@@ -388,8 +384,6 @@ public partial class SettingsService : ObservableObject
             CustomPinOffset = settings.CustomPinOffset;
             DefaultPinIcon = settings.DefaultPinIcon ?? string.Empty;
             ColorList = settings.ColorList ?? ColorList;
-            IconSortCrits = settings.IconSortCrits ?? IconSortCrits;
-            PinSortCrits = settings.PinSortCrits ?? PinSortCrits;
             PriorityItems = settings.PriorityItems ?? PriorityItems;
         }
         catch (Exception ex)
@@ -458,8 +452,6 @@ public partial class SettingsService : ObservableObject
         CustomPinOffset = defaultSettings.CustomPinOffset;
         DefaultPinIcon = defaultSettings.DefaultPinIcon;
         ColorList = [.. defaultSettings.ColorList];
-        IconSortCrits = [.. defaultSettings.IconSortCrits];
-        PinSortCrits = [.. defaultSettings.PinSortCrits];
         PriorityItems = [.. defaultSettings.PriorityItems];
     }
 }
