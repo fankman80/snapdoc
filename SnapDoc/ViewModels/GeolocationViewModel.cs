@@ -2,6 +2,7 @@
 using SnapDoc.Services;
 using System.ComponentModel;
 using System.Windows.Input;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.ViewModels;
 
@@ -71,7 +72,7 @@ public partial class GeolocationViewModel : BaseViewModel
     public ICommand ToggleGPSCommand { get; }
 
     // ----------------------------------------------------------------------
-    // 🔹 Ein/Aus-Logik für GPS
+    // Ein/Aus-Logik für GPS
     // ----------------------------------------------------------------------
     public async Task OnToggleGPSAsync()
     {
@@ -90,9 +91,9 @@ public partial class GeolocationViewModel : BaseViewModel
             if (status != PermissionStatus.Granted)
             {
                 await Shell.Current.DisplayAlertAsync(
-                    "GPS deaktiviert",
+                    "GPS ist deaktiviert",
                     "Standortberechtigung wurde nicht erteilt. GPS kann nicht aktiviert werden.",
-                    "OK");
+                    AppResources.ok);
                 return;
             }
         }
@@ -104,7 +105,7 @@ public partial class GeolocationViewModel : BaseViewModel
                 "GPS ist deaktiviert",
                 "Um die Standorterkennung zu aktivieren, bitte GPS in den Systemeinstellungen einschalten.",
                 "Einstellungen öffnen",
-                "{x:Static res:AppResources.abbrechen}");
+                AppResources.abbrechen);
 
 #if ANDROID
             if (openSettings)
@@ -164,7 +165,7 @@ public partial class GeolocationViewModel : BaseViewModel
     }
 
     // ----------------------------------------------------------------------
-    // 🔹 Aktuelle Position einmalig abfragen, nur wenn GPS aktiv ist
+    // Aktuelle Position einmalig abfragen, nur wenn GPS aktiv ist
     // ----------------------------------------------------------------------
     public async Task<Location> GetCurrentLocationAsync()
     {
@@ -203,7 +204,7 @@ public partial class GeolocationViewModel : BaseViewModel
     }
 
     // ----------------------------------------------------------------------
-    // 🔹 Kontinuierliches Tracking starten
+    // Kontinuierliches Tracking starten
     // ----------------------------------------------------------------------
     public async Task StartListeningAsync()
     {
@@ -232,7 +233,7 @@ public partial class GeolocationViewModel : BaseViewModel
     }
 
     // ----------------------------------------------------------------------
-    // 🔹 Tracking stoppen
+    // Tracking stoppen
     // ----------------------------------------------------------------------
     public void StopListening()
     {
@@ -252,7 +253,7 @@ public partial class GeolocationViewModel : BaseViewModel
     }
 
     // ----------------------------------------------------------------------
-    // 🔹 Bei jeder Standortänderung automatisch aktualisieren
+    // Bei jeder Standortänderung automatisch aktualisieren
     // ----------------------------------------------------------------------
     private void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)
     {
