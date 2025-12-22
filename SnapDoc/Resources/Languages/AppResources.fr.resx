@@ -202,7 +202,7 @@
     <value>Charger un nouveau modèle</value>
   </data>
   <data name="neu_setzen" xml:space="preserve">
-    <value>Réinitialiser/Placer à nouveau</value>
+    <value>Déplacer</value>
   </data>
   <data name="objektbezeichnung" xml:space="preserve">
     <value>Désignation de l'objet</value>
