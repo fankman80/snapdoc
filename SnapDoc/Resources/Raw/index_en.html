@@ -182,7 +182,7 @@
         function initMarkersFromBridge(center, zoom, icon, scale, markers) { initialCenter = center; initialZoom = zoom; initialIcon = icon; initialIconScale = scale; if (!map) initMap(); if (markers && markers.length > 0) setMultipleMarkers(markers); }
 
         function formatLength(line) { const length = ol.sphere.getLength(line); return length > 1000 ? (length / 1000).toFixed(2) + ' km' : length.toFixed(2) + ' m'; }
-        function formatArea(polygon) { const area = ol.sphere.getArea(polygon); return area > 10000 ? (area / 1000000).toFixed(2) + ' km�' : area.toFixed(2) + ' m�'; }
+        function formatArea(polygon) { const area = ol.sphere.getArea(polygon); return area > 10000 ? (area / 1000000).toFixed(2) + ' km²' : area.toFixed(2) + ' m²'; }
 
         const baseStyle = new ol.style.Style({ stroke: new ol.style.Stroke({ color: '#999999', width: 3 }), fill: new ol.style.Fill({ color: 'rgba(255,255,255,0.3)' }), image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: '#999999' }), stroke: new ol.style.Stroke({ color: '#fff', width: 2 }) }) });
         const labelStyle = new ol.style.Style({ text: new ol.style.Text({ font: 'bold 14px Segoe UI', fill: new ol.style.Fill({ color: '#fff' }), stroke: new ol.style.Stroke({ color: '#333', width: 3 }), overflow: true }) });
