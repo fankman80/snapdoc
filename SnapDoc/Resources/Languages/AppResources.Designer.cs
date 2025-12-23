@@ -178,6 +178,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bearbeiten ähnelt.
+        /// </summary>
+        internal static string bearbeiten {
+            get {
+                return ResourceManager.GetString("bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bericht exportieren ähnelt.
         /// </summary>
         internal static string bericht_exportieren {
@@ -340,6 +349,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Distanz messen ähnelt.
+        /// </summary>
+        internal static string distanz_messen {
+            get {
+                return ResourceManager.GetString("distanz_messen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Drehung fixiert ähnelt.
         /// </summary>
         internal static string drehung_fixiert {
@@ -363,6 +381,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string eigene_icons {
             get {
                 return ResourceManager.GetString("eigene_icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen öffnen ähnelt.
+        /// </summary>
+        internal static string einstellungen_oeffnen {
+            get {
+                return ResourceManager.GetString("einstellungen_oeffnen", resourceCulture);
             }
         }
         
@@ -538,11 +565,56 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fehler beim Starten ähnelt.
+        /// </summary>
+        internal static string fehler_beim_starten {
+            get {
+                return ResourceManager.GetString("fehler_beim_starten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fehler beim Stoppen ähnelt.
+        /// </summary>
+        internal static string fehler_beim_stoppen {
+            get {
+                return ResourceManager.GetString("fehler_beim_stoppen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Fehler beim Importieren des Bildes ähnelt.
         /// </summary>
         internal static string fehler_bild_import {
             get {
                 return ResourceManager.GetString("fehler_bild_import", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fehler bei Standortabfrage ähnelt.
+        /// </summary>
+        internal static string fehler_standortabfrage {
+            get {
+                return ResourceManager.GetString("fehler_standortabfrage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fläche messen ähnelt.
+        /// </summary>
+        internal static string flaeche_messen {
+            get {
+                return ResourceManager.GetString("flaeche_messen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Formatieren ähnelt.
+        /// </summary>
+        internal static string formatieren {
+            get {
+                return ResourceManager.GetString("formatieren", resourceCulture);
             }
         }
         
@@ -628,6 +700,51 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die GPS aktiv ähnelt.
+        /// </summary>
+        internal static string gps_aktiv {
+            get {
+                return ResourceManager.GetString("gps_aktiv", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die GPS ist deaktiviert ähnelt.
+        /// </summary>
+        internal static string gps_deaktiviert {
+            get {
+                return ResourceManager.GetString("gps_deaktiviert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die GPS gestoppt ähnelt.
+        /// </summary>
+        internal static string gps_gestoppt {
+            get {
+                return ResourceManager.GetString("gps_gestoppt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die GPS konnte nicht gestartet werden ähnelt.
+        /// </summary>
+        internal static string gps_start_fehler {
+            get {
+                return ResourceManager.GetString("gps_start_fehler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Um die Standorterkennung zu aktivieren, bitte GPS in den Systemeinstellungen einschalten. ähnelt.
+        /// </summary>
+        internal static string gps_system_einschalten_aufforderung {
+            get {
+                return ResourceManager.GetString("gps_system_einschalten_aufforderung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Grösse fixiert ähnelt.
         /// </summary>
         internal static string groesse_fixiert {
@@ -669,6 +786,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string helligkeit_l {
             get {
                 return ResourceManager.GetString("helligkeit_l", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Hinweis ähnelt.
+        /// </summary>
+        internal static string hinweis {
+            get {
+                return ResourceManager.GetString("hinweis", resourceCulture);
             }
         }
         
@@ -745,6 +871,42 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Klicken, um die Vermessung zu starten ähnelt.
+        /// </summary>
+        internal static string klicken_start_vermessung {
+            get {
+                return ResourceManager.GetString("klicken_start_vermessung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Klicken, um  ähnelt.
+        /// </summary>
+        internal static string klicken_um {
+            get {
+                return ResourceManager.GetString("klicken_um", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die die Linie weiter zu zeichnen ähnelt.
+        /// </summary>
+        internal static string klicken_weiter_linie {
+            get {
+                return ResourceManager.GetString("klicken_weiter_linie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die das Polygon weiter zu zeichnen ähnelt.
+        /// </summary>
+        internal static string klicken_weiter_polygon {
+            get {
+                return ResourceManager.GetString("klicken_weiter_polygon", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die KML-Datei exportieren ähnelt.
         /// </summary>
         internal static string kml_datei_exportieren {
@@ -813,6 +975,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string lade_pdf_seiten {
             get {
                 return ResourceManager.GetString("lade_pdf_seiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Linie ähnelt.
+        /// </summary>
+        internal static string linie {
+            get {
+                return ResourceManager.GetString("linie", resourceCulture);
             }
         }
         
@@ -1114,6 +1285,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Für diesen Pin sind noch keine Informationen verfügbar. ähnelt.
+        /// </summary>
+        internal static string pin_keine_infos {
+            get {
+                return ResourceManager.GetString("pin_keine_infos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin Liste ähnelt.
         /// </summary>
         internal static string pin_liste {
@@ -1272,6 +1452,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string planrotation_sperren {
             get {
                 return ResourceManager.GetString("planrotation_sperren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Polygon ähnelt.
+        /// </summary>
+        internal static string polygon {
+            get {
+                return ResourceManager.GetString("polygon", resourceCulture);
             }
         }
         
@@ -1483,6 +1672,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Speichern ähnelt.
+        /// </summary>
+        internal static string speichern {
+            get {
+                return ResourceManager.GetString("speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Sprache ähnelt.
         /// </summary>
         internal static string sprache {
@@ -1515,6 +1713,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string standort {
             get {
                 return ResourceManager.GetString("standort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Standortberechtigung wurde nicht erteilt. GPS kann nicht aktiviert werden. ähnelt.
+        /// </summary>
+        internal static string standort_berechtigung_fehlt {
+            get {
+                return ResourceManager.GetString("standort_berechtigung_fehlt", resourceCulture);
             }
         }
         
@@ -1596,6 +1803,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string titelbild_von_der_festplatte_hochladen {
             get {
                 return ResourceManager.GetString("titelbild_von_der_festplatte_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Validieren ähnelt.
+        /// </summary>
+        internal static string validieren {
+            get {
+                return ResourceManager.GetString("validieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vermessung ähnelt.
+        /// </summary>
+        internal static string vermessung {
+            get {
+                return ResourceManager.GetString("vermessung", resourceCulture);
             }
         }
         
@@ -1794,6 +2019,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string zu_pin_wechseln {
             get {
                 return ResourceManager.GetString("zu_pin_wechseln", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Zum bearbeiten ziehen ähnelt.
+        /// </summary>
+        internal static string zum_bearbeiten_ziehen {
+            get {
+                return ResourceManager.GetString("zum_bearbeiten_ziehen", resourceCulture);
             }
         }
         

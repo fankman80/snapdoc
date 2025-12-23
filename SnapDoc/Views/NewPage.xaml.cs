@@ -609,19 +609,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task UpdatePinLocationAsync(Pin pin)
     {
-        try
-        {
-            var location = await geoViewModel.GetCurrentLocationAsync();
-            if (location != null)
-            {
-                pin.GeoLocation = new GeoLocData(location);
-                GlobalJson.SaveToFile();
-            }
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"Fehler beim Abrufen der GPS-Koordinaten: {ex.Message}");
-        }
+        var location = await geoViewModel.TryGetLocationAsync();
+        if (location == null)
+            return;
+
+        pin.GeoLocation = new GeoLocData(location);
+        GlobalJson.SaveToFile();
     }
 
     private void OnMouseScroll(object sender, ScrollWheelEventArgs e)

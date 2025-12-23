@@ -163,7 +163,9 @@ public partial class MapView : IQueryAttributable
             }
             else if (SettingsService.Instance.IsGpsActive)
             {
-                Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
+                var location = await geoViewModel.TryGetLocationAsync();
+                if (location == null)
+                    return;
 
                 // Zoom auf GPS
                 lon = location.Longitude;
@@ -173,7 +175,9 @@ public partial class MapView : IQueryAttributable
         }
         else if (SettingsService.Instance.IsGpsActive)
         {
-            Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
+            var location = await geoViewModel.TryGetLocationAsync();
+            if (location == null)
+                return;
 
             // Zoom auf GPS (wenn kein Pin)
             lon = location.Longitude;
@@ -220,11 +224,33 @@ public partial class MapView : IQueryAttributable
 
     private static string LoadHtmlFromFile()
     {
-        using var stream = LoadLocalizedHtml("index");
+        var assembly = typeof(MapView).Assembly;
+        using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.index.html")!;
         using var reader = new StreamReader(stream);
         string htmlContent = reader.ReadToEnd();
+
+        // Farben ersetzen
         htmlContent = htmlContent.Replace("#999999", ((Color)Application.Current.Resources["Primary"]).ToRgbaHex());
         htmlContent = htmlContent.Replace("#888888", ((Color)Application.Current.Resources["PrimaryDarkText"]).ToRgbaHex());
+
+        // Lokalisierte Texte ersetzen
+        htmlContent = htmlContent.Replace("@Bearbeiten@", AppResources.bearbeiten);
+        htmlContent = htmlContent.Replace("@Vermessung@", AppResources.vermessung);
+        htmlContent = htmlContent.Replace("@Distanz messen@", AppResources.distanz_messen);
+        htmlContent = htmlContent.Replace("@Fläche messen@", AppResources.flaeche_messen);
+        htmlContent = htmlContent.Replace("@Löschen@", AppResources.loeschen);
+        htmlContent = htmlContent.Replace("@Linie@", AppResources.linie);
+        htmlContent = htmlContent.Replace("@Polygon@", AppResources.polygon);
+        htmlContent = htmlContent.Replace("@Bezeichnung@", AppResources.bezeichnung);
+        htmlContent = htmlContent.Replace("@Standort@", AppResources.standort);
+        htmlContent = htmlContent.Replace("@Beschreibung@", AppResources.beschreibung);
+        htmlContent = htmlContent.Replace("@Hinweis@", AppResources.hinweis);
+        htmlContent = htmlContent.Replace("@Für diesen Pin sind noch keine Informationen verfügbar.@", AppResources.pin_keine_infos);
+        htmlContent = htmlContent.Replace("@Klicken, um die Vermessung zu starten@", AppResources.klicken_start_vermessung);
+        htmlContent = htmlContent.Replace("@Klicken, um @", AppResources.klicken_um);
+        htmlContent = htmlContent.Replace("@das Polygon weiter zu zeichnen@", AppResources.klicken_weiter_polygon);
+        htmlContent = htmlContent.Replace("@die Linie weiter zu zeichnen@", AppResources.klicken_weiter_linie);
+        htmlContent = htmlContent.Replace("@Zum Bearbeiten ziehen@", AppResources.zum_bearbeiten_ziehen);
 
         return htmlContent;
     }
@@ -259,23 +285,38 @@ public partial class MapView : IQueryAttributable
     {
         if (!SettingsService.Instance.IsGpsActive)
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.standortdienste_deaktiviert, AppResources.standortdienste_aktivieren_aufforderung, AppResources.ok);
-            else
-                await Toast.Make(AppResources.standortdienste_aktivieren_aufforderung).Show();
+            await ShowGpsDisabledMessageAsync();
             return;
         }
-        
-        Location location = await geoViewModel.GetCurrentLocationAsync() ?? geoViewModel.LastKnownLocation;
+
+        var location = await geoViewModel.TryGetLocationAsync();
+        if (location == null)
+            return;
 
         lon = location.Longitude;
         lat = location.Latitude;
         zoom = 18;
 
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation = new GeoLocData(location);
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation =
+            new GeoLocData(location);
 
         GeoAdminWebView.Reload();
     }
+
+    private static async Task ShowGpsDisabledMessageAsync()
+    {
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+            await Application.Current.Windows[0].Page
+                .DisplayAlertAsync(
+                    AppResources.standortdienste_deaktiviert,
+                    AppResources.standortdienste_aktivieren_aufforderung,
+                    AppResources.ok);
+        else
+            await Toast
+                .Make(AppResources.standortdienste_aktivieren_aufforderung)
+                .Show();
+    }
+
 
     private async void GetCoordinatesClicked(object sender, EventArgs e)
     {
@@ -371,25 +412,6 @@ public partial class MapView : IQueryAttributable
         var layer = Settings.SwissTopoLayers[SettingsService.Instance.MapOverlay2].Id; //ch.swisstopo.swissimage
         var script = $"changeMapLayer('{layer}');";
         GeoAdminWebView.EvaluateJavaScriptAsync(script);
-    }
-    public static Stream LoadLocalizedHtml(string baseName)
-    {
-        var lang = CultureInfo.CurrentUICulture.TwoLetterISOLanguageName;
-
-        lang = lang switch
-        {
-            "de" => "de",
-            "fr" => "fr",
-            "en" => "en",
-            _ => "de" // Fallback
-        };
-
-        var assembly = Assembly.GetExecutingAssembly();
-        var resourceName = $"SnapDoc.Resources.Raw.{baseName}_{lang}.html";
-
-        var stream = assembly.GetManifestResourceStream(resourceName) ?? throw new InvalidOperationException(
-                $"HTML-Ressource nicht gefunden: {resourceName}");
-        return stream;
     }
 }
 

@@ -91,20 +91,20 @@ public partial class GeolocationViewModel : BaseViewModel
             if (status != PermissionStatus.Granted)
             {
                 await Shell.Current.DisplayAlertAsync(
-                    "GPS ist deaktiviert",
-                    "Standortberechtigung wurde nicht erteilt. GPS kann nicht aktiviert werden.",
+                    AppResources.gps_deaktiviert,
+                    AppResources.standort_berechtigung_fehlt,
                     AppResources.ok);
                 return;
             }
         }
 
         // System-GPS prüfen
-        if (!await IsSystemGpsEnabledAsync())
+        if (!await GeolocationViewModel.IsSystemGpsEnabledAsync())
         {
             bool openSettings = await Shell.Current.DisplayAlertAsync(
-                "GPS ist deaktiviert",
-                "Um die Standorterkennung zu aktivieren, bitte GPS in den Systemeinstellungen einschalten.",
-                "Einstellungen öffnen",
+                AppResources.gps_deaktiviert,
+                AppResources.gps_system_einschalten_aufforderung,
+                AppResources.einstellungen_oeffnen,
                 AppResources.abbrechen);
 
 #if ANDROID
@@ -144,7 +144,7 @@ public partial class GeolocationViewModel : BaseViewModel
         GPSButtonIcon = IsGpsActive ? Settings.GPSButtonOnIcon : Settings.GPSButtonOffIcon;
     }
 
-    private async static Task<bool> IsSystemGpsEnabledAsync()
+    public static async Task<bool> IsSystemGpsEnabledAsync()
     {
 #if ANDROID
     try
@@ -172,6 +172,12 @@ public partial class GeolocationViewModel : BaseViewModel
         if (!SettingsService.Instance.IsGpsActive)
             return null;
 
+        if (!await IsSystemGpsEnabledAsync())
+        {
+            HandleSystemGpsDisabled();
+            return null;
+        }
+
         try
         {
             var status = await Permissions.CheckStatusAsync<Permissions.LocationWhenInUse>();
@@ -193,7 +199,7 @@ public partial class GeolocationViewModel : BaseViewModel
         }
         catch (Exception ex)
         {
-            ListeningLocationStatus = $"Fehler bei Standortabfrage: {ex.Message}";
+            ListeningLocationStatus = $"{AppResources.fehler_standortabfrage}: {ex.Message}";
             return null;
         }
         finally
@@ -221,14 +227,14 @@ public partial class GeolocationViewModel : BaseViewModel
             };
 
             var success = await Geolocation.StartListeningForegroundAsync(request);
-            ListeningLocationStatus = success ? "GPS aktiv" : "GPS konnte nicht gestartet werden";
+            ListeningLocationStatus = success ? AppResources.gps_aktiv : AppResources.gps_start_fehler;
 
             OnPropertyChanged(nameof(IsListening));
             OnPropertyChanged(nameof(IsNotListening));
         }
         catch (Exception ex)
         {
-            ListeningLocationStatus = $"Fehler beim Starten: {ex.Message}";
+            ListeningLocationStatus = $"{AppResources.fehler_beim_starten}: {ex.Message}";
         }
     }
 
@@ -241,15 +247,35 @@ public partial class GeolocationViewModel : BaseViewModel
         {
             Geolocation.LocationChanged -= Geolocation_LocationChanged;
             Geolocation.StopListeningForeground();
-            ListeningLocationStatus = "GPS gestoppt";
+            ListeningLocationStatus = AppResources.gps_gestoppt;
         }
         catch (Exception ex)
         {
-            ListeningLocationStatus = $"Fehler beim Stoppen: {ex.Message}";
+            ListeningLocationStatus = $"{AppResources.fehler_beim_stoppen}: {ex.Message}";
         }
 
         OnPropertyChanged(nameof(IsListening));
         OnPropertyChanged(nameof(IsNotListening));
+    }
+
+    // ----------------------------------------------------------------------
+    // Überprüfen ob System-GPS deaktiviert wurde
+    // ----------------------------------------------------------------------
+    public void HandleSystemGpsDisabled()
+    {
+        if (!IsGpsActive)
+            return;
+
+        IsGpsActive = false;
+        StopListening();
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Shell.Current.DisplayAlertAsync(
+                AppResources.gps_deaktiviert,
+                AppResources.gps_system_einschalten_aufforderung,
+                AppResources.ok);
+        });
     }
 
     // ----------------------------------------------------------------------
@@ -280,5 +306,11 @@ public partial class GeolocationViewModel : BaseViewModel
         cts?.Cancel();
         StopListening();
         base.OnDisappearing();
+    }
+
+    public async Task<Location> TryGetLocationAsync()
+    {
+        return await GetCurrentLocationAsync()
+            ?? LastKnownLocation;
     }
 }

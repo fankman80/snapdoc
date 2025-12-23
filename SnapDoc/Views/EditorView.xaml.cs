@@ -4,6 +4,7 @@ using Android.Webkit;
 #endif
 using SnapDoc.Services;
 using System.Text.Json;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -134,6 +135,10 @@ public partial class EditorView : ContentPage, IQueryAttributable
         string htmlContent = reader.ReadToEnd();
         htmlContent = htmlContent.Replace("#999999", ((Color)Application.Current.Resources["Primary"]).ToRgbaHex());
         htmlContent = htmlContent.Replace("#888888", ((Color)Application.Current.Resources["PrimaryDarkText"]).ToRgbaHex());
+        htmlContent = htmlContent.Replace("@Formatieren@", AppResources.formatieren);
+        htmlContent = htmlContent.Replace("@Validieren@", AppResources.validieren);
+        htmlContent = htmlContent.Replace("@Abbrechen@", AppResources.abbrechen);
+        htmlContent = htmlContent.Replace("@Speichern@", AppResources.speichern);
 
         // Neues Flag ersetzen
         htmlContent = htmlContent.Replace("#IS_READ_ONLY", isReadOnly.ToString().ToLowerInvariant());

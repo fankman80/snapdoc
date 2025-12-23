@@ -108,16 +108,7 @@
 		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-	<ItemGroup>
-	  <MauiAsset Remove="Resources\Raw\index_de.html" />
-	  <MauiAsset Remove="Resources\Raw\index_en.html" />
-	  <MauiAsset Remove="Resources\Raw\index_fr.html" />
-	</ItemGroup>
-
     <ItemGroup>
-        <EmbeddedResource Include="Resources\Raw\index_de.html" />
-        <EmbeddedResource Include="Resources\Raw\index_en.html" />
-        <EmbeddedResource Include="Resources\Raw\index_fr.html" />
         <EmbeddedResource Include="Resources\Raw\index.html" />
         <EmbeddedResource Include="Resources\Raw\editor.html" />
     </ItemGroup>

@@ -157,21 +157,21 @@
     <div id="map"></div>
     <div id="popup">
         <div id="popupContent"></div>
-        <button id="sendButton">Bearbeiten</button>
+        <button id="sendButton">@Bearbeiten@</button>
     </div>
 
     <div class="measure-buttons">
-        <button id="startMeasure">Vermessung</button>
+        <button id="startMeasure">@Vermessung@</button>
         <div id="measureOptions" style="display:none; flex-direction: column; gap: 6px;">
-            <button id="measureDistance">Distanz messen</button>
-            <button id="measureArea">Fläche messen</button>
-            <button id="clearMeasure">Löschen</button>
+            <button id="measureDistance">@Distanz messen@</button>
+            <button id="measureArea">@Fläche messen@</button>
+            <button id="clearMeasure">@Löschen@</button>
         </div>
     </div>
 
     <select id="type" style="display:none;">
-        <option value="LineString">Linie</option>
-        <option value="Polygon">Polygon</option>
+        <option value="LineString">@Linie@</option>
+        <option value="Polygon">@Polygon@</option>
     </select>
     <input type="checkbox" id="segments" checked style="display:none;">
     <input type="checkbox" id="clear" style="display:none;">
@@ -234,7 +234,7 @@
         const modifyStyle = new ol.style.Style({
             image: new ol.style.Circle({ radius: 5, fill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }), stroke: new ol.style.Stroke({ color: '#333', width: 1 }) }),
             text: new ol.style.Text({
-                text: 'Zum Bearbeiten ziehen',
+                text: '@Zum Bearbeiten ziehen@',
                 font: '12px Segoe UI',
                 fill: new ol.style.Fill({ color: '#fff' }),
                 backgroundFill: new ol.style.Fill({ color: 'rgba(0,0,0,0.4)' }),
@@ -397,11 +397,10 @@
                     currentPlankey = feature.get('plankey');
 
                     let content = '';
-                    if (feature.get('pinname')) content += `<h4 class="popup-header">Bezeichnung:</h4><p>${feature.get('pinname')}</p><hr class="solid">`;
-                    if (feature.get('pinlocation')) content += `<h4 class="popup-header">Standort:</h4><p>${feature.get('pinlocation')}</p><hr class="solid">`;
-                    if (feature.get('pindesc')) content += `<h4 class="popup-header">Beschreibung:</h4><p>${feature.get('pindesc')}</p>`;
-
-                    if (!content) content = `<h4 class="popup-header">Hinweis:</h4><p>Für diesen Pin sind noch keine Informationen verfügbar.</p>`;
+                    if (feature.get('pinname')) content += `<h4 class="popup-header">@Bezeichnung@:</h4><p>${feature.get('pinname')}</p><hr class="solid">`;
+                    if (feature.get('pinlocation')) content += `<h4 class="popup-header">@Standort@:</h4><p>${feature.get('pinlocation')}</p><hr class="solid">`;
+                    if (feature.get('pindesc')) content += `<h4 class="popup-header">@Beschreibung@:</h4><p>${feature.get('pindesc')}</p>`;
+                    if (!content) content = `<h4 class="popup-header">@Hinweis@:</h4><p>@Für diesen Pin sind noch keine Informationen verfügbar.@</p>`;
                     else content = content.replace(/<hr class="solid">$/, '');
 
                     popupContent.innerHTML = content;
@@ -417,8 +416,8 @@
         // Draw-Funktion
         function addInteraction(type) {
             const drawType = type === 'area' ? 'Polygon' : 'LineString';
-            const activeTip = 'Klicken, um ' + (drawType === 'Polygon' ? 'das Polygon weiter zu zeichnen' : 'die Linie weiter zu zeichnen');
-            const idleTip = 'Klicken, um die Vermessung zu starten';
+            const activeTip = '@Klicken, um @' + (drawType === 'Polygon' ? '@das Polygon weiter zu zeichnen@' : '@die Linie weiter zu zeichnen@');
+            const idleTip = '@Klicken, um die Vermessung zu starten@';
             let tip = idleTip;
 
             // Alte Draw-Interaktion entfernen

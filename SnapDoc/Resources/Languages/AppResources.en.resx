@@ -699,4 +699,82 @@
   <data name="dunkel" xml:space="preserve">
     <value>Dark</value>
   </data>
+  <data name="gps_deaktiviert" xml:space="preserve">
+    <value>GPS is disabled</value>
+  </data>
+  <data name="standort_berechtigung_fehlt" xml:space="preserve">
+    <value>Location permission was not granted. GPS cannot be activated.</value>
+  </data>
+  <data name="gps_system_einschalten_aufforderung" xml:space="preserve">
+    <value>To enable location detection, please turn on GPS in the system settings.</value>
+  </data>
+  <data name="einstellungen_oeffnen" xml:space="preserve">
+    <value>Open Settings</value>
+  </data>
+  <data name="fehler_standortabfrage" xml:space="preserve">
+    <value>Error during location request</value>
+  </data>
+  <data name="gps_aktiv" xml:space="preserve">
+    <value>GPS active</value>
+  </data>
+  <data name="gps_start_fehler" xml:space="preserve">
+    <value>GPS could not be started</value>
+  </data>
+  <data name="fehler_beim_starten" xml:space="preserve">
+    <value>Error while starting</value>
+  </data>
+  <data name="gps_gestoppt" xml:space="preserve">
+    <value>GPS stopped</value>
+  </data>
+  <data name="fehler_beim_stoppen" xml:space="preserve">
+    <value>Error while stopping</value>
+  </data>
+  <data name="speichern" xml:space="preserve">
+    <value>Save</value>
+  </data>
+  <data name="formatieren" xml:space="preserve">
+    <value>Format</value>
+  </data>
+  <data name="validieren" xml:space="preserve">
+    <value>Validate</value>
+  </data>
+  <data name="bearbeiten" xml:space="preserve">
+    <value>Edit</value>
+  </data>
+  <data name="vermessung" xml:space="preserve">
+    <value>Measurement</value>
+  </data>
+  <data name="distanz_messen" xml:space="preserve">
+    <value>Measure distance</value>
+  </data>
+  <data name="flaeche_messen" xml:space="preserve">
+    <value>Measure area</value>
+  </data>
+  <data name="linie" xml:space="preserve">
+    <value>Line</value>
+  </data>
+  <data name="polygon" xml:space="preserve">
+    <value>Polygon</value>
+  </data>
+  <data name="hinweis" xml:space="preserve">
+    <value>Note</value>
+  </data>
+  <data name="pin_keine_infos" xml:space="preserve">
+    <value>No information available for this pin.</value>
+  </data>
+  <data name="klicken_start_vermessung" xml:space="preserve">
+    <value>Click to start measurement</value>
+  </data>
+  <data name="klicken_um" xml:space="preserve">
+    <value>Click to </value>
+  </data>
+  <data name="klicken_weiter_polygon" xml:space="preserve">
+    <value>continue drawing the polygon</value>
+  </data>
+  <data name="klicken_weiter_linie" xml:space="preserve">
+    <value>continue drawing the line</value>
+  </data>
+  <data name="zum_bearbeiten_ziehen" xml:space="preserve">
+    <value>Drag to edit</value>
+  </data>
 </root>

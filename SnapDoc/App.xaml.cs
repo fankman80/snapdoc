@@ -1,6 +1,8 @@
 ﻿using SnapDoc.Services;
 using UraniumUI;
 using static SnapDoc.Helper;
+using SnapDoc.ViewModels;
+
 
 
 #if ANDROID
@@ -60,6 +62,15 @@ public partial class App : Application
 
         // lade Einstellungen
         SettingsService.Instance.LoadSettings();
+
+        // prüfe GPS-Verfügbarkeit
+        var location = await GeolocationViewModel.Instance.TryGetLocationAsync();
+        if (location == null)
+            SettingsService.Instance.IsGpsActive = false;
+        else
+            SettingsService.Instance.IsGpsActive = true;
+
+        // Einstellungen speichern
         SettingsService.Instance.SaveSettings();
     }
 
