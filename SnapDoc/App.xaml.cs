@@ -3,8 +3,6 @@ using UraniumUI;
 using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 
-
-
 #if ANDROID
 using Android.OS;
 using Android.Content;

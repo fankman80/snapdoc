@@ -2,6 +2,7 @@
 #pragma warning disable MVVMTK0045
 
 using CommunityToolkit.Mvvm.ComponentModel;
+using DocumentFormat.OpenXml.Office.CustomXsn;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
@@ -371,6 +372,8 @@ namespace SnapDoc
         public string OnPinId { get; set; }
 
         [ObservableProperty] private bool _allowExport;
+
+        public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
     }
 
     public class PdfItem

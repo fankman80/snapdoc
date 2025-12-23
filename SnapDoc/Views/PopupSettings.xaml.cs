@@ -18,7 +18,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
         InitializeComponent();
 
         string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
-        svgIcon.Source = LoadSvgWithColor("customcolor.svg", hexColor);
+        svgIcon.Source = LoadSvgWithColor("customcolor.svg", "#999999", hexColor);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -106,29 +106,5 @@ public partial class PopupSettings : Popup, IQueryAttributable
             SettingsService.Instance.IconCategories = iconCategories;
             IconLookup.Initialize(Settings.IconData);
         }
-    }
-
-    private static string LoadSvgWithColor(string rawFileName, string newColor)
-    {
-        // Temporären Pfad erzeugen
-        string tempPath = Path.Combine(FileSystem.CacheDirectory, $"temp_{newColor.TrimStart('#')}.svg");
-
-        // Wenn bereits vorhanden → direkt zurückgeben
-        if (File.Exists(tempPath))
-            return tempPath;
-
-        // SVG aus dem Paket laden
-        using var stream = FileSystem.OpenAppPackageFileAsync(rawFileName).Result;
-        using var reader = new StreamReader(stream);
-        string svgText = reader.ReadToEnd();
-
-        // Farbe ersetzen
-        svgText = svgText.Replace("#999999", newColor, StringComparison.OrdinalIgnoreCase);
-
-        // Geänderten SVG-Text in Datei schreiben
-        File.WriteAllText(tempPath, svgText);
-
-        // FileStream öffnen und zurückgeben
-        return tempPath;
     }
 }

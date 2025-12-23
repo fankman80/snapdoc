@@ -49,16 +49,16 @@
         <ResourceDictionary>
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-
+            
             <!-- Template für Liste -->
             <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
-                <Grid HeightRequest="60"
+                <Grid HeightRequest="80"
                       Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnImageTapped" />
                     </Grid.GestureRecognizers>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="60" />
+                        <ColumnDefinition Width="80" />
                         <ColumnDefinition Width="*" />
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
@@ -73,9 +73,10 @@
                                     RetryCount="2"
                                     RetryDelay="100">
                     </ff:CachedImage>
-                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="6">
-                        <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"/>
-                        <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}{0:HH:mm:ss}' FontSize="12"/>
+                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                        <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12"/>
+                        <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
+                        <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
                     </VerticalStackLayout>
                     <HorizontalStackLayout Grid.Column="2" Spacing="0">
                         <Button Text="{x:Static local:MaterialIcons.Keep}"
@@ -102,8 +103,8 @@
             
             <!-- Template für Grid -->
             <DataTemplate x:Key="GalleryGridTemplate" x:DataType="local:FotoItem">
-                <Grid Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
-                    <views:SquareView>
+                <Grid>
+                    <views:SquareView Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
                         <ff:CachedImage Source="{Binding ImagePath}"
                                         Aspect="AspectFill"
                                         BitmapOptimizations="True"
@@ -122,15 +123,14 @@
                             HeightRequest="36"
                             MinimumWidthRequest="36"
                             MinimumHeightRequest="36"
-                            CornerRadius="18"
                             Padding="0"
                             Margin="6"
                             FontFamily="MaterialOutlined"
                             FontSize="24"
                             VerticalOptions="End"
                             HorizontalOptions="End"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                            TextColor="{DynamicResource Primary}"
+                            BackgroundColor="Transparent"
+                            TextColor="White"
                             Clicked="OnAllowExportClicked"/>
                 </Grid>
             </DataTemplate>

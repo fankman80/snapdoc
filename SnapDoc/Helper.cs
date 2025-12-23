@@ -430,4 +430,27 @@ public class Helper
             }
         }
     }
+    public static string LoadSvgWithColor(string rawFileName, string replaceColor, string newColor)
+    {
+        // Temporären Pfad erzeugen
+        string tempPath = Path.Combine(FileSystem.CacheDirectory, $"temp_{newColor.TrimStart('#')}.svg");
+
+        // Wenn bereits vorhanden → direkt zurückgeben
+        if (File.Exists(tempPath))
+            return tempPath;
+
+        // SVG aus dem Paket laden
+        using var stream = FileSystem.OpenAppPackageFileAsync(rawFileName).Result;
+        using var reader = new StreamReader(stream);
+        string svgText = reader.ReadToEnd();
+
+        // Farbe ersetzen
+        svgText = svgText.Replace(replaceColor, newColor, StringComparison.OrdinalIgnoreCase);
+
+        // Geänderten SVG-Text in Datei schreiben
+        File.WriteAllText(tempPath, svgText);
+
+        // FileStream öffnen und zurückgeben
+        return tempPath;
+    }
 }
