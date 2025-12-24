@@ -74,7 +74,7 @@
                                     RetryDelay="100">
                     </ff:CachedImage>
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                        <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12"/>
+                        <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12" FontAttributes="Bold"/>
                         <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
                         <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
                     </VerticalStackLayout>

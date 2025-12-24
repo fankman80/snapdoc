@@ -68,7 +68,7 @@ public partial class LocalizedLabel : Label
                 formattedValue = string.Empty;
             }
 
-            Text = $"{label} {formattedValue}";
+            Text = $"{label}{formattedValue}";
         }
         else
         {

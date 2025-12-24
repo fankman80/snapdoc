@@ -70,6 +70,7 @@ public partial class LoadDataToView
     public static void ResetData()
     {
         (Application.Current.Windows[0].Page as AppShell).PlanItems.Clear();
+        (Application.Current.Windows[0].Page as AppShell).AllPlanItems.Clear();
 
         // Reset Datenbank
         GlobalJson.Data.Client_name = null;

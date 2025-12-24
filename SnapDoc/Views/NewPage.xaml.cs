@@ -1041,7 +1041,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     break;
 
                 default:
-                    (Application.Current.Windows[0].Page as AppShell).PlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Result.NameEntry;
+                    (Application.Current.Windows[0].Page as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Result.NameEntry;
                     Title = result.Result.NameEntry;
 
                     GlobalJson.Data.Plans[PlanId].Name = result.Result.NameEntry;
@@ -1251,7 +1251,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Titel speichern
         (Application.Current.Windows[0].Page as AppShell)
-            ?.PlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
+            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
 
         GlobalJson.Data.Plans[PlanId].Name = Title;
 
