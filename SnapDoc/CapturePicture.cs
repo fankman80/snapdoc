@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using SkiaSharp;
+using SnapDoc.Resources.Languages;
 
 namespace SnapDoc;
 
@@ -16,9 +17,9 @@ public class CapturePicture
         if (cameraStatus != PermissionStatus.Granted)
         {
             await Application.Current.Windows[0].Page.DisplayAlertAsync(
-                "Berechtigung fehlt",
-                "Bitte erlaube Kamera- und Speicherzugriff in den App-Einstellungen.",
-                "OK");
+                AppResources.berechtigung_fehlt,
+                AppResources.berechtigung_kamera_dateien_info,
+                AppResources.ok);
             return (null, new Size(0, 0));
         }
 
@@ -27,10 +28,7 @@ public class CapturePicture
             var foto = await MediaPicker.Default.CapturePhotoAsync();
 
             if (foto == null)
-            {
-                Console.WriteLine("Keine Datei zurückgegeben (Picker evtl. abgebrochen).");
                 return (null, new Size(0, 0));
-            }
 
             using var stream = await foto.OpenReadAsync();
             string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}{Path.GetExtension(foto.FileName)}";
@@ -65,12 +63,10 @@ public class CapturePicture
         }
         catch (TaskCanceledException)
         {
-            Console.WriteLine("Fotovorgang vom Benutzer abgebrochen oder Intent unterbrochen.");
             return (null, new Size(0, 0));
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Fehler beim Aufnehmen oder Speichern des Fotos: {ex.Message}");
             return (null, new Size(0, 0));
         }
     }

@@ -777,4 +777,10 @@
   <data name="zum_bearbeiten_ziehen" xml:space="preserve">
     <value>Zum bearbeiten ziehen</value>
   </data>
+  <data name="berechtigung_fehlt" xml:space="preserve">
+    <value>Berechtigung fehlt</value>
+  </data>
+  <data name="berechtigung_kamera_dateien_info" xml:space="preserve">
+    <value>Diese Funktion benötigt Zugriff auf Kamera und Dateien. Bitte aktiviere die Berechtigung in den Einstellungen deines Geräts.</value>
+  </data>
 </root>

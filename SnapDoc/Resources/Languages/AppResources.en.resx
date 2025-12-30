@@ -777,4 +777,10 @@
   <data name="zum_bearbeiten_ziehen" xml:space="preserve">
     <value>Drag to edit</value>
   </data>
+  <data name="berechtigung_fehlt" xml:space="preserve">
+    <value>Permission required</value>
+  </data>
+  <data name="berechtigung_kamera_dateien_info" xml:space="preserve">
+    <value>This feature requires access to your camera and files. Please enable the permission in your device settings.</value>
+  </data>
 </root>

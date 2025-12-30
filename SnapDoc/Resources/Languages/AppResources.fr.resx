@@ -777,4 +777,10 @@
   <data name="zum_bearbeiten_ziehen" xml:space="preserve">
     <value>Faire glisser pour modifier</value>
   </data>
+  <data name="berechtigung_fehlt" xml:space="preserve">
+    <value>Autorisation manquante</value>
+  </data>
+  <data name="berechtigung_kamera_dateien_info" xml:space="preserve">
+    <value>Cette fonctionnalité nécessite l'accès à l'appareil photo et aux fichiers. Veuillez activer l'autorisation dans les paramètres de votre appareil.</value>
+  </data>
 </root>

@@ -187,6 +187,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Berechtigung fehlt ähnelt.
+        /// </summary>
+        internal static string berechtigung_fehlt {
+            get {
+                return ResourceManager.GetString("berechtigung_fehlt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Diese Funktion benötigt Zugriff auf Kamera und Dateien. Bitte aktiviere die Berechtigung in den Einstellungen deines Geräts. ähnelt.
+        /// </summary>
+        internal static string berechtigung_kamera_dateien_info {
+            get {
+                return ResourceManager.GetString("berechtigung_kamera_dateien_info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bericht exportieren ähnelt.
         /// </summary>
         internal static string bericht_exportieren {
