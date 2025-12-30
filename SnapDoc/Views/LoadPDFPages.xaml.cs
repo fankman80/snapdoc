@@ -11,7 +11,7 @@ namespace SnapDoc.Views;
 public partial class LoadPDFPages : ContentPage
 {
     IEnumerable<FileResult> resultList;
-    public int DynamicSpan { get; set; } = 0; // Standardwert
+    public int DynamicSpan { get; set; } = 0;
 
     public LoadPDFPages()
     {
@@ -295,8 +295,9 @@ public partial class LoadPDFPages : ContentPage
         {
             double screenWidth = this.Width;
             double imageWidth = SettingsService.Instance.PlanPreviewSize; // Mindestbreite in Pixeln
-            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
+            DynamicSpan = Math.Max(SettingsService.Instance.GridViewMinColumns, (int)(screenWidth / imageWidth));
         }
+
         OnPropertyChanged(nameof(DynamicSpan));
     }
 }

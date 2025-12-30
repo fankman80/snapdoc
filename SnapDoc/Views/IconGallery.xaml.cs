@@ -19,7 +19,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private string PinId;
     private bool isLongPressed = false;
     private string OrderDirection = "asc";
-    public int DynamicSpan { get; set; } = 1; // Standardwert
+    public int DynamicSpan { get; set; } = 1;
 
     public IconGallery()
     {
@@ -291,10 +291,11 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         {
             double screenWidth = this.Width;
             double imageWidth = SettingsService.Instance.IconPreviewSize; // Mindestbreite in Pixeln
-            DynamicSpan = Math.Max(2, (int)(screenWidth / imageWidth));
+            DynamicSpan = Math.Max(SettingsService.Instance.GridViewMinColumns, (int)(screenWidth / imageWidth));
         }
         else
             DynamicSpan = 1;
+
         OnPropertyChanged(nameof(DynamicSpan));
     }
 }

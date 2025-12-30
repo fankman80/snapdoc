@@ -124,7 +124,7 @@
                             MinimumWidthRequest="36"
                             MinimumHeightRequest="36"
                             Padding="0"
-                            Margin="4"
+                            Margin="2"
                             FontFamily="MaterialOutlined"
                             FontSize="24"
                             VerticalOptions="End"

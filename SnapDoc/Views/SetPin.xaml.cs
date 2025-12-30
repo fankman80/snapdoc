@@ -20,6 +20,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
     private string PlanId;
     private string PinId;
+    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
 
     private ObservableCollection<FotoItem> images;
     public ObservableCollection<FotoItem> Images
@@ -45,20 +46,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
             {
                 pin = value;
                 OnPropertyChanged(nameof(Pin));
-            }
-        }
-    }
-
-    private int dynamicSpan = 3;
-    public int DynamicSpan
-    {
-        get => dynamicSpan;
-        set
-        {
-            if (dynamicSpan != value)
-            {
-                dynamicSpan = value;
-                OnPropertyChanged(nameof(DynamicSpan));
             }
         }
     }
@@ -379,5 +366,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         double screenWidth = this.Width;
         double imageWidth = SettingsService.Instance.FotoPreviewSize;
         DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
+
+        OnPropertyChanged(nameof(DynamicSpan));
     }
 }

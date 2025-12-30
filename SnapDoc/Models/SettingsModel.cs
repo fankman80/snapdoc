@@ -44,6 +44,7 @@ internal class SettingsModel
     public int PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
     public int FotoPreviewSize { get; set; } // Grösse Fotovorschau in der Foto-Galerie
     public int IconPreviewSize { get; set; } // Grösse der Icons in der Icon-Auswahl
+    public int GridViewMinColumns { get; set; } // Minimale Spaltenanzahl im Rastermodus
     public double DefaultPinZoom { get; set; } // Standard Zoomstufe für Pins
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates

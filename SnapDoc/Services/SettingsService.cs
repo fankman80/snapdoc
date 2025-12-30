@@ -106,6 +106,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _planPreviewSize = 150;
     [ObservableProperty] private int _fotoPreviewSize = 150;
     [ObservableProperty] private int _iconPreviewSize = 64;
+    [ObservableProperty] private int _gridViewMinColumns = 3;
     [ObservableProperty] private double _defaultPinZoom = 2;
     [ObservableProperty] private bool _isPlanRotateLocked = false;
     [ObservableProperty] private bool _isPlanListThumbnails = false;
@@ -298,6 +299,7 @@ public partial class SettingsService : ObservableObject
             PlanPreviewSize = PlanPreviewSize,
             FotoPreviewSize = FotoPreviewSize,
             IconPreviewSize = IconPreviewSize,
+            GridViewMinColumns = GridViewMinColumns,
             DefaultPinZoom = DefaultPinZoom,
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
@@ -370,6 +372,7 @@ public partial class SettingsService : ObservableObject
             PlanPreviewSize = settings.PlanPreviewSize;
             FotoPreviewSize = settings.FotoPreviewSize;
             IconPreviewSize = settings.IconPreviewSize;
+            GridViewMinColumns = settings.GridViewMinColumns;
             DefaultPinZoom = settings.DefaultPinZoom;
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
@@ -438,6 +441,7 @@ public partial class SettingsService : ObservableObject
         PlanPreviewSize = defaultSettings.PlanPreviewSize;
         FotoPreviewSize = defaultSettings.FotoPreviewSize;
         IconPreviewSize = defaultSettings.IconPreviewSize;
+        GridViewMinColumns = defaultSettings.GridViewMinColumns;
         DefaultPinZoom = defaultSettings.DefaultPinZoom;
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
