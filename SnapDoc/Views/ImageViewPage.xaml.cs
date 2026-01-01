@@ -188,30 +188,36 @@ public partial class ImageViewPage : IQueryAttributable
         if (ImgSource == "showTitle")
         {
             string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
-            if (File.Exists(file)) File.Delete(file);
+            if (File.Exists(file))
+                File.Delete(file);
 
             file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
-            if (File.Exists(file)) File.Delete(file);
+            if (File.Exists(file))
+                File.Delete(file);
 
             GlobalJson.Data.TitleImage = "banner_thumbnail.png";
-            GlobalJson.SaveToFile();
-            await Shell.Current.GoToAsync($"..");
         }
         else
         {
             string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file)) File.Delete(file);
+            if (File.Exists(file))
+                File.Delete(file);
 
             file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file)) File.Delete(file);
+            if (File.Exists(file))
+                File.Delete(file);
 
             file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file)) File.Delete(file);
+            if (File.Exists(file))
+                File.Delete(file);
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
-            GlobalJson.SaveToFile();
-            await Shell.Current.GoToAsync($"setpin?planId={PlanId}&pinId={PinId}");
         }
+
+        // save data to file
+        GlobalJson.SaveToFile();  
+
+        await Shell.Current.GoToAsync($"..");
     }
 
     private void DrawingClicked(object sender, EventArgs e)
@@ -221,13 +227,13 @@ public partial class ImageViewPage : IQueryAttributable
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
-        // 1) Canvas erzeugen und anhängen
+        // Canvas erzeugen und anhängen
         drawingView = drawingController.CreateCanvasView();
         absoluteLayout.Children.Add(drawingView);
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-        // 2) DrawingController initialisieren
+        // DrawingController initialisieren
         drawingController.InitializeDrawing(
             SelectedColor.ToSKColor(),
             lineWidth,
@@ -238,7 +244,7 @@ public partial class ImageViewPage : IQueryAttributable
             SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha)
         );
 
-        // 3) initialer Modus
+        // initialer Modus
         drawingController.DrawMode = DrawMode.None;
         drawMode = DrawMode.None;
     }

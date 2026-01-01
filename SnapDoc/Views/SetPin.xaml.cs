@@ -198,21 +198,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
-        if (Shell.Current.Navigation.NavigationStack.Count > 1)
-        {
-            try
-            {
-                await Shell.Current.GoToAsync("..");
-            }
-            catch
-            {
-                await Shell.Current.GoToAsync("//homescreen");
-            }
-        }
-        else
-        {
-            await Shell.Current.GoToAsync("//homescreen");
-        }
+        await Shell.Current.GoToAsync("..");
     }
 
     private void DeletePinData(string pinId)
