@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                xmlns:views="clr-namespace:SnapDoc.Views"             
+                xmlns:services="clr-namespace:SnapDoc.Services"
+                xmlns:controls="clr-namespace:SnapDoc.Controls"
+                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+                xmlns:local="clr-namespace:SnapDoc"
+                Shell.TitleColor="{DynamicResource PrimaryDark}"
+                Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+                x:Class="SnapDoc.Views.MapViewOSM"
+                x:Name="ThisPage"
+                Title="{x:Static res:AppResources.osm_karte}">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="0"
+              VerticalOptions="Center">
+            <Label Grid.Column="0"
+                   x:DataType="views:MapView"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+            <Button Grid.Column="1"
+                    Text="{x:Static local:MaterialIcons.Moved_location}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.kml_datei_exportieren}"                    
+                    Clicked="KmlExportClicked"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid>
+        <AbsoluteLayout>
+            <StackLayout Orientation="Vertical"
+                         Spacing="14"
+                         Padding="14"
+                         AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
+                         AbsoluteLayout.LayoutFlags="PositionProportional">
+                <Border Grid.Column="0"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        Stroke="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                        StrokeThickness="1"
+                        HorizontalOptions="End"
+                        BackgroundColor="White"
+                        StrokeShape="RoundRectangle 30">
+                    <Image Source="mapcolorbtn.png"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMapLayerColorClicked"/>
+                    </Border.GestureRecognizers>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
+                    </Border.Shadow>
+                </Border>
+                <Border
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    Stroke="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                    StrokeThickness="1"
+                    HorizontalOptions="End"
+                    BackgroundColor="White"
+                    StrokeShape="RoundRectangle 30">
+                    <Image Source="maprealbtn.png"/>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnMapLayerRealClicked"/>
+                    </Border.GestureRecognizers>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
+                    </Border.Shadow>
+                </Border>
+                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        HorizontalOptions="End"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="GetCoordinatesClicked">
+                    <Button.Shadow>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
+                    </Button.Shadow>
+                </Button>
+                <Border x:Name="SetPosBtn"
+                        IsVisible="False"
+                        Padding="10,10,14,10"
+                        HeightRequest="60"
+                        StrokeThickness="0"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        StrokeShape="RoundRectangle 30">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="SetPosClicked"/>
+                    </Border.GestureRecognizers>
+                    <Border.Shadow>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6" />
+                    </Border.Shadow>
+                    <Grid ColumnDefinitions="60,*"
+                          ColumnSpacing="6"
+                          VerticalOptions="Center"
+                          HorizontalOptions="Center">
+                        <Image x:Name="SetPosBtnIcon"
+                               Grid.Column="0"
+                               Source="{AppThemeBinding Light=ic_pin_dark.png, Dark=ic_pin_light.png}" />
+                        <Label Grid.Column="1"
+                               Text="{x:Static res:AppResources.neu_setzen}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               TextColor="{DynamicResource PrimaryDarkText}" />
+                    </Grid>
+                </Border>
+            </StackLayout>
+        </AbsoluteLayout>
+    </Grid>
+</ContentPage>

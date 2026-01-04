@@ -68,6 +68,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("pinList", typeof(PinList));
         Routing.RegisterRoute("exportSettings", typeof(ExportSettings));
         Routing.RegisterRoute("mapview", typeof(MapView));
+        Routing.RegisterRoute("mapviewosm", typeof(MapViewOSM));
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
 
         AllPlanItems = [];
@@ -154,6 +155,7 @@ public partial class AppShell : Shell
                 if (GlobalJson.Data.Plans == null && (parameter == "exportSettings" ||
                                                         parameter == "pinList" ||
                                                         parameter == "mapview" ||
+                                                        parameter == "mapviewosm" ||
                                                         parameter == "fotogallery"))
                 {
                     var popup = new PopupAlert("Es sind noch keine Pläne vorhanden. Importieren zuerst eine oder mehrere PDF-Seiten in der Projektverwaltung.");

@@ -1195,6 +1195,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die OpenStreepMap Karte ähnelt.
+        /// </summary>
+        internal static string osm_karte {
+            get {
+                return ResourceManager.GetString("osm_karte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Eine oder mehrere PDF-Dateien auswählen ähnelt.
         /// </summary>
         internal static string pdf_dateien_auswaehlen {

@@ -121,6 +121,8 @@
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.3.0" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
 		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.3-preview.1" />
+		<PackageReference Include="Mapsui" Version="5.0.2" />
+		<PackageReference Include="Mapsui.Maui" Version="5.0.2" />
 		<PackageReference Include="MetadataExtractor" Version="2.9.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.1" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.20" />
@@ -143,6 +145,9 @@
 	  <Compile Update="Views\FotoGallery.xaml.cs">
 	    <DependentUpon>FotoGallery.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\MapViewOSM.xaml.cs">
+	    <DependentUpon>MapViewOSM.xaml</DependentUpon>
+	  </Compile>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -161,6 +166,9 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Views\FotoGallery.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\MapViewOSM.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	</ItemGroup>

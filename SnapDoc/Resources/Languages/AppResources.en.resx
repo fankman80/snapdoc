@@ -783,4 +783,7 @@
   <data name="berechtigung_kamera_dateien_info" xml:space="preserve">
     <value>This feature requires access to your camera and files. Please enable the permission in your device settings.</value>
   </data>
+  <data name="osm_karte" xml:space="preserve">
+    <value>OpenStreepMap</value>
+  </data>
 </root>

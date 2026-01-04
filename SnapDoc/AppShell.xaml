@@ -222,6 +222,19 @@
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
+                    <!-- swisstopo Karte -->
+                    <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="mapviewosm" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="0"
+                               Text="{x:Static local:MaterialIcons.Map}"
+                               FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.osm_karte}" FontSize="14" VerticalOptions="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
+                    </Grid>
+
                     <!-- Pins -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
