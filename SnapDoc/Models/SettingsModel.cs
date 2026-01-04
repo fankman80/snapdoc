@@ -4,6 +4,7 @@ internal class SettingsModel
 {
     public int PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
     public int PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
+    public int MapService { get; set; } // swisstopo-Karten oder OpenStreetMap-Karten aktiviert
     public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo
     public int MapIcon { get; set; } // Ausgewähltes Karten-Icon auf swisstopo
     public int MapOverlay1 { get; set; } // Ausgewähltes swisstopo-Overlay 1

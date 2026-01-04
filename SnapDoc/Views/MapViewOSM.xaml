@@ -4,6 +4,7 @@
                 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                 xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                 xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+                xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
                 xmlns:views="clr-namespace:SnapDoc.Views"             
                 xmlns:services="clr-namespace:SnapDoc.Services"
                 xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -43,7 +44,9 @@
     </Shell.TitleView>
 
     <Grid>
-        <AbsoluteLayout>
+        <mapsui:MapControl x:Name="MapControl" />
+
+        <AbsoluteLayout InputTransparent="True">
             <StackLayout Orientation="Vertical"
                          Spacing="14"
                          Padding="14"

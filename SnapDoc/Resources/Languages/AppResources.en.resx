@@ -784,6 +784,9 @@
     <value>This feature requires access to your camera and files. Please enable the permission in your device settings.</value>
   </data>
   <data name="osm_karte" xml:space="preserve">
-    <value>OpenStreepMap</value>
+    <value>OpenStreetMap</value>
+  </data>
+  <data name="kartenservice" xml:space="preserve">
+    <value>Map service</value>
   </data>
 </root>

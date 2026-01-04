@@ -784,6 +784,9 @@
     <value>Cette fonctionnalité nécessite l'accès à l'appareil photo et aux fichiers. Veuillez activer l'autorisation dans les paramètres de votre appareil.</value>
   </data>
   <data name="osm_karte" xml:space="preserve">
-    <value>OpenStreepMap</value>
+    <value>OpenStreetMap</value>
+  </data>
+  <data name="kartenservice" xml:space="preserve">
+    <value>Service de cartographie</value>
   </data>
 </root>

@@ -115,6 +115,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _pinMaxScaleLimit = 100;
     [ObservableProperty] private int _maxPdfPixelCount = 30;
     [ObservableProperty] private int _pdfThumbDpi = 72;
+    [ObservableProperty] private int _mapService = 0;
     [ObservableProperty] private int _mapIconSize = 85;
     [ObservableProperty] private int _mapIcon = 0;
     [ObservableProperty] private int _mapOverlay1 = 1;
@@ -186,6 +187,22 @@ public partial class SettingsService : ObservableObject
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
+
+    // Select Menu-Entrys for Map Services
+    public bool IsSwissTopoVisible => IsProjectLoaded && MapService == 0;
+    public bool IsOsmVisible => IsProjectLoaded && MapService == 1;
+
+    partial void OnIsProjectLoadedChanged(bool oldValue, bool newValue)
+    {
+        OnPropertyChanged(nameof(IsSwissTopoVisible));
+        OnPropertyChanged(nameof(IsOsmVisible));
+    }
+
+    partial void OnMapServiceChanged(int oldValue, int newValue)
+    {
+        OnPropertyChanged(nameof(IsSwissTopoVisible));
+        OnPropertyChanged(nameof(IsOsmVisible));
+    }
 
     // --- Selected ColorTheme ---
     private string _selectedColorTheme;
@@ -259,6 +276,7 @@ public partial class SettingsService : ObservableObject
         {
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
+            MapService = MapService,
             MapIconSize = MapIconSize,
             MapIcon = MapIcon,
             MapOverlay1 = MapOverlay1,
@@ -334,6 +352,7 @@ public partial class SettingsService : ObservableObject
 
             PinMinScaleLimit = settings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
+            MapService = settings.MapService;
             MapIconSize = settings.MapIconSize;
             MapIcon = settings.MapIcon;
             MapOverlay1 = settings.MapOverlay1;
@@ -401,6 +420,7 @@ public partial class SettingsService : ObservableObject
         var defaultSettings = new SettingsService();
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
+        MapService = defaultSettings.MapService;
         MapIconSize = defaultSettings.MapIconSize;
         MapIcon = defaultSettings.MapIcon;
         MapOverlay1 = defaultSettings.MapOverlay1;

@@ -14,6 +14,7 @@ public partial class AppShell : Shell
     public List<PlanItem> AllPlanItems { get; set; }
     public ObservableCollection<PlanItem> PlanItems { get; set; }
 
+
     private bool _isActiveToggle;
     public bool IsActiveToggle
     {

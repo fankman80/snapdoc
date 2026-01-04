@@ -871,6 +871,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kartenservice ähnelt.
+        /// </summary>
+        internal static string kartenservice {
+            get {
+                return ResourceManager.GetString("kartenservice", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kategorie ähnelt.
         /// </summary>
         internal static string kategorie {
@@ -1195,7 +1204,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die OpenStreepMap Karte ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die OpenStreetMap ähnelt.
         /// </summary>
         internal static string osm_karte {
             get {

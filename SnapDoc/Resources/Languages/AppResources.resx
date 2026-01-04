@@ -784,6 +784,9 @@
     <value>Diese Funktion benötigt Zugriff auf Kamera und Dateien. Bitte aktiviere die Berechtigung in den Einstellungen deines Geräts.</value>
   </data>
   <data name="osm_karte" xml:space="preserve">
-    <value>OpenStreepMap Karte</value>
+    <value>OpenStreetMap</value>
+  </data>
+  <data name="kartenservice" xml:space="preserve">
+    <value>Kartenservice</value>
   </data>
 </root>

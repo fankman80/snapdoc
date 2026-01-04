@@ -236,7 +236,12 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void ShowGeoLoc(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"mapview?planId={PlanId}&pinId={PinId}");
+        if (SettingsService.Instance.MapService == 0)
+            await Shell.Current.GoToAsync($"mapview?planId={PlanId}&pinId={PinId}");
+        else if (SettingsService.Instance.MapService == 1)
+            await Shell.Current.GoToAsync($"mapviewosm?planId={PlanId}&pinId={PinId}");
+        else
+            await Shell.Current.GoToAsync($"mapview?planId={PlanId}&pinId={PinId}");
     }
 
     private async void TakeFoto(object sender, EventArgs e)

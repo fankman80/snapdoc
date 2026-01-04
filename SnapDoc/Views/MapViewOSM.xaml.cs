@@ -10,13 +10,10 @@ using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using System.Globalization;
-using System.Text.Json;
 using Mapsui.Extensions;
 using Mapsui.Layers;
 using Mapsui.Nts;
 using Mapsui.Styles;
-using Color = Microsoft.Maui.Graphics.Color;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
 using Image = Microsoft.Maui.Controls.Image;
@@ -32,35 +29,27 @@ public partial class MapViewOSM : IQueryAttributable
     private int zoom = 8;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly List<GeometryFeature> _features = [];
-    private MapControl mapControl = new MapControl();
-    private Map map = new Map();
+    private readonly MapControl mapControl = new();
+    private readonly Map map = new();
 
     public MapViewOSM()
     {
         InitializeComponent();
 
         map.Layers.Add(OpenStreetMap.CreateTileLayer());
+        map.Layers.Add(OpenStreetMap.CreateTileLayer());
+        map.Layers.Add(CreatePinLayer());
 
-        var pinLayer = CreatePinLayer();
-        map.Layers.Add(pinLayer);
-
-        mapControl.Map = map;
-
+        MapControl.Map = map;
         map.Widgets.Clear();
-        Content = mapControl;
-
-        var center = new MPoint(lon, lat);
-        var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(center.X, center.Y).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[18]);
     }
 
-    protected override void OnAppearing()
+    protected async override void OnAppearing()
     {
         base.OnAppearing();
 
-        UpdateUiFromQuery();
+        await UpdateUiFromQueryAsync();
 
-        var positions = new List<object>();
         foreach (var plan in GlobalJson.Data.Plans)
         {
             foreach (var pin in plan.Value.Pins ?? [])
@@ -72,12 +61,17 @@ public partial class MapViewOSM : IQueryAttributable
                 }
             }
         }
+
+        var center = new MPoint(lon, lat);
+        var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(center.X, center.Y).ToMPoint();
+        map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
     }
 
     private void AddPin(Map map, Point pos)
     {
         // WGS84 → Spherical Mercator
         var (x, y) = SphericalMercator.FromLonLat(pos.X, pos.Y);
+        double scale = (double)SettingsService.Instance.MapIconSize / 100;
 
         _features.Add(new GeometryFeature
         {
@@ -87,7 +81,7 @@ public partial class MapViewOSM : IQueryAttributable
                 new ImageStyle
                 {
                     Image = ImageStyles.CreatePinStyle().Image, // optional eigener Style
-                    SymbolScale = 1.0,
+                    SymbolScale = scale,
                     RelativeOffset = new RelativeOffset(0, 0.5)
                 }
             }
@@ -113,13 +107,13 @@ public partial class MapViewOSM : IQueryAttributable
     {
         if (query.TryGetValue("planId", out var planIdObj))
             PlanId = planIdObj as string ?? string.Empty;
-        if (query.TryGetValue("pinId", out var pinIdObj)) 
+        if (query.TryGetValue("pinId", out var pinIdObj))
             PinId = pinIdObj as string ?? string.Empty;
 
-        UpdateUiFromQuery();
+        _ = UpdateUiFromQueryAsync(); // fire & forget
     }
 
-    private async void UpdateUiFromQuery()
+    private async Task UpdateUiFromQueryAsync()
     {
         if (!string.IsNullOrEmpty(PlanId) &&
             !string.IsNullOrEmpty(PinId) &&

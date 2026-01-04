@@ -140,11 +140,36 @@
                         Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
                         <uranium:ExpanderView.Header>
-                            <Label Text="{x:Static res:AppResources.swisstopo_karten_pins}"/>
+                            <Label Text="{x:Static res:AppResources.kartenservice}"/>
                         </uranium:ExpanderView.Header>
                         <VerticalStackLayout Spacing="0">
+                            <material:RadioButtonGroupView Spacing="16"
+                                                           SelectedIndex="{Binding MapService, Mode=TwoWay}"
+                                                           HorizontalOptions="Fill"
+                                                           Orientation="Vertical">
+                                <material:RadioButton Value="0"
+                                                      FontFamily="OpenSansRegular"
+                                                      TextFontSize="14"
+                                                      Text="{x:Static res:AppResources.swisstopo_karte}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Start" />
+                                <material:RadioButton Value="1"
+                                                      FontFamily="OpenSansRegular"
+                                                      TextFontSize="14"
+                                                      Text="{x:Static res:AppResources.osm_karte}"
+                                                      CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                      HorizontalOptions="Start" />
+                            </material:RadioButtonGroupView>
+
+                            <!-- Trennlinie -->
+                            <Grid Margin="0,16,0,16" IsVisible="{Binding IsProjectLoaded}">
+                                <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
+                            </Grid>
+
                             <material:RadioButtonGroupView Spacing="24"
-                                                           Margin="2,10,0,0"
+                                                           Margin="2,0,0,0"
                                                            SelectedIndex="{Binding MapIcon, Mode=TwoWay}"
                                                            HorizontalOptions="Fill"
                                                            Orientation="Horizontal">
@@ -154,28 +179,24 @@
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
-
                                 <material:RadioButton Value="1"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
-
                                 <material:RadioButton Value="2"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
-
                                 <material:RadioButton Value="3"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
-
                                 <material:RadioButton Value="4"
                                                       WidthRequest="30"
                                                       Margin="0,0,0,10"
@@ -184,7 +205,7 @@
                                                       HorizontalOptions="Center" />
                             </material:RadioButtonGroupView>
 
-                            <HorizontalStackLayout Spacing="24" Margin="0,0,0,10">
+                            <HorizontalStackLayout Spacing="24" Margin="0,0,0,16">
                                 <ffimageloading:SvgCachedImage x:Name="svgIcon"
                                        WidthRequest="30"/>
                                 <Image HorizontalOptions="Center"

@@ -11,7 +11,6 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Globalization;
-using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 
@@ -122,17 +121,17 @@ public partial class MapView : IQueryAttributable
     {
         if (query.TryGetValue("planId", out var planIdObj))
             PlanId = planIdObj as string ?? string.Empty;
-        if (query.TryGetValue("pinId", out var pinIdObj)) 
+        if (query.TryGetValue("pinId", out var pinIdObj))
             PinId = pinIdObj as string ?? string.Empty;
 
-        UpdateUiFromQuery();
+        _ = UpdateUiFromQueryAsync(); // fire & forget
     }
 
-    protected override void OnAppearing()
+    protected async override void OnAppearing()
     {
         base.OnAppearing();
 
-        UpdateUiFromQuery();
+        await UpdateUiFromQueryAsync();
 
         GeoAdminWebView.Source = new HtmlWebViewSource
         {
@@ -140,7 +139,7 @@ public partial class MapView : IQueryAttributable
         };
     }
 
-    private async void UpdateUiFromQuery()
+    private async Task UpdateUiFromQueryAsync()
     {
         if (!string.IsNullOrEmpty(PlanId) &&
             !string.IsNullOrEmpty(PinId) &&
