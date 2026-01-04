@@ -240,6 +240,11 @@ public partial class MapViewOSM : IQueryAttributable
             File.Delete(outputPath);
     }
 
+    private void GetCoordinatesClicked(object sender, EventArgs e)
+    {
+
+    }
+
     private void OnMapLayerColorClicked(object sender, EventArgs e)
     {
 
