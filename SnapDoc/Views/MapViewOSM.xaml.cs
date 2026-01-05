@@ -12,12 +12,12 @@ using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.ButtonWidgets;
-using Mapsui.Widgets.InfoWidgets;
 using Mapsui.Widgets.ScaleBar;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using Color = Microsoft.Maui.Graphics.Color;
 using Image = Microsoft.Maui.Controls.Image;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
@@ -33,10 +33,11 @@ public partial class MapViewOSM : IQueryAttributable
     private int zoom = 8;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly List<GeometryFeature> _features = [];
-    private readonly MapControl mapControl = new();
     private readonly Map map = new();
-    //private readonly object? _selectedPinId;
     private bool _mapInitialized = false;
+    private bool _isDraggingPin;
+    private GeometryFeature _draggedPin;
+    private Mapsui.Styles.Image pinImage;
 
     public MapViewOSM()
     {
@@ -52,6 +53,9 @@ public partial class MapViewOSM : IQueryAttributable
         map.Widgets.Add(new ZoomInOutWidget { Margin = new MRect(20, 40), HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top });
 
         MapControl.Map.Tapped += OnMapTapped;
+        MapControl.Map.PointerPressed += OnPressed;
+        MapControl.Map.PointerMoved += OnMoved;
+        MapControl.Map.PointerReleased += OnReleased;
     }
 
     protected async override void OnAppearing()
@@ -64,6 +68,14 @@ public partial class MapViewOSM : IQueryAttributable
         _mapInitialized = true;
 
         await UpdateUiFromQueryAsync();
+
+        // load Pin image with app primary color
+        string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
+        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor)).AbsoluteUri;
+        pinImage = new Mapsui.Styles.Image
+        {
+            Source = uri
+        };
 
         foreach (var plan in GlobalJson.Data.Plans)
         {
@@ -97,7 +109,7 @@ public partial class MapViewOSM : IQueryAttributable
             {
                 new ImageStyle
                 {
-                    Image = ImageStyles.CreatePinStyle().Image, // optional eigener Style
+                    Image = pinImage,
                     SymbolScale = scale,
                     RelativeOffset = new RelativeOffset(0, 0.5)
                 }
@@ -109,14 +121,13 @@ public partial class MapViewOSM : IQueryAttributable
         layer.DataHasChanged();
     }
 
-
     private MemoryLayer CreatePinLayer()
     {
         return new MemoryLayer
         {
             Name = "Pins",
             Features = _features,
-            Style = null // wichtig
+            Style = null
         };
     }
 
@@ -194,6 +205,30 @@ public partial class MapViewOSM : IQueryAttributable
 
         GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation =
             new GeoLocData(location);
+
+        // 2Pin-Feature in der Map verschieben
+        var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+        if (pinLayer != null)
+        {
+            var feature = pinLayer.Features
+                                  .OfType<GeometryFeature>()
+                                  .FirstOrDefault(f => f["PinId"]?.ToString() == PinId &&
+                                                       f["PlanId"]?.ToString() == PlanId);
+
+            if (feature != null)
+            {
+                // WGS84 → Spherical Mercator
+                var (x, y) = SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
+                feature.Geometry = new Point(x, y);
+
+                // Layer updaten
+                pinLayer.FeaturesWereModified();
+                pinLayer.DataHasChanged();
+            }
+        }
+
+        var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
+        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[zoom]);
     }
 
     private static async Task ShowGpsDisabledMessageAsync()
@@ -281,8 +316,96 @@ public partial class MapViewOSM : IQueryAttributable
         }
     }
 
-    private void GetCoordinatesClicked(object sender, EventArgs e)
+    private void OnPressed(object sender, MapEventArgs e)
     {
+        // Nur Pins-Layer abfragen
+        var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
+        if (pinLayer == null)
+            return;
 
+        var mapInfo = e.GetMapInfo([pinLayer]);
+
+        if (mapInfo?.Feature is GeometryFeature feature &&
+            feature["PinId"] != null)
+        {
+            _draggedPin = feature;
+            _isDraggingPin = true;
+
+            MapControl.Map.Navigator.PanLock = true; // verhindert Verschieben
+        }
+    }
+
+    private void OnMoved(object sender, MapEventArgs e)
+    {
+        if (!_isDraggingPin || _draggedPin == null)
+            return;
+
+        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
+
+        _draggedPin.Geometry = new Point(worldPos.X, worldPos.Y);
+
+        var layer = map.Layers.OfType<MemoryLayer>()
+                              .First(l => l.Name == "Pins");
+        layer.FeaturesWereModified();
+        layer.DataHasChanged();
+    }
+
+    private void OnReleased(object sender, MapEventArgs e)
+    {
+        if (!_isDraggingPin)
+            return;
+
+        _isDraggingPin = false;
+        _draggedPin = null;
+       
+        MapControl.Map.Navigator.PanLock = false; // Karte wieder aktivieren
+    }
+
+    private async void GetCoordinatesClicked(object sender, EventArgs e)
+    {
+        var pinLayer = map.Layers.OfType<MemoryLayer>()
+                                 .FirstOrDefault(l => l.Name == "Pins");
+
+        if (pinLayer == null)
+            return;
+
+        foreach (var feature in pinLayer.Features.Cast<GeometryFeature>())
+        {
+            // Feature-Attribute
+            var planKey = feature["PlanId"]?.ToString();
+            var pinKey = feature["PinId"]?.ToString();
+
+            if (planKey == null || pinKey == null)
+                continue;
+
+            var pin = GlobalJson.Data.Plans[planKey].Pins[pinKey];
+
+            // Geometry ist Spherical Mercator -> zurück zu WGS84
+            if (feature.Geometry is Point point)
+            {
+                var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
+
+                // Prüfen, ob sich die Koordinaten geändert haben
+                pin.GeoLocation ??= new GeoLocData();
+
+                if (pin.GeoLocation.WGS84.Latitude != wgs84.lat || pin.GeoLocation.WGS84.Longitude != wgs84.lon)
+                {
+                    pin.GeoLocation.WGS84.Latitude = wgs84.lat;
+                    pin.GeoLocation.WGS84.Longitude = wgs84.lon;
+                    pin.GeoLocation.Accuracy = 0;
+
+                    await pin.GeoLocation.UpdateCH1903Async(); // optional: CH1903 konvertieren
+                }
+            }
+        }
+
+        // GlobalJson speichern
+        GlobalJson.SaveToFile();
+
+        // Feedback an User
+        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+            await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.pin_positionen_aktualisiert, AppResources.ok);
+        else
+            await Toast.Make(AppResources.pin_positionen_aktualisiert).Show();
     }
 }

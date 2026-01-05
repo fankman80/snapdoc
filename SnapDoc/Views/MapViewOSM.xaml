@@ -44,15 +44,12 @@
     </Shell.TitleView>
 
     <Grid>
-        <mapsui:MapControl x:Name="MapControl" />
-
-        <AbsoluteLayout InputTransparent="True">
-            <StackLayout Orientation="Vertical"
-                         Spacing="14"
-                         Padding="14"
-                         AbsoluteLayout.LayoutBounds="1,1,AutoSize,AutoSize"
-                         AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
+        <mapsui:MapControl x:Name="MapControl"/>
+        <VerticalStackLayout HorizontalOptions="End"
+                             VerticalOptions="End"
+                             Spacing="14"
+                             Padding="14">
+            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
                         WidthRequest="60"
                         HeightRequest="60"
                         CornerRadius="30"
@@ -65,7 +62,7 @@
                     </Button.Shadow>
                 </Button>
                 <Border x:Name="SetPosBtn"
-                        IsVisible="False"
+                        IsVisible="false"
                         Padding="10,10,14,10"
                         HeightRequest="60"
                         StrokeThickness="0"
@@ -91,7 +88,7 @@
                                TextColor="{DynamicResource PrimaryDarkText}" />
                     </Grid>
                 </Border>
-            </StackLayout>
-        </AbsoluteLayout>
+                </VerticalStackLayout>
+
     </Grid>
 </ContentPage>
