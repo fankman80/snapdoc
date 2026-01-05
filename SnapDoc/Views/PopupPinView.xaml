@@ -34,9 +34,9 @@
             
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
-                                        Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        HeightRequest="1"
-                                        Margin="0,6,0,6"/>
+                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     HeightRequest="1"
+                     Margin="0,6,0,6"/>
             
             <HorizontalStackLayout Spacing="0">
                 <Label Text="{x:Static res:AppResources.standort}"
@@ -48,9 +48,9 @@
 
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
-                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                     HeightRequest="1"
-                                     Margin="0,6,0,6"/>
+                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     HeightRequest="1"
+                     Margin="0,6,0,6"/>
 
             <HorizontalStackLayout Spacing="0">
                 <Label Text="{x:Static res:AppResources.beschreibung}"
