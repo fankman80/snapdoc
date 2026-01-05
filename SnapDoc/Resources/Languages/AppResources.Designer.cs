@@ -1807,6 +1807,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tippen und ziehen, um Distanz zu messen ähnelt.
+        /// </summary>
+        internal static string tippen_ziehen_messen {
+            get {
+                return ResourceManager.GetString("tippen_ziehen_messen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die (Titel eingeben...) ähnelt.
         /// </summary>
         internal static string titel_eingeben {

@@ -7,17 +7,21 @@ using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
 using Mapsui.Nts;
+using Mapsui.Nts.Extensions;
 using Mapsui.Projections;
 using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
+using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.ButtonWidgets;
+using Mapsui.Widgets.InfoWidgets;
 using Mapsui.Widgets.ScaleBar;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using Color = Microsoft.Maui.Graphics.Color;
+using Color = Mapsui.Styles.Color;
+using Font = Mapsui.Styles.Font;
 using Image = Microsoft.Maui.Controls.Image;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
@@ -38,20 +42,58 @@ public partial class MapViewOSM : IQueryAttributable
     private bool _isDraggingPin;
     private GeometryFeature _draggedPin;
     private Mapsui.Styles.Image pinImage;
+    private readonly TextBoxWidget _instructionWidget;
+    private readonly ButtonWidget _toggleButton;
+    private readonly RulerWidget _rulerWidget;
 
     public MapViewOSM()
     {
         InitializeComponent();
 
-        map.Layers.Add(OpenStreetMap.CreateTileLayer());
+        // casting Colors from MAUI to Mapsui
+        var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
+        var c2 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["PrimaryDarkText"];
+        var widgetColor = new Color((int)(c1.Red * 255), (int)(c1.Green * 255), (int)(c1.Blue * 255));
+        var widgetDarkColor = new Color((int)(c2.Red * 255), (int)(c2.Green * 255), (int)(c2.Blue * 255));
+
+        _instructionWidget = CreateInstructionTextBox(AppResources.tippen_ziehen_messen);
+        _instructionWidget.Enabled = false; // initial unsichtbar
+        _rulerWidget = new RulerWidget // Ruler am Anfang inaktiv
+        {
+            IsActive = false,
+            Color = widgetColor,
+            ColorOfBeginAndEndDots = widgetColor
+        };
+        _toggleButton = new ButtonWidget
+        {
+            Text = AppResources.distanz_messen,
+            VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top,
+            HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Right,
+            CornerRadius = 4,
+            BackColor = widgetColor,
+            TextColor = widgetDarkColor,
+            Margin = new MRect(10),
+            Padding = new MRect(8),
+            TextSize = 13,
+            WithTappedEvent = (s, e) =>
+            {
+                _rulerWidget.IsActive = !_rulerWidget.IsActive;
+                _instructionWidget.Enabled = _rulerWidget.IsActive;
+                e.Map.RefreshGraphics();
+            }
+        };
+
+        map.Widgets.Clear();
+
         map.Layers.Add(OpenStreetMap.CreateTileLayer());
         map.Layers.Add(CreatePinLayer());
 
-        MapControl.Map = map;
-        map.Widgets.Clear();
-        map.Widgets.Add(new ScaleBarWidget(map) { TextAlignment = Mapsui.Widgets.Alignment.Center, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
-        map.Widgets.Add(new ZoomInOutWidget { Margin = new MRect(20, 40), HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top });
+        map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
+        map.Widgets.Add(_instructionWidget);
+        map.Widgets.Add(_rulerWidget);
+        map.Widgets.Add(_toggleButton);
 
+        MapControl.Map = map;
         MapControl.Map.Tapped += OnMapTapped;
         MapControl.Map.PointerPressed += OnPressed;
         MapControl.Map.PointerMoved += OnMoved;
@@ -70,7 +112,7 @@ public partial class MapViewOSM : IQueryAttributable
         await UpdateUiFromQueryAsync();
 
         // load Pin image with app primary color
-        string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
+        string hexColor = ((Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"]).ToRgbaHex();
         string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor)).AbsoluteUri;
         pinImage = new Mapsui.Styles.Image
         {
@@ -408,4 +450,17 @@ public partial class MapViewOSM : IQueryAttributable
         else
             await Toast.Make(AppResources.pin_positionen_aktualisiert).Show();
     }
+
+    private static TextBoxWidget CreateInstructionTextBox(string text) => new()
+    {
+        Text = text,
+        TextSize = 13,
+        VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top,
+        HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Center,
+        Margin = new MRect(10),
+        Padding = new MRect(8),
+        CornerRadius = 4,
+        BackColor = new Color(108, 117, 125, 128),
+        TextColor = Color.White,
+    };
 }

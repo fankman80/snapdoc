@@ -789,4 +789,7 @@
   <data name="kartenservice" xml:space="preserve">
     <value>Kartenservice</value>
   </data>
+  <data name="tippen_ziehen_messen" xml:space="preserve">
+    <value>Tippen und ziehen, um Distanz zu messen</value>
+  </data>
 </root>
