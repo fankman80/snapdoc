@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               xmlns:views="clr-namespace:SnapDoc.Views"  
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               Padding="0"
+               Margin="16"
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:DataType="views:PopupPinView"
+               x:TypeArguments="x:String"
+               x:Class="SnapDoc.Views.PopupPinView">
+
+    <Grid>
+        <VerticalStackLayout Spacing="6">
+            <HorizontalStackLayout>
+                <Image Source="{Binding Pin.PinIcon}"
+                       WidthRequest="50"
+                       HeightRequest="50"/>
+                <VerticalStackLayout Spacing="6">
+                    <HorizontalStackLayout Spacing="0">
+                        <Label Text="{x:Static res:AppResources.bezeichnung}"
+                           TextColor="{DynamicResource Primary}"/>
+                        <Label Text=":"
+                           TextColor="{DynamicResource Primary}"/>
+                    </HorizontalStackLayout>
+                    <Label Text="{Binding Pin.PinName}"/>
+                </VerticalStackLayout>
+            </HorizontalStackLayout>
+            
+            <!-- Trennlinie -->
+            <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
+                                        Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        HeightRequest="1"
+                                        Margin="0,6,0,6"/>
+            
+            <HorizontalStackLayout Spacing="0">
+                <Label Text="{x:Static res:AppResources.standort}"
+                        TextColor="{DynamicResource Primary}"/>
+                <Label Text=":"
+                        TextColor="{DynamicResource Primary}"/>
+            </HorizontalStackLayout>
+            <Label Text="{Binding Pin.PinLocation}"/>
+
+            <!-- Trennlinie -->
+            <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
+                                     Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                     HeightRequest="1"
+                                     Margin="0,6,0,6"/>
+
+            <HorizontalStackLayout Spacing="0">
+                <Label Text="{x:Static res:AppResources.beschreibung}"
+                       TextColor="{DynamicResource Primary}"/>
+                <Label Text=":"
+                       TextColor="{DynamicResource Primary}"/>
+            </HorizontalStackLayout>
+            <Label Text="{Binding Pin.PinDesc}" Margin="0,0,0,16"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        Text="{x:Static res:AppResources.abbrechen}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnCancelClicked" />
+                <Button Grid.Column="1"
+                        Text="{x:Static res:AppResources.bearbeiten}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnGoToClicked" />
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
+</toolkit:Popup>

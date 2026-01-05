@@ -1,29 +1,33 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Alerts;
+using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
+using Mapsui;
+using Mapsui.Extensions;
+using Mapsui.Layers;
+using Mapsui.Nts;
 using Mapsui.Projections;
+using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
-using Mapsui;
+using Mapsui.Widgets.ButtonWidgets;
+using Mapsui.Widgets.InfoWidgets;
+using Mapsui.Widgets.ScaleBar;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using Mapsui.Extensions;
-using Mapsui.Layers;
-using Mapsui.Nts;
-using Mapsui.Styles;
+using Image = Microsoft.Maui.Controls.Image;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
-using Image = Microsoft.Maui.Controls.Image;
 
 namespace SnapDoc.Views;
 
 public partial class MapViewOSM : IQueryAttributable
 {
-    public string PlanId = string.Empty;
-    public string PinId = string.Empty;
+    private string PlanId = string.Empty;
+    private string PinId = string.Empty;
     private double lon = 8.226692;  // Default: Schweiz
     private double lat = 46.80121;
     private int zoom = 8;
@@ -31,6 +35,8 @@ public partial class MapViewOSM : IQueryAttributable
     private readonly List<GeometryFeature> _features = [];
     private readonly MapControl mapControl = new();
     private readonly Map map = new();
+    //private readonly object? _selectedPinId;
+    private bool _mapInitialized = false;
 
     public MapViewOSM()
     {
@@ -42,11 +48,20 @@ public partial class MapViewOSM : IQueryAttributable
 
         MapControl.Map = map;
         map.Widgets.Clear();
+        map.Widgets.Add(new ScaleBarWidget(map) { TextAlignment = Mapsui.Widgets.Alignment.Center, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
+        map.Widgets.Add(new ZoomInOutWidget { Margin = new MRect(20, 40), HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top });
+
+        MapControl.Map.Tapped += OnMapTapped;
     }
 
     protected async override void OnAppearing()
     {
         base.OnAppearing();
+
+        if (_mapInitialized)
+            return;
+
+        _mapInitialized = true;
 
         await UpdateUiFromQueryAsync();
 
@@ -57,7 +72,7 @@ public partial class MapViewOSM : IQueryAttributable
                 if (pin.Value.GeoLocation != null)
                 {
                     var loc = pin.Value.GeoLocation.WGS84;
-                    AddPin(map, new Point(loc.Longitude, loc.Latitude));
+                    AddPin(map, new Point(loc.Longitude, loc.Latitude), plan.Key, pin.Key);
                 }
             }
         }
@@ -67,7 +82,7 @@ public partial class MapViewOSM : IQueryAttributable
         map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
     }
 
-    private void AddPin(Map map, Point pos)
+    private void AddPin(Map map, Point pos, string planId, string pinId)
     {
         // WGS84 → Spherical Mercator
         var (x, y) = SphericalMercator.FromLonLat(pos.X, pos.Y);
@@ -76,6 +91,8 @@ public partial class MapViewOSM : IQueryAttributable
         _features.Add(new GeometryFeature
         {
             Geometry = new Point(x, y),
+            ["PinId"] = pinId,
+            ["PlanId"] = planId,
             Styles =
             {
                 new ImageStyle
@@ -240,17 +257,31 @@ public partial class MapViewOSM : IQueryAttributable
             File.Delete(outputPath);
     }
 
+    private async void OnMapTapped(object sender, MapEventArgs e)
+    {
+        var map = MapControl.Map;
+        if (map == null) return;
+
+        // Nur Pins-Layer abfragen
+        var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
+        if (pinLayer == null) return;
+
+        var mapInfo = e.GetMapInfo([pinLayer]);
+
+        if (mapInfo?.Feature is GeometryFeature feature)
+        {
+            var pinId = feature["PinId"].ToString();
+            var planId = feature["PlanId"].ToString();
+
+            var popup = new PopupPinView(planId, pinId);
+            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+            if (result.Result == "edit")
+                _mapInitialized = false;
+        }
+    }
+
     private void GetCoordinatesClicked(object sender, EventArgs e)
-    {
-
-    }
-
-    private void OnMapLayerColorClicked(object sender, EventArgs e)
-    {
-
-    }
-
-    private void OnMapLayerRealClicked(object sender, EventArgs e)
     {
 
     }
