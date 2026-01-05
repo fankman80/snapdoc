@@ -164,7 +164,7 @@
                             </material:RadioButtonGroupView>
 
                             <!-- Trennlinie -->
-                            <Grid Margin="0,16,0,16" IsVisible="{Binding IsProjectLoaded}">
+                            <Grid Margin="0,16,0,16" >
                                 <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
                             </Grid>
 
