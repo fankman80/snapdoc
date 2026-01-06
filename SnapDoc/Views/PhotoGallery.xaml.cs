@@ -167,14 +167,18 @@ public partial class FotoGalleryView : ContentPage
         var filtered = AllFotos
             .Where(p => !IsActiveToggle || p.AllowExport);
 
-        if (OrderDirection == "asc")
-            filtered = filtered.OrderBy(p => p.DateTime);
-        else
-            filtered = filtered.OrderByDescending(p => p.DateTime);
+        filtered = OrderDirection == "asc"
+            ? filtered.OrderBy(p => p.DateTime)
+            : filtered.OrderByDescending(p => p.DateTime);
 
-        Fotos = new ObservableCollection<FotoItem>(filtered);
-        FotoGallery.ItemsSource = Fotos;
-        FotoCounterLabel.Text = $"{AppResources.fotos}: {Fotos.Count}";
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            Fotos.Clear();
+            foreach (var item in filtered)
+                Fotos.Add(item);
+
+            FotoCounterLabel.Text = $"{AppResources.fotos}: {Fotos.Count}";
+        });
     }
 
     private void OnFilterToggleChanged(object sender, ToggledEventArgs e)
