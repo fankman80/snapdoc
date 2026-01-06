@@ -43,8 +43,8 @@ public partial class MapViewOSM : IQueryAttributable
     private GeometryFeature _draggedPin;
     private Mapsui.Styles.Image pinImage;
     private readonly TextBoxWidget _instructionWidget;
-    private readonly ButtonWidget _toggleButton;
     private readonly RulerWidget _rulerWidget;
+    private Microsoft.Maui.Graphics.Color hexColor = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
 
     public MapViewOSM()
     {
@@ -52,9 +52,7 @@ public partial class MapViewOSM : IQueryAttributable
 
         // casting Colors from MAUI to Mapsui
         var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
-        var c2 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["PrimaryDarkText"];
-        var widgetColor = new Color((int)(c1.Red * 255), (int)(c1.Green * 255), (int)(c1.Blue * 255));
-        var widgetDarkColor = new Color((int)(c2.Red * 255), (int)(c2.Green * 255), (int)(c2.Blue * 255));
+        var widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
 
         _instructionWidget = CreateInstructionTextBox(AppResources.tippen_ziehen_messen);
         _instructionWidget.Enabled = false; // initial unsichtbar
@@ -64,34 +62,15 @@ public partial class MapViewOSM : IQueryAttributable
             Color = widgetColor,
             ColorOfBeginAndEndDots = widgetColor
         };
-        _toggleButton = new ButtonWidget
-        {
-            Text = AppResources.distanz_messen,
-            VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top,
-            HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Right,
-            CornerRadius = 4,
-            BackColor = widgetColor,
-            TextColor = widgetDarkColor,
-            Margin = new MRect(10),
-            Padding = new MRect(8),
-            TextSize = 13,
-            WithTappedEvent = (s, e) =>
-            {
-                _rulerWidget.IsActive = !_rulerWidget.IsActive;
-                _instructionWidget.Enabled = _rulerWidget.IsActive;
-                e.Map.RefreshGraphics();
-            }
-        };
 
         map.Widgets.Clear();
 
         map.Layers.Add(OpenStreetMap.CreateTileLayer());
         map.Layers.Add(CreatePinLayer());
 
-        map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
+        map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
         map.Widgets.Add(_instructionWidget);
         map.Widgets.Add(_rulerWidget);
-        map.Widgets.Add(_toggleButton);
 
         MapControl.Map = map;
         MapControl.Map.Tapped += OnMapTapped;
@@ -112,12 +91,8 @@ public partial class MapViewOSM : IQueryAttributable
         await UpdateUiFromQueryAsync();
 
         // load Pin image with app primary color
-        string hexColor = ((Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"]).ToRgbaHex();
-        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor)).AbsoluteUri;
-        pinImage = new Mapsui.Styles.Image
-        {
-            Source = uri
-        };
+        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
+        pinImage = new Mapsui.Styles.Image { Source = uri };
 
         foreach (var plan in GlobalJson.Data.Plans)
         {
@@ -271,6 +246,19 @@ public partial class MapViewOSM : IQueryAttributable
 
         var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
         map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[zoom]);
+    }
+
+    private async void OnRulerClicked(object sender, EventArgs e)
+    {
+        _rulerWidget.IsActive = !_rulerWidget.IsActive;
+        _instructionWidget.Enabled = _rulerWidget.IsActive;
+
+        if (_rulerWidget.IsActive)
+            RulerButton.Text = AppResources.abbrechen;
+        else
+            RulerButton.Text = AppResources.distanz_messen;
+
+        MapControl.Map.RefreshGraphics();
     }
 
     private static async Task ShowGpsDisabledMessageAsync()
@@ -457,7 +445,7 @@ public partial class MapViewOSM : IQueryAttributable
         TextSize = 13,
         VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Top,
         HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Center,
-        Margin = new MRect(10),
+        Margin = new MRect(50),
         Padding = new MRect(8),
         CornerRadius = 4,
         BackColor = new Color(108, 117, 125, 128),

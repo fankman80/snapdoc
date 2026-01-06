@@ -45,6 +45,26 @@
 
     <Grid>
         <mapsui:MapControl x:Name="MapControl"/>
+        <Button x:Name="RulerButton"
+                Text="{x:Static res:AppResources.distanz_messen}"
+                MinimumHeightRequest="32"                
+                FontSize="13"
+                FontFamily="Segoe UI"
+                Padding="8,0,8,0"
+                Margin="10"
+                CornerRadius="4"
+                BackgroundColor="White"
+                TextColor="Black"
+                BorderColor="#999"
+                BorderWidth="1"
+                HorizontalOptions="End"
+                VerticalOptions="Start"
+                Clicked="OnRulerClicked">
+            <Button.Shadow>
+                <Shadow Brush="Black" Opacity="0.2" Offset="2,2" Radius="4"/>
+            </Button.Shadow>
+        </Button>
+
         <VerticalStackLayout HorizontalOptions="End"
                              VerticalOptions="End"
                              Spacing="14"
