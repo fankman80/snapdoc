@@ -274,12 +274,12 @@ public partial class LoadPDFPages : ContentPage
         if (DynamicSpan == 1)
         {
             DynamicSpan = 0;
-            btnRows.Text = Settings.TableGridIcon;
+            btnRows.Text = Settings.TableRowIcon;
         }
         else
         {
             DynamicSpan = 1;
-            btnRows.Text = Settings.TableRowIcon;
+            btnRows.Text = Settings.TableGridIcon;
         }
         UpdateSpan();
     }

@@ -164,15 +164,15 @@ public partial class FotoGalleryView : ContentPage
         if (AllFotos == null)
             return;
 
-        var filtered = AllFotos
-            .Where(p => !IsActiveToggle || p.AllowExport);
-
-        filtered = OrderDirection == "asc"
-            ? filtered.OrderBy(p => p.DateTime)
-            : filtered.OrderByDescending(p => p.DateTime);
-
         MainThread.BeginInvokeOnMainThread(() =>
         {
+            var filtered = AllFotos
+                .Where(p => !IsActiveToggle || p.AllowExport);
+
+            filtered = OrderDirection == "asc"
+                ? filtered.OrderBy(p => p.DateTime)
+                : filtered.OrderByDescending(p => p.DateTime);
+
             Fotos.Clear();
             foreach (var item in filtered)
                 Fotos.Add(item);
@@ -215,9 +215,9 @@ public partial class FotoGalleryView : ContentPage
     private void UpdateButton()
     {
         if (SettingsService.Instance.PhotoGalleryGridView)
-            btnRows.Text = Settings.TableGridIcon;
-        else
             btnRows.Text = Settings.TableRowIcon;
+        else
+            btnRows.Text = Settings.TableGridIcon;
     }
 
     private void OnSizeChanged(object sender, EventArgs e)

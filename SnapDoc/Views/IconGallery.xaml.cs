@@ -215,44 +215,48 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
     private void IconSorting(string order)
     {
-        if (SortPicker.SelectedItem == null) return;
+        if (SortPicker.SelectedItem == null)
+            return;
 
-        Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, CategoryPicker.SelectedItem.ToString());
-        SettingsService.Instance.IconCategories = iconCategories;
-        SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
-        SettingsService.Instance.IconCategory = CategoryPicker.SelectedItem.ToString();
-
-        CategoryPicker.ItemsSource = iconCategories;
-
-        var selectedOption = SortPicker.SelectedItem.ToString();
-
-        if (order == "asc") // Sortiere aufsteigend
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            switch (SettingsService.Instance.IconSortCrit)
-            {
-                case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
-                    Icons = [.. Settings.IconData.OrderBy(pin => pin.DisplayName).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
-                    Icons = [.. Settings.IconData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
-                    break;
-            }
-        }
-        else // Sortiere absteigend
-        {
-            switch (SettingsService.Instance.IconSortCrit)
-            {
-                case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
-                    Icons = [.. Settings.IconData.OrderByDescending(pin => pin.DisplayName).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
-                    Icons = [.. Settings.IconData.OrderByDescending(pin => pin.PinColor.ToString()).ToList()];
-                    break;
-            }
-        }
+            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, CategoryPicker.SelectedItem.ToString());
+            SettingsService.Instance.IconCategories = iconCategories;
+            SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
+            SettingsService.Instance.IconCategory = CategoryPicker.SelectedItem.ToString();
 
-        IconCollectionView.ItemsSource = null;
-        IconCollectionView.ItemsSource = Icons;
+            CategoryPicker.ItemsSource = iconCategories;
+
+            var selectedOption = SortPicker.SelectedItem.ToString();
+
+            if (order == "asc") // Sortiere aufsteigend
+            {
+                switch (SettingsService.Instance.IconSortCrit)
+                {
+                    case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
+                        Icons = [.. Settings.IconData.OrderBy(pin => pin.DisplayName).ToList()];
+                        break;
+                    case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
+                        Icons = [.. Settings.IconData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
+                        break;
+                }
+            }
+            else // Sortiere absteigend
+            {
+                switch (SettingsService.Instance.IconSortCrit)
+                {
+                    case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
+                        Icons = [.. Settings.IconData.OrderByDescending(pin => pin.DisplayName).ToList()];
+                        break;
+                    case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
+                        Icons = [.. Settings.IconData.OrderByDescending(pin => pin.PinColor.ToString()).ToList()];
+                        break;
+                }
+            }
+
+            IconCollectionView.ItemsSource = null;
+            IconCollectionView.ItemsSource = Icons;
+        });
     }
 
     private void OnChangeRowsClicked(object sender, EventArgs e)
@@ -275,9 +279,9 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private void UpdateButton()
     {
         if (SettingsService.Instance.IconGalleryGridView)
-            btnRows.Text = Settings.TableGridIcon;
-        else
             btnRows.Text = Settings.TableRowIcon;
+        else
+            btnRows.Text = Settings.TableGridIcon;
     }
 
     private void OnSizeChanged(object sender, EventArgs e)
