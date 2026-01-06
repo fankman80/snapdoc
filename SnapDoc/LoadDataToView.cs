@@ -13,7 +13,8 @@ public partial class LoadDataToView
         if (Application.Current.Windows[0].Page is not AppShell shell)
             return;
 
-        shell.AllPlanItems.Clear();
+        if (GlobalJson.Data.Plans == null)
+            return;
 
         foreach (var plan in GlobalJson.Data.Plans)
         {

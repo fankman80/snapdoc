@@ -44,7 +44,7 @@ public partial class MapViewOSM : IQueryAttributable
     private Mapsui.Styles.Image pinImage;
     private readonly TextBoxWidget _instructionWidget;
     private readonly RulerWidget _rulerWidget;
-    private Microsoft.Maui.Graphics.Color hexColor = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
+    private readonly Microsoft.Maui.Graphics.Color hexColor = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
 
     public MapViewOSM()
     {
@@ -115,7 +115,7 @@ public partial class MapViewOSM : IQueryAttributable
     {
         // WGS84 → Spherical Mercator
         var (x, y) = SphericalMercator.FromLonLat(pos.X, pos.Y);
-        double scale = (double)SettingsService.Instance.MapIconSize / 100;
+        double scale = (double)SettingsService.Instance.MapIconSize / 100.0;
 
         _features.Add(new GeometryFeature
         {

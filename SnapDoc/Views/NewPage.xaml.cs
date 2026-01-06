@@ -182,14 +182,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (e.PropertyName == "Scale" || e.PropertyName == "Rotation")
         {
-            var scale = 1.0 / PlanContainer.Scale;
-            var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
+            double scale = 1.0 / PlanContainer.Scale;
+            double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
             foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
             {
                 if (img.AutomationId != null)
                 {
                     if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockAutoScale)
-                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
+                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
                             img.Scale = scale * GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].PinScale;
 
                     if (!GlobalJson.Data.Plans[PlanId].Pins[img.AutomationId].IsLockRotate)
@@ -673,9 +673,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin != true)
         {
-            var scale = 1.0 / planContainer.Scale;
-            var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
-            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
+            double scale = 1.0 / planContainer.Scale;
+            double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
+            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
                 return 1 / planContainer.Scale * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
             else
                 return scaleLimit * GlobalJson.Data.Plans[PlanId].Pins[pinId].PinScale;
@@ -992,13 +992,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
-        var scale = 1.0 / PlanContainer.Scale;
-        var scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100;
-
-        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100)
-            activePin.Scale = scale * sliderValue / 100;
+        double scale = 1.0 / PlanContainer.Scale;
+        double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
+        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
+            activePin.Scale = scale * sliderValue / 100.0;
         else
-            activePin.Scale = sliderValue / 100;
+            activePin.Scale = sliderValue / 100.0;
 
         percentLabel.Text = $"{sliderValue}%";
     }
@@ -1007,7 +1006,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
-        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale = sliderValue / 100;
+        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale = sliderValue / 100.0;
 
         // save data to file
         GlobalJson.SaveToFile();

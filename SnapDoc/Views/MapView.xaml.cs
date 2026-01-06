@@ -210,7 +210,7 @@ public partial class MapView : IQueryAttributable
             icon = icon.Replace("'", "\\'").Replace("\r", "").Replace("\n", "");
         }
 
-        double scale = (double)SettingsService.Instance.MapIconSize / 100;
+        double scale = (double)SettingsService.Instance.MapIconSize / 100.0;
         string pinJson = GeneratePinJson();
 
         return $@"initMarkersFromBridge(

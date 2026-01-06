@@ -49,7 +49,9 @@
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
-            <CollectionView x:Name="fileListView" Grid.Row="0"
+            <CollectionView x:Name="fileListView"
+                            Grid.Row="0"
+                             ItemSizingStrategy="MeasureAllItems"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />

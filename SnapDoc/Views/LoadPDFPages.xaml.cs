@@ -1,6 +1,5 @@
 ﻿#nullable disable
 
-using Microsoft.Maui.Controls;
 using PDFtoImage;
 using SkiaSharp;
 using SnapDoc.Models;
@@ -17,7 +16,7 @@ public partial class LoadPDFPages : ContentPage
     {
         InitializeComponent();
 
-        btnRows.Text = Settings.TableGridIcon;
+        btnRows.Text = Settings.TableRowIcon;
         BindingContext = this;
     }
 

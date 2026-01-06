@@ -103,7 +103,7 @@ public class Helper
     {
         var iconItems = new List<IconItem>();
         var categories = new HashSet<string>();
-        category = category ?? AppResources.alle_icons;
+        category ??= AppResources.alle_icons;
 
         try
         {
