@@ -4,7 +4,6 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-               xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
                xmlns:views="clr-namespace:SnapDoc.Views"                  
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -39,7 +38,15 @@
             </Grid.RowDefinitions>
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
                 <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
-                    <Label Text="{x:Static res:AppResources.zum_loeschen_gedrueckt_halten}" FontSize="12" Margin="0,0,0,8"/>
+                    <Label FontSize="12" Margin="0,0,0,8">
+                        <Label.Text>
+                            <OnPlatform x:TypeArguments="x:String">
+                                <On Platform="Android,iOS" Value="{x:Static res:AppResources.zum_loeschen_gedrueckt_halten}" />
+                                <On Platform="WinUI" Value="{x:Static res:AppResources.rechtsklick_loeschen}" />
+                            </OnPlatform>
+                        </Label.Text>
+                    </Label>
+
                     <CollectionView x:Name="ColorListPicker" Margin="-3"
                                     ItemsSource="{Binding ColorsList}"
                                     SelectionMode="None">
@@ -50,18 +57,24 @@
                             <DataTemplate x:DataType="local:ColorBoxItem">
                                 <Grid>
                                     <!-- Normales Farbfeld -->
-                                    <mr:Border IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
-                                               WidthRequest="40"
-                                               HeightRequest="40"
-                                               BackgroundColor="{Binding BackgroundColor}"
-                                               Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
-                                               StrokeThickness="1"
-                                               Tapped="OnColorTapped"
-                                               LongPressing="OnLongPressed">
-                                        <mr:Border.StrokeShape>
+                                    <Border IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
+                                            WidthRequest="40"
+                                            HeightRequest="40"
+                                            BackgroundColor="{Binding BackgroundColor}"
+                                            Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
+                                            StrokeThickness="1">
+                                        <Border.GestureRecognizers>
+                                            <PointerGestureRecognizer
+                                                PointerPressed="OnPointerPressed"
+                                                PointerReleased="OnPointerReleased"
+                                                PointerExited="OnPointerReleased" />
+                                            <TapGestureRecognizer Tapped="OnColorTapped" NumberOfTapsRequired="1" Buttons="Primary"/>
+                                            <TapGestureRecognizer Tapped="OnColorTapped" NumberOfTapsRequired="1" Buttons="Secondary"/>
+                                        </Border.GestureRecognizers>
+                                        <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?20:0'}"/>
-                                        </mr:Border.StrokeShape>
-                                    </mr:Border>
+                                        </Border.StrokeShape>
+                                    </Border>
 
                                     <!-- Plusfeld -->
                                     <Border IsVisible="{Binding IsAddButton}"

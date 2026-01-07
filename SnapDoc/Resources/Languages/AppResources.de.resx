@@ -792,4 +792,10 @@
   <data name="tippen_ziehen_messen" xml:space="preserve">
     <value>Tippen und ziehen, um Distanz zu messen</value>
   </data>
+  <data name="rechtsklick_icon_bearbeiten" xml:space="preserve">
+    <value>Rechtsklick, um Icon zu bearbeiten</value>
+  </data>
+  <data name="rechtsklick_loeschen" xml:space="preserve">
+    <value>Rechtsklick zum Löschen</value>
+  </data>
 </root>

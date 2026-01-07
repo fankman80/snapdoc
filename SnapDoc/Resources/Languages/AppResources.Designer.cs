@@ -1663,6 +1663,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rechtsklick, um Icon zu bearbeiten ähnelt.
+        /// </summary>
+        internal static string rechtsklick_icon_bearbeiten {
+            get {
+                return ResourceManager.GetString("rechtsklick_icon_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rechtsklick zum Löschen ähnelt.
+        /// </summary>
+        internal static string rechtsklick_loeschen {
+            get {
+                return ResourceManager.GetString("rechtsklick_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird importiert... ähnelt.
         /// </summary>
         internal static string rojekt_wird_importiert {

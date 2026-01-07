@@ -792,4 +792,10 @@
   <data name="tippen_ziehen_messen" xml:space="preserve">
     <value>Appuyer et faire glisser pour mesurer la distance</value>
   </data>
+  <data name="rechtsklick_icon_bearbeiten" xml:space="preserve">
+    <value>Clic droit pour modifier l'icône</value>
+  </data>
+  <data name="rechtsklick_loeschen" xml:space="preserve">
+    <value>Clic droit pour supprimer</value>
+  </data>
 </root>

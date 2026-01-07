@@ -49,7 +49,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string TapInfo(string eventName, TapEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)} {e.NumberOfTaps} times with {e.NumberOfTouches} fingers.");
         sb.Append($" ViewPosition: {e.ViewPosition.X:F}/{e.ViewPosition.Y:F}/{e.ViewPosition.Width:F}/{e.ViewPosition.Height:F}");
@@ -62,7 +62,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string LongPressInfo(string eventName, LongPressEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)} for {e.Duration}ms with {e.NumberOfTouches} fingers");
         AddTouches(sb, e);
@@ -74,7 +74,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string DownUpInfo(string eventName, DownUpEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         if (e.TriggeringTouches != null)
             sb.Append($" on {GetElementName(e)} with finger(s) {String.Join(", ", e.TriggeringTouches.Select(n => $"#{n}"))}.");
@@ -88,7 +88,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string PanInfo(string eventName, PanEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)} with {e.NumberOfTouches} fingers");
         sb.Append($", DeltaDistance = {e.DeltaDistance.X:F}/{e.DeltaDistance.Y:F}");
@@ -103,7 +103,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string RotateInfo(string eventName, RotateEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)} with {e.NumberOfTouches} fingers");
         sb.Append($", DeltaAngle = {e.DeltaAngle:F}");
@@ -118,7 +118,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string PinchInfo(string eventName, PinchEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)} with {e.NumberOfTouches} fingers");
         sb.Append($", DeltaScale = {e.DeltaScale:F}");
@@ -137,7 +137,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string MouseInfo(string eventName, MouseEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)}");
         sb.Append($", ViewPosition: {e.ViewPosition.X:F}/{e.ViewPosition.Y:F}/{e.ViewPosition.Width:F}/{e.ViewPosition.Height:F}");
@@ -153,7 +153,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
 
     private string ScrollWheelInfo(string eventName, ScrollWheelEventArgs e)
     {
-        StringBuilder sb = new StringBuilder(eventName);
+        StringBuilder sb = new(eventName);
 
         sb.Append($" {GetElementName(e)}");
         sb.Append($", ScrollDelta: {e.ScrollDelta.X:F}/{e.ScrollDelta.Y:F}");

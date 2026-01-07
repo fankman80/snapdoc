@@ -15,6 +15,10 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private bool isUpdating = false;
     private double workR, workG, workB;
     private double workH, workS, workV;
+    private CancellationTokenSource _longPressCts;
+    private ColorBoxItem _pressedItem;
+    private const int LongPressMs = 750;
+    private bool _longPressHandled;
 
     public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
     {
@@ -53,18 +57,34 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         BindingContext = this;
     }
 
-    private void OnColorTapped(object sender, EventArgs e)
+    private void OnColorTapped(object sender, TappedEventArgs e)
     {
-        if (sender is MR.Gestures.Border border && border.BindingContext is ColorBoxItem tappedItem)
+        if (_longPressHandled)
+        {
+            _longPressHandled = false;
+            return;
+        }
+
+        if (sender is not BindableObject view)
+            return;
+
+        _pressedItem = view.BindingContext as ColorBoxItem;
+        if (_pressedItem == null)
+            return;
+
+        if (e.Buttons == ButtonsMask.Secondary)
+            RemovePressed(_pressedItem);
+
+        if (e.Buttons == ButtonsMask.Primary)
         {
             foreach (var item in ColorsList)
                 item.IsSelected = false;
 
-            tappedItem.IsSelected = true;
+            _pressedItem.IsSelected = true;
 
-            RedValue = tappedItem.BackgroundColor.Red;
-            GreenValue = tappedItem.BackgroundColor.Green;
-            BlueValue = tappedItem.BackgroundColor.Blue;
+            RedValue = _pressedItem.BackgroundColor.Red;
+            GreenValue = _pressedItem.BackgroundColor.Green;
+            BlueValue = _pressedItem.BackgroundColor.Blue;
         }
     }
 
@@ -108,22 +128,62 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         }
     }
 
-    private void OnLongPressed(object sender, EventArgs e)
+    private void RemovePressed(ColorBoxItem tappedItem)
     {
-        if (sender is MR.Gestures.Border border && border.BindingContext is ColorBoxItem tappedItem)
+        if (!tappedItem.IsAddButton)
         {
-            if (!tappedItem.IsAddButton)
-            {
-                ColorsList.Remove(tappedItem);
+            ColorsList.Remove(tappedItem);
 
-                // Farbliste speichern
-                SettingsService.Instance.ColorList = [.. ColorsList
-                .Where(c => !c.IsAddButton)
-                .Select(c => c.BackgroundColor.ToHex())];
+            // Farbliste speichern
+            SettingsService.Instance.ColorList = [.. ColorsList
+            .Where(c => !c.IsAddButton)
+            .Select(c => c.BackgroundColor.ToHex())];
 
-                SettingsService.Instance.SaveSettings();
-            }
+            SettingsService.Instance.SaveSettings();
         }
+    }
+
+    private void OnPointerPressed(object sender, PointerEventArgs e)
+    {
+        if (sender is not BindableObject view)
+            return;
+
+        _pressedItem = view.BindingContext as ColorBoxItem;
+        if (_pressedItem == null)
+            return;
+
+        _longPressCts?.Cancel();
+        _longPressCts = new CancellationTokenSource();
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(LongPressMs, _longPressCts.Token);
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_pressedItem == null)
+                        return;
+
+                    _longPressHandled = true;
+
+                    RemovePressed(_pressedItem);
+                });
+            }
+            catch (TaskCanceledException)
+            {
+                // normal
+            }
+        });
+    }
+
+    private void OnPointerReleased(object sender, PointerEventArgs e)
+    {
+        _longPressCts?.Cancel();
+        _longPressCts = null;
+        _pressedItem = null;
+        _longPressHandled = false;
     }
 
     public double RedValue

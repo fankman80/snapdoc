@@ -3,28 +3,33 @@
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Maui.Controls;
 using SkiaSharp;
 using SnapDoc.Messages;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using static SnapDoc.Helper;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
 public partial class IconGallery : ContentPage, IQueryAttributable
 {
     public ObservableCollection<IconItem> Icons { get; set; }
+    public int DynamicSpan { get; set; } = 1;
     private string PlanId;
     private string PinId;
-    private bool isLongPressed = false;
     private string OrderDirection = "asc";
-    public int DynamicSpan { get; set; } = 1;
+    private CancellationTokenSource _longPressCts;
+    private IconItem _pressedItem;
+    private const int LongPressMs = 750;
+    private bool _longPressHandled;
+    private bool _isPopupOpen;
 
     public IconGallery()
     {
         InitializeComponent(); 
         UpdateButton();
+
         BindingContext = this;
     }
 
@@ -59,54 +64,43 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             PinId = value2 as string;
     }
 
-    private async void OnIconClicked(object sender, EventArgs e)
+    private async void OnIconClicked(object sender, TappedEventArgs e)
     {
-        if (isLongPressed)
+        if (_longPressHandled)
         {
-            isLongPressed = false;
+            _longPressHandled = false;
             return;
         }
 
-        var button = sender as Button;
-        var fileName = button.AutomationId;
+        if (sender is not BindableObject view)
+            return;
 
-        // Suche Icon-Daten
-        var iconItem = IconLookup.Get(fileName);
-        if (iconItem != null)
+        _pressedItem = view.BindingContext as IconItem;
+        if (_pressedItem == null)
+            return;
+
+        if (e.Buttons == ButtonsMask.Secondary)
+            await ShowEditPopup(_pressedItem);
+
+        if (e.Buttons == ButtonsMask.Primary)
         {
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = iconItem.DisplayName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = iconItem.FileName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = iconItem.AnchorPoint;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = iconItem.IconSize;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = iconItem.IsRotationLocked;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = iconItem.IsAutoScaleLocked;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = iconItem.PinColor;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = iconItem.IconScale;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = iconItem.IsCustomIcon;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = _pressedItem.DisplayName;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = _pressedItem.FileName;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = _pressedItem.AnchorPoint;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = _pressedItem.IconSize;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = _pressedItem.IsRotationLocked;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = _pressedItem.IsAutoScaleLocked;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = _pressedItem.PinColor;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = _pressedItem.IconScale;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = _pressedItem.IsCustomIcon;
+  
+            // save data to file
+            GlobalJson.SaveToFile();
+
+            WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
+
+            await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
         }
-
-        // save data to file
-        GlobalJson.SaveToFile();
-
-        WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
-
-        await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
-    }
-
-    private async void OnLongPressed(object sender, EventArgs e)
-    {
-        isLongPressed = true;
-        var button = sender as Button;
-        var fileName = button.AutomationId;
-
-        // Suche Icon-Daten
-        var iconItem = IconLookup.Get(fileName);
-        iconItem.IsDefaultIcon = iconItem.FileName == SettingsService.Instance.DefaultPinIcon;
-        var popup = new PopupIconEdit(iconItem);
-        var result1 = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-
-        if (result1.Result != null)
-            IconSorting(OrderDirection);
     }
 
     private async void ImportIconClicked(object sender, EventArgs e)
@@ -301,5 +295,70 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             DynamicSpan = 1;
 
         OnPropertyChanged(nameof(DynamicSpan));
+    }
+
+    private void OnPointerPressed(object sender, PointerEventArgs e)
+    {
+        if (_isPopupOpen || sender is not BindableObject view)
+            return;
+
+        _pressedItem = view.BindingContext as IconItem;
+        if (_pressedItem == null)
+            return;
+
+        _longPressCts?.Cancel();
+        _longPressCts = new CancellationTokenSource();
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(LongPressMs, _longPressCts.Token);
+
+                MainThread.BeginInvokeOnMainThread(async () =>
+                {
+                    if (_isPopupOpen || _pressedItem == null)
+                        return;
+
+                    _longPressHandled = true;
+                    _isPopupOpen = true;
+
+                    try
+                    {
+                        await ShowEditPopup(_pressedItem);
+                    }
+                    finally
+                    {
+                        _isPopupOpen = false;
+                    }
+                });
+            }
+            catch (TaskCanceledException)
+            {
+                // normal
+            }
+        });
+    }
+
+    private void OnPointerReleased(object sender, PointerEventArgs e)
+    {
+        _longPressCts?.Cancel();
+        _longPressCts = null;
+
+        if (_isPopupOpen) return;
+
+        _pressedItem = null;
+        _longPressHandled = false;
+    }
+
+    private async Task ShowEditPopup(IconItem item)
+    {
+        item.IsDefaultIcon = item.FileName == SettingsService.Instance.DefaultPinIcon;
+
+        var popup = new PopupIconEdit(item);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+        if (result.Result != null)
+            IconSorting(OrderDirection);
     }
 }
