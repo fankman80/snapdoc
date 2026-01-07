@@ -174,8 +174,8 @@
   <data name="freihandlinie_zeichnen" xml:space="preserve">
     <value>Freihandlinie zeichnen</value>
   </data>
-  <data name="gedrückt_halten_um_Icon_zu_editieren" xml:space="preserve">
-    <value>Gedrückt halten um Icon zu editieren.</value>
+  <data name="doppelklick_icon_bearbeiten" xml:space="preserve">
+    <value>Doppelklick, um Icon zu bearbeiten</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
     <value>Grösse Pinbeschriftung</value>
@@ -414,8 +414,8 @@
   <data name="abbrechen" xml:space="preserve">
     <value>Abbrechen</value>
   </data>
-  <data name="zum_loeschen_gedrueckt_halten" xml:space="preserve">
-    <value>zum Löschen gedrückt halten</value>
+  <data name="doppelklick_farbe_loeschen" xml:space="preserve">
+    <value>Doppelklick, um Farbe zu löschen</value>
   </data>
   <data name="farbdefinition" xml:space="preserve">
     <value>▼      Farbdefinition      ▼</value>

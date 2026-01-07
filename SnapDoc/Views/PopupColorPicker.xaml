@@ -14,6 +14,7 @@
                Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
+               x:Name="ThisPage"
                x:TypeArguments="local:ColorPickerReturn"
                x:Class="SnapDoc.Views.PopupColorPicker">
 
@@ -38,15 +39,9 @@
             </Grid.RowDefinitions>
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
                 <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="0">
-                    <Label FontSize="12" Margin="0,0,0,8">
-                        <Label.Text>
-                            <OnPlatform x:TypeArguments="x:String">
-                                <On Platform="Android,iOS" Value="{x:Static res:AppResources.zum_loeschen_gedrueckt_halten}" />
-                                <On Platform="WinUI" Value="{x:Static res:AppResources.rechtsklick_loeschen}" />
-                            </OnPlatform>
-                        </Label.Text>
-                    </Label>
-
+                    <Label Text="{x:Static res:AppResources.doppelklick_farbe_loeschen}"
+                           FontSize="12"
+                           Margin="0,0,0,8"/>
                     <CollectionView x:Name="ColorListPicker" Margin="-3"
                                     ItemsSource="{Binding ColorsList}"
                                     SelectionMode="None">
@@ -63,14 +58,12 @@
                                             BackgroundColor="{Binding BackgroundColor}"
                                             Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
                                             StrokeThickness="1">
-                                        <Border.GestureRecognizers>
-                                            <PointerGestureRecognizer
-                                                PointerPressed="OnPointerPressed"
-                                                PointerReleased="OnPointerReleased"
-                                                PointerExited="OnPointerReleased" />
-                                            <TapGestureRecognizer Tapped="OnColorTapped" NumberOfTapsRequired="1" Buttons="Primary"/>
-                                            <TapGestureRecognizer Tapped="OnColorTapped" NumberOfTapsRequired="1" Buttons="Secondary"/>
-                                        </Border.GestureRecognizers>
+                                        <Border.Behaviors>
+                                            <local:UnifiedTapBehavior
+                                                x:DataType="views:PopupColorPicker"
+                                                SingleTapCommand="{Binding TapCommand, Source={x:Reference ThisPage}}"
+                                                DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />
+                                        </Border.Behaviors>
                                         <Border.StrokeShape>
                                             <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?20:0'}"/>
                                         </Border.StrokeShape>

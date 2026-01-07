@@ -67,14 +67,12 @@
                         <ColumnDefinition Width="Auto" />
                         <ColumnDefinition Width="26" />
                     </Grid.ColumnDefinitions>
-                    <Grid.GestureRecognizers>
-                        <PointerGestureRecognizer
-                            PointerPressed="OnPointerPressed"
-                            PointerReleased="OnPointerReleased"
-                            PointerExited="OnPointerReleased"/>
-                        <TapGestureRecognizer Tapped="OnIconClicked" NumberOfTapsRequired="1" Buttons="Primary"/>
-                        <TapGestureRecognizer Tapped="OnIconClicked" NumberOfTapsRequired="1" Buttons="Secondary"/>
-                    </Grid.GestureRecognizers>
+                    <Grid.Behaviors>
+                        <local:UnifiedTapBehavior
+                            x:DataType="views:IconGallery"
+                            SingleTapCommand="{Binding TapCommand, Source={x:Reference ThisPage}}"
+                            DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />
+                    </Grid.Behaviors>
 
                     <Image Grid.Column="0" 
                            Source="{Binding DisplayIconPath}"
@@ -85,7 +83,7 @@
                            VerticalOptions="Center"
                            LineBreakMode="WordWrap"/>
                     <Button Grid.Column="2"
-                             AutomationId = "{Binding FileName}"
+                             AutomationId="{Binding FileName}"
                              IsVisible="{Binding IsDefaultIcon}"
                              Padding="0"
                              BackgroundColor="Transparent"
@@ -100,16 +98,15 @@
             </DataTemplate>
 
             <!-- Template für Grid (Label unsichtbar) -->
-            <DataTemplate x:Key="IconGridTemplate" x:DataType="local:IconItem">
+            <DataTemplate x:Key="IconGridTemplate"
+                          x:DataType="local:IconItem">
                 <Grid>
-                    <Grid.GestureRecognizers>
-                        <PointerGestureRecognizer
-                            PointerPressed="OnPointerPressed"
-                            PointerReleased="OnPointerReleased"
-                            PointerExited="OnPointerReleased" />
-                        <TapGestureRecognizer Tapped="OnIconClicked" NumberOfTapsRequired="1" Buttons="Primary"/>
-                        <TapGestureRecognizer Tapped="OnIconClicked" NumberOfTapsRequired="1" Buttons="Secondary"/>
-                    </Grid.GestureRecognizers>
+                    <Grid.Behaviors>
+                        <local:UnifiedTapBehavior
+                            x:DataType="views:IconGallery"
+                            SingleTapCommand="{Binding TapCommand, Source={x:Reference ThisPage}}"
+                            DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />
+                    </Grid.Behaviors>
                     <Image Source="{Binding DisplayIconPath}"
                            Aspect="AspectFit"
                            Margin="6"/>
@@ -192,15 +189,9 @@
             </CollectionView>
         </Grid>
         <Label Grid.Row="2"
+               Text="{x:Static res:AppResources.doppelklick_icon_bearbeiten}"
                FontSize="12"
                HorizontalOptions="Center"
-               VerticalOptions="Center">
-            <Label.Text>
-                <OnPlatform x:TypeArguments="x:String">
-                    <On Platform="Android,iOS" Value="{x:Static res:AppResources.gedrückt_halten_um_Icon_zu_editieren}" />
-                    <On Platform="WinUI" Value="{x:Static res:AppResources.rechtsklick_icon_bearbeiten}" />
-                </OnPlatform>
-            </Label.Text>
-        </Label>
+               VerticalOptions="Center"/>
     </Grid>
 </ContentPage>

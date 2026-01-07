@@ -9,6 +9,7 @@ using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using System.Windows.Input;
 
 namespace SnapDoc.Views;
 
@@ -19,11 +20,12 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     private string PlanId;
     private string PinId;
     private string OrderDirection = "asc";
-    private CancellationTokenSource _longPressCts;
-    private IconItem _pressedItem;
-    private const int LongPressMs = 750;
-    private bool _longPressHandled;
-    private bool _isPopupOpen;
+
+    public ICommand TapCommand =>
+        new Command<IconItem>(item => SelectIcon(item));
+
+    public ICommand DoubleTapCommand =>
+        new Command<IconItem>(async item => await ShowEditPopup(item));
 
     public IconGallery()
     {
@@ -64,43 +66,27 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             PinId = value2 as string;
     }
 
-    private async void OnIconClicked(object sender, TappedEventArgs e)
+    private async void SelectIcon(IconItem _pressedItem)
     {
-        if (_longPressHandled)
-        {
-            _longPressHandled = false;
-            return;
-        }
-
-        if (sender is not BindableObject view)
-            return;
-
-        _pressedItem = view.BindingContext as IconItem;
         if (_pressedItem == null)
             return;
 
-        if (e.Buttons == ButtonsMask.Secondary)
-            await ShowEditPopup(_pressedItem);
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = _pressedItem.DisplayName;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = _pressedItem.FileName;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = _pressedItem.AnchorPoint;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = _pressedItem.IconSize;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = _pressedItem.IsRotationLocked;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = _pressedItem.IsAutoScaleLocked;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = _pressedItem.PinColor;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = _pressedItem.IconScale;
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = _pressedItem.IsCustomIcon;
 
-        if (e.Buttons == ButtonsMask.Primary)
-        {
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = _pressedItem.DisplayName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = _pressedItem.FileName;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Anchor = _pressedItem.AnchorPoint;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Size = _pressedItem.IconSize;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockRotate = _pressedItem.IsRotationLocked;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsLockAutoScale = _pressedItem.IsAutoScaleLocked;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinColor = _pressedItem.PinColor;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].PinScale = _pressedItem.IconScale;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = _pressedItem.IsCustomIcon;
-  
-            // save data to file
-            GlobalJson.SaveToFile();
+        // save data to file
+        GlobalJson.SaveToFile();
 
-            WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
+        WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
 
-            await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
-        }
+        await Shell.Current.GoToAsync($"..?planId={PlanId}&pinId={PinId}");
     }
 
     private async void ImportIconClicked(object sender, EventArgs e)
@@ -295,60 +281,6 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             DynamicSpan = 1;
 
         OnPropertyChanged(nameof(DynamicSpan));
-    }
-
-    private void OnPointerPressed(object sender, PointerEventArgs e)
-    {
-        if (_isPopupOpen || sender is not BindableObject view)
-            return;
-
-        _pressedItem = view.BindingContext as IconItem;
-        if (_pressedItem == null)
-            return;
-
-        _longPressCts?.Cancel();
-        _longPressCts = new CancellationTokenSource();
-
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(LongPressMs, _longPressCts.Token);
-
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    if (_isPopupOpen || _pressedItem == null)
-                        return;
-
-                    _longPressHandled = true;
-                    _isPopupOpen = true;
-
-                    try
-                    {
-                        await ShowEditPopup(_pressedItem);
-                    }
-                    finally
-                    {
-                        _isPopupOpen = false;
-                    }
-                });
-            }
-            catch (TaskCanceledException)
-            {
-                // normal
-            }
-        });
-    }
-
-    private void OnPointerReleased(object sender, PointerEventArgs e)
-    {
-        _longPressCts?.Cancel();
-        _longPressCts = null;
-
-        if (_isPopupOpen) return;
-
-        _pressedItem = null;
-        _longPressHandled = false;
     }
 
     private async Task ShowEditPopup(IconItem item)

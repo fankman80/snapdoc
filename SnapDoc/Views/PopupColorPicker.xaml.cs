@@ -1,9 +1,10 @@
 #nullable disable
 
-using SnapDoc.Services;
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Windows.Input;
 
 namespace SnapDoc.Views;
 
@@ -15,10 +16,12 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private bool isUpdating = false;
     private double workR, workG, workB;
     private double workH, workS, workV;
-    private CancellationTokenSource _longPressCts;
-    private ColorBoxItem _pressedItem;
-    private const int LongPressMs = 750;
-    private bool _longPressHandled;
+
+    public ICommand TapCommand =>
+        new Command<ColorBoxItem>(item => SelectColor(item));
+
+    public ICommand DoubleTapCommand =>
+        new Command<ColorBoxItem>(item => DeleteColor(item));
 
     public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
     {
@@ -57,34 +60,30 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         BindingContext = this;
     }
 
-    private void OnColorTapped(object sender, TappedEventArgs e)
+    private void SelectColor(ColorBoxItem _pressedItem)
     {
-        if (_longPressHandled)
+        foreach (var item in ColorsList)
+            item.IsSelected = false;
+
+        _pressedItem.IsSelected = true;
+
+        RedValue = _pressedItem.BackgroundColor.Red;
+        GreenValue = _pressedItem.BackgroundColor.Green;
+        BlueValue = _pressedItem.BackgroundColor.Blue;
+    }
+
+    private void DeleteColor(ColorBoxItem _pressedItem)
+    {
+        if (!_pressedItem.IsAddButton)
         {
-            _longPressHandled = false;
-            return;
-        }
+            ColorsList.Remove(_pressedItem);
 
-        if (sender is not BindableObject view)
-            return;
+            // Farbliste speichern
+            SettingsService.Instance.ColorList = [.. ColorsList
+            .Where(c => !c.IsAddButton)
+            .Select(c => c.BackgroundColor.ToHex())];
 
-        _pressedItem = view.BindingContext as ColorBoxItem;
-        if (_pressedItem == null)
-            return;
-
-        if (e.Buttons == ButtonsMask.Secondary)
-            RemovePressed(_pressedItem);
-
-        if (e.Buttons == ButtonsMask.Primary)
-        {
-            foreach (var item in ColorsList)
-                item.IsSelected = false;
-
-            _pressedItem.IsSelected = true;
-
-            RedValue = _pressedItem.BackgroundColor.Red;
-            GreenValue = _pressedItem.BackgroundColor.Green;
-            BlueValue = _pressedItem.BackgroundColor.Blue;
+            SettingsService.Instance.SaveSettings();
         }
     }
 
@@ -126,64 +125,6 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
             SettingsService.Instance.SaveSettings();
         }
-    }
-
-    private void RemovePressed(ColorBoxItem tappedItem)
-    {
-        if (!tappedItem.IsAddButton)
-        {
-            ColorsList.Remove(tappedItem);
-
-            // Farbliste speichern
-            SettingsService.Instance.ColorList = [.. ColorsList
-            .Where(c => !c.IsAddButton)
-            .Select(c => c.BackgroundColor.ToHex())];
-
-            SettingsService.Instance.SaveSettings();
-        }
-    }
-
-    private void OnPointerPressed(object sender, PointerEventArgs e)
-    {
-        if (sender is not BindableObject view)
-            return;
-
-        _pressedItem = view.BindingContext as ColorBoxItem;
-        if (_pressedItem == null)
-            return;
-
-        _longPressCts?.Cancel();
-        _longPressCts = new CancellationTokenSource();
-
-        _ = Task.Run(async () =>
-        {
-            try
-            {
-                await Task.Delay(LongPressMs, _longPressCts.Token);
-
-                MainThread.BeginInvokeOnMainThread(async () =>
-                {
-                    if (_pressedItem == null)
-                        return;
-
-                    _longPressHandled = true;
-
-                    RemovePressed(_pressedItem);
-                });
-            }
-            catch (TaskCanceledException)
-            {
-                // normal
-            }
-        });
-    }
-
-    private void OnPointerReleased(object sender, PointerEventArgs e)
-    {
-        _longPressCts?.Cancel();
-        _longPressCts = null;
-        _pressedItem = null;
-        _longPressHandled = false;
     }
 
     public double RedValue

@@ -174,8 +174,8 @@
   <data name="freihandlinie_zeichnen" xml:space="preserve">
     <value>Dessin à main levée</value>
   </data>
-  <data name="gedrückt_halten_um_Icon_zu_editieren" xml:space="preserve">
-    <value>Maintenir enfoncé pour modifier l'icône.</value>
+  <data name="doppelklick_icon_bearbeiten" xml:space="preserve">
+    <value>Double-clic pour modifier l'icône</value>
   </data>
   <data name="groesse_pinbeschriftung" xml:space="preserve">
     <value>Taille de l'étiquette du pin's</value>
@@ -414,8 +414,8 @@
   <data name="abbrechen" xml:space="preserve">
     <value>Annuler</value>
   </data>
-  <data name="zum_loeschen_gedrueckt_halten" xml:space="preserve">
-    <value>Maintenir pour supprimer</value>
+  <data name="doppelklick_farbe_loeschen" xml:space="preserve">
+    <value>Double-clic pour supprimer la couleur</value>
   </data>
   <data name="farbdefinition" xml:space="preserve">
     <value>▼      Définition de couleur      ▼</value>

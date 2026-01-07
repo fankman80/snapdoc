@@ -376,6 +376,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Doppelklick, um Farbe zu löschen ähnelt.
+        /// </summary>
+        internal static string doppelklick_farbe_loeschen {
+            get {
+                return ResourceManager.GetString("doppelklick_farbe_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Doppelklick, um Icon zu bearbeiten ähnelt.
+        /// </summary>
+        internal static string doppelklick_icon_bearbeiten {
+            get {
+                return ResourceManager.GetString("doppelklick_icon_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Drehung fixiert ähnelt.
         /// </summary>
         internal static string drehung_fixiert {
@@ -705,15 +723,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string freihandlinie_zeichnen {
             get {
                 return ResourceManager.GetString("freihandlinie_zeichnen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Gedrückt halten um Icon zu editieren. ähnelt.
-        /// </summary>
-        internal static string gedrückt_halten_um_Icon_zu_editieren {
-            get {
-                return ResourceManager.GetString("gedrückt_halten_um_Icon_zu_editieren", resourceCulture);
             }
         }
         
@@ -2091,15 +2100,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string zum_bearbeiten_ziehen {
             get {
                 return ResourceManager.GetString("zum_bearbeiten_ziehen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die zum Löschen gedrückt halten ähnelt.
-        /// </summary>
-        internal static string zum_loeschen_gedrueckt_halten {
-            get {
-                return ResourceManager.GetString("zum_loeschen_gedrueckt_halten", resourceCulture);
             }
         }
     }
