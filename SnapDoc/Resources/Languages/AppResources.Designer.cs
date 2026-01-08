@@ -1672,6 +1672,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rechteck zeichnen ähnelt.
+        /// </summary>
+        internal static string rechteck_zeichnen {
+            get {
+                return ResourceManager.GetString("rechteck_zeichnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Rechtsklick, um Icon zu bearbeiten ähnelt.
         /// </summary>
         internal static string rechtsklick_icon_bearbeiten {

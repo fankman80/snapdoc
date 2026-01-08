@@ -716,98 +716,58 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     }
 
     private void DrawFreeClicked(object sender, EventArgs e)
-    {
-        if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
-        {
-            planContainer.IsPanningEnabled = false;
-            drawMode = DrawMode.Free;
-            drawingController.DrawMode = DrawMode.Free;
-            DrawPolyBtn.CornerRadius = 30;
-            DrawFreeBtn.CornerRadius = 10;
-            DrawRectangleBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-        else
-        {
-            planContainer.IsPanningEnabled = true;
-            drawMode = DrawMode.None;
-            drawingController.DrawMode = DrawMode.None;
-            DrawFreeBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-    }
+        => SetDrawMode(DrawMode.Free);
 
     private void DrawPolyClicked(object sender, EventArgs e)
-    {
-        if (drawMode == DrawMode.Free || drawMode == DrawMode.None)
-        {
-            planContainer.IsPanningEnabled = false;
-            drawMode = DrawMode.Poly;
-            drawingController.DrawMode = DrawMode.Poly;
-            DrawPolyBtn.CornerRadius = 10;
-            DrawFreeBtn.CornerRadius = 30;
-            DrawRectangleBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
-            drawingView?.InvalidateSurface();
-        }
-        else
-        {
-            planContainer.IsPanningEnabled = true;
-            drawMode = DrawMode.None;
-            drawingController.DrawMode = DrawMode.None;
-            DrawPolyBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-    }
+        => SetDrawMode(DrawMode.Poly);
 
     private void DrawRectangleClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Rectangle);
+
+    private void SetDrawMode(DrawMode mode)
     {
-        if (drawMode == DrawMode.Free || drawMode == DrawMode.Poly || drawMode == DrawMode.None)
-        {
-        // Zeichenmodus aktivieren
-        planContainer.IsPanningEnabled = false;
+        bool activate = drawMode != mode;
 
-        drawMode = DrawMode.Rectangle;
-        drawingController.DrawMode = DrawMode.Rectangle;
+        // DrawMode setzen
+        drawMode = activate ? mode : DrawMode.None;
+        drawingController.DrawMode = drawMode;
 
-        // UI
-        DrawRectangleBtn.CornerRadius = 10;
+        // Panning
+        planContainer.IsPanningEnabled = !activate;
+
+        // Buttons reset
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
-
-        // Handles anzeigen
-        drawingController.CombinedDrawable?
-            .RectangleDrawable?
-            .DisplayHandles = true;
-
-        // Polyline-Handles aus
-        drawingController.CombinedDrawable?
-            .PolyDrawable?
-            .DisplayHandles = false;
-
-        drawingView?.InvalidateSurface();
-        }
-        else
-        {
-        // Zeichenmodus verlassen
-        planContainer.IsPanningEnabled = true;
-
-        drawMode = DrawMode.None;
-        drawingController.DrawMode = DrawMode.None;
-
-        // UI reset
         DrawRectangleBtn.CornerRadius = 30;
 
-        // Handles aus
-        drawingController.CombinedDrawable?
-            .RectangleDrawable?
-            .DisplayHandles = false;
+        // Aktiver Button
+        if (activate)
+        {
+            switch (mode)
+            {
+                case DrawMode.Free:
+                    DrawFreeBtn.CornerRadius = 10;
+                    break;
+
+                case DrawMode.Poly:
+                    DrawPolyBtn.CornerRadius = 10;
+                    break;
+
+                case DrawMode.Rectangle:
+                    DrawRectangleBtn.CornerRadius = 10;
+                    break;
+            }
+        }
+
+        // Handles
+        var combined = drawingController.CombinedDrawable;
+        if (combined != null)
+        {
+            combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
+            combined.RectangleDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
+        }
 
         drawingView?.InvalidateSurface();
-        }
     }
 
     private void EraseClicked(object sender, EventArgs e)

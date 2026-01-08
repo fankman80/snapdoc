@@ -8,13 +8,15 @@ namespace SnapDoc;
 
 public partial class DrawingController(TransformViewModel transformVm, double density) : IDisposable
 {
-    private SKCanvasView? canvasView;
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
+    private SKCanvasView? canvasView;
     private int? activeIndex = null;
     private DateTime? lastClickTime;
     private SKPoint? lastClickPosition;
     private readonly bool scaleHandlesWithTransform = true;
+    private SKPoint? rectDragStart;
+    private bool isDraggingRectangle;
 
     // BoundingBox
     public float MinX { get; private set; }
@@ -76,7 +78,21 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 LineThickness = lineThickness * (float)density,
                 HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale * (float)density : handleRadius * (float)density,
                 PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density
+            },
+            RectangleDrawable = new InteractiveRectangleDrawable
+            {
+                FillColor = fillColor,
+                LineColor = lineColor,
+                PointColor = pointColor,
+                LineThickness = lineThickness * (float)density,
+                HandleRadius = scaleHandlesWithTransform
+                    ? handleRadius / (float)transformVm.Scale * (float)density
+                    : handleRadius * (float)density,
+                            PointRadius = scaleHandlesWithTransform
+                    ? pointRadius / (float)transformVm.Scale * (float)density
+                    : pointRadius * (float)density
             }
+
         };
 
         canvasView?.InvalidateSurface();
@@ -102,10 +118,10 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // Event nur als handled markieren, wenn Free-Modus oder Poly-Modus und Punkt aktiv
-        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null))
-            e.Handled = true; // blockiert andere Views
+        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null) || (DrawMode == DrawMode.Rectangle))
+            e.Handled = true;
         else
-            e.Handled = false; // lässt Touch durchgehen
+            e.Handled = false;
 
         canvasView?.InvalidateSurface();
     }
@@ -158,6 +174,27 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             free.AddPoint(p);
             canvasView?.InvalidateSurface();
         }
+        else if (DrawMode == DrawMode.Rectangle)
+        {
+            var rect = CombinedDrawable.RectangleDrawable;
+            if (rect == null) return;
+
+            activeIndex = rect.FindPointIndex(p.X, p.Y);
+
+            if (activeIndex != null)
+            {
+                transformVm.IsPanningEnabled = false;
+                transformVm.IsPinchingEnabled = false;
+            }
+            else
+            {
+                rectDragStart = p;
+                isDraggingRectangle = true;
+                rect.SetFromDrag(p, p);
+            }
+
+            canvasView?.InvalidateSurface();
+        }
     }
 
     private void OnDragInteraction(SKPoint p)
@@ -168,6 +205,16 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable.FreeDrawable.AddPoint(p);
+        else if (DrawMode == DrawMode.Rectangle)
+        {
+            var rect = CombinedDrawable.RectangleDrawable;
+            if (rect == null) return;
+
+            if (activeIndex != null)
+                rect.MovePoint(activeIndex.Value, p);
+            else if (isDraggingRectangle && rectDragStart.HasValue)
+                rect.SetFromDrag(rectDragStart.Value, p);
+        }
 
         canvasView?.InvalidateSurface();
     }
@@ -181,28 +228,55 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             transformVm.IsPinchingEnabled = true;
         }
         else if (DrawMode == DrawMode.Free)
-        {
             CombinedDrawable?.FreeDrawable.EndStroke();
+        else if (DrawMode == DrawMode.Rectangle)
+        {
+            activeIndex = null;
+            rectDragStart = null;
+            isDraggingRectangle = false;
+
+            transformVm.IsPanningEnabled = true;
+            transformVm.IsPinchingEnabled = true;
         }
 
         canvasView?.InvalidateSurface();
     }
 
-    public void ResizePolyHandles()
+    public void ResizeHandles()
     {
-        if (CombinedDrawable == null || DrawMode != DrawMode.Poly) return;
+        if (CombinedDrawable == null)
+            return;
 
+        // Polyline
         var poly = CombinedDrawable.PolyDrawable;
-
-        if (scaleHandlesWithTransform)
+        if (poly != null && DrawMode == DrawMode.Poly)
         {
-            poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
-            poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
+            if (scaleHandlesWithTransform)
+            {
+                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
+                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
+            }
+            else
+            {
+                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density);
+                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density);
+            }
         }
-        else
+
+        // Rectangle
+        var rect = CombinedDrawable.RectangleDrawable;
+        if (rect != null && DrawMode == DrawMode.Rectangle)
         {
-            poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density);
-            poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density);
+            if (scaleHandlesWithTransform)
+            {
+                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
+                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
+            }
+            else
+            {
+                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density);
+                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density);
+            }
         }
 
         canvasView?.InvalidateSurface();
@@ -245,6 +319,15 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             poly.LineColor = lineColor;
             poly.FillColor = lineColor.WithAlpha((byte)(fillOpacity * 255));
             poly.LineThickness = lineWidth * (float)density;
+        }
+
+        // Rectangle
+        var rect = CombinedDrawable.RectangleDrawable;
+        if (rect != null)
+        {
+            rect.LineColor = lineColor;
+            rect.FillColor = lineColor.WithAlpha((byte)(fillOpacity * 255));
+            rect.LineThickness = lineWidth * (float)density;
         }
 
         canvasView?.InvalidateSurface();
@@ -314,6 +397,20 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                     if (pt.Y < minY) minY = pt.Y;
                     if (pt.Y > maxY) maxY = pt.Y;
                 }
+            }
+        }
+
+        // === Rectangle Punkte ===
+        var rect = CombinedDrawable.RectangleDrawable;
+        if (rect != null && rect.Points.Length == 4)
+        {
+            foreach (var pt in rect.Points)
+            {
+                hasPoints = true;
+                minX = Math.Min(minX, pt.X);
+                maxX = Math.Max(maxX, pt.X);
+                minY = Math.Min(minY, pt.Y);
+                maxY = Math.Max(maxY, pt.Y);
             }
         }
 

@@ -6,14 +6,14 @@ public class InteractivePolylineDrawable
 {
     public List<SKPoint> Points { get; set; } = [];
     public float HandleRadius { get; set; } = 15f;
-    public bool DisplayHandles { get; set; } = true;
     public float PointRadius { get; set; } = 8f;
+    public float LineThickness { get; set; } = 3f;
+    public bool DisplayHandles { get; set; } = true;
     public bool IsClosed { get; private set; } = false;
     public SKColor FillColor { get; set; } = SKColors.Red.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.Red;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
-    public float LineThickness { get; set; } = 3f;
     public bool HasContent => Points.Count > 0;
 
     public void Draw(SKCanvas canvas)
@@ -72,7 +72,7 @@ public class InteractivePolylineDrawable
                     Color = color,
                     IsStroke = false,
                     IsAntialias = true,
-                    Style = SKPaintStyle.Stroke,
+                    Style = SKPaintStyle.StrokeAndFill,
                     StrokeWidth = 2
                 };
                 canvas.DrawCircle(Points[i], PointRadius, pointPaint);

@@ -4,37 +4,35 @@ namespace SnapDoc;
 
 public class InteractiveRectangleDrawable
 {
-    // Eckpunkte (immer 4)
-    public List<SKPoint> Points { get; private set; } = [];
-
+    public SKPoint Start { get; private set; }
+    public SKPoint End { get; private set; }
+    public bool HasContent => Start != End;
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
     public float LineThickness { get; set; } = 3f;
-
     public bool DisplayHandles { get; set; } = true;
-
     public SKColor FillColor { get; set; } = SKColors.Blue.WithAlpha(100);
     public SKColor LineColor { get; set; } = SKColors.Blue;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
 
-    public bool HasContent => Points.Count == 4;
+    public SKPoint[] Points
+    {
+        get
+        {
+            return
+            [
+                new SKPoint(Start.X, Start.Y), // TL
+                new SKPoint(End.X, Start.Y),   // TR
+                new SKPoint(End.X, End.Y),     // BR
+                new SKPoint(Start.X, End.Y)    // BL
+            ];
+        }
+    }
 
-    /// <summary>
-    /// Erzeugt ein Rechteck aus zwei Punkten (Drag Start → End)
-    /// </summary>
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
-        Points.Clear();
-
-        var left   = Math.Min(start.X, end.X);
-        var right  = Math.Max(start.X, end.X);
-        var top    = Math.Min(start.Y, end.Y);
-        var bottom = Math.Max(start.Y, end.Y);
-
-        Points.Add(new SKPoint(left,  top));    // 0: oben links
-        Points.Add(new SKPoint(right, top));    // 1: oben rechts
-        Points.Add(new SKPoint(right, bottom)); // 2: unten rechts
-        Points.Add(new SKPoint(left,  bottom)); // 3: unten links
+        Start = start;
+        End = end;
     }
 
     public void Draw(SKCanvas canvas)
@@ -42,23 +40,23 @@ public class InteractiveRectangleDrawable
         if (!HasContent)
             return;
 
-        // Füllen
+        var pts = Points;
+
+        using var path = new SKPath();
+        path.MoveTo(pts[0]);
+        path.LineTo(pts[1]);
+        path.LineTo(pts[2]);
+        path.LineTo(pts[3]);
+        path.Close();
+
         using var fillPaint = new SKPaint
         {
             Color = FillColor,
             IsStroke = false,
             IsAntialias = true
         };
-
-        using var path = new SKPath();
-        path.MoveTo(Points[0]);
-        for (int i = 1; i < Points.Count; i++)
-            path.LineTo(Points[i]);
-        path.Close();
-
         canvas.DrawPath(path, fillPaint);
 
-        // Rahmen
         using var linePaint = new SKPaint
         {
             Color = LineColor,
@@ -66,70 +64,70 @@ public class InteractiveRectangleDrawable
             IsStroke = true,
             IsAntialias = true
         };
+        canvas.DrawPath(path, linePaint);
 
-        for (int i = 0; i < Points.Count; i++)
-        {
-            var next = (i + 1) % Points.Count;
-            canvas.DrawLine(Points[i], Points[next], linePaint);
-        }
-
-        // Handles
         if (DisplayHandles)
         {
             using var handlePaint = new SKPaint
             {
                 Color = PointColor,
-                Style = SKPaintStyle.Stroke,
+                Style = SKPaintStyle.StrokeAndFill,
                 StrokeWidth = 2,
                 IsAntialias = true
             };
 
-            foreach (var p in Points)
+            foreach (var p in pts)
                 canvas.DrawCircle(p, PointRadius, handlePaint);
         }
     }
 
-    /// <summary>
-    /// Liefert den Index des angeklickten Eckpunkts
-    /// </summary>
     public int? FindPointIndex(float x, float y)
     {
-        for (int i = 0; i < Points.Count; i++)
-        {
-            var dx = Points[i].X - x;
-            var dy = Points[i].Y - y;
+        var pts = Points;
+        var p = new SKPoint(x, y);
 
-            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius)
+        for (int i = 0; i < pts.Length; i++)
+        {
+            if (SKPoint.Distance(p, pts[i]) <= HandleRadius)
                 return i;
         }
+
         return null;
     }
 
-    /// <summary>
-    /// Verschiebt einen Eckpunkt und hält das Rechteck korrekt
-    /// </summary>
-    public void MovePoint(int index, SKPoint newPosition)
+    public void MovePoint(int index, SKPoint newPos)
     {
-        if (!HasContent || index < 0 || index > 3)
-            return;
+        float left = Start.X;
+        float right = End.X;
+        float top = Start.Y;
+        float bottom = End.Y;
 
-        // gegenüberliegender Punkt
-        int opposite = (index + 2) % 4;
+        switch (index)
+        {
+            case 0: // TL
+                left = newPos.X;
+                top = newPos.Y;
+                break;
+            case 1: // TR
+                right = newPos.X;
+                top = newPos.Y;
+                break;
+            case 2: // BR
+                right = newPos.X;
+                bottom = newPos.Y;
+                break;
+            case 3: // BL
+                left = newPos.X;
+                bottom = newPos.Y;
+                break;
+        }
 
-        Points[index] = newPosition;
-
-        // X/Y der angrenzenden Punkte korrigieren
-        Points[(index + 1) % 4] = new SKPoint(
-            Points[opposite].X,
-            newPosition.Y);
-
-        Points[(index + 3) % 4] = new SKPoint(
-            newPosition.X,
-            Points[opposite].Y);
+        Start = new SKPoint(left, top);
+        End = new SKPoint(right, bottom);
     }
 
     public void Reset()
     {
-        Points.Clear();
+        Start = End = default;
     }
 }

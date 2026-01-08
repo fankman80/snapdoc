@@ -113,7 +113,7 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPinching(object sender, PinchEventArgs e)
     {
         fotoContainer.IsPanningEnabled = false;
-        drawingController.ResizePolyHandles();
+        drawingController.ResizeHandles();
     }
 
     public void OnPinched(object sender, PinchEventArgs e)
@@ -159,7 +159,7 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer.TranslationY -= deltaTranslationY;
         fotoContainer.Scale = targetScale;
 
-        drawingController.ResizePolyHandles();
+        drawingController.ResizeHandles();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
@@ -220,6 +220,61 @@ public partial class ImageViewPage : IQueryAttributable
         await Shell.Current.GoToAsync($"..");
     }
 
+    private void DrawFreeClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Free);
+
+    private void DrawPolyClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Poly);
+
+    private void DrawRectangleClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Rectangle);
+
+    private void SetDrawMode(DrawMode mode)
+    {
+        bool activate = drawMode != mode;
+
+        // DrawMode setzen
+        drawMode = activate ? mode : DrawMode.None;
+        drawingController.DrawMode = drawMode;
+
+        // Panning
+        fotoContainer.IsPanningEnabled = !activate;
+
+        // Buttons reset
+        DrawFreeBtn.CornerRadius = 30;
+        DrawPolyBtn.CornerRadius = 30;
+        DrawRectangleBtn.CornerRadius = 30;
+
+        // Aktiver Button
+        if (activate)
+        {
+            switch (mode)
+            {
+                case DrawMode.Free:
+                    DrawFreeBtn.CornerRadius = 10;
+                    break;
+
+                case DrawMode.Poly:
+                    DrawPolyBtn.CornerRadius = 10;
+                    break;
+
+                case DrawMode.Rectangle:
+                    DrawRectangleBtn.CornerRadius = 10;
+                    break;
+            }
+        }
+
+        // Handles
+        var combined = drawingController.CombinedDrawable;
+        if (combined != null)
+        {
+            combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
+            combined.RectangleDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
+        }
+
+        drawingView?.InvalidateSurface();
+    }
+
     private void DrawingClicked(object sender, EventArgs e)
     {
         DrawBtn.IsVisible = false;
@@ -249,58 +304,12 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = DrawMode.None;
     }
 
-    private void DrawFreeClicked(object sender, EventArgs e)
-    {
-        if (drawMode == DrawMode.Poly || drawMode == DrawMode.None)
-        {
-            fotoContainer.IsPanningEnabled = false;
-            drawMode = DrawMode.Free;
-            drawingController.DrawMode = DrawMode.Free;
-            DrawPolyBtn.CornerRadius = 30;
-            DrawFreeBtn.CornerRadius = 10;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-        else
-        {
-            fotoContainer.IsPanningEnabled = true;
-            drawMode = DrawMode.None;
-            drawingController.DrawMode = DrawMode.None;
-            DrawFreeBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-    }
-
-    private void DrawPolyClicked(object sender, EventArgs e)
-    {
-        if (drawMode == DrawMode.Free || drawMode == DrawMode.None)
-        {
-            fotoContainer.IsPanningEnabled = false;
-            drawMode = DrawMode.Poly;
-            drawingController.DrawMode = DrawMode.Poly;
-            DrawPolyBtn.CornerRadius = 10;
-            DrawFreeBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
-            drawingController.ResizePolyHandles();
-            drawingView?.InvalidateSurface();
-        }
-        else
-        {
-            fotoContainer.IsPanningEnabled = true;
-            drawMode = DrawMode.None;
-            drawingController.DrawMode = DrawMode.None;
-            DrawPolyBtn.CornerRadius = 30;
-            drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
-            drawingView?.InvalidateSurface();
-        }
-    }
-
     private void EraseClicked(object sender, EventArgs e)
     {
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
+        DrawRectangleBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
 
@@ -371,6 +380,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
+        DrawRectangleBtn.CornerRadius = 30;
         fotoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;

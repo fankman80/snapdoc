@@ -798,4 +798,7 @@
   <data name="rechtsklick_loeschen" xml:space="preserve">
     <value>Clic droit pour supprimer</value>
   </data>
+  <data name="rechteck_zeichnen" xml:space="preserve">
+    <value>Dessine un rectangle</value>
+  </data>
 </root>

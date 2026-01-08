@@ -290,7 +290,7 @@
                         </Border>
                     </AbsoluteLayout>
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
-                            BackgroundColor="{DynamicResource Primary}"
+                            BackgroundColor="LimeGreen"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
                             HeightRequest="60"
@@ -302,6 +302,15 @@
                                        Margin="96,0,0,20"
                                        AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                        AbsoluteLayout.LayoutFlags="PositionProportional">
+                    <Button x:Name="DrawRectangleBtn"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
+                            Clicked="DrawRectangleClicked"/>                    
                     <Button x:Name="DrawPolyBtn"
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                             BackgroundColor="{DynamicResource Primary}"
@@ -320,15 +329,6 @@
                             CornerRadius="30"
                             ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"
                             Clicked="DrawFreeClicked"/>
-                    <Button x:Name="DrawRectangleBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
-                            BackgroundColor="{DynamicResource Primary}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            WidthRequest="60"
-                            HeightRequest="60"
-                            CornerRadius="30"
-                            ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
-                            Clicked="DrawRectangleClicked"/>
                 </HorizontalStackLayout>
             </AbsoluteLayout>
         </AbsoluteLayout>

@@ -798,4 +798,7 @@
   <data name="rechtsklick_loeschen" xml:space="preserve">
     <value>Rechtsklick zum Löschen</value>
   </data>
+  <data name="rechteck_zeichnen" xml:space="preserve">
+    <value>Rechteck zeichnen</value>
+  </data>
 </root>
