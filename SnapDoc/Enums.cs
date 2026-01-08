@@ -4,6 +4,7 @@ namespace SnapDoc
     {
         None,
         Free,
-        Poly
+        Poly,
+        Rectangle
     }
 }
