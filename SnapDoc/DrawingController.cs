@@ -321,7 +321,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             poly.LineThickness = lineWidth * (float)density;
         }
 
-        // Rectangle
+        // Rectangle aktualisieren
         var rect = CombinedDrawable.RectangleDrawable;
         if (rect != null)
         {
@@ -338,18 +338,51 @@ public partial class DrawingController(TransformViewModel transformVm, double de
 
     public void DrawWithoutHandles(SKCanvas canvas)
     {
-        if (CombinedDrawable == null) return;
+        if (CombinedDrawable == null)
+            return;
 
         var poly = CombinedDrawable.PolyDrawable;
-        var old = poly.DisplayHandles;
-        poly.DisplayHandles = false;
+        var rect = CombinedDrawable.RectangleDrawable;
+        bool polyOld = false;
+        bool rectOld = false;
+
+        if (poly != null)
+        {
+            polyOld = poly.DisplayHandles;
+            poly.DisplayHandles = false;
+        }
+
+        if (rect != null)
+        {
+            rectOld = rect.DisplayHandles;
+            rect.DisplayHandles = false;
+        }
+
         CombinedDrawable.Draw(canvas);
-        poly.DisplayHandles = old;
+
+        poly?.DisplayHandles = polyOld;
+        rect?.DisplayHandles = rectOld;
     }
 
     public bool IsEmpty()
-        => CombinedDrawable == null ||
-           (CombinedDrawable.PolyDrawable.Points.Count == 0 && CombinedDrawable.FreeDrawable.Strokes.Count == 0);
+    {
+        if (CombinedDrawable == null)
+            return true;
+
+        bool polyEmpty =
+            CombinedDrawable.PolyDrawable == null ||
+            CombinedDrawable.PolyDrawable.Points.Count == 0;
+
+        bool freeEmpty =
+            CombinedDrawable.FreeDrawable == null ||
+            CombinedDrawable.FreeDrawable.Strokes.Count == 0;
+
+        bool rectEmpty =
+            CombinedDrawable.RectangleDrawable == null ||
+            CombinedDrawable.RectangleDrawable.Points.Length == 0;
+
+        return polyEmpty && freeEmpty && rectEmpty;
+    }
 
     public void Reset()
     {

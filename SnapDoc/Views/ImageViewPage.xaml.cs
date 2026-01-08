@@ -1,13 +1,14 @@
 ﻿#nullable disable
 
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Layouts;
 using MR.Gestures;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 

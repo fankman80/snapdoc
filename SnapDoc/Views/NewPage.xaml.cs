@@ -782,57 +782,57 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView == null || drawingController.IsEmpty())
-        return;
+        if (drawingView != null && !drawingController.IsEmpty())
+        {
+            var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
+            var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
+            string filePath = Path.Combine(customPinPath, customPinName);
 
-        var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-        var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-        string filePath = Path.Combine(customPinPath, customPinName);
+            if (!Directory.Exists(customPinPath))
+                Directory.CreateDirectory(customPinPath);
 
-        if (!Directory.Exists(customPinPath))
-            Directory.CreateDirectory(customPinPath);
+            SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
-        SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
+            // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
+            var cx = imageRect.MidX / density;
+            var cy = imageRect.MidY / density;
 
-        // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
-        var cx = imageRect.MidX / density;
-        var cy = imageRect.MidY / density;
+            // Mittelpunkt der DrawingView
+            double centerX = drawingView.Width / 2;
+            double centerY = drawingView.Height / 2;
 
-        // Mittelpunkt der DrawingView
-        double centerX = drawingView.Width / 2;
-        double centerY = drawingView.Height / 2;
+            // Punkt relativ zum Zentrum
+            double rx = cx - centerX + SettingsService.Instance.CustomPinOffset.X;
+            double ry = cy - centerY + SettingsService.Instance.CustomPinOffset.Y;
 
-        // Punkt relativ zum Zentrum
-        double rx = cx - centerX + SettingsService.Instance.CustomPinOffset.X;
-        double ry = cy - centerY + SettingsService.Instance.CustomPinOffset.Y;
+            // Inverse Rotation anwenden
+            double angle = -planContainer.Rotation * (Math.PI / 180.0);
+            double cos = Math.Cos(angle);
+            double sin = Math.Sin(angle);
 
-        // Inverse Rotation anwenden
-        double angle = -planContainer.Rotation * (Math.PI / 180.0);
-        double cos = Math.Cos(angle);
-        double sin = Math.Sin(angle);
+            double ux = rx * cos - ry * sin;
+            double uy = rx * sin + ry * cos;
 
-        double ux = rx * cos - ry * sin;
-        double uy = rx * sin + ry * cos;
+            // Jetzt wieder zurück in absolute Koordinate
+            double fx = ux + centerX;
+            double fy = uy + centerY;
 
-        // Jetzt wieder zurück in absolute Koordinate
-        double fx = ux + centerX;
-        double fy = uy + centerY;
+            // In Bild-Koordinaten umrechnen
+            var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
+                     ((fx - drawingView.Width / 2) / planContainer.Scale);
 
-        // In Bild-Koordinaten umrechnen
-        var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
-               ((fx - drawingView.Width / 2) / planContainer.Scale);
+            var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
+                     ((fy - drawingView.Height / 2) / planContainer.Scale);
 
-        var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
-               ((fy - drawingView.Height / 2) / planContainer.Scale);
-
-        // Pin setzen
-        SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
-                customPinName,
-                (int)imageRect.Width,
-                (int)imageRect.Height,
-                new SKColor(SelectedColor.ToUint()),
-                1 / planContainer.Scale / density,
-                Helper.NormalizeAngle360(-planContainer.Rotation));
+            // Pin setzen
+            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
+                    customPinName,
+                    (int)imageRect.Width,
+                    (int)imageRect.Height,
+                    new SKColor(SelectedColor.ToUint()),
+                    1 / planContainer.Scale / density,
+                    Helper.NormalizeAngle360(-planContainer.Rotation));
+        }
 
         // Cleanup drawing canvas
         drawingController.Detach();

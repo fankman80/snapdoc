@@ -92,7 +92,7 @@
                 AbsoluteLayout.LayoutFlags="PositionProportional"
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                 Clicked="DrawingClicked"/>
-
+        
         <AbsoluteLayout x:Name="ToolBtns"
                         IsVisible="False"
                         AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
@@ -112,20 +112,20 @@
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout>
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
-                                BackgroundColor="{DynamicResource Primary}"
-                                TextColor="{DynamicResource PrimaryDarkText}"
-                                WidthRequest="60"
-                                HeightRequest="60"
-                                CornerRadius="30"
-                                ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
-                                Clicked="PenSettingsClicked"/>
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
+                            Clicked="PenSettingsClicked"/>
                     <Border x:DataType="views:ImageViewPage"
-                                WidthRequest="22"
-                                HeightRequest="22"
-                                BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedColor}"
-                                StrokeThickness="0"
-                                AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
-                                AbsoluteLayout.LayoutFlags="PositionProportional">
+                            WidthRequest="22"
+                            HeightRequest="22"
+                            BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedColor}"
+                            StrokeThickness="0"
+                            AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
+                            AbsoluteLayout.LayoutFlags="PositionProportional">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="11"/>
                         </Border.StrokeShape>
@@ -151,32 +151,32 @@
                                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button x:Name="DrawRectangleBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
-                            BackgroundColor="{DynamicResource Primary}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            WidthRequest="60"
-                            HeightRequest="60"
-                            CornerRadius="30"
-                            ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
-                            Clicked="DrawRectangleClicked"/>
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
+                        Clicked="DrawRectangleClicked"/>
                 <Button x:Name="DrawPolyBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
-                            BackgroundColor="{DynamicResource Primary}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            WidthRequest="60"
-                            HeightRequest="60"
-                            CornerRadius="30"
-                            ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"
-                            Clicked="DrawPolyClicked"/>
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"
+                        Clicked="DrawPolyClicked"/>
                 <Button x:Name="DrawFreeBtn"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
-                            BackgroundColor="{DynamicResource Primary}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            WidthRequest="60"
-                            HeightRequest="60"
-                            CornerRadius="30"
-                            ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"
-                            Clicked="DrawFreeClicked"/>
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"
+                        Clicked="DrawFreeClicked"/>
             </HorizontalStackLayout>
         </AbsoluteLayout>
     </AbsoluteLayout>
