@@ -724,6 +724,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             drawingController.DrawMode = DrawMode.Free;
             DrawPolyBtn.CornerRadius = 30;
             DrawFreeBtn.CornerRadius = 10;
+            DrawRectangleBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = false;
             drawingView?.InvalidateSurface();
         }
@@ -747,6 +748,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             drawingController.DrawMode = DrawMode.Poly;
             DrawPolyBtn.CornerRadius = 10;
             DrawFreeBtn.CornerRadius = 30;
+            DrawRectangleBtn.CornerRadius = 30;
             drawingController.CombinedDrawable?.PolyDrawable?.DisplayHandles = true;
             drawingView?.InvalidateSurface();
         }
@@ -882,6 +884,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
+        DrawRectangleBtn.CornerRadius = 30;
         planContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
