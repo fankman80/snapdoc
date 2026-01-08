@@ -761,11 +761,59 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
+    private void DrawRectangleClicked(object sender, EventArgs e)
+    {
+        if (drawMode == DrawMode.Free || drawMode == DrawMode.Poly || drawMode == DrawMode.None)
+        {
+        // Zeichenmodus aktivieren
+        planContainer.IsPanningEnabled = false;
+
+        drawMode = DrawMode.Rectangle;
+        drawingController.DrawMode = DrawMode.Rectangle;
+
+        // UI
+        DrawRectangleBtn.CornerRadius = 10;
+        DrawFreeBtn.CornerRadius = 30;
+        DrawPolyBtn.CornerRadius = 30;
+
+        // Handles anzeigen
+        drawingController.CombinedDrawable?
+            .RectangleDrawable?
+            .DisplayHandles = true;
+
+        // Polyline-Handles aus
+        drawingController.CombinedDrawable?
+            .PolyDrawable?
+            .DisplayHandles = false;
+
+        drawingView?.InvalidateSurface();
+        }
+        else
+        {
+        // Zeichenmodus verlassen
+        planContainer.IsPanningEnabled = true;
+
+        drawMode = DrawMode.None;
+        drawingController.DrawMode = DrawMode.None;
+
+        // UI reset
+        DrawRectangleBtn.CornerRadius = 30;
+
+        // Handles aus
+        drawingController.CombinedDrawable?
+            .RectangleDrawable?
+            .DisplayHandles = false;
+
+        drawingView?.InvalidateSurface();
+        }
+    }
+
     private void EraseClicked(object sender, EventArgs e)
     {
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
+        DrawRectangleBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
     }
