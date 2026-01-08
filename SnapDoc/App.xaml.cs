@@ -1,17 +1,20 @@
-﻿using SnapDoc.Services;
+﻿#nullable disable
+using SnapDoc.Services;
 using UraniumUI;
 using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 
 #if ANDROID
-using Android.OS;
+using Android.Hardware.Display;
 using Android.Content;
-using Android.Content.PM;
-using Android.Provider;
 #endif
 
 #if WINDOWS
 using Microsoft.UI.Windowing;
+#endif
+
+#if IOS
+using UIKit;
 #endif
 
 namespace SnapDoc;
@@ -68,11 +71,44 @@ public partial class App : Application
         else
             SettingsService.Instance.IsGpsActive = true;
 
+        // ermittle die Höhe der Navigationsleiste (für CustomPinOffset)
+        double bottomInset = 0;
+#if ANDROID
+        var displayManager = Android.App.Application.Context.GetSystemService(Context.DisplayService) as DisplayManager;
+        var defaultdisplay = displayManager.GetDisplay(Android.Views.Display.DefaultDisplay);
+        var gotheight = Android.App.Application.Context.CreateDisplayContext(defaultdisplay).Resources.DisplayMetrics.HeightPixels;
+
+        // this is the status bar height
+        var statusid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("status_bar_height", "dimen", "android");
+        var statusbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(statusid);
+
+        // this is the navigation bar height
+        var navid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("navigation_bar_height", "dimen", "android");
+        var navbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(navid);
+
+        bottomInset = navbarheight / DeviceDisplay.MainDisplayInfo.Density;
+#endif
+
+#if IOS
+        var window = UIApplication.SharedApplication
+            .ConnectedScenes
+            .OfType<UIWindowScene>()
+            .FirstOrDefault()?
+            .Windows
+            .FirstOrDefault(w => w.IsKeyWindow);
+
+        var safeAreaBottom = window?.SafeAreaInsets.Bottom ?? 0;
+
+        bottomInset = safeAreaBottom;
+#endif
+
+        SettingsService.Instance.CustomPinOffset = new Point(0, -bottomInset / 2);
+
         // Einstellungen speichern
         SettingsService.Instance.SaveSettings();
     }
 
-    protected override Window CreateWindow(IActivationState? activationState)
+    protected override Window CreateWindow(IActivationState activationState)
     {
         var window = new Window(UraniumServiceProvider.Current.GetRequiredService<AppShell>())
         {

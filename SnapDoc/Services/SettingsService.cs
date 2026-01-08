@@ -149,7 +149,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private string _polyLineHandleColor = "#808080";
     [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
     [ObservableProperty] private byte _polyLineHandleAlpha = 200;
-    [ObservableProperty] private Point _customPinOffset = Settings.DefaultCustomPinOffset;
+    [ObservableProperty] private Point _customPinOffset = new(0,0);
     [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
     [ObservableProperty] private string _selectedTemplate;
     [ObservableProperty] private ObservableCollection<string> _templates = [];

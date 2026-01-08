@@ -16,15 +16,12 @@ public static class Settings
 
 #if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");
-    public static readonly Point DefaultCustomPinOffset = new(0, 0);
 #endif
 #if ANDROID
     private static string dataDirectory = Path.Combine(FileSystem.AppDataDirectory, "SnapDoc");
-    public static readonly Point DefaultCustomPinOffset = new(0, -8);
 #endif
 #if IOS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapDoc");
-    public static readonly Point DefaultCustomPinOffset = new(0, -8);
 #endif
 
     public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
