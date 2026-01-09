@@ -251,6 +251,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable?.FreeDrawable.EndStroke();
         else if (DrawMode == DrawMode.Rectangle)
         {
+            var rect = CombinedDrawable.RectangleDrawable;
             if (isDraggingRectangle && !rect.IsDrawn)
                 rect.IsDrawn = true; // markiere Rechteck als gezeichnet
                 
