@@ -227,8 +227,8 @@ public partial class ImageViewPage : IQueryAttributable
     private void DrawPolyClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Poly);
 
-    private void DrawRectangleClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Rectangle);
+    private void DrawRectClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Rect);
 
     private void SetDrawMode(DrawMode mode)
     {
@@ -244,7 +244,7 @@ public partial class ImageViewPage : IQueryAttributable
         // Buttons reset
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
 
         // Aktiver Button
         if (activate)
@@ -259,7 +259,7 @@ public partial class ImageViewPage : IQueryAttributable
                     DrawPolyBtn.CornerRadius = 10;
                     break;
 
-                case DrawMode.Rectangle:
+                case DrawMode.Rect:
                     DrawRectangleBtn.CornerRadius = 10;
                     break;
             }
@@ -270,7 +270,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (combined != null)
         {
             combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
-            combined.RectangleDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
+            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
         }
 
         drawingView?.InvalidateSurface();
@@ -310,7 +310,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
 
@@ -381,7 +381,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
         fotoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
