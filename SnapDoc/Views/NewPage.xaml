@@ -302,7 +302,7 @@
                                        Margin="96,0,0,20"
                                        AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                        AbsoluteLayout.LayoutFlags="PositionProportional">
-                    <Button x:Name="DrawRectangleBtn"
+                    <Button x:Name="DrawRectBtn"
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
