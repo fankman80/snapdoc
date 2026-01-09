@@ -4,7 +4,8 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:vm="clr-namespace:SnapDoc.ViewModels"
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
@@ -68,7 +69,7 @@
                         <ColumnDefinition Width="26" />
                     </Grid.ColumnDefinitions>
                     <Grid.Behaviors>
-                        <local:UnifiedTapBehavior
+                        <vm:UnifiedTapBehavior
                             x:DataType="views:IconGallery"
                             SingleTapCommand="{Binding TapCommand, Source={x:Reference ThisPage}}"
                             DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />
@@ -102,7 +103,7 @@
                           x:DataType="local:IconItem">
                 <Grid>
                     <Grid.Behaviors>
-                        <local:UnifiedTapBehavior
+                        <vm:UnifiedTapBehavior
                             x:DataType="views:IconGallery"
                             SingleTapCommand="{Binding TapCommand, Source={x:Reference ThisPage}}"
                             DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />

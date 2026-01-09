@@ -1,6 +1,6 @@
 ﻿using SkiaSharp;
 
-namespace SnapDoc;
+namespace SnapDoc.DrawingTool;
 
 public class InteractivePolylineDrawable
 {

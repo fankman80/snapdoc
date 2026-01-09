@@ -1,10 +1,11 @@
 ﻿using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.DrawingTool;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 
-namespace SnapDoc;
+namespace SnapDoc.DrawingTool;
 
 public partial class DrawingController(TransformViewModel transformVm, double density) : IDisposable
 {

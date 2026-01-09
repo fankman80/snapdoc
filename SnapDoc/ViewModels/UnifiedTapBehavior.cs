@@ -2,7 +2,7 @@
 
 using System.Windows.Input;
 
-namespace SnapDoc;
+namespace SnapDoc.ViewModels;
 
 public partial class UnifiedTapBehavior : Behavior<View>
 {
