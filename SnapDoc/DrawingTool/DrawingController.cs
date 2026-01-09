@@ -61,7 +61,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         float lineThickness, SKColor fillColor, 
         float handleRadius, float pointRadius,
         SKColor pointColor, SKColor startPointColor,
-        bool scaleHandlesWithTransform = true)
+        bool scaleHandlesWithTransform = true,
+        float rotationAngle = 0f)
     {
         CombinedDrawable = new CombinedDrawable
         {
@@ -91,9 +92,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                     : handleRadius * (float)density,
                             PointRadius = scaleHandlesWithTransform
                     ? pointRadius / (float)transformVm.Scale * (float)density
-                    : pointRadius * (float)density
+                    : pointRadius * (float)density,
+                AllowedAngleDeg = rotationAngle
             }
-
         };
 
         canvasView?.InvalidateSurface();

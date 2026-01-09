@@ -1,12 +1,10 @@
-using SkiaSharp;
+﻿using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
 public class InteractiveRectangleDrawable
 {
-    public SKPoint Start { get; private set; }
-    public SKPoint End { get; private set; }
-    public bool HasContent => Start != End;
+    public bool HasContent => Width > 1f && Height > 1f;
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
     public float LineThickness { get; set; } = 3f;
@@ -14,25 +12,63 @@ public class InteractiveRectangleDrawable
     public SKColor FillColor { get; set; } = SKColors.Blue.WithAlpha(100);
     public SKColor LineColor { get; set; } = SKColors.Blue;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
+    public SKPoint Center { get; private set; }
+    public float Width { get; private set; }
+    public float Height { get; private set; }
+    public float AllowedAngleDeg { get; set; } = 0f;
+    public float AllowedAngleRad => AllowedAngleDeg * MathF.PI / 180f;
 
     public SKPoint[] Points
     {
         get
         {
-            return
-            [
-                new SKPoint(Start.X, Start.Y), // TL
-                new SKPoint(End.X, Start.Y),   // TR
-                new SKPoint(End.X, End.Y),     // BR
-                new SKPoint(Start.X, End.Y)    // BL
-            ];
+            float hw = Width / 2f;
+            float hh = Height / 2f;
+
+            var local = new[]
+            {
+                new SKPoint(-hw, -hh),
+                new SKPoint( hw, -hh),
+                new SKPoint( hw,  hh),
+                new SKPoint(-hw,  hh),
+            };
+
+            float cos = MathF.Cos(AllowedAngleRad);
+            float sin = MathF.Sin(AllowedAngleRad);
+
+            var pts = new SKPoint[4];
+
+            for (int i = 0; i < 4; i++)
+            {
+                pts[i] = new SKPoint(
+                    Center.X + local[i].X * cos - local[i].Y * sin,
+                    Center.Y + local[i].X * sin + local[i].Y * cos
+                );
+            }
+
+            return pts;
         }
     }
 
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
-        Start = start;
-        End = end;
+        var dx = end.X - start.X;
+        var dy = end.Y - start.Y;
+        float cos = MathF.Cos(-AllowedAngleRad);
+        float sin = MathF.Sin(-AllowedAngleRad);
+        float localX = dx * cos - dy * sin;
+        float localY = dx * sin + dy * cos;
+        float hx = localX / 2f;
+        float hy = localY / 2f;
+
+        const float minSize = 2f;
+        Width = MathF.Max(minSize, MathF.Abs(localX));
+        Height = MathF.Max(minSize, MathF.Abs(localY));
+
+        Center = new SKPoint(
+            start.X + hx * MathF.Cos(AllowedAngleRad) - hy * MathF.Sin(AllowedAngleRad),
+            start.Y + hx * MathF.Sin(AllowedAngleRad) + hy * MathF.Cos(AllowedAngleRad)
+        );
     }
 
     public void Draw(SKCanvas canvas)
@@ -97,37 +133,47 @@ public class InteractiveRectangleDrawable
 
     public void MovePoint(int index, SKPoint newPos)
     {
-        float left = Start.X;
-        float right = End.X;
-        float top = Start.Y;
-        float bottom = End.Y;
+        float cos = MathF.Cos(-AllowedAngleRad);
+        float sin = MathF.Sin(-AllowedAngleRad);
+        float lx = (newPos.X - Center.X) * cos - (newPos.Y - Center.Y) * sin;
+        float ly = (newPos.X - Center.X) * sin + (newPos.Y - Center.Y) * cos;
+        float hw = Width / 2f;
+        float hh = Height / 2f;
 
-        switch (index)
+        float fx = index switch
         {
-            case 0: // TL
-                left = newPos.X;
-                top = newPos.Y;
-                break;
-            case 1: // TR
-                right = newPos.X;
-                top = newPos.Y;
-                break;
-            case 2: // BR
-                right = newPos.X;
-                bottom = newPos.Y;
-                break;
-            case 3: // BL
-                left = newPos.X;
-                bottom = newPos.Y;
-                break;
-        }
+            0 or 3 => hw,   // TL / BL → rechter Punkt fix
+            1 or 2 => -hw,   // TR / BR → linker Punkt fix
+            _ => 0
+        };
 
-        Start = new SKPoint(left, top);
-        End = new SKPoint(right, bottom);
+        float fy = index switch
+        {
+            0 or 1 => hh,   // TL / TR → unterer Punkt fix
+            2 or 3 => -hh,   // BR / BL → oberer Punkt fix
+            _ => 0
+        };
+
+        float minX = MathF.Min(lx, fx);
+        float maxX = MathF.Max(lx, fx);
+        float minY = MathF.Min(ly, fy);
+        float maxY = MathF.Max(ly, fy);
+
+        Width = MathF.Max(1, maxX - minX);
+        Height = MathF.Max(1, maxY - minY);
+
+        float cxLocal = (minX + maxX) / 2f;
+        float cyLocal = (minY + maxY) / 2f;
+
+        Center = new SKPoint(
+            Center.X + cxLocal * MathF.Cos(AllowedAngleRad) - cyLocal * MathF.Sin(AllowedAngleRad),
+            Center.Y + cxLocal * MathF.Sin(AllowedAngleRad) + cyLocal * MathF.Cos(AllowedAngleRad)
+        );
     }
 
     public void Reset()
     {
-        Start = End = default;
+        Width = Height = 0;
+        AllowedAngleDeg = 0;
     }
 }

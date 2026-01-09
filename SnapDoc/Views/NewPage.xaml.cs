@@ -708,7 +708,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
             SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            false
+            false,
+            (float)planContainer.Rotation
         );
 
         // 3) initialer Modus
