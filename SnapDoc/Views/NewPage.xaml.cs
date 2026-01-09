@@ -43,7 +43,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
     private float selectedOpacity = 0.5f;
-    private int lineWidth = 4;
+    private int lineWidth = 3;
 
     private Color selectedColor = new(255, 0, 0);
     public Color SelectedColor

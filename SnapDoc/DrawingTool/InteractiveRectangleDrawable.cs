@@ -16,6 +16,8 @@ public class InteractiveRectangleDrawable
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
     public float Height { get; private set; }
+    private static SKBitmap? _rotationHandleBitmap;
+    private static bool _isLoading;
     private float _allowedAngleRad;
     public float AllowedAngleRad
     {
@@ -26,6 +28,11 @@ public class InteractiveRectangleDrawable
     {
         get => AllowedAngleRad * 180f / MathF.PI;
         set => AllowedAngleRad = value * MathF.PI / 180f;
+    }
+
+    public InteractiveRectangleDrawable()
+    {
+        InteractiveRectangleDrawable.EnsureRotationHandleLoaded();
     }
 
     // === Eckpunkte ===
@@ -57,6 +64,24 @@ public class InteractiveRectangleDrawable
             }
 
             return pts;
+        }
+    }
+
+    private static async void EnsureRotationHandleLoaded()
+    {
+        if (_rotationHandleBitmap != null || _isLoading)
+            return;
+
+        _isLoading = true;
+
+        try
+        {
+            using var stream = await FileSystem.OpenAppPackageFileAsync("rotate_option.png");
+            _rotationHandleBitmap = SKBitmap.Decode(stream);
+        }
+        finally
+        {
+            _isLoading = false;
         }
     }
 
@@ -100,7 +125,7 @@ public class InteractiveRectangleDrawable
         );
     }
 
-    public async void Draw(SKCanvas canvas)
+    public void Draw(SKCanvas canvas)
     {
         if (!HasContent) return;
 
@@ -142,10 +167,18 @@ public class InteractiveRectangleDrawable
         foreach (var p in pts)
             canvas.DrawCircle(p, PointRadius, handlePaint);
 
-        // Rotationshandle (Bitmap oder Icon)
-        using var stream = await FileSystem.OpenAppPackageFileAsync("rotate_option.png");
-        using var bitmap = SKBitmap.Decode(stream);
-        canvas.DrawBitmap(bitmap, new SKPoint(RotationHandle.X - bitmap.Width / 2, RotationHandle.Y - bitmap.Height / 2));
+        // Rotationshandle
+        if (_rotationHandleBitmap != null)
+        {
+            var bmp = _rotationHandleBitmap;
+            canvas.DrawBitmap(
+                bmp,
+                new SKPoint(
+                    RotationHandle.X - bmp.Width / 2f,
+                    RotationHandle.Y - bmp.Height / 2f
+                )
+            );
+        }
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius;
