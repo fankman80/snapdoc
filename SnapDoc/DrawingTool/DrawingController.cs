@@ -82,7 +82,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale * (float)density : handleRadius * (float)density,
                 PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density
             },
-            RectangleDrawable = new InteractiveRectangleDrawable
+            RectDrawable = new InteractiveRectangleDrawable
             {
                 FillColor = fillColor,
                 LineColor = lineColor,
@@ -121,7 +121,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // Event nur als handled markieren, wenn Free-Modus oder Poly-Modus und Punkt aktiv
-        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null) || (DrawMode == DrawMode.Rectangle))
+        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null) || (DrawMode == DrawMode.Rect))
             e.Handled = true;
         else
             e.Handled = false;
@@ -177,7 +177,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             free.AddPoint(p);
             canvasView?.InvalidateSurface();
         }
-        else if (DrawMode == DrawMode.Rectangle)
+        else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable.RectangleDrawable;
             if (rect == null) return;
@@ -223,9 +223,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable.FreeDrawable.AddPoint(p);
-        else if (DrawMode == DrawMode.Rectangle)
+        else if (DrawMode == DrawMode.Rect)
         {
-            var rect = CombinedDrawable.RectangleDrawable;
+            var rect = CombinedDrawable.RectDrawable;
             if (rect == null) return;
 
             if (isRotatingRectangle)
@@ -249,7 +249,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable?.FreeDrawable.EndStroke();
-        else if (DrawMode == DrawMode.Rectangle)
+        else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable.RectangleDrawable;
             if (isDraggingRectangle && !rect.IsDrawn)
@@ -289,8 +289,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // Rectangle
-        var rect = CombinedDrawable.RectangleDrawable;
-        if (rect != null && DrawMode == DrawMode.Rectangle)
+        var rect = CombinedDrawable.RectDrawable;
+        if (rect != null && DrawMode == DrawMode.Rect)
         {
             if (scaleHandlesWithTransform)
             {
@@ -347,7 +347,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // Rectangle aktualisieren
-        var rect = CombinedDrawable.RectangleDrawable;
+        var rect = CombinedDrawable.RectDrawable;
         if (rect != null)
         {
             rect.LineColor = lineColor;
@@ -367,7 +367,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             return;
 
         var poly = CombinedDrawable.PolyDrawable;
-        var rect = CombinedDrawable.RectangleDrawable;
+        var rect = CombinedDrawable.RectDrawable;
         bool polyOld = false;
         bool rectOld = false;
 
@@ -403,8 +403,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable.FreeDrawable.Strokes.Count == 0;
 
         bool rectEmpty =
-            CombinedDrawable.RectangleDrawable == null ||
-            CombinedDrawable.RectangleDrawable.Points.Length == 0;
+            CombinedDrawable.RectDrawable == null ||
+            CombinedDrawable.RectDrawable.Points.Length == 0;
 
         return polyEmpty && freeEmpty && rectEmpty;
     }
@@ -459,7 +459,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // === Rectangle Punkte ===
-        var rect = CombinedDrawable.RectangleDrawable;
+        var rect = CombinedDrawable.RectDrawable;
         if (rect != null && rect.Points.Length == 4)
         {
             foreach (var pt in rect.Points)
