@@ -9,6 +9,7 @@ public class InteractiveRectangleDrawable
     public float PointRadius { get; set; } = 8f;
     public float LineThickness { get; set; } = 3f;
     public bool DisplayHandles { get; set; } = true;
+    public bool IsDrawn { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.Blue.WithAlpha(100);
     public SKColor LineColor { get; set; } = SKColors.Blue;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
