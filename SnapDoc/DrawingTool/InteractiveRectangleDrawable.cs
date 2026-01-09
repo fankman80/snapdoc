@@ -16,7 +16,16 @@ public class InteractiveRectangleDrawable
     public float Width { get; private set; }
     public float Height { get; private set; }
     public float AllowedAngleDeg { get; set; } = 0f;
-    public float AllowedAngleRad => AllowedAngleDeg * MathF.PI / 180f;
+    private float _allowedAngleRad;
+    public float AllowedAngleRad
+    {
+        get => _allowedAngleRad;
+        set
+        {
+            _allowedAngleRad = value;
+            AllowedAngleDeg = value * 180f / MathF.PI;
+        }
+    }
 
     public SKPoint[] Points
     {
@@ -50,6 +59,27 @@ public class InteractiveRectangleDrawable
         }
     }
 
+    public SKPoint RotationHandle
+    {
+        get
+        {
+            float handleDistance = 30f; // Abstand vom Rechteck
+            float hh = Height / 2f;
+
+            // Handle oben Mitte
+            float xLocal = 0;
+            float yLocal = -hh - handleDistance;
+
+            float cos = MathF.Cos(AllowedAngleRad);
+            float sin = MathF.Sin(AllowedAngleRad);
+
+            return new SKPoint(
+                Center.X + xLocal * cos - yLocal * sin,
+                Center.Y + xLocal * sin + yLocal * cos
+            );
+        }
+    }
+
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
         var dx = end.X - start.X;
@@ -71,7 +101,7 @@ public class InteractiveRectangleDrawable
         );
     }
 
-    public void Draw(SKCanvas canvas)
+    public async void Draw(SKCanvas canvas)
     {
         if (!HasContent)
             return;
@@ -107,14 +137,30 @@ public class InteractiveRectangleDrawable
             using var handlePaint = new SKPaint
             {
                 Color = PointColor,
-                Style = SKPaintStyle.StrokeAndFill,
-                StrokeWidth = 2,
+                Style = SKPaintStyle.Fill,
                 IsAntialias = true
             };
 
             foreach (var p in pts)
                 canvas.DrawCircle(p, PointRadius, handlePaint);
+
+            // Rotation-Handle
+            var bitmap = SKBitmap.Decode("rotate_option.png");
+            canvas.DrawBitmap(bitmap, new SKPoint(RotationHandle.X - bitmap.Width / 2, RotationHandle.Y - bitmap.Height / 2));
         }
+    }
+
+    public bool IsOverRotationHandle(SKPoint p)
+    {
+        return SKPoint.Distance(p, RotationHandle) <= HandleRadius;
+    }
+
+    public void SetRotationFromPoint(SKPoint p)
+    {
+        var dx = p.X - Center.X;
+        var dy = p.Y - Center.Y;
+        AllowedAngleRad = MathF.Atan2(dy, dx) + MathF.PI / 2;
+        AllowedAngleDeg = AllowedAngleRad * 180f / MathF.PI;
     }
 
     public int? FindPointIndex(float x, float y)

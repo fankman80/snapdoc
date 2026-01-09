@@ -18,6 +18,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     private readonly bool scaleHandlesWithTransform = true;
     private SKPoint? rectDragStart;
     private bool isDraggingRectangle;
+    private bool isRotatingRectangle = false;
 
     // BoundingBox
     public float MinX { get; private set; }
@@ -181,18 +182,27 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             var rect = CombinedDrawable.RectangleDrawable;
             if (rect == null) return;
 
-            activeIndex = rect.FindPointIndex(p.X, p.Y);
-
-            if (activeIndex != null)
+            if (rect.IsOverRotationHandle(p))
             {
                 transformVm.IsPanningEnabled = false;
                 transformVm.IsPinchingEnabled = false;
+                isRotatingRectangle = true;
             }
             else
             {
-                rectDragStart = p;
-                isDraggingRectangle = true;
-                rect.SetFromDrag(p, p);
+                activeIndex = rect.FindPointIndex(p.X, p.Y);
+
+                if (activeIndex != null)
+                {
+                    transformVm.IsPanningEnabled = false;
+                    transformVm.IsPinchingEnabled = false;
+                }
+                else
+                {
+                    rectDragStart = p;
+                    isDraggingRectangle = true;
+                    rect.SetFromDrag(p, p);
+                }
             }
 
             canvasView?.InvalidateSurface();
@@ -212,10 +222,18 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             var rect = CombinedDrawable.RectangleDrawable;
             if (rect == null) return;
 
-            if (activeIndex != null)
+            if (isRotatingRectangle)
+            {
+                rect.SetRotationFromPoint(p);
+            }
+            else if (activeIndex != null)
+            {
                 rect.MovePoint(activeIndex.Value, p);
+            }
             else if (isDraggingRectangle && rectDragStart.HasValue)
+            {
                 rect.SetFromDrag(rectDragStart.Value, p);
+            }
         }
 
         canvasView?.InvalidateSurface();
@@ -236,6 +254,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             activeIndex = null;
             rectDragStart = null;
             isDraggingRectangle = false;
+            isRotatingRectangle = false;
 
             transformVm.IsPanningEnabled = true;
             transformVm.IsPinchingEnabled = true;
