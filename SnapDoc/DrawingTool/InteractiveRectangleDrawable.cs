@@ -100,7 +100,7 @@ public class InteractiveRectangleDrawable
         );
     }
 
-    public void Draw(SKCanvas canvas)
+    public async void Draw(SKCanvas canvas)
     {
         if (!HasContent) return;
 
@@ -143,7 +143,8 @@ public class InteractiveRectangleDrawable
             canvas.DrawCircle(p, PointRadius, handlePaint);
 
         // Rotationshandle (Bitmap oder Icon)
-        var bitmap = SKBitmap.Decode("rotate_option.png");
+        using var stream = await FileSystem.OpenAppPackageFileAsync("rotate_option.png");
+        using var bitmap = SKBitmap.Decode(stream);
         canvas.DrawBitmap(bitmap, new SKPoint(RotationHandle.X - bitmap.Width / 2, RotationHandle.Y - bitmap.Height / 2));
     }
 
