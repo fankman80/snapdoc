@@ -4,7 +4,6 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractiveRectangleDrawable
 {
-    // === Eigenschaften ===
     public bool HasContent => Width > 1f && Height > 1f;
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
@@ -35,7 +34,6 @@ public class InteractiveRectangleDrawable
         InteractiveRectangleDrawable.EnsureRotationHandleLoaded();
     }
 
-    // === Eckpunkte ===
     public SKPoint[] Points
     {
         get
@@ -85,7 +83,6 @@ public class InteractiveRectangleDrawable
         }
     }
 
-    // === Rotationshandle ===
     public SKPoint RotationHandle
     {
         get
@@ -103,7 +100,6 @@ public class InteractiveRectangleDrawable
         }
     }
 
-    // === Methoden ===
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
         var dx = end.X - start.X;
@@ -167,17 +163,20 @@ public class InteractiveRectangleDrawable
         foreach (var p in pts)
             canvas.DrawCircle(p, PointRadius, handlePaint);
 
-        // Rotationshandle
         if (_rotationHandleBitmap != null)
         {
-            var bmp = _rotationHandleBitmap;
-            canvas.DrawBitmap(
-                bmp,
-                new SKPoint(
-                    RotationHandle.X - bmp.Width / 2f,
-                    RotationHandle.Y - bmp.Height / 2f
-                )
+#pragma warning disable CS0618 // FilterQuality ist veraltet, aber nötig
+            var paint = new SKPaint { IsAntialias = true, FilterQuality = SKFilterQuality.High };
+#pragma warning restore CS0618
+            float density = (float)DeviceDisplay.MainDisplayInfo.Density;
+            float size = 35f * density;
+            var destRect = new SKRect(
+                RotationHandle.X - size / 2f,
+                RotationHandle.Y - size / 2f,
+                RotationHandle.X + size / 2f,
+                RotationHandle.Y + size / 2f
             );
+            canvas.DrawBitmap(_rotationHandleBitmap, destRect, paint);
         }
     }
 
