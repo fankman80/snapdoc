@@ -723,8 +723,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawPolyClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Poly);
 
-    private void DrawRectangleClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Rectangle);
+    private void DrawRectClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Rect);
 
     private void SetDrawMode(DrawMode mode)
     {
@@ -740,7 +740,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // Buttons reset
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
 
         // Aktiver Button
         if (activate)
@@ -756,7 +756,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     break;
 
                 case DrawMode.Rectangle:
-                    DrawRectangleBtn.CornerRadius = 10;
+                    DrawRectBtn.CornerRadius = 10;
                     break;
             }
         }
@@ -766,7 +766,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (combined != null)
         {
             combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
-            combined.RectangleDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
+            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rect;
         }
 
         drawingView?.InvalidateSurface();
@@ -777,7 +777,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
         drawingController.Reset();
         drawingView?.InvalidateSurface();
     }
@@ -843,7 +843,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = DrawMode.None;
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
-        DrawRectangleBtn.CornerRadius = 30;
+        DrawRectBtn.CornerRadius = 30;
         planContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
