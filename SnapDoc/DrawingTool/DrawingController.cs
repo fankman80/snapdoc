@@ -182,7 +182,13 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             var rect = CombinedDrawable.RectangleDrawable;
             if (rect == null) return;
 
-            if (rect.IsOverRotationHandle(p))
+            if (!rect.IsDrawn)
+            {
+                rectDragStart = p;
+                isDraggingRectangle = true;
+                rect.SetFromDrag(p, p);
+            }
+            else if (rect.IsOverRotationHandle(p))
             {
                 transformVm.IsPanningEnabled = false;
                 transformVm.IsPinchingEnabled = false;
@@ -201,7 +207,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 {
                     rectDragStart = p;
                     isDraggingRectangle = true;
-                    rect.SetFromDrag(p, p);
+                    //rect.SetFromDrag(p, p);
                 }
             }
 
@@ -223,17 +229,11 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (rect == null) return;
 
             if (isRotatingRectangle)
-            {
                 rect.SetRotationFromPoint(p);
-            }
             else if (activeIndex != null)
-            {
                 rect.MovePoint(activeIndex.Value, p);
-            }
             else if (isDraggingRectangle && rectDragStart.HasValue)
-            {
                 rect.SetFromDrag(rectDragStart.Value, p);
-            }
         }
 
         canvasView?.InvalidateSurface();
@@ -251,6 +251,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable?.FreeDrawable.EndStroke();
         else if (DrawMode == DrawMode.Rectangle)
         {
+            if (isDraggingRectangle && !rect.IsDrawn)
+                rect.IsDrawn = true; // markiere Rechteck als gezeichnet
+                
             activeIndex = null;
             rectDragStart = null;
             isDraggingRectangle = false;
