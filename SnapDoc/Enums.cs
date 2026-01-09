@@ -5,6 +5,6 @@ namespace SnapDoc
         None,
         Free,
         Poly,
-        Rectangle
+        Rect
     }
 }
