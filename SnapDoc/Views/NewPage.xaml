@@ -310,7 +310,7 @@
                             HeightRequest="60"
                             CornerRadius="30"
                             ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
-                            Clicked="DrawRectangleClicked"/>                    
+                            Clicked="DrawRectClicked"/>                    
                     <Button x:Name="DrawPolyBtn"
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                             BackgroundColor="{DynamicResource Primary}"
