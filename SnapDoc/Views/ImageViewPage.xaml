@@ -150,7 +150,7 @@
                                    Margin="96,0,0,20"
                                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                    AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button x:Name="DrawRectangleBtn"
+                <Button x:Name="DrawRectBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
@@ -158,7 +158,7 @@
                         HeightRequest="60"
                         CornerRadius="30"
                         ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
-                        Clicked="DrawRectangleClicked"/>
+                        Clicked="DrawRectClicked"/>
                 <Button x:Name="DrawPolyBtn"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                         BackgroundColor="{DynamicResource Primary}"
