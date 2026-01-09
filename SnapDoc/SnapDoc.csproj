@@ -113,6 +113,10 @@
         <EmbeddedResource Include="Resources\Raw\editor.html" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiImage Include="Resources\Raw\rotate_option.png" />
+    </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.456" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
