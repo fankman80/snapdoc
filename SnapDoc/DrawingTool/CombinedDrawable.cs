@@ -16,7 +16,7 @@ public class CombinedDrawable
         if (PolyDrawable?.HasContent == true)
             PolyDrawable.Draw(canvas);
 
-        if (RectangleDrawable?.HasContent == true)
+        if (RectDrawable?.HasContent == true)
             RectDrawable.Draw(canvas);
     }
 
