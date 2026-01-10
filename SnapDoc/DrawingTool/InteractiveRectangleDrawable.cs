@@ -101,27 +101,6 @@ public class InteractiveRectangleDrawable
         }
     }
 
-    public void SetFromDrag(SKPoint start, SKPoint end)
-    {
-        var dx = end.X - start.X;
-        var dy = end.Y - start.Y;
-
-        float cos = MathF.Cos(-AllowedAngleRad);
-        float sin = MathF.Sin(-AllowedAngleRad);
-
-        float localX = dx * cos - dy * sin;
-        float localY = dx * sin + dy * cos;
-
-        const float minSize = 2f;
-        Width = MathF.Max(minSize, MathF.Abs(localX));
-        Height = MathF.Max(minSize, MathF.Abs(localY));
-
-        Center = new SKPoint(
-            start.X + localX / 2f * MathF.Cos(AllowedAngleRad) - localY / 2f * MathF.Sin(AllowedAngleRad),
-            start.Y + localX / 2f * MathF.Sin(AllowedAngleRad) + localY / 2f * MathF.Cos(AllowedAngleRad)
-        );
-    }
-
     public void Draw(SKCanvas canvas)
     {
         if (!HasContent) return;
@@ -204,6 +183,27 @@ public class InteractiveRectangleDrawable
         return null;
     }
 
+    public void SetFromDrag(SKPoint start, SKPoint end)
+    {
+        var dx = end.X - start.X;
+        var dy = end.Y - start.Y;
+
+        float cos = MathF.Cos(-AllowedAngleRad);
+        float sin = MathF.Sin(-AllowedAngleRad);
+
+        float localX = dx * cos - dy * sin;
+        float localY = dx * sin + dy * cos;
+
+        const float minSize = 2f;
+        Width = MathF.Max(minSize, MathF.Abs(localX));
+        Height = MathF.Max(minSize, MathF.Abs(localY));
+
+        Center = new SKPoint(
+            start.X + localX / 2f * MathF.Cos(AllowedAngleRad) - localY / 2f * MathF.Sin(AllowedAngleRad),
+            start.Y + localX / 2f * MathF.Sin(AllowedAngleRad) + localY / 2f * MathF.Cos(AllowedAngleRad)
+        );
+    }
+
     public void MovePoint(int index, SKPoint newPos)
     {
         float cos = MathF.Cos(-AllowedAngleRad);
@@ -246,7 +246,10 @@ public class InteractiveRectangleDrawable
 
     public void Reset()
     {
-        Width = Height = 0;
+        Width = 0;
+        Height = 0;
+        Center = default;
         AllowedAngleRad = 0f;
+        IsDrawn = false;
     }
 }

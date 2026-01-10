@@ -260,7 +260,7 @@ public partial class ImageViewPage : IQueryAttributable
                     break;
 
                 case DrawMode.Rect:
-                    DrawRectangleBtn.CornerRadius = 10;
+                    DrawRectBtn.CornerRadius = 10;
                     break;
             }
         }
@@ -270,7 +270,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (combined != null)
         {
             combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
-            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rectangle;
+            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rect;
         }
 
         drawingView?.InvalidateSurface();

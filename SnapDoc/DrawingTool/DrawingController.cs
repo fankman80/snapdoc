@@ -1,7 +1,6 @@
 ﻿using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
-using SnapDoc.DrawingTool;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 
@@ -17,7 +16,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     private SKPoint? lastClickPosition;
     private readonly bool scaleHandlesWithTransform = true;
     private SKPoint? rectDragStart;
-    private bool isDraggingRectangle;
     private bool isRotatingRectangle = false;
 
     // BoundingBox
@@ -53,6 +51,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     public void Detach()
     {
         if (canvasView == null) return;
+
         canvasView.PaintSurface -= OnPaintSurface;
         canvasView.Touch -= OnTouch;
         canvasView = null;
@@ -136,7 +135,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (DrawMode == DrawMode.Poly)
         {
             var poly = CombinedDrawable.PolyDrawable;
-
             var now = DateTime.Now;
             if (lastClickTime.HasValue &&
                 (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
@@ -167,7 +165,6 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 else if (activeIndex == null)
                     poly.Points.Add(p);
             }
-
             canvasView?.InvalidateSurface();
         }
         else if (DrawMode == DrawMode.Free)
@@ -179,14 +176,15 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
         else if (DrawMode == DrawMode.Rect)
         {
-            var rect = CombinedDrawable.RectangleDrawable;
-            if (rect == null) return;
+            var rect = CombinedDrawable.RectDrawable;
+            if (rect == null)
+                return;
 
             if (!rect.IsDrawn)
             {
                 rectDragStart = p;
-                isDraggingRectangle = true;
-                rect.SetFromDrag(p, p);
+                transformVm.IsPanningEnabled = false;
+                transformVm.IsPinchingEnabled = false;
             }
             else if (rect.IsOverRotationHandle(p))
             {
@@ -197,20 +195,12 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             else
             {
                 activeIndex = rect.FindPointIndex(p.X, p.Y);
-
                 if (activeIndex != null)
                 {
                     transformVm.IsPanningEnabled = false;
                     transformVm.IsPinchingEnabled = false;
                 }
-                else
-                {
-                    rectDragStart = p;
-                    isDraggingRectangle = true;
-                    //rect.SetFromDrag(p, p);
-                }
             }
-
             canvasView?.InvalidateSurface();
         }
     }
@@ -229,11 +219,17 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (rect == null) return;
 
             if (isRotatingRectangle)
+            {
                 rect.SetRotationFromPoint(p);
+            }
             else if (activeIndex != null)
+            {
                 rect.MovePoint(activeIndex.Value, p);
-            else if (isDraggingRectangle && rectDragStart.HasValue)
+            }
+            else if (rectDragStart.HasValue)
+            {
                 rect.SetFromDrag(rectDragStart.Value, p);
+            }
         }
 
         canvasView?.InvalidateSurface();
@@ -251,14 +247,14 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             CombinedDrawable?.FreeDrawable.EndStroke();
         else if (DrawMode == DrawMode.Rect)
         {
-            var rect = CombinedDrawable.RectangleDrawable;
-            if (isDraggingRectangle && !rect.IsDrawn)
-                rect.IsDrawn = true; // markiere Rechteck als gezeichnet
-                
-            activeIndex = null;
-            rectDragStart = null;
-            isDraggingRectangle = false;
+            var rect = CombinedDrawable?.RectDrawable;
+
+            if (rect is { IsDrawn: false })
+                rect.IsDrawn = true;
+
             isRotatingRectangle = false;
+            rectDragStart = null;
+            activeIndex = null;
 
             transformVm.IsPanningEnabled = true;
             transformVm.IsPinchingEnabled = true;
@@ -404,7 +400,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
 
         bool rectEmpty =
             CombinedDrawable.RectDrawable == null ||
-            CombinedDrawable.RectDrawable.Points.Length == 0;
+            !CombinedDrawable.RectDrawable.HasContent;
 
         return polyEmpty && freeEmpty && rectEmpty;
     }

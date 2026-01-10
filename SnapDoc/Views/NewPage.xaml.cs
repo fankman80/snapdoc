@@ -755,7 +755,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     DrawPolyBtn.CornerRadius = 10;
                     break;
 
-                case DrawMode.Rectangle:
+                case DrawMode.Rect:
                     DrawRectBtn.CornerRadius = 10;
                     break;
             }
