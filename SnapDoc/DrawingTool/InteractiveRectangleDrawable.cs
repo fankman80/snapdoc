@@ -88,7 +88,7 @@ public class InteractiveRectangleDrawable
     {
         get
         {
-            float handleDistance = 30f;
+            float handleDistance = PointRadius * 3;
             float yLocal = -Height / 2f - handleDistance;
 
             float cos = MathF.Cos(AllowedAngleRad);
@@ -148,8 +148,7 @@ public class InteractiveRectangleDrawable
 #pragma warning disable CS0618 // FilterQuality ist veraltet, aber nötig
             var paint = new SKPaint { IsAntialias = true, FilterQuality = SKFilterQuality.High };
 #pragma warning restore CS0618
-            float density = (float)DeviceDisplay.MainDisplayInfo.Density;
-            float size = 35f * density;
+            float size = PointRadius * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
@@ -183,6 +182,13 @@ public class InteractiveRectangleDrawable
         return null;
     }
 
+    public SKPoint GetOppositePoint(int index)
+    {
+        int opposite = (index + 2) % 4;
+        return Points[opposite];
+    }
+
+
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
         var dx = end.X - start.X;
@@ -201,46 +207,6 @@ public class InteractiveRectangleDrawable
         Center = new SKPoint(
             start.X + localX / 2f * MathF.Cos(AllowedAngleRad) - localY / 2f * MathF.Sin(AllowedAngleRad),
             start.Y + localX / 2f * MathF.Sin(AllowedAngleRad) + localY / 2f * MathF.Cos(AllowedAngleRad)
-        );
-    }
-
-    public void MovePoint(int index, SKPoint newPos)
-    {
-        float cos = MathF.Cos(-AllowedAngleRad);
-        float sin = MathF.Sin(-AllowedAngleRad);
-        float lx = (newPos.X - Center.X) * cos - (newPos.Y - Center.Y) * sin;
-        float ly = (newPos.X - Center.X) * sin + (newPos.Y - Center.Y) * cos;
-
-        float hw = Width / 2f;
-        float hh = Height / 2f;
-
-        float fx = index switch
-        {
-            0 or 3 => hw,
-            1 or 2 => -hw,
-            _ => 0
-        };
-        float fy = index switch
-        {
-            0 or 1 => hh,
-            2 or 3 => -hh,
-            _ => 0
-        };
-
-        float minX = MathF.Min(lx, fx);
-        float maxX = MathF.Max(lx, fx);
-        float minY = MathF.Min(ly, fy);
-        float maxY = MathF.Max(ly, fy);
-
-        Width = MathF.Max(1, maxX - minX);
-        Height = MathF.Max(1, maxY - minY);
-
-        float cxLocal = (minX + maxX) / 2f;
-        float cyLocal = (minY + maxY) / 2f;
-
-        Center = new SKPoint(
-            Center.X + cxLocal * MathF.Cos(AllowedAngleRad) - cyLocal * MathF.Sin(AllowedAngleRad),
-            Center.Y + cxLocal * MathF.Sin(AllowedAngleRad) + cyLocal * MathF.Cos(AllowedAngleRad)
         );
     }
 

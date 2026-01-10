@@ -17,6 +17,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     private readonly bool scaleHandlesWithTransform = true;
     private SKPoint? rectDragStart;
     private bool isRotatingRectangle = false;
+    private SKPoint? rectResizeAnchor;
 
     // BoundingBox
     public float MinX { get; private set; }
@@ -197,6 +198,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 activeIndex = rect.FindPointIndex(p.X, p.Y);
                 if (activeIndex != null)
                 {
+                    rectResizeAnchor = rect.GetOppositePoint(activeIndex.Value);
+
                     transformVm.IsPanningEnabled = false;
                     transformVm.IsPinchingEnabled = false;
                 }
@@ -222,9 +225,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             {
                 rect.SetRotationFromPoint(p);
             }
-            else if (activeIndex != null)
+            else if (activeIndex != null && rectResizeAnchor.HasValue)
             {
-                rect.MovePoint(activeIndex.Value, p);
+                rect.SetFromDrag(rectResizeAnchor.Value, p);
             }
             else if (rectDragStart.HasValue)
             {
@@ -252,9 +255,10 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (rect is { IsDrawn: false })
                 rect.IsDrawn = true;
 
+            rectResizeAnchor = null;
+            activeIndex = null;
             isRotatingRectangle = false;
             rectDragStart = null;
-            activeIndex = null;
 
             transformVm.IsPanningEnabled = true;
             transformVm.IsPinchingEnabled = true;
