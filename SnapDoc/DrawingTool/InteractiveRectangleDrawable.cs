@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using DocumentFormat.OpenXml.Packaging;
+using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
@@ -15,7 +16,11 @@ public class InteractiveRectangleDrawable
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
-    public float Height { get; private set; }
+    public float Height { get; set; }
+    public string Text { get; set; } = "";
+    public float TextSize { get; set; } = 24f;
+    public SKColor TextColor { get; set; } = SKColors.Black;
+    public float TextPadding { get; set; } = 8f;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
     private float _allowedAngleRad;
@@ -131,6 +136,10 @@ public class InteractiveRectangleDrawable
         };
         canvas.DrawPath(path, linePaint);
 
+        // Draw text if available
+        if (Text != null)
+            DrawMultilineText(canvas);
+
         if (!DisplayHandles) return;
 
         using var handlePaint = new SKPaint
@@ -157,6 +166,73 @@ public class InteractiveRectangleDrawable
             );
             canvas.DrawBitmap(_rotationHandleBitmap, destRect, paint);
         }
+    }
+
+    private void DrawMultilineText(SKCanvas canvas)
+    {
+        if (string.IsNullOrWhiteSpace(Text))
+            return;
+
+        canvas.Save();
+        canvas.Translate(Center.X, Center.Y);
+        canvas.RotateDegrees(AllowedAngleDeg);
+
+        var font = new SKFont
+        {
+            Size = TextSize,
+        };
+
+        var paint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = TextColor,
+            IsStroke = false
+        };
+
+        float maxWidth = Width - 2 * TextPadding;
+        var lines = BreakTextIntoLines(Text, font, maxWidth);
+        var metrics = font.Metrics;
+        float lineHeight = metrics.Descent - metrics.Ascent;
+        float totalHeight = lines.Count * lineHeight;
+        float y = -totalHeight / 2f - metrics.Ascent;
+
+        foreach (var line in lines)
+        {
+            float lineWidth = font.MeasureText(line);
+            float x = -lineWidth / 2f;
+
+            canvas.DrawText(line, x, y, font, paint);
+            y += lineHeight;
+        }
+
+        canvas.Restore();
+    }
+
+    private static List<string> BreakTextIntoLines(string text, SKFont font, float maxWidth)
+    {
+        var result = new List<string>();
+        var words = text.Split(' ');
+        string line = "";
+
+        foreach (var word in words)
+        {
+            var test = string.IsNullOrEmpty(line) ? word : $"{line} {word}";
+
+            if (font.MeasureText(test) <= maxWidth)
+                line = test;
+            else
+            {
+                if (!string.IsNullOrEmpty(line))
+                    result.Add(line);
+
+                line = word;
+            }
+        }
+
+        if (!string.IsNullOrEmpty(line))
+            result.Add(line);
+
+        return result;
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius;

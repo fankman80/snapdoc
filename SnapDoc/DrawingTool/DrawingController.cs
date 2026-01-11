@@ -94,7 +94,8 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                             PointRadius = scaleHandlesWithTransform
                     ? pointRadius / (float)transformVm.Scale * (float)density
                     : pointRadius * (float)density,
-                AllowedAngleDeg = rotationAngle
+                AllowedAngleDeg = rotationAngle,
+                Text = "Hallo Velo, blablabla, Brandschutzverordnung"
             }
         };
 
@@ -324,7 +325,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
     }
 
-    public void UpdateDrawingStyles(SKColor lineColor, float lineWidth, float fillOpacity)
+    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, float lineWidth)
     {
         if (CombinedDrawable == null)
             return;
@@ -342,7 +343,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (poly != null)
         {
             poly.LineColor = lineColor;
-            poly.FillColor = lineColor.WithAlpha((byte)(fillOpacity * 255));
+            poly.FillColor = fillColor;
             poly.LineThickness = lineWidth * (float)density;
         }
 
@@ -351,7 +352,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (rect != null)
         {
             rect.LineColor = lineColor;
-            rect.FillColor = lineColor.WithAlpha((byte)(fillOpacity * 255));
+            rect.FillColor = fillColor;
             rect.LineThickness = lineWidth * (float)density;
         }
 

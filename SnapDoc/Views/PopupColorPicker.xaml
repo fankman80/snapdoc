@@ -165,20 +165,6 @@
                         </VerticalStackLayout>
                     </toolkit:Expander>
 
-                    <controls:LocalizedLabel x:Name="lineWidthText"
-                                             ResourceKey="pinselgroesse"
-                                             Value="{Binding LineWidth}"
-                                             ValueFormat="{}: {0}"
-                                             IsVisible="{Binding LineWidthVisibility}"/>
-                    <Slider x:Name="LineWidthSlider"
-                            IsVisible="{Binding LineWidthVisibility}"
-                            Maximum="20"
-                            Minimum="0"
-                            Value="{Binding LineWidth}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
                     <controls:LocalizedLabel ResourceKey="deckkraft"
                                              Value="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255'}"
                                              ValueFormat="{}: {0:F0}%"

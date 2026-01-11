@@ -262,6 +262,16 @@
                             CornerRadius="30"
                             ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                             Clicked="EraseClicked"/>
+                    <Button x:Name="AddTextBtn"
+                            IsVisible="False"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
+                            BackgroundColor="{DynamicResource Primary}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            WidthRequest="60"
+                            HeightRequest="60"
+                            CornerRadius="30"
+                            ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
+                            Clicked="TextClicked"/>                    
                     <AbsoluteLayout>
                         <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                                 BackgroundColor="{DynamicResource Primary}"
@@ -274,7 +284,7 @@
                         <Border x:DataType="views:NewPage"
                                 WidthRequest="22"
                                 HeightRequest="22"
-                                BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedColor}"
+                                BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor}"
                                 StrokeThickness="0"
                                 AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
                                 AbsoluteLayout.LayoutFlags="PositionProportional">

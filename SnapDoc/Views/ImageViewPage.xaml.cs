@@ -30,16 +30,28 @@ public partial class ImageViewPage : IQueryAttributable
     private float selectedOpacity = 0.5f;
     private int lineWidth = 6;
 
-    private Color selectedColor = new(255, 0, 0);
-    public Color SelectedColor
+    private Color selectedBorderColor = new(0, 0, 255);
+    public Color SelectedBorderColor
     {
-        get => selectedColor;
+        get => selectedBorderColor;
         set
         {
-            selectedColor = value;
+            selectedBorderColor = value;
             OnPropertyChanged();
         }
     }
+
+    private Color selectedFillColor = new(255, 0, 0);
+    public Color SelectedFillColor
+    {
+        get => selectedFillColor;
+        set
+        {
+            selectedFillColor = value;
+            OnPropertyChanged();
+        }
+    }
+
 
     private bool isGotoPinBtnVisible = false;
     public bool IsGotoPinBtnVisible
@@ -291,9 +303,9 @@ public partial class ImageViewPage : IQueryAttributable
 
         // DrawingController initialisieren
         drawingController.InitializeDrawing(
-            SelectedColor.ToSKColor(),
+            SelectedBorderColor.ToSKColor(),
             lineWidth,
-            SelectedColor.WithAlpha(selectedOpacity).ToSKColor(),
+            SelectedFillColor.ToSKColor(),
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
@@ -468,19 +480,21 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(lineWidth, SelectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        //var popup = new PopupColorPicker(lineWidth, SelectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
+        //var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), "#000000");
+        var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
 
-        SelectedColor = Color.FromArgb(result.Result.PenColorHex);
-        selectedOpacity = 1f / 255f * result.Result.FillOpacity;
+        SelectedBorderColor = Color.FromArgb(result.Result.BorderColorHex);
         lineWidth = result.Result.PenWidth;
 
         drawingController?.UpdateDrawingStyles(
-            SelectedColor.ToSKColor(),
-            lineWidth,
-            selectedOpacity
+            SelectedBorderColor.ToSKColor(),
+            SelectedFillColor.ToSKColor(),
+            lineWidth
         );
     }
 }

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:views="clr-namespace:SnapDoc.Views"     
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               xmlns:local="clr-namespace:SnapDoc"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               Padding="0"
+               Margin="16"
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="local:PopupStyleReturn"
+               x:Class="SnapDoc.Views.PopupStyleEditor">
+
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+
+    <Grid x:DataType="views:PopupStyleEditor">
+        <VerticalStackLayout>
+            <Label x:Name="titleText"
+                   HorizontalOptions="Start"
+                   Text="Text eingeben:"/>
+
+            <Grid>
+                <Border HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10">
+                    <Image Source="pattern.png" Aspect="Center"/>
+                </Border>
+                <Border BackgroundColor="{Binding SelectedBorderColor}"
+                        HeightRequest="44"                        
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"/>
+                <Button BorderWidth="1"
+                        HeightRequest="44"
+                        BorderColor="Black"
+                        BackgroundColor="Transparent"
+                        Text="Stiftfarbe"
+                        TextColor="{Binding SelectedBorderColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                        Clicked="OnBorderColorPickerClicked"/>
+            </Grid>
+            <Grid>
+                <Border HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10">
+                    <Image Source="pattern.png" Aspect="Center"/>
+                </Border>
+                <Border BackgroundColor="{Binding SelectedFillColor}"
+                        HeightRequest="44"                        
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"/>
+                <Button BorderWidth="1"
+                        HeightRequest="44"
+                        BorderColor="Black"
+                        BackgroundColor="Transparent"
+                        Text="Füllfarbe"
+                        TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                        Clicked="OnFillColorPickerClicked"/>
+            </Grid>
+            <Grid>
+                <Border HeightRequest="44"
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10">
+                    <Image Source="pattern.png" Aspect="Center"/>
+                </Border>
+                <Border BackgroundColor="{Binding SelectedTextColor}"
+                        HeightRequest="44"                        
+                        StrokeThickness="0"
+                        StrokeShape="RoundRectangle 10"/>
+                <Button BorderWidth="1"
+                        HeightRequest="44"
+                        BorderColor="Black"
+                        BackgroundColor="Transparent"
+                        Text="Textfarbe"
+                        TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                        Clicked="OnTextColorPickerClicked"/>
+            </Grid>
+            
+            <controls:LocalizedLabel x:Name="lineWidthText"
+                                     ResourceKey="pinselgroesse"
+                                     Value="{Binding LineWidth}"
+                                     ValueFormat="{}: {0}"/>
+            <Slider x:Name="LineWidthSlider"
+                    Maximum="20"
+                    Minimum="0"
+                    Value="{Binding LineWidth}"
+                    ThumbColor="{DynamicResource Primary}"
+                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        x:Name="cancelButtonText"
+                        Text="{x:Static res:AppResources.abbrechen}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnCancelClicked" />
+                <Button Grid.Column="1"
+                        x:Name="okButtonText"
+                        Text="{x:Static res:AppResources.ok}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnOkClicked" />
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
+</toolkit:Popup>

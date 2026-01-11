@@ -23,13 +23,12 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     public ICommand DoubleTapCommand =>
         new Command<ColorBoxItem>(item => DeleteColor(item));
 
-    public PopupColorPicker(int lineWidth, Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
+    public PopupColorPicker(Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
     {
 	    InitializeComponent();
         okButtonText.Text = okText;
         LineWidthVisibility = lineWidthVisibility;
         FillOpacityVisibility = fillOpacityVisibility;
-        LineWidth = lineWidth;
         FillOpacity = fillOpacity;
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
@@ -89,7 +88,7 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), lineWidth, fillOpacity));
+        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), fillOpacity));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -286,20 +285,6 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
             if (selectedColor != value)
             {
                 selectedColor = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
-    private int lineWidth;
-    public int LineWidth
-    {
-        get => lineWidth;
-        set
-        {
-            if (lineWidth != value)
-            {
-                lineWidth = value;
                 OnPropertyChanged();
             }
         }

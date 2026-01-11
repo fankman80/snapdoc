@@ -263,11 +263,19 @@ namespace SnapDoc
                     : $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
     }
 
-    public class ColorPickerReturn(string colorHex, int width, byte fillOpacity)
+    public class ColorPickerReturn(string colorHex, byte fillOpacity)
     {
-        public string PenColorHex { get; set; } = colorHex;
-        public int PenWidth { get; set; } = width;
+        public string ColorHex { get; set; } = colorHex;
+
         public byte FillOpacity { get; set; } = fillOpacity;
+    }
+
+    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width)
+    {
+        public string BorderColorHex { get; set; } = borderColorHex;
+        public string FillColorHex { get; set; } = fillColorHex;
+        public string TextColorHex { get; set; } = textColorHex;
+        public int PenWidth { get; set; } = width;
     }
 
     public class PlanSelectorReturn(string planTarget, bool isPinCopy)
