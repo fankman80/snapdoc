@@ -363,6 +363,19 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private async void TextClicked(object sender, EventArgs e)
+    {
+        var combined = drawingController.CombinedDrawable;
+
+        var popup = new PopupEntry(title: "Text eingeben:", inputTxt: combined.RectDrawable?.Text, okText: AppResources.ok);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result.Result != null)
+        {
+            combined.RectDrawable?.Text = result.Result;
+            drawingView?.InvalidateSurface();
+        }
+    }
+
     private async void CheckClicked(object sender, EventArgs e)
     {
         if (drawingView != null && !drawingController.IsEmpty() || isCleared == true)
