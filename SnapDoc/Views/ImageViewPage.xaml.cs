@@ -27,6 +27,7 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
+    private int lineWidth = 3;
 
     private Color selectedBorderColor = new(0, 0, 255, 255);
     public Color SelectedBorderColor
@@ -58,20 +59,6 @@ public partial class ImageViewPage : IQueryAttributable
         {
             selectedTextColor = value;
             OnPropertyChanged();
-        }
-    }
-
-    private int lineWidth = 6;
-    public int LineWidth
-    {
-        get => lineWidth;
-        set
-        {
-            if (lineWidth != value)
-            {
-                lineWidth = value;
-                OnPropertyChanged();
-            }
         }
     }
 
@@ -367,11 +354,14 @@ public partial class ImageViewPage : IQueryAttributable
     {
         var combined = drawingController.CombinedDrawable;
 
-        var popup = new PopupEntry(title: "Text eingeben:", inputTxt: combined.RectDrawable?.Text, okText: AppResources.ok);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
+        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
-            combined.RectDrawable?.Text = result.Result;
+            combined.RectDrawable?.Text = result.Result.InputTxt;
+            combined.RectDrawable?.TextSize = result.Result.FontSize;
+            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
+            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             drawingView?.InvalidateSurface();
         }
     }
@@ -522,7 +512,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupStyleEditor(LineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex());
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex());
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
@@ -530,7 +520,7 @@ public partial class ImageViewPage : IQueryAttributable
         SelectedBorderColor = Color.FromArgb(result.Result.BorderColorHex);
         SelectedFillColor = Color.FromArgb(result.Result.FillColorHex);
         SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
-        LineWidth = result.Result.PenWidth;
+        lineWidth = result.Result.PenWidth;
 
         drawingController?.UpdateDrawingStyles(
             SelectedBorderColor.ToSKColor(),

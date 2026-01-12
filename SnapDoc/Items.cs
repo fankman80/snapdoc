@@ -293,6 +293,14 @@ namespace SnapDoc
         public string PlanColor { get; set; } = planColor;
     }
 
+    public class TextEditReturn(int fontSize, RectangleTextAlignment alignment, bool autoSize, string inputTxt)
+    {
+        public int FontSize { get; set; } = fontSize;
+        public RectangleTextAlignment Alignment { get; set; } = alignment;
+        public bool AutoSize { get; set; } = autoSize;
+        public string InputTxt { get; set; } = inputTxt;
+    }
+
     public class PriorityItem
     {
         public required string Key { get; set; }

@@ -178,6 +178,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Automatische Schriftgrösse ähnelt.
+        /// </summary>
+        internal static string automatische_schriftgroesse {
+            get {
+                return ResourceManager.GetString("automatische_schriftgroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bearbeiten ähnelt.
         /// </summary>
         internal static string bearbeiten {
@@ -1735,6 +1744,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schriftgrösse ähnelt.
+        /// </summary>
+        internal static string schriftgroesse {
+            get {
+                return ResourceManager.GetString("schriftgroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Seiten hinzufügen ähnelt.
         /// </summary>
         internal static string seiten_hinzufuegen {
@@ -1839,6 +1857,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string swisstopo_karten_pins {
             get {
                 return ResourceManager.GetString("swisstopo_karten_pins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Text eingeben ähnelt.
+        /// </summary>
+        internal static string text_eingeben {
+            get {
+                return ResourceManager.GetString("text_eingeben", resourceCulture);
             }
         }
         

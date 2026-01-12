@@ -804,4 +804,13 @@
   <data name="textfeld_bearbeiten" xml:space="preserve">
     <value>Edit text field</value>
   </data>
+  <data name="text_eingeben" xml:space="preserve">
+    <value>Enter text</value>
+  </data>
+  <data name="schriftgroesse" xml:space="preserve">
+    <value>Font size</value>
+  </data>
+  <data name="automatische_schriftgroesse" xml:space="preserve">
+    <value>Automatic font size</value>
+  </data>
 </root>

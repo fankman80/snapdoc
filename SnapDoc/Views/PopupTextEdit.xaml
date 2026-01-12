@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:views="clr-namespace:SnapDoc.Views"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+                xmlns:local="clr-namespace:SnapDoc"              
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               Padding="0"
+               Margin="16"
+               WidthRequest="280"
+               HorizontalOptions="Center"
+               x:TypeArguments="local:TextEditReturn"
+               x:Class="SnapDoc.Views.PopupTextEdit">
+
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+
+    <Grid>
+        <VerticalStackLayout x:DataType="views:PopupTextEdit">
+            <Label HorizontalOptions="Start"
+                   Text="{x:Static res:AppResources.text_eingeben}"/>
+
+            <material:EditorField Text="{Binding InputTxt}"
+                                TitleColor="{DynamicResource SecondaryBackground}"
+                                BorderColor="{DynamicResource SecondaryBackground}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+
+            <VerticalStackLayout Spacing="0" IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
+                <controls:LocalizedLabel ResourceKey="schriftgroesse" Value="{Binding FontSize}" ValueFormat="{}: {0} MP"/>
+                <Slider Maximum="80"
+                        Minimum="6"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                        Value="{Binding FontSize}"/>
+            </VerticalStackLayout>
+
+            <HorizontalStackLayout Spacing="10">
+                <!-- LEFT -->
+                <Button
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_left}}"
+                    BorderWidth="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"                    
+                    Style="{StaticResource AlignButtonStyle}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Left}">
+
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding FontAlignment}"
+                            Value="{x:Static local:RectangleTextAlignment.Left}">
+                            <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- CENTER -->
+                <Button
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_center}}"
+                    BorderWidth="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                    Style="{StaticResource AlignButtonStyle}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Center}">
+
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding FontAlignment}"
+                            Value="{x:Static local:RectangleTextAlignment.Center}">
+                            <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+                <!-- RIGHT -->
+                <Button
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_right}}"
+                    BorderWidth="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                    Style="{StaticResource AlignButtonStyle}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Right}">
+
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding FontAlignment}"
+                            Value="{x:Static local:RectangleTextAlignment.Right}">
+                            <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </HorizontalStackLayout>
+
+            <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
+                <controls:Switch Grid.Column="0"
+                                 IsToggled="{Binding AutoSize}"
+                                 HorizontalOptions="Start"
+                                 VerticalOptions="Center"
+                                 BorderColorOff ="Transparent"
+                                 KnobColorOn="White"
+                                 KnobColorOff="White"
+                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                <Label Text="{x:Static res:AppResources.automatische_schriftgroesse}" Grid.Column="1" VerticalOptions="Center" />
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Button Grid.Column="0"
+                        x:Name="cancelButtonText"
+                        Text="{x:Static res:AppResources.abbrechen}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnCancelClicked" />
+                <Button Grid.Column="1"
+                        x:Name="okButtonText"
+                        Text="{x:Static res:AppResources.ok}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnOkClicked" />
+            </Grid>
+        </VerticalStackLayout>
+    </Grid>
+</toolkit:Popup>

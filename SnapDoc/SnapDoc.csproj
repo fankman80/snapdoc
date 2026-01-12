@@ -152,6 +152,9 @@
 	  <Compile Update="Views\MapViewOSM.xaml.cs">
 	    <DependentUpon>MapViewOSM.xaml</DependentUpon>
 	  </Compile>
+	  <Compile Update="Views\PopupTextEdit.xaml.cs">
+	    <DependentUpon>PopupTextEdit.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Views\PopupStyleEditor.xaml.cs">
 	    <DependentUpon>PopupStyleEditor.xaml</DependentUpon>
 	  </Compile>
@@ -179,6 +182,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\MapViewOSM.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PopupTextEdit.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PopupStyleEditor.xaml">

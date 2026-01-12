@@ -19,7 +19,11 @@ public class InteractiveRectangleDrawable
     public float Width { get; private set; }
     public float Height { get; set; }
     public string Text { get; set; } = "";
-    public float TextSize { get; set; } = 24f;
+    public int TextSize { get; set; } = 24;
+    public float MinTextSize { get; set; } = 6f;
+    public float MaxTextSize { get; set; } = 200f;
+    public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
+    public bool AutoSizeText { get; set; } = false;
     public float TextPadding { get; set; } = 8f;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
@@ -177,9 +181,18 @@ public class InteractiveRectangleDrawable
         canvas.Translate(Center.X, Center.Y);
         canvas.RotateDegrees(AllowedAngleDeg);
 
+        // Calculate max text area
+        float maxTextWidth = Width - 2 * TextPadding;
+        float maxTextHeight = Height - 2 * TextPadding;
+
+        // Determine font size
+        float fontSize = AutoSizeText
+            ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
+            : TextSize;
+
         var font = new SKFont
         {
-            Size = TextSize,
+            Size = fontSize
         };
 
         var paint = new SKPaint
@@ -191,16 +204,22 @@ public class InteractiveRectangleDrawable
 
         float maxWidth = Width - 2 * TextPadding;
         var lines = BreakTextIntoLines(Text, font, maxWidth);
+
         var metrics = font.Metrics;
         float lineHeight = metrics.Descent - metrics.Ascent;
         float totalHeight = lines.Count * lineHeight;
         float y = -totalHeight / 2f - metrics.Ascent;
 
+        canvas.ClipRect(new SKRect(
+            -Width / 2f,
+            -Height / 2f,
+                Width / 2f,
+                Height / 2f
+        ));
+
         foreach (var line in lines)
         {
-            float lineWidth = font.MeasureText(line);
-            float x = -lineWidth / 2f;
-
+            float x = GetAlignedX(line, font);
             canvas.DrawText(line, x, y, font, paint);
             y += lineHeight;
         }
@@ -233,6 +252,69 @@ public class InteractiveRectangleDrawable
             result.Add(line);
 
         return result;
+    }
+
+    float GetAlignedX(string line, SKFont font)
+    {
+        float lineWidth = font.MeasureText(line);
+
+        return TextAlignment switch
+        {
+            RectangleTextAlignment.Left =>
+                -Width / 2f + TextPadding,
+
+            RectangleTextAlignment.Right =>
+                Width / 2f - TextPadding - lineWidth,
+
+            _ => // Center
+                -lineWidth / 2f
+        };
+    }
+
+    private float CalculateAutoFontSize(string text, float maxWidth, float maxHeight)
+    {
+        float low = MinTextSize;
+        float high = MaxTextSize;
+        float best = low;
+
+        while (high - low > 0.5f)
+        {
+            float mid = (low + high) / 2f;
+
+            if (DoesTextFit(text, mid, maxWidth, maxHeight))
+            {
+                best = mid;
+                low = mid;
+            }
+            else
+            {
+                high = mid;
+            }
+        }
+
+        return best;
+    }
+
+    private static bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
+    {
+        var font = new SKFont { Size = fontSize };
+
+        var lines = BreakTextIntoLines(text, font, maxWidth);
+
+        var metrics = font.Metrics;
+        float lineHeight = metrics.Descent - metrics.Ascent;
+        float totalHeight = lines.Count * lineHeight;
+
+        if (totalHeight > maxHeight)
+            return false;
+
+        foreach (var line in lines)
+        {
+            if (font.MeasureText(line) > maxWidth)
+                return false;
+        }
+
+        return true;
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius;

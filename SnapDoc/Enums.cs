@@ -7,4 +7,10 @@ namespace SnapDoc
         Poly,
         Rect
     }
+    public enum RectangleTextAlignment
+    {
+        Left,
+        Center,
+        Right
+    }
 }
