@@ -2,12 +2,10 @@
 #pragma warning disable MVVMTK0045
 
 using CommunityToolkit.Mvvm.ComponentModel;
-using DocumentFormat.OpenXml.Office.CustomXsn;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using System.ComponentModel;
-using System.Globalization;
 using System.Runtime.CompilerServices;
 using static SnapDoc.Helper;
 
