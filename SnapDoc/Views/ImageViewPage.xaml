@@ -4,6 +4,7 @@
 			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"		 
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views" 
+             xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
 			 BackgroundColor="DimGrey"
@@ -11,6 +12,12 @@
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
 			 x:Class="SnapDoc.Views.ImageViewPage"
              x:Name="ThisPage">
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto,Auto"
@@ -110,22 +117,47 @@
                         CornerRadius="30"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
-                <AbsoluteLayout>
+                <Button x:Name="AddTextBtn"
+                        IsVisible="False"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
+                        Clicked="TextClicked"/>
+                <AbsoluteLayout x:DataType="views:ImageViewPage">
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
-                            BackgroundColor="{DynamicResource Primary}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            WidthRequest="60"
-                            HeightRequest="60"
-                            CornerRadius="30"
-                            ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
-                            Clicked="PenSettingsClicked"/>
-                    <Border x:DataType="views:ImageViewPage"
-                            WidthRequest="22"
-                            HeightRequest="22"
-                            BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedColor}"
-                            StrokeThickness="0"
-                            AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
-                            AbsoluteLayout.LayoutFlags="PositionProportional">
+                                BackgroundColor="{DynamicResource Primary}"
+                                TextColor="{DynamicResource PrimaryDarkText}"
+                                WidthRequest="60"
+                                HeightRequest="60"
+                                CornerRadius="30"
+                                ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
+                                Clicked="PenSettingsClicked"/>
+                    <Border WidthRequest="22"
+                                HeightRequest="22"
+                                BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
+                                StrokeThickness="0"
+                                AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
+                                AbsoluteLayout.LayoutFlags="PositionProportional">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="11"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="Black" 
+                                Opacity="0.3" 
+                                Offset="3,3" 
+                                Radius="4"/>
+                        </Border.Shadow>
+                    </Border>
+                    <Border WidthRequest="22"
+                                HeightRequest="22"
+                                BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
+                                StrokeThickness="0"
+                                AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                AbsoluteLayout.LayoutFlags="PositionProportional">
                         <Border.StrokeShape>
                             <RoundRectangle CornerRadius="11"/>
                         </Border.StrokeShape>

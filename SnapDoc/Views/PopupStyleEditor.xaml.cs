@@ -69,19 +69,21 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string okText = null, string cancelText = null)
     {
         InitializeComponent();
+
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         LineWidth = lineWidth;
-        SelectedBorderColor = String.IsNullOrEmpty(borderColor) ? Colors.Blue : Color.FromArgb(borderColor);
-        SelectedFillColor = String.IsNullOrEmpty(fillColor) ? Colors.Red : Color.FromArgb(fillColor);
-        SelectedTextColor = String.IsNullOrEmpty(textColor) ? Colors.Black : Color.FromArgb(textColor);
+
+        SelectedBorderColor = Color.FromArgb(borderColor);
+        SelectedFillColor = Color.FromArgb(fillColor);
+        SelectedTextColor = Color.FromArgb(textColor);
 
         BindingContext = this;
     }
 
     private async void OnBorderColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(SelectedBorderColor, fillOpacity: (byte)(SelectedBorderColor.Alpha * 255), lineWidthVisibility: false, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(SelectedBorderColor, fillOpacity: (byte)(SelectedBorderColor.Alpha * 255), fillOpacityVisibility: true);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
@@ -90,7 +92,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private async void OnFillColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(SelectedFillColor, fillOpacity: (byte)(SelectedFillColor.Alpha * 255), lineWidthVisibility: false, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(SelectedFillColor, fillOpacity: (byte)(SelectedFillColor.Alpha * 255), fillOpacityVisibility: true);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
@@ -99,7 +101,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private async void OnTextColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(SelectedTextColor, fillOpacity: (byte)(SelectedTextColor.Alpha * 255), lineWidthVisibility: false, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(SelectedTextColor, fillOpacity: (byte)(SelectedTextColor.Alpha * 255), fillOpacityVisibility: true);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)

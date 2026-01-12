@@ -59,7 +59,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     }
 
     public void InitializeDrawing(SKColor lineColor,
-        float lineThickness, SKColor fillColor, 
+        float lineThickness, SKColor fillColor, SKColor textColor,
         float handleRadius, float pointRadius,
         SKColor pointColor, SKColor startPointColor,
         bool scaleHandlesWithTransform = true,
@@ -87,6 +87,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 FillColor = fillColor,
                 LineColor = lineColor,
                 PointColor = pointColor,
+                TextColor = textColor,
                 LineThickness = lineThickness * (float)density,
                 HandleRadius = scaleHandlesWithTransform
                     ? handleRadius / (float)transformVm.Scale * (float)density
@@ -95,7 +96,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                     ? pointRadius / (float)transformVm.Scale * (float)density
                     : pointRadius * (float)density,
                 AllowedAngleDeg = rotationAngle,
-                Text = "Hallo Velo, blablabla, Brandschutzverordnung"
+                Text = ""
             }
         };
 
@@ -325,7 +326,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
     }
 
-    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, float lineWidth)
+    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth)
     {
         if (CombinedDrawable == null)
             return;
@@ -353,6 +354,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         {
             rect.LineColor = lineColor;
             rect.FillColor = fillColor;
+            rect.TextColor = textColor;
             rect.LineThickness = lineWidth * (float)density;
         }
 

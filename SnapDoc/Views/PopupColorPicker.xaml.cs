@@ -11,7 +11,6 @@ namespace SnapDoc.Views;
 public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropertyChanged
 {
     public ObservableCollection<ColorBoxItem> ColorsList { get; set; }
-    public bool LineWidthVisibility { get; set; }
     public bool FillOpacityVisibility { get; set; }
     private bool isUpdating = false;
     private double workR, workG, workB;
@@ -23,11 +22,10 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     public ICommand DoubleTapCommand =>
         new Command<ColorBoxItem>(item => DeleteColor(item));
 
-    public PopupColorPicker(Color selectedColor, byte fillOpacity = 255, bool lineWidthVisibility = true, bool fillOpacityVisibility = false, string okText = "Ok")
+    public PopupColorPicker(Color selectedColor, byte fillOpacity = 255, bool fillOpacityVisibility = false, string okText = "Ok")
     {
 	    InitializeComponent();
         okButtonText.Text = okText;
-        LineWidthVisibility = lineWidthVisibility;
         FillOpacityVisibility = fillOpacityVisibility;
         FillOpacity = fillOpacity;
         ColorsList = new ObservableCollection<ColorBoxItem>(

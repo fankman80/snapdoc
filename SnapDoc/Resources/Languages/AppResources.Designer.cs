@@ -1024,6 +1024,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Linienbreite ähnelt.
+        /// </summary>
+        internal static string linienbreite {
+            get {
+                return ResourceManager.GetString("linienbreite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Löschen ähnelt.
         /// </summary>
         internal static string loeschen {
@@ -1398,15 +1407,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string pins {
             get {
                 return ResourceManager.GetString("pins", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pinselgrösse ähnelt.
-        /// </summary>
-        internal static string pinselgroesse {
-            get {
-                return ResourceManager.GetString("pinselgroesse", resourceCulture);
             }
         }
         
@@ -1839,6 +1839,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string swisstopo_karten_pins {
             get {
                 return ResourceManager.GetString("swisstopo_karten_pins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Textfeld bearbeiten ähnelt.
+        /// </summary>
+        internal static string textfeld_bearbeiten {
+            get {
+                return ResourceManager.GetString("textfeld_bearbeiten", resourceCulture);
             }
         }
         

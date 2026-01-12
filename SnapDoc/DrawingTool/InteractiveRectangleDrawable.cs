@@ -11,15 +11,15 @@ public class InteractiveRectangleDrawable
     public float LineThickness { get; set; } = 3f;
     public bool DisplayHandles { get; set; } = true;
     public bool IsDrawn { get; set; } = false;
-    public SKColor FillColor { get; set; } = SKColors.Blue.WithAlpha(100);
+    public SKColor FillColor { get; set; } = SKColors.Blue;
     public SKColor LineColor { get; set; } = SKColors.Blue;
+    public SKColor TextColor { get; set; } = SKColors.Black;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
     public float Height { get; set; }
     public string Text { get; set; } = "";
     public float TextSize { get; set; } = 24f;
-    public SKColor TextColor { get; set; } = SKColors.Black;
     public float TextPadding { get; set; } = 8f;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
@@ -137,7 +137,7 @@ public class InteractiveRectangleDrawable
         canvas.DrawPath(path, linePaint);
 
         // Draw text if available
-        if (Text != null)
+        if (!string.IsNullOrEmpty(Text))
             DrawMultilineText(canvas);
 
         if (!DisplayHandles) return;

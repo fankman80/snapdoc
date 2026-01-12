@@ -50,7 +50,7 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(SelectedColor, fillOpacity: (byte)(SelectedColor.Alpha * 255), lineWidthVisibility: false, fillOpacityVisibility: true);
+        var popup = new PopupColorPicker(SelectedColor, fillOpacity: (byte)(SelectedColor.Alpha * 255), fillOpacityVisibility: true);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)

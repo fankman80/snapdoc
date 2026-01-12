@@ -375,9 +375,6 @@
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
     <value>Résolution conversion PDF</value>
   </data>
-  <data name="pingroesse" xml:space="preserve">
-    <value>Taille du pin's</value>
-  </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Titre du projet</value>
   </data>
@@ -438,8 +435,8 @@
   <data name="helligkeit_l" xml:space="preserve">
     <value>Luminosité (L)</value>
   </data>
-  <data name="pinselgroesse" xml:space="preserve">
-    <value>Taille du pinceau</value>
+  <data name="linienbreite" xml:space="preserve">
+    <value>Largeur de ligne</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
     <value>Opacité</value>
@@ -800,5 +797,11 @@
   </data>
   <data name="rechteck_zeichnen" xml:space="preserve">
     <value>Dessine un rectangle</value>
+  </data>
+  <data name="pingroesse" xml:space="preserve">
+    <value>Taille du pin's</value>
+  </data>
+  <data name="textfeld_bearbeiten" xml:space="preserve">
+    <value>Modifier le champ de texte</value>
   </data>
 </root>

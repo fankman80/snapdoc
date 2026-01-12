@@ -27,10 +27,8 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private float selectedOpacity = 0.5f;
-    private int lineWidth = 6;
 
-    private Color selectedBorderColor = new(0, 0, 255);
+    private Color selectedBorderColor = new(0, 0, 255, 255);
     public Color SelectedBorderColor
     {
         get => selectedBorderColor;
@@ -41,7 +39,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    private Color selectedFillColor = new(255, 0, 0);
+    private Color selectedFillColor = new(255, 0, 0, 128);
     public Color SelectedFillColor
     {
         get => selectedFillColor;
@@ -52,6 +50,30 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private Color selectedTextColor = new(0, 0, 0, 255);
+    public Color SelectedTextColor
+    {
+        get => selectedTextColor;
+        set
+        {
+            selectedTextColor = value;
+            OnPropertyChanged();
+        }
+    }
+
+    private int lineWidth = 6;
+    public int LineWidth
+    {
+        get => lineWidth;
+        set
+        {
+            if (lineWidth != value)
+            {
+                lineWidth = value;
+                OnPropertyChanged();
+            }
+        }
+    }
 
     private bool isGotoPinBtnVisible = false;
     public bool IsGotoPinBtnVisible
@@ -264,15 +286,25 @@ public partial class ImageViewPage : IQueryAttributable
             switch (mode)
             {
                 case DrawMode.Free:
+                    AddTextBtn.IsVisible = false;
                     DrawFreeBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Poly:
+                    AddTextBtn.IsVisible = false;
                     DrawPolyBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Rect:
+                    AddTextBtn.IsVisible = true;
                     DrawRectBtn.CornerRadius = 10;
+                    break;
+
+                case DrawMode.None:
+                    AddTextBtn.IsVisible = false;
+                    DrawPolyBtn.CornerRadius = 30;
+                    DrawFreeBtn.CornerRadius = 30;
+                    DrawRectBtn.CornerRadius = 30;
                     break;
             }
         }
@@ -306,6 +338,7 @@ public partial class ImageViewPage : IQueryAttributable
             SelectedBorderColor.ToSKColor(),
             lineWidth,
             SelectedFillColor.ToSKColor(),
+            SelectedTextColor.ToSKColor(),
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
@@ -319,12 +352,8 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        drawMode = DrawMode.None;
-        DrawPolyBtn.CornerRadius = 30;
-        DrawFreeBtn.CornerRadius = 30;
-        DrawRectBtn.CornerRadius = 30;
+        SetDrawMode(DrawMode.None);
         drawingController.Reset();
-        drawingView?.InvalidateSurface();
 
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
@@ -480,20 +509,20 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        //var popup = new PopupColorPicker(lineWidth, SelectedColor, fillOpacity: (byte)(selectedOpacity * 255), lineWidthVisibility: true, fillOpacityVisibility: true);
-        //var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
-
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), "#000000");
+        var popup = new PopupStyleEditor(LineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex());
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
 
         SelectedBorderColor = Color.FromArgb(result.Result.BorderColorHex);
-        lineWidth = result.Result.PenWidth;
+        SelectedFillColor = Color.FromArgb(result.Result.FillColorHex);
+        SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
+        LineWidth = result.Result.PenWidth;
 
         drawingController?.UpdateDrawingStyles(
             SelectedBorderColor.ToSKColor(),
             SelectedFillColor.ToSKColor(),
+            SelectedTextColor.ToSKColor(),
             lineWidth
         );
     }

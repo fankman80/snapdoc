@@ -166,9 +166,9 @@
                     </toolkit:Expander>
 
                     <controls:LocalizedLabel ResourceKey="deckkraft"
+                                             IsVisible="{Binding FillOpacityVisibility}"
                                              Value="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255'}"
-                                             ValueFormat="{}: {0:F0}%"
-                                             IsVisible="{Binding LineWidthVisibility}"/>
+                                             ValueFormat="{}: {0:F0}%"/>
                     <Slider x:Name="FillOpacitySlider"
                             IsVisible="{Binding FillOpacityVisibility}"
                             Maximum="255"

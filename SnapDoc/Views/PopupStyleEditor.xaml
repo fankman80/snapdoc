@@ -84,7 +84,7 @@
             </Grid>
             
             <controls:LocalizedLabel x:Name="lineWidthText"
-                                     ResourceKey="pinselgroesse"
+                                     ResourceKey="linienbreite"
                                      Value="{Binding LineWidth}"
                                      ValueFormat="{}: {0}"/>
             <Slider x:Name="LineWidthSlider"

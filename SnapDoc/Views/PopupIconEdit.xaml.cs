@@ -196,7 +196,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
-        var popup = new PopupColorPicker(SelectedColor, lineWidthVisibility: false);
+        var popup = new PopupColorPicker(SelectedColor);
         var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
