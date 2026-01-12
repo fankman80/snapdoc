@@ -123,7 +123,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         }
 
         // Event nur als handled markieren, wenn Free-Modus oder Poly-Modus und Punkt aktiv
-        if (DrawMode == DrawMode.Free || (DrawMode == DrawMode.Poly && activeIndex != null) || (DrawMode == DrawMode.Rect))
+        if (DrawMode == DrawMode.Free ||
+           (DrawMode == DrawMode.Poly && activeIndex != null) ||
+           (DrawMode == DrawMode.Rect && (activeIndex != null || rectDragStart.HasValue || isRotatingRectangle)))
             e.Handled = true;
         else
             e.Handled = false;

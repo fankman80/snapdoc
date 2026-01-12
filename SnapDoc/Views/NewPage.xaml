@@ -287,8 +287,8 @@
                                 CornerRadius="30"
                                 ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                                 Clicked="PenSettingsClicked"/>
-                        <Border WidthRequest="22"
-                                HeightRequest="22"
+                        <Border WidthRequest="20"
+                                HeightRequest="20"
                                 BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                                 StrokeThickness="0"
                                 AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
@@ -300,11 +300,11 @@
                                 <Shadow Brush="Black" 
                                 Opacity="0.3" 
                                 Offset="3,3" 
-                                Radius="4"/>
+                                Radius="3"/>
                             </Border.Shadow>
                         </Border>
-                        <Border WidthRequest="22"
-                                HeightRequest="22"
+                        <Border WidthRequest="20"
+                                HeightRequest="20"
                                 BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                                 StrokeThickness="0"
                                 AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
@@ -316,7 +316,7 @@
                                 <Shadow Brush="Black" 
                                 Opacity="0.3" 
                                 Offset="3,3" 
-                                Radius="4"/>
+                                Radius="3"/>
                             </Border.Shadow>
                         </Border>                        
                     </AbsoluteLayout>

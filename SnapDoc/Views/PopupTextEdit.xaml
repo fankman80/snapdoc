@@ -34,7 +34,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
             <VerticalStackLayout Spacing="0" IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
-                <controls:LocalizedLabel ResourceKey="schriftgroesse" Value="{Binding FontSize}" ValueFormat="{}: {0} MP"/>
+                <controls:LocalizedLabel ResourceKey="schriftgroesse" Value="{Binding FontSize}" ValueFormat="{}: {0:F0}"/>
                 <Slider Maximum="80"
                         Minimum="6"
                         ThumbColor="{DynamicResource Primary}"
@@ -49,8 +49,7 @@
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_left}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
-                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"                    
-                    Style="{StaticResource AlignButtonStyle}"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Left}">
 
@@ -70,7 +69,6 @@
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                    Style="{StaticResource AlignButtonStyle}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Center}">
 
@@ -90,7 +88,6 @@
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                    Style="{StaticResource AlignButtonStyle}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Right}">
 

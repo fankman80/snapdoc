@@ -10,8 +10,8 @@ namespace SnapDoc.Views;
 
 public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChanged
 {
-    private int fontSize;
-    public int FontSize
+    private float fontSize;
+    public float FontSize
     {
         get => fontSize;
         set
@@ -66,7 +66,7 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         }
     }
 
-    public PopupTextEdit(int fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, bool autoSize = false, string inputTxt = "", string okText = null, string cancelText = null)
+    public PopupTextEdit(float fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, bool autoSize = false, string inputTxt = "", string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;

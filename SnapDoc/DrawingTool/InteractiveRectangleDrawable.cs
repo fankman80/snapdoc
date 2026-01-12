@@ -19,7 +19,7 @@ public class InteractiveRectangleDrawable
     public float Width { get; private set; }
     public float Height { get; set; }
     public string Text { get; set; } = "";
-    public int TextSize { get; set; } = 24;
+    public float TextSize { get; set; } = 24;
     public float MinTextSize { get; set; } = 6f;
     public float MaxTextSize { get; set; } = 200f;
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
@@ -186,13 +186,13 @@ public class InteractiveRectangleDrawable
         float maxTextHeight = Height - 2 * TextPadding;
 
         // Determine font size
-        float fontSize = AutoSizeText
+        TextSize = AutoSizeText
             ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
             : TextSize;
 
         var font = new SKFont
         {
-            Size = fontSize
+            Size = TextSize
         };
 
         var paint = new SKPaint
