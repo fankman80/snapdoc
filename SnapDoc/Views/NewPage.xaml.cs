@@ -841,8 +841,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
             // Canvas-Punkt (Mittelpunkt deiner gedrehten Zeichnung)
-            var cx = imageRect.MidX; // / density;
-            var cy = imageRect.MidY; // / density;
+            var cx = imageRect.MidX / density;
+            var cy = imageRect.MidY / density;
 
             double fx = cx + SettingsService.Instance.CustomPinOffset.X;
             double fy = cy + SettingsService.Instance.CustomPinOffset.Y;
