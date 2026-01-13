@@ -291,10 +291,11 @@ namespace SnapDoc
         public string PlanColor { get; set; } = planColor;
     }
 
-    public class TextEditReturn(float fontSize, RectangleTextAlignment alignment, bool autoSize, string inputTxt)
+    public class TextEditReturn(float fontSize, RectangleTextAlignment alignment, RectangleTextStyle style, bool autoSize, string inputTxt)
     {
         public float FontSize { get; set; } = fontSize;
         public RectangleTextAlignment Alignment { get; set; } = alignment;
+        public RectangleTextStyle Style { get; set; } = style;
         public bool AutoSize { get; set; } = autoSize;
         public string InputTxt { get; set; } = inputTxt;
     }

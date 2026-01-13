@@ -118,7 +118,7 @@
     </ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.456" />
+		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.463" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="13.0.0" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="13.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />

@@ -6,13 +6,13 @@ using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.DrawingTool;
 using SnapDoc.Messages;
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using SnapDoc.DrawingTool;
 using System.ComponentModel;
-using SnapDoc.Resources.Languages;
 
 #if WINDOWS
 using SnapDoc.Platforms.Windows;
@@ -524,7 +524,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         int customPinSizeHeight = 0,
                         SKColor? pinColor = null,
                         double customScale = 1,
-                        double _rotation = 0)
+                        double _rotation = 0,
+                        string customDisplayName = "")
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage == null) return;
@@ -555,7 +556,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             _isCustomPin = true;
             _isCustomIcon = false;
             _newPin = customName;
-            _displayName = "";
+            _displayName = customDisplayName;
             _isAllowExport = true;
             _scale = customScale;
         }
@@ -734,6 +735,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (float)planContainer.Rotation
         );
 
+        drawingController.InitialRotation = (float)planContainer.Rotation;
+
         // 3) initialer Modus
         drawingController.DrawMode = DrawMode.None;
         drawMode = DrawMode.None;
@@ -811,13 +814,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var combined = drawingController.CombinedDrawable;
 
-        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
+        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
             combined.RectDrawable?.Text = result.Result.InputTxt;
             combined.RectDrawable?.TextSize = result.Result.FontSize;
             combined.RectDrawable?.TextAlignment = result.Result.Alignment;
+            combined.RectDrawable?.TextStyle = result.Result.Style;
             combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             drawingView?.InvalidateSurface();
         }
@@ -858,7 +862,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     (int)imageRect.Width,
                     (int)imageRect.Height,
                     new SKColor(SelectedBorderColor.ToUint()),
-                    1 / planContainer.Scale / density);
+                    1 / planContainer.Scale / density,
+                    drawingController.InitialRotation - planContainer.Rotation,
+                    drawingController.CombinedDrawable.RectDrawable.Text);
         }
 
         // Cleanup drawing canvas
@@ -898,7 +904,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         float rotation = (float)-planContainer.Rotation;
 
         // --- BoundingBox VOR dem Zeichnen berechnen ---
-        var boundingBox = drawingController.CalculateBoundingBox(rotation);
+        var boundingBox = drawingController.CalculateBoundingBox((float)-drawingController.InitialRotation);
         if (boundingBox == null)
             return new SKRectI(0, 0, 0, 0);
 
@@ -913,7 +919,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // --- Zeichne final auf Canvas ---
         canvas.Clear(SKColors.Transparent);
-        drawingController.RenderFinal(canvas, rotation);
+        drawingController.RenderFinal(canvas, (float)-drawingController.InitialRotation);
         canvas.Flush();
 
         // --- Ganze Zeichnung als Bitmap holen ---

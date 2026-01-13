@@ -38,6 +38,26 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         }
     }
 
+    private RectangleTextStyle textStyle;
+    public RectangleTextStyle TextStyle
+    {
+        get => textStyle;
+        set
+        {
+            if (textStyle != value)
+            {
+                textStyle = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsBold));
+                OnPropertyChanged(nameof(IsItalic));
+            }
+        }
+    }
+
+    public bool IsBold => TextStyle.HasFlag(RectangleTextStyle.Bold);
+    public bool IsItalic => TextStyle.HasFlag(RectangleTextStyle.Italic);
+
+
     private bool autoSize;
     public bool AutoSize
     {
@@ -66,13 +86,14 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         }
     }
 
-    public PopupTextEdit(float fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, bool autoSize = false, string inputTxt = "", string okText = null, string cancelText = null)
+    public PopupTextEdit(float fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, RectangleTextStyle textStyle  = RectangleTextStyle.Normal, bool autoSize = false, string inputTxt = "", string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         FontSize = fontSize;
         FontAlignment = fontAlignment;
+        TextStyle = textStyle;
         AutoSize = autoSize;
         InputTxt = inputTxt;
 
@@ -85,9 +106,19 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         FontAlignment = alignment;
     }
 
+    [RelayCommand]
+    private void ToggleTextStyle(RectangleTextStyle style)
+    {
+ 
+        TextStyle ^= style;
+
+        if (TextStyle == 0)
+            TextStyle = RectangleTextStyle.Normal;
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new TextEditReturn(FontSize, FontAlignment, AutoSize, InputTxt));
+        await CloseAsync(new TextEditReturn(FontSize, FontAlignment, TextStyle, AutoSize, InputTxt));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

@@ -3,12 +3,12 @@
 
 using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc;
 

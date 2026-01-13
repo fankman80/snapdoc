@@ -351,13 +351,14 @@ public partial class ImageViewPage : IQueryAttributable
     {
         var combined = drawingController.CombinedDrawable;
 
-        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
+        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
             combined.RectDrawable?.Text = result.Result.InputTxt;
             combined.RectDrawable?.TextSize = result.Result.FontSize;
             combined.RectDrawable?.TextAlignment = result.Result.Alignment;
+            combined.RectDrawable?.TextStyle = result.Result.Style;
             combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             drawingView?.InvalidateSurface();
         }

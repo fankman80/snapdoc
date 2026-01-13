@@ -1,5 +1,4 @@
-﻿using DocumentFormat.OpenXml.Packaging;
-using SkiaSharp;
+﻿using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
@@ -19,12 +18,13 @@ public class InteractiveRectangleDrawable
     public float Width { get; private set; }
     public float Height { get; set; }
     public string Text { get; set; } = "";
-    public float TextSize { get; set; } = 24;
+    public float TextSize { get; set; } = 36;
     public float MinTextSize { get; set; } = 6f;
     public float MaxTextSize { get; set; } = 200f;
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
+    public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
     public bool AutoSizeText { get; set; } = true;
-    public float TextPadding { get; set; } = 8f;
+    public float TextPadding { get; set; } = 10f;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
     private float _allowedAngleRad;
@@ -189,7 +189,7 @@ public class InteractiveRectangleDrawable
             ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
             : TextSize;
 
-        var font = new SKFont
+        var font = new SKFont(TextStyle.ToTypeface())
         {
             Size = TextSize
         };
@@ -229,27 +229,39 @@ public class InteractiveRectangleDrawable
     private static List<string> BreakTextIntoLines(string text, SKFont font, float maxWidth)
     {
         var result = new List<string>();
-        var words = text.Split(' ');
-        string line = "";
+        var hardLines = text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
 
-        foreach (var word in words)
+        foreach (var hardLine in hardLines)
         {
-            var test = string.IsNullOrEmpty(line) ? word : $"{line} {word}";
-
-            if (font.MeasureText(test) <= maxWidth)
-                line = test;
-            else
+            if (string.IsNullOrEmpty(hardLine))
             {
-                if (!string.IsNullOrEmpty(line))
-                    result.Add(line);
-
-                line = word;
+                result.Add(string.Empty);
+                continue;
             }
+
+            var words = hardLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string line = "";
+
+            foreach (var word in words)
+            {
+                var test = string.IsNullOrEmpty(line) ? word : $"{line} {word}";
+
+                if (font.MeasureText(test) <= maxWidth)
+                {
+                    line = test;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(line))
+                        result.Add(line);
+
+                    line = word;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(line))
+                result.Add(line);
         }
-
-        if (!string.IsNullOrEmpty(line))
-            result.Add(line);
-
         return result;
     }
 

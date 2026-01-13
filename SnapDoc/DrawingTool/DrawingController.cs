@@ -1,6 +1,4 @@
-﻿using CommunityToolkit.Maui.Views;
-using NetTopologySuite.Triangulate.Tri;
-using SkiaSharp;
+﻿using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
@@ -12,6 +10,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
 {
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
+    public double InitialRotation = 0f;
     private SKCanvasView? canvasView;
     private int? activeIndex = null;
     private DateTime? lastClickTime;
@@ -20,6 +19,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     private SKPoint? rectDragStart;
     private bool isRotatingRectangle = false;
     private SKPoint? rectResizeAnchor;
+
 
     // BoundingBox
     public float MinX { get; private set; }

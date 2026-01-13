@@ -24,14 +24,12 @@
 
     <Grid>
         <VerticalStackLayout x:DataType="views:PopupTextEdit">
-            <Label HorizontalOptions="Start"
-                   Text="{x:Static res:AppResources.text_eingeben}"/>
-
             <material:EditorField Text="{Binding InputTxt}"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                                  Title="{x:Static res:AppResources.text_eingeben}"
+                                  TitleColor="{DynamicResource SecondaryBackground}"
+                                  BorderColor="{DynamicResource SecondaryBackground}"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                  AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
             <VerticalStackLayout Spacing="0" IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
                 <controls:LocalizedLabel ResourceKey="schriftgroesse" Value="{Binding FontSize}" ValueFormat="{}: {0:F0}"/>
@@ -46,7 +44,7 @@
             <HorizontalStackLayout Spacing="10">
                 <!-- LEFT -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_left}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_left}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
@@ -65,7 +63,7 @@
 
                 <!-- CENTER -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_center}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_center}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
@@ -84,7 +82,7 @@
 
                 <!-- RIGHT -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Align_horizontal_right}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_right}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
@@ -102,6 +100,49 @@
                 </Button>
             </HorizontalStackLayout>
 
+            <HorizontalStackLayout Spacing="10">
+                <!-- Bold -->
+                <Button
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_bold}}"
+                    BorderWidth="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                    Command="{Binding ToggleTextStyleCommand}"
+                    CommandParameter="{x:Static local:RectangleTextStyle.Bold}">
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding IsBold}"
+                            Value="True">
+                            <Setter Property="BorderColor"
+                                    Value="{AppThemeBinding Light={DynamicResource Primary},
+                                                            Dark={DynamicResource PrimaryDark}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+
+
+                <!-- Italic -->
+                <Button
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_italic}}"
+                    BorderWidth="2"
+                    BackgroundColor="Transparent"
+                    BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                    Command="{Binding ToggleTextStyleCommand}"
+                    CommandParameter="{x:Static local:RectangleTextStyle.Italic}">
+                    <Button.Triggers>
+                        <DataTrigger
+                            TargetType="Button"
+                            Binding="{Binding IsItalic}"
+                            Value="True">
+                            <Setter Property="BorderColor"
+                                    Value="{AppThemeBinding Light={DynamicResource Primary},
+                                                            Dark={DynamicResource PrimaryDark}}" />
+                        </DataTrigger>
+                    </Button.Triggers>
+                </Button>
+            </HorizontalStackLayout>
+            
             <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
                 <controls:Switch Grid.Column="0"
                                  IsToggled="{Binding AutoSize}"
