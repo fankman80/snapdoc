@@ -4,16 +4,15 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractiveFreehandDrawable
 {
-    public List<List<SKPoint>> Strokes { get; set; } = [];
+    public List<List<SKPoint>> Points { get; set; } = [];
     public float LineThickness { get; set; } = 3f;
     public SKColor LineColor { get; set; } = SKColors.Black;
     private List<SKPoint>? _currentStroke;
-    public bool HasContent => Strokes.Any(stroke => stroke.Count > 1);
-
+    public bool HasContent => Points.Any(stroke => stroke.Count > 1);
     public void StartStroke()
     {
         _currentStroke = [];
-        Strokes.Add(_currentStroke);
+        Points.Add(_currentStroke);
     }
 
     public void AddPoint(SKPoint point)
@@ -38,18 +37,18 @@ public class InteractiveFreehandDrawable
             IsAntialias = true
         };
 
-        foreach (var stroke in Strokes)
+        foreach (var point in Points)
         {
-            if (stroke.Count < 2) continue;
-            for (int i = 0; i < stroke.Count - 1; i++)
+            if (point.Count < 2) continue;
+            for (int i = 0; i < point.Count - 1; i++)
             {
-                canvas.DrawLine(stroke[i], stroke[i + 1], paint);
+                canvas.DrawLine(point[i], point[i + 1], paint);
             }
         }
     }
 
     public void Reset()
     {
-        Strokes.Clear();
+        Points.Clear();
     }
 }

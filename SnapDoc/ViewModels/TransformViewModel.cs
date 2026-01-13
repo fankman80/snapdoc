@@ -8,6 +8,7 @@ public partial class TransformViewModel : CustomEventArgsViewModel
     #region Properties
     public bool IsPanningEnabled = true;
     public bool IsPinchingEnabled = true;
+    public bool IsRotatingEnabled = true;
     protected double anchorX = 0.5;
 
     public double AnchorX
@@ -92,10 +93,8 @@ public partial class TransformViewModel : CustomEventArgsViewModel
     {
         base.OnRotating(e);
 
-        if (SettingsService.Instance.IsPlanRotateLocked)
-        {
-            return;   // rotating nur, wenn rotating aktiviert ist
-        }
+        if (!IsRotatingEnabled || SettingsService.Instance.IsPlanRotateLocked) return;   // rotating nur, wenn rotating aktiviert is
+
         Rotation += e.DeltaAngle;
     }
 }

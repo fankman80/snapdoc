@@ -756,9 +756,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = activate ? mode : DrawMode.None;
         drawingController.DrawMode = drawMode;
 
-        // Panning
-        planContainer.IsPanningEnabled = !activate;
-
         // Buttons reset
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
@@ -839,36 +836,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
 
-            // Canvas-Punkt (z.B. Mittelpunkt deiner Zeichnung)
+            // Canvas-Punkt (Mittelpunkt deiner gedrehten Zeichnung)
             var cx = imageRect.MidX / density;
             var cy = imageRect.MidY / density;
 
-            // Mittelpunkt der DrawingView
-            double centerX = drawingView.Width / 2;
-            double centerY = drawingView.Height / 2;
-
-            // Punkt relativ zum Zentrum
-            double rx = cx - centerX + SettingsService.Instance.CustomPinOffset.X;
-            double ry = cy - centerY + SettingsService.Instance.CustomPinOffset.Y;
-
-            // Inverse Rotation anwenden
-            double angle = -planContainer.Rotation * (Math.PI / 180.0);
-            double cos = Math.Cos(angle);
-            double sin = Math.Sin(angle);
-
-            double ux = rx * cos - ry * sin;
-            double uy = rx * sin + ry * cos;
-
-            // Jetzt wieder zurück in absolute Koordinate
-            double fx = ux + centerX;
-            double fy = uy + centerY;
+            double fx = cx + SettingsService.Instance.CustomPinOffset.X;
+            double fy = cy + SettingsService.Instance.CustomPinOffset.Y;
 
             // In Bild-Koordinaten umrechnen
-            var ox = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Width *
-                     ((fx - drawingView.Width / 2) / planContainer.Scale);
+            var ox =
+                ((fx - drawingView.Width / 2) / planContainer.Scale) /
+                GlobalJson.Data.Plans[PlanId].ImageSize.Width;
 
-            var oy = 1.0 / GlobalJson.Data.Plans[PlanId].ImageSize.Height *
-                     ((fy - drawingView.Height / 2) / planContainer.Scale);
+            var oy =
+                ((fy - drawingView.Height / 2) / planContainer.Scale) /
+                GlobalJson.Data.Plans[PlanId].ImageSize.Height;
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
@@ -876,8 +858,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     (int)imageRect.Width,
                     (int)imageRect.Height,
                     new SKColor(SelectedBorderColor.ToUint()),
-                    1 / planContainer.Scale / density,
-                    Helper.NormalizeAngle360(-planContainer.Rotation));
+                    1 / planContainer.Scale / density);
         }
 
         // Cleanup drawing canvas
@@ -888,7 +869,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
         DrawRectBtn.CornerRadius = 30;
-        planContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
 
@@ -910,29 +890,41 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         int width = (int)drawingView.CanvasSize.Width;
         int height = (int)drawingView.CanvasSize.Height;
         var info = new SKImageInfo(width, height);
+
         using var surface = SKSurface.Create(info);
         var canvas = surface.Canvas;
 
+        // --- Rotation ermitteln ---
+        float rotation = (float)-planContainer.Rotation;
+
+        // --- BoundingBox VOR dem Zeichnen berechnen ---
+        var boundingBox = drawingController.CalculateBoundingBox(rotation);
+        if (boundingBox == null)
+            return new SKRectI(0, 0, 0, 0);
+
+        // --- Offset für Strichdicke hinzufügen ---
+        var offset = (lineWidth * density);
+        var cropRect = new SKRectI(
+            (int)(boundingBox.Value.Left - offset),
+            (int)(boundingBox.Value.Top - offset),
+            (int)(boundingBox.Value.Right + offset),
+            (int)(boundingBox.Value.Bottom + offset)
+        );
+
+        // --- Zeichne final auf Canvas ---
         canvas.Clear(SKColors.Transparent);
-
-        // Zeichne ohne Handles auf canvas
-        drawingController.DrawWithoutHandles(canvas);
-
+        drawingController.RenderFinal(canvas, rotation);
         canvas.Flush();
 
-        // Ganze Zeichnung als Bitmap holen
+        // --- Ganze Zeichnung als Bitmap holen ---
         using var fullImage = surface.Snapshot();
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
-        var offset = (lineWidth * density) / 2;
-        var boundingBox = drawingController.CalculateBoundingBox();
-        var cropRect = new SKRectI((int)(boundingBox.Value.Left - offset), (int)(boundingBox.Value.Top - offset), (int)(boundingBox.Value.Right + offset), (int)(boundingBox.Value.Bottom + offset));
-
-        // Croppen
+        // --- Croppen ---
         var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
         fullBitmap.ExtractSubset(croppedBitmap, cropRect);
 
-        // PNG speichern
+        // --- PNG speichern ---
         using var image = SKImage.FromBitmap(croppedBitmap);
         using var data = image.Encode(SKEncodedImageFormat.Png, 100);
         using var stream = File.OpenWrite(filePath);

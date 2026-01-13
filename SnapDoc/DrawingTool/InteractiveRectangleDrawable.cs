@@ -38,7 +38,6 @@ public class InteractiveRectangleDrawable
         get => AllowedAngleRad * 180f / MathF.PI;
         set => AllowedAngleRad = value * MathF.PI / 180f;
     }
-
     public InteractiveRectangleDrawable()
     {
         InteractiveRectangleDrawable.EnsureRotationHandleLoaded();

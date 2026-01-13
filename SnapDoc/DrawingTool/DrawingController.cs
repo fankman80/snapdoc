@@ -1,4 +1,6 @@
-﻿using SkiaSharp;
+﻿using CommunityToolkit.Maui.Views;
+using NetTopologySuite.Triangulate.Tri;
+using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
@@ -159,8 +161,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             activeIndex = poly.FindPointIndex(p.X, p.Y);
             if (activeIndex != null)
             {
-                transformVm.IsPanningEnabled = false;
-                transformVm.IsPinchingEnabled = false;
+                DisableViewTransforms();
             }
 
             if (!poly.IsClosed)
@@ -178,6 +179,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             free.StartStroke();
             free.AddPoint(p);
             canvasView?.InvalidateSurface();
+            DisableViewTransforms();
         }
         else if (DrawMode == DrawMode.Rect)
         {
@@ -188,14 +190,12 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (!rect.IsDrawn)
             {
                 rectDragStart = p;
-                transformVm.IsPanningEnabled = false;
-                transformVm.IsPinchingEnabled = false;
+                DisableViewTransforms();
             }
             else if (rect.IsOverRotationHandle(p))
             {
-                transformVm.IsPanningEnabled = false;
-                transformVm.IsPinchingEnabled = false;
                 isRotatingRectangle = true;
+                DisableViewTransforms();
             }
             else
             {
@@ -203,9 +203,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 if (activeIndex != null)
                 {
                     rectResizeAnchor = rect.GetOppositePoint(activeIndex.Value);
-
-                    transformVm.IsPanningEnabled = false;
-                    transformVm.IsPinchingEnabled = false;
+                    DisableViewTransforms();
                 }
             }
             canvasView?.InvalidateSurface();
@@ -247,11 +245,11 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (DrawMode == DrawMode.Poly)
         {
             activeIndex = null;
-            transformVm.IsPanningEnabled = true;
-            transformVm.IsPinchingEnabled = true;
         }
         else if (DrawMode == DrawMode.Free)
+        {
             CombinedDrawable?.FreeDrawable.EndStroke();
+        }
         else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable?.RectDrawable;
@@ -263,12 +261,25 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             activeIndex = null;
             isRotatingRectangle = false;
             rectDragStart = null;
-
-            transformVm.IsPanningEnabled = true;
-            transformVm.IsPinchingEnabled = true;
         }
 
+        EnableViewTransforms();
+
         canvasView?.InvalidateSurface();
+    }
+
+    private void EnableViewTransforms()
+    {
+        transformVm.IsPanningEnabled = true;
+        transformVm.IsPinchingEnabled = true;
+        transformVm.IsRotatingEnabled = true;
+    }
+
+    private void DisableViewTransforms()
+    {
+        transformVm.IsPanningEnabled = false;
+        transformVm.IsPinchingEnabled = false;
+        transformVm.IsRotatingEnabled = false;
     }
 
     public void ResizeHandles()
@@ -366,6 +377,85 @@ public partial class DrawingController(TransformViewModel transformVm, double de
     private static float Distance(SKPoint a, SKPoint b)
         => MathF.Sqrt((a.X - b.X) * (a.X - b.X) + (a.Y - b.Y) * (a.Y - b.Y));
 
+    public bool IsEmpty()
+    {
+        if (CombinedDrawable == null)
+            return true;
+
+        bool polyEmpty =
+            CombinedDrawable.PolyDrawable == null ||
+            CombinedDrawable.PolyDrawable.Points.Count == 0;
+
+        bool freeEmpty =
+            CombinedDrawable.FreeDrawable == null ||
+            CombinedDrawable.FreeDrawable.Points.Count == 0;
+
+        bool rectEmpty =
+            CombinedDrawable.RectDrawable == null ||
+            !CombinedDrawable.RectDrawable.HasContent;
+
+        return polyEmpty && freeEmpty && rectEmpty;
+    }
+
+    public void Reset()
+    {
+        CombinedDrawable?.Reset();
+        canvasView?.InvalidateSurface();
+    }
+
+    private SKPoint GetRotationCenter()
+    {
+        if (canvasView == null)
+            return new SKPoint(0,0);
+
+        return new SKPoint(
+            canvasView.CanvasSize.Width / 2f,
+            canvasView.CanvasSize.Height / 2f
+        );
+    }
+
+    public SKRect? CalculateBoundingBox(float rotationDeg)
+    {
+        if (CombinedDrawable == null)
+            return null;
+
+        var allPoints = new List<SKPoint>();
+
+        if (CombinedDrawable.PolyDrawable != null)
+            allPoints.AddRange(CombinedDrawable.PolyDrawable.Points);
+
+        if (CombinedDrawable.FreeDrawable != null)
+            foreach (var stroke in CombinedDrawable.FreeDrawable.Points)
+                allPoints.AddRange(stroke);
+
+        if (CombinedDrawable.RectDrawable is { IsDrawn: true, Points.Length: 4 })
+            allPoints.AddRange(CombinedDrawable.RectDrawable.Points);
+
+        if (allPoints.Count == 0)
+            return null;
+
+        IEnumerable<SKPoint> points = allPoints;
+
+        if (Math.Abs(rotationDeg) > 0.001f)
+        {
+            var pivot = GetRotationCenter();
+
+            var matrix = SKMatrix.CreateRotationDegrees(
+                rotationDeg,
+                pivot.X,
+                pivot.Y);
+
+            points = allPoints.Select(p => matrix.MapPoint(p));
+        }
+
+        float minX = points.Min(p => p.X);
+        float maxX = points.Max(p => p.X);
+        float minY = points.Min(p => p.Y);
+        float maxY = points.Max(p => p.Y);
+
+        return new SKRect(minX, minY, maxX, maxY);
+    }
+
     public void DrawWithoutHandles(SKCanvas canvas)
     {
         if (CombinedDrawable == null)
@@ -394,93 +484,25 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         rect?.DisplayHandles = rectOld;
     }
 
-    public bool IsEmpty()
+    public void RenderFinal(SKCanvas canvas, float rotationDeg)
     {
         if (CombinedDrawable == null)
-            return true;
+            return;
 
-        bool polyEmpty =
-            CombinedDrawable.PolyDrawable == null ||
-            CombinedDrawable.PolyDrawable.Points.Count == 0;
+        var pivot = GetRotationCenter();
 
-        bool freeEmpty =
-            CombinedDrawable.FreeDrawable == null ||
-            CombinedDrawable.FreeDrawable.Strokes.Count == 0;
+        canvas.Save();
 
-        bool rectEmpty =
-            CombinedDrawable.RectDrawable == null ||
-            !CombinedDrawable.RectDrawable.HasContent;
-
-        return polyEmpty && freeEmpty && rectEmpty;
-    }
-
-    public void Reset()
-    {
-        CombinedDrawable?.Reset();
-        canvasView?.InvalidateSurface();
-    }
-
-    public SKRect? CalculateBoundingBox()
-    {
-        if (CombinedDrawable == null)
-            return null;
-
-        float minX = float.MaxValue;
-        float minY = float.MaxValue;
-        float maxX = float.MinValue;
-        float maxY = float.MinValue;
-
-        bool hasPoints = false;
-
-        // === Polyline Punkte ===
-        var poly = CombinedDrawable.PolyDrawable;
-        if (poly != null && poly.Points.Count > 0)
+        if (Math.Abs(rotationDeg) > 0.001f)
         {
-            foreach (var pt in poly.Points)
-            {
-                hasPoints = true;
-                if (pt.X < minX) minX = pt.X;
-                if (pt.X > maxX) maxX = pt.X;
-                if (pt.Y < minY) minY = pt.Y;
-                if (pt.Y > maxY) maxY = pt.Y;
-            }
+            canvas.Translate(pivot.X, pivot.Y);
+            canvas.RotateDegrees(rotationDeg);
+            canvas.Translate(-pivot.X, -pivot.Y);
         }
 
-        // === Freehand Punkte ===
-        var free = CombinedDrawable.FreeDrawable;
-        if (free != null && free.Strokes.Count > 0)
-        {
-            foreach (var stroke in free.Strokes)
-            {
-                foreach (var pt in stroke)
-                {
-                    hasPoints = true;
-                    if (pt.X < minX) minX = pt.X;
-                    if (pt.X > maxX) maxX = pt.X;
-                    if (pt.Y < minY) minY = pt.Y;
-                    if (pt.Y > maxY) maxY = pt.Y;
-                }
-            }
-        }
+        DrawWithoutHandles(canvas);
 
-        // === Rectangle Punkte ===
-        var rect = CombinedDrawable.RectDrawable;
-        if (rect != null && rect.Points.Length == 4)
-        {
-            foreach (var pt in rect.Points)
-            {
-                hasPoints = true;
-                minX = Math.Min(minX, pt.X);
-                maxX = Math.Max(maxX, pt.X);
-                minY = Math.Min(minY, pt.Y);
-                maxY = Math.Max(maxY, pt.Y);
-            }
-        }
-
-        if (!hasPoints)
-            return null;
-
-        return new SKRect(minX, minY, maxX, maxY);
+        canvas.Restore();
     }
 
     public void Dispose()

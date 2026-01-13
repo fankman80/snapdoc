@@ -259,9 +259,6 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = activate ? mode : DrawMode.None;
         drawingController.DrawMode = drawMode;
 
-        // Panning
-        fotoContainer.IsPanningEnabled = !activate;
-
         // Buttons reset
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
@@ -426,7 +423,6 @@ public partial class ImageViewPage : IQueryAttributable
         DrawPolyBtn.CornerRadius = 30;
         DrawFreeBtn.CornerRadius = 30;
         DrawRectBtn.CornerRadius = 30;
-        fotoContainer.IsPanningEnabled = true;
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
 
