@@ -23,7 +23,7 @@ public class InteractiveRectangleDrawable
     public float MinTextSize { get; set; } = 6f;
     public float MaxTextSize { get; set; } = 200f;
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
-    public bool AutoSizeText { get; set; } = false;
+    public bool AutoSizeText { get; set; } = true;
     public float TextPadding { get; set; } = 8f;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
