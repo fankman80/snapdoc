@@ -909,12 +909,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             return new SKRectI(0, 0, 0, 0);
 
         // --- Offset für Strichdicke hinzufügen ---
-        var offset = (lineWidth * density);
+        var offset = (lineWidth * density) / 2;
         var cropRect = new SKRectI(
-            (int)(boundingBox.Value.Left - offset),
-            (int)(boundingBox.Value.Top - offset),
-            (int)(boundingBox.Value.Right + offset),
-            (int)(boundingBox.Value.Bottom + offset)
+            (int)Math.Floor(boundingBox.Value.Left - offset),
+            (int)Math.Floor(boundingBox.Value.Top - offset),
+            (int)Math.Ceiling(boundingBox.Value.Right + offset),
+            (int)Math.Ceiling(boundingBox.Value.Bottom + offset)
         );
 
         // --- Zeichne final auf Canvas ---
