@@ -496,7 +496,7 @@ public partial class ExportReport
                                                                                       i,
                                                                                       storeItemId,
                                                                                       $"/positions/pos[@id='{i}']",
-                                                                                      new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - scaledPinSize.Height),
+                                                                                      new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - (SettingsService.Instance.PinLabelFontSize / 2)),
                                                                                       SettingsService.Instance.PinLabelFontSize,
                                                                                       pinColor.ToString()[3..]));
                                                     i++;
