@@ -4,29 +4,40 @@ namespace SnapDoc;
 
 public static class RectangleTextStyleExtensions
 {
-    public static SKTypeface ToTypeface(
-        this RectangleTextStyle style,
-        string? fontFamily = null)
+    public static SKTypeface ToTypeface(this RectangleTextStyle style)
     {
-        bool bold = style.HasFlag(RectangleTextStyle.Bold);
-        bool italic = style.HasFlag(RectangleTextStyle.Italic);
-
-        if (bold && italic)
+        return style switch
         {
-            return SKTypeface.FromFamilyName(
-                fontFamily,
-                new SKFontStyle(
-                    SKFontStyleWeight.Bold,
-                    SKFontStyleWidth.Normal,
-                    SKFontStyleSlant.Italic));
-        }
+            RectangleTextStyle.Bold | RectangleTextStyle.Italic =>
+                SkiaFontLoader.Load("OpenSans-BoldItalic.ttf"),
 
-        if (bold)
-            return SKTypeface.FromFamilyName(fontFamily, SKFontStyle.Bold);
+            RectangleTextStyle.Bold =>
+                SkiaFontLoader.Load("OpenSans-Semibold.ttf"),
 
-        if (italic)
-            return SKTypeface.FromFamilyName(fontFamily, SKFontStyle.Italic);
+            RectangleTextStyle.Italic =>
+                SkiaFontLoader.Load("OpenSans-Italic.ttf"),
 
-        return SKTypeface.FromFamilyName(fontFamily, SKFontStyle.Normal);
+            _ =>
+                SkiaFontLoader.Load("OpenSans-Regular.ttf")
+        };
+    }
+}
+
+public static class SkiaFontLoader
+{
+    static readonly Dictionary<string, SKTypeface> _cache = [];
+
+    public static SKTypeface Load(string fileName)
+    {
+        if (_cache.TryGetValue(fileName, out var tf))
+            return tf;
+
+        using var stream = FileSystem.OpenAppPackageFileAsync(fileName)
+                                     .GetAwaiter()
+                                     .GetResult();
+
+        tf = SKTypeface.FromStream(stream);
+        _cache[fileName] = tf;
+        return tf;
     }
 }

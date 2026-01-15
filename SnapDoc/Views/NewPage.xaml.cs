@@ -844,17 +844,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var cx = imageRect.MidX / density;
             var cy = imageRect.MidY / density;
 
-            double fx = cx + SettingsService.Instance.CustomPinOffset.X;
-            double fy = cy + SettingsService.Instance.CustomPinOffset.Y;
+            // Korrigierten Offset berechnen
+            var baseOffset = SettingsService.Instance.CustomPinOffset;
+            var rotatedOffset = RotateOffset(baseOffset, planContainer.Rotation);
+            double fx = cx + rotatedOffset.X;
+            double fy = cy + rotatedOffset.Y;
 
             // In Bild-Koordinaten umrechnen
-            var ox =
-                ((fx - drawingView.Width / 2) / planContainer.Scale) /
-                GlobalJson.Data.Plans[PlanId].ImageSize.Width;
+            var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) /
+                     GlobalJson.Data.Plans[PlanId].ImageSize.Width;
 
-            var oy =
-                ((fy - drawingView.Height / 2) / planContainer.Scale) /
-                GlobalJson.Data.Plans[PlanId].ImageSize.Height;
+            var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) /
+                     GlobalJson.Data.Plans[PlanId].ImageSize.Height;
 
             // Pin setzen
             SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
@@ -879,6 +880,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = true;
 
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+    }
+
+    static Point RotateOffset(Point offset, double angleDeg)
+    {
+        var rad = angleDeg * Math.PI / 180.0;
+        var cos = Math.Cos(rad);
+        var sin = Math.Sin(rad);
+
+        return new Point(
+            offset.X * cos - offset.Y * sin,
+            offset.X * sin + offset.Y * cos
+        );
     }
 
     private void RemoveDrawingView()

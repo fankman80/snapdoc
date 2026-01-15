@@ -306,9 +306,12 @@ public class InteractiveRectangleDrawable
         return best;
     }
 
-    private static bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
+    private bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
     {
-        var font = new SKFont { Size = fontSize };
+        var font = new SKFont(TextStyle.ToTypeface())
+        {
+            Size = fontSize
+        };
 
         var lines = BreakTextIntoLines(text, font, maxWidth);
 
