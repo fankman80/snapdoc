@@ -846,7 +846,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             // Korrigierten Offset berechnen
             var baseOffset = SettingsService.Instance.CustomPinOffset;
-            var rotatedOffset = RotateOffset(baseOffset, planContainer.Rotation);
+            var rotatedOffset = RotateOffset(baseOffset, -planContainer.Rotation);
             double fx = cx + rotatedOffset.X;
             double fy = cy + rotatedOffset.Y;
 
