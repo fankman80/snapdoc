@@ -33,7 +33,7 @@
 
             <VerticalStackLayout Spacing="0" IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
                 <controls:LocalizedLabel ResourceKey="schriftgroesse" Value="{Binding FontSize}" ValueFormat="{}: {0:F0}"/>
-                <Slider Maximum="80"
+                <Slider Maximum="180"
                         Minimum="6"
                         ThumbColor="{DynamicResource Primary}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
