@@ -18,7 +18,7 @@ public class InteractiveRectangleDrawable
     public float Width { get; private set; }
     public float Height { get; set; }
     public string Text { get; set; } = "";
-    public float TextSize { get; set; } = 36;
+    public float TextSize { get; set; } = 60;
     public float MinTextSize { get; set; } = 6f;
     public float MaxTextSize { get; set; } = 200f;
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
