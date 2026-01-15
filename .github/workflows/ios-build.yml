@@ -31,11 +31,12 @@ jobs:
     # 5️⃣ Apple Zertifikat (.p12) installieren
     - name: Install Apple signing certificate
       env:
-        APPLE_P12_BASE64: ${{ secrets.APPLE_P12_BASE64 }}
-        APPLE_P12_PASSWORD: ${{ secrets.APPLE_P12_PASSWORD }}
+        IOS_P12_BASE64: ${{ secrets.IOS_P12_BASE64 }}
+        IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+        IOS_CERT_NAME: ${{ secrets.IOS_CERT_NAME }}
       run: |
         # P12 in temporären Ordner speichern
-        echo "$APPLE_P12_BASE64" | base64 --decode > /tmp/ios_cert.p12
+        echo "$IOS_P12_BASE64" | base64 --decode > /tmp/ios_cert.p12
 
         # Keychain erstellen und als Default setzen
         security create-keychain -p "" build.keychain
@@ -46,7 +47,7 @@ jobs:
         # P12 importieren
         security import /tmp/ios_cert.p12 \
           -k ~/Library/Keychains/build.keychain \
-          -P "$APPLE_P12_PASSWORD" \
+          -P "$IOS_P12_PASSWORD" \
           -T /usr/bin/codesign \
           -T /usr/bin/security
 
