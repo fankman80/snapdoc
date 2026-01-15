@@ -34,21 +34,30 @@ jobs:
         APPLE_P12_BASE64: ${{ secrets.APPLE_P12_BASE64 }}
         APPLE_P12_PASSWORD: ${{ secrets.APPLE_P12_PASSWORD }}
       run: |
-        echo "$APPLE_P12_BASE64" | base64 --decode > ios_cert.p12
+        # P12 in temporären Ordner speichern
+        echo "$APPLE_P12_BASE64" | base64 --decode > /tmp/ios_cert.p12
 
+        # Keychain erstellen und als Default setzen
         security create-keychain -p "" build.keychain
+        security list-keychains -s build.keychain
         security default-keychain -s build.keychain
         security unlock-keychain -p "" build.keychain
 
-        security import ios_cert.p12 \
-          -k build.keychain \
+        # P12 importieren
+        security import /tmp/ios_cert.p12 \
+          -k ~/Library/Keychains/build.keychain \
           -P "$APPLE_P12_PASSWORD" \
-          -T /usr/bin/codesign
+          -T /usr/bin/codesign \
+          -T /usr/bin/security
 
+        # Key Partition setzen, damit Codesign Zugriff hat
         security set-key-partition-list \
           -S apple-tool:,apple: \
           -s \
-          -k "" build.keychain
+          -k "" ~/Library/Keychains/build.keychain
+
+        # P12 optional löschen
+        rm /tmp/ios_cert.p12
 
     # 6️⃣ Provisioning Profile installieren
     - name: Install provisioning profile
