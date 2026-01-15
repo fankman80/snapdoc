@@ -5,15 +5,15 @@ on:
 
 jobs:
   build-maui:
-    runs-on: macos-26  # Xcode 26 / .NET 10 iOS
+    runs-on: macos-26
 
     steps:
       # 1️⃣ Repo auschecken
       - name: Checkout Repository
         uses: actions/checkout@v4
 
-      # 2️⃣ .NET 10 RC2 installieren
-      - name: Setup .NET 10 RC2
+      # 2️⃣ .NET 10
+      - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 10.0.x
