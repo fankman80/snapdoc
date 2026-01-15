@@ -5,7 +5,7 @@ on:
 
 jobs:
   build-maui:
-    runs-on: macos-26
+    runs-on: macos-15
 
     steps:
       # 1️⃣ Repo auschecken
