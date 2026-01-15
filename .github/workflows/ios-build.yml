@@ -16,7 +16,7 @@ jobs:
       - name: Setup .NET 10
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.2
+          dotnet-version: 10.0.x
 
       # 3️⃣ MAUI Workloads installieren
       - name: Install MAUI workloads
