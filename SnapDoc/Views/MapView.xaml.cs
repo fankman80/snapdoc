@@ -1,9 +1,4 @@
 ﻿#nullable disable
-
-#if ANDROID
-using Android.Webkit;
-#endif
-
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Models;
@@ -13,6 +8,10 @@ using SnapDoc.ViewModels;
 using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Serialization;
+
+#if ANDROID
+using Android.Webkit;
+#endif
 
 namespace SnapDoc.Views;
 
@@ -157,19 +156,16 @@ public partial class MapView : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
-        if (!string.IsNullOrEmpty(PlanId) &&
-            !string.IsNullOrEmpty(PinId) &&
-            GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
-            plan.Pins.TryGetValue(PinId, out var pin))
+        if (!string.IsNullOrEmpty(PlanId) && !string.IsNullOrEmpty(PinId))
         {
             Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
             SetPosBtn.IsVisible = true;
 
-            if (pin.GeoLocation != null)
+            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
             {
                 // Zoom auf Pin
-                lon = pin.GeoLocation.WGS84.Longitude;
-                lat = pin.GeoLocation.WGS84.Latitude;
+                lon = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Longitude;
+                lat = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Latitude;
                 zoom = 18;
             }
             else if (SettingsService.Instance.IsGpsActive)

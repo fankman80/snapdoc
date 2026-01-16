@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
@@ -13,7 +12,6 @@ using Mapsui.Styles;
 using Mapsui.Tiling;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
-using Mapsui.Widgets.ButtonWidgets;
 using Mapsui.Widgets.InfoWidgets;
 using Mapsui.Widgets.ScaleBar;
 using SnapDoc.Models;
@@ -22,7 +20,6 @@ using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
-using Image = Microsoft.Maui.Controls.Image;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
 
@@ -46,9 +43,25 @@ public partial class MapViewOSM : IQueryAttributable
     private readonly RulerWidget _rulerWidget;
     private readonly Microsoft.Maui.Graphics.Color hexColor = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
 
+    private PinItem pin;
+    public PinItem Pin
+    {
+        get => pin;
+        set
+        {
+            if (pin != value)
+            {
+                pin = value;
+                OnPropertyChanged(nameof(Pin));
+            }
+        }
+    }
+
     public MapViewOSM()
     {
         InitializeComponent();
+
+        BindingContext = this;
 
         // casting Colors from MAUI to Mapsui
         var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
@@ -155,28 +168,21 @@ public partial class MapViewOSM : IQueryAttributable
         if (query.TryGetValue("pinId", out var pinIdObj))
             PinId = pinIdObj as string ?? string.Empty;
 
-        _ = UpdateUiFromQueryAsync(); // fire & forget
+        _ = UpdateUiFromQueryAsync();
     }
 
     private async Task UpdateUiFromQueryAsync()
     {
-        if (!string.IsNullOrEmpty(PlanId) &&
-            !string.IsNullOrEmpty(PinId) &&
-            GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
-            plan.Pins.TryGetValue(PinId, out var pin))
+        if (!string.IsNullOrEmpty(PlanId) && !string.IsNullOrEmpty(PinId))
         {
-            var file = pin.PinIcon;
-            if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-                file = Path.Combine(Settings.DataDirectory, file);
-        
+            Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
             SetPosBtn.IsVisible = true;
-            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source = file;
 
-            if (pin.GeoLocation != null)
+            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
             {
                 // Zoom auf Pin
-                lon = pin.GeoLocation.WGS84.Longitude;
-                lat = pin.GeoLocation.WGS84.Latitude;
+                lon = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Longitude;
+                lat = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Latitude;
                 zoom = 18;
             }
             else if (SettingsService.Instance.IsGpsActive)

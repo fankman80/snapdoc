@@ -93,13 +93,13 @@
                     <Border.Shadow>
                         <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6" />
                     </Border.Shadow>
-                    <Grid ColumnDefinitions="60,*"
+                    <Grid x:DataType="views:MapViewOSM"
+                          ColumnDefinitions="60,*"
                           ColumnSpacing="6"
                           VerticalOptions="Center"
                           HorizontalOptions="Center">
-                        <Image x:Name="SetPosBtnIcon"
-                               Grid.Column="0"
-                               Source="{AppThemeBinding Light=ic_pin_dark.png, Dark=ic_pin_light.png}" />
+                        <Image Grid.Column="0"
+                               Source="{Binding Pin.DisplayIconPath}" />
                         <Label Grid.Column="1"
                                Text="{x:Static res:AppResources.neu_setzen}"
                                HorizontalTextAlignment="Center"
