@@ -18,7 +18,7 @@
     <Grid>
         <VerticalStackLayout Spacing="6">
             <HorizontalStackLayout>
-                <Image Source="{Binding Pin.PinIcon}"
+                <Image Source="{Binding Pin.DisplayIconPath}"
                        WidthRequest="50"
                        HeightRequest="50"/>
                 <VerticalStackLayout Spacing="6">
@@ -40,9 +40,9 @@
             
             <HorizontalStackLayout Spacing="0">
                 <Label Text="{x:Static res:AppResources.standort}"
-                        TextColor="{DynamicResource Primary}"/>
+                       TextColor="{DynamicResource Primary}"/>
                 <Label Text=":"
-                        TextColor="{DynamicResource Primary}"/>
+                       TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
             <Label Text="{Binding Pin.PinLocation}"/>
 

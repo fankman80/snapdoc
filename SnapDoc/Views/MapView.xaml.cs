@@ -25,9 +25,25 @@ public partial class MapView : IQueryAttributable
     private int zoom = 8;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
 
+    private PinItem pin;
+    public PinItem Pin
+    {
+        get => pin;
+        set
+        {
+            if (pin != value)
+            {
+                pin = value;
+                OnPropertyChanged(nameof(Pin));
+            }
+        }
+    }
+
     public MapView()
     {
         InitializeComponent();
+
+        BindingContext = this;
 
 #if WINDOWS
         GeoAdminWebView.HandlerChanged += async (s, e) =>
@@ -146,12 +162,8 @@ public partial class MapView : IQueryAttributable
             GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
             plan.Pins.TryGetValue(PinId, out var pin))
         {
-            var file = pin.PinIcon;
-            if (file.Contains("customicons", StringComparison.OrdinalIgnoreCase))
-                file = Path.Combine(Settings.DataDirectory, file);
-        
+            Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
             SetPosBtn.IsVisible = true;
-            SetPosBtn.FindByName<Image>("SetPosBtnIcon").Source = file;
 
             if (pin.GeoLocation != null)
             {
