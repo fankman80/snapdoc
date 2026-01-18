@@ -219,9 +219,16 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // remove custom pin image
         if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin)
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon);
-            if (File.Exists(file))
-                File.Delete(file);
+            var filename = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon) + ".png";
+            string path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filename);
+
+            if (File.Exists(path))
+                File.Delete(path);
+
+            filename = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon) + ".data";
+            path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filename);
+            if (File.Exists(path))
+                File.Delete(path);
         }
 
         // remove pin from database

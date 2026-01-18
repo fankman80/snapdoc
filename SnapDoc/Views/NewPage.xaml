@@ -125,6 +125,18 @@
                     </Slider>
                 </Border>
 
+                <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Padding="0"
+                        Margin="25,0,0,180"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="LoadCustomPinClicked"/>
                 <Button x:Name="sizeModeBtn"
                         FontSize="38"
                         FontFamily="MaterialOutlined"

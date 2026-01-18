@@ -9,7 +9,7 @@ public class InteractivePolylineDrawable
     public float PointRadius { get; set; } = 8f;
     public float LineThickness { get; set; } = 3f;
     public bool DisplayHandles { get; set; } = true;
-    public bool IsClosed { get; private set; } = false;
+    public bool IsClosed { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.Red.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.Red;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);

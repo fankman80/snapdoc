@@ -5,6 +5,7 @@ using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.DrawingTool;
 using SnapDoc.Messages;
@@ -525,7 +526,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         SKColor? pinColor = null,
                         double customScale = 1,
                         double _rotation = 0,
-                        string customDisplayName = "")
+                        string customDisplayName = "",
+                        bool overwrite = false)
     {
         var currentPage = (NewPage)Shell.Current.CurrentPage;
         if (currentPage == null) return;
@@ -561,7 +563,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             _scale = customScale;
         }
 
-        // Pin sofort erstellen, GeoLocation vorerst null
         Pin newPinData = new()
         {
             Pos = _pos,
@@ -588,19 +589,35 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             IsAllowExport = _isAllowExport,
         };
 
-        // Sicherstellen, dass der Plan existiert
-        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+        if (!overwrite)
         {
-            plan.Pins ??= [];
-            plan.Pins[currentDateTime] = newPinData;
+            // Sicherstellen, dass der Plan existiert
+            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+            {
+                plan.Pins ??= [];
+                plan.Pins[currentDateTime] = newPinData;
 
-            GlobalJson.Data.Plans[PlanId].PinCount += 1;
+                GlobalJson.Data.Plans[PlanId].PinCount += 1;
 
+                GlobalJson.SaveToFile(); // initial speichern
+
+                AddPin(currentDateTime, newPinData.PinIcon);
+
+                _ = UpdatePinLocationAsync(newPinData);
+            }
+        }
+        else
+        {
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinIcon = _newPin;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].Size = _size;
+            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].Pos = _pos;
             GlobalJson.SaveToFile(); // initial speichern
 
-            AddPin(currentDateTime, newPinData.PinIcon);
-
-            _ = UpdatePinLocationAsync(newPinData);
+            var pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, _newPin);
+            activePin.Source= pinIcon;
+            //AdjustImagePosition(activePin);
+            activePin.IsVisible = true;
+            activePin = null;
         }
     }
 
@@ -669,17 +686,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 #endif
     }
 
-    private void ZoomToPin(string pinId)
+    private void ZoomToPin(string pinId, double? factor = null)
     {
-        if (GlobalJson.Data.Plans[PlanId].Pins.TryGetValue(pinId, out var pin) && pin != null)
-        {
-            var pos = GlobalJson.Data.Plans[PlanId].Pins[pinId].Pos;
-            planContainer.AnchorX = pos.X;
-            planContainer.AnchorY = pos.Y;
-            planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pos.X);
-            planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pos.Y);
-            planContainer.Scale = SettingsService.Instance.DefaultPinZoom;
-        }
+        double zoom = factor ?? SettingsService.Instance.DefaultPinZoom;
+
+        if (!GlobalJson.Data.Plans[PlanId].Pins.TryGetValue(pinId, out var pin))
+            return;
+
+        planContainer.AnchorX = pin.Pos.X;
+        planContainer.AnchorY = pin.Pos.Y;
+        planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pin.Pos.X);
+        planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pin.Pos.Y);
+        planContainer.Scale = zoom;
     }
 
     private void ImageFit(object sender, EventArgs e)
@@ -810,75 +828,71 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController.Reset();
     }
 
-    private async void TextClicked(object sender, EventArgs e)
-    {
-        var combined = drawingController.CombinedDrawable;
-
-        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
-        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
-        if (result.Result != null)
-        {
-            combined.RectDrawable?.Text = result.Result.InputTxt;
-            combined.RectDrawable?.TextSize = result.Result.FontSize;
-            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
-            combined.RectDrawable?.TextStyle = result.Result.Style;
-            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
-            drawingView?.InvalidateSurface();
-        }
-    }
-
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView != null && !drawingController.IsEmpty())
-        {
-            var customPinPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath);
-            var customPinName = "custompin_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + ".png";
-            string filePath = Path.Combine(customPinPath, customPinName);
+        if (drawingView == null || drawingController.IsEmpty())
+            goto Cleanup;
 
-            if (!Directory.Exists(customPinPath))
-                Directory.CreateDirectory(customPinPath);
+        var plan = GlobalJson.Data.Plans[PlanId];
+        var customPinPath = Path.Combine(
+            Settings.DataDirectory,
+            GlobalJson.Data.ProjectPath,
+            GlobalJson.Data.CustomPinsPath);
 
-            SKRect imageRect = await SaveCanvasAsCroppedPng(filePath);
+        Directory.CreateDirectory(customPinPath);
 
-            // Canvas-Punkt (Mittelpunkt deiner gedrehten Zeichnung)
-            var cx = imageRect.MidX / density;
-            var cy = imageRect.MidY / density;
+        bool overwrite =
+            activePin != null &&
+            plan.Pins.TryGetValue(activePin.AutomationId, out var pin) &&
+            File.Exists(Path.Combine(
+                customPinPath,
+                Path.GetFileName(pin.PinIcon)));
 
-            // Korrigierten Offset berechnen
-            var baseOffset = SettingsService.Instance.CustomPinOffset;
-            var rotatedOffset = RotateOffset(baseOffset, -planContainer.Rotation);
-            double fx = cx + rotatedOffset.X;
-            double fy = cy + rotatedOffset.Y;
+        var fileType = ".png";
+        var customPinName = overwrite
+            ? Path.GetFileNameWithoutExtension(plan.Pins[activePin.AutomationId].PinIcon)
+            : $"custompin_{DateTime.Now:yyyyMMdd_HHmmss}";
 
-            // In Bild-Koordinaten umrechnen
-            var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) /
-                     GlobalJson.Data.Plans[PlanId].ImageSize.Width;
+        var pngPath = Path.Combine(customPinPath, customPinName + fileType);
 
-            var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) /
-                     GlobalJson.Data.Plans[PlanId].ImageSize.Height;
+        // PNG erzeugen
+        SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
 
-            // Pin setzen
-            SetPin(new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
-                    customPinName,
-                    (int)imageRect.Width,
-                    (int)imageRect.Height,
-                    new SKColor(SelectedBorderColor.ToUint()),
-                    1 / planContainer.Scale / density,
-                    drawingController.InitialRotation - planContainer.Rotation,
-                    drawingController.CombinedDrawable.RectDrawable.Text);
-        }
+        // Mittelpunkt (Canvas → Plan)
+        var cx = imageRect.MidX / density;
+        var cy = imageRect.MidY / density;
 
-        // Cleanup drawing canvas
+        var rotatedOffset = RotateOffset(
+            SettingsService.Instance.CustomPinOffset,
+            -planContainer.Rotation);
+
+        double fx = cx + rotatedOffset.X;
+        double fy = cy + rotatedOffset.Y;
+
+        var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) / plan.ImageSize.Width;
+        var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) / plan.ImageSize.Height;
+
+        SetPin(
+            new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
+            customPinName + fileType,
+            (int)imageRect.Width,
+            (int)imageRect.Height,
+            new SKColor(SelectedBorderColor.ToUint()),
+            1 / planContainer.Scale / density,
+            drawingController.InitialRotation - planContainer.Rotation,
+            drawingController.CombinedDrawable.RectDrawable.Text,
+            overwrite
+        );
+
+        drawingController.SaveToFile(Path.Combine(customPinPath, customPinName + ".data"));
+
+    Cleanup:
         drawingController.Detach();
         RemoveDrawingView();
-
         drawMode = DrawMode.None;
-        DrawPolyBtn.CornerRadius = 30;
-        DrawFreeBtn.CornerRadius = 30;
-        DrawRectBtn.CornerRadius = 30;
+        SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
-
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
     }
 
@@ -972,6 +986,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         );
     }
 
+    private async void TextClicked(object sender, EventArgs e)
+    {
+        var combined = drawingController.CombinedDrawable;
+
+        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
+        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
+        if (result.Result != null)
+        {
+            combined.RectDrawable?.Text = result.Result.InputTxt;
+            combined.RectDrawable?.TextSize = result.Result.FontSize;
+            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
+            combined.RectDrawable?.TextStyle = result.Result.Style;
+            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
+            drawingView?.InvalidateSurface();
+        }
+    }
+
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
     {
         planContainer.IsPanningEnabled = true;
@@ -979,6 +1010,36 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         activePin = null;
+    }
+
+    private void LoadCustomPinClicked(object sender, EventArgs e)
+    {
+        if (!GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsCustomPin)
+            return; 
+
+        activePin.IsVisible = false;
+        planContainer.IsPanningEnabled = true;
+        PinEditBorder.IsVisible = false;
+        DrawBtn.IsVisible = true;
+        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        DrawingClicked(null, null);
+        ZoomToPin(activePin.AutomationId, 1 / GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale);
+
+        // Activate CustomPin Edit Mode
+        var file = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinIcon) + ".data";
+        var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
+        if (File.Exists(filePath))
+        {
+            drawingController.LoadFromFile(filePath, new SKPoint((float)this.Width / 2, (float)this.Height / 2));
+            var style = drawingController.LoadedStyle;
+            if (style != null)
+            {
+                SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
+                SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
+                SelectedTextColor = SKColor.Parse(style.TextColor).ToMauiColor();
+                lineWidth = (int)style.LineThickness;
+            }
+        }
     }
 
     private void OnSizeModeClicked(object sender, EventArgs e)

@@ -9,6 +9,7 @@ namespace SnapDoc.DrawingTool;
 public partial class DrawingController(TransformViewModel transformVm, double density) : IDisposable
 {
     public CombinedDrawable? CombinedDrawable { get; private set; }
+    public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
     public double InitialRotation = 0f;
     private SKCanvasView? canvasView;
@@ -72,7 +73,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             FreeDrawable = new InteractiveFreehandDrawable
             {
                 LineColor = lineColor,
-                LineThickness = lineThickness * (float)density
+                LineThickness = lineThickness * (float)density,
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
@@ -82,7 +83,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 StartPointColor = startPointColor,
                 LineThickness = lineThickness * (float)density,
                 HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale * (float)density : handleRadius * (float)density,
-                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density
+                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density,
             },
             RectDrawable = new InteractiveRectangleDrawable
             {
@@ -98,7 +99,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                     ? pointRadius / (float)transformVm.Scale * (float)density
                     : pointRadius * (float)density,
                 AllowedAngleDeg = rotationAngle,
-                Text = ""
+                Text = "",
             }
         };
 
@@ -504,6 +505,42 @@ public partial class DrawingController(TransformViewModel transformVm, double de
 
         canvas.Restore();
     }
+
+    public void SaveToFile(string path)
+    {
+        if (CombinedDrawable == null)
+            return;
+
+        DrawingPersistenceService.Save(path, CombinedDrawable);
+    }
+
+    public void LoadFromFile(string path, SKPoint position)
+    {
+        CombinedDrawable ??= new CombinedDrawable
+            {
+                FreeDrawable = new InteractiveFreehandDrawable(),
+                PolyDrawable = new InteractivePolylineDrawable(),
+                RectDrawable = new InteractiveRectangleDrawable()
+            };
+
+        var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position);
+        LoadedStyle = dto.Style;
+
+        DrawMode = DrawMode.None;
+        HideAllHandles();
+
+        canvasView?.InvalidateSurface();
+    }
+
+    private void HideAllHandles()
+    {
+        if (CombinedDrawable == null)
+            return;
+
+        CombinedDrawable.PolyDrawable?.DisplayHandles = false;
+        CombinedDrawable.RectDrawable?.DisplayHandles = false;
+    }
+
 
     public void Dispose()
     {

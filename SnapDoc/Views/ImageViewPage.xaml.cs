@@ -421,12 +421,9 @@ public partial class ImageViewPage : IQueryAttributable
         RemoveDrawingView();
 
         drawMode = DrawMode.None;
-        DrawPolyBtn.CornerRadius = 30;
-        DrawFreeBtn.CornerRadius = 30;
-        DrawRectBtn.CornerRadius = 30;
+        SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
-
         isCleared = false;
     }
 
