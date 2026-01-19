@@ -96,7 +96,7 @@ public class InteractiveRectangleDrawable
     {
         get
         {
-            float handleDistance = PointRadius * 3;
+            float handleDistance = PointRadius * (float)Settings.DisplayDensity * 3;
             float yLocal = -Height / 2f - handleDistance;
 
             float cos = MathF.Cos(AllowedAngleRad);
@@ -133,7 +133,7 @@ public class InteractiveRectangleDrawable
         using var linePaint = new SKPaint
         {
             Color = LineColor,
-            StrokeWidth = LineThickness,
+            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
             IsStroke = true,
             IsAntialias = true
         };
@@ -153,14 +153,14 @@ public class InteractiveRectangleDrawable
         };
 
         foreach (var p in pts)
-            canvas.DrawCircle(p, PointRadius, handlePaint);
+            canvas.DrawCircle(p, PointRadius * (float)Settings.DisplayDensity, handlePaint);
 
         if (_rotationHandleBitmap != null)
         {
 #pragma warning disable CS0618 // FilterQuality ist veraltet, aber nötig
             var paint = new SKPaint { IsAntialias = true, FilterQuality = SKFilterQuality.High };
 #pragma warning restore CS0618
-            float size = PointRadius * 4;
+            float size = PointRadius * (float)Settings.DisplayDensity * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
@@ -331,7 +331,7 @@ public class InteractiveRectangleDrawable
         return true;
     }
 
-    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius;
+    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * (float)Settings.DisplayDensity;
 
     public void SetRotationFromPoint(SKPoint p)
     {
@@ -347,7 +347,7 @@ public class InteractiveRectangleDrawable
 
         for (int i = 0; i < pts.Length; i++)
         {
-            if (SKPoint.Distance(p, pts[i]) <= HandleRadius)
+            if (SKPoint.Distance(p, pts[i]) <= HandleRadius * (float)Settings.DisplayDensity)
                 return i;
         }
 

@@ -30,7 +30,7 @@ public class InteractiveFreehandDrawable
         using var paint = new SKPaint
         {
             Color = LineColor,
-            StrokeWidth = LineThickness,
+            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
             IsStroke = true,
             StrokeCap = SKStrokeCap.Round,
             StrokeJoin = SKStrokeJoin.Round,

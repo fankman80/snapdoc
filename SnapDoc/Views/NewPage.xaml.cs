@@ -38,7 +38,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isTappedHandled = false;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
-    private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -92,7 +91,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer = new TransformViewModel();
         BindingContext = planContainer;
 
-        drawingController = new DrawingController(planContainer, density);
+        drawingController = new DrawingController(planContainer);
         PlanId = planId;
         PageTitle = GlobalJson.Data.Plans[PlanId].Name;
 
@@ -876,8 +875,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
 
         // Mittelpunkt (Canvas → Plan)
-        var cx = imageRect.MidX / density;
-        var cy = imageRect.MidY / density;
+        var cx = imageRect.MidX / Settings.DisplayDensity;
+        var cy = imageRect.MidY / Settings.DisplayDensity;
 
         var rotatedOffset = RotateOffset(
             SettingsService.Instance.CustomPinOffset,
@@ -895,7 +894,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (int)imageRect.Width,
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
-            1 / planContainer.Scale / density,
+            1 / planContainer.Scale / Settings.DisplayDensity,
             drawingController.InitialRotation - planContainer.Rotation,
             drawingController.CombinedDrawable.RectDrawable.Text,
             overwrite
@@ -953,7 +952,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             return new SKRectI(0, 0, 0, 0);
 
         // --- Offset für Strichdicke hinzufügen ---
-        var offset = (lineWidth * density) / 2;
+        var offset = (lineWidth * Settings.DisplayDensity) / 2;
         var cropRect = new SKRectI(
             (int)Math.Floor(boundingBox.Value.Left - offset),
             (int)Math.Floor(boundingBox.Value.Top - offset),

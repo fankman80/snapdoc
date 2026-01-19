@@ -102,6 +102,9 @@ public partial class App : Application
         bottomInset = safeAreaBottom;
 #endif
 
+        // Display-Density speichern
+        Settings.DisplayDensity = DeviceDisplay.MainDisplayInfo.Density;
+
         SettingsService.Instance.CustomPinOffset = new Point(0, -bottomInset / 2);
 
         // Einstellungen speichern

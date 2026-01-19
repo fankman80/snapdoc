@@ -3,6 +3,8 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
+    public static double DisplayDensity { get; set; } = 1;
+
     // Icondefinitionen
     public const string PinEditRotateModeLockIcon = MaterialIcons.Lock_reset;
     public const string PinEditRotateModeUnlockIcon = MaterialIcons.Rotate_auto;

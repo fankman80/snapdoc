@@ -46,7 +46,7 @@ public class InteractivePolylineDrawable
         using var linePaint = new SKPaint
         {
             Color = LineColor,
-            StrokeWidth = LineThickness,
+            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
             IsStroke = true,
             StrokeCap = SKStrokeCap.Round,
             IsAntialias = true
@@ -75,7 +75,7 @@ public class InteractivePolylineDrawable
                     Style = SKPaintStyle.StrokeAndFill,
                     StrokeWidth = 2
                 };
-                canvas.DrawCircle(Points[i], PointRadius, pointPaint);
+                canvas.DrawCircle(Points[i], PointRadius * (float)Settings.DisplayDensity, pointPaint);
             }
         }
     }
@@ -86,7 +86,7 @@ public class InteractivePolylineDrawable
         {
             var dx = Points[i].X - x;
             var dy = Points[i].Y - y;
-            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius)
+            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * (float)Settings.DisplayDensity)
                 return i;
         }
         return null;
@@ -101,7 +101,7 @@ public class InteractivePolylineDrawable
         var dx = start.X - x;
         var dy = start.Y - y;
 
-        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius)
+        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * (float)Settings.DisplayDensity)
         {
             IsClosed = true;
             return true;

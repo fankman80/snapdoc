@@ -21,7 +21,6 @@ public partial class ImageViewPage : IQueryAttributable
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private readonly TransformViewModel fotoContainer;
-    private readonly double density = DeviceDisplay.MainDisplayInfo.Density;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -85,7 +84,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
 
-        drawingController = new DrawingController(fotoContainer, density);
+        drawingController = new DrawingController(fotoContainer);
     }
 
     protected override void OnAppearing()

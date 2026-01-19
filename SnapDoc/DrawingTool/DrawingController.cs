@@ -6,7 +6,7 @@ using SnapDoc.ViewModels;
 
 namespace SnapDoc.DrawingTool;
 
-public partial class DrawingController(TransformViewModel transformVm, double density) : IDisposable
+public partial class DrawingController(TransformViewModel transformVm) : IDisposable
 {
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
@@ -73,7 +73,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             FreeDrawable = new InteractiveFreehandDrawable
             {
                 LineColor = lineColor,
-                LineThickness = lineThickness * (float)density,
+                LineThickness = lineThickness,
             },
             PolyDrawable = new InteractivePolylineDrawable
             {
@@ -81,9 +81,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 LineColor = lineColor,
                 PointColor = pointColor,
                 StartPointColor = startPointColor,
-                LineThickness = lineThickness * (float)density,
-                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale * (float)density : handleRadius * (float)density,
-                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale * (float)density : pointRadius * (float)density,
+                LineThickness = lineThickness,
+                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
+                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius,
             },
             RectDrawable = new InteractiveRectangleDrawable
             {
@@ -91,13 +91,9 @@ public partial class DrawingController(TransformViewModel transformVm, double de
                 LineColor = lineColor,
                 PointColor = pointColor,
                 TextColor = textColor,
-                LineThickness = lineThickness * (float)density,
-                HandleRadius = scaleHandlesWithTransform
-                    ? handleRadius / (float)transformVm.Scale * (float)density
-                    : handleRadius * (float)density,
-                            PointRadius = scaleHandlesWithTransform
-                    ? pointRadius / (float)transformVm.Scale * (float)density
-                    : pointRadius * (float)density,
+                LineThickness = lineThickness,
+                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
+                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius,
                 AllowedAngleDeg = rotationAngle,
                 Text = "",
             }
@@ -147,7 +143,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             if (lastClickTime.HasValue &&
                 (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
                 lastClickPosition.HasValue &&
-                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius * (float)density)
+                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius)
             {
                 DeletePointAt(p);
                 lastClickTime = null;
@@ -294,13 +290,13 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         {
             if (scaleHandlesWithTransform)
             {
-                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
-                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
+                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale);
+                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale);
             }
             else
             {
-                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density);
-                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density);
+                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius);
+                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius);
             }
         }
 
@@ -310,13 +306,13 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         {
             if (scaleHandlesWithTransform)
             {
-                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale * density);
-                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale * density);
+                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale);
+                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale);
             }
             else
             {
-                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius * density);
-                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius * density);
+                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius);
+                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius);
             }
         }
 
@@ -350,7 +346,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         if (free != null)
         {
             free.LineColor = lineColor;
-            free.LineThickness = lineWidth * (float)density;
+            free.LineThickness = lineWidth;
         }
 
         // Polyline aktualisieren
@@ -359,7 +355,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
         {
             poly.LineColor = lineColor;
             poly.FillColor = fillColor;
-            poly.LineThickness = lineWidth * (float)density;
+            poly.LineThickness = lineWidth;
         }
 
         // Rectangle aktualisieren
@@ -369,7 +365,7 @@ public partial class DrawingController(TransformViewModel transformVm, double de
             rect.LineColor = lineColor;
             rect.FillColor = fillColor;
             rect.TextColor = textColor;
-            rect.LineThickness = lineWidth * (float)density;
+            rect.LineThickness = lineWidth;
         }
 
         canvasView?.InvalidateSurface();
