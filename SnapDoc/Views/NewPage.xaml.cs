@@ -941,6 +941,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         doubleTappedPin?.IsVisible = true;
         doubleTappedPin = null;
+
+        drawingView?.InvalidateSurface();
     }
 
     static Point RotateOffset(Point offset, double angleDeg)
@@ -1048,6 +1050,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             combined.RectDrawable?.TextPadding = result.Result.TextPadding;
         }
+
+        drawingView?.InvalidateSurface();
     }
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
