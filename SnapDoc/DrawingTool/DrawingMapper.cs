@@ -148,8 +148,11 @@ public static class DrawingMapper
         return SKRect.Create(minX, minY, maxX - minX, maxY - minY);
     }
 
-    private static void ApplyStyle(DrawingStyleDto s, CombinedDrawable d)
+    private static void ApplyStyle(DrawingStyleDto? s, CombinedDrawable d)
     {
+        if (s == null)
+            return;
+
         var lineColor = SKColor.Parse(s.LineColor);
         var fillColor = SKColor.Parse(s.FillColor);
         var textColor = SKColor.Parse(s.TextColor);

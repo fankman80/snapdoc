@@ -29,7 +29,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public string PinDelete;
     public string PinZoom = null;
     private bool isPinSet = false;
-    private MR.Gestures.Image activePin = null;
+    private MR.Gestures.Image activePin = null; 
+    private MR.Gestures.Image doubleTappedPin = null;
     private double densityX, densityY;
     private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
@@ -354,15 +355,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         smallImage.DoubleTapped += (s, e) =>
         {
-            activePin = smallImage;
-            PinSizeSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale * 100;
-            PinRotateSlider.Value = Helper.ToSliderValue(GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation);
+            doubleTappedPin = smallImage;
+            PinSizeSlider.Value = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinScale * 100;
+            PinRotateSlider.Value = Helper.ToSliderValue(GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation);
             planContainer.IsPanningEnabled = false;
             DrawBtn.IsVisible = false;
             SetPinBtn.IsVisible = false;
             PinEditBorder.IsVisible = true;
 
-            if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
+            if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsCustomPin)
+                loadCustomPinBtn.IsVisible = true;
+            else
+                loadCustomPinBtn.IsVisible = false;
+
+            if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate)
             {
                 rotateModeLabel.Text = AppResources.drehung_fixiert;
                 rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
@@ -372,7 +378,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 rotateModeLabel.Text = AppResources.automatische_drehung;
                 rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             }
-            if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
+            if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockAutoScale)
             {
                 sizeModeLabel.Text = AppResources.groesse_fixiert;
                 sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
@@ -384,8 +390,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             }
         };
 
-        // sort large custom pins on lower z-indexes
-        // and small pins on higher z-indexes
+        // sort large custom pins on lower z-indexes and small pins on higher z-indexes
         smallImage.ZIndex = 10000 - (int)((GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Width +
                                            GlobalJson.Data.Plans[PlanId].Pins[pinId].Size.Height) / 2);
 
@@ -504,7 +509,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
         double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
 
-        if (activePin != null && PinEditBorder.IsVisible == false)
+        if (activePin != null && doubleTappedPin == null)
         {
             activePin.TranslationX += deltaX * scaleSpeed;
             activePin.TranslationY += deltaY * scaleSpeed;
@@ -608,16 +613,28 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         else
         {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinIcon = _newPin;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].Size = _size;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].Pos = _pos;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinIcon = _newPin;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Size = _size;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Pos = _pos;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation = _rotation;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinName = _displayName;
             GlobalJson.SaveToFile(); // initial speichern
 
+            Point _originAnchor = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Anchor;
+            Point _originPos = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Pos;
+            Size _planSize = GlobalJson.Data.Plans[PlanId].ImageSize;
+            Size _pinSize = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Size;
+
             var pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, _newPin);
-            activePin.Source= pinIcon;
-            //AdjustImagePosition(activePin);
-            activePin.IsVisible = true;
-            activePin = null;
+            doubleTappedPin.Source = pinIcon;
+            doubleTappedPin.WidthRequest = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Size.Width;
+            doubleTappedPin.HeightRequest = GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].Size.Height;
+            doubleTappedPin.TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width);
+            doubleTappedPin.TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height);
+            doubleTappedPin.Rotation = _rotation;
+            doubleTappedPin.Scale = _scale;
+            doubleTappedPin.IsVisible = true;
+            doubleTappedPin = null;
         }
     }
 
@@ -842,15 +859,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Directory.CreateDirectory(customPinPath);
 
         bool overwrite =
-            activePin != null &&
-            plan.Pins.TryGetValue(activePin.AutomationId, out var pin) &&
+            doubleTappedPin != null &&
+            plan.Pins.TryGetValue(doubleTappedPin.AutomationId, out var pin) &&
             File.Exists(Path.Combine(
                 customPinPath,
                 Path.GetFileName(pin.PinIcon)));
 
         var fileType = ".png";
         var customPinName = overwrite
-            ? Path.GetFileNameWithoutExtension(plan.Pins[activePin.AutomationId].PinIcon)
+            ? Path.GetFileNameWithoutExtension(plan.Pins[doubleTappedPin.AutomationId].PinIcon)
             : $"custompin_{DateTime.Now:yyyyMMdd_HHmmss}";
 
         var pngPath = Path.Combine(customPinPath, customPinName + fileType);
@@ -1009,24 +1026,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        activePin = null;
+        doubleTappedPin = null;
     }
 
     private void LoadCustomPinClicked(object sender, EventArgs e)
     {
-        if (!GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsCustomPin)
-            return; 
+        if (!GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsCustomPin)
+            return;
 
-        activePin.IsVisible = false;
+        doubleTappedPin.IsVisible = false;
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
-        DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
         DrawingClicked(null, null);
-        ZoomToPin(activePin.AutomationId, 1 / GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale);
+        ZoomToPin(doubleTappedPin.AutomationId, 1 / GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinScale);
+        planContainer.Rotation = -GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation;
 
         // Activate CustomPin Edit Mode
-        var file = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinIcon) + ".data";
+        var file = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinIcon) + ".data";
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
         if (File.Exists(filePath))
         {
@@ -1044,15 +1061,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnSizeModeClicked(object sender, EventArgs e)
     {
-        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale)
+        if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockAutoScale)
         {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = false;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockAutoScale = false;
             sizeModeLabel.Text = AppResources.automatische_groessenanpassung;
             sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
         else
         {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockAutoScale = true;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockAutoScale = true;
             sizeModeLabel.Text = AppResources.groesse_fixiert;
             sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
@@ -1063,20 +1080,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnRotateModeClicked(object sender, EventArgs e)
     {
-        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
+        if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate)
         {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = false;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate = false;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation = 0;
             rotateModeLabel.Text = AppResources.automatische_drehung;
             rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.Value = 0;
 
-            activePin.Rotation = planContainer.Rotation * -1;
+            doubleTappedPin.Rotation = planContainer.Rotation * -1;
         }
         else
         {
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate = true;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
             rotateModeLabel.Text = AppResources.drehung_fixiert;
             rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             PinRotateSlider.Value = Helper.ToSliderValue(-planContainer.Rotation);
@@ -1091,7 +1108,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
         degreesLabel.Text = $"{sliderValue}°";
-        activePin.Rotation = Helper.SliderToRotation(sliderValue);
+        doubleTappedPin.Rotation = Helper.SliderToRotation(sliderValue);
     }
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
@@ -1099,12 +1116,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var sliderValue = Helper.SliderToRotation(Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0));
 
         if (sliderValue != 0)
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate = true;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate = true;
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].IsLockRotate)
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = sliderValue;
+        if (GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].IsLockRotate)
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation = sliderValue;
         else
-            GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinRotation = 0;
+            GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinRotation = 0;
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -1113,7 +1130,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        activePin = null;
+        doubleTappedPin = null;
     }
 
     private void OnResizeSliderValueChanged(object sender, EventArgs e)
@@ -1123,9 +1140,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         double scale = 1.0 / PlanContainer.Scale;
         double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
         if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
-            activePin.Scale = scale * sliderValue / 100.0;
+            doubleTappedPin.Scale = scale * sliderValue / 100.0;
         else
-            activePin.Scale = sliderValue / 100.0;
+            doubleTappedPin.Scale = sliderValue / 100.0;
 
         percentLabel.Text = $"{sliderValue}%";
     }
@@ -1134,7 +1151,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
 
-        GlobalJson.Data.Plans[PlanId].Pins[activePin.AutomationId].PinScale = sliderValue / 100.0;
+        GlobalJson.Data.Plans[PlanId].Pins[doubleTappedPin.AutomationId].PinScale = sliderValue / 100.0;
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -1143,7 +1160,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        activePin = null;
+        doubleTappedPin = null;
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
