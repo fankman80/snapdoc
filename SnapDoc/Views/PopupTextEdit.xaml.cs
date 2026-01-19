@@ -54,6 +54,20 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         }
     }
 
+    private int textPadding;
+    public int TextPadding
+    {
+        get => textPadding;
+        set
+        {
+            if (textPadding != value)
+            {
+                textPadding = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public bool IsBold => TextStyle.HasFlag(RectangleTextStyle.Bold);
     public bool IsItalic => TextStyle.HasFlag(RectangleTextStyle.Italic);
 
@@ -86,7 +100,7 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         }
     }
 
-    public PopupTextEdit(float fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, RectangleTextStyle textStyle  = RectangleTextStyle.Normal, bool autoSize = false, string inputTxt = "", string okText = null, string cancelText = null)
+    public PopupTextEdit(float fontSize = 24, RectangleTextAlignment fontAlignment = RectangleTextAlignment.Center, RectangleTextStyle textStyle  = RectangleTextStyle.Normal, bool autoSize = false, string inputTxt = "", int textPadding = 10, string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;
@@ -96,6 +110,7 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
         TextStyle = textStyle;
         AutoSize = autoSize;
         InputTxt = inputTxt;
+        TextPadding = textPadding;
 
         BindingContext = this;
     }
@@ -118,7 +133,7 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new TextEditReturn(FontSize, FontAlignment, TextStyle, AutoSize, InputTxt));
+        await CloseAsync(new TextEditReturn(FontSize, FontAlignment, TextStyle, AutoSize, InputTxt, TextPadding));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

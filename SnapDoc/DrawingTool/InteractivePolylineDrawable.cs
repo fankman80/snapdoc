@@ -10,8 +10,8 @@ public class InteractivePolylineDrawable
     public float LineThickness { get; set; } = 3f;
     public bool DisplayHandles { get; set; } = true;
     public bool IsClosed { get; set; } = false;
-    public SKColor FillColor { get; set; } = SKColors.Red.WithAlpha(128);
-    public SKColor LineColor { get; set; } = SKColors.Red;
+    public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
+    public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
     public bool HasContent => Points.Count > 0;
@@ -42,21 +42,24 @@ public class InteractivePolylineDrawable
             canvas.DrawPath(path, fillPaint);
         }
 
-        // Linien
-        using var linePaint = new SKPaint
+        if (LineThickness > 0)
         {
-            Color = LineColor,
-            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
-            IsStroke = true,
-            StrokeCap = SKStrokeCap.Round,
-            IsAntialias = true
-        };
+            // Linien
+            using var linePaint = new SKPaint
+            {
+                Color = LineColor,
+                StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+                IsStroke = true,
+                StrokeCap = SKStrokeCap.Round,
+                IsAntialias = true
+            };
 
-        for (int i = 0; i < Points.Count; i++)
-        {
-            var nextIndex = (i + 1) % Points.Count;
-            if (!IsClosed && nextIndex == 0) break;
-            canvas.DrawLine(Points[i], Points[nextIndex], linePaint);
+            for (int i = 0; i < Points.Count; i++)
+            {
+                var nextIndex = (i + 1) % Points.Count;
+                if (!IsClosed && nextIndex == 0) break;
+                canvas.DrawLine(Points[i], Points[nextIndex], linePaint);
+            }
         }
 
         // Punkte

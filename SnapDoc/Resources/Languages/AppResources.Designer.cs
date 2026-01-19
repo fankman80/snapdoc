@@ -1672,6 +1672,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Randabstand ähnelt.
+        /// </summary>
+        internal static string randabstand {
+            get {
+                return ResourceManager.GetString("randabstand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Raster/Liste umschalten ähnelt.
         /// </summary>
         internal static string raster_liste_umschalten {

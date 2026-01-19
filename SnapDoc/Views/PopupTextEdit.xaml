@@ -142,7 +142,17 @@
                     </Button.Triggers>
                 </Button>
             </HorizontalStackLayout>
-            
+
+            <VerticalStackLayout Spacing="0">
+                <controls:LocalizedLabel ResourceKey="randabstand" Value="{Binding TextPadding}" ValueFormat="{}: {0:F0}"/>
+                <Slider Maximum="50"
+                        Minimum="0"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                        Value="{Binding TextPadding}"/>
+            </VerticalStackLayout>
+
             <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
                 <controls:Switch Grid.Column="0"
                                  IsToggled="{Binding AutoSize}"

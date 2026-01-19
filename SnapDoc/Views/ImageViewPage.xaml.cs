@@ -28,7 +28,7 @@ public partial class ImageViewPage : IQueryAttributable
     private DrawMode drawMode = DrawMode.None;
     private int lineWidth = 3;
 
-    private Color selectedBorderColor = new(0, 0, 255, 255);
+    private Color selectedBorderColor = new(0, 153, 0, 255);
     public Color SelectedBorderColor
     {
         get => selectedBorderColor;
@@ -39,7 +39,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    private Color selectedFillColor = new(255, 0, 0, 128);
+    private Color selectedFillColor = new(202, 255, 150, 128);
     public Color SelectedFillColor
     {
         get => selectedFillColor;

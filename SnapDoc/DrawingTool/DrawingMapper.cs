@@ -16,7 +16,8 @@ public static class DrawingMapper
             TextSize = d.RectDrawable.TextSize,
             TextAlignment = (int)d.RectDrawable.TextAlignment,
             TextStyle = (int)d.RectDrawable.TextStyle,
-            AutoSizeText = d.RectDrawable.AutoSizeText
+            AutoSizeText = d.RectDrawable.AutoSizeText,
+            TextPadding = d.RectDrawable.TextPadding,
         };
 
         var bounds = CalculateBounds(d);
@@ -172,5 +173,6 @@ public static class DrawingMapper
         d.RectDrawable.TextAlignment = (RectangleTextAlignment)s.TextAlignment;
         d.RectDrawable.TextStyle = (RectangleTextStyle)s.TextStyle;
         d.RectDrawable.AutoSizeText = s.AutoSizeText;
+        d.RectDrawable.TextPadding = s.TextPadding;
     }
 }

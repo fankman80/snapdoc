@@ -813,4 +813,7 @@
   <data name="automatische_schriftgroesse" xml:space="preserve">
     <value>Taille de police automatique</value>
   </data>
+  <data name="randabstand" xml:space="preserve">
+    <value>Marges</value>
+  </data>
 </root>

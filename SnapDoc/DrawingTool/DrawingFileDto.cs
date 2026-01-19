@@ -11,6 +11,7 @@ public class DrawingStyleDto
     public int TextAlignment { get; set; }
     public int TextStyle { get; set; }
     public bool AutoSizeText { get; set; }
+    public int TextPadding { get; set; }
 }
 
 public class DrawingFileDto

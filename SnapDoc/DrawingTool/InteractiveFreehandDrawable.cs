@@ -6,9 +6,10 @@ public class InteractiveFreehandDrawable
 {
     public List<List<SKPoint>> Points { get; set; } = [];
     public float LineThickness { get; set; } = 3f;
-    public SKColor LineColor { get; set; } = SKColors.Black;
-    private List<SKPoint>? _currentStroke;
+    public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public bool HasContent => Points.Any(stroke => stroke.Count > 1);
+    private List<SKPoint>? _currentStroke;
+
     public void StartStroke()
     {
         _currentStroke = [];

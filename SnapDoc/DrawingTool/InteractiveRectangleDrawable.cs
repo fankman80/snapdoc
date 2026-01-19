@@ -10,8 +10,8 @@ public class InteractiveRectangleDrawable
     public float LineThickness { get; set; } = 3f;
     public bool DisplayHandles { get; set; } = true;
     public bool IsDrawn { get; set; } = false;
-    public SKColor FillColor { get; set; } = SKColors.Blue;
-    public SKColor LineColor { get; set; } = SKColors.Blue;
+    public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
+    public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor TextColor { get; set; } = SKColors.Black;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
     public SKPoint Center { get; private set; }
@@ -24,7 +24,7 @@ public class InteractiveRectangleDrawable
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
     public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
     public bool AutoSizeText { get; set; } = true;
-    public float TextPadding { get; set; } = 10f;
+    public int TextPadding { get; set; } = 10;
     private static SKBitmap? _rotationHandleBitmap;
     private static bool _isLoading;
     private float _allowedAngleRad;
@@ -130,14 +130,17 @@ public class InteractiveRectangleDrawable
         };
         canvas.DrawPath(path, fillPaint);
 
-        using var linePaint = new SKPaint
+        if (LineThickness > 0)
         {
-            Color = LineColor,
-            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
-            IsStroke = true,
-            IsAntialias = true
-        };
-        canvas.DrawPath(path, linePaint);
+            using var linePaint = new SKPaint
+            {
+                Color = LineColor,
+                StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+                IsStroke = true,
+                IsAntialias = true
+            };
+            canvas.DrawPath(path, linePaint);
+        }
 
         // Draw text if available
         if (!string.IsNullOrEmpty(Text))
