@@ -184,8 +184,8 @@ public class InteractiveRectangleDrawable
         canvas.RotateDegrees(AllowedAngleDeg);
 
         // Calculate max text area
-        float maxTextWidth = Width - 2 * TextPadding;
-        float maxTextHeight = Height - 2 * TextPadding;
+        float maxTextWidth = Width - 2 * TextPadding * (float)Settings.DisplayDensity;
+        float maxTextHeight = Height - 2 * TextPadding * (float)Settings.DisplayDensity;
 
         // Determine font size
         TextSize = AutoSizeText
@@ -204,7 +204,7 @@ public class InteractiveRectangleDrawable
             IsStroke = false
         };
 
-        float maxWidth = Width - 2 * TextPadding;
+        float maxWidth = Width - 2 * TextPadding * (float)Settings.DisplayDensity;
         var lines = BreakTextIntoLines(Text, font, maxWidth);
 
         var metrics = font.Metrics;
@@ -275,10 +275,10 @@ public class InteractiveRectangleDrawable
         return TextAlignment switch
         {
             RectangleTextAlignment.Left =>
-                -Width / 2f + TextPadding,
+                -Width / 2f + TextPadding * (float)Settings.DisplayDensity,
 
             RectangleTextAlignment.Right =>
-                Width / 2f - TextPadding - lineWidth,
+                Width / 2f - TextPadding * (float)Settings.DisplayDensity - lineWidth,
 
             _ => // Center
                 -lineWidth / 2f
