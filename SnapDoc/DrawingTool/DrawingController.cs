@@ -11,7 +11,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
-    public double InitialRotation = 0f;
+    public float InitialRotation = 0f;
     private SKCanvasView? canvasView;
     private int? activeIndex = null;
     private DateTime? lastClickTime;
@@ -507,7 +507,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable == null)
             return;
 
-        DrawingPersistenceService.Save(path, CombinedDrawable);
+        DrawingPersistenceService.Save(path, CombinedDrawable, InitialRotation);
     }
 
     public void LoadFromFile(string path, SKPoint position)
@@ -519,7 +519,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 RectDrawable = new InteractiveRectangleDrawable()
             };
 
-        var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position);
+        var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position, this);
+        InitialRotation = dto.InitialRotation;
         LoadedStyle = dto.Style;
 
         DrawMode = DrawMode.None;

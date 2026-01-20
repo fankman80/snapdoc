@@ -4,7 +4,7 @@ namespace SnapDoc.DrawingTool;
 
 public static class DrawingMapper
 {
-    public static DrawingFileDto ToDto(CombinedDrawable d)
+    public static DrawingFileDto ToDto(CombinedDrawable d, float initialRotation)
     {
         var style = new DrawingStyleDto
         {
@@ -31,6 +31,8 @@ public static class DrawingMapper
                 Width = bounds.Width,
                 Height = bounds.Height
             },
+
+            InitialRotation = initialRotation,
 
             // ---------------- POLY ----------------
             Poly = d.PolyDrawable?.Points.Count > 0
@@ -72,9 +74,11 @@ public static class DrawingMapper
         };
     }
 
-    public static void FromDto(DrawingFileDto dto, CombinedDrawable d, SKPoint targetCenter)
+    public static void FromDto(DrawingFileDto dto, CombinedDrawable d, SKPoint targetCenter, DrawingController controller)
     {
         d.Reset();
+
+        controller.InitialRotation = dto.InitialRotation;
 
         ApplyStyle(dto.Style, d);
 

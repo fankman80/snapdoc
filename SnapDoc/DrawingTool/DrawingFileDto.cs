@@ -18,6 +18,7 @@ public class DrawingFileDto
 {
     public BoundsDto? Bounds { get; set; }
     public DrawingStyleDto? Style { get; set; }
+    public float InitialRotation { get; set; }
     public PolyDto? Poly { get; set; }
     public FreeDto? Free { get; set; }
     public RectDto? Rect { get; set; }

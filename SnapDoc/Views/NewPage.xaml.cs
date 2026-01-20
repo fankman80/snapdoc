@@ -1068,20 +1068,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (!thisPlan.Pins[doubleTappedPin.AutomationId].IsCustomPin)
             return;
 
-        doubleTappedPin.IsVisible = false;
-        planContainer.IsPanningEnabled = true;
-        PinEditBorder.IsVisible = false;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        DrawingClicked(null, null);
-        ZoomToPin(doubleTappedPin.AutomationId, 1 / thisPlan.Pins[doubleTappedPin.AutomationId].PinScale / Settings.DisplayDensity);
-        planContainer.Rotation = -thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation;
-
         // Activate CustomPin Edit Mode
         var file = Path.GetFileNameWithoutExtension(thisPlan.Pins[doubleTappedPin.AutomationId].PinIcon) + ".data";
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
         if (File.Exists(filePath))
         {
+            doubleTappedPin.IsVisible = false;
+            planContainer.IsPanningEnabled = true;
+            PinEditBorder.IsVisible = false;
+            SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+            DrawingClicked(null, null);
+            ZoomToPin(doubleTappedPin.AutomationId, 1 / thisPlan.Pins[doubleTappedPin.AutomationId].PinScale / Settings.DisplayDensity);
             drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
+            planContainer.Rotation = -thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation + drawingController.InitialRotation;  
+            
             var style = drawingController.LoadedStyle;
             if (style != null)
             {
