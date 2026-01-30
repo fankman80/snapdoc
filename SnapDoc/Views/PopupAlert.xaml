@@ -6,11 +6,11 @@
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               WidthRequest="280"
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupAlert">
 
-    <Grid Padding="16">
+    <Grid Padding="12"
+          WidthRequest="320">
         <VerticalStackLayout>
             <Label x:Name="titleText"
                    Text=""

@@ -11,7 +11,6 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               WidthRequest="280"
                HorizontalOptions="Center"
                x:Name="ThisPage"
                x:TypeArguments="local:ColorPickerReturn"
@@ -30,7 +29,8 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid Padding="16">
+    <Grid Padding="12"
+          WidthRequest="320">
         <Grid VerticalOptions="Center">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
@@ -45,18 +45,18 @@
                                     ItemsSource="{Binding ColorsList}"
                                     SelectionMode="None">
                         <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="6"/>
+                            <GridItemsLayout Orientation="Vertical" Span="6" HorizontalItemSpacing="2" VerticalItemSpacing="2"/>
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="local:ColorBoxItem">
                                 <Grid>
                                     <!-- Normales Farbfeld -->
-                                    <Border IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
+                                    <Border x:Name="ColorBox"
+                                            IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
                                             BackgroundColor="{Binding BackgroundColor}"
                                             Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
-                                            StrokeThickness="1">
+                                            StrokeThickness="1"
+                                            SizeChanged="OnColorBoxSizeChanged">
                                         <Border.Behaviors>
                                             <vm:UnifiedTapBehavior
                                                 x:DataType="views:PopupColorPicker"
@@ -64,17 +64,19 @@
                                                 DoubleTapCommand="{Binding DoubleTapCommand, Source={x:Reference ThisPage}}" />
                                         </Border.Behaviors>
                                         <Border.StrokeShape>
-                                            <RoundRectangle CornerRadius="{Binding IsSelected, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?20:0'}"/>
+                                            <RoundRectangle
+                                                CornerRadius="{Binding IsSelected,
+                                                Converter={StaticResource MathExpressionConverter},
+                                                ConverterParameter='x==true?999:0'}"/>
                                         </Border.StrokeShape>
                                     </Border>
 
                                     <!-- Plusfeld -->
                                     <Border IsVisible="{Binding IsAddButton}"
-                                            WidthRequest="40"
-                                            HeightRequest="40"
                                             BackgroundColor="Transparent"
                                             Stroke="Black"
-                                            Padding="10">
+                                            Padding="10"
+                                            SizeChanged="OnColorBoxSizeChanged">
                                         <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Size=24, Glyph={x:Static local:MaterialIcons.Add}}"/>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnAddTapped" />

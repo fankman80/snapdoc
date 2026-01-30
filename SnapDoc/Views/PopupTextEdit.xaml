@@ -9,7 +9,6 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"              
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               WidthRequest="280"
                HorizontalOptions="Center"
                x:TypeArguments="local:TextEditReturn"
                x:Class="SnapDoc.Views.PopupTextEdit">
@@ -20,7 +19,8 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid Padding="16">
+    <Grid Padding="12"
+          WidthRequest="320">
         <VerticalStackLayout x:DataType="views:PopupTextEdit">
             <material:EditorField Text="{Binding InputTxt}"
                                   Title="{x:Static res:AppResources.text_eingeben}"

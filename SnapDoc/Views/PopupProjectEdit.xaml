@@ -7,13 +7,13 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               WidthRequest="280"
                HorizontalOptions="Center"
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupProjectEdit">
 
-    <Grid Padding="16">
-        <VerticalStackLayout>
+    <Grid Padding="12"
+          WidthRequest="320">
+        <VerticalStackLayout HorizontalOptions="Fill">
             <material:TextField x:Name="text_entry"
                                 Title="{x:Static res:AppResources.projekt_titel}"
                                 TitleColor="{DynamicResource SecondaryBackground}"
@@ -58,12 +58,14 @@
                     <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
+                        HorizontalOptions="Fill"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
+                        HorizontalOptions="Fill"
                         x:Name="okButtonText"
                         Text="{x:Static res:AppResources.ok}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

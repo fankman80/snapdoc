@@ -325,4 +325,12 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         workG = Color.FromHsla(workH, workS, workV).Green;
         workB = Color.FromHsla(workH, workS, workV).Blue;
     }
+
+    private void OnColorBoxSizeChanged(object sender, EventArgs e)
+    {
+        if (sender is Border border && border.Width > 0)
+        {
+            border.HeightRequest = border.Width;
+        }
+    }
 }
