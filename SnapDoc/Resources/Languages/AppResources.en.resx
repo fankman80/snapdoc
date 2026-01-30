@@ -816,4 +816,16 @@
   <data name="randabstand" xml:space="preserve">
     <value>Margins</value>
   </data>
+  <data name="textfarbe" xml:space="preserve">
+    <value>Text color</value>
+  </data>
+  <data name="stiftfarbe" xml:space="preserve">
+    <value>Pen color</value>
+  </data>
+  <data name="fuellfarbe" xml:space="preserve">
+    <value>Fill color</value>
+  </data>
+  <data name="vorlagen" xml:space="preserve">
+    <value>Templates</value>
+  </data>
 </root>

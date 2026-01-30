@@ -736,6 +736,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Füllfarbe ähnelt.
+        /// </summary>
+        internal static string fuellfarbe {
+            get {
+                return ResourceManager.GetString("fuellfarbe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die GPS aktiv ähnelt.
         /// </summary>
         internal static string gps_aktiv {
@@ -1843,6 +1852,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stiftfarbe ähnelt.
+        /// </summary>
+        internal static string stiftfarbe {
+            get {
+                return ResourceManager.GetString("stiftfarbe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Suche... ähnelt.
         /// </summary>
         internal static string suche {
@@ -1875,6 +1893,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string text_eingeben {
             get {
                 return ResourceManager.GetString("text_eingeben", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Textfarbe ähnelt.
+        /// </summary>
+        internal static string textfarbe {
+            get {
+                return ResourceManager.GetString("textfarbe", resourceCulture);
             }
         }
         
@@ -1983,6 +2010,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string vorlage_loeschen {
             get {
                 return ResourceManager.GetString("vorlage_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vorlagen ähnelt.
+        /// </summary>
+        internal static string vorlagen {
+            get {
+                return ResourceManager.GetString("vorlagen", resourceCulture);
             }
         }
         

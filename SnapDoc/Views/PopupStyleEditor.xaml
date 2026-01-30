@@ -5,6 +5,7 @@
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:views="clr-namespace:SnapDoc.Views"     
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
@@ -17,100 +18,145 @@
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
+            <services:HexToColorConverter x:Key="HexToColorConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
     <Grid x:DataType="views:PopupStyleEditor" Padding="16">
-        <VerticalStackLayout>
-            <Label x:Name="titleText"
-                   HorizontalOptions="Start"
-                   Text="Text eingeben:"/>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <Grid>
-                <Border HeightRequest="44"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10">
-                    <Image Source="pattern.png" Aspect="Center"/>
-                </Border>
-                <Border BackgroundColor="{Binding SelectedBorderColor}"
-                        HeightRequest="44"                        
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10"/>
-                <Button BorderWidth="1"
-                        HeightRequest="44"
-                        BorderColor="Black"
-                        BackgroundColor="Transparent"
-                        Text="Stiftfarbe"
-                        TextColor="{Binding SelectedBorderColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                        Clicked="OnBorderColorPickerClicked"/>
-            </Grid>
-            <Grid>
-                <Border HeightRequest="44"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10">
-                    <Image Source="pattern.png" Aspect="Center"/>
-                </Border>
-                <Border BackgroundColor="{Binding SelectedFillColor}"
-                        HeightRequest="44"                        
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10"/>
-                <Button BorderWidth="1"
-                        HeightRequest="44"
-                        BorderColor="Black"
-                        BackgroundColor="Transparent"
-                        Text="Füllfarbe"
-                        TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                        Clicked="OnFillColorPickerClicked"/>
-            </Grid>
-            <Grid>
-                <Border HeightRequest="44"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10">
-                    <Image Source="pattern.png" Aspect="Center"/>
-                </Border>
-                <Border BackgroundColor="{Binding SelectedTextColor}"
-                        HeightRequest="44"                        
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10"/>
-                <Button BorderWidth="1"
-                        HeightRequest="44"
-                        BorderColor="Black"
-                        BackgroundColor="Transparent"
-                        Text="Textfarbe"
-                        TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                        Clicked="OnTextColorPickerClicked"/>
-            </Grid>
-            
-            <controls:LocalizedLabel x:Name="lineWidthText"
-                                     ResourceKey="linienbreite"
-                                     Value="{Binding LineWidth}"
-                                     ValueFormat="{}: {0}"/>
-            <Slider x:Name="LineWidthSlider"
-                    Maximum="20"
-                    Minimum="0"
-                    Value="{Binding LineWidth}"
-                    ThumbColor="{DynamicResource Primary}"
-                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+        <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+            <VerticalStackLayout>
+                <Grid>
+                    <Border HeightRequest="44"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10">
+                        <Image Source="pattern.png" Aspect="Center"/>
+                    </Border>
+                    <Border BackgroundColor="{Binding SelectedBorderColor}"
+                            HeightRequest="44"                        
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"/>
+                    <Button BorderWidth="1"
+                            HeightRequest="44"
+                            BorderColor="Black"
+                            BackgroundColor="Transparent"
+                            Text="{x:Static res:AppResources.stiftfarbe}"
+                            TextColor="{Binding SelectedBorderColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                            Clicked="OnBorderColorPickerClicked"/>
+                </Grid>
+                <Grid>
+                    <Border HeightRequest="44"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10">
+                        <Image Source="pattern.png" Aspect="Center"/>
+                    </Border>
+                    <Border BackgroundColor="{Binding SelectedFillColor}"
+                            HeightRequest="44"                        
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"/>
+                    <Button BorderWidth="1"
+                            HeightRequest="44"
+                            BorderColor="Black"
+                            BackgroundColor="Transparent"
+                            Text="{x:Static res:AppResources.fuellfarbe}"
+                            TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                            Clicked="OnFillColorPickerClicked"/>
+                </Grid>
+                <Grid>
+                    <Border HeightRequest="44"
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10">
+                        <Image Source="pattern.png" Aspect="Center"/>
+                    </Border>
+                    <Border BackgroundColor="{Binding SelectedTextColor}"
+                            HeightRequest="44"                        
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 10"/>
+                    <Button BorderWidth="1"
+                            HeightRequest="44"
+                            BorderColor="Black"
+                            BackgroundColor="Transparent"
+                            Text="{x:Static res:AppResources.textfarbe}"
+                            TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                            Clicked="OnTextColorPickerClicked"/>
+                </Grid>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        x:Name="cancelButtonText"
-                        Text="{x:Static res:AppResources.abbrechen}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
-                        x:Name="okButtonText"
-                        Text="{x:Static res:AppResources.ok}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnOkClicked" />
-            </Grid>
-        </VerticalStackLayout>
+                <controls:LocalizedLabel x:Name="lineWidthText"
+                                         ResourceKey="linienbreite"
+                                         Value="{Binding LineWidth}"
+                                         ValueFormat="{}: {0}"/>
+
+                <Slider x:Name="LineWidthSlider"
+                        Maximum="20"
+                        Minimum="0"
+                        Value="{Binding LineWidth}"
+                        ThumbColor="{DynamicResource Primary}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <Border Stroke="{DynamicResource SecondaryBackground}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
+                    <uranium:ExpanderView Margin="6,6,6,6">
+                        <uranium:ExpanderView.Header>
+                            <Label Text="{x:Static res:AppResources.vorlagen}"/>
+                        </uranium:ExpanderView.Header>
+                        <CollectionView ItemsSource="{Binding Items}"
+                                        SelectionMode="None"
+                                        Margin="0">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                            </CollectionView.ItemsLayout>
+                            <CollectionView.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid x:DataType="local:StylePickerItem" HeightRequest="44">
+                                        <Border>
+                                            <Image Source="pattern.png" Aspect="Center"/>
+                                        </Border>
+                                        <Border BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
+                                                StrokeThickness="{Binding LineWidth}"
+                                                Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
+                                                StrokeLineCap="Square"/>
+                                        <Label Text="{Binding Text}"
+                                               TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
+                                               FontSize="14"
+                                               HorizontalOptions="Center"
+                                               VerticalOptions="Center"/>
+                                        <Grid.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnItemClicked"/>
+                                        </Grid.GestureRecognizers>
+                                    </Grid>
+                                </DataTemplate>
+                            </CollectionView.ItemTemplate>
+                        </CollectionView>
+                    </uranium:ExpanderView>
+                </Border>
+            </VerticalStackLayout>     
+        </ScrollView>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="0"
+                    x:Name="cancelButtonText"
+                    Text="{x:Static res:AppResources.abbrechen}"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="OnCancelClicked" />
+            <Button Grid.Column="1"
+                    x:Name="okButtonText"
+                    Text="{x:Static res:AppResources.ok}"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="OnOkClicked" />
+        </Grid>
     </Grid>
 </toolkit:Popup>

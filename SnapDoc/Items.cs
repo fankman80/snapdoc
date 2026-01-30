@@ -404,6 +404,15 @@ namespace SnapDoc
         public int PdfPage { get; set; }
     }
 
+    public class StylePickerItem
+    {
+        public string Text { get; set; }
+        public string BackgroundColor { get; set; }
+        public string BorderColor { get; set; }
+        public string TextColor { get; set; }
+        public int LineWidth { get; set; }
+    }
+
     public partial class ColorBoxItem : ObservableObject
     {
         [ObservableProperty] private Color backgroundColor;

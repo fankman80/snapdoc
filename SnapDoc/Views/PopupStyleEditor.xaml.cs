@@ -3,6 +3,7 @@
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -10,6 +11,8 @@ namespace SnapDoc.Views;
 
 public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyPropertyChanged
 {
+    public List<StylePickerItem> Items { get; } = SettingsService.Instance.StyleTemplateItems;
+
     private Color selectedFillColor;
     public Color SelectedFillColor
     {
@@ -79,6 +82,17 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         SelectedTextColor = Color.FromArgb(textColor);
 
         BindingContext = this;
+    }
+
+    private async void OnItemClicked(object sender, EventArgs e)
+    {
+        if (sender is Grid grid && grid.BindingContext is StylePickerItem item)
+        {
+            SelectedFillColor = Color.FromArgb(item.BackgroundColor);
+            SelectedBorderColor = Color.FromArgb(item.BorderColor);
+            SelectedTextColor = Color.FromArgb(item.TextColor);
+            LineWidth = item.LineWidth;
+        }
     }
 
     private async void OnBorderColorPickerClicked(object sender, EventArgs e)

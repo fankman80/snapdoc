@@ -187,6 +187,37 @@ public partial class SettingsService : ObservableObject
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
+    [ObservableProperty] private List<StylePickerItem> _styleTemplateItems =
+    [
+        new() {
+            Text = "Text",
+            BackgroundColor = Colors.LightGreen.WithAlpha(0.5f).ToArgbHex(true),
+            BorderColor = Colors.Green.WithAlpha(1f).ToArgbHex(true),
+            TextColor = Colors.DarkGreen.WithAlpha(1f).ToArgbHex(true),
+            LineWidth = 3,
+            },
+        new() {
+            Text = "Text",
+            BackgroundColor = Colors.LightYellow.WithAlpha(0.5f).ToArgbHex(true),
+            BorderColor = Colors.Goldenrod.WithAlpha(1f).ToArgbHex(true),
+            TextColor = Colors.DarkGoldenrod.WithAlpha(1f).ToArgbHex(true),
+            LineWidth = 6,
+        },
+        new() {
+            Text = "Text",
+            BackgroundColor = Colors.LightPink.WithAlpha(0.5f).ToArgbHex(true),
+            BorderColor = Colors.Red.WithAlpha(1f).ToArgbHex(true),
+            TextColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
+            LineWidth = 2,
+            },
+        new() {
+            Text = "Text",
+            BackgroundColor = Colors.OrangeRed.WithAlpha(0.5f).ToArgbHex(true),
+            BorderColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
+            TextColor = Colors.White.WithAlpha(1f).ToArgbHex(true),
+            LineWidth = 0,
+            }
+    ];
 
     // Select Menu-Entrys for Map Services
     public bool IsSwissTopoVisible => IsProjectLoaded && MapService == 0;
@@ -333,6 +364,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinIcon = DefaultPinIcon,
             ColorList = ColorList,
             PriorityItems = PriorityItems,
+            StyleTemplateItems = StyleTemplateItems,
         };
         File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
     }
@@ -407,6 +439,7 @@ public partial class SettingsService : ObservableObject
             DefaultPinIcon = settings.DefaultPinIcon ?? string.Empty;
             ColorList = settings.ColorList ?? ColorList;
             PriorityItems = settings.PriorityItems ?? PriorityItems;
+            StyleTemplateItems = settings.StyleTemplateItems ?? StyleTemplateItems;
         }
         catch (Exception ex)
         {
@@ -477,6 +510,7 @@ public partial class SettingsService : ObservableObject
         DefaultPinIcon = defaultSettings.DefaultPinIcon;
         ColorList = [.. defaultSettings.ColorList];
         PriorityItems = [.. defaultSettings.PriorityItems];
+        StyleTemplateItems = [.. defaultSettings.StyleTemplateItems];
     }
 }
 #pragma warning restore MVVMTK0045

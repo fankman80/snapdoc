@@ -61,4 +61,5 @@ internal class SettingsModel
     public string? DefaultPinIcon { get; set; } // Standard Pin Icon
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
+    public List<StylePickerItem>? StyleTemplateItems { get; set; } // Liste der Stilvorlagen für den Stil-Editor
 }
