@@ -9,8 +9,6 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"
-               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
                x:TypeArguments="local:PopupStyleReturn"
@@ -22,7 +20,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid x:DataType="views:PopupStyleEditor">
+    <Grid x:DataType="views:PopupStyleEditor" Padding="16">
         <VerticalStackLayout>
             <Label x:Name="titleText"
                    HorizontalOptions="Start"

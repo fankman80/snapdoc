@@ -7,8 +7,6 @@
                xmlns:views="clr-namespace:SnapDoc.Views"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"
-               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
                xmlns:services="clr-namespace:SnapDoc.Services"
@@ -24,7 +22,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid>
+    <Grid Padding="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />

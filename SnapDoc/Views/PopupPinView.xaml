@@ -7,15 +7,13 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:views="clr-namespace:SnapDoc.Views"  
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"
-               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
                x:DataType="views:PopupPinView"
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupPinView">
 
-    <Grid>
+    <Grid Padding="16">
         <VerticalStackLayout Spacing="6">
             <HorizontalStackLayout>
                 <Image Source="{Binding Pin.DisplayIconPath}"

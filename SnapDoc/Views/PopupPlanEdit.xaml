@@ -10,8 +10,6 @@
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-               Padding="0"
-               Margin="16"
                WidthRequest="280"
                HorizontalOptions="Center"
                x:TypeArguments="local:PlanEditReturn"
@@ -24,7 +22,7 @@
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 
-    <Grid x:DataType="views:PopupPlanEdit">
+    <Grid x:DataType="views:PopupPlanEdit" Padding="16">
         <VerticalStackLayout>
             <material:TextField x:Name="name_entry"
                                 Title="{x:Static res:AppResources.planbezeichnung}"
