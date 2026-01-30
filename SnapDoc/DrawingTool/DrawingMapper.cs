@@ -63,12 +63,12 @@ public static class DrawingMapper
             Rect = d.RectDrawable?.IsDrawn == true
                 ? new RectDto
                 {
-                    RotationDeg = d.RectDrawable.AllowedAngleDeg,
+                    RotationDeg = NormalizeAngleDeg(d.RectDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.RectDrawable.Text,
                     Points = [.. d.RectDrawable.Points
-                    .Select(p => new PointDto(
-                        p.X - bounds.Left,
-                        p.Y - bounds.Top))]
+                        .Select(p => new PointDto(
+                            p.X - bounds.Left,
+                            p.Y - bounds.Top))]
                 }
                 : null
         };
@@ -119,7 +119,7 @@ public static class DrawingMapper
             r.Reset();
 
             r.Text = dto.Rect.Text ?? "";
-            r.AllowedAngleDeg = dto.Rect.RotationDeg;
+            r.AllowedAngleDeg = dto.InitialRotation + dto.Rect.RotationDeg;
 
             var p0 = new SKPoint(
                 dto.Rect.Points[0].X + offset.X,
@@ -178,5 +178,21 @@ public static class DrawingMapper
         d.RectDrawable.TextStyle = (RectangleTextStyle)s.TextStyle;
         d.RectDrawable.AutoSizeText = s.AutoSizeText;
         d.RectDrawable.TextPadding = s.TextPadding;
+    }
+
+    private static float NormalizeAngleDeg(float deg)
+    {
+        deg %= 360f;
+
+        if (deg > 180f)
+            deg -= 360f;
+
+        if (deg < -180f)
+            deg += 360f;
+
+        if (Math.Abs(deg) < 0.0001f)
+            return 0f;
+
+        return deg;
     }
 }
