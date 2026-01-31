@@ -41,7 +41,7 @@
                     <Label Text="{x:Static res:AppResources.doppelklick_farbe_loeschen}"
                            FontSize="12"
                            Margin="0,0,0,8"/>
-                    <CollectionView x:Name="ColorListPicker" Margin="-3"
+                    <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
                                     SelectionMode="None">
                         <CollectionView.ItemsLayout>
@@ -55,7 +55,9 @@
                                             IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
                                             BackgroundColor="{Binding BackgroundColor}"
                                             Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
-                                            StrokeThickness="1"
+                                            StrokeThickness="{Binding IsSelected,
+                                                Converter={StaticResource MathExpressionConverter},
+                                                ConverterParameter='x==true?1:0'}"
                                             SizeChanged="OnColorBoxSizeChanged">
                                         <Border.Behaviors>
                                             <vm:UnifiedTapBehavior
