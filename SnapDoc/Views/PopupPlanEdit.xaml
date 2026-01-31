@@ -85,7 +85,7 @@
                                          VerticalTextAlignment="Center"
                                          ResourceKey="plan_drehung"
                                          Value="{Binding PlanRotate}"
-                                         ValueFormat="{}{0}°"/>
+                                         ValueFormat="{}: {0}°"/>
                 <Button Grid.Column="1"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
