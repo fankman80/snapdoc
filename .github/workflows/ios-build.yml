@@ -22,7 +22,7 @@ jobs:
       - name: Restore NuGet packages
         run: dotnet restore SnapDoc.sln
 
-      # Zertifikat korrekt importieren
+      # 🔐 Zertifikat korrekt importieren
       - name: Install Apple certificate
         env:
           IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
@@ -42,14 +42,14 @@ jobs:
           security list-keychains -d user -s build.keychain
           security default-keychain -s build.keychain
 
-      # Provisioning Profile
+      # 📄 Provisioning Profile
       - name: Install provisioning profile
         run: |
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode \
             > ~/Library/MobileDevice/Provisioning\ Profiles/snapdoc.mobileprovision
 
-      # Signierter IPA-Build
+      # 🏗️ Signierter IPA-Build
       - name: Build iOS IPA (Release)
         run: |
           dotnet publish SnapDoc.sln \
