@@ -400,7 +400,7 @@
     <value>Exporter le plan</value>
   </data>
   <data name="plan_drehung" xml:space="preserve">
-    <value>Rotation du plan :</value>
+    <value>Rotation du plan</value>
   </data>
   <data name="farben_entfernen" xml:space="preserve">
     <value>Supprimer les couleurs</value>
