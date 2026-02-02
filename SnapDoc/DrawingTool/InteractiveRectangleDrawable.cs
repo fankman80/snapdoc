@@ -8,6 +8,7 @@ public class InteractiveRectangleDrawable
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
     public float LineThickness { get; set; } = 3f;
+    public string StrokeStyle { get; set; } = "";
     public bool DisplayHandles { get; set; } = true;
     public bool IsDrawn { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
@@ -137,7 +138,12 @@ public class InteractiveRectangleDrawable
                 Color = LineColor,
                 StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
                 IsStroke = true,
-                IsAntialias = true
+                IsAntialias = true,
+                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                ? null
+                : SKPathEffect.CreateDash(
+                    Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
+                    0f)
             };
             canvas.DrawPath(path, linePaint);
         }

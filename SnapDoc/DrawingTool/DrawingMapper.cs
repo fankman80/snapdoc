@@ -11,7 +11,7 @@ public static class DrawingMapper
             LineColor = d.PolyDrawable.LineColor.ToString(),
             FillColor = d.PolyDrawable.FillColor.ToString(),
             LineThickness = d.PolyDrawable.LineThickness,
-
+            StrokeStyle = d.PolyDrawable.StrokeStyle,
             TextColor = d.RectDrawable.TextColor.ToString(),
             TextSize = d.RectDrawable.TextSize,
             TextAlignment = (int)d.RectDrawable.TextAlignment,
@@ -164,14 +164,16 @@ public static class DrawingMapper
 
         d.FreeDrawable.LineColor = lineColor;
         d.FreeDrawable.LineThickness = s.LineThickness;
-
+        
         d.PolyDrawable.LineColor = lineColor;
         d.PolyDrawable.FillColor = fillColor;
         d.PolyDrawable.LineThickness = s.LineThickness;
+        d.PolyDrawable.StrokeStyle = s.StrokeStyle;
 
         d.RectDrawable.LineColor = lineColor;
         d.RectDrawable.FillColor = fillColor;
         d.RectDrawable.LineThickness = s.LineThickness;
+        d.RectDrawable.StrokeStyle = s.StrokeStyle;
         d.RectDrawable.TextColor = textColor;
         d.RectDrawable.TextSize = s.TextSize;
         d.RectDrawable.TextAlignment = (RectangleTextAlignment)s.TextAlignment;

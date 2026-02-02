@@ -268,12 +268,13 @@ namespace SnapDoc
         public byte FillOpacity { get; set; } = fillOpacity;
     }
 
-    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width)
+    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle)
     {
         public string BorderColorHex { get; set; } = borderColorHex;
         public string FillColorHex { get; set; } = fillColorHex;
         public string TextColorHex { get; set; } = textColorHex;
         public int PenWidth { get; set; } = width;
+        public string StrokeStyle { get; set; } = strokeStyle;
     }
 
     public class PlanSelectorReturn(string planTarget, bool isPinCopy)
@@ -411,6 +412,11 @@ namespace SnapDoc
         public string BorderColor { get; set; }
         public string TextColor { get; set; }
         public int LineWidth { get; set; }
+        public string StrokeStyle { get; set; }
+
+
+        public double[] StrokeDashArray =>
+            Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
     }
 
     public partial class ColorBoxItem : ObservableObject

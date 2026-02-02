@@ -86,8 +86,7 @@
                             Clicked="OnTextColorPickerClicked"/>
                 </Grid>
 
-                <controls:LocalizedLabel x:Name="lineWidthText"
-                                         ResourceKey="linienbreite"
+                <controls:LocalizedLabel ResourceKey="linienbreite"
                                          Value="{Binding LineWidth}"
                                          ValueFormat="{}: {0}"/>
 
@@ -98,6 +97,14 @@
                         ThumbColor="{DynamicResource Primary}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <material:TextField Text="{Binding StrokeStyle}"
+                                    Title="Linienmuster"
+                                    TextChanged="OnStrokeTextChanged"
+                                    TitleColor="{DynamicResource SecondaryBackground}"
+                                    BorderColor="{DynamicResource SecondaryBackground}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                 <Border Stroke="{DynamicResource SecondaryBackground}"
                         StrokeThickness="1"
@@ -123,7 +130,8 @@
                                         <Border BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
                                                 StrokeThickness="{Binding LineWidth}"
                                                 Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
-                                                StrokeLineCap="Square"/>
+                                                StrokeLineCap="Square"
+                                                StrokeDashArray="{Binding StrokeDashArray}"/>
                                         <Label Text="{Binding Text}"
                                                TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
                                                FontSize="14"

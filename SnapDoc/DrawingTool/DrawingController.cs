@@ -62,7 +62,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     }
 
     public void InitializeDrawing(SKColor lineColor,
-        float lineThickness, SKColor fillColor, SKColor textColor,
+        float lineThickness, string strokeStyle, SKColor fillColor, SKColor textColor,
         float handleRadius, float pointRadius,
         SKColor pointColor, SKColor startPointColor,
         bool scaleHandlesWithTransform = true,
@@ -79,6 +79,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             {
                 FillColor = fillColor,
                 LineColor = lineColor,
+                StrokeStyle = strokeStyle,
                 PointColor = pointColor,
                 StartPointColor = startPointColor,
                 LineThickness = lineThickness,
@@ -92,6 +93,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 PointColor = pointColor,
                 TextColor = textColor,
                 LineThickness = lineThickness,
+                StrokeStyle = strokeStyle,
                 HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
                 PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius,
                 AllowedAngleDeg = rotationAngle,
@@ -336,7 +338,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         }
     }
 
-    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth)
+    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle)
     {
         if (CombinedDrawable == null)
             return;
@@ -356,6 +358,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             poly.LineColor = lineColor;
             poly.FillColor = fillColor;
             poly.LineThickness = lineWidth;
+            poly.StrokeStyle = strokeStyle;
         }
 
         // Rectangle aktualisieren
@@ -366,6 +369,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.FillColor = fillColor;
             rect.TextColor = textColor;
             rect.LineThickness = lineWidth;
+            rect.StrokeStyle = strokeStyle;
         }
 
         canvasView?.InvalidateSurface();

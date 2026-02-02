@@ -27,6 +27,7 @@ public partial class ImageViewPage : IQueryAttributable
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
     private int lineWidth = 3;
+    private string strokeStyle = "";
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
     public Color SelectedBorderColor
@@ -320,6 +321,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.InitializeDrawing(
             SelectedBorderColor.ToSKColor(),
             lineWidth,
+            strokeStyle,
             SelectedFillColor.ToSKColor(),
             SelectedTextColor.ToSKColor(),
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
@@ -505,7 +507,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex());
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle);
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
@@ -519,7 +521,8 @@ public partial class ImageViewPage : IQueryAttributable
             SelectedBorderColor.ToSKColor(),
             SelectedFillColor.ToSKColor(),
             SelectedTextColor.ToSKColor(),
-            lineWidth
+            lineWidth,
+            strokeStyle
         );
     }
 }

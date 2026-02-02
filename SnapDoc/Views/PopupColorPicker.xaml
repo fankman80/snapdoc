@@ -55,9 +55,7 @@
                                             IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
                                             BackgroundColor="{Binding BackgroundColor}"
                                             Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
-                                            StrokeThickness="{Binding IsSelected,
-                                                Converter={StaticResource MathExpressionConverter},
-                                                ConverterParameter='x==true?1:0'}"
+                                            StrokeThickness="{Binding IsSelected, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0'}"
                                             SizeChanged="OnColorBoxSizeChanged">
                                         <Border.Behaviors>
                                             <vm:UnifiedTapBehavior

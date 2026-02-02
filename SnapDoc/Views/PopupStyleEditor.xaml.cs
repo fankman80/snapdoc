@@ -69,13 +69,28 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         }
     }
 
-    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string okText = null, string cancelText = null)
+    private string strokeStyle;
+    public string StrokeStyle
+    {
+        get => strokeStyle;
+        set
+        {
+            if (strokeStyle != value)
+            {
+                strokeStyle = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string strokeStyle, string okText = null, string cancelText = null)
     {
         InitializeComponent();
 
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         LineWidth = lineWidth;
+        StrokeStyle = strokeStyle;
 
         SelectedBorderColor = Color.FromArgb(borderColor);
         SelectedFillColor = Color.FromArgb(fillColor);
@@ -92,6 +107,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
             SelectedBorderColor = Color.FromArgb(item.BorderColor);
             SelectedTextColor = Color.FromArgb(item.TextColor);
             LineWidth = item.LineWidth;
+            StrokeStyle = item.StrokeStyle;
         }
     }
 
@@ -122,9 +138,14 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
             SelectedTextColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);
     }
 
+    private void OnStrokeTextChanged(object sender, TextChangedEventArgs e)
+    {
+        StrokeStyle = string.Concat(e.NewTextValue.Where(c => char.IsDigit(c) || c == ' '));
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth));
+        await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

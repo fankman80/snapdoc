@@ -453,4 +453,23 @@ public class Helper
         // FileStream öffnen und zurückgeben
         return tempPath;
     }
+
+    public static float[] ParseDashArray(string strokeStyle, float scale = 1f, float lineWidth = 1f)
+    {
+        if (string.IsNullOrWhiteSpace(strokeStyle))
+            return null;
+
+        var values = strokeStyle
+            .Split(' ', StringSplitOptions.RemoveEmptyEntries)
+            .Select(s => float.TryParse(s, NumberStyles.Float, CultureInfo.InvariantCulture, out var v) ? v : -1f)
+            .Where(v => v > 0)
+            .Select(v => v * scale * lineWidth)
+            .ToList();
+
+        // gerade Anzahl erzwingen
+        if (values.Count % 2 != 0)
+            values.RemoveAt(values.Count - 1);
+
+        return values.Count >= 2 ? [.. values] : null;
+    }
 }

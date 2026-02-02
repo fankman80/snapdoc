@@ -6,6 +6,7 @@ public class DrawingStyleDto
     public string LineColor { get; set; } = "#FF000000";
     public string FillColor { get; set; } = "#00000000";
     public float LineThickness { get; set; }
+    public string StrokeStyle { get; set; } = "";
     public string TextColor { get; set; } = "#FF000000";
     public float TextSize { get; set; }
     public int TextAlignment { get; set; }

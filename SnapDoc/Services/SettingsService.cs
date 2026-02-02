@@ -195,6 +195,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = Colors.Green.WithAlpha(1f).ToArgbHex(true),
             TextColor = Colors.DarkGreen.WithAlpha(1f).ToArgbHex(true),
             LineWidth = 3,
+            StrokeStyle = "",
             },
         new() {
             Text = "Text",
@@ -202,6 +203,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = Colors.Goldenrod.WithAlpha(1f).ToArgbHex(true),
             TextColor = Colors.DarkGoldenrod.WithAlpha(1f).ToArgbHex(true),
             LineWidth = 6,
+            StrokeStyle = "4 2",
         },
         new() {
             Text = "Text",
@@ -209,6 +211,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = Colors.Red.WithAlpha(1f).ToArgbHex(true),
             TextColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
             LineWidth = 2,
+            StrokeStyle = "4 2 8 2",
             },
         new() {
             Text = "Text",
@@ -216,6 +219,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
             TextColor = Colors.White.WithAlpha(1f).ToArgbHex(true),
             LineWidth = 0,
+            StrokeStyle = "4 4",
             }
     ];
 
