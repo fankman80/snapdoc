@@ -51,7 +51,6 @@ public class InteractivePolylineDrawable
                 Color = LineColor,
                 StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
                 IsStroke = true,
-                StrokeCap = SKStrokeCap.Round,
                 IsAntialias = true,
                 PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
                 ? null
