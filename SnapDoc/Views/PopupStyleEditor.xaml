@@ -32,60 +32,101 @@
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
                 <Grid>
-                    <Border HeightRequest="44"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10">
-                        <Image Source="pattern.png" Aspect="Center"/>
-                    </Border>
-                    <Border BackgroundColor="{Binding SelectedBorderColor}"
-                            HeightRequest="44"                        
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10"/>
-                    <Button BorderWidth="1"
-                            HeightRequest="44"
-                            BorderColor="Black"
-                            BackgroundColor="Transparent"
-                            Text="{x:Static res:AppResources.stiftfarbe}"
-                            TextColor="{Binding SelectedBorderColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                            Clicked="OnBorderColorPickerClicked"/>
-                </Grid>
-                <Grid>
-                    <Border HeightRequest="44"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10">
-                        <Image Source="pattern.png" Aspect="Center"/>
-                    </Border>
-                    <Border BackgroundColor="{Binding SelectedFillColor}"
-                            HeightRequest="44"                        
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10"/>
-                    <Button BorderWidth="1"
-                            HeightRequest="44"
-                            BorderColor="Black"
-                            BackgroundColor="Transparent"
-                            Text="{x:Static res:AppResources.fuellfarbe}"
-                            TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                            Clicked="OnFillColorPickerClicked"/>
-                </Grid>
-                <Grid>
-                    <Border HeightRequest="44"
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10">
-                        <Image Source="pattern.png" Aspect="Center"/>
-                    </Border>
-                    <Border BackgroundColor="{Binding SelectedTextColor}"
-                            HeightRequest="44"                        
-                            StrokeThickness="0"
-                            StrokeShape="RoundRectangle 10"/>
-                    <Button BorderWidth="1"
-                            HeightRequest="44"
-                            BorderColor="Black"
-                            BackgroundColor="Transparent"
-                            Text="{x:Static res:AppResources.textfarbe}"
-                            TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                            Clicked="OnTextColorPickerClicked"/>
-                </Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="44" />
+                        <RowDefinition Height="44" />
+                        <RowDefinition Height="44" />
+                    </Grid.RowDefinitions>
 
+                    <Grid Grid.Column="0" Grid.Row="0">
+                        <Border HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10">
+                            <Image Source="pattern.png" Aspect="Center"/>
+                        </Border>
+                        <Border BackgroundColor="{Binding SelectedBorderColor}"
+                                HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"/>
+                        <Button BorderWidth="1"
+                                HeightRequest="44"
+                                BorderColor="Black"
+                                BackgroundColor="Transparent"
+                                Text="{x:Static res:AppResources.stiftfarbe}"
+                                TextColor="{Binding SelectedBorderColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                                Clicked="OnBorderColorPickerClicked"/>
+                    </Grid>
+                    <Grid Grid.Column="0" Grid.Row="1">
+                        <Border HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10">
+                            <Image Source="pattern.png" Aspect="Center"/>
+                        </Border>
+                        <Border BackgroundColor="{Binding SelectedFillColor}"
+                                HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"/>
+                        <Button BorderWidth="1"
+                                HeightRequest="44"
+                                BorderColor="Black"
+                                BackgroundColor="Transparent"
+                                Text="{x:Static res:AppResources.fuellfarbe}"
+                                TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                                Clicked="OnFillColorPickerClicked"/>
+                    </Grid>
+                    <Grid Grid.Column="0" Grid.Row="2">
+                        <Border HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10">
+                            <Image Source="pattern.png" Aspect="Center"/>
+                        </Border>
+                        <Border BackgroundColor="{Binding SelectedTextColor}"
+                                HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"/>
+                        <Button BorderWidth="1"
+                                HeightRequest="44"
+                                BorderColor="Black"
+                                BackgroundColor="Transparent"
+                                Text="{x:Static res:AppResources.textfarbe}"
+                                TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                                Clicked="OnTextColorPickerClicked"/>
+                    </Grid>
+                    <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="3">
+                        <Border>
+                            <Image Source="pattern.png" Aspect="Center"/>
+                        </Border>
+                        <Border BackgroundColor="{Binding SelectedFillColor}"
+                                StrokeThickness="{Binding LineWidth}"
+                                Stroke="{Binding SelectedBorderColor}"
+                                StrokeLineCap="Square"
+                                StrokeDashArray="{Binding StrokeDashArray}"/>
+                        <material:TextField Text="{Binding TemplateText}"
+                                            Padding="0"
+                                            FontAttributes="Bold"
+                                            FontSize="16"
+                                            TextColor="{Binding SelectedTextColor}"
+                                            BackgroundColor="Transparent"
+                                            BorderThickness="0"
+                                            VerticalOptions="Center"                                              
+                                            HorizontalOptions="Center"/>
+                    </Grid>
+                    <Button Grid.Column="1" Grid.Row="2"
+                            WidthRequest="44"
+                            Text="{x:Static local:MaterialIcons.Add_2}"
+                            FontSize="24"
+                            FontFamily="MaterialOutlined"
+                            TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                            BackgroundColor="Transparent"
+                            HorizontalOptions="End"
+                            Padding="0"
+                            Clicked="OnTemplateAddClicked"/>
+                </Grid>
+                
                 <controls:LocalizedLabel ResourceKey="linienbreite"
                                          Value="{Binding LineWidth}"
                                          ValueFormat="{}: {0}"/>
@@ -116,30 +157,41 @@
                             <Label Text="{x:Static res:AppResources.vorlagen}"/>
                         </uranium:ExpanderView.Header>
                         <CollectionView ItemsSource="{Binding Items}"
-                                        SelectionMode="None"
-                                        Margin="0">
+                                            SelectionMode="None"
+                                            Margin="0">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
                             </CollectionView.ItemsLayout>
                             <CollectionView.ItemTemplate>
                                 <DataTemplate>
-                                    <Grid x:DataType="local:StylePickerItem" HeightRequest="44">
-                                        <Border>
+                                    <Grid x:DataType="local:StylePickerItem"
+                                          Grid.ColumnDefinitions="*,Auto"
+                                          HeightRequest="44"
+                                          ColumnSpacing="0">
+                                        <Border Grid.Column="0">
                                             <Image Source="pattern.png" Aspect="Center"/>
                                         </Border>
-                                        <Border BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
+                                        <Border Grid.Column="0"
+                                                BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
                                                 StrokeThickness="{Binding LineWidth}"
                                                 Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
                                                 StrokeLineCap="Square"
                                                 StrokeDashArray="{Binding StrokeDashArray}"/>
-                                        <Label Text="{Binding Text}"
-                                               TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
-                                               FontSize="14"
-                                               HorizontalOptions="Center"
-                                               VerticalOptions="Center"/>
-                                        <Grid.GestureRecognizers>
-                                            <TapGestureRecognizer Tapped="OnItemClicked"/>
-                                        </Grid.GestureRecognizers>
+                                        <Button Grid.Column="0"
+                                                Text="{Binding Text}"
+                                                FontSize="14"                                                
+                                                TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
+                                                BackgroundColor="Transparent"
+                                                HorizontalOptions="Fill"
+                                                Clicked="OnTemplateClicked"/>
+                                        <Button Grid.Column="1"
+                                                Text="{x:Static local:MaterialIcons.Delete}"
+                                                FontSize="24"
+                                                FontFamily="MaterialOutlined"
+                                                TextColor="{DynamicResource PrimaryDark}"
+                                                BackgroundColor="Transparent"
+                                                Padding="0"
+                                                Clicked="OnTemplateDeleteClicked"/>
                                     </Grid>
                                 </DataTemplate>
                             </CollectionView.ItemTemplate>

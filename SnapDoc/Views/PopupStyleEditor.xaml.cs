@@ -2,8 +2,11 @@
 
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using CommunityToolkit.Mvvm.Messaging;
+using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -11,7 +14,7 @@ namespace SnapDoc.Views;
 
 public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyPropertyChanged
 {
-    public List<StylePickerItem> Items { get; } = SettingsService.Instance.StyleTemplateItems;
+    public ObservableCollection<StylePickerItem> Items { get; } = new ObservableCollection<StylePickerItem>(SettingsService.Instance.StyleTemplateItems);
 
     private Color selectedFillColor;
     public Color SelectedFillColor
@@ -79,7 +82,36 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
             {
                 strokeStyle = value;
                 OnPropertyChanged();
+                OnPropertyChanged(nameof(StrokeDashArray));
             }
+        }
+    }
+
+    private string templateText;
+    public string TemplateText
+    {
+        get => templateText;
+        set
+        {
+            if (templateText != value)
+            {
+                templateText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public double[] StrokeDashArray
+    {
+        get
+        {
+            if (string.IsNullOrWhiteSpace(StrokeStyle))
+                return [];
+
+            return Helper.ParseDashArray(StrokeStyle)?
+                .Select(f => (double)f)
+                .ToArray()
+                ?? [];
         }
     }
 
@@ -91,6 +123,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         LineWidth = lineWidth;
         StrokeStyle = strokeStyle;
+        TemplateText = "Text";
 
         SelectedBorderColor = Color.FromArgb(borderColor);
         SelectedFillColor = Color.FromArgb(fillColor);
@@ -99,16 +132,50 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         BindingContext = this;
     }
 
-    private async void OnItemClicked(object sender, EventArgs e)
+    private async void OnTemplateClicked(object sender, EventArgs e)
     {
-        if (sender is Grid grid && grid.BindingContext is StylePickerItem item)
+        var button = sender as Button;
+        StylePickerItem item = (StylePickerItem)button.BindingContext;
+
+        SelectedFillColor = Color.FromArgb(item.BackgroundColor);
+        SelectedBorderColor = Color.FromArgb(item.BorderColor);
+        SelectedTextColor = Color.FromArgb(item.TextColor);
+        LineWidth = item.LineWidth;
+        StrokeStyle = item.StrokeStyle;
+        TemplateText = item.Text;
+    }
+
+    private async void OnTemplateDeleteClicked(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+        StylePickerItem item = (StylePickerItem)button.BindingContext;
+
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
+        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result.Result != null)
         {
-            SelectedFillColor = Color.FromArgb(item.BackgroundColor);
-            SelectedBorderColor = Color.FromArgb(item.BorderColor);
-            SelectedTextColor = Color.FromArgb(item.TextColor);
-            LineWidth = item.LineWidth;
-            StrokeStyle = item.StrokeStyle;
+            Items.Remove(item);
+            SettingsService.Instance.StyleTemplateItems = [.. Items];
+            SettingsService.Instance.SaveSettings();
         }
+    }
+
+    private async void OnTemplateAddClicked(object sender, EventArgs e)
+    {
+        StylePickerItem item = new()
+        {
+            Text = TemplateText,
+            BackgroundColor = SelectedFillColor.ToArgbHex(),
+            BorderColor = SelectedBorderColor.ToArgbHex(),
+            TextColor = SelectedTextColor.ToArgbHex(),
+            LineWidth = LineWidth,
+            StrokeStyle = StrokeStyle
+        };
+
+        Items.Add(item);
+
+        SettingsService.Instance.StyleTemplateItems = [.. Items];
+        SettingsService.Instance.SaveSettings();
     }
 
     private async void OnBorderColorPickerClicked(object sender, EventArgs e)

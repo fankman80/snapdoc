@@ -654,7 +654,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             Size _pinSize = thisPlan.Pins[doubleTappedPin.AutomationId].Size;
 
             var pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, _newPin);
-            doubleTappedPin.Source = pinIcon;
+            //doubleTappedPin.Source = pinIcon;
+            doubleTappedPin.Source = ImageSource.FromFile($"{pinIcon}?t={DateTime.UtcNow.Ticks}");  // Cache-Busting
+
             doubleTappedPin.WidthRequest = thisPlan.Pins[doubleTappedPin.AutomationId].Size.Width;
             doubleTappedPin.HeightRequest = thisPlan.Pins[doubleTappedPin.AutomationId].Size.Height;
             doubleTappedPin.TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width);

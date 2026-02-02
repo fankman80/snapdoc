@@ -391,7 +391,8 @@ public partial class ImageViewPage : IQueryAttributable
                 if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
                     Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
 
-                if (!File.Exists(origPath)) File.Copy(imgPath, origPath);
+                if (!File.Exists(origPath))
+                    File.Copy(imgPath, origPath);
 
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
