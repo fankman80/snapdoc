@@ -89,7 +89,7 @@
                     <VerticalStackLayout>
                         <Grid>
                             <views:SquareView Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
-                                <Image Source="{Binding ImagePath}"
+                                <Image Source="{Binding DisplayImage}"
                                        Aspect="AspectFill">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />

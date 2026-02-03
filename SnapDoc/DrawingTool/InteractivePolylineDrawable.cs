@@ -19,55 +19,48 @@ public class InteractivePolylineDrawable
 
     public void Draw(SKCanvas canvas)
     {
-        if (Points.Count == 0)
+        if (Points.Count < 2)
             return;
 
-        // Polygon füllen, falls geschlossen
-        if (IsClosed)
+        using var path = new SKPath();
+        path.MoveTo(Points[0]);
+        for (int i = 1; i < Points.Count; i++)
         {
-            using var path = new SKPath();
-            path.MoveTo(Points[0]);
-            for (int i = 1; i < Points.Count; i++)
-            {
-                path.LineTo(Points[i]);
-            }
+            path.LineTo(Points[i]);
+        }
+
+        if (IsClosed)
             path.Close();
 
+        if (IsClosed)
+        {
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 IsStroke = false,
                 IsAntialias = true
             };
-
             canvas.DrawPath(path, fillPaint);
         }
 
         if (LineThickness > 0)
         {
-            // Linien
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
                 StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
                 IsStroke = true,
                 IsAntialias = true,
+                StrokeJoin = SKStrokeJoin.Round, // Schöne Ecken!
                 PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(
-                    Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
-                    0f)
+                    ? null
+                    : SKPathEffect.CreateDash(
+                        Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
+                        0f)
             };
-
-            for (int i = 0; i < Points.Count; i++)
-            {
-                var nextIndex = (i + 1) % Points.Count;
-                if (!IsClosed && nextIndex == 0) break;
-                canvas.DrawLine(Points[i], Points[nextIndex], linePaint);
-            }
+            canvas.DrawPath(path, linePaint);
         }
 
-        // Punkte
         if (DisplayHandles)
         {
             for (int i = 0; i < Points.Count; i++)

@@ -125,10 +125,8 @@ public partial class ImageViewPage : IQueryAttributable
                 this.Title = formattedDate;
             }
 
-            FotoImage.Source = ImageSource.FromStream(() =>
-            {
-                return File.OpenRead(imgPath);
-            });
+            var bytes = File.ReadAllBytes(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;

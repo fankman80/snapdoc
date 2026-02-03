@@ -93,10 +93,13 @@ public partial class SetPin : ContentPage, IQueryAttributable
             .Select(img => new FotoItem
             {
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
+                OnPlanId = this.PlanId,
+                OnPinId = this.PinId,
                 AllowExport = img.Value.AllowExport,
                 DateTime = img.Value.DateTime
-            }).ToObservableCollection();
-            
+            }.Initialize())
+            .ToObservableCollection();
+
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
             GeoLocButton.Text = Settings.GPSButtonOnIcon;
         else
@@ -107,9 +110,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        var tappedImage = sender as Image;
-        var filePath = ((FileImageSource)tappedImage.Source).File;
-        var fileName = new FileResult(filePath).FileName;
+        if (sender is not Image tappedImage) return;
+        if (tappedImage.BindingContext is not FotoItem fotoItem) return;
+        var filePath = fotoItem.ImagePath;
+        var fileName = Path.GetFileName(filePath);
 
         await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={PlanId}&pinId={PinId}&gotoBtn=false");
     }

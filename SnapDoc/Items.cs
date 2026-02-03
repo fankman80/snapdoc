@@ -381,6 +381,7 @@ namespace SnapDoc
         [ObservableProperty] private bool _isSelected;
     }
 
+
     public partial class FotoItem : ObservableObject
     {
         public string ImagePath { get; set; }
@@ -389,8 +390,29 @@ namespace SnapDoc
         public string OnPinId { get; set; }
 
         [ObservableProperty] private bool _allowExport;
+        [ObservableProperty] private ImageSource _displayImage;
 
         public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
+        public void ReloadImage()
+        {
+            if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath))
+                return;
+            try
+            {
+                var bytes = File.ReadAllBytes(ImagePath);
+                DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Laden: {ex.Message}");
+            }
+        }
+
+        public FotoItem Initialize()
+        {
+            ReloadImage();
+            return this;
+        }
     }
 
     public class PdfItem

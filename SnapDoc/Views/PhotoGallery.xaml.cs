@@ -93,7 +93,7 @@ public partial class FotoGalleryView : ContentPage
                         AllowExport = foto.AllowExport,
                         OnPlanId = planId,
                         OnPinId = pinId
-                    });
+                    }.Initialize());
                 }
             }
         }
