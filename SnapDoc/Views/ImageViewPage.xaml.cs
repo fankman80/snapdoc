@@ -385,7 +385,8 @@ public partial class ImageViewPage : IQueryAttributable
 
             if (isCleared)
             {
-                if (File.Exists(imgPath)) File.Delete(imgPath);
+                if (File.Exists(imgPath))
+                    File.Delete(imgPath);
                 File.Move(origPath, imgPath);
 
                 FotoImage.Source = ImageSource.FromStream(() =>
@@ -449,32 +450,6 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    //private static async Task<string> FileRenamer(string filePath)
-    //{
-    //    var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
-    //    var onlyPath = Path.GetDirectoryName(filePath);
-    //    string newFileName;
-    //    var extension = Path.GetExtension(filePath);
-
-    //    if (name.Length == 3)
-    //        newFileName = $"{name[0]}_{name[1]}_{name[2]}_{1}" + extension;
-    //    else
-    //    {
-    //        if (Int32.TryParse(name[3], out int i))
-    //            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{i + 1}" + extension;
-    //        else
-    //            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{0}" + extension;
-    //    }
-
-    //    if (File.Exists(Path.Combine(filePath)))
-    //    {
-    //        File.Move(filePath, Path.Combine(onlyPath, newFileName));
-    //        return Path.Combine(onlyPath, newFileName);
-    //    }
-    //    else
-    //        return filePath;
-    //}
-
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
         using var fotoStream = File.OpenRead(fotoPath);
@@ -527,6 +502,7 @@ public partial class ImageViewPage : IQueryAttributable
         SelectedFillColor = Color.FromArgb(result.Result.FillColorHex);
         SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
         lineWidth = result.Result.PenWidth;
+        strokeStyle = result.Result.StrokeStyle;
 
         drawingController?.UpdateDrawingStyles(
             SelectedBorderColor.ToSKColor(),
