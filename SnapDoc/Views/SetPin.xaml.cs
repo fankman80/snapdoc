@@ -52,6 +52,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     public SetPin()
     {
         InitializeComponent();
+
         BindingContext = this;
     }
 

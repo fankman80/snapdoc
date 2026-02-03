@@ -124,7 +124,11 @@ public partial class ImageViewPage : IQueryAttributable
                 string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                 this.Title = formattedDate;
             }
-            FotoImage.Source = imgPath;
+
+            FotoImage.Source = ImageSource.FromStream(() =>
+            {
+                return File.OpenRead(imgPath);
+            });
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -343,7 +347,13 @@ public partial class ImageViewPage : IQueryAttributable
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
-            FotoImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            
+            FotoImage.Source = ImageSource.FromStream(() =>
+            {
+                return File.OpenRead(imgPath);
+            });
+
             GlobalJson.SaveToFile();
         }
     }
@@ -378,11 +388,6 @@ public partial class ImageViewPage : IQueryAttributable
                 if (File.Exists(imgPath)) File.Delete(imgPath);
                 File.Move(origPath, imgPath);
 
-                //imgPath = await FileRenamer(imgPath);
-                //thumbPath = await FileRenamer(thumbPath);
-                //_ = await FileRenamer(origPath);
-                //FotoImage.Source = imgPath;
-
                 FotoImage.Source = ImageSource.FromStream(() =>
                 {
                     return File.OpenRead(imgPath);
@@ -401,11 +406,6 @@ public partial class ImageViewPage : IQueryAttributable
 
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
-
-                //imgPath = await FileRenamer(imgPath);
-                //thumbPath = await FileRenamer(thumbPath);
-                //_ = await FileRenamer(origPath);
-                //FotoImage.Source = imgPath;
 
                 FotoImage.Source = ImageSource.FromStream(() =>
                 {
