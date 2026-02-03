@@ -4,7 +4,6 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -62,16 +61,10 @@
                         <ColumnDefinition Width="Auto" />
                     </Grid.ColumnDefinitions>
 
-                    <ff:CachedImage Grid.Column="0"
-                                    Source="{Binding ImagePath}"
-                                    Aspect="AspectFill"
-                                    BitmapOptimizations="True"
-                                    CacheType="Memory"
-                                    FadeAnimationEnabled="False"
-                                    FadeAnimationForCachedImages="False"
-                                    RetryCount="2"
-                                    RetryDelay="100">
-                    </ff:CachedImage>
+                    <Image Grid.Column="0"
+                           Source="{Binding ImagePath}"
+                           Aspect="AspectFill">
+                    </Image>
                     <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                         <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12" FontAttributes="Bold"/>
                         <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
@@ -104,18 +97,12 @@
             <DataTemplate x:Key="GalleryGridTemplate" x:DataType="local:FotoItem">
                 <Grid>
                     <views:SquareView Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
-                        <ff:CachedImage Source="{Binding ImagePath}"
-                                        Aspect="AspectFill"
-                                        BitmapOptimizations="True"
-                                        CacheType="Memory"
-                                        FadeAnimationEnabled="False"
-                                        FadeAnimationForCachedImages="False"
-                                        RetryCount="2"
-                                        RetryDelay="100">
-                            <ff:CachedImage.GestureRecognizers>
+                        <Image Source="{Binding ImagePath}"
+                               Aspect="AspectFill">
+                            <Image.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnImageTapped" />
-                            </ff:CachedImage.GestureRecognizers>
-                        </ff:CachedImage>
+                            </Image.GestureRecognizers>
+                        </Image>
                     </views:SquareView>
                     <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                             WidthRequest="36"

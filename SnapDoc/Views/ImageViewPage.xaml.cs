@@ -378,11 +378,16 @@ public partial class ImageViewPage : IQueryAttributable
                 if (File.Exists(imgPath)) File.Delete(imgPath);
                 File.Move(origPath, imgPath);
 
-                imgPath = await FileRenamer(imgPath);
-                thumbPath = await FileRenamer(thumbPath);
-                _ = await FileRenamer(origPath);
+                //imgPath = await FileRenamer(imgPath);
+                //thumbPath = await FileRenamer(thumbPath);
+                //_ = await FileRenamer(origPath);
+                //FotoImage.Source = imgPath;
 
-                FotoImage.Source = imgPath;
+                FotoImage.Source = ImageSource.FromStream(() =>
+                {
+                    return File.OpenRead(imgPath);
+                });
+
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
@@ -397,11 +402,16 @@ public partial class ImageViewPage : IQueryAttributable
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
 
-                imgPath = await FileRenamer(imgPath);
-                thumbPath = await FileRenamer(thumbPath);
-                _ = await FileRenamer(origPath);
+                //imgPath = await FileRenamer(imgPath);
+                //thumbPath = await FileRenamer(thumbPath);
+                //_ = await FileRenamer(origPath);
+                //FotoImage.Source = imgPath;
 
-                FotoImage.Source = imgPath;
+                FotoImage.Source = ImageSource.FromStream(() =>
+                {
+                    return File.OpenRead(imgPath);
+                });
+
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
@@ -439,31 +449,31 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    private static async Task<string> FileRenamer(string filePath)
-    {
-        var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
-        var onlyPath = Path.GetDirectoryName(filePath);
-        string newFileName;
-        var extension = Path.GetExtension(filePath);
+    //private static async Task<string> FileRenamer(string filePath)
+    //{
+    //    var name = Path.GetFileNameWithoutExtension(filePath).Split('_');
+    //    var onlyPath = Path.GetDirectoryName(filePath);
+    //    string newFileName;
+    //    var extension = Path.GetExtension(filePath);
 
-        if (name.Length == 3)
-            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{1}" + extension;
-        else
-        {
-            if (Int32.TryParse(name[3], out int i))
-                newFileName = $"{name[0]}_{name[1]}_{name[2]}_{i + 1}" + extension;
-            else
-                newFileName = $"{name[0]}_{name[1]}_{name[2]}_{0}" + extension;
-        }
+    //    if (name.Length == 3)
+    //        newFileName = $"{name[0]}_{name[1]}_{name[2]}_{1}" + extension;
+    //    else
+    //    {
+    //        if (Int32.TryParse(name[3], out int i))
+    //            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{i + 1}" + extension;
+    //        else
+    //            newFileName = $"{name[0]}_{name[1]}_{name[2]}_{0}" + extension;
+    //    }
 
-        if (File.Exists(Path.Combine(filePath)))
-        {
-            File.Move(filePath, Path.Combine(onlyPath, newFileName));
-            return Path.Combine(onlyPath, newFileName);
-        }
-        else
-            return filePath;
-    }
+    //    if (File.Exists(Path.Combine(filePath)))
+    //    {
+    //        File.Move(filePath, Path.Combine(onlyPath, newFileName));
+    //        return Path.Combine(onlyPath, newFileName);
+    //    }
+    //    else
+    //        return filePath;
+    //}
 
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {

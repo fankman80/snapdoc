@@ -8,7 +8,6 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using FFImageLoading.Maui;
 using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
@@ -107,7 +106,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        var tappedImage = sender as CachedImage;
+        var tappedImage = sender as Image;
         var filePath = ((FileImageSource)tappedImage.Source).File;
         var fileName = new FileResult(filePath).FileName;
 

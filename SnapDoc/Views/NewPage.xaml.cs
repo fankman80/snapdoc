@@ -654,7 +654,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             Size _pinSize = thisPlan.Pins[doubleTappedPin.AutomationId].Size;
 
             var pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, _newPin);
-            //doubleTappedPin.Source = pinIcon;
             doubleTappedPin.Source = ImageSource.FromStream(() =>
             {
                 return File.OpenRead(pinIcon);
