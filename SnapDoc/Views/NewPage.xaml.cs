@@ -280,26 +280,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Size _pinSize = thisPlan.Pins[pinId].Size;
         Double _rotation = PlanContainer.Rotation * -1 + thisPlan.Pins[pinId].PinRotation;
 
+        ImageSource pinSource = pinIcon;
         if (thisPlan.Pins[pinId].IsCustomPin)
         {
             _rotation = thisPlan.Pins[pinId].PinRotation;
             pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
+            var bytes = File.ReadAllBytes(pinIcon);
+            pinSource = ImageSource.FromStream(() => new MemoryStream(bytes));
         }
         else if (thisPlan.Pins[pinId].IsCustomIcon)
         {
             var _pinIcon = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
             if (File.Exists(_pinIcon))
-            {
-                // pinIcon = _pinIcon;
-                var bytes = File.ReadAllBytes(_pinIcon);
-                pinIcon = ImageSource.FromStream(() => new MemoryStream(bytes));
-            }
+                pinSource = _pinIcon;
             else
             {
-                // Lade Default-Icon falls Custom-Icon nicht existiert
                 string _newPin = SettingsService.Instance.DefaultPinIcon;
                 var iconItem = Helper.IconLookup.Get(_newPin);
-                pinIcon = iconItem.FileName;
+                pinSource = iconItem.FileName;
                 _originAnchor = iconItem.AnchorPoint;
                 _pinSize = iconItem.IconSize;
             }
@@ -308,7 +306,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // berechne Anchor-Koordinaten
         var smallImage = new MR.Gestures.Image
         {
-            Source = pinIcon,
+            Source = pinSource,
             AutomationId = pinId,
             WidthRequest = thisPlan.Pins[pinId].Size.Width,
             HeightRequest = thisPlan.Pins[pinId].Size.Height,
@@ -352,6 +350,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.IsPanningEnabled = false;
         activePin = img;
     }
+
     private void OnPinUp(object sender, EventArgs e)
     {
         var img = (MR.Gestures.Image)sender;
@@ -1484,23 +1483,4 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 #endif
     }
-}
-
-public static class ColorExtensions
-{
-    public static SKColor ToSKColor(this Color color)
-    {
-        byte a = (byte)(color.Alpha * 255);
-        byte r = (byte)(color.Red * 255);
-        byte g = (byte)(color.Green * 255);
-        byte b = (byte)(color.Blue * 255);
-
-        return new SKColor(r, g, b, a);
-    }
-}
-
-public sealed class PinContext
-{
-    public string PlanId { get; init; } = "";
-    public string PinId { get; init; } = "";
 }

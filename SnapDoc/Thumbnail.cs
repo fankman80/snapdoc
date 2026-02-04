@@ -3,7 +3,7 @@ using SnapDoc.Services;
 
 namespace SnapDoc;
 
-class Thumbnail
+public class Thumbnail
 {
     public static void Generate(string originalFilePath, string thumbnailPath)
     {

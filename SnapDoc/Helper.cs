@@ -473,3 +473,35 @@ public class Helper
         return values.Count >= 2 ? [.. values] : null;
     }
 }
+public static class ColorExtensions
+{
+    public static SKColor ToSKColor(this Color color)
+    {
+        byte a = (byte)(color.Alpha * 255);
+        byte r = (byte)(color.Red * 255);
+        byte g = (byte)(color.Green * 255);
+        byte b = (byte)(color.Blue * 255);
+
+        return new SKColor(r, g, b, a);
+    }
+}
+
+public sealed class PinContext
+{
+    public string PlanId { get; init; } = "";
+    public string PinId { get; init; } = "";
+}
+
+public partial class SquareView : ContentView
+{
+    protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
+    {
+        if (!double.IsInfinity(widthConstraint))
+        {
+            var size = widthConstraint;
+            Content?.Measure(size, size);
+            return new Size(size, size);
+        }
+        return base.MeasureOverride(widthConstraint, heightConstraint);
+    }
+}

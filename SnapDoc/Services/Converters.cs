@@ -2,6 +2,8 @@
 
 using SkiaSharp;
 using System.Globalization;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace SnapDoc.Services;
 
@@ -119,4 +121,23 @@ public class HexToColorConverter : IValueConverter
 
     public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
         => throw new NotImplementedException();
+}
+
+public class SKColorConverter : JsonConverter<SKColor>
+{
+    public override SKColor Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+    {
+        var colorString = reader.GetString();
+        if (!string.IsNullOrEmpty(colorString))
+        {
+            return SKColor.Parse(colorString); // Hex-String in SKColor umwandeln
+        }
+        return SKColors.Transparent; // Fallback-Wert
+    }
+
+    public override void Write(Utf8JsonWriter writer, SKColor value, JsonSerializerOptions options)
+    {
+        var colorString = value.ToString(); // SKColor in Hex-String umwandeln
+        writer.WriteStringValue(colorString);
+    }
 }

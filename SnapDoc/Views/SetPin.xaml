@@ -92,7 +92,7 @@
                 <DataTemplate x:DataType="local:FotoItem">
                     <VerticalStackLayout>
                         <Grid>
-                            <views:SquareView Opacity="{Binding DisplayOpacity}">
+                            <local:SquareView Opacity="{Binding DisplayOpacity}">
                                 <Image Source="{Binding DisplayImage}"
                                        Aspect="AspectFill"
                                        HorizontalOptions="Fill"
@@ -101,7 +101,7 @@
                                         <TapGestureRecognizer Tapped="OnImageTapped" />
                                     </Image.GestureRecognizers>
                                 </Image>
-                            </views:SquareView>
+                            </local:SquareView>
                             <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                     WidthRequest="36"
                                     HeightRequest="36"
