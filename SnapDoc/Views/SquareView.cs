@@ -2,11 +2,12 @@
 {
     public partial class SquareView : ContentView
     {
-        protected override async void OnSizeAllocated(double width, double height)
+        protected override Size MeasureOverride(double widthConstraint, double heightConstraint)
         {
-            base.OnSizeAllocated(width, height);
-            await Task.Yield();
-            HeightRequest = Width;
+            if (!double.IsInfinity(widthConstraint))
+                return new Size(widthConstraint, widthConstraint);
+
+            return base.MeasureOverride(widthConstraint, heightConstraint);
         }
     }
 }

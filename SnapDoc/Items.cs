@@ -87,7 +87,10 @@ namespace SnapDoc
             _pin.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(Pin.IsAllowExport))
+                {
                     OnPropertyChanged(nameof(IsAllowExport));
+                    OnPropertyChanged(nameof(DisplayOpacity));
+                }
             };
             UpdatePriorityColor();
         }
@@ -96,6 +99,7 @@ namespace SnapDoc
         public string SelfId => _pin.SelfId;
         public string OnPlanId => _pin.OnPlanId;
         public DateTime Time => _pin.DateTime;
+        public double DisplayOpacity => IsAllowExport ? 1.0 : 0.3;
 
         public string DisplayIconPath
         {
@@ -181,6 +185,7 @@ namespace SnapDoc
                 {
                     _pin.IsAllowExport = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(DisplayOpacity));
                 }
             }
         }
@@ -316,7 +321,7 @@ namespace SnapDoc
 
     public partial class PlanItem : ObservableObject
     {
-        private readonly Plan _plan; // direkte Referenz auf das zugrundeliegende Modell
+        private readonly Plan _plan;
 
         public PlanItem(Plan plan)
         {
@@ -325,7 +330,10 @@ namespace SnapDoc
             _plan.PropertyChanged += (s, e) =>
             {
                 if (e.PropertyName == nameof(Plan.AllowExport))
+                {
                     OnPropertyChanged(nameof(AllowExport));
+                    OnPropertyChanged(nameof(DisplayOpacity));
+                }
                 else if (e.PropertyName == nameof(Plan.PlanColor))
                     OnPropertyChanged(nameof(PlanColor));
                 else if (e.PropertyName == nameof(Plan.PinCount))
@@ -336,6 +344,7 @@ namespace SnapDoc
         public string PlanId { get; set; } = string.Empty;
         public string PlanRoute { get; set; } = string.Empty;
         public string Thumbnail { get; set; } = string.Empty;
+        public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
 
         public bool AllowExport
         {
@@ -346,6 +355,7 @@ namespace SnapDoc
                 {
                     _plan.AllowExport = value;
                     OnPropertyChanged();
+                    OnPropertyChanged(nameof(DisplayOpacity));
                 }
             }
         }
@@ -381,16 +391,16 @@ namespace SnapDoc
         [ObservableProperty] private bool _isSelected;
     }
 
-
     public partial class FotoItem : ObservableObject
     {
+        [ObservableProperty] private ImageSource _displayImage;        
+        [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayOpacity))]
+        private bool _allowExport;
         public string ImagePath { get; set; }
         public DateTime DateTime { get; set; }
         public string OnPlanId { get; set; }
         public string OnPinId { get; set; }
-
-        [ObservableProperty] private bool _allowExport;
-        [ObservableProperty] private ImageSource _displayImage;
+        public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
 
         public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
         public void ReloadImage()

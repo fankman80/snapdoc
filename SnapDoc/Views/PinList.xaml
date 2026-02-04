@@ -33,7 +33,6 @@
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -107,7 +106,7 @@
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PinItem" >
                         <Grid RowSpacing="0" ColumnSpacing="0"
-                              Opacity="{Binding IsAllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
+                              Opacity="{Binding DisplayOpacity}">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="16" />
                                 <ColumnDefinition Width="64" />

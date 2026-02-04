@@ -8,11 +8,12 @@ namespace SnapDoc.Views;
 
 public partial class FotoGalleryView : ContentPage
 {
-    private List<FotoItem> AllFotos;
     public ObservableCollection<FotoItem> Fotos { get; set; } = [];
+    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
     private string OrderDirection = "asc";
     private bool _isActiveToggle;
-    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
+    private CancellationTokenSource _imageLoadingCts;
+    private List<FotoItem> AllFotos;
 
     public bool IsActiveToggle
     {
@@ -52,36 +53,37 @@ public partial class FotoGalleryView : ContentPage
     {
         base.OnDisappearing();
 
+        _imageLoadingCts?.Cancel(); // Ladevorgang stoppen
         SizeChanged -= OnSizeChanged;
     }
 
     private void FotoLoader()
     {
+        // Falls noch ein alter Ladevorgang läuft, abbrechen
+        _imageLoadingCts?.Cancel();
+        _imageLoadingCts = new CancellationTokenSource();
+        var token = _imageLoadingCts.Token;
+
         var list = new List<FotoItem>();
 
         foreach (var planEntry in GlobalJson.Data.Plans)
         {
             var planId = planEntry.Key;
             var plan = planEntry.Value;
-
-            if (plan?.Pins == null)
-                continue;
+            if (plan?.Pins == null) continue;
 
             foreach (var pinEntry in plan.Pins)
             {
                 var pinId = pinEntry.Key;
                 var pin = pinEntry.Value;
-
-                if (pin?.Fotos == null)
-                    continue;
+                if (pin?.Fotos == null) continue;
 
                 foreach (var fotoEntry in pin.Fotos)
                 {
                     var foto = fotoEntry.Value;
+                    if (foto == null || string.IsNullOrWhiteSpace(foto.File)) continue;
 
-                    if (foto == null || string.IsNullOrWhiteSpace(foto.File))
-                        continue;
-
+                    // WICHTIG: Kein .Initialize() mehr hier!
                     list.Add(new FotoItem
                     {
                         ImagePath = SafeCombine(
@@ -93,13 +95,48 @@ public partial class FotoGalleryView : ContentPage
                         AllowExport = foto.AllowExport,
                         OnPlanId = planId,
                         OnPinId = pinId
-                    }.Initialize());
+                    });
                 }
             }
         }
 
         AllFotos = list;
         ApplyFilterAndSorting();
+
+        // Startet das Laden der Bilder im Hintergrund
+        Task.Run(() => LoadImagesInBackgroundAsync(token), token);
+    }
+
+    private async Task LoadImagesInBackgroundAsync(CancellationToken token)
+    {
+        var itemsToLoad = AllFotos.ToList();
+
+        foreach (var item in itemsToLoad)
+        {
+            if (token.IsCancellationRequested) break;
+
+            try
+            {
+                if (File.Exists(item.ImagePath))
+                {
+                    // 1. Bytes einmalig im Hintergrund lesen
+                    var bytes = File.ReadAllBytes(item.ImagePath);
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        // 2. WICHTIG: Die Factory muss einen NEUEN MemoryStream 
+                        // aus dem Byte-Array liefern, wenn sie aufgerufen wird.
+                        item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LazyLoad Error: {ex.Message}");
+            }
+
+            await Task.Delay(10, token);
+        }
     }
 
     private static string SafeCombine(params string[] parts)

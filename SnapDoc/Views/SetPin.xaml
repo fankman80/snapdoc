@@ -65,7 +65,6 @@
         <ResourceDictionary>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -88,7 +87,7 @@
                 <DataTemplate x:DataType="local:FotoItem">
                     <VerticalStackLayout>
                         <Grid>
-                            <views:SquareView Opacity="{Binding AllowExport, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:30/100'}">
+                            <views:SquareView Opacity="{Binding DisplayOpacity}">
                                 <Image Source="{Binding DisplayImage}"
                                        Aspect="AspectFill">
                                     <Image.GestureRecognizers>
