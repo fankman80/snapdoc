@@ -130,8 +130,9 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Grid Grid.Row="0" HorizontalOptions="Start"
-              x:DataType="views:FotoGalleryView"
+        <Grid Grid.Row="0"
+              x:DataType="views:FotoGalleryView"              
+              HorizontalOptions="Start"
               ColumnDefinitions="50, Auto"
               HeightRequest="40">
             <controls:Switch Grid.Column="0"
@@ -175,7 +176,10 @@
                         ItemSizingStrategy="MeasureFirstItem"
                         RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="{Binding DynamicSpan}"
+                                 VerticalItemSpacing="6"
+                                 HorizontalItemSpacing="6"/>
             </CollectionView.ItemsLayout>
         </CollectionView>
 

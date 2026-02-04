@@ -14,23 +14,22 @@ namespace SnapDoc.Views;
 
 public partial class SetPin : ContentPage, IQueryAttributable
 {
-    private readonly HashSet<Picker> _initializedPickers = [];
-    
     public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
+    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
+    private readonly HashSet<Picker> _initializedPickers = [];
     private string PlanId;
     private string PinId;
-    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
 
-    private ObservableCollection<FotoItem> images;
-    public ObservableCollection<FotoItem> Images
+    private ObservableCollection<FotoItem> fotos = [];
+    public ObservableCollection<FotoItem> Fotos
     {
-        get => images;
+        get => fotos;
         set
         {
-            if (images != value)
+            if (fotos != value)
             {
-                images = value;
-                OnPropertyChanged(nameof(Images));
+                fotos = value;
+                OnPropertyChanged(nameof(Fotos));
             }
         }
     }
@@ -68,6 +67,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         SizeChanged += OnSizeChanged;;
 
         UpdateSpan();
+        FotoLoader();
     }
 
     protected override void OnDisappearing()
@@ -84,12 +84,17 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
 
-        MyView_Load();
+        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
+            GeoLocButton.Text = Settings.GPSButtonOnIcon;
+        else
+            GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
+
+        Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
     }
 
-    private void MyView_Load()
+    private void FotoLoader()
     {
-        Images = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
+        Fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
             .Select(img => new FotoItem
             {
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
@@ -99,13 +104,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = img.Value.DateTime
             }.Initialize())
             .ToObservableCollection();
-
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
-            GeoLocButton.Text = Settings.GPSButtonOnIcon;
-        else
-            GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
-
-        Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
@@ -268,20 +266,24 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = DateTime.Now,
                 ImageSize = imgSize
             };
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
+            GlobalJson.SaveToFile();
 
-            var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
-            pin.Fotos[path.FileName] = newImageData;
-
-            Images.Add(new FotoItem
+            var newItem = new FotoItem
             {
                 ImagePath = path.FullPath,
+                OnPlanId = this.PlanId,
+                OnPinId = this.PinId,
                 AllowExport = true,
                 DateTime = DateTime.Now
-            });
+            }.Initialize();
 
-            // save data to file
-            GlobalJson.SaveToFile();
+            Fotos.Add(newItem);
+#if WINDOWS
+            FotoLoader();
+#endif
         }
+
     }
 
     private void OnSelectedItemChanged(object sender, EventArgs e)

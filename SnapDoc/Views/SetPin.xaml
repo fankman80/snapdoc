@@ -75,13 +75,18 @@
         </Grid.RowDefinitions>
         <CollectionView Grid.Row="0"
                         x:Name="ImageGallery"
-                        ItemsSource="{Binding Images}"
+                        ItemsSource="{Binding Fotos}"
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="True"
                         ReorderCompleted="OnReorderCompleted"
-                        SelectionMode="None">
+                        SelectionMode="None"
+                        ItemSizingStrategy="MeasureFirstItem"
+                        RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" HorizontalItemSpacing="6" VerticalItemSpacing="6"/>
+                <GridItemsLayout Orientation="Vertical"
+                                 Span="{Binding DynamicSpan}"
+                                 HorizontalItemSpacing="6"
+                                 VerticalItemSpacing="6"/>
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:FotoItem">

@@ -46,6 +46,7 @@ public partial class FotoGalleryView : ContentPage
 
         UpdateSpan();
         FotoLoader();
+
         ApplyFilterAndSorting();
     }
 
@@ -69,18 +70,21 @@ public partial class FotoGalleryView : ContentPage
         {
             var planId = planEntry.Key;
             var plan = planEntry.Value;
-            if (plan?.Pins == null) continue;
+            if (plan?.Pins == null)
+                continue;
 
             foreach (var pinEntry in plan.Pins)
             {
                 var pinId = pinEntry.Key;
                 var pin = pinEntry.Value;
-                if (pin?.Fotos == null) continue;
+                if (pin?.Fotos == null)
+                    continue;
 
                 foreach (var fotoEntry in pin.Fotos)
                 {
                     var foto = fotoEntry.Value;
-                    if (foto == null || string.IsNullOrWhiteSpace(foto.File)) continue;
+                    if (foto == null || string.IsNullOrWhiteSpace(foto.File))
+                        continue;
 
                     list.Add(new FotoItem
                     {
@@ -117,13 +121,10 @@ public partial class FotoGalleryView : ContentPage
             {
                 if (File.Exists(item.ImagePath))
                 {
-                    // 1. Bytes einmalig im Hintergrund lesen
                     var bytes = File.ReadAllBytes(item.ImagePath);
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        // 2. WICHTIG: Die Factory muss einen NEUEN MemoryStream 
-                        // aus dem Byte-Array liefern, wenn sie aufgerufen wird.
                         item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
                     });
                 }

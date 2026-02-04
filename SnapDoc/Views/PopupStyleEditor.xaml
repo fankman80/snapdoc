@@ -154,7 +154,7 @@
                         Padding="8"
                         Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
-                        <uranium:ExpanderView.Header Padding="0">
+                        <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.vorlagen}"/>
                         </uranium:ExpanderView.Header>
                         <CollectionView ItemsSource="{Binding Items}"
