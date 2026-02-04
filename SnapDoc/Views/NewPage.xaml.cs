@@ -289,7 +289,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             var _pinIcon = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
             if (File.Exists(_pinIcon))
-                pinIcon = _pinIcon;
+                // pinIcon = _pinIcon;
+                var bytes = File.ReadAllBytes(_pinIcon);
+                pinIcon = ImageSource.FromStream(() => new MemoryStream(bytes));
             else
             {
                 // Lade Default-Icon falls Custom-Icon nicht existiert
