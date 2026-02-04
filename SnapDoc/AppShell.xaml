@@ -21,7 +21,8 @@
             <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
             <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
-
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+            
             <!-- Template Liste ohne Thumbnails -->
             <DataTemplate x:Key="PlanListTemplate" x:DataType="local:PlanItem">
                 <Grid ColumnDefinitions="Auto,*,Auto,Auto"

@@ -59,7 +59,6 @@ public partial class FotoGalleryView : ContentPage
 
     private void FotoLoader()
     {
-        // Falls noch ein alter Ladevorgang läuft, abbrechen
         _imageLoadingCts?.Cancel();
         _imageLoadingCts = new CancellationTokenSource();
         var token = _imageLoadingCts.Token;
@@ -83,7 +82,6 @@ public partial class FotoGalleryView : ContentPage
                     var foto = fotoEntry.Value;
                     if (foto == null || string.IsNullOrWhiteSpace(foto.File)) continue;
 
-                    // WICHTIG: Kein .Initialize() mehr hier!
                     list.Add(new FotoItem
                     {
                         ImagePath = SafeCombine(

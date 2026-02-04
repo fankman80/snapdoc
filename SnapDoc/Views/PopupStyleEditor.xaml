@@ -96,7 +96,7 @@
                                 TextColor="{Binding SelectedTextColor, Converter={StaticResource ColorToColorForTextConverter}}"
                                 Clicked="OnTextColorPickerClicked"/>
                     </Grid>
-                    <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="3">
+                    <Grid Grid.Column="1" Grid.Row="0" Grid.RowSpan="3" Padding="2">
                         <Border>
                             <Image Source="pattern.png" Aspect="Center"/>
                         </Border>
@@ -117,13 +117,14 @@
                     </Grid>
                     <Button Grid.Column="1" Grid.Row="2"
                             WidthRequest="44"
-                            Text="{x:Static local:MaterialIcons.Add_2}"
-                            FontSize="24"
+                            Text="{x:Static local:MaterialIcons.Stack_star}"
+                            FontSize="36"
                             FontFamily="MaterialOutlined"
-                            TextColor="{Binding SelectedFillColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                            BackgroundColor="Transparent"
+                            TextColor="{DynamicResource PrimaryDark}"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                             HorizontalOptions="End"
                             Padding="0"
+                            CornerRadius="0"
                             Clicked="OnTemplateAddClicked"/>
                 </Grid>
                 
@@ -153,12 +154,12 @@
                         Padding="8"
                         Margin="0,0,0,10">
                     <uranium:ExpanderView Margin="6,6,6,6">
-                        <uranium:ExpanderView.Header>
+                        <uranium:ExpanderView.Header Padding="0">
                             <Label Text="{x:Static res:AppResources.vorlagen}"/>
                         </uranium:ExpanderView.Header>
                         <CollectionView ItemsSource="{Binding Items}"
-                                            SelectionMode="None"
-                                            Margin="0">
+                                        SelectionMode="None"
+                                        Margin="0">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
                             </CollectionView.ItemsLayout>

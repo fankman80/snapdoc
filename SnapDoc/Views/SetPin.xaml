@@ -89,7 +89,9 @@
                         <Grid>
                             <views:SquareView Opacity="{Binding DisplayOpacity}">
                                 <Image Source="{Binding DisplayImage}"
-                                       Aspect="AspectFill">
+                                       Aspect="AspectFill"
+                                       HorizontalOptions="Fill"
+                                       VerticalOptions="Fill">                                       
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnImageTapped" />
                                     </Image.GestureRecognizers>
