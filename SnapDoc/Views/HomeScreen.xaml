@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              x:Class="SnapDoc.Views.HomeScreen"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="DimGrey">
 
     <ContentPage.Content>
-        <Image Source="banner.png" VerticalOptions="End"/>
+        <controls:SvgView
+            Margin="40"
+            Source="logo.svg"
+            TintColor="{DynamicResource Primary}"
+            TargetHexColor="#00b1ca"
+            Aspect="AspectFit" />
     </ContentPage.Content>
 </ContentPage>
