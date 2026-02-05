@@ -1,11 +1,9 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
-using DocumentFormat.OpenXml.Wordprocessing;
-using FFImageLoading.Maui;
+//using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
-using SnapDoc.Services;
 using System.Globalization;
 using UraniumUI;
 
@@ -27,7 +25,7 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .UseUraniumUI()
-            .UseFFImageLoading()
+            //.UseFFImageLoading()
             .ConfigureMRGestures()
             .UseSkiaSharp()
             .ConfigureFonts(fonts =>

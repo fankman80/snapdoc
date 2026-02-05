@@ -4,15 +4,16 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupSettings">
-
+                <!--xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"-->
+    
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
@@ -205,8 +206,17 @@
                             </material:RadioButtonGroupView>
 
                             <HorizontalStackLayout Spacing="24" Margin="0,0,0,16">
-                                <ffimageloading:SvgCachedImage x:Name="svgIcon"
-                                       WidthRequest="30"/>
+                                <!--<skia:SKCanvasView x:Name="svgIcon"
+                                       WidthRequest="30"
+                                       PaintSurface="OnPaintCanvas"/>-->
+
+                                <controls:SvgView 
+                                    Source="customcolor.svg"
+                                    TintColor="{DynamicResource Primary}"
+                                    TargetHexColor="#999999"
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    Aspect="AspectFit" />
                                 <Image HorizontalOptions="Center"
                                        WidthRequest="30"
                                        Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>

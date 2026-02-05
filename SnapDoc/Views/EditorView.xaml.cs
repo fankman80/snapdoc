@@ -1,10 +1,11 @@
 ﻿#nullable disable
-#if ANDROID
-using Android.Webkit;
-#endif
 using SnapDoc.Services;
 using System.Text.Json;
 using SnapDoc.Resources.Languages;
+
+#if ANDROID
+using Android.Webkit;
+#endif
 
 namespace SnapDoc.Views;
 

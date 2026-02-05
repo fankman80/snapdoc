@@ -3,7 +3,6 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
@@ -16,7 +15,8 @@
              x:DataType="views:NewPage"
              x:Name="ThisPage"
              Title="{Binding PageTitle}">
-
+            <!--xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"-->
+    
     <ContentPage.Resources>
         <ResourceDictionary>
             <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
@@ -82,13 +82,14 @@
 				                   TranslationY="{Binding TranslationY}"
 				                   AnchorX="{Binding AnchorX}"
 				                   AnchorY="{Binding AnchorY}">
-                    <ff:CachedImageView x:Name="PlanImage"
+                    <!--<ff:CachedImageView x:Name="PlanImage"
                                         CacheType="All"
                                         DownsampleUseDipUnits="False"
                                         DownsampleToViewSize="False"
                                         FadeAnimationEnabled ="False"
                                         FadeAnimationForCachedImages ="False"
-                                        LoadingDelay="0"/>
+                                        LoadingDelay="0"/>-->
+                    <Image x:Name="PlanImage"/>
                 </mr:AbsoluteLayout>
             </mr:ContentView>
 

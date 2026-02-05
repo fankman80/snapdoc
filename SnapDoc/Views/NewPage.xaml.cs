@@ -33,7 +33,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private MR.Gestures.Image activePin = null; 
     private MR.Gestures.Image doubleTappedPin = null;
     private double densityX, densityY;
-    private double oversizeScaleFac = 1;
+    //private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
     private Point mousePos;
     private bool isTappedHandled = false;
@@ -229,34 +229,33 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Task AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
-        if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
-        {
-            PlanImage.DownsampleToViewSize = true;
-            PlanImage.DownsampleWidth = SettingsService.Instance.MaxPdfImageSizeW;
-            PlanImage.DownsampleHeight = SettingsService.Instance.MaxPdfImageSizeH;
+        //if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
+        //{
+        //    oversizeScaleFac = Math.Min(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height) /
+        //                       Math.Max(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height);
 
-            oversizeScaleFac = Math.Min(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height) /
-                               Math.Max(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height);
+        //    if (thisPlan.ImageSize.Width > thisPlan.ImageSize.Height)
+        //    {
+        //        PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW;
+        //        PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * oversizeScaleFac;
+        //    }
+        //    else
+        //    {
+        //        PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * oversizeScaleFac;
+        //        PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH;
+        //    }
+        //}
+        //else
+        //{
+        //    PlanImage.WidthRequest = thisPlan.ImageSize.Width;
+        //    PlanImage.HeightRequest = thisPlan.ImageSize.Height;
+        //}
 
-            if (thisPlan.ImageSize.Width > thisPlan.ImageSize.Height)
-            {
-                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW;
-                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * oversizeScaleFac;
-            }
-            else
-            {
-                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * oversizeScaleFac;
-                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH;
-            }
-        }
-        else
-        {
-            PlanImage.WidthRequest = thisPlan.ImageSize.Width;
-            PlanImage.HeightRequest = thisPlan.ImageSize.Height;
-        }
+        // PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
 
-        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-        
+        var imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        PlanImage.Source = ImageHelper.ResizeAndLoadNative(imagePath, SettingsService.Instance.MaxPdfImageSizeW, SettingsService.Instance.MaxPdfImageSizeH);
+     
         return Task.CompletedTask;
     }
 

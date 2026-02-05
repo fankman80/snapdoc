@@ -10,6 +10,13 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
 
+#if ANDROID
+using Microsoft.Maui.Graphics;
+using System.IO;
+using Android.Opengl;
+#endif
+
+
 namespace SnapDoc;
 
 public class Helper
@@ -504,4 +511,50 @@ public partial class SquareView : ContentView
         }
         return base.MeasureOverride(widthConstraint, heightConstraint);
     }
+}
+
+public static class ImageHelper
+{
+    public static ImageSource ResizeAndLoadNative(string filePath, int maxWidth, int maxHeight)
+    {
+#if ANDROID
+        var options = new global::Android.Graphics.BitmapFactory.Options { InJustDecodeBounds = true };
+        global::Android.Graphics.BitmapFactory.DecodeFile(filePath, options);
+        options.InSampleSize = CalculateInSampleSize(options, maxWidth, maxHeight);
+        options.InJustDecodeBounds = false;
+        using global::Android.Graphics.Bitmap resizedBitmap = global::Android.Graphics.BitmapFactory.DecodeFile(filePath, options);
+
+        if (resizedBitmap == null)
+            return null;
+
+        var ms = new MemoryStream();
+        resizedBitmap.Compress(global::Android.Graphics.Bitmap.CompressFormat.Jpeg, 85, ms);
+        ms.Seek(0, SeekOrigin.Begin);
+
+        return ImageSource.FromStream(() => ms);
+#else
+        return ImageSource.FromFile(filePath);
+#endif
+    }
+
+#if ANDROID
+    private static int CalculateInSampleSize(global::Android.Graphics.BitmapFactory.Options options, int reqWidth, int reqHeight)
+    {
+        int height = options.OutHeight;
+        int width = options.OutWidth;
+        int inSampleSize = 1;
+
+        if (height > reqHeight || width > reqWidth)
+        {
+            int halfHeight = height / 2;
+            int halfWidth = width / 2;
+
+            while ((halfHeight / inSampleSize) >= reqHeight && (halfWidth / inSampleSize) >= reqWidth)
+            {
+                inSampleSize *= 2;
+            }
+        }
+        return inSampleSize;
+    }
+#endif
 }
