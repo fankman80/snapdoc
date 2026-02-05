@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
-//using FFImageLoading.Maui;
+using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -25,7 +25,7 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
             .UseUraniumUI()
-            //.UseFFImageLoading()
+            .UseFFImageLoading()
             .ConfigureMRGestures()
             .UseSkiaSharp()
             .ConfigureFonts(fonts =>
