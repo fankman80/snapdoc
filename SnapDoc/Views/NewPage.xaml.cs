@@ -251,11 +251,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PlanImage.HeightRequest = thisPlan.ImageSize.Height;
         }
 
-        // PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-
-        var imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-        PlanImage.Source = ImageHelper.ResizeAndLoadNative(imagePath, SettingsService.Instance.MaxPdfImageSizeW, SettingsService.Instance.MaxPdfImageSizeH);
-     
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        
         return Task.CompletedTask;
     }
 
