@@ -11,8 +11,7 @@
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupSettings">
-                <!--xmlns:ffimageloading="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"-->
-    
+
     <toolkit:Popup.Resources>
         <ResourceDictionary>
             <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
@@ -205,10 +204,6 @@
                             </material:RadioButtonGroupView>
 
                             <HorizontalStackLayout Spacing="24" Margin="0,0,0,16">
-                                <!--<skia:SKCanvasView x:Name="svgIcon"
-                                       WidthRequest="30"
-                                       PaintSurface="OnPaintCanvas"/>-->
-
                                 <controls:SvgView 
                                     Source="customcolor.svg"
                                     TintColor="{DynamicResource Primary}"

@@ -2,30 +2,17 @@
 
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
-using FFImageLoading.Maui;
-using SkiaSharp;
-using SkiaSharp.Views.Maui;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using Svg.Skia;
 using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
 public partial class PopupSettings : Popup, IQueryAttributable
 {
-    public SvgCachedImage PinSvgImage;
-    //private SKSvg _svg = new SKSvg();
-
     public PopupSettings()
     {
         InitializeComponent();
-
-        //string hexColor = ((Color)Application.Current.Resources["Primary"]).ToRgbaHex();
-        //svgIcon.Source = LoadSvgWithColor("customcolor.svg", "#999999", hexColor);
-
-        //var svgSource = LoadSvgWithColor("customcolor.svg", "#999999", hexColor);
-        //_svg.Load(svgSource);
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -45,35 +32,6 @@ public partial class PopupSettings : Popup, IQueryAttributable
             }
         }
     }
-
-    //private void OnPaintCanvas(object sender, SKPaintSurfaceEventArgs e)
-    //{
-    //    var canvas = e.Surface.Canvas;
-    //    canvas.Clear(SKColors.Transparent);
-
-    //    if (_svg?.Picture != null)
-    //    {
-    //        float canvasWidth = e.Info.Width;
-    //        float canvasHeight = e.Info.Height;
-    //        float svgWidth = _svg.Picture.CullRect.Width;
-    //        float svgHeight = _svg.Picture.CullRect.Height;
-
-    //        if (svgWidth <= 0 || svgHeight <= 0)
-    //            return;
-
-    //        float scaleX = canvasWidth / svgWidth;
-    //        float scaleY = canvasHeight / svgHeight;
-    //        float scale = Math.Min(scaleX, scaleY);
-    //        float left = (canvasWidth - svgWidth * scale) / 2f;
-    //        float top = (canvasHeight - svgHeight * scale) / 2f;
-
-    //        canvas.Save();
-    //        canvas.Translate(left, top);
-    //        canvas.Scale(scale);
-    //        canvas.DrawPicture(_svg.Picture);
-    //        canvas.Restore();
-    //    }
-    //}
 
     private void OnOkClicked(object sender, EventArgs e)
     {
