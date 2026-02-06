@@ -274,6 +274,14 @@
                     <Grid Margin="14,6,14,6" IsVisible="{Binding IsProjectLoaded}">
                         <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
                     </Grid>
+
+                    <Button 
+                        IsVisible="{Binding IsPdfAdded}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
+                        Clicked="OnAddPdfClicked"/>
                 </VerticalStackLayout>
             </Grid>
         </DataTemplate>
