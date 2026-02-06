@@ -33,7 +33,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private MR.Gestures.Image activePin = null; 
     private MR.Gestures.Image doubleTappedPin = null;
     private double densityX, densityY;
-    private double oversizeScaleFac = 1;
     private bool isFirstLoad = true;
     private Point mousePos;
     private bool isTappedHandled = false;
@@ -231,7 +230,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         //calculate aspect-ratio, resolution and imagesize
         if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
         {
-            oversizeScaleFac = Math.Min(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height) /
+            var oversizeScaleFac = Math.Min(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height) /
                                Math.Max(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height);
 
             if (thisPlan.ImageSize.Width > thisPlan.ImageSize.Height)
