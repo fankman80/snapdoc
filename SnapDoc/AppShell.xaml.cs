@@ -14,7 +14,6 @@ public partial class AppShell : Shell
     public List<PlanItem> AllPlanItems { get; set; }
     public ObservableCollection<PlanItem> PlanItems { get; set; }
 
-
     private bool _isActiveToggle;
     public bool IsActiveToggle
     {
@@ -94,7 +93,7 @@ public partial class AppShell : Shell
                 : (DataTemplate)Resources["PlanListTemplate"];
     }
 
-    public void ApplyFilterAndSorting()
+    private void ApplyFilterAndSorting()
     {
         if (AllPlanItems == null)
             return;
@@ -130,13 +129,18 @@ public partial class AppShell : Shell
         await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
     }
 
-    public void OnTitleClicked(object sender, EventArgs e)
+    private void OnTitleClicked(object sender, EventArgs e)
     {
         if (SettingsService.Instance.IsProjectLoaded)
         {
             var projectDetails = new ProjectDetails();
             projectDetails.OnTitleCaptureClicked(null, null);
         }
+    }
+
+    private async void OnAddPdfClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("loadPdfImages");
     }
 
     private async void OnNavigateTapped(object sender, EventArgs e)
@@ -244,7 +248,7 @@ public partial class AppShell : Shell
             SelectedPlanItem = selected;
     }
 
-    public void HighlightCurrentPlan(string planId)
+    private void HighlightCurrentPlan(string planId)
     {
         if (PlanItems == null || PlanCollectionView == null)
             return;
