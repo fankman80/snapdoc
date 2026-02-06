@@ -22,6 +22,7 @@
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
             <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+            <toolkit:IsListNullOrEmptyConverter x:Key="IsListNullOrEmptyConverter" />
             
             <!-- Template Liste ohne Thumbnails -->
             <DataTemplate x:Key="PlanListTemplate" x:DataType="local:PlanItem">
@@ -276,7 +277,7 @@
                     </Grid>
 
                     <Button 
-                        IsVisible="{Binding IsPdfAdded}"
+                        IsVisible="{Binding AllPlanItems, Converter={StaticResource IsListNullOrEmptyConverter}}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
