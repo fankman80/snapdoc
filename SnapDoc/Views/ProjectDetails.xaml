@@ -161,6 +161,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
+                        IsVisible="{OnIdiom Desktop=false, Default=true}"
                         Padding="0"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

@@ -142,7 +142,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ausgeblendete Pläne ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ausgeblendete Pläne ähnelt.
         /// </summary>
         internal static string ausgeblendete_plaene {
             get {
@@ -925,6 +925,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine PDF-Seiten hinzugefügt ähnelt.
+        /// </summary>
+        internal static string keine_pdf_seiten {
+            get {
+                return ResourceManager.GetString("keine_pdf_seiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Klicken, um die Vermessung zu starten ähnelt.
         /// </summary>
         internal static string klicken_start_vermessung {
@@ -1456,7 +1465,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Plan-Drehung: ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan-Drehung ähnelt.
         /// </summary>
         internal static string plan_drehung {
             get {

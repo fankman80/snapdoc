@@ -828,4 +828,7 @@
   <data name="vorlagen" xml:space="preserve">
     <value>Templates</value>
   </data>
+  <data name="keine_pdf_seiten" xml:space="preserve">
+    <value>No PDF pages added</value>
+  </data>
 </root>

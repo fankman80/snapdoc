@@ -520,7 +520,7 @@
     <value>Pläne umsortieren: Gedrückt halten und ziehen</value>
   </data>
   <data name="ausgeblendete_plaene" xml:space="preserve">
-    <value>ausgeblendete Pläne</value>
+    <value>Ausgeblendete Pläne</value>
   </data>
   <data name="kein_projekt_geladen" xml:space="preserve">
     <value>Kein Projekt geladen</value>
@@ -827,5 +827,8 @@
   </data>
   <data name="vorlagen" xml:space="preserve">
     <value>Vorlagen</value>
+  </data>
+  <data name="keine_pdf_seiten" xml:space="preserve">
+    <value>Keine PDF-Seiten hinzugefügt</value>
   </data>
 </root>

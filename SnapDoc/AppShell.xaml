@@ -22,8 +22,7 @@
             <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
             <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-            <toolkit:IsListNullOrEmptyConverter x:Key="IsListNullOrEmptyConverter" />
-            
+
             <!-- Template Liste ohne Thumbnails -->
             <DataTemplate x:Key="PlanListTemplate" x:DataType="local:PlanItem">
                 <Grid ColumnDefinitions="Auto,*,Auto,Auto"
@@ -276,13 +275,15 @@
                         <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
                     </Grid>
 
-                    <Button 
-                        IsVisible="{Binding AllPlanItems, Converter={StaticResource IsListNullOrEmptyConverter}}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
-                        Clicked="OnAddPdfClicked"/>
+                    <Button x:DataType="local:AppShell"
+                            Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
+                            IsVisible="{Binding ShowAddPdfButton, Source={RelativeSource AncestorType={x:Type local:AppShell}}}"
+                            Margin="14,6,14,6"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
+                            Clicked="OnAddPdfClicked"/>
                 </VerticalStackLayout>
             </Grid>
         </DataTemplate>

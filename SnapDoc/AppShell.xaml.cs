@@ -11,22 +11,14 @@ namespace SnapDoc;
 
 public partial class AppShell : Shell
 {
-    public List<PlanItem> AllPlanItems { get; set; }
+    public ObservableCollection<PlanItem> AllPlanItems { get; set; }
     public ObservableCollection<PlanItem> PlanItems { get; set; }
 
-    private bool _isActiveToggle;
-    public bool IsActiveToggle
+    private bool _showAddPdfButton = false;
+    public bool ShowAddPdfButton
     {
-        get => _isActiveToggle;
-        set
-        {
-            if (_isActiveToggle ==value)
-                return;
-
-            _isActiveToggle = value;
-            OnPropertyChanged();
-            ApplyFilterAndSorting();
-        }
+        get => _showAddPdfButton;
+        set { _showAddPdfButton = value; OnPropertyChanged(); }
     }
 
     private PlanItem _selectedPlanItem;
@@ -44,7 +36,7 @@ public partial class AppShell : Shell
         }
     }
 
-    private string _infoText;
+    private string _infoText = AppResources.kein_projekt_geladen;
     public string InfoText
     {
         get => _infoText;
@@ -78,6 +70,7 @@ public partial class AppShell : Shell
         BindingContext = this;
 
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
+        AllPlanItems.CollectionChanged += (s, e) => UpdateButtonVisibility();
 
         ApplyPlanTemplate();
     }
@@ -93,7 +86,7 @@ public partial class AppShell : Shell
                 : (DataTemplate)Resources["PlanListTemplate"];
     }
 
-    private void ApplyFilterAndSorting()
+    public void ApplyFilterAndSorting()
     {
         if (AllPlanItems == null)
             return;
@@ -108,8 +101,10 @@ public partial class AppShell : Shell
 
         if (!SettingsService.Instance.IsProjectLoaded)
             InfoText = AppResources.kein_projekt_geladen;
-        else if (SettingsService.Instance.IsHideInactivePlans)
-            InfoText = $"{AllPlanItems.Count - PlanItems.Count} {AppResources.ausgeblendete_plaene}";
+        else if (AllPlanItems == null || AllPlanItems.Count == 0)
+            InfoText = AppResources.keine_pdf_seiten;
+        else if (SettingsService.Instance.IsHideInactivePlans && (AllPlanItems != null || AllPlanItems.Count > 0))
+            InfoText = $"{AppResources.ausgeblendete_plaene}: {AllPlanItems.Count - PlanItems.Count}";
         else
             InfoText = AppResources.plaene_umsortieren_gedrueckt_halten_und_ziehen;
     }
@@ -248,7 +243,7 @@ public partial class AppShell : Shell
             SelectedPlanItem = selected;
     }
 
-    private void HighlightCurrentPlan(string planId)
+    public void HighlightCurrentPlan(string planId)
     {
         if (PlanItems == null || PlanCollectionView == null)
             return;
@@ -256,5 +251,13 @@ public partial class AppShell : Shell
         var selected = PlanItems.FirstOrDefault(p => p.PlanId == planId);
         if (selected != null)
             PlanCollectionView.SelectedItem = selected;
+    }
+
+    private void UpdateButtonVisibility()
+    {
+        bool isProjectLoaded = SettingsService.Instance.IsProjectLoaded;
+        bool isListEmpty = (AllPlanItems == null || AllPlanItems.Count == 0);
+
+        ShowAddPdfButton = isProjectLoaded && isListEmpty;
     }
 }

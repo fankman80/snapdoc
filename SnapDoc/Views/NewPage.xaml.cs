@@ -1284,6 +1284,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Anzeige neu aufbauen
         shell.ApplyFilterAndSorting();
+
+        await Shell.Current.GoToAsync("//homescreen");
     }
 
     private static void DeleteIfExists(string path)
