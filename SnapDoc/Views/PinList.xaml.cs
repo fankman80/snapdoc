@@ -17,7 +17,6 @@ public partial class PinList : ContentPage
     public PinList()
     {
         InitializeComponent();
-        pinListView.ItemsSource = DisplayPins;
         BindingContext = this;
     }
 
@@ -128,11 +127,13 @@ public partial class PinList : ContentPage
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        string planId = button.AutomationId;
-        string pinId = button.ClassId;
+        if (sender is not VisualElement element)
+            return;
 
-        await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");
+        if (element.BindingContext is not PinItem item)
+            return;
+
+        await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.SelfId}");
     }
 
     private void OnAllowExportClicked(object sender, EventArgs e)
