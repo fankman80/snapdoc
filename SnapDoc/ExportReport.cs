@@ -321,6 +321,9 @@ public partial class ExportReport
                                                             newTableCell.TableCellProperties =
                                                                 new TableCellProperties(new Shading { Fill = fillColor.Replace("#", "") });
                                                         }
+                                                        var priorityIndex = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority;
+                                                        var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
+                                                        AddText(prio_item?.Key ?? "");
                                                         break;
 
                                                     case "${pin_geolocWGS84}":
@@ -688,7 +691,7 @@ public partial class ExportReport
             Cy = MillimetersToEMU(size.Height)
         };
 
-        transform2D.Rotation = (OXML.Int32Value)(rotationAngle * 60000); // Rotation in 1/60000 Grad
+        transform2D.Rotation = (OXML.Int32Value)(int)(rotationAngle * 60000); // Rotation in 1/60000 Grad
         transform2D.Append(offset);
         transform2D.Append(extents);
 
@@ -860,7 +863,7 @@ public partial class ExportReport
             Cy = MillimetersToEMU(size.Height)
         };
 
-        _t2d.Rotation = (OXML.Int32Value)(rotationAngle * 60000); // (in 1/60000 Grad, daher multiplizieren)
+        _t2d.Rotation = (OXML.Int32Value)(int)(rotationAngle * 60000); // (in 1/60000 Grad, daher multiplizieren)
         _t2d.Append(_os);
         _t2d.Append(_ex);
 
