@@ -156,7 +156,7 @@
                                        ClassId="{Binding SelfId}"
                                        AutomationId = "{Binding OnPlanId}"
                                        Source="{Binding DisplayIconPath}"
-                                       Aspect="AspectFill">
+                                       Aspect="AspectFit">
                                     <Image.GestureRecognizers>
                                         <TapGestureRecognizer Tapped="OnPinIconClicked"/>
                                     </Image.GestureRecognizers>
