@@ -1204,7 +1204,7 @@
 		<RotationLocked>true</RotationLocked>
 		<AutoScaleLocked>true</AutoScaleLocked>
 		<CustomIcon>false</CustomIcon>
-		<Color Red="255" Green="255" Blue="255" />
+		<Color Red="0" Green="0" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Türen und Tore</Category>
 	</Item>
@@ -1217,7 +1217,7 @@
 		<RotationLocked>true</RotationLocked>
 		<AutoScaleLocked>true</AutoScaleLocked>
 		<CustomIcon>false</CustomIcon>
-		<Color Red="255" Green="255" Blue="255" />
+		<Color Red="0" Green="0" Blue="0" />
 		<Scale>0.4</Scale>
 		<Category>Türen und Tore</Category>
 	</Item>	
