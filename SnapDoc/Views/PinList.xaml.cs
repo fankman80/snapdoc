@@ -10,18 +10,18 @@ namespace SnapDoc.Views;
 public partial class PinList : ContentPage
 {
     public Command<IconItem> IconTappedCommand { get; }
-    private List<PinItem> pinItems = [];
-    private List<PinItem> originalPinItems = []; // Originalreihenfolge speichern
+    public ObservableCollection<PinItem> DisplayPins { get; } = [];
+    private readonly List<PinItem> _allPins = [];
     private string OrderDirection = "asc";
-    private ObservableCollection<PinItem> filteredPinItems;
 
     public PinList()
     {
         InitializeComponent();
+        pinListView.ItemsSource = DisplayPins;
         BindingContext = this;
     }
 
-    protected override void OnAppearing()
+    protected override async void OnAppearing()
     {
         base.OnAppearing();
 
@@ -38,35 +38,61 @@ public partial class PinList : ContentPage
 
     private void LoadPins()
     {
-        pinListView.ItemsSource = null;
-        pinItems.Clear();
-        bool saveRequested = false;
-
-        foreach (var plan in GlobalJson.Data.Plans)
+        _allPins.Clear();
+        foreach (var plan in GlobalJson.Data.Plans.Values)
         {
-            if (plan.Value.Pins != null)
+            if (plan.Pins != null)
             {
-                foreach (var pin in plan.Value.Pins.Values)
+                foreach (var pin in plan.Pins.Values)
                 {
-                    var newPin = new PinItem(pin);
-                    pinItems.Add(newPin);
+                    _allPins.Add(new PinItem(pin));
                 }
             }
         }
+        ApplyFilterAndSort();
+    }
 
-        if (saveRequested)
-            GlobalJson.SaveToFile();
+    private void ApplyFilterAndSort()
+    {
+        if (SortPicker.SelectedItem == null)
+            return;
 
-        originalPinItems = [.. pinItems];
-        filteredPinItems = [.. pinItems];
+        var selectedCrit = SortPicker.SelectedItem.ToString();
+        SettingsService.Instance.PinSortCrit = selectedCrit;
 
-        pinListView.ItemsSource = pinItems;
-        PinCounterLabel.Text =  $"{AppResources.pins}: {pinItems.Count}";
+        var searchText = SearchEntry.Text?.ToLower() ?? string.Empty;
+        var query = _allPins.Where(pin =>
+            string.IsNullOrWhiteSpace(searchText) ||
+            (pin.OnPlanId?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (pin.PinLocation?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (pin.PinName?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false) ||
+            (pin.PinDesc?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
+        );
 
-        IconSorting(OrderDirection);
+        object keySelector(PinItem pin)
+        {
+            var crits = SettingsService.Instance.PinSortCrits;
+            if (selectedCrit == crits[0]) return pin.OnPlanId;
+            if (selectedCrit == crits[1]) return pin.PinIcon;
+            if (selectedCrit == crits[2]) return pin.PinLocation;
+            if (selectedCrit == crits[3]) return pin.PinName;
+            if (selectedCrit == crits[4]) return pin.IsAllowExport;
+            if (selectedCrit == crits[5]) return pin.Time;
+            if (selectedCrit == crits[6]) return pin.PinPriority;
+            return pin.Time; // Default
+        }
 
-        if (!string.IsNullOrEmpty(SearchEntry.Text))
-            SearchEntry_TextChanged(null, new TextChangedEventArgs(SearchEntry.Text, SearchEntry.Text));
+        var sorted = OrderDirection == "asc"
+            ? [.. query.OrderBy(keySelector)]
+            : query.OrderByDescending(keySelector).ToList();
+
+        DisplayPins.Clear();
+        foreach (var item in sorted)
+        {
+            DisplayPins.Add(item);
+        }
+
+        PinCounterLabel.Text = $"{AppResources.pins}: {DisplayPins.Count}";
     }
 
     private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -126,124 +152,19 @@ public partial class PinList : ContentPage
 
     private void OnSortPickerChanged(object sender, EventArgs e)
     {
-        IconSorting(OrderDirection);
+        ApplyFilterAndSort();
         SettingsService.Instance.SaveSettings();
     }
 
     private void OnSortDirectionClicked(object sender, EventArgs e)
     {
-
-        if (OrderDirection == "asc")
-        {
-            SortDirection.ScaleY *= -1;
-            OrderDirection = "desc";
-            IconSorting("desc");
-        }
-        else
-        {
-            SortDirection.ScaleY *= -1;
-            OrderDirection = "asc";
-            IconSorting("asc");
-        }
-    }
-
-    private void IconSorting(string order)
-    {
-        if (SortPicker.SelectedItem == null) return;
-
-        // Setze die Liste auf die ursprüngliche Reihenfolge zurück, bevor sortiert wird
-        if (string.IsNullOrWhiteSpace(SearchEntry.Text))
-            pinItems = [.. originalPinItems];
-        else
-            pinItems = [.. filteredPinItems];
-
-        SettingsService.Instance.PinSortCrit = SortPicker.SelectedItem.ToString();
-
-        var selectedOption = SortPicker.SelectedItem.ToString();
-
-        if (order == "asc") // Sortiere aufsteigend
-        {
-            switch (SettingsService.Instance.PinSortCrit)
-            {
-                case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.OnPlanId).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.PinIcon).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.PinLocation).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.PinName).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.IsAllowExport).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.Time).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[6]:
-                    pinItems = [.. pinItems.OrderBy(pin => pin.PinPriority).ToList()];
-                    break;
-            }
-        }
-        else // Sortiere absteigend
-        {
-            switch (SettingsService.Instance.PinSortCrit)
-            {
-                case var crit when crit == SettingsService.Instance.PinSortCrits[0]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.OnPlanId).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[1]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinIcon).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[2]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinLocation).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[3]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinName).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[4]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.IsAllowExport).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[5]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.Time).ToList()];
-                    break;
-                case var crit when crit == SettingsService.Instance.PinSortCrits[6]:
-                    pinItems = [.. pinItems.OrderByDescending(pin => pin.PinPriority).ToList()];
-                    break;
-            }
-        }
-
-        pinListView.ItemsSource = null;
-        pinListView.ItemsSource = pinItems;
+        OrderDirection = (OrderDirection == "asc") ? "desc" : "asc";
+        SortDirection.ScaleY *= -1;
+        ApplyFilterAndSort();
     }
 
     private void SearchEntry_TextChanged(object sender, TextChangedEventArgs e)
     {
-        string searchText = e.NewTextValue?.ToLower() ?? string.Empty;
-
-        filteredPinItems.Clear();
-        foreach (var pin in pinItems)
-        {
-            if (
-                pin.OnPlanId.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                pin.PinLocation.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                pin.PinName.Contains(searchText, StringComparison.OrdinalIgnoreCase) ||
-                pin.PinDesc.Contains(searchText, StringComparison.OrdinalIgnoreCase)
-            )
-            {
-                filteredPinItems.Add(pin);
-                continue;
-            }
-        }
-
-        // Verwende Originalliste falls die Suche leer ist
-        if (string.IsNullOrWhiteSpace(SearchEntry.Text))
-            filteredPinItems = [.. originalPinItems];
-
-        pinListView.ItemsSource = filteredPinItems;
-        PinCounterLabel.Text = $"{AppResources.pins}: {filteredPinItems.Count}";
+        ApplyFilterAndSort();
     }
 }
