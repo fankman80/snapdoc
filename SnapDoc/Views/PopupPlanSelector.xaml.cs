@@ -78,14 +78,9 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
             IsPlanSelected = false;
     }
 
-    private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        IsPlanSelected = e.CurrentSelection.Count > 0;
-    }
-
     private void LoadingPlans()
     {
-        PlanItems ??= new ObservableCollection<PlanItem>();
+        PlanItems ??= [];
 
         if (Application.Current.Windows[0].Page is not AppShell shell)
         {
@@ -124,9 +119,9 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
                     PlanItems.RemoveAt(i);
             }
 
-            PlanCollectionView.ItemsSource = PlanItems;
-
             selectedPlan = tappedItem.CommandParameter?.ToString();
+
+            IsPlanSelected = true;
         }
     }
 }

@@ -67,13 +67,11 @@
                     MaximumHeightRequest="800"
                     x:DataType="local:Views.PopupPlanSelector"
                     IsVisible="{Binding IsNotDuplicateAtLocation}">
-            <CollectionView x:Name="PlanCollectionView"
-                            x:DataType="local:Views.PopupPlanSelector"
+            <CollectionView x:DataType="local:Views.PopupPlanSelector"
                             ItemsSource="{Binding PlanItems}"
                             CanReorderItems="False"
                             SelectionMode="Single"
-                            ItemsUpdatingScrollMode="KeepItemsInView"
-                            SelectionChanged="OnPlanSelectionChanged">
+                            ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PlanItem">
                         <Grid ColumnDefinitions="Auto,*,Auto" HeightRequest="44">
