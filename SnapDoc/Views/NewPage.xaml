@@ -101,7 +101,7 @@
                     StrokeThickness="0"
                     HeightRequest="60"
                     VerticalOptions="End"
-                    Margin="25,0,25,100"
+                    Margin="20,0,20,100"
                     ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
@@ -134,7 +134,7 @@
                         HeightRequest="60"
                         CornerRadius="30"
                         Padding="0"
-                        Margin="25,0,0,180"
+                        Margin="20,0,0,180"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -148,7 +148,7 @@
                         WidthRequest="50"
                         CornerRadius="30"
                         Padding="0"
-                        Margin="30,0,0,105"
+                        Margin="25,0,0,105"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -160,7 +160,7 @@
                        HorizontalOptions="End"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="0,0,35,118"
+                       Margin="0,0,30,118"
                        ZIndex="10001"/>                
                 <Label x:Name="sizeModeLabel"
                        FontSize="12"
@@ -168,13 +168,13 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="90,0,0,104"
+                       Margin="85,0,0,104"
                        ZIndex="10001"/>                
                 <Border BackgroundColor="{DynamicResource Primary}"
                         StrokeThickness="0"
                         HeightRequest="60"
                         VerticalOptions="End"
-                        Margin="25,0,25,20"
+                        Margin="20,0,20,20"
                         ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
@@ -206,7 +206,7 @@
                         WidthRequest="50"
                         CornerRadius="30"
                         Padding="0"
-                        Margin="30,0,0,25"
+                        Margin="25,0,0,25"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -221,7 +221,7 @@
                         WidthRequest="50"
                         CornerRadius="30"
                         Padding="0"
-                        Margin="0,0,30,25"
+                        Margin="0,0,25,25"
                         ZIndex="10001"
                         HorizontalOptions="End"
                         VerticalOptions="End"
@@ -232,7 +232,7 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="90,0,0,24"
+                       Margin="85,0,0,24"
                        ZIndex="10001"/>
                 <Button InputTransparent="False"
                         Visual="None"
