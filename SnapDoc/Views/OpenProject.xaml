@@ -105,9 +105,12 @@
                                     Background="Transparent"
                                     Clicked="OnProjectClicked"/>
                             <Button Grid.Column="2" Grid.RowSpan="2"
-                                    Padding="6"
-                                    Background="Transparent"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}, Glyph={x:Static local:MaterialIcons.Edit_square}}"
+                                    Padding="0"
+                                    Text="{x:Static local:MaterialIcons.Edit_square}"
+                                    FontSize="30"
+                                    FontFamily="MaterialOutlined"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Clicked="OnEditClicked"/>
                         </Grid>
                     </DataTemplate>
