@@ -1,7 +1,6 @@
 #nullable disable
 
 using CommunityToolkit.Maui.Views;
-using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -9,61 +8,54 @@ namespace SnapDoc.Views;
 
 public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPropertyChanged
 {
-    public ObservableCollection<PlanItem> PlanItems { get; set; }
+    private readonly string PlanId;
     private static string selectedPlan;
 
-    string actionText = AppResources.verschieben;
-    public string ActionText
+    private ObservableCollection<PlanItem> _planItems;
+    public ObservableCollection<PlanItem> PlanItems
     {
-        get => actionText;
+        get => _planItems;
         set
         {
-            if (actionText != value)
+            if (_planItems != value)
             {
-                actionText = value;
+                _planItems = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    private string infoText = AppResources.ziel_auswaehlen + ":";
-    public string InfoText
+    private bool _isPlanSelected;
+    public bool IsPlanSelected
     {
-        get => infoText;
+        get => _isPlanSelected;
         set
         {
-            if (infoText != value)
+            if (_isPlanSelected != value)
             {
-                infoText = value;
+                _isPlanSelected = value;
                 OnPropertyChanged();
             }
         }
     }
 
-    public PopupPlanSelector(string planId, string cancelText = null)
+    public bool IsNotDuplicateAtLocation => RadioButtonGroup.SelectedIndex == 0 || RadioButtonGroup.SelectedIndex == 1;
+
+    public PopupPlanSelector(string planId)
     {
         InitializeComponent();
 
-        okButtonText.IsVisible = false;
-        cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
-
-        if (Application.Current.Windows[0].Page is AppShell shell)
-            PlanItems = new ObservableCollection<PlanItem>(shell.PlanItems);
-        else
-            PlanItems = [];
-
-        for (int i = PlanItems.Count - 1; i >= 0; i--)
-        {
-            if (PlanItems[i].PlanId == planId)
-                PlanItems.RemoveAt(i);
-        }
-
         BindingContext = this;
+
+        PlanId = planId;
+        RadioButtonGroup.SelectedIndex = 0;
+
+        LoadingPlans();
     }
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanSelectorReturn(selectedPlan, copyCheckBox.IsChecked));
+        await CloseAsync(new PlanSelectorReturn(selectedPlan, RadioButtonGroup.SelectedIndex != 1));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -71,12 +63,52 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         await CloseAsync(null);
     }
 
-    private void OnCheckChanged(object sender, EventArgs e)
+    private void OnRadioButtonChanged(object sender, EventArgs e)
     {
-        ActionText = copyCheckBox.IsChecked ? AppResources.kopieren : AppResources.verschieben;
+        LoadingPlans();
 
-        if (okButtonText.IsVisible)
-            InfoText = ActionText;
+        OnPropertyChanged(nameof(IsNotDuplicateAtLocation));
+
+        if (RadioButtonGroup.SelectedIndex == 2)
+        {
+            IsPlanSelected = true;
+            selectedPlan = PlanId;
+        }
+        else
+            IsPlanSelected = false;
+    }
+
+    private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        IsPlanSelected = e.CurrentSelection.Count > 0;
+    }
+
+    private void LoadingPlans()
+    {
+        PlanItems ??= new ObservableCollection<PlanItem>();
+
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+        {
+            PlanItems.Clear();
+            return;
+        }
+
+        var index = RadioButtonGroup.SelectedIndex;
+
+        var filteredPlans = shell.PlanItems.Where(plan =>
+        {
+            if (index == 2) 
+                return plan.PlanId == PlanId;
+
+            return plan.PlanId != PlanId;
+        }).ToList();
+
+        PlanItems.Clear();
+
+        foreach (var plan in filteredPlans)
+        {
+            PlanItems.Add(plan);
+        }
     }
 
     private void OnPlanTapped(object sender, EventArgs e)
@@ -92,14 +124,9 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
                     PlanItems.RemoveAt(i);
             }
 
-            PlanCollectionView.ItemsSource = null;
             PlanCollectionView.ItemsSource = PlanItems;
 
             selectedPlan = tappedItem.CommandParameter?.ToString();
-
-            InfoText = copyCheckBox.IsChecked ? AppResources.pin_auf_plan_kopieren + ":" : AppResources.pin_auf_plan_verschieben + ":";
-
-            okButtonText.IsVisible = true;
         }
     }
 }

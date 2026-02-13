@@ -88,6 +88,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die An Ort duplizieren ähnelt.
+        /// </summary>
+        internal static string an_ort_duplizieren {
+            get {
+                return ResourceManager.GetString("an_ort_duplizieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Anker X ähnelt.
         /// </summary>
         internal static string anker_x {
@@ -120,6 +129,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string app_settings {
             get {
                 return ResourceManager.GetString("app_settings", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf einen anderen Plan kopieren ähnelt.
+        /// </summary>
+        internal static string auf_anderen_plan_kopieren {
+            get {
+                return ResourceManager.GetString("auf_anderen_plan_kopieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf anderen Plan verschieben ähnelt.
+        /// </summary>
+        internal static string auf_anderen_plan_verschieben {
+            get {
+                return ResourceManager.GetString("auf_anderen_plan_verschieben", resourceCulture);
             }
         }
         
@@ -1983,15 +2010,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string vermessung {
             get {
                 return ResourceManager.GetString("vermessung", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Verschieben ähnelt.
-        /// </summary>
-        internal static string verschieben {
-            get {
-                return ResourceManager.GetString("verschieben", resourceCulture);
             }
         }
         

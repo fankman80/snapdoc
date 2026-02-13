@@ -128,13 +128,15 @@
                                 <Label Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
                                        Margin="6,4,0,0"
                                        FontSize="12"
-                                       Text="{Binding PlanDisplay}" />
+                                       Text="{Binding PlanDisplay}"
+                                       LineBreakMode="TailTruncation"/>
 
                                 <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
                                        Margin="6,0,0,0"
                                        FontAttributes="Bold"
                                        FontSize="12"
-                                       Text="{Binding PinName}" />
+                                       Text="{Binding PinName}"
+                                       LineBreakMode="TailTruncation"/>
 
                                 <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
@@ -142,6 +144,7 @@
                                          Margin="0,0,10,0"/>
 
                                 <Label Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3"
+                                       HeightRequest="70"
                                        MaxLines="4"
                                        LineBreakMode="TailTruncation"
                                        FontSize="12"
@@ -149,10 +152,10 @@
                                        Text="{Binding PinDesc}"/>
 
                                 <Image Grid.Column="1" Grid.Row="3"
-                                       WidthRequest="64"
-                                       HeightRequest="64"
+                                       WidthRequest="50"
+                                       HeightRequest="50"
                                        IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
-                                       Margin="8"
+                                       Margin="6"
                                        ClassId="{Binding SelfId}"
                                        AutomationId = "{Binding OnPlanId}"
                                        Source="{Binding DisplayIconPath}"

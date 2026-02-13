@@ -161,6 +161,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
         clonedPin.SelfId = newId;
         clonedPin.OnPlanId = toPlanId;
 
+        // wenn der Pin im selben Plan bleibt, muss die Position leicht angepasst werden, damit er nicht genau auf dem alten Pin liegt
+        if (fromPlanId == toPlanId)
+            clonedPin.Pos = new Point(clonedPin.Pos.X + SettingsService.Instance.PinDuplicateOffset, clonedPin.Pos.Y);
+
         toPlan.Pins ??= [];
         toPlan.Pins[newId] = clonedPin;
         toPlan.PinCount++;

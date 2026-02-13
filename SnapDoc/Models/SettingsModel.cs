@@ -10,6 +10,7 @@ internal class SettingsModel
     public int MapOverlay1 { get; set; } // Ausgewähltes swisstopo-Overlay 1
     public int MapOverlay2 { get; set; } // Ausgewähltes swisstopo-Overlay 2
     public int PinPlaceMode { get; set; } // Modus zum Platzieren der Pins
+    public double PinDuplicateOffset { get; set; } // Abstand, um den Pins bei der Platzierung verschoben werden, wenn sich bereits ein Pin an der Position befindet
     public int IconSortCrit { get; set; } // Kriterium zur Sortierung der Icons
     public int PinSortCrit { get; set; } // Kriterium zur Sortierung der Pins
     public int IconCategory { get; set; } // Icon-Kategorie

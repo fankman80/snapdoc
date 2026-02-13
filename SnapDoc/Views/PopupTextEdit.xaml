@@ -119,7 +119,6 @@
                     </Button.Triggers>
                 </Button>
 
-
                 <!-- Italic -->
                 <Button
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_italic}}"

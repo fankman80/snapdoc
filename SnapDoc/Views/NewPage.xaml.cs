@@ -1201,6 +1201,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         doubleTappedPin = null;
     }
 
+    private async void OnRotateSnapCklicked(object sender, EventArgs e)
+    {
+        var snapValue = 0;
+
+        if (PinRotateSlider.Value == 0)
+            snapValue = 90;
+        else if (PinRotateSlider.Value == 90)
+            snapValue = 180;
+        else if (PinRotateSlider.Value == 180)
+            snapValue = -90;
+        else if (PinRotateSlider.Value == -90)
+            snapValue = 0;
+
+        PinRotateSlider.Value = snapValue;
+        degreesLabel.Text = $"{snapValue}°";
+        doubleTappedPin.Rotation = Helper.SliderToRotation(snapValue);
+    }
+
     private async void OnEditClicked(object sender, EventArgs e)
     {
         var popup = new PopupPlanEdit(name: thisPlan.Name,

@@ -121,6 +121,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _mapOverlay1 = 1;
     [ObservableProperty] private int _mapOverlay2 = 5;
     [ObservableProperty] private int _pinPlaceMode = 0;
+    [ObservableProperty] private double _pinDuplicateOffset = 0.01;
     [ObservableProperty] private string _iconSortCrit;
     [ObservableProperty] private string _pinSortCrit;
     [ObservableProperty] private string _iconCategory;
@@ -317,6 +318,7 @@ public partial class SettingsService : ObservableObject
             MapOverlay1 = MapOverlay1,
             MapOverlay2 = MapOverlay2,
             PinPlaceMode = PinPlaceMode,
+            PinDuplicateOffset = PinDuplicateOffset,
             IsPlanRotateLocked = IsPlanRotateLocked,
             IsPlanListThumbnails = IsPlanListThumbnails,
             IsHideInactivePlans = IsHideInactivePlans,
@@ -394,6 +396,7 @@ public partial class SettingsService : ObservableObject
             MapOverlay1 = settings.MapOverlay1;
             MapOverlay2 = settings.MapOverlay2;
             PinPlaceMode = settings.PinPlaceMode;
+            PinDuplicateOffset = settings.PinDuplicateOffset;
             IsPlanRotateLocked = settings.IsPlanRotateLocked;
             IsPlanListThumbnails = settings.IsPlanListThumbnails;
             IsHideInactivePlans = settings.IsHideInactivePlans;
@@ -463,6 +466,7 @@ public partial class SettingsService : ObservableObject
         MapOverlay1 = defaultSettings.MapOverlay1;
         MapOverlay2 = defaultSettings.MapOverlay2;
         PinPlaceMode = defaultSettings.PinPlaceMode;
+        PinDuplicateOffset = defaultSettings.PinDuplicateOffset;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
         IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
         IsHideInactivePlans = defaultSettings.IsHideInactivePlans;

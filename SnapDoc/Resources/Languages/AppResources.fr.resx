@@ -642,8 +642,8 @@
   <data name="standardeinstellungen_laden" xml:space="preserve">
     <value>Charger les paramètres par défaut?</value>
   </data>
-  <data name="verschieben" xml:space="preserve">
-    <value>Déplacer</value>
+  <data name="auf_anderen_plan_verschieben" xml:space="preserve">
+    <value>Déplacer vers un autre plan</value>
   </data>
   <data name="ziel_auswaehlen" xml:space="preserve">
     <value>Choisir la destination</value>
@@ -830,5 +830,11 @@
   </data>
   <data name="keine_pdf_seiten" xml:space="preserve">
     <value>Aucune page PDF ajoutée</value>
+  </data>
+  <data name="an_ort_duplizieren" xml:space="preserve">
+    <value>Dupliquer sur place</value>
+  </data>
+  <data name="auf_anderen_plan_kopieren" xml:space="preserve">
+    <value>Copier vers un autre plan</value>
   </data>
 </root>
