@@ -144,16 +144,16 @@
                                          Margin="0,0,10,0"/>
 
                                 <Label Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3"
-                                       HeightRequest="70"
-                                       MaxLines="4"
+                                       HeightRequest="64"
+                                       MaxLines="3"
                                        LineBreakMode="TailTruncation"
                                        FontSize="12"
                                        Margin="6,4,10,4"
                                        Text="{Binding PinDesc}"/>
 
                                 <Image Grid.Column="1" Grid.Row="3"
-                                       WidthRequest="50"
-                                       HeightRequest="50"
+                                       WidthRequest="52"
+                                       HeightRequest="52"
                                        IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                                        Margin="6"
                                        ClassId="{Binding SelfId}"
