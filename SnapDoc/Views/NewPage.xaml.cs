@@ -1217,6 +1217,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PinRotateSlider.Value = snapValue;
         degreesLabel.Text = $"{snapValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(snapValue);
+        thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = snapValue;
+
+        // save data to file
+        GlobalJson.SaveToFile();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
