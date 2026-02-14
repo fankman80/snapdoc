@@ -263,7 +263,7 @@
 	<Item>
 		<FileName>feuerwehraufzug.png</FileName>
 		<Description>Feuerwehraufzug</Description>
-		<AnchorPoint X="1.0" Y="0.5" />
+		<AnchorPoint X="0.5" Y="0.5" />
 		<Size Width="102" Height="64" />
 		<RotationLocked>true</RotationLocked>
 		<AutoScaleLocked>false</AutoScaleLocked>
