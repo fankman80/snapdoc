@@ -160,10 +160,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else
         {
             if (PinZoom != null)
-            {
                 ZoomToPin(PinZoom);
-                PinZoom = null;
-            }
         }
 
         // Setze den Titel der Seite und markiere den Plan im ShellManü
@@ -182,17 +179,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        PinZoom = null;
+        
         if (query.TryGetValue("pinZoom", out object value1))
-        {
             PinZoom = value1 as string;
-        }
 
         if (query.TryGetValue("pinMove", out object value2))
         {
             var pinId = value2 as string;
             PinZoom = value2 as string;
 
-            // add pin-icon on plan
             if (!_pinLookup.ContainsKey(pinId) && !isFirstLoad)
                 AddPin(pinId, thisPlan.Pins[pinId].PinIcon);
         }
@@ -464,10 +460,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 AddPins();
 
                 if (PinZoom != null)
-                {
                     ZoomToPin(PinZoom);
-                    PinZoom = null;
-                }
             }
         } 
     }
@@ -743,6 +736,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.TranslationX = (this.Width / 2) - (PlanContainer.Width * pin.Pos.X);
         planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pin.Pos.Y);
         planContainer.Scale = zoom;
+
+        PinZoom = null;
     }
 
     private void ImageFit(object sender, EventArgs e)
