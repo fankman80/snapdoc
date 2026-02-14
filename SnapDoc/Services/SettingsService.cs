@@ -120,7 +120,9 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private int _mapIcon = 0;
     [ObservableProperty] private int _mapOverlay1 = 1;
     [ObservableProperty] private int _mapOverlay2 = 5;
-    [ObservableProperty] private int _pinPlaceMode = 0;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] private bool _isPinPlaceBtnManualHide = false;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] private int _pinPlaceMode = 0;
+    public bool IsButtonActuallyVisible => PinPlaceMode != 2 && !IsPinPlaceBtnManualHide;
     [ObservableProperty] private double _pinDuplicateOffset = 0.01;
     [ObservableProperty] private string _iconSortCrit;
     [ObservableProperty] private string _pinSortCrit;

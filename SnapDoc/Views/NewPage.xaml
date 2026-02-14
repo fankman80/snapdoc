@@ -20,6 +20,7 @@
     <ContentPage.Resources>
         <ResourceDictionary>
             <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
         </ResourceDictionary>
     </ContentPage.Resources>
 
@@ -242,7 +243,8 @@
                         Clicked="OnFullScreenButtonClicked"/>
             </Grid>
 
-            <Button x:Name="SetPinBtn"
+            <Button x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                    IsVisible="{Binding IsButtonActuallyVisible}"
                     Margin="0,0,20,20"
                     ZIndex="10000"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"

@@ -97,11 +97,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         thisPlan = GlobalJson.Data.Plans[PlanId];
         PageTitle = thisPlan.Name;
 
-
-        // Überwache Sichtbarkeit des SetPin-Buttons
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
-        SettingsService.Instance.PropertyChanged += SettingsService_PropertyChanged;
-
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
             var pinId = m.Value;
@@ -172,7 +167,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         base.OnDisappearing();
 
-        SettingsService.Instance.PropertyChanged -= SettingsService_PropertyChanged;
         PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
         PlanContainer.PropertyChanged -= PlanContainer_PropertyChanged;
     }
@@ -192,12 +186,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         query.Clear();
-    }
-
-    private void SettingsService_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(SettingsService.PinPlaceMode))
-            SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
     }
 
     private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -394,7 +382,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         planContainer.IsPanningEnabled = false;
         DrawBtn.IsVisible = false;
-        SetPinBtn.IsVisible = false;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         PinEditBorder.IsVisible = true;
 
         loadCustomPinBtn.IsVisible = pin.IsCustomPin;
@@ -767,7 +755,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void DrawingClicked(object sender, EventArgs e)
     {
-        SetPinBtn.IsVisible = false;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
 
@@ -934,7 +922,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = false;
 
         doubleTappedPin?.IsVisible = true;
         doubleTappedPin = null;
@@ -1058,7 +1046,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = false;
         doubleTappedPin = null;
     }
 
@@ -1075,7 +1063,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             doubleTappedPin.IsVisible = false;
             planContainer.IsPanningEnabled = true;
             PinEditBorder.IsVisible = false;
-            SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+            SettingsService.Instance.IsPinPlaceBtnManualHide = false;
             DrawingClicked(null, null);
             ZoomToPin(doubleTappedPin.AutomationId, 1 / thisPlan.Pins[doubleTappedPin.AutomationId].PinScale / Settings.DisplayDensity);
             drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
@@ -1162,7 +1150,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = false;
         doubleTappedPin = null;
     }
 
@@ -1192,7 +1180,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
-        SetPinBtn.IsVisible = SettingsService.Instance.PinPlaceMode != 2;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = false;
         doubleTappedPin = null;
     }
 
