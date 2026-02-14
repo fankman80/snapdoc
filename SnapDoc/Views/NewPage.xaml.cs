@@ -179,8 +179,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        PinZoom = null;
-        
         if (query.TryGetValue("pinZoom", out object value1))
             PinZoom = value1 as string;
 
@@ -192,6 +190,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (!_pinLookup.ContainsKey(pinId) && !isFirstLoad)
                 AddPin(pinId, thisPlan.Pins[pinId].PinIcon);
         }
+
+        query.Clear();
     }
 
     private void SettingsService_PropertyChanged(object sender, PropertyChangedEventArgs e)
