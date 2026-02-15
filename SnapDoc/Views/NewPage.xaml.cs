@@ -1187,16 +1187,22 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void OnRotateSnapCklicked(object sender, EventArgs e)
     {
         var snapValue = 0;
-
-        if (PinRotateSlider.Value == 0)
-            snapValue = 90;
-        else if (PinRotateSlider.Value == 90)
-            snapValue = 180;
-        else if (PinRotateSlider.Value == 180)
-            snapValue = -90;
-        else if (PinRotateSlider.Value == -90)
-            snapValue = 0;
-
+        if (PinRotateSlider.Value % 1 == 0)
+        {
+            if (PinRotateSlider.Value == 0)
+                snapValue = 90;
+            else if (PinRotateSlider.Value == 90)
+                snapValue = 180;
+            else if (PinRotateSlider.Value == 180)
+                snapValue = -90;
+            else if (PinRotateSlider.Value == -90)
+                snapValue = 0;
+        }
+        else
+        {
+            snapValue = Math.Round(PinRotateSlider.Value * 4 / 360, 0) * 90
+        }
+        
         PinRotateSlider.Value = snapValue;
         degreesLabel.Text = $"{snapValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(snapValue);
