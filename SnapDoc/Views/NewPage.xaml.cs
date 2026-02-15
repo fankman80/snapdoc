@@ -1200,7 +1200,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         else
         {
-            snapValue = Math.Round(PinRotateSlider.Value * 4 / 360, 0) * 90
+            snapValue = Math.Round(PinRotateSlider.Value * 4 / 360, 0) * 90;
         }
         
         PinRotateSlider.Value = snapValue;
