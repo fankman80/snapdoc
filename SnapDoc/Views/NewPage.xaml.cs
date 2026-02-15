@@ -1187,7 +1187,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void OnRotateSnapCklicked(object sender, EventArgs e)
     {
         var snapValue = 0;
-        if (PinRotateSlider.Value % 1 == 0)
+        if ((PinRotateSlider.Value * 4 / 360) % 1 == 0)
         {
             if (PinRotateSlider.Value == 0)
                 snapValue = 90;
