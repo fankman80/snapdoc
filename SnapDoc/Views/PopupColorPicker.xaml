@@ -42,6 +42,7 @@
                            FontSize="12"/>
                     <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
+                                    ItemSizingStrategy="MeasureFirstItem"
                                     SelectionMode="None">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="6" HorizontalItemSpacing="2" VerticalItemSpacing="2"/>
@@ -74,7 +75,7 @@
                                     <Border IsVisible="{Binding IsAddButton}"
                                             BackgroundColor="Transparent"
                                             Stroke="Black"
-                                            Padding="10"
+                                            Padding="8"
                                             SizeChanged="OnColorBoxSizeChanged">
                                         <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static local:MaterialIcons.Add}}"/>
                                         <Border.GestureRecognizers>
