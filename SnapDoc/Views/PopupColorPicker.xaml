@@ -42,21 +42,22 @@
                            FontSize="12"/>
                     <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
-                                    ItemSizingStrategy="MeasureFirstItem"
+                                    ItemSizingStrategy="MeasureAllItems"
                                     SelectionMode="None">
                         <CollectionView.ItemsLayout>
-                            <GridItemsLayout Orientation="Vertical" Span="6" HorizontalItemSpacing="2" VerticalItemSpacing="2"/>
+                            <GridItemsLayout Orientation="Vertical" Span="6" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="local:ColorBoxItem">
                                 <Grid>
                                     <!-- Normales Farbfeld -->
                                     <Border x:Name="ColorBox"
+                                            WidthRequest="48"
+                                            HeightRequest="48"
                                             IsVisible="{Binding IsAddButton, Converter={StaticResource InvertedBoolConverter}}"
                                             BackgroundColor="{Binding BackgroundColor}"
                                             Stroke="{Binding IsSelected, Converter={StaticResource IsValidConverter}}"
-                                            StrokeThickness="{Binding IsSelected, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0'}"
-                                            SizeChanged="OnColorBoxSizeChanged">
+                                            StrokeThickness="1">
                                         <Border.Behaviors>
                                             <vm:UnifiedTapBehavior
                                                 x:DataType="views:PopupColorPicker"
@@ -73,10 +74,12 @@
 
                                     <!-- Plusfeld -->
                                     <Border IsVisible="{Binding IsAddButton}"
+                                            WidthRequest="48"
+                                            HeightRequest="48"
                                             BackgroundColor="Transparent"
                                             Stroke="Black"
                                             Padding="8"
-                                            SizeChanged="OnColorBoxSizeChanged">
+                                            StrokeThickness="1">
                                         <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static local:MaterialIcons.Add}}"/>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnAddTapped" />
