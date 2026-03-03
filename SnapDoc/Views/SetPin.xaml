@@ -80,7 +80,6 @@
                         CanReorderItems="True"
                         ReorderCompleted="OnReorderCompleted"
                         SelectionMode="None"
-                        ItemSizingStrategy="MeasureFirstItem"
                         RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"

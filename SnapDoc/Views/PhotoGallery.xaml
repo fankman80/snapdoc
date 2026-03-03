@@ -173,7 +173,6 @@
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="False"
                         SelectionMode="None"
-                        ItemSizingStrategy="MeasureFirstItem"
                         RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"

@@ -98,7 +98,6 @@
             <CollectionView x:DataType="views:PinList"
                             ItemsSource="{Binding DisplayPins}"
                             SelectionMode="Single"
-                            ItemSizingStrategy="MeasureFirstItem"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="8" Span="1"/>
