@@ -40,14 +40,17 @@ public partial class FotoGalleryView : ContentPage
     {
         base.OnAppearing();
 
-        SizeChanged += OnSizeChanged;
+        Dispatcher.Dispatch(async () =>
+        {
+            SetIconGridView();
 
-        SetIconGridView();
+            await Task.Delay(100);
+            UpdateSpan();
 
-        UpdateSpan();
-        FotoLoader();
+            FotoLoader();
 
-        ApplyFilterAndSorting();
+            SizeChanged += OnSizeChanged;
+        });
     }
 
     protected override void OnDisappearing()

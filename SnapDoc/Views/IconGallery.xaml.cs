@@ -39,14 +39,19 @@ public partial class IconGallery : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
-        SizeChanged += OnSizeChanged;
-        SortPicker.SelectedIndexChanged += OnSortPickerChanged;
-        CategoryPicker.SelectedIndexChanged += OnCategoryPickerChanged;
+        Dispatcher.Dispatch(async () =>
+        {
+            SetIconGridView();
 
-        SetIconGridView();
+            await Task.Delay(100);
+            UpdateSpan();
 
-        UpdateSpan();
-        IconSorting(OrderDirection);
+            IconSorting(OrderDirection);
+
+            SizeChanged += OnSizeChanged;
+            SortPicker.SelectedIndexChanged += OnSortPickerChanged;
+            CategoryPicker.SelectedIndexChanged += OnCategoryPickerChanged;
+        });
     }
 
     protected override void OnDisappearing()
@@ -193,49 +198,57 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
     }
 
-    private void IconSorting(string order)
+    private async void IconSorting(string order)
     {
-        if (SortPicker.SelectedItem == null)
+        if (SortPicker.SelectedItem == null || CategoryPicker.SelectedItem == null)
             return;
+
+        var selectedCategory = CategoryPicker.SelectedItem.ToString();
+        var selectedCrit = SortPicker.SelectedItem.ToString();
+
+        var (sortedIcons, categories) = await Task.Run(() =>
+        {
+            var data = Helper.LoadIconItems(
+                Path.Combine(Settings.TemplateDirectory, "IconData.xml"),
+                out List<string> iconCategories,
+                selectedCategory);
+
+            IEnumerable<IconItem> query = data;
+            if (order == "asc")
+            {
+                query = selectedCrit == SettingsService.Instance.IconSortCrits[0]
+                    ? query.OrderBy(pin => pin.DisplayName)
+                    : query.OrderBy(pin => pin.PinColor.ToString());
+            }
+            else
+            {
+                query = selectedCrit == SettingsService.Instance.IconSortCrits[0]
+                    ? query.OrderByDescending(pin => pin.DisplayName)
+                    : query.OrderByDescending(pin => pin.PinColor.ToString());
+            }
+
+            return (SortedList: query.ToList(), Categories: iconCategories);
+        });
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories, CategoryPicker.SelectedItem.ToString());
-            SettingsService.Instance.IconCategories = iconCategories;
-            SettingsService.Instance.IconSortCrit = SortPicker.SelectedItem.ToString();
-            SettingsService.Instance.IconCategory = CategoryPicker.SelectedItem.ToString();
+            SettingsService.Instance.IconCategories = categories;
+            SettingsService.Instance.IconSortCrit = selectedCrit;
+            SettingsService.Instance.IconCategory = selectedCategory;
 
-            CategoryPicker.ItemsSource = iconCategories;
-
-            var selectedOption = SortPicker.SelectedItem.ToString();
-
-            if (order == "asc") // Sortiere aufsteigend
+            if (Icons == null)
+                Icons = new ObservableCollection<IconItem>(sortedIcons);
+            else
             {
-                switch (SettingsService.Instance.IconSortCrit)
-                {
-                    case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
-                        Icons = [.. Settings.IconData.OrderBy(pin => pin.DisplayName).ToList()];
-                        break;
-                    case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
-                        Icons = [.. Settings.IconData.OrderBy(pin => pin.PinColor.ToString()).ToList()];
-                        break;
-                }
-            }
-            else // Sortiere absteigend
-            {
-                switch (SettingsService.Instance.IconSortCrit)
-                {
-                    case var crit when crit == SettingsService.Instance.IconSortCrits[0]:
-                        Icons = [.. Settings.IconData.OrderByDescending(pin => pin.DisplayName).ToList()];
-                        break;
-                    case var crit when crit == SettingsService.Instance.IconSortCrits[1]:
-                        Icons = [.. Settings.IconData.OrderByDescending(pin => pin.PinColor.ToString()).ToList()];
-                        break;
-                }
+                Icons.Clear();
+                foreach (var icon in sortedIcons)
+                    Icons.Add(icon);
             }
 
-            IconCollectionView.ItemsSource = null;
-            IconCollectionView.ItemsSource = Icons;
+            if (IconCollectionView.ItemsSource != Icons)
+                IconCollectionView.ItemsSource = Icons;
+
+            CategoryPicker.ItemsSource = categories;
         });
     }
 

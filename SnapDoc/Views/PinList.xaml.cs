@@ -24,8 +24,14 @@ public partial class PinList : ContentPage
     {
         base.OnAppearing();
 
-        LoadPins();
-        SortPicker.SelectedIndexChanged += OnSortPickerChanged;
+        Dispatcher.Dispatch(async () =>
+        {
+            await Task.Delay(100);
+
+            LoadPins();
+
+            SortPicker.SelectedIndexChanged += OnSortPickerChanged;
+        });
     }
 
     protected override void OnDisappearing()
@@ -85,13 +91,14 @@ public partial class PinList : ContentPage
             ? [.. query.OrderBy(keySelector)]
             : query.OrderByDescending(keySelector).ToList();
 
-        DisplayPins.Clear();
-        foreach (var item in sorted)
-        {
-            DisplayPins.Add(item);
-        }
-
-        PinCounterLabel.Text = $"{AppResources.pins}: {DisplayPins.Count}";
+        MainThread.BeginInvokeOnMainThread(() => {
+            DisplayPins.Clear();
+            foreach (var item in sorted)
+            {
+                DisplayPins.Add(item);
+            }
+            PinCounterLabel.Text = $"{AppResources.pins}: {DisplayPins.Count}";
+        });
     }
 
     private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
