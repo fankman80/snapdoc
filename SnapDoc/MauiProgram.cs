@@ -17,13 +17,13 @@ public static class MauiProgram
 {
     public static MauiApp CreateMauiApp()
     {
-        // Sprache setzen
         SetLanguage();
 
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
+            .UseMauiCommunityToolkitCamera()
             .UseUraniumUI()
             .UseFFImageLoading()
             .ConfigureMRGestures()
@@ -146,7 +146,6 @@ public static class MauiProgram
             }
         }
 
-        // Wenn NICHT "system" eingestellt ist, erzwinge die Sprache aus der Datei
         if (lang != "system" && !string.IsNullOrWhiteSpace(lang))
         {
             try

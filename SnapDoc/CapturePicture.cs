@@ -2,6 +2,7 @@
 
 using SkiaSharp;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Views;
 
 namespace SnapDoc;
 
@@ -25,10 +26,19 @@ public class CapturePicture
 
         try
         {
-            var foto = await MediaPicker.Default.CapturePhotoAsync();
+            FileResult foto = null;
 
-            if (foto == null)
-                return (null, new Size(0, 0));
+            if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+            {
+                await Shell.Current.GoToAsync("cameraView");
+                foto = await CameraResultService.WaitForCaptureAsync();
+            }
+            else
+            {
+                foto = await MediaPicker.Default.CapturePhotoAsync();
+            }
+
+            if (foto == null) return (null, new Size(0, 0));
 
             using var stream = await foto.OpenReadAsync();
             string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}{Path.GetExtension(foto.FileName)}";

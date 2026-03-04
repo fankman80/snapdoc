@@ -62,6 +62,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("mapview", typeof(MapView));
         Routing.RegisterRoute("mapviewosm", typeof(MapViewOSM));
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
+        Routing.RegisterRoute("cameraView", typeof(CameraView));
 
         AllPlanItems = [];
         PlanItems = [];
