@@ -1,143 +1,131 @@
-using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Core.Primitives;
-using CommunityToolkit.Maui.Views;
+
+using Camera.MAUI;
 using System.Diagnostics;
 
 namespace SnapDoc.Views;
 
 public partial class CameraView : ContentPage
 {
+    bool playing = false;
+    private string tempFilePath = string.Empty;
+
     public CameraView()
     {
         InitializeComponent();
-
-        // WICHTIG: Die Seite ist ihr eigener Datenlieferant
-        BindingContext = this;
-
-        // --- Manuelle Bindings im Code-Behind ---
-
-        // Zoom: Slider -> Kamera
-        MainCamera.SetBinding(CommunityToolkit.Maui.Views.CameraView.ZoomFactorProperty,
-            new Binding(nameof(Slider.Value), source: ZoomSlider));
-
-        // Slider Limits an die gewählte Kamera binden
-        ZoomSlider.SetBinding(Slider.MinimumProperty,
-            new Binding("SelectedCamera.MinimumZoomFactor", source: MainCamera));
-        ZoomSlider.SetBinding(Slider.MaximumProperty,
-            new Binding("SelectedCamera.MaximumZoomFactor", source: MainCamera));
-
-        // Blitz: Picker -> Kamera
-        FlashPicker.ItemsSource = Enum.GetValues(typeof(CameraFlashMode));
-        MainCamera.SetBinding(CommunityToolkit.Maui.Views.CameraView.CameraFlashModeProperty,
-            new Binding(nameof(Picker.SelectedItem), source: FlashPicker));
-
-        // Auflösung: Kamera -> Picker -> Kamera
-        ResolutionPicker.SetBinding(Picker.ItemsSourceProperty,
-            new Binding("SelectedCamera.SupportedResolutions", source: MainCamera));
-        MainCamera.SetBinding(CommunityToolkit.Maui.Views.CameraView.ImageCaptureResolutionProperty,
-            new Binding(nameof(Picker.SelectedItem), source: ResolutionPicker));
-        ResolutionPicker.ItemDisplayBinding = new Binding(".");
-
-        CaptureButton.Clicked += OnCaptureClicked;
-        MainCamera.PropertyChanged += OnCameraPropertyChanged;
+        cameraView.CamerasLoaded += CameraView_CamerasLoaded;
     }
 
-    private void OnCameraPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void CameraView_CamerasLoaded(object sender, EventArgs e)
     {
-        // Wir prüfen, ob die Kamera fertig geladen hat oder ob sich die Auflösungen geändert haben
-        if (e.PropertyName == nameof(MainCamera.SelectedCamera) ||
-            e.PropertyName == "SelectedResolution") // Manchmal reicht auch die Auswahl der Kamera
+        if (cameraView.Cameras.Count > 0)
         {
-            TrySetMaxResolution();
-        }
-    }
+            cameraView.Camera = cameraView.Cameras.First();
 
-    private void TrySetMaxResolution()
-    {
-        var currentCam = MainCamera.SelectedCamera;
-        if (currentCam?.SupportedResolutions?.Count > 0)
-        {
-            var maxRes = currentCam.SupportedResolutions
-                .OrderByDescending(r => r.Width * r.Height)
-                .First();
-
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                if (MainCamera.ImageCaptureResolution != maxRes)
-                {
-                    MainCamera.ImageCaptureResolution = maxRes;
-                    ResolutionPicker.SelectedItem = maxRes;
-                    Debug.WriteLine($"Max Auflösung gesetzt: {maxRes.Width}x{maxRes.Height}");
-                }
+                var result = await cameraView.StartCameraAsync();
+
+                if (result == CameraResult.Success)
+                    playing = true;
             });
         }
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        CameraResultService.SetResult(null); // Verhindert endloses Warten
     }
 
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
         try
         {
-            var captureImageCTS = new CancellationTokenSource(TimeSpan.FromSeconds(3));
-            Stream stream = await MainCamera.CaptureImage(captureImageCTS.Token);
-
+            var stream = await cameraView.TakePhotoAsync();
             if (stream != null)
-                await ProcessCapturedStream(stream);
+            {
+                tempFilePath = await SavePhotoToCache(stream);
+
+                if (File.Exists(tempFilePath))
+                {
+                    await cameraView.StopCameraAsync();
+                    previewImage.Source = ImageSource.FromFile(tempFilePath);
+                    ToggleUI(isPreview: true);
+                }
+            }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Kamerafehler: {ex.Message}");
+            Debug.WriteLine($"Fehler beim Snapshot: {ex.Message}");
         }
     }
 
-    private async Task ProcessCapturedStream(Stream stream)
+    private async void OnConfirmClicked(object sender, EventArgs e)
     {
-        string filename = $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
-        string path = Path.Combine(FileSystem.CacheDirectory, filename); // Temporär speichern
+        CameraResultService.SetResult(new FileResult(tempFilePath));
+        await Shell.Current.GoToAsync("..");
+    }
 
-        using (var fileStream = File.Create(path))
+    private async void OnRetakeClicked(object sender, EventArgs e)
+    {
+        if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+        await cameraView.StartCameraAsync();
+        ToggleUI(isPreview: false);
+    }
+
+    private void ToggleUI(bool isPreview)
+    {
+        previewImage.IsVisible = isPreview;
+        previewButtons.IsVisible = isPreview;
+        liveButtons.IsVisible = !isPreview;
+    }
+
+    private async Task<string> SavePhotoToCache(Stream photoStream)
+    {
+        if (photoStream == null) return null;
+
+        string fileName = $"Capture_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
+        string cachePath = Path.Combine(FileSystem.CacheDirectory, fileName);
+
+        using (FileStream fileStream = File.Create(cachePath))
         {
-            await stream.CopyToAsync(fileStream);
+            if (photoStream.CanSeek) photoStream.Position = 0;
+            await photoStream.CopyToAsync(fileStream);
         }
 
-        // Ergebnis an den wartenden Service senden
-        CameraResultService.SetResult(new FileResult(path));
-
-        await Navigation.PopAsync();
+        return cachePath; // Rückgabe des Pfads zur Datei
     }
 
     private async void OnSwitchCameraClicked(object sender, EventArgs e)
     {
-        try
+        if (cameraView.Cameras.Count > 1)
         {
-            var cameras = await MainCamera.GetAvailableCameras(CancellationToken.None);
+            int index = cameraView.Cameras.IndexOf(cameraView.Camera);
+            int nextIndex = (index + 1) % cameraView.Cameras.Count;
 
-            if (cameras == null || cameras.Count < 2)
-                return;
-
-            var currentCamera = MainCamera.SelectedCamera;
-            int currentIndex = -1;
-            for (int i = 0; i < cameras.Count; i++)
-            {
-                if (cameras[i] == currentCamera)
-                {
-                    currentIndex = i;
-                    break;
-                }
-            }
-
-            int nextIndex = (currentIndex + 1) % cameras.Count;
-            MainCamera.SelectedCamera = cameras[nextIndex];
+            await cameraView.StopCameraAsync();
+            cameraView.Camera = cameraView.Cameras[nextIndex];
         }
-        catch (Exception ex)
+    }
+
+    private void OnFlashButtonClicked(object sender, EventArgs e)
+    {
+        var button = sender as Button;
+
+        switch (cameraView.FlashMode)
         {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim Kamera-Wechsel: {ex.Message}");
+            case FlashMode.Auto:
+                cameraView.FlashMode = FlashMode.Enabled;
+                if (button != null) button.Text = "Flash: ON";
+                break;
+
+            case FlashMode.Enabled:
+                cameraView.FlashMode = FlashMode.Disabled;
+                if (button != null) button.Text = "Flash: OFF";
+                break;
+
+            case FlashMode.Disabled:
+            default:
+                cameraView.FlashMode = FlashMode.Auto;
+                if (button != null) button.Text = "Flash: AUTO";
+                break;
         }
+
+        Debug.WriteLine($"Blitz-Modus geändert auf: {cameraView.FlashMode}");
     }
 }
 

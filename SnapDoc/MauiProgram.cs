@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
 using Microsoft.Maui.Platform;
+using Camera.MAUI;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
@@ -36,6 +37,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-BoldItalic.ttf", "OpenSansBoldItalic");
                 fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
             });
+
+        builder.UseMauiCameraView();
 
         // Registriere die AppShell
         builder.Services.AddSingleton<AppShell>();
