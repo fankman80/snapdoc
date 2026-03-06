@@ -20,14 +20,14 @@
                ZIndex="1"/>
         
         <AbsoluteLayout VerticalOptions="Start" Padding="20" ZIndex="2">
-                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                <Button HeightRequest="40" WidthRequest="40" CornerRadius="20"
                         Text="{x:Static local:MaterialIcons.Close}"
                         Padding="0"
-                        FontSize="36"
+                        FontSize="26"
                         FontFamily="MaterialOutlined"
                         TextColor="White"
-                        BackgroundColor="DimGrey"
-                        Opacity="0.8"
+                        BackgroundColor="#404040"
+                        Opacity="0.6"
                         Clicked="OnCloseClicked"/>
         </AbsoluteLayout>
 
@@ -39,8 +39,8 @@
                         FontSize="36"
                         FontFamily="MaterialOutlined"
                         TextColor="White"
-                        BackgroundColor="DimGrey"
-                        Opacity="0.8"                   
+                        BackgroundColor="#404040"
+                        Opacity="0.6"                   
                         Clicked="OnFlashButtonClicked"/>
                 <Button x:Name="controlButton"
                         HeightRequest="80" WidthRequest="80" CornerRadius="40"
@@ -56,8 +56,8 @@
                         FontSize="36"
                         FontFamily="MaterialOutlined"
                         TextColor="White"
-                        BackgroundColor="DimGrey"
-                        Opacity="0.8"                     
+                        BackgroundColor="#404040"
+                        Opacity="0.6"                     
                         Clicked="OnSwitchCameraClicked"/>
             </HorizontalStackLayout>
 
