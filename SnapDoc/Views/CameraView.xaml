@@ -8,9 +8,8 @@
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
         <cv:CameraView x:Name="cameraView"
-                       HorizontalOptions="Fill"
-                       VerticalOptions="Fill"
-                       Aspect="AspectFit" 
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"
                        ZIndex="0"/>
 
         <Image x:Name="previewImage" 
