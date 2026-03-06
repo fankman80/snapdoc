@@ -10,6 +10,7 @@
         <cv:CameraView x:Name="cameraView"
                        HorizontalOptions="Fill"
                        VerticalOptions="Fill"
+                       Aspect="AspectFit" 
                        ZIndex="0"/>
 
         <Image x:Name="previewImage" 
