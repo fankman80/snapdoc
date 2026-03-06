@@ -30,8 +30,27 @@ public partial class CameraView : ContentPage
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                if (await cameraView.StartCameraAsync() == CameraResult.Success)
+                var available = cameraView.Camera.AvailableResolutions;
+                Size selectedRes = new(0, 0);
+
+                if (available != null && available.Count > 0)
+                {
+                    var preferred = available
+                        .Where(r => r.Width <= 1920 && r.Width > 0)
+                        .OrderByDescending(r => r.Width * r.Height)
+                        .FirstOrDefault();
+
+                    if (preferred.Width > 0)
+                        selectedRes = preferred;
+                    else
+                        selectedRes = available.OrderBy(r => r.Width).First();
+                }
+
+                if (await cameraView.StartCameraAsync(selectedRes) == CameraResult.Success)
+                {
+                    await Task.Delay(1000);
                     cameraView.FlashMode = FlashMode.Auto;
+                }
             });
         }
     }
@@ -108,11 +127,30 @@ public partial class CameraView : ContentPage
     {
         if (cameraView.Cameras.Count > 1)
         {
-            int index = cameraView.Cameras.IndexOf(cameraView.Camera);
-            int nextIndex = (index + 1) % cameraView.Cameras.Count;
+            int nextIndex = (cameraView.Cameras.IndexOf(cameraView.Camera) + 1) % cameraView.Cameras.Count;
 
             await cameraView.StopCameraAsync();
             cameraView.Camera = cameraView.Cameras[nextIndex];
+
+            var available = cameraView.Camera.AvailableResolutions;
+            Size selectedRes = new(0, 0);
+
+            if (available != null && available.Count > 0)
+            {
+                var preferred = available
+                    .Where(r => r.Width <= 1920 && r.Width > 0)
+                    .OrderByDescending(r => r.Width * r.Height)
+                    .FirstOrDefault();
+
+                if (preferred.Width > 0)
+                    selectedRes = preferred;
+                else
+                    selectedRes = available.OrderBy(r => r.Width).First();
+            }
+
+            // Starten mit der gewählten Auflösung
+            if (await cameraView.StartCameraAsync(selectedRes) == CameraResult.Success)
+                await Task.Delay(1000);
         }
     }
 
