@@ -26,25 +26,12 @@ public partial class CameraView : ContentPage
     {
         if (cameraView.Cameras.Count > 0)
         {
-            cameraView.Camera = cameraView.Cameras.First();
+            var backCamera = cameraView.Cameras.FirstOrDefault(c => c.Position == CameraPosition.Back);            
+            cameraView.Camera = backCamera ?? cameraView.Cameras.First();
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                var available = cameraView.Camera.AvailableResolutions;
-                Size selectedRes = new(0, 0);
-
-                if (available != null && available.Count > 0)
-                {
-                    var preferred = available
-                        .Where(r => r.Width <= 1920 && r.Width > 0)
-                        .OrderByDescending(r => r.Width * r.Height)
-                        .FirstOrDefault();
-
-                    if (preferred.Width > 0)
-                        selectedRes = preferred;
-                    else
-                        selectedRes = available.OrderBy(r => r.Width).First();
-                }
+                Size selectedRes = GetOptimalResolution(highRes: false);
 
                 if (await cameraView.StartCameraAsync(selectedRes) == CameraResult.Success)
                 {
@@ -59,21 +46,58 @@ public partial class CameraView : ContentPage
     {
         try
         {
-            using var stream = await cameraView.TakePhotoAsync();
-            if (stream != null)
+            flashOverlay.IsVisible = true;
+            flashOverlay.Opacity = 1;
+
+            await cameraView.StopCameraAsync();
+            var maxRes = GetOptimalResolution(highRes: true);
+
+            if (await cameraView.StartCameraAsync(maxRes) == CameraResult.Success)
             {
-                tempFilePath = await SavePhotoToCache(stream);
-                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
+                await Task.Delay(350); // Puffer für Sensor-Pegel
+
+                using var stream = await cameraView.TakePhotoAsync();
+
+                if (stream != null)
                 {
+                    tempFilePath = await SavePhotoToCache(stream);
                     await cameraView.StopCameraAsync();
-                    previewImage.Source = ImageSource.FromFile(tempFilePath);
-                    ToggleUI(isPreview: true);
+
+                    if (!string.IsNullOrEmpty(tempFilePath))
+                    {
+                        previewImage.Source = ImageSource.FromFile(tempFilePath);
+                        ToggleUI(isPreview: true);
+                        await flashOverlay.FadeToAsync(0, 400, Easing.CubicOut);
+                        flashOverlay.IsVisible = false;
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
-            Debug.WriteLine($"Fehler beim Snapshot: {ex.Message}");
+            Debug.WriteLine($"Fehler: {ex.Message}");
+            flashOverlay.IsVisible = false; // Im Fehlerfall Vorhang auf
+            OnRetakeClicked(sender, e);
+        }
+    }
+
+    private Size GetOptimalResolution(bool highRes)
+    {
+        var available = cameraView.Camera?.AvailableResolutions;
+        if (available == null || available.Count == 0) return new Size(0, 0);
+
+        if (highRes)
+        {
+            return available.OrderByDescending(r => r.Width * r.Height).First();
+        }
+        else
+        {
+            var preferred = available
+                .Where(r => r.Width <= 1920 && r.Width > 0)
+                .OrderByDescending(r => r.Width * r.Height)
+                .FirstOrDefault();
+
+            return preferred.Width > 0 ? preferred : available.OrderBy(r => r.Width).First();
         }
     }
 
@@ -89,7 +113,10 @@ public partial class CameraView : ContentPage
     private async void OnRetakeClicked(object sender, EventArgs e)
     {
         if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
-        await cameraView.StartCameraAsync();
+
+        var stableRes = GetOptimalResolution(highRes: false);
+        await cameraView.StartCameraAsync(stableRes);
+
         ToggleUI(isPreview: false);
     }
 
@@ -132,25 +159,12 @@ public partial class CameraView : ContentPage
             await cameraView.StopCameraAsync();
             cameraView.Camera = cameraView.Cameras[nextIndex];
 
-            var available = cameraView.Camera.AvailableResolutions;
-            Size selectedRes = new(0, 0);
+            Size selectedRes = GetOptimalResolution(highRes: false);
 
-            if (available != null && available.Count > 0)
-            {
-                var preferred = available
-                    .Where(r => r.Width <= 1920 && r.Width > 0)
-                    .OrderByDescending(r => r.Width * r.Height)
-                    .FirstOrDefault();
-
-                if (preferred.Width > 0)
-                    selectedRes = preferred;
-                else
-                    selectedRes = available.OrderBy(r => r.Width).First();
-            }
-
-            // Starten mit der gewählten Auflösung
             if (await cameraView.StartCameraAsync(selectedRes) == CameraResult.Success)
+            {
                 await Task.Delay(1000);
+            }
         }
     }
 

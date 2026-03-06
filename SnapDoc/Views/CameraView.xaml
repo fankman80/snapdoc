@@ -7,6 +7,14 @@
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
+        <BoxView x:Name="flashOverlay"
+                 BackgroundColor="White"
+                 Opacity="0"
+                 IsVisible="False"
+                 InputTransparent="True" 
+                 HorizontalOptions="Fill"
+                 VerticalOptions="Fill" />
+        
         <cv:CameraView x:Name="cameraView"
                        HorizontalOptions="Fill"
                        VerticalOptions="Fill"
