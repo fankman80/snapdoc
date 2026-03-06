@@ -24,7 +24,6 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit()
-            .UseMauiCommunityToolkitCamera()
             .UseUraniumUI()
             .UseFFImageLoading()
             .ConfigureMRGestures()
