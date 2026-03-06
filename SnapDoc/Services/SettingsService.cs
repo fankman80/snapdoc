@@ -1,9 +1,10 @@
 ﻿#pragma warning disable MVVMTK0045
 using CommunityToolkit.Mvvm.ComponentModel;
+using DocumentFormat.OpenXml.Office2010.Drawing;
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Services;
 
@@ -145,6 +146,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private bool _isGpsActive = false;
+    [ObservableProperty] private int _cameraTool = 0;
     [ObservableProperty] private string _editorTheme = "material-darker";
     [ObservableProperty] private float _polyLineHandleRadius = 10f;
     [ObservableProperty] private float _polyLineHandleTouchRadius = 20f;
@@ -361,6 +363,7 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
             IsGpsActive = IsGpsActive,
+            CameraTool = CameraTool,
             EditorTheme = EditorTheme,
             PolyLineHandleRadius = PolyLineHandleRadius,
             PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
@@ -437,6 +440,7 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
             IsGpsActive = settings.IsGpsActive;
+            CameraTool = settings.CameraTool;
             EditorTheme = settings.EditorTheme ?? string.Empty;
             PolyLineHandleRadius = settings.PolyLineHandleRadius;
             PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
@@ -509,6 +513,7 @@ public partial class SettingsService : ObservableObject
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
         IsGpsActive = defaultSettings.IsGpsActive;
+        CameraTool = defaultSettings.CameraTool;
         EditorTheme = defaultSettings.EditorTheme;
         PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
         PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;

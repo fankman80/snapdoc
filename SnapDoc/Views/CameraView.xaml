@@ -1,43 +1,68 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
-             x:Class="SnapDoc.Views.CameraView"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-             xmlns:local="clr-namespace:SnapDoc"
+             xmlns:local="clr-namespace:SnapDoc"             
+             x:Class="SnapDoc.Views.CameraView"
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
-        <cv:CameraView x:Name="cameraView" HorizontalOptions="Fill" VerticalOptions="Fill" ZIndex="0"/>
+        <cv:CameraView x:Name="cameraView"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill"
+                       ZIndex="0"/>
 
         <Image x:Name="previewImage" 
-           IsVisible="False" 
-           BackgroundColor="Black" 
-           Aspect="AspectFit" 
-           ZIndex="1"/>
+               IsVisible="False" 
+               BackgroundColor="Black" 
+               Aspect="AspectFit" 
+               ZIndex="1"/>
+        
+        <AbsoluteLayout VerticalOptions="Start" Padding="20" ZIndex="2">
+                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                        Text="{x:Static local:MaterialIcons.Close}"
+                        Padding="0"
+                        FontSize="36"
+                        FontFamily="MaterialOutlined"
+                        TextColor="White"
+                        BackgroundColor="DimGrey"
+                        Opacity="0.8"
+                        Clicked="OnCloseClicked"/>
+        </AbsoluteLayout>
 
-        <VerticalStackLayout VerticalOptions="End" Spacing="20" Padding="30" ZIndex="2">
-            <HorizontalStackLayout x:Name="liveButtons" HorizontalOptions="Center" Spacing="30">
-                <Button HeightRequest="80" WidthRequest="80" CornerRadius="40"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=46, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Flash_on}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
+        <VerticalStackLayout VerticalOptions="End" Padding="30" ZIndex="2">
+            <HorizontalStackLayout x:Name="liveButtons" HorizontalOptions="Center" Spacing="50">
+                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                        Text="{x:Static local:MaterialIcons.Flash_auto}"
+                        Padding="0"
+                        FontSize="36"
+                        FontFamily="MaterialOutlined"
+                        TextColor="White"
+                        BackgroundColor="DimGrey"
+                        Opacity="0.8"                   
                         Clicked="OnFlashButtonClicked"/>
                 <Button x:Name="controlButton"
                         HeightRequest="80" WidthRequest="80" CornerRadius="40"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=46, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Photo_camera}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
+                        Text="{x:Static local:MaterialIcons.Photo_camera}"
+                        Padding="0"
+                        FontSize="46"
+                        FontFamily="MaterialOutlined"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                      
                         Clicked="OnCaptureClicked"/>
-                <Button HeightRequest="80" WidthRequest="80" CornerRadius="40"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=46, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Flip_camera_ios}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
+                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                        Text="{x:Static local:MaterialIcons.Flip_camera_ios}"
+                        Padding="0"
+                        FontSize="36"
+                        FontFamily="MaterialOutlined"
+                        TextColor="White"
+                        BackgroundColor="DimGrey"
+                        Opacity="0.8"                     
                         Clicked="OnSwitchCameraClicked"/>
             </HorizontalStackLayout>
 
-            <HorizontalStackLayout x:Name="previewButtons" IsVisible="False" HorizontalOptions="Center" Spacing="30">
-                <Button Text="Abbrechen" Clicked="OnRetakeClicked" BackgroundColor="Red" />
-                <Button Text="Speichern" Clicked="OnConfirmClicked" BackgroundColor="Green" WidthRequest="120" />
+            <HorizontalStackLayout x:Name="previewButtons" IsVisible="False" HorizontalOptions="Center" Spacing="50">
+                <Button Text="{x:Static res:AppResources.abbrechen}" Clicked="OnRetakeClicked" BackgroundColor="Red"/>
+                <Button Text="{x:Static res:AppResources.speichern}" Clicked="OnConfirmClicked" BackgroundColor="Green"/>
             </HorizontalStackLayout>
 
         </VerticalStackLayout>

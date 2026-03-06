@@ -6,8 +6,7 @@ namespace SnapDoc.Views;
 
 public partial class CameraView : ContentPage
 {
-    bool playing = false;
-    private string tempFilePath = string.Empty;
+    private string? tempFilePath = string.Empty;
 
     public CameraView()
     {
@@ -15,7 +14,15 @@ public partial class CameraView : ContentPage
         cameraView.CamerasLoaded += CameraView_CamerasLoaded;
     }
 
-    private void CameraView_CamerasLoaded(object sender, EventArgs e)
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        CameraResultService.SetResult(null);
+        _ = cameraView.StopCameraAsync();
+    }
+
+    private void CameraView_CamerasLoaded(object? sender, EventArgs e)
     {
         if (cameraView.Cameras.Count > 0)
         {
@@ -23,10 +30,8 @@ public partial class CameraView : ContentPage
 
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                var result = await cameraView.StartCameraAsync();
-
-                if (result == CameraResult.Success)
-                    playing = true;
+                if (await cameraView.StartCameraAsync() == CameraResult.Success)
+                    cameraView.FlashMode = FlashMode.Auto;
             });
         }
     }
@@ -35,12 +40,11 @@ public partial class CameraView : ContentPage
     {
         try
         {
-            var stream = await cameraView.TakePhotoAsync();
+            using var stream = await cameraView.TakePhotoAsync();
             if (stream != null)
             {
                 tempFilePath = await SavePhotoToCache(stream);
-
-                if (File.Exists(tempFilePath))
+                if (!string.IsNullOrEmpty(tempFilePath) && File.Exists(tempFilePath))
                 {
                     await cameraView.StopCameraAsync();
                     previewImage.Source = ImageSource.FromFile(tempFilePath);
@@ -56,7 +60,10 @@ public partial class CameraView : ContentPage
 
     private async void OnConfirmClicked(object sender, EventArgs e)
     {
-        CameraResultService.SetResult(new FileResult(tempFilePath));
+        if (!string.IsNullOrEmpty(tempFilePath))
+            CameraResultService.SetResult(new FileResult(tempFilePath));
+        else
+            CameraResultService.SetResult(null);
         await Shell.Current.GoToAsync("..");
     }
 
@@ -67,6 +74,12 @@ public partial class CameraView : ContentPage
         ToggleUI(isPreview: false);
     }
 
+    private async void OnCloseClicked(object sender, EventArgs e)
+    {
+        await cameraView.StopCameraAsync();
+        await Shell.Current.GoToAsync("..");
+    }
+
     private void ToggleUI(bool isPreview)
     {
         previewImage.IsVisible = isPreview;
@@ -74,9 +87,10 @@ public partial class CameraView : ContentPage
         liveButtons.IsVisible = !isPreview;
     }
 
-    private async Task<string> SavePhotoToCache(Stream photoStream)
+    private static async Task<string?> SavePhotoToCache(Stream photoStream)
     {
-        if (photoStream == null) return null;
+        if (photoStream == null)
+            return null;
 
         string fileName = $"Capture_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
         string cachePath = Path.Combine(FileSystem.CacheDirectory, fileName);
@@ -87,7 +101,7 @@ public partial class CameraView : ContentPage
             await photoStream.CopyToAsync(fileStream);
         }
 
-        return cachePath; // Rückgabe des Pfads zur Datei
+        return cachePath;
     }
 
     private async void OnSwitchCameraClicked(object sender, EventArgs e)
@@ -110,36 +124,34 @@ public partial class CameraView : ContentPage
         {
             case FlashMode.Auto:
                 cameraView.FlashMode = FlashMode.Enabled;
-                if (button != null) button.Text = "Flash: ON";
+                button?.Text = MaterialIcons.Flash_on; 
                 break;
 
             case FlashMode.Enabled:
                 cameraView.FlashMode = FlashMode.Disabled;
-                if (button != null) button.Text = "Flash: OFF";
+                button?.Text = MaterialIcons.Flash_off;
                 break;
 
             case FlashMode.Disabled:
             default:
                 cameraView.FlashMode = FlashMode.Auto;
-                if (button != null) button.Text = "Flash: AUTO";
+                button?.Text = MaterialIcons.Flash_auto;
                 break;
         }
-
-        Debug.WriteLine($"Blitz-Modus geändert auf: {cameraView.FlashMode}");
     }
 }
 
 public static class CameraResultService
 {
-    private static TaskCompletionSource<FileResult> _tcs;
+    private static TaskCompletionSource<FileResult?>? _tcs;
 
-    public static Task<FileResult> WaitForCaptureAsync()
+    public static Task<FileResult?> WaitForCaptureAsync()
     {
-        _tcs = new TaskCompletionSource<FileResult>();
+        _tcs = new TaskCompletionSource<FileResult?>();
         return _tcs.Task;
     }
 
-    public static void SetResult(FileResult result)
+    public static void SetResult(FileResult? result)
     {
         _tcs?.TrySetResult(result);
     }
