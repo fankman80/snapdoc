@@ -47,10 +47,13 @@ public partial class CameraView : ContentPage
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-    
-        // Kurze Verzögerung, damit die UI-Engine die neuen Grid-Maße kennt
-        Task.Run(async () => {
-            await Task.Delay(100);
+
+    if (width <= 0 || height <= 0)
+        return;
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            await Task.Delay(200); 
             UpdateCameraLayout();
         });
     }
