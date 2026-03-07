@@ -1,4 +1,3 @@
-
 using Camera.MAUI;
 using System.Diagnostics;
 
@@ -56,21 +55,25 @@ public partial class CameraView : ContentPage
         });
     }
 
-
-    private void UpdateCameraLayout()
+    private async void UpdateCameraLayout()
     {
-        if (cameraView.Camera == null || CameraContainer.Width <= 0) return;
+        if (cameraView.Camera == null || CameraContainer.Width <= 0)
+            return;
 
-        // 1. Die gewählte Vorschau-Auflösung holen
+        cameraView.WidthRequest = -1;
+        cameraView.HeightRequest = -1;
+
+        await Task.Delay(50); 
+
         var res = GetOptimalResolution(highRes: false);
-        if (res.Width <= 0) return;
+        if (res.Width <= 0)
+            return;
 
-        // 2. Sensor-Ratio an Display-Orientierung anpassen
         double streamWidth = res.Width;
         double streamHeight = res.Height;
-
-        // Falls das Handy hochkant gehalten wird, Ratio umkehren
+        
         bool isPortrait = DeviceDisplay.MainDisplayInfo.Orientation == DisplayOrientation.Portrait;
+    
         if (isPortrait && streamWidth > streamHeight)
         {
             streamWidth = res.Height;
@@ -78,29 +81,22 @@ public partial class CameraView : ContentPage
         }
 
         double streamRatio = streamWidth / streamHeight;
-
-        // 3. Verfügbaren Platz im schwarzen Hintergrund-Grid messen
         double containerWidth = CameraContainer.Width;
         double containerHeight = CameraContainer.Height;
-        double containerRatio = containerWidth / containerHeight;
-
         double finalWidth, finalHeight;
 
-        // 4. Skalierung berechnen (Letterboxing)
-        if (containerRatio > streamRatio)
+        // Letterboxing Berechnung
+        if ((containerWidth / containerHeight) > streamRatio)
         {
-            // Der Bildschirm ist breiter als das Kamerabild -> Höhe füllen
             finalHeight = containerHeight;
             finalWidth = containerHeight * streamRatio;
         }
         else
         {
-            // Der Bildschirm ist schmaler als das Kamerabild -> Breite füllen
             finalWidth = containerWidth;
             finalHeight = containerWidth / streamRatio;
         }
 
-        // 5. Die CameraView auf diese exakten Maße zwingen
         MainThread.BeginInvokeOnMainThread(() =>
         {
             cameraView.WidthRequest = finalWidth;
