@@ -26,6 +26,8 @@ public partial class CameraView : ContentPage
     {
         if (cameraView.Cameras.Count > 0)
         {
+            switchCameraButton.IsVisible = cameraView.Cameras.Count > 1;
+
             var backCamera = cameraView.Cameras.FirstOrDefault(c => c.Position == CameraPosition.Back);            
             cameraView.Camera = backCamera ?? cameraView.Cameras.First();
 
@@ -84,21 +86,37 @@ public partial class CameraView : ContentPage
     private Size GetOptimalResolution(bool highRes)
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null || available.Count == 0) return new Size(0, 0);
+        if (available == null || available.Count == 0)
+            return new Size(0, 0);
+
+        // 1. Alle verfügbaren Ratios gruppieren
+        var groups = available
+            .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
+            .Select(g => new {
+                Ratio = g.Key,
+                MaxPhoto = g.OrderByDescending(r => r.Width * r.Height).First(),
+                BestPreview = g.Where(r => r.Width <= 1920).OrderByDescending(r => r.Width * r.Height).FirstOrDefault()
+            })
+            .Where(g => g.BestPreview.Width > 0) // Nur Gruppen mit einer Vorschau-Option
+            .ToList();
+
+        if (groups.Count == 0)
+            return highRes ? available.OrderByDescending(r => r.Width * r.Height).First() : available.First();
+
+        // 2. Suche nach einer Gruppe, die eine "gute" Vorschau bietet (mind. 720p Breite) UND eine hohe Foto-Auflösung hat.
+        var highQualityGroups = groups
+            .Where(g => g.BestPreview.Width >= 1280)
+            .OrderByDescending(g => g.MaxPhoto.Width * g.MaxPhoto.Height)
+            .ToList();
+
+        var selectedGroup = highQualityGroups.Count > 0
+            ? highQualityGroups.First()
+            : groups.OrderByDescending(g => g.MaxPhoto.Width * g.MaxPhoto.Height).First();
 
         if (highRes)
-        {
-            return available.OrderByDescending(r => r.Width * r.Height).First();
-        }
+            return selectedGroup.MaxPhoto;
         else
-        {
-            var preferred = available
-                .Where(r => r.Width <= 1920 && r.Width > 0)
-                .OrderByDescending(r => r.Width * r.Height)
-                .FirstOrDefault();
-
-            return preferred.Width > 0 ? preferred : available.OrderBy(r => r.Width).First();
-        }
+            return selectedGroup.BestPreview;
     }
 
     private async void OnConfirmClicked(object sender, EventArgs e)
@@ -143,7 +161,8 @@ public partial class CameraView : ContentPage
 
         using (FileStream fileStream = File.Create(cachePath))
         {
-            if (photoStream.CanSeek) photoStream.Position = 0;
+            if (photoStream.CanSeek)
+                photoStream.Position = 0;
             await photoStream.CopyToAsync(fileStream);
         }
 
@@ -162,9 +181,7 @@ public partial class CameraView : ContentPage
             Size selectedRes = GetOptimalResolution(highRes: false);
 
             if (await cameraView.StartCameraAsync(selectedRes) == CameraResult.Success)
-            {
                 await Task.Delay(1000);
-            }
         }
     }
 

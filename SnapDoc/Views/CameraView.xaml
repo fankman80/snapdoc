@@ -31,8 +31,13 @@
         </AbsoluteLayout>
 
         <VerticalStackLayout VerticalOptions="End" Padding="30" ZIndex="2">
-            <HorizontalStackLayout x:Name="liveButtons" HorizontalOptions="Center" Spacing="50">
-                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+            <Grid x:Name="liveButtons" 
+                  HorizontalOptions="Fill" 
+                  MaximumWidthRequest="600" 
+                  ColumnDefinitions="*, *, *" 
+                  ColumnSpacing="0">
+                <Button Grid.Column="0"
+                        HeightRequest="60" WidthRequest="60" CornerRadius="30"
                         Text="{x:Static local:MaterialIcons.Flash_auto}"
                         Padding="0"
                         FontSize="36"
@@ -41,7 +46,8 @@
                         BackgroundColor="#404040"
                         Opacity="0.6"                   
                         Clicked="OnFlashButtonClicked"/>
-                <Button x:Name="controlButton"
+                <Button Grid.Column="1"
+                        x:Name="controlButton"
                         HeightRequest="80" WidthRequest="80" CornerRadius="40"
                         Text="{x:Static local:MaterialIcons.Photo_camera}"
                         Padding="0"
@@ -49,7 +55,9 @@
                         FontFamily="MaterialOutlined"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                      
                         Clicked="OnCaptureClicked"/>
-                <Button HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                <Button Grid.Column="2"
+                        x:Name="switchCameraButton"
+                        HeightRequest="60" WidthRequest="60" CornerRadius="30"
                         Text="{x:Static local:MaterialIcons.Flip_camera_ios}"
                         Padding="0"
                         FontSize="36"
@@ -58,7 +66,7 @@
                         BackgroundColor="#404040"
                         Opacity="0.6"                     
                         Clicked="OnSwitchCameraClicked"/>
-            </HorizontalStackLayout>
+            </Grid>
 
             <HorizontalStackLayout x:Name="previewButtons" IsVisible="False" HorizontalOptions="Center" Spacing="50">
                 <Button Text="{x:Static res:AppResources.abbrechen}" Clicked="OnRetakeClicked" BackgroundColor="Red"/>
