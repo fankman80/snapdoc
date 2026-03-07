@@ -7,10 +7,16 @@
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
-        <cv:CameraView x:Name="cameraView"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"
-                       ZIndex="0"/>
+        <Grid x:Name="CameraContainer" 
+              HorizontalOptions="Fill" 
+              VerticalOptions="Fill" 
+              BackgroundColor="Black"
+              ZIndex="0">
+    
+            <cv:CameraView x:Name="cameraView"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center" />
+        </Grid>
 
         <Image x:Name="previewImage" 
                IsVisible="False" 
