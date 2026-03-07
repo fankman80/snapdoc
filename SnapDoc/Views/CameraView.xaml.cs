@@ -39,6 +39,7 @@ public partial class CameraView : ContentPage
                 {
                     await Task.Delay(1000);
                     cameraView.FlashMode = FlashMode.Auto;
+                    cameraView.ZoomFactor = 1;
                 }
             });
         }
@@ -56,7 +57,7 @@ public partial class CameraView : ContentPage
 
             if (await cameraView.StartCameraAsync(maxRes) == CameraResult.Success)
             {
-                await Task.Delay(350); // Puffer für Sensor-Pegel
+                await Task.Delay(350); // Puffer fÃ¼r Sensor-Pegel
 
                 using var stream = await cameraView.TakePhotoAsync();
 
@@ -89,7 +90,7 @@ public partial class CameraView : ContentPage
         if (available == null || available.Count == 0)
             return new Size(0, 0);
 
-        // 1. Alle verfügbaren Ratios gruppieren
+        // 1. Alle verfÃ¼gbaren Ratios gruppieren
         var groups = available
             .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
             .Select(g => new {
@@ -103,7 +104,7 @@ public partial class CameraView : ContentPage
         if (groups.Count == 0)
             return highRes ? available.OrderByDescending(r => r.Width * r.Height).First() : available.First();
 
-        // 2. Suche nach einer Gruppe, die eine "gute" Vorschau bietet (mind. 720p Breite) UND eine hohe Foto-Auflösung hat.
+        // 2. Suche nach einer Gruppe, die eine "gute" Vorschau bietet (mind. 720p Breite) UND eine hohe Foto-AuflÃ¶sung hat.
         var highQualityGroups = groups
             .Where(g => g.BestPreview.Width >= 1280)
             .OrderByDescending(g => g.MaxPhoto.Width * g.MaxPhoto.Height)
