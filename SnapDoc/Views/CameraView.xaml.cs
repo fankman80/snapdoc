@@ -45,6 +45,49 @@ public partial class CameraView : ContentPage
         }
     }
 
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+    
+        Task.Run(async () => {
+            await Task.Delay(100);
+            UpdateCameraLayout();
+        });
+    }
+
+    private void UpdateCameraLayout()
+    {
+        if (cameraView.Camera == null) return;
+
+        var res = GetOptimalResolution(highRes: false);
+        if (res.Width <= 0 || res.Height <= 0) return;
+
+        double streamRatio = res.Width / res.Height;
+        double availableWidth = CameraContainer.Width;
+        double availableHeight = CameraContainer.Height;
+
+        if (availableWidth <= 0 || availableHeight <= 0) return;
+
+        double targetWidth, targetHeight;
+
+        if (availableWidth / availableHeight > streamRatio)
+        {
+            targetHeight = availableHeight;
+            targetWidth = availableHeight * streamRatio;
+        }
+        else
+        {
+            targetWidth = availableWidth;
+            targetHeight = availableWidth / streamRatio;
+        }
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            cameraView.WidthRequest = targetWidth;
+            cameraView.HeightRequest = targetHeight;
+        });
+    }
+
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
         try
