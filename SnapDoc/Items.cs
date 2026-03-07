@@ -458,5 +458,11 @@ namespace SnapDoc
         [ObservableProperty] private bool isSelected;
         public bool IsAddButton { get; set; }
     }
+
+    public class RatioItem
+    {
+        public required string Name { get; set; }
+        public double Value { get; set; }
+    }
 }
 #pragma warning restore MVVMTK0045

@@ -2,17 +2,14 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-             xmlns:local="clr-namespace:SnapDoc"             
+             xmlns:local="clr-namespace:SnapDoc"           
              x:Class="SnapDoc.Views.CameraView"
              Shell.NavBarIsVisible="False">
 
-    <Grid HorizontalOptions="Fill" VerticalOptions="Fill">
+    <Grid HorizontalOptions="Fill" VerticalOptions="Fill" BackgroundColor="Black">
         <Grid x:Name="CameraContainer" 
               HorizontalOptions="Fill" 
-              VerticalOptions="Fill" 
-              BackgroundColor="Black"
-              ZIndex="0">
-    
+              VerticalOptions="Fill">
             <cv:CameraView x:Name="cameraView"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
@@ -21,72 +18,97 @@
         <Image x:Name="previewImage" 
                IsVisible="False" 
                BackgroundColor="Black" 
-               Aspect="AspectFit" 
-               ZIndex="1"/>
+               Aspect="AspectFit" />
 
-        <AbsoluteLayout VerticalOptions="Start" Padding="20" ZIndex="2">
-            <Button HeightRequest="40" WidthRequest="40" CornerRadius="20"
-                        Text="{x:Static local:MaterialIcons.Close}"
-                        Padding="0"
-                        FontSize="26"
-                        FontFamily="MaterialOutlined"
-                        TextColor="White"
-                        BackgroundColor="#404040"
-                        Opacity="0.6"
-                        Clicked="OnCloseClicked"/>
-        </AbsoluteLayout>
+        <Button Text="{x:Static local:MaterialIcons.Close}"
+                Padding="0"
+                HorizontalOptions="Start"
+                VerticalOptions="Start"
+                Margin="20"
+                HeightRequest="44" WidthRequest="44" CornerRadius="22"
+                FontSize="26"
+                FontFamily="MaterialOutlined"
+                TextColor="White"
+                BackgroundColor="#404040"
+                Opacity="0.8"
+                Clicked="OnCloseClicked"/>
 
-        <VerticalStackLayout VerticalOptions="End" Padding="30" ZIndex="2">
+        <VerticalStackLayout x:Name="ratioContainer" 
+                             HorizontalOptions="End" 
+                             VerticalOptions="Start" 
+                             Margin="0,20,20,0" 
+                             Spacing="10">
+            <BindableLayout.ItemTemplate>
+                <DataTemplate x:DataType="local:RatioItem">
+                    <Button Text="{Binding Name}"
+                            Clicked="OnRatioClicked"
+                            CommandParameter="{Binding Value}"
+                            HeightRequest="40" 
+                            WidthRequest="60"
+                            Padding="0"
+                            FontSize="12"
+                            CornerRadius="20"
+                            BackgroundColor="#404040"
+                            TextColor="White"
+                            Opacity="0.8" />
+                </DataTemplate>
+            </BindableLayout.ItemTemplate>
+        </VerticalStackLayout>
+
+        <VerticalStackLayout VerticalOptions="End" Padding="30" Spacing="20">
             <Grid x:Name="liveButtons" 
-                  HorizontalOptions="Fill" 
-                  MaximumWidthRequest="600" 
-                  ColumnDefinitions="*, *, *" 
-                  ColumnSpacing="0">
+                  HorizontalOptions="Center" 
+                  WidthRequest="300" 
+                  ColumnDefinitions="*, *, *">
+
                 <Button Grid.Column="0"
-                        HeightRequest="60" WidthRequest="60" CornerRadius="30"
-                        Text="{x:Static local:MaterialIcons.Flash_auto}"
                         Padding="0"
-                        FontSize="36"
-                        FontFamily="MaterialOutlined"
-                        TextColor="White"
-                        BackgroundColor="#404040"
-                        Opacity="0.6"                   
+                        Text="{x:Static local:MaterialIcons.Flash_auto}"
+                        HeightRequest="60" WidthRequest="60" CornerRadius="30"
+                        FontSize="30" FontFamily="MaterialOutlined"
+                        TextColor="White" BackgroundColor="#404040" Opacity="0.8"
                         Clicked="OnFlashButtonClicked"/>
+
                 <Button Grid.Column="1"
+                        Padding="0"
                         x:Name="controlButton"
                         HeightRequest="80" WidthRequest="80" CornerRadius="40"
                         Text="{x:Static local:MaterialIcons.Photo_camera}"
-                        Padding="0"
-                        FontSize="46"
-                        FontFamily="MaterialOutlined"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                      
+                        FontSize="40" FontFamily="MaterialOutlined"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         Clicked="OnCaptureClicked"/>
+
                 <Button Grid.Column="2"
+                        Padding="0"
                         x:Name="switchCameraButton"
                         HeightRequest="60" WidthRequest="60" CornerRadius="30"
                         Text="{x:Static local:MaterialIcons.Flip_camera_ios}"
-                        Padding="0"
-                        FontSize="36"
-                        FontFamily="MaterialOutlined"
-                        TextColor="White"
-                        BackgroundColor="#404040"
-                        Opacity="0.6"                     
+                        FontSize="30" FontFamily="MaterialOutlined"
+                        TextColor="White" BackgroundColor="#404040" Opacity="0.8"
                         Clicked="OnSwitchCameraClicked"/>
             </Grid>
 
-            <HorizontalStackLayout x:Name="previewButtons" IsVisible="False" HorizontalOptions="Center" Spacing="50">
-                <Button Text="{x:Static res:AppResources.abbrechen}" Clicked="OnRetakeClicked" BackgroundColor="Red"/>
-                <Button Text="{x:Static res:AppResources.speichern}" Clicked="OnConfirmClicked" BackgroundColor="Green"/>
-            </HorizontalStackLayout>
+            <Grid x:Name="previewButtons"
+                  IsVisible="False" 
+                  HorizontalOptions="Center"
+                  ColumnDefinitions="auto, auto"
+                  ColumnSpacing="40">
+                <Button Grid.Column="0" 
+                        Text="{x:Static res:AppResources.abbrechen}" 
+                        Clicked="OnRetakeClicked" 
+                        BackgroundColor="#E53935" TextColor="White" WidthRequest="140" />
+                <Button Grid.Column="1" 
+                        Text="{x:Static res:AppResources.speichern}" 
+                        Clicked="OnConfirmClicked" 
+                        BackgroundColor="#43A047" TextColor="White" WidthRequest="140" />
+            </Grid>
 
         </VerticalStackLayout>
+
         <BoxView x:Name="flashOverlay"
                  BackgroundColor="White"
                  Opacity="0"
                  IsVisible="False"
-                 InputTransparent="True" 
-                 HorizontalOptions="Fill"
-                 VerticalOptions="Fill"
-                 ZIndex="99" />
+                 InputTransparent="True" />
     </Grid>
 </ContentPage>
