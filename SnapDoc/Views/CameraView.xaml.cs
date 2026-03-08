@@ -298,10 +298,7 @@ public partial class CameraView : ContentPage
                     btn.TextColor = Colors.White;
             }
 
-            if (Application.Current?.Resources.TryGetValue("Primary", out var primaryColor) == true)
-                selectedButton.BackgroundColor = (Color)primaryColor;
-            else
-                selectedButton.BackgroundColor = Colors.Cyan; // Fallback
+            selectedButton.TextColor = Colors.Yellow;
 
             var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
             _optimalPhotoSize = photo;
@@ -318,6 +315,7 @@ public partial class CameraView : ContentPage
         previewImage.IsVisible = isPreview;
         previewButtons.IsVisible = isPreview;
         liveButtons.IsVisible = !isPreview;
+        ratioContainer.IsVisible = !isPreview;
     }
 
     private static async Task<string?> SavePhotoToCache(Stream photoStream)
