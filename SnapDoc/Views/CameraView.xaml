@@ -38,14 +38,14 @@
         <VerticalStackLayout x:Name="ratioContainer" 
                              HorizontalOptions="End" 
                              VerticalOptions="Start" 
-                             Margin="0,20,20,0" 
+                             Margin="0,16,16,0" 
                              Spacing="10">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="local:RatioItem">
                     <Button Text="{Binding Name}"
                             Clicked="OnRatioClicked"
                             CommandParameter="{Binding Value}"
-                            HeightRequest="32" 
+                            HeightRequest="28" 
                             WidthRequest="52"
                             Padding="0"
                             FontSize="12"
