@@ -55,21 +55,26 @@ public partial class CameraView : ContentPage
     private void PopulateRatioButtons()
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null)
-            return;
+        if (available == null) return;
 
-        var ratios = available
-            .Select(r => Math.Round((double)r.Width / r.Height, 2))
-            .Distinct()
-            .OrderByDescending(r => r)
-            .Select(r => new RatioItem { Name = CameraView.GetRatioName(r), Value = r })
+        var uniqueRatios = available
+            .Select(r => new { Ratio = Math.Round((double)r.Width / r.Height, 2), Name = GetRatioName(Math.Round((double)r.Width / r.Height, 2)) })
+            .GroupBy(x => x.Name) // Gruppiere nach dem Namen "16:9", "4:3" etc.
+            .Select(g => new RatioItem { 
+                Name = g.Key, 
+                Value = g.First().Ratio 
+            })
+            .OrderByDescending(r => r.Value)
             .ToList();
 
-        BindableLayout.SetItemsSource(ratioContainer, ratios);
+        BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
-        MainThread.BeginInvokeOnMainThread(() => {
-            if (ratioContainer.Children.FirstOrDefault() is Button firstButton)
-                firstButton.BackgroundColor = (Color)Application.Current!.Resources["Primary"];
+        // Initialen Button markieren
+        MainThread.BeginInvokeOnMainThread(async () => {
+            await Task.Delay(200); // Warten auf UI Rendering
+            var firstButton = ratioContainer.Children.FirstOrDefault() as Button;
+            if (firstButton != null && Application.Current?.Resources.TryGetValue("Primary", out var color))
+                firstButton.BackgroundColor = (Color)color;
         });
     }
 
@@ -105,13 +110,14 @@ public partial class CameraView : ContentPage
 
         var photoCandidate = selectedGroup.Resolutions.First();
         var previewCandidate = selectedGroup.Resolutions
-            .Where(r => r.Width <= 1920 && r.Width >= 1000)
-            .OrderByDescending(r => r.Width)
+            .Where(r => r.Width >= 1500) 
+            .OrderBy(r => r.Width) // Nimm die kleinste, die aber noch groß genug ist
             .FirstOrDefault();
 
+        // Falls keine gefunden wurde (sehr altes Gerät), nimm die größte verfügbare
         if (previewCandidate.Width == 0)
             previewCandidate = selectedGroup.Resolutions.OrderByDescending(r => r.Width).First();
-
+    
         return (photoCandidate, previewCandidate);
     }
 
@@ -233,21 +239,29 @@ public partial class CameraView : ContentPage
 
     private async void OnRatioClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        if (button?.CommandParameter is double newRatio)
+        var selectedButton = sender as Button;
+        if (selectedButton?.CommandParameter is double newRatio)
         {
             _userSelectedRatio = newRatio;
 
-            // Kamera mit neuer Ratio neu initialisieren
-            var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
-            _optimalPhotoSize = photo;
-            _optimalPreviewSize = preview;
+            foreach (var child in ratioContainer.Children)
+            {
+                if (child is Button btn)
+                    btn.BackgroundColor = Color.FromArgb("#404040");
+            }
+
+            if (Application.Current?.Resources.TryGetValue("Primary", out var primaryColor) == true)
+                selectedButton.BackgroundColor = (Color)primaryColor;
+            else
+                selectedButton.BackgroundColor = Colors.Cyan; // Fallback
+
+            var pair = GetOptimalMatchedPair(_userSelectedRatio);
+            _optimalPhotoSize = pair.photo;
+            _optimalPreviewSize = pair.preview;
 
             await cameraView.StopCameraAsync();
             if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
-            {
                 UpdateCameraLayout();
-            }
         }
     }
 
