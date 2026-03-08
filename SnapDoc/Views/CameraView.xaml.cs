@@ -9,6 +9,7 @@ public partial class CameraView : ContentPage
     private Size _optimalPhotoSize;
     private Size _optimalPreviewSize;
     private double? _userSelectedRatio = null;
+    private FlashMode _currentFlashMode = FlashMode.Auto;
 
     public CameraView()
     {
@@ -40,14 +41,15 @@ public partial class CameraView : ContentPage
 
     private async Task InitializeCameraSelection()
     {
-        var (photo, preview) = GetOptimalMatchedPair();
+        var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio); // Ratio übergeben!
         _optimalPhotoSize = photo;
         _optimalPreviewSize = preview;
 
         if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
         {
             UpdateCameraLayout();
-            cameraView.FlashMode = FlashMode.Auto;
+            cameraView.FlashMode = _currentFlashMode;
+            UpdateFlashButtonUI();
             PopulateRatioButtons();
         }
     }
@@ -55,7 +57,8 @@ public partial class CameraView : ContentPage
     private void PopulateRatioButtons()
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null) return;
+        if (available == null)
+            return;
 
         var uniqueRatios = available
             .Select(r => new { Ratio = Math.Round((double)r.Width / r.Height, 2), Name = GetRatioName(Math.Round((double)r.Width / r.Height, 2)) })
@@ -72,9 +75,8 @@ public partial class CameraView : ContentPage
         // Initialen Button markieren
         MainThread.BeginInvokeOnMainThread(async () => {
             await Task.Delay(200); // Warten auf UI Rendering
-            var firstButton = ratioContainer.Children.FirstOrDefault() as Button;
-            if (firstButton != null && Application.Current?.Resources.TryGetValue("Primary", out var color))
-                firstButton.BackgroundColor = (Color)color;
+            if (ratioContainer.Children.FirstOrDefault() is Button firstButton)
+                firstButton.TextColor = Colors.Yellow;
         });
     }
 
@@ -121,14 +123,57 @@ public partial class CameraView : ContentPage
         return (photoCandidate, previewCandidate);
     }
 
+    private async Task RestartPreview()
+    {
+        await cameraView.StopCameraAsync();
+        if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+        {
+            UpdateCameraLayout();
+            cameraView.FlashMode = _currentFlashMode;
+            UpdateFlashButtonUI();
+        }
+    }
+
+    private void OnFlashButtonClicked(object sender, EventArgs e)
+    {
+        _currentFlashMode = cameraView.FlashMode switch
+        {
+            FlashMode.Auto => FlashMode.Enabled,
+            FlashMode.Enabled => FlashMode.Disabled,
+            _ => FlashMode.Auto
+        };
+
+        cameraView.FlashMode = _currentFlashMode;
+        UpdateFlashButtonUI();
+    }
+
     protected override void OnSizeAllocated(double width, double height)
     {
         base.OnSizeAllocated(width, height);
-        if (width <= 0 || height <= 0) return;
+        if (width <= 0 || height <= 0)
+            return;
 
         MainThread.BeginInvokeOnMainThread(async () => {
-            await Task.Delay(150);
-            UpdateCameraLayout();
+            await Task.Delay(200);
+
+            if (cameraView.Camera != null)
+            {
+                try
+                {
+                    await cameraView.StopCameraAsync();
+                    if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+                    {
+                        cameraView.FlashMode = _currentFlashMode;
+                        UpdateCameraLayout();
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Fehler beim Re-Start nach Rotation: {ex.Message}");
+                }
+            }
+            else
+                UpdateCameraLayout();
         });
     }
 
@@ -170,6 +215,19 @@ public partial class CameraView : ContentPage
         cameraView.HeightRequest = finalHeight;
     }
 
+    private void UpdateFlashButtonUI()
+    {
+        if (liveButtons.Children.FirstOrDefault() is not Button flashBtn)
+            return;
+
+        flashBtn.Text = _currentFlashMode switch
+        {
+            FlashMode.Enabled => MaterialIcons.Flash_on,
+            FlashMode.Disabled => MaterialIcons.Flash_off,
+            _ => MaterialIcons.Flash_auto
+        };
+    }
+
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
         try
@@ -207,16 +265,6 @@ public partial class CameraView : ContentPage
         }
     }
 
-    private async Task RestartPreview()
-    {
-        await cameraView.StopCameraAsync();
-        if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
-        {
-            UpdateCameraLayout();
-            cameraView.FlashMode = FlashMode.Auto;
-        }
-    }
-
     private async void OnRetakeClicked(object sender, EventArgs e)
     {
         if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
@@ -247,7 +295,7 @@ public partial class CameraView : ContentPage
             foreach (var child in ratioContainer.Children)
             {
                 if (child is Button btn)
-                    btn.BackgroundColor = Color.FromArgb("#404040");
+                    btn.TextColor = Colors.White;
             }
 
             if (Application.Current?.Resources.TryGetValue("Primary", out var primaryColor) == true)
@@ -255,9 +303,9 @@ public partial class CameraView : ContentPage
             else
                 selectedButton.BackgroundColor = Colors.Cyan; // Fallback
 
-            var pair = GetOptimalMatchedPair(_userSelectedRatio);
-            _optimalPhotoSize = pair.photo;
-            _optimalPreviewSize = pair.preview;
+            var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
+            _optimalPhotoSize = photo;
+            _optimalPreviewSize = preview;
 
             await cameraView.StopCameraAsync();
             if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
@@ -292,26 +340,6 @@ public partial class CameraView : ContentPage
             await cameraView.StopCameraAsync();
             cameraView.Camera = cameraView.Cameras[nextIndex];
             await InitializeCameraSelection();
-        }
-    }
-
-    private void OnFlashButtonClicked(object sender, EventArgs e)
-    {
-        var button = sender as Button;
-        switch (cameraView.FlashMode)
-        {
-            case FlashMode.Auto:
-                cameraView.FlashMode = FlashMode.Enabled;
-                button?.Text = MaterialIcons.Flash_on;
-                break;
-            case FlashMode.Enabled:
-                cameraView.FlashMode = FlashMode.Disabled;
-                button?.Text = MaterialIcons.Flash_off;
-                break;
-            default:
-                cameraView.FlashMode = FlashMode.Auto;
-                button?.Text = MaterialIcons.Flash_auto;
-                break;
         }
     }
 }
