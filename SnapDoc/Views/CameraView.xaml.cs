@@ -44,6 +44,7 @@ public partial class CameraView : ContentPage
         var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio); // Ratio übergeben!
         _optimalPhotoSize = photo;
         _optimalPreviewSize = preview;
+        _userSelectedRatio = Math.Round((double)photo.Width / photo.Height, 2);
 
         if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
         {
@@ -62,21 +63,27 @@ public partial class CameraView : ContentPage
 
         var uniqueRatios = available
             .Select(r => new { Ratio = Math.Round((double)r.Width / r.Height, 2), Name = GetRatioName(Math.Round((double)r.Width / r.Height, 2)) })
-            .GroupBy(x => x.Name) // Gruppiere nach dem Namen "16:9", "4:3" etc.
-            .Select(g => new RatioItem { 
-                Name = g.Key, 
-                Value = g.First().Ratio 
-            })
+            .GroupBy(x => x.Name)
+            .Select(g => new RatioItem { Name = g.Key, Value = g.First().Ratio })
             .OrderByDescending(r => r.Value)
             .ToList();
 
         BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
-        // Initialen Button markieren
         MainThread.BeginInvokeOnMainThread(async () => {
-            await Task.Delay(200); // Warten auf UI Rendering
-            if (ratioContainer.Children.FirstOrDefault() is Button firstButton)
-                firstButton.TextColor = Colors.Yellow;
+            await Task.Delay(300);
+        
+            foreach (var child in ratioContainer.Children)
+            {
+                if (child is Button btn && btn.CommandParameter is double val)
+                {
+                    if (Math.Abs(val - (_userSelectedRatio ?? 0)) < 0.05)
+                    {
+                        btn.TextColor = Colors.Yellow;
+                        break;
+                    }
+                }
+            }
         });
     }
 
