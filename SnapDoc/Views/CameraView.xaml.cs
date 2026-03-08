@@ -112,7 +112,7 @@ public partial class CameraView : ContentPage
 
         var photoCandidate = selectedGroup.Resolutions.First();
         var previewCandidate = selectedGroup.Resolutions
-            .Where(r => r.Width >= 1500) 
+            .Where(r => r.Width >= 2560) 
             .OrderBy(r => r.Width) // Nimm die kleinste, die aber noch groß genug ist
             .FirstOrDefault();
 
@@ -306,7 +306,14 @@ public partial class CameraView : ContentPage
 
             await cameraView.StopCameraAsync();
             if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+            {
+                await Task.Delay(250); 
                 UpdateCameraLayout();
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await Task.Delay(100);
+                    UpdateCameraLayout();
+                });
+            }
         }
     }
 
