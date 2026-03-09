@@ -1,6 +1,5 @@
 ﻿#pragma warning disable MVVMTK0045
 using CommunityToolkit.Mvvm.ComponentModel;
-using DocumentFormat.OpenXml.Office2010.Drawing;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
@@ -82,6 +81,7 @@ public partial class SettingsService : ObservableObject
         ColorThemes = [.. ColorThemeMapping.Keys];
         AppThemes = [AppResources.hell, AppResources.dunkel];
         AppLanguages = [.. Settings.Languages.Values];
+        AppCameraTools = [.. Settings.CameraTools];
         IconCategories = [AppResources.alle_icons];
         SelectedColorTheme = ColorThemes[0];
         SelectedAppTheme = AppThemes[0];
@@ -91,6 +91,7 @@ public partial class SettingsService : ObservableObject
     }
 
     [ObservableProperty] private string _selectedAppLanguage = Settings.Languages.First().Value;
+    [ObservableProperty] private string _selectedCameraTool = Settings.CameraTools.First();
     [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
@@ -146,7 +147,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private double _gpsResponseTimeOut = 10;
     [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
     [ObservableProperty] private bool _isGpsActive = false;
-    [ObservableProperty] private int _cameraTool = 0;
     [ObservableProperty] private string _editorTheme = "material-darker";
     [ObservableProperty] private float _polyLineHandleRadius = 10f;
     [ObservableProperty] private float _polyLineHandleTouchRadius = 20f;
@@ -161,6 +161,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private List<string> _colorThemes;
     [ObservableProperty] private List<string> _appThemes;
     [ObservableProperty] private List<string> _appLanguages;
+    [ObservableProperty] private List<string> _appCameraTools;
     [ObservableProperty] private List<string> _iconCategories;
     [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
 
@@ -331,6 +332,7 @@ public partial class SettingsService : ObservableObject
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
             SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
             SelectedAppLanguage = AppLanguages.IndexOf(SelectedAppLanguage),
+            SelectedCameraTool = AppCameraTools.IndexOf(SelectedCameraTool),
             IconSortCrit = IconSortCrits.IndexOf(IconSortCrit),
             PinSortCrit = PinSortCrits.IndexOf(PinSortCrit),
             IconCategory = IconCategories.IndexOf(IconCategory),
@@ -363,7 +365,6 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = GpsResponseTimeOut,
             GpsMinTimeUpdate = GpsMinTimeUpdate,
             IsGpsActive = IsGpsActive,
-            CameraTool = CameraTool,
             EditorTheme = EditorTheme,
             PolyLineHandleRadius = PolyLineHandleRadius,
             PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
@@ -410,6 +411,7 @@ public partial class SettingsService : ObservableObject
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
             SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
             SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
+            SelectedCameraTool = (settings.SelectedCameraTool < AppCameraTools.Count) ? AppCameraTools[settings.SelectedAppLanguage] : AppCameraTools[0];
             IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0) ? IconCategories[settings.IconCategory] : IconCategories[0];
             IsPlanExport = settings.IsPlanExport;
             IsPosImageExport = settings.IsPosImageExport;
@@ -440,7 +442,6 @@ public partial class SettingsService : ObservableObject
             GpsResponseTimeOut = settings.GpsResponseTimeOut;
             GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
             IsGpsActive = settings.IsGpsActive;
-            CameraTool = settings.CameraTool;
             EditorTheme = settings.EditorTheme ?? string.Empty;
             PolyLineHandleRadius = settings.PolyLineHandleRadius;
             PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
@@ -513,7 +514,6 @@ public partial class SettingsService : ObservableObject
         GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
         GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
         IsGpsActive = defaultSettings.IsGpsActive;
-        CameraTool = defaultSettings.CameraTool;
         EditorTheme = defaultSettings.EditorTheme;
         PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
         PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;

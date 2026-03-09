@@ -41,10 +41,12 @@ public partial class CameraView : ContentPage
 
     private async Task InitializeCameraSelection()
     {
-        var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio); // Ratio übergeben!
+        // Wir starten explizit mit 4:3 (1.33), da dies meist der volle Sensor ist
+        _userSelectedRatio = 1.33;
+
+        var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
         _optimalPhotoSize = photo;
         _optimalPreviewSize = preview;
-        _userSelectedRatio = Math.Round((double)photo.Width / photo.Height, 2);
 
         if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
         {
@@ -100,33 +102,16 @@ public partial class CameraView : ContentPage
     private (Size photo, Size preview) GetOptimalMatchedPair(double? targetRatio = null)
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null || available.Count == 0)
-            return (new Size(0, 0), new Size(0, 0));
+        if (available == null || available.Count == 0) return (new Size(0, 0), new Size(0, 0));
 
-        var ratioGroups = available
+        var selectedGroup = available
             .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
-            .Select(g => new {
-                Ratio = g.Key,
-                Resolutions = g.OrderByDescending(r => r.Width * r.Height).ToList()
-            })
-            .ToList();
+            .OrderBy(g => Math.Abs(g.Key - (targetRatio ?? 1.33)))
+            .First();
 
-        var selectedGroup = targetRatio.HasValue
-            ? ratioGroups.FirstOrDefault(g => g.Ratio == targetRatio.Value)
-            : ratioGroups.OrderByDescending(g => g.Resolutions.First().Width * g.Resolutions.First().Height).FirstOrDefault();
+        var photoCandidate = selectedGroup.OrderByDescending(r => r.Width).First();
+        var previewCandidate = selectedGroup.OrderByDescending(r => r.Width).First();
 
-        selectedGroup ??= ratioGroups.First();
-
-        var photoCandidate = selectedGroup.Resolutions.First();
-        var previewCandidate = selectedGroup.Resolutions
-            .Where(r => r.Width >= 2560) 
-            .OrderBy(r => r.Width) // Nimm die kleinste, die aber noch groß genug ist
-            .FirstOrDefault();
-
-        // Falls keine gefunden wurde (sehr altes Gerät), nimm die größte verfügbare
-        if (previewCandidate.Width == 0)
-            previewCandidate = selectedGroup.Resolutions.OrderByDescending(r => r.Width).First();
-    
         return (photoCandidate, previewCandidate);
     }
 
@@ -314,12 +299,9 @@ public partial class CameraView : ContentPage
             await cameraView.StopCameraAsync();
             if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
             {
-                await Task.Delay(250); 
                 UpdateCameraLayout();
-                MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(100);
-                    UpdateCameraLayout();
-                });
+                await Task.Delay(150); // Kurz warten, bis der native Stream stabil ist
+                UpdateCameraLayout();
             }
         }
     }

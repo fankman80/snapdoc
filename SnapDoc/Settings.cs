@@ -82,6 +82,13 @@ public static class Settings
         ["fr"] = "Français",
     };
 
+    public static readonly List<string> CameraTools =
+    [
+        "Auto",
+        "System",
+        "SnapDoc",
+    ];
+
     public static readonly PopupOptions PopupOptions = new()
     {
         CanBeDismissedByTappingOutsideOfPopup = false,

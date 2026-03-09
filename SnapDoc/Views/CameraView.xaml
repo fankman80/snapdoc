@@ -45,8 +45,7 @@
                     <Button Text="{Binding Name}"
                             Clicked="OnRatioClicked"
                             CommandParameter="{Binding Value}"
-                            HeightRequest="28" 
-                            WidthRequest="52"
+                            WidthRequest="50"
                             Padding="0"
                             FontSize="12"
                             CornerRadius="8"
@@ -60,7 +59,7 @@
         <VerticalStackLayout VerticalOptions="End" Padding="30" Spacing="20">
             <Grid x:Name="liveButtons" 
                   HorizontalOptions="Center" 
-                  WidthRequest="300" 
+                  WidthRequest="400" 
                   ColumnDefinitions="*, *, *">
 
                 <Button Grid.Column="0"

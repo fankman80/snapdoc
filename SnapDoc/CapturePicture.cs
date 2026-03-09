@@ -27,10 +27,12 @@ public class CapturePicture
 
         try
         {
-            FileResult foto = SettingsService.Instance.CameraTool switch
+            var camTools = Settings.CameraTools;
+
+            FileResult foto = SettingsService.Instance.SelectedCameraTool switch
             {
-                1 => await MediaPicker.Default.CapturePhotoAsync(),
-                2 => await OpenCustomCamera(),
+                var s when s == Settings.CameraTools[1] => await MediaPicker.Default.CapturePhotoAsync(),
+                var s when s == Settings.CameraTools[2] => await OpenCustomCamera(),
                 _ => DeviceInfo.Current.Platform == DevicePlatform.WinUI
                      ? await OpenCustomCamera()
                      : await MediaPicker.Default.CapturePhotoAsync()

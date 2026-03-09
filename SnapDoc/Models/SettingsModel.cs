@@ -51,7 +51,7 @@ internal class SettingsModel
     public double GpsResponseTimeOut { get; set; } // Maximale Wartezeit auf GPS-Daten
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates
     public bool IsGpsActive { get; set; } // GPS Ein/Aus
-    public int CameraTool { get; set; } // Ausgewähltes Kamera-Tool / 0 = Auto, 1 = System Kamera, 2 = Maui.Camera
+    public int SelectedCameraTool { get; set; } // Ausgewähltes Kamera-Tool / 0 = Auto, 1 = System Kamera, 2 = Maui.Camera
     public string? EditorTheme { get; set; } // Json Editor Thema
     public float PolyLineHandleRadius { get; set; } // Radius der Griffe für Polylinien
     public float PolyLineHandleTouchRadius { get; set; } // Touch-Radius der Griffe für Polylinien
