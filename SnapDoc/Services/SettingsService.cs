@@ -92,6 +92,8 @@ public partial class SettingsService : ObservableObject
 
     [ObservableProperty] private string _selectedAppLanguage = Settings.Languages.First().Value;
     [ObservableProperty] private string _selectedCameraTool = Settings.CameraTools.First();
+    [ObservableProperty] private int _flashMode = 0;
+    [ObservableProperty] private double _captureRatio = 1.33;
     [ObservableProperty] private string _appVersion = AppInfo.VersionString;
     [ObservableProperty] private bool _isProjectLoaded = false;
     [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
@@ -333,6 +335,7 @@ public partial class SettingsService : ObservableObject
             SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
             SelectedAppLanguage = AppLanguages.IndexOf(SelectedAppLanguage),
             SelectedCameraTool = AppCameraTools.IndexOf(SelectedCameraTool),
+            CaptureRatio = CaptureRatio,
             IconSortCrit = IconSortCrits.IndexOf(IconSortCrit),
             PinSortCrit = PinSortCrits.IndexOf(PinSortCrit),
             IconCategory = IconCategories.IndexOf(IconCategory),
@@ -411,7 +414,8 @@ public partial class SettingsService : ObservableObject
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
             SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
             SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
-            SelectedCameraTool = (settings.SelectedCameraTool < AppCameraTools.Count) ? AppCameraTools[settings.SelectedAppLanguage] : AppCameraTools[0];
+            SelectedCameraTool = (settings.SelectedCameraTool < AppCameraTools.Count) ? AppCameraTools[settings.SelectedCameraTool] : AppCameraTools[0];
+            CaptureRatio = settings.CaptureRatio;
             IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0) ? IconCategories[settings.IconCategory] : IconCategories[0];
             IsPlanExport = settings.IsPlanExport;
             IsPosImageExport = settings.IsPosImageExport;
@@ -482,6 +486,8 @@ public partial class SettingsService : ObservableObject
         SelectedColorTheme = defaultSettings.SelectedColorTheme;
         SelectedAppTheme = defaultSettings.SelectedAppTheme;
         SelectedAppLanguage = defaultSettings.SelectedAppLanguage;
+        SelectedCameraTool  = defaultSettings.SelectedCameraTool;
+        CaptureRatio = defaultSettings.CaptureRatio;
         IconSortCrit = defaultSettings.IconSortCrit;
         PinSortCrit = defaultSettings.PinSortCrit;
         IconCategory = defaultSettings.IconCategory;

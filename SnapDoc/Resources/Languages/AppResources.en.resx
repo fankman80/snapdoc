@@ -837,4 +837,7 @@
   <data name="auf_anderen_plan_kopieren" xml:space="preserve">
     <value>Copy to another plan</value>
   </data>
+  <data name="kamera" xml:space="preserve">
+    <value>Camera</value>
+  </data>
 </root>

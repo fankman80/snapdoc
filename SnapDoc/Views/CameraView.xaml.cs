@@ -1,15 +1,16 @@
 using Camera.MAUI;
+using SnapDoc.Services;
 using System.Diagnostics;
 
 namespace SnapDoc.Views;
 
 public partial class CameraView : ContentPage
 {
-    private string? tempFilePath = string.Empty;
-    private Size _optimalPhotoSize;
-    private Size _optimalPreviewSize;
-    private double? _userSelectedRatio = null;
-    private FlashMode _currentFlashMode = FlashMode.Auto;
+    private string? _tempFilePath = string.Empty;
+    private Size _optimalSize;
+    private double _userSelectedRatio = SettingsService.Instance.CaptureRatio;
+    private FlashMode _currentFlashMode = (FlashMode)SettingsService.Instance.FlashMode;
+    private CancellationTokenSource? _resizeCts;
 
     public CameraView()
     {
@@ -41,14 +42,10 @@ public partial class CameraView : ContentPage
 
     private async Task InitializeCameraSelection()
     {
-        // Wir starten explizit mit 4:3 (1.33), da dies meist der volle Sensor ist
-        _userSelectedRatio = 1.33;
+        var photo = GetOptimalSize(_userSelectedRatio);
+        _optimalSize = photo;
 
-        var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
-        _optimalPhotoSize = photo;
-        _optimalPreviewSize = preview;
-
-        if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+        if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
         {
             UpdateCameraLayout();
             cameraView.FlashMode = _currentFlashMode;
@@ -79,7 +76,7 @@ public partial class CameraView : ContentPage
             {
                 if (child is Button btn && btn.CommandParameter is double val)
                 {
-                    if (Math.Abs(val - (_userSelectedRatio ?? 0)) < 0.05)
+                    if (Math.Abs(val - _userSelectedRatio) < 0.05)
                     {
                         btn.TextColor = Colors.Yellow;
                         break;
@@ -99,26 +96,23 @@ public partial class CameraView : ContentPage
         return ratio.ToString("F2");
     }
 
-    private (Size photo, Size preview) GetOptimalMatchedPair(double? targetRatio = null)
+    private Size GetOptimalSize(double? targetRatio = null)
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null || available.Count == 0) return (new Size(0, 0), new Size(0, 0));
+        if (available == null || available.Count == 0) return new Size(0, 0);
 
-        var selectedGroup = available
+        return available
             .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
             .OrderBy(g => Math.Abs(g.Key - (targetRatio ?? 1.33)))
+            .First()
+            .OrderByDescending(r => r.Width)
             .First();
-
-        var photoCandidate = selectedGroup.OrderByDescending(r => r.Width).First();
-        var previewCandidate = selectedGroup.OrderByDescending(r => r.Width).First();
-
-        return (photoCandidate, previewCandidate);
     }
 
     private async Task RestartPreview()
     {
         await cameraView.StopCameraAsync();
-        if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+        if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
         {
             UpdateCameraLayout();
             cameraView.FlashMode = _currentFlashMode;
@@ -137,6 +131,8 @@ public partial class CameraView : ContentPage
 
         cameraView.FlashMode = _currentFlashMode;
         UpdateFlashButtonUI();
+
+        SettingsService.Instance.FlashMode = (int)_currentFlashMode;
     }
 
     protected override void OnSizeAllocated(double width, double height)
@@ -145,66 +141,51 @@ public partial class CameraView : ContentPage
         if (width <= 0 || height <= 0)
             return;
 
-        MainThread.BeginInvokeOnMainThread(async () => {
-            await Task.Delay(200);
+        UpdateCameraLayout();
 
-            if (cameraView.Camera != null)
+        _resizeCts?.Cancel();
+        _resizeCts = new CancellationTokenSource();
+        var token = _resizeCts.Token;
+
+        _ = Task.Run(async () => {
+            try
             {
-                try
-                {
-                    await cameraView.StopCameraAsync();
-                    if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
-                    {
-                        cameraView.FlashMode = _currentFlashMode;
-                        UpdateCameraLayout();
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Fehler beim Re-Start nach Rotation: {ex.Message}");
-                }
+                await Task.Delay(500, token);
+                // Hier könnte man prüfen, ob die Kamera noch lebt
+                // unter Windows meist nicht nötig, solange man nicht Stop/Start ruft
             }
-            else
-                UpdateCameraLayout();
+            catch (OperationCanceledException) { }
         });
     }
 
     private void UpdateCameraLayout()
     {
-        if (cameraView.Camera == null || CameraContainer.Width <= 0 || _optimalPreviewSize.Width <= 0)
+        if (cameraView == null || cameraView.Camera == null)
             return;
 
-        cameraView.WidthRequest = -1;
-        cameraView.HeightRequest = -1;
-
-        double streamWidth = _optimalPreviewSize.Width;
-        double streamHeight = _optimalPreviewSize.Height;
-
-        bool isPortrait = DeviceDisplay.MainDisplayInfo.Orientation == DisplayOrientation.Portrait;
-        if (isPortrait && streamWidth > streamHeight)
-        {
-            streamWidth = _optimalPreviewSize.Height;
-            streamHeight = _optimalPreviewSize.Width;
-        }
-
-        double streamRatio = streamWidth / streamHeight;
+        double targetRatio = (double)_optimalSize.Width / _optimalSize.Height;
         double containerWidth = CameraContainer.Width;
         double containerHeight = CameraContainer.Height;
 
-        double finalWidth, finalHeight;
-        if ((containerWidth / containerHeight) > streamRatio)
+        if (containerWidth <= 0 || containerHeight <= 0)
+            return;
+
+        // 2. Berechne "Aspect Fill" oder "Aspect Fit" manuell
+        double containerRatio = containerWidth / containerHeight;
+
+        if (containerRatio > targetRatio)
         {
-            finalHeight = containerHeight;
-            finalWidth = containerHeight * streamRatio;
+            cameraView.HeightRequest = containerHeight;
+            cameraView.WidthRequest = containerHeight * targetRatio;
         }
         else
         {
-            finalWidth = containerWidth;
-            finalHeight = containerWidth / streamRatio;
+            cameraView.WidthRequest = containerWidth;
+            cameraView.HeightRequest = containerWidth / targetRatio;
         }
 
-        cameraView.WidthRequest = finalWidth;
-        cameraView.HeightRequest = finalHeight;
+        cameraView.HorizontalOptions = LayoutOptions.Center;
+        cameraView.VerticalOptions = LayoutOptions.Center;
     }
 
     private void UpdateFlashButtonUI()
@@ -227,27 +208,21 @@ public partial class CameraView : ContentPage
             flashOverlay.IsVisible = true;
             flashOverlay.Opacity = 1;
 
-            await cameraView.StopCameraAsync();
+            using var stream = await cameraView.TakePhotoAsync();
 
-            if (await cameraView.StartCameraAsync(_optimalPhotoSize) == CameraResult.Success)
+            if (stream != null)
             {
-                await Task.Delay(350);
-                using var stream = await cameraView.TakePhotoAsync();
+                _tempFilePath = await SavePhotoToCache(stream);
+                await cameraView.StopCameraAsync();
 
-                if (stream != null)
+                if (!string.IsNullOrEmpty(_tempFilePath))
                 {
-                    tempFilePath = await SavePhotoToCache(stream);
-                    await cameraView.StopCameraAsync();
-
-                    if (!string.IsNullOrEmpty(tempFilePath))
-                    {
-                        previewImage.Source = ImageSource.FromFile(tempFilePath);
-                        ToggleUI(isPreview: true);
-                        await flashOverlay.FadeToAsync(0, 400, Easing.CubicOut);
-                        flashOverlay.IsVisible = false;
-                    }
+                    previewImage.Source = ImageSource.FromFile(_tempFilePath);
+                    ToggleUI(isPreview: true);
+                    await flashOverlay.FadeToAsync(0, 400, Easing.CubicOut);
                 }
             }
+            flashOverlay.IsVisible = false;
         }
         catch (Exception ex)
         {
@@ -259,15 +234,15 @@ public partial class CameraView : ContentPage
 
     private async void OnRetakeClicked(object sender, EventArgs e)
     {
-        if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
-        tempFilePath = string.Empty;
+        if (File.Exists(_tempFilePath)) File.Delete(_tempFilePath);
+        _tempFilePath = string.Empty;
         await RestartPreview();
         ToggleUI(isPreview: false);
     }
 
     private async void OnConfirmClicked(object sender, EventArgs e)
     {
-        CameraResultService.SetResult(!string.IsNullOrEmpty(tempFilePath) ? new FileResult(tempFilePath) : null);
+        CameraResultService.SetResult(!string.IsNullOrEmpty(_tempFilePath) ? new FileResult(_tempFilePath) : null);
         await Shell.Current.GoToAsync("..");
     }
 
@@ -292,17 +267,21 @@ public partial class CameraView : ContentPage
 
             selectedButton.TextColor = Colors.Yellow;
 
-            var (photo, preview) = GetOptimalMatchedPair(_userSelectedRatio);
-            _optimalPhotoSize = photo;
-            _optimalPreviewSize = preview;
+            var photo = GetOptimalSize(_userSelectedRatio);
+            _optimalSize = photo;
 
             await cameraView.StopCameraAsync();
-            if (await cameraView.StartCameraAsync(_optimalPreviewSize) == CameraResult.Success)
+            if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
                 UpdateCameraLayout();
                 await Task.Delay(150); // Kurz warten, bis der native Stream stabil ist
                 UpdateCameraLayout();
             }
+
+            SettingsService.Instance.CaptureRatio = _userSelectedRatio;
+
+            // save data to file
+            GlobalJson.SaveToFile();
         }
     }
 

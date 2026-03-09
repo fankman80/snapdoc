@@ -27,8 +27,6 @@ public class CapturePicture
 
         try
         {
-            var camTools = Settings.CameraTools;
-
             FileResult foto = SettingsService.Instance.SelectedCameraTool switch
             {
                 var s when s == Settings.CameraTools[1] => await MediaPicker.Default.CapturePhotoAsync(),

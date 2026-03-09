@@ -925,6 +925,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
+        /// </summary>
+        internal static string kamera {
+            get {
+                return ResourceManager.GetString("kamera", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kartenservice ähnelt.
         /// </summary>
         internal static string kartenservice {

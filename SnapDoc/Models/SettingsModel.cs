@@ -52,6 +52,7 @@ internal class SettingsModel
     public float GpsMinTimeUpdate { get; set; } // Minimale Zeitänderung für GPS-Updates
     public bool IsGpsActive { get; set; } // GPS Ein/Aus
     public int SelectedCameraTool { get; set; } // Ausgewähltes Kamera-Tool / 0 = Auto, 1 = System Kamera, 2 = Maui.Camera
+    public double CaptureRatio { get; set; } // Seitenverhältnis für die Kameraaufnahme
     public string? EditorTheme { get; set; } // Json Editor Thema
     public float PolyLineHandleRadius { get; set; } // Radius der Griffe für Polylinien
     public float PolyLineHandleTouchRadius { get; set; } // Touch-Radius der Griffe für Polylinien

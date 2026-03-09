@@ -333,7 +333,7 @@
                                     <RowDefinition Height="Auto" />
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
-                                <Label Grid.Column="0" Grid.Row="0" Text="Kamera" VerticalOptions="Center"/>
+                                <Label Grid.Column="0" Grid.Row="0" Text="{x:Static res:AppResources.kamera}" VerticalOptions="Center"/>
                                 <Border Grid.Column="1" Grid.Row="0" Stroke="{DynamicResource SecondaryBackground}"
                                         VerticalOptions="Fill"
                                         StrokeThickness="1"
