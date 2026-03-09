@@ -31,16 +31,16 @@ ${title_image}
 // Titelbild
 
 ${pin_nr}
-// Laufende Nummer des Pins
+// Fortlaufende Nummer des Pins
 
 ${pin_planName}
-// Name des Plans, auf dem der Pin liegt
+// Name des Plans
 
 ${pin_posImage}
-// Position des Pins im Bildkoordinatensystem
+// Positionsbild des Pins (Planausschnitt)
 
 ${pin_fotoList}
-// Zugehörige Fotos des Pins
+// Die dem Pin zugehörige Fotos
 
 ${pin_name}
 // Titel oder Bezeichnung des Pins

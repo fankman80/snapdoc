@@ -151,8 +151,6 @@ public partial class CameraView : ContentPage
             try
             {
                 await Task.Delay(500, token);
-                // Hier könnte man prüfen, ob die Kamera noch lebt
-                // unter Windows meist nicht nötig, solange man nicht Stop/Start ruft
             }
             catch (OperationCanceledException) { }
         });
@@ -171,6 +169,7 @@ public partial class CameraView : ContentPage
         double sWidth = _optimalSize.Width;
         double sHeight = _optimalSize.Height;
         bool isPortrait = DeviceDisplay.MainDisplayInfo.Orientation == DisplayOrientation.Portrait;
+
         if (isPortrait && sWidth > sHeight)
         {
             sWidth = _optimalSize.Height;
@@ -244,7 +243,8 @@ public partial class CameraView : ContentPage
 
     private async void OnRetakeClicked(object sender, EventArgs e)
     {
-        if (File.Exists(_tempFilePath)) File.Delete(_tempFilePath);
+        if (File.Exists(_tempFilePath))
+            File.Delete(_tempFilePath);
         _tempFilePath = string.Empty;
         await RestartPreview();
         ToggleUI(isPreview: false);
@@ -312,7 +312,8 @@ public partial class CameraView : ContentPage
         string cachePath = Path.Combine(FileSystem.CacheDirectory, $"Capture_{DateTime.Now:yyyyMMdd_HHmmss}.jpg");
         using (FileStream fileStream = File.Create(cachePath))
         {
-            if (photoStream.CanSeek) photoStream.Position = 0;
+            if (photoStream.CanSeek)
+                photoStream.Position = 0;
             await photoStream.CopyToAsync(fileStream);
         }
         return cachePath;
