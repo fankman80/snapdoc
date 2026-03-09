@@ -160,19 +160,29 @@ public partial class CameraView : ContentPage
 
     private void UpdateCameraLayout()
     {
-        if (cameraView == null || cameraView.Camera == null)
+        if (cameraView?.Camera == null || CameraContainer.Width <= 0 || CameraContainer.Height <= 0)
             return;
 
-        double targetRatio = (double)_optimalSize.Width / _optimalSize.Height;
+        // Reset: Verhindert, dass alte Maße die Berechnung blockieren
+        cameraView.WidthRequest = -1;
+        cameraView.HeightRequest = -1;
+
+        // Sensor-Maße holen
+        double sWidth = _optimalSize.Width;
+        double sHeight = _optimalSize.Height;
+        bool isPortrait = DeviceDisplay.MainDisplayInfo.Orientation == DisplayOrientation.Portrait;
+        if (isPortrait && sWidth > sHeight)
+        {
+            sWidth = _optimalSize.Height;
+            sHeight = _optimalSize.Width;
+        }
+
+        double targetRatio = sWidth / sHeight;
         double containerWidth = CameraContainer.Width;
         double containerHeight = CameraContainer.Height;
-
-        if (containerWidth <= 0 || containerHeight <= 0)
-            return;
-
-        // 2. Berechne "Aspect Fill" oder "Aspect Fit" manuell
         double containerRatio = containerWidth / containerHeight;
 
+        // Skalierung berechnen (Aspect Fit)
         if (containerRatio > targetRatio)
         {
             cameraView.HeightRequest = containerHeight;
@@ -273,9 +283,12 @@ public partial class CameraView : ContentPage
             await cameraView.StopCameraAsync();
             if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
+                await Task.Delay(250);
                 UpdateCameraLayout();
-                await Task.Delay(150); // Kurz warten, bis der native Stream stabil ist
-                UpdateCameraLayout();
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await Task.Delay(100);
+                    UpdateCameraLayout();
+                });
             }
 
             SettingsService.Instance.CaptureRatio = _userSelectedRatio;
