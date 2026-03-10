@@ -286,28 +286,30 @@ public partial class CameraView : ContentPage
             _userSelectedRatio = newRatio;
             _isRatioPickerExpanded = false;
 
-            selectedButton.TextColor = Colors.Yellow;
-
-            var photo = GetOptimalSize(_userSelectedRatio);
-            _optimalSize = photo;
-
-            await cameraView.StopCameraAsync();
-            if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
-            {
-                await Task.Delay(250);
-                UpdateCameraLayout();
-                MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(100);
-                    UpdateCameraLayout();
-                });
-            }
-
             SettingsService.Instance.CaptureRatio = _userSelectedRatio;
-
-            // save data to file
-            GlobalJson.SaveToFile();
+            GlobalJson.SaveToFile(); 
 
             UpdateRatioPickerUI();
+
+            try 
+            {
+                var photo = GetOptimalSize(_userSelectedRatio);
+                _optimalSize = photo;
+
+                await cameraView.StopCameraAsync();
+            
+                if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
+                {
+                    UpdateCameraLayout();
+                
+                    await Task.Delay(100);
+                    UpdateCameraLayout();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fehler beim Kamera-Ratio-Wechsel: {ex.Message}");
+            }
         }
     }
 
