@@ -7,6 +7,9 @@
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill" BackgroundColor="Black">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnContainerTapped" />
+        </Grid.GestureRecognizers>
         <Grid x:Name="CameraContainer" 
               HorizontalOptions="Fill" 
               VerticalOptions="Fill">
@@ -39,7 +42,8 @@
                              HorizontalOptions="End" 
                              VerticalOptions="Start" 
                              Margin="0,16,16,0" 
-                             Spacing="10">
+                             Spacing="10"
+                             Opacity="0">
             <BindableLayout.ItemTemplate>
                 <DataTemplate x:DataType="local:RatioItem">
                     <Button Text="{Binding Name}"

@@ -11,6 +11,7 @@ public partial class CameraView : ContentPage
     private double _userSelectedRatio = SettingsService.Instance.CaptureRatio;
     private FlashMode _currentFlashMode = (FlashMode)SettingsService.Instance.FlashMode;
     private CancellationTokenSource? _resizeCts;
+    private bool _isRatioPickerExpanded = false;
 
     public CameraView()
     {
@@ -57,8 +58,7 @@ public partial class CameraView : ContentPage
     private void PopulateRatioButtons()
     {
         var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null)
-            return;
+        if (available == null) return;
 
         var uniqueRatios = available
             .Select(r => new { Ratio = Math.Round((double)r.Width / r.Height, 2), Name = GetRatioName(Math.Round((double)r.Width / r.Height, 2)) })
@@ -69,20 +69,23 @@ public partial class CameraView : ContentPage
 
         BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
+        // WICHTIG: Kein langer Delay mehr
         MainThread.BeginInvokeOnMainThread(async () => {
-            await Task.Delay(300);
-        
-            foreach (var child in ratioContainer.Children)
+            // Kurzes Warten, bis die UI-Elemente im Baum sind
+            int timeout = 0;
+            while (ratioContainer.Children.Count == 0 && timeout < 10)
             {
-                if (child is Button btn && btn.CommandParameter is double val)
-                {
-                    if (Math.Abs(val - _userSelectedRatio) < 0.05)
-                    {
-                        btn.TextColor = Colors.Yellow;
-                        break;
-                    }
-                }
+                await Task.Delay(50);
+                timeout++;
             }
+
+            _isRatioPickerExpanded = false;
+
+            // Update ohne Animation (silent), damit es sofort stimmt
+            UpdateRatioPickerUI(animate: false);
+
+            // Jetzt den ganzen Container weich einblenden
+            await ratioContainer.FadeToAsync(1, 200);
         });
     }
 
@@ -273,13 +276,15 @@ public partial class CameraView : ContentPage
         var selectedButton = sender as Button;
         if (selectedButton?.CommandParameter is double newRatio)
         {
-            _userSelectedRatio = newRatio;
-
-            foreach (var child in ratioContainer.Children)
+            if (!_isRatioPickerExpanded)
             {
-                if (child is Button btn)
-                    btn.TextColor = Colors.White;
+                _isRatioPickerExpanded = true;
+                UpdateRatioPickerUI();
+                return;
             }
+
+            _userSelectedRatio = newRatio;
+            _isRatioPickerExpanded = false;
 
             selectedButton.TextColor = Colors.Yellow;
 
@@ -301,6 +306,53 @@ public partial class CameraView : ContentPage
 
             // save data to file
             GlobalJson.SaveToFile();
+
+            UpdateRatioPickerUI();
+        }
+    }
+
+    private void OnContainerTapped(object sender, EventArgs e)
+    {
+        if (_isRatioPickerExpanded)
+        {
+            _isRatioPickerExpanded = false;
+            UpdateRatioPickerUI();
+        }
+    }
+
+    private void UpdateRatioPickerUI(bool animate = true)
+    {
+        foreach (var child in ratioContainer.Children)
+        {
+            if (child is Button btn && btn.CommandParameter is double val)
+            {
+                bool isSelected = Math.Abs(val - _userSelectedRatio) < 0.05;
+                bool shouldBeVisible = _isRatioPickerExpanded || isSelected;
+
+                // Farbe setzen
+                btn.TextColor = isSelected ? Colors.Yellow : Colors.White;
+
+                if (shouldBeVisible)
+                {
+                    if (!btn.IsVisible)
+                    {
+                        btn.IsVisible = true;
+                        if (animate)
+                        {
+                            btn.Opacity = 0;
+                            btn.FadeToAsync(0.8, 250);
+                        }
+                        else
+                        {
+                            btn.Opacity = 0.8;
+                        }
+                    }
+                }
+                else
+                {
+                    btn.IsVisible = false;
+                }
+            }
         }
     }
 
