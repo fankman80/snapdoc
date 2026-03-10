@@ -47,10 +47,10 @@ public partial class CameraView : ContentPage
 
         if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
         {
-            UpdateCameraLayout();
             cameraView.FlashMode = _currentFlashMode;
             UpdateFlashButtonUI();
             PopulateRatioButtons();
+            UpdateCameraLayout(this.Width, this.Height);
         }
     }
 
@@ -141,7 +141,7 @@ public partial class CameraView : ContentPage
         if (width <= 0 || height <= 0)
             return;
 
-        UpdateCameraLayout();
+        UpdateCameraLayout(width, height);
 
         _resizeCts?.Cancel();
         _resizeCts = new CancellationTokenSource();
@@ -156,19 +156,24 @@ public partial class CameraView : ContentPage
         });
     }
 
-    private void UpdateCameraLayout()
+    private void UpdateCameraLayout(double? overrideWidth = null, double? overrideHeight = null)
     {
-        if (cameraView?.Camera == null || CameraContainer.Width <= 0 || CameraContainer.Height <= 0)
+        if (cameraView?.Camera == null)
             return;
 
-        // Reset: Verhindert, dass alte Maße die Berechnung blockieren
+        double availableWidth = (overrideWidth > 0) ? overrideWidth.Value : this.Width;
+        double availableHeight = (overrideHeight > 0) ? overrideHeight.Value : this.Height;
+
+        if (availableWidth <= 0 || availableHeight <= 0)
+            return;
+
+        // Reset
         cameraView.WidthRequest = -1;
         cameraView.HeightRequest = -1;
 
-        // Sensor-Maße holen
         double sWidth = _optimalSize.Width;
         double sHeight = _optimalSize.Height;
-        bool isPortrait = DeviceDisplay.MainDisplayInfo.Orientation == DisplayOrientation.Portrait;
+        bool isPortrait = availableHeight > availableWidth;
 
         if (isPortrait && sWidth > sHeight)
         {
@@ -177,22 +182,23 @@ public partial class CameraView : ContentPage
         }
 
         double targetRatio = sWidth / sHeight;
-        double containerWidth = CameraContainer.Width;
-        double containerHeight = CameraContainer.Height;
-        double containerRatio = containerWidth / containerHeight;
+        double containerRatio = availableWidth / availableHeight;
 
-        // Skalierung berechnen (Aspect Fit)
+        double finalWidth, finalHeight;
+
         if (containerRatio > targetRatio)
         {
-            cameraView.HeightRequest = containerHeight;
-            cameraView.WidthRequest = containerHeight * targetRatio;
+            finalHeight = availableHeight;
+            finalWidth = availableHeight * targetRatio;
         }
         else
         {
-            cameraView.WidthRequest = containerWidth;
-            cameraView.HeightRequest = containerWidth / targetRatio;
+            finalWidth = availableWidth;
+            finalHeight = availableWidth / targetRatio;
         }
 
+        cameraView.WidthRequest = finalWidth;
+        cameraView.HeightRequest = finalHeight;
         cameraView.HorizontalOptions = LayoutOptions.Center;
         cameraView.VerticalOptions = LayoutOptions.Center;
     }
