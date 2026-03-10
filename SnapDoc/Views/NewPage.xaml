@@ -97,6 +97,10 @@
                   IsVisible="False"
                   AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                   AbsoluteLayout.LayoutFlags="All">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnFullScreenButtonClicked" />
+                </Grid.GestureRecognizers>
+                
                 <Border
                     BackgroundColor="{DynamicResource Primary}"
                     StrokeThickness="0"
@@ -235,12 +239,6 @@
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="85,0,0,24"
                        ZIndex="10001"/>
-                <Button InputTransparent="False"
-                        Visual="None"
-                        CornerRadius="0"
-                        BackgroundColor="Transparent"
-                        VerticalOptions="Fill"
-                        Clicked="OnFullScreenButtonClicked"/>
             </Grid>
 
             <Button x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
