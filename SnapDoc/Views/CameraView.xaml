@@ -10,6 +10,7 @@
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnContainerTapped" />
         </Grid.GestureRecognizers>
+        
         <Grid x:Name="CameraContainer" 
               HorizontalOptions="Fill" 
               VerticalOptions="Fill">
@@ -17,6 +18,31 @@
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
         </Grid>
+
+        <VerticalStackLayout x:Name="zoomContainer"
+                             VerticalOptions="Center" 
+                             HorizontalOptions="End" 
+                             Margin="0,0,20,0"
+                             IsVisible="False"
+                             Opacity="0">
+
+            <Slider x:Name="zoomSlider"
+                    Minimum="1"
+                    Maximum="10"
+                    Rotation="-90"
+                    TranslationX="110"
+                    WidthRequest="250"
+                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    MinimumTrackColor="White"
+                    MaximumTrackColor="White"
+                    ValueChanged="OnZoomSliderValueChanged" />
+
+            <Label Text="{Binding Source={x:Reference zoomSlider}, Path=Value, StringFormat='{0:F1}x'}"
+                   TextColor="Yellow"
+                   HorizontalOptions="Center" 
+                   TranslationX="110"
+                   TranslationY="110" />
+        </VerticalStackLayout>
 
         <Image x:Name="previewImage" 
                IsVisible="False" 

@@ -12,6 +12,8 @@ public partial class CameraView : ContentPage
     private FlashMode _currentFlashMode = (FlashMode)SettingsService.Instance.FlashMode;
     private CancellationTokenSource? _resizeCts;
     private bool _isRatioPickerExpanded = false;
+    private CancellationTokenSource? _zoomTimerCts;
+    private bool _isZoomSupported = false;
 
     public CameraView()
     {
@@ -48,9 +50,25 @@ public partial class CameraView : ContentPage
 
         if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
         {
+            // Prüfen, ob Zoom unterstützt wird
+            _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
+            if (_isZoomSupported)
+            {
+                zoomSlider.Minimum = cameraView.MinZoomFactor;
+                zoomSlider.Maximum = Math.Min(cameraView.MaxZoomFactor, 8);
+                zoomSlider.Value = cameraView.ZoomFactor;
+            }
+            zoomContainer.IsVisible = false;
+            zoomContainer.Opacity = 0;
+
+            // Blitzmodus setzen
             cameraView.FlashMode = _currentFlashMode;
             UpdateFlashButtonUI();
+
+            // Ratio-Buttons befüllen
             PopulateRatioButtons();
+
+            // Layout anpassen
             UpdateCameraLayout(this.Width, this.Height);
         }
     }
@@ -69,9 +87,7 @@ public partial class CameraView : ContentPage
 
         BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
-        // WICHTIG: Kein langer Delay mehr
         MainThread.BeginInvokeOnMainThread(async () => {
-            // Kurzes Warten, bis die UI-Elemente im Baum sind
             int timeout = 0;
             while (ratioContainer.Children.Count == 0 && timeout < 10)
             {
@@ -80,11 +96,7 @@ public partial class CameraView : ContentPage
             }
 
             _isRatioPickerExpanded = false;
-
-            // Update ohne Animation (silent), damit es sofort stimmt
             UpdateRatioPickerUI(animate: false);
-
-            // Jetzt den ganzen Container weich einblenden
             await ratioContainer.FadeToAsync(1, 200);
         });
     }
@@ -219,6 +231,39 @@ public partial class CameraView : ContentPage
         };
     }
 
+    private void OnZoomSliderValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        if (!_isZoomSupported)
+            return;
+
+        cameraView.ZoomFactor = (float)e.NewValue;
+        ShowZoomSliderWithTimeout();
+    }
+
+    private async void ShowZoomSliderWithTimeout()
+    {
+        _zoomTimerCts?.Cancel();
+        _zoomTimerCts = new CancellationTokenSource();
+        var token = _zoomTimerCts.Token;
+
+        try
+        {
+            if (!zoomContainer.IsVisible)
+            {
+                zoomContainer.IsVisible = true;
+                await zoomContainer.FadeToAsync(1, 250, Easing.CubicOut);
+            }
+
+            await Task.Delay(3000, token);
+            await zoomContainer.FadeToAsync(0, 500, Easing.CubicIn);
+            zoomContainer.IsVisible = false;
+        }
+        catch (OperationCanceledException)
+        {
+            // Timer wurde durch neue Interaktion abgebrochen - alles gut!
+        }
+    }
+
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
         try
@@ -273,8 +318,7 @@ public partial class CameraView : ContentPage
 
     private async void OnRatioClicked(object sender, EventArgs e)
     {
-        var selectedButton = sender as Button;
-        if (selectedButton == null || selectedButton.CommandParameter == null)
+        if (sender is not Button selectedButton || selectedButton.CommandParameter == null)
             return;
 
         double newRatio = Convert.ToDouble(selectedButton.CommandParameter);
@@ -330,6 +374,9 @@ public partial class CameraView : ContentPage
             _isRatioPickerExpanded = false;
             UpdateRatioPickerUI();
         }
+
+        if (_isZoomSupported)
+            ShowZoomSliderWithTimeout();
     }
 
     private void UpdateRatioPickerUI(bool animate = true)
