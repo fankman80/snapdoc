@@ -54,12 +54,12 @@ public partial class CameraView : ContentPage
             _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
             if (_isZoomSupported)
             {
-                zoomSlider.Minimum = cameraView.MinZoomFactor;
-                zoomSlider.Maximum = Math.Min(cameraView.MaxZoomFactor, 8);
-                zoomSlider.Value = cameraView.ZoomFactor;
+                customZoomSlider.Minimum = cameraView.MinZoomFactor;
+                customZoomSlider.Maximum = Math.Min(cameraView.MaxZoomFactor, 10);
+                customZoomSlider.Value = cameraView.ZoomFactor;
             }
-            zoomContainer.IsVisible = false;
-            zoomContainer.Opacity = 0;
+            customZoomSlider.IsVisible = false;
+            customZoomSlider.Opacity = 0;
 
             // Blitzmodus setzen
             cameraView.FlashMode = _currentFlashMode;
@@ -248,15 +248,15 @@ public partial class CameraView : ContentPage
 
         try
         {
-            if (!zoomContainer.IsVisible)
+            if (!customZoomSlider.IsVisible)
             {
-                zoomContainer.IsVisible = true;
-                await zoomContainer.FadeToAsync(1, 250, Easing.CubicOut);
+                customZoomSlider.IsVisible = true;
+                await customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut);
             }
 
             await Task.Delay(3000, token);
-            await zoomContainer.FadeToAsync(0, 500, Easing.CubicIn);
-            zoomContainer.IsVisible = false;
+            await customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn);
+            customZoomSlider.IsVisible = false;
         }
         catch (OperationCanceledException)
         {
