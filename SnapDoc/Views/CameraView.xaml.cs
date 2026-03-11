@@ -274,42 +274,50 @@ public partial class CameraView : ContentPage
     private async void OnRatioClicked(object sender, EventArgs e)
     {
         var selectedButton = sender as Button;
-        if (selectedButton?.CommandParameter is double newRatio)
-        {
-            if (!_isRatioPickerExpanded)
-            {
-                _isRatioPickerExpanded = true;
-                UpdateRatioPickerUI();
-                return;
-            }
-
-            _userSelectedRatio = newRatio;
-            _isRatioPickerExpanded = false;
-
-            SettingsService.Instance.CaptureRatio = _userSelectedRatio;
-            GlobalJson.SaveToFile(); 
-
-            UpdateRatioPickerUI();
-
-            try 
-            {
-                var photo = GetOptimalSize(_userSelectedRatio);
-                _optimalSize = photo;
-
-                await cameraView.StopCameraAsync();
+    
+        if (selectedButton == null || selectedButton.CommandParameter == null)
+            return;
             
-                if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
-                {
-                    UpdateCameraLayout();
-                
-                    await Task.Delay(100);
-                    UpdateCameraLayout();
-                }
-            }
-            catch (Exception ex)
+        double newRatio = Convert.ToDouble(selectedButton.CommandParameter);
+
+        if (!_isRatioPickerExpanded)
+        {
+            _isRatioPickerExpanded = true;
+            UpdateRatioPickerUI();
+            return;
+        }
+
+        _userSelectedRatio = newRatio;
+        _isRatioPickerExpanded = false;
+
+        // Speichern
+        SettingsService.Instance.CaptureRatio = _userSelectedRatio;
+        GlobalJson.SaveToFile(); 
+
+        UpdateRatioPickerUI();
+
+        try 
+        {
+            await cameraView.StopCameraAsync();
+
+            cameraView.WidthRequest = 0;
+            cameraView.HeightRequest = 0;
+            await Task.Yield(); 
+            _optimalSize = GetOptimalSize(_userSelectedRatio);
+
+            if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
-                Debug.WriteLine($"Fehler beim Kamera-Ratio-Wechsel: {ex.Message}");
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await Task.Delay(100); 
+                    UpdateCameraLayout();
+                    await Task.Delay(50);
+                    UpdateCameraLayout();
+                });
             }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler beim Ratio-Wechsel: {ex.Message}");
         }
     }
 
