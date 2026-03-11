@@ -288,29 +288,33 @@ public partial class CameraView : ContentPage
 
         _userSelectedRatio = newRatio;
         _isRatioPickerExpanded = false;
-        SettingsService.Instance.CaptureRatio = _userSelectedRatio;
-        GlobalJson.SaveToFile(); 
         UpdateRatioPickerUI();
+
+        SettingsService.Instance.CaptureRatio = _userSelectedRatio;
+
+        try
+        {
+            await Task.Run(() => { GlobalJson.SaveToFile(); });
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"JSON Speicherfehler: {ex.Message}");
+        }
 
         try 
         {
             await cameraView.StopCameraAsync();
-            await Task.Delay(200);
+            await Task.Delay(100);
             _optimalSize = GetOptimalSize(_userSelectedRatio);
             var result = await cameraView.StartCameraAsync(_optimalSize);
         
             if (result == CameraResult.Success)
             {
                 MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(150); // Puffer für den Grafik-Buffer
+                    await Task.Delay(150);
                     UpdateCameraLayout();
                     this.InvalidateMeasure(); 
                 });
-            }
-            else
-            {
-                Debug.WriteLine($"Kamera-Start fehlgeschlagen: {result}");
-                await cameraView.StartCameraAsync(new Size(640, 480));
             }
         }
         catch (Exception ex)
