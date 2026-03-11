@@ -37,7 +37,9 @@
                     MaximumTrackColor="White"
                     ValueChanged="OnZoomSliderValueChanged" />
 
-            <Label Text="{Binding Source={x:Reference zoomSlider}, Path=Value, StringFormat='{0:F1}x'}"
+            <Label BindingContext="{x:Reference zoomSlider}"
+                   Text="{Binding Value, StringFormat='{0:F1}x'}"
+                   x:DataType="Slider"
                    TextColor="Yellow"
                    HorizontalOptions="Center" 
                    TranslationX="110"
