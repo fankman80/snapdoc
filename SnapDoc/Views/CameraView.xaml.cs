@@ -274,10 +274,9 @@ public partial class CameraView : ContentPage
     private async void OnRatioClicked(object sender, EventArgs e)
     {
         var selectedButton = sender as Button;
-    
         if (selectedButton == null || selectedButton.CommandParameter == null)
             return;
-            
+
         double newRatio = Convert.ToDouble(selectedButton.CommandParameter);
 
         if (!_isRatioPickerExpanded)
@@ -289,30 +288,29 @@ public partial class CameraView : ContentPage
 
         _userSelectedRatio = newRatio;
         _isRatioPickerExpanded = false;
-
-        // Speichern
         SettingsService.Instance.CaptureRatio = _userSelectedRatio;
         GlobalJson.SaveToFile(); 
-
         UpdateRatioPickerUI();
 
         try 
         {
             await cameraView.StopCameraAsync();
-
-            cameraView.WidthRequest = 0;
-            cameraView.HeightRequest = 0;
-            await Task.Yield(); 
+            await Task.Delay(200);
             _optimalSize = GetOptimalSize(_userSelectedRatio);
-
-            if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
+            var result = await cameraView.StartCameraAsync(_optimalSize);
+        
+            if (result == CameraResult.Success)
             {
                 MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(100); 
+                    await Task.Delay(150); // Puffer für den Grafik-Buffer
                     UpdateCameraLayout();
-                    await Task.Delay(50);
-                    UpdateCameraLayout();
+                    this.InvalidateMeasure(); 
                 });
+            }
+            else
+            {
+                Debug.WriteLine($"Kamera-Start fehlgeschlagen: {result}");
+                await cameraView.StartCameraAsync(new Size(640, 480));
             }
         }
         catch (Exception ex)
