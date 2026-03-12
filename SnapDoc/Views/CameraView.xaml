@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"           
              x:Class="SnapDoc.Views.CameraView"
              Shell.NavBarIsVisible="False">
@@ -10,44 +11,37 @@
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnContainerTapped" />
         </Grid.GestureRecognizers>
-        
-        <Grid x:Name="CameraContainer" 
-              HorizontalOptions="Fill" 
+
+        <Grid x:Name="CameraContainer"
+              HorizontalOptions="Fill"
               VerticalOptions="Fill">
             <cv:CameraView x:Name="cameraView"
                            HorizontalOptions="Center"
                            VerticalOptions="Center" />
         </Grid>
 
-        <VerticalStackLayout x:Name="zoomContainer"
-                             VerticalOptions="Center" 
-                             HorizontalOptions="End" 
-                             Margin="0,0,20,0"
-                             IsVisible="False"
-                             Opacity="0">
+        <controls:VerticalZoomSlider x:Name="customZoomSlider"
+                                     VerticalOptions="Center"
+                                     HorizontalOptions="End"
+                                     Margin="0,0,20,0"
+                                     IsVisible="False"
+                                     Opacity="0"
+                                     Minimum="1"
+                                     Maximum="10"
+                                     TrackColor="Gray"
+                                     ActiveTrackColor="Gray"
+                                     ThumbColor="Yellow"
+                                     TextColor="Yellow"
+                                     ThumbRadius="10"
+                                     TrackWidth="5"
+                                     FontSize="16"
+                                     IsFontBold="False"
+                                     HeightRequest="320"
+                                     WidthRequest="80"
+                                     ValueChanged="OnZoomSliderValueChanged" />
 
-            <Slider x:Name="zoomSlider"
-                    Minimum="1"
-                    Maximum="10"
-                    Rotation="-90"
-                    TranslationX="110"
-                    WidthRequest="250"
-                    ThumbColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    MinimumTrackColor="White"
-                    MaximumTrackColor="White"
-                    ValueChanged="OnZoomSliderValueChanged" />
-
-            <Label BindingContext="{x:Reference zoomSlider}"
-                   Text="{Binding Value, StringFormat='{0:F1}x'}"
-                   x:DataType="Slider"
-                   TextColor="Yellow"
-                   HorizontalOptions="Center" 
-                   TranslationX="110"
-                   TranslationY="110" />
-        </VerticalStackLayout>
-
-        <Image x:Name="previewImage" 
-               IsVisible="False" 
+        <Image x:Name="previewImage"
+               IsVisible="False"
                BackgroundColor="Black" 
                Aspect="AspectFit" />
 
