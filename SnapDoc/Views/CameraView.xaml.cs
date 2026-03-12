@@ -335,15 +335,7 @@ public partial class CameraView : ContentPage
         UpdateRatioPickerUI();
 
         SettingsService.Instance.CaptureRatio = _userSelectedRatio;
-
-        try
-        {
-            await Task.Run(() => { GlobalJson.SaveToFile(); });
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"JSON Speicherfehler: {ex.Message}");
-        }
+        SettingsService.Instance.SaveSettings();
 
         try 
         {
