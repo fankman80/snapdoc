@@ -52,6 +52,7 @@ public partial class CameraView : ContentPage
         {
             // Prüfen, ob Zoom unterstützt wird
             _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
+            _isZoomSupported = true;
             if (_isZoomSupported)
             {
                 customZoomSlider.Minimum = cameraView.MinZoomFactor;
@@ -85,6 +86,9 @@ public partial class CameraView : ContentPage
             .OrderByDescending(r => r.Value)
             .ToList();
 
+        // "Full" Option hinzufügen (wir nutzen -1.0 als Identifier)
+        uniqueRatios.Insert(0, new RatioItem { Name = "Full", Value = -1.0 });
+
         BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
         MainThread.BeginInvokeOnMainThread(async () => {
@@ -116,9 +120,15 @@ public partial class CameraView : ContentPage
         var available = cameraView.Camera?.AvailableResolutions;
         if (available == null || available.Count == 0) return new Size(0, 0);
 
+        double finalTarget;
+        if (targetRatio == -1.0)
+            finalTarget = Math.Max(this.Width, this.Height) / Math.Min(this.Width, this.Height);
+        else
+            finalTarget = targetRatio ?? 1.33;
+
         return available
             .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
-            .OrderBy(g => Math.Abs(g.Key - (targetRatio ?? 1.33)))
+            .OrderBy(g => Math.Abs(g.Key - finalTarget))
             .First()
             .OrderByDescending(r => r.Width)
             .First();
@@ -186,6 +196,16 @@ public partial class CameraView : ContentPage
         cameraView.WidthRequest = -1;
         cameraView.HeightRequest = -1;
 
+        // Sonderfall: Full Mode
+        if (_userSelectedRatio == -1.0)
+        {
+            cameraView.WidthRequest = availableWidth;
+            cameraView.HeightRequest = availableHeight;
+            cameraView.HorizontalOptions = LayoutOptions.Fill;
+            cameraView.VerticalOptions = LayoutOptions.Fill;
+            return;
+        }
+
         double sWidth = _optimalSize.Width;
         double sHeight = _optimalSize.Height;
         bool isPortrait = availableHeight > availableWidth;
@@ -198,7 +218,6 @@ public partial class CameraView : ContentPage
 
         double targetRatio = sWidth / sHeight;
         double containerRatio = availableWidth / availableHeight;
-
         double finalWidth, finalHeight;
 
         if (containerRatio > targetRatio)
@@ -248,15 +267,30 @@ public partial class CameraView : ContentPage
 
         try
         {
+            if (cameraView.Camera != null)
+            {
+                // VerticalViewAngle auslesen und runden
+                float vAngle = cameraView.Camera.VerticalViewAngle;
+                fovLabel.Text = $"FOV: {vAngle:F1}°";
+
+            }
+
             if (!customZoomSlider.IsVisible)
             {
                 customZoomSlider.IsVisible = true;
-                await customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut);
+                fovLabel.IsVisible = true;
+
+                await Task.WhenAll(customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut),
+                                   fovLabel.FadeToAsync(1, 250, Easing.CubicOut));
             }
 
             await Task.Delay(3000, token);
-            await customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn);
+
+            await Task.WhenAll(customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn),
+                               fovLabel.FadeToAsync(0, 500, Easing.CubicIn));
+
             customZoomSlider.IsVisible = false;
+            fovLabel.IsVisible = false;
         }
         catch (OperationCanceledException)
         {
