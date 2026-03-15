@@ -20,18 +20,6 @@
                            VerticalOptions="Fill" />
         </Grid>
 
-        <Label x:Name="fovLabel"
-               HorizontalOptions="Center"
-               VerticalOptions="Start"
-               Margin="0,25,0,0"
-               TextColor="Yellow"
-               BackgroundColor="#40000000"
-               Padding="10,5"
-               FontSize="14"
-               IsVisible="False"
-               Opacity="0"
-               Text="FOV: 0°" />
-
         <controls:VerticalZoomSlider x:Name="customZoomSlider"
                                      VerticalOptions="Center"
                                      HorizontalOptions="End"
