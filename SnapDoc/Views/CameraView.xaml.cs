@@ -52,7 +52,6 @@ public partial class CameraView : ContentPage
         {
             // Prüfen, ob Zoom unterstützt wird
             _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
-            _isZoomSupported = true;
             if (_isZoomSupported)
             {
                 customZoomSlider.Minimum = cameraView.MinZoomFactor;
@@ -267,30 +266,14 @@ public partial class CameraView : ContentPage
 
         try
         {
-            if (cameraView.Camera != null)
-            {
-                // VerticalViewAngle auslesen und runden
-                float vAngle = cameraView.Camera.VerticalViewAngle;
-                fovLabel.Text = $"FOV: {vAngle:F1}°";
-
-            }
-
             if (!customZoomSlider.IsVisible)
             {
                 customZoomSlider.IsVisible = true;
-                fovLabel.IsVisible = true;
-
-                await Task.WhenAll(customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut),
-                                   fovLabel.FadeToAsync(1, 250, Easing.CubicOut));
+                await customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut);
             }
-
             await Task.Delay(3000, token);
-
-            await Task.WhenAll(customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn),
-                               fovLabel.FadeToAsync(0, 500, Easing.CubicIn));
-
+            await customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn);
             customZoomSlider.IsVisible = false;
-            fovLabel.IsVisible = false;
         }
         catch (OperationCanceledException)
         {
