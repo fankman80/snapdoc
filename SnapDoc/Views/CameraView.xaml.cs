@@ -85,9 +85,6 @@ public partial class CameraView : ContentPage
             .OrderByDescending(r => r.Value)
             .ToList();
 
-        // "Full" Option hinzufügen (wir nutzen -1.0 als Identifier)
-        uniqueRatios.Insert(0, new RatioItem { Name = "Full", Value = -1.0 });
-
         BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
 
         MainThread.BeginInvokeOnMainThread(async () => {
@@ -133,14 +130,44 @@ public partial class CameraView : ContentPage
             .First();
     }
 
-    private async Task RestartPreview()
+    private async Task RestartPreview(Size? specificSize = null)
     {
-        await cameraView.StopCameraAsync();
-        if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
+        try
         {
-            UpdateCameraLayout();
-            cameraView.FlashMode = _currentFlashMode;
-            UpdateFlashButtonUI();
+            await cameraView.StopCameraAsync();
+
+            // 1. Layout-Reset: Control zwingen, seine Größe zu vergessen
+            cameraView.WidthRequest = -1;
+            cameraView.HeightRequest = -1;
+
+            // Kurze Pause, damit MAUI das UI-Grid entspannen kann
+            await Task.Delay(150);
+
+            // Wenn eine neue Größe (Ratio) mitgegeben wurde, nutzen wir diese
+            if (specificSize.HasValue)
+                _optimalSize = specificSize.Value;
+
+            if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
+            {
+                // Blitz und UI wiederherstellen
+                cameraView.FlashMode = _currentFlashMode;
+                UpdateFlashButtonUI();
+
+                // 2. Den UI-Thread kurz atmen lassen für die Hardware-Initialisierung
+                MainThread.BeginInvokeOnMainThread(async () => {
+                    await Task.Delay(200);
+
+                    UpdateCameraLayout();
+
+                    // 3. Layout-Zyklus erzwingen
+                    this.InvalidateMeasure();
+                    if (this.Parent is View parent) parent.InvalidateMeasure();
+                });
+            }
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler beim Restart: {ex.Message}");
         }
     }
 
@@ -194,16 +221,6 @@ public partial class CameraView : ContentPage
         // Reset
         cameraView.WidthRequest = -1;
         cameraView.HeightRequest = -1;
-
-        // Sonderfall: Full Mode
-        if (_userSelectedRatio == -1.0)
-        {
-            cameraView.WidthRequest = availableWidth;
-            cameraView.HeightRequest = availableHeight;
-            cameraView.HorizontalOptions = LayoutOptions.Fill;
-            cameraView.VerticalOptions = LayoutOptions.Fill;
-            return;
-        }
 
         double sWidth = _optimalSize.Width;
         double sHeight = _optimalSize.Height;
@@ -277,7 +294,6 @@ public partial class CameraView : ContentPage
         }
         catch (OperationCanceledException)
         {
-            // Timer wurde durch neue Interaktion abgebrochen - alles gut!
         }
     }
 
@@ -317,6 +333,7 @@ public partial class CameraView : ContentPage
         if (File.Exists(_tempFilePath))
             File.Delete(_tempFilePath);
         _tempFilePath = string.Empty;
+
         await RestartPreview();
         ToggleUI(isPreview: false);
     }
@@ -354,26 +371,8 @@ public partial class CameraView : ContentPage
         SettingsService.Instance.CaptureRatio = _userSelectedRatio;
         SettingsService.Instance.SaveSettings();
 
-        try 
-        {
-            await cameraView.StopCameraAsync();
-            await Task.Delay(100);
-            _optimalSize = GetOptimalSize(_userSelectedRatio);
-            var result = await cameraView.StartCameraAsync(_optimalSize);
-        
-            if (result == CameraResult.Success)
-            {
-                MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(150);
-                    UpdateCameraLayout();
-                    this.InvalidateMeasure(); 
-                });
-            }
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Fehler beim Ratio-Wechsel: {ex.Message}");
-        }
+        var newSize = GetOptimalSize(_userSelectedRatio);
+        await RestartPreview(newSize);
     }
 
     private void OnContainerTapped(object sender, EventArgs e)
@@ -452,7 +451,9 @@ public partial class CameraView : ContentPage
             int nextIndex = (cameraView.Cameras.IndexOf(cameraView.Camera) + 1) % cameraView.Cameras.Count;
             await cameraView.StopCameraAsync();
             cameraView.Camera = cameraView.Cameras[nextIndex];
-            await InitializeCameraSelection();
+
+            var newSize = GetOptimalSize(_userSelectedRatio);
+            await RestartPreview(newSize);
         }
     }
 }
