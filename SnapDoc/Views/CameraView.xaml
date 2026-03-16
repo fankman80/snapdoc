@@ -14,10 +14,12 @@
 
         <Grid x:Name="CameraContainer"
               HorizontalOptions="Fill"
-              VerticalOptions="Fill">
+              VerticalOptions="Fill"
+              BackgroundColor="Black">
             <cv:CameraView x:Name="cameraView"
-                           HorizontalOptions="Fill"
-                           VerticalOptions="Fill" />
+                           HorizontalOptions="Center" 
+                           VerticalOptions="Center"
+                           Margin="0" />
         </Grid>
 
         <controls:VerticalZoomSlider x:Name="customZoomSlider"

@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.1.1" android:versionCode="254">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.1.1" android:versionCode="255">
 	<!-- Berechtigungen -->
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />

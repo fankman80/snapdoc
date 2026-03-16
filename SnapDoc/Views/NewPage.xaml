@@ -85,11 +85,12 @@
 				                   AnchorY="{Binding AnchorY}">
                     <ff:CachedImageView x:Name="PlanImage"
                                         CacheType="All"
+                                        BitmapOptimizations="True"
                                         DownsampleUseDipUnits="False"
-                                        DownsampleToViewSize="False"
+                                        DownsampleToViewSize="True"
                                         FadeAnimationEnabled ="False"
                                         FadeAnimationForCachedImages ="False"
-                                        LoadingDelay="0"/>
+                                        LoadingDelay="40"/>
                 </mr:AbsoluteLayout>
             </mr:ContentView>
 

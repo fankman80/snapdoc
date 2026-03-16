@@ -136,30 +136,23 @@ public partial class CameraView : ContentPage
         {
             await cameraView.StopCameraAsync();
 
-            // 1. Layout-Reset: Control zwingen, seine Größe zu vergessen
             cameraView.WidthRequest = -1;
             cameraView.HeightRequest = -1;
 
-            // Kurze Pause, damit MAUI das UI-Grid entspannen kann
             await Task.Delay(150);
 
-            // Wenn eine neue Größe (Ratio) mitgegeben wurde, nutzen wir diese
             if (specificSize.HasValue)
                 _optimalSize = specificSize.Value;
 
             if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
-                // Blitz und UI wiederherstellen
                 cameraView.FlashMode = _currentFlashMode;
                 UpdateFlashButtonUI();
 
-                // 2. Den UI-Thread kurz atmen lassen für die Hardware-Initialisierung
                 MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(200);
+                    await Task.Delay(300);
 
-                    UpdateCameraLayout();
-
-                    // 3. Layout-Zyklus erzwingen
+                    UpdateCameraLayout(this.Width, this.Height);
                     this.InvalidateMeasure();
                     if (this.Parent is View parent) parent.InvalidateMeasure();
                 });
@@ -209,7 +202,7 @@ public partial class CameraView : ContentPage
 
     private void UpdateCameraLayout(double? overrideWidth = null, double? overrideHeight = null)
     {
-        if (cameraView?.Camera == null)
+        if (cameraView?.Camera == null || _optimalSize.Width <= 0 || _optimalSize.Height <= 0)
             return;
 
         double availableWidth = (overrideWidth > 0) ? overrideWidth.Value : this.Width;
@@ -222,17 +215,17 @@ public partial class CameraView : ContentPage
         cameraView.WidthRequest = -1;
         cameraView.HeightRequest = -1;
 
-        double sWidth = _optimalSize.Width;
-        double sHeight = _optimalSize.Height;
+        double rawWidth = _optimalSize.Width;
+        double rawHeight = _optimalSize.Height;
+
         bool isPortrait = availableHeight > availableWidth;
+        double targetRatio;
 
-        if (isPortrait && sWidth > sHeight)
-        {
-            sWidth = _optimalSize.Height;
-            sHeight = _optimalSize.Width;
-        }
+        if (isPortrait)
+            targetRatio = rawHeight / rawWidth;
+        else
+            targetRatio = rawWidth / rawHeight;
 
-        double targetRatio = sWidth / sHeight;
         double containerRatio = availableWidth / availableHeight;
         double finalWidth, finalHeight;
 
@@ -247,10 +240,17 @@ public partial class CameraView : ContentPage
             finalHeight = availableWidth / targetRatio;
         }
 
-        cameraView.WidthRequest = finalWidth;
-        cameraView.HeightRequest = finalHeight;
-        cameraView.HorizontalOptions = LayoutOptions.Center;
-        cameraView.VerticalOptions = LayoutOptions.Center;
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            // Erst zurücksetzen, dann hart setzen
+            cameraView.HorizontalOptions = LayoutOptions.Center;
+            cameraView.VerticalOptions = LayoutOptions.Center;
+
+            cameraView.WidthRequest = finalWidth;
+            cameraView.HeightRequest = finalHeight;
+
+            Debug.WriteLine($"[Layout] Resolution: {rawWidth}x{rawHeight} | View: {finalWidth:F0}x{finalHeight:F0}");
+        });
     }
 
     private void UpdateFlashButtonUI()
@@ -299,6 +299,9 @@ public partial class CameraView : ContentPage
 
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
+        if (flashOverlay.IsVisible)
+            return;
+
         try
         {
             flashOverlay.IsVisible = true;
@@ -323,8 +326,11 @@ public partial class CameraView : ContentPage
         catch (Exception ex)
         {
             Debug.WriteLine($"Capture Fehler: {ex.Message}");
-            flashOverlay.IsVisible = false;
             await RestartPreview();
+        }
+        finally
+        {
+            flashOverlay.IsVisible = false;
         }
     }
 
