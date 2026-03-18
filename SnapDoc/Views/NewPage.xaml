@@ -85,11 +85,14 @@
 				                   AnchorX="{Binding AnchorX}"
 				                   AnchorY="{Binding AnchorY}">
                     <ff:CachedImageView x:Name="PlanImage"
+                                        x:DataType="views:NewPage"
+                                        Source="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
                                         CacheType="All"
                                         BitmapOptimizations="True"
                                         DownsampleUseDipUnits="False"
                                         DownsampleToViewSize="True"
                                         FadeAnimationEnabled ="False"
+                                        LoadingPriority="High"
                                         FadeAnimationForCachedImages ="False"
                                         LoadingDelay="40"/>
                 </mr:AbsoluteLayout>
@@ -103,13 +106,12 @@
                     <TapGestureRecognizer Tapped="OnFullScreenButtonClicked" />
                 </Grid.GestureRecognizers>
                 
-                <Border
-                    BackgroundColor="{DynamicResource Primary}"
-                    StrokeThickness="0"
-                    HeightRequest="60"
-                    VerticalOptions="End"
-                    Margin="20,0,20,100"
-                    ZIndex="10000">
+                <Border BackgroundColor="{DynamicResource Primary}"
+                        StrokeThickness="0"
+                        HeightRequest="60"
+                        VerticalOptions="End"
+                        Margin="20,0,20,100"
+                        ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>

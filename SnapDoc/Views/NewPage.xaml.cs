@@ -46,6 +46,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private int lineWidth = 3;
     private string strokeStyle = "";
 
+    private string planImageSource = "";
+    public string PlanImageSource
+    {
+        get => planImageSource;
+        set
+        {
+            planImageSource = value;
+            OnPropertyChanged();
+        }
+    }
+
     private Color selectedBorderColor = new(0, 153, 0, 255);
     public Color SelectedBorderColor
     {
@@ -234,7 +245,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PlanImage.HeightRequest = thisPlan.ImageSize.Height;
         }
 
-        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
         
         return Task.CompletedTask;
     }
@@ -1336,7 +1347,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         isFirstLoad = true;
 
-        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
     }
 
     private async void PlanRotate(int angle)
