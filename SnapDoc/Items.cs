@@ -216,6 +216,8 @@ namespace SnapDoc
             }
         }
 
+        public List<string> PinPriorites { get; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
+
         public int PinPriority
         {
             get => _pin.PinPriority;
@@ -248,8 +250,10 @@ namespace SnapDoc
         {
             var items = SettingsService.Instance.PriorityItems;
 
-            if (PinPriority > 0 && PinPriority < items.Count)
+            if (PinPriority >= 0 && PinPriority < items.Count) // Check auf >= 0 korrigiert
+            {
                 PriorityColor = Color.FromArgb(items[PinPriority].Color);
+            }
             else
             {
                 PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark

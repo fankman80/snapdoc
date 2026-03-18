@@ -135,31 +135,28 @@ public partial class CameraView : ContentPage
         try
         {
             await cameraView.StopCameraAsync();
+            cameraView.IsVisible = false;
 
             cameraView.WidthRequest = -1;
             cameraView.HeightRequest = -1;
 
-            await Task.Delay(150);
-
             if (specificSize.HasValue)
                 _optimalSize = specificSize.Value;
+
+            await Task.Delay(200);
 
             if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
                 cameraView.FlashMode = _currentFlashMode;
-                UpdateFlashButtonUI();
-
                 MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(350);
+                    await Task.Delay(250);
                     UpdateCameraLayout(this.Width, this.Height);
+                    cameraView.IsVisible = true;
                     this.InvalidateMeasure();
                 });
             }
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Fehler beim Restart: {ex.Message}");
-        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); }
     }
 
     private void OnFlashButtonClicked(object sender, EventArgs e)
@@ -231,15 +228,12 @@ public partial class CameraView : ContentPage
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            cameraView.WidthRequest = 0;
-            cameraView.HeightRequest = 0;
-            await Task.Yield(); // Einen Frame warten
-
             cameraView.HorizontalOptions = LayoutOptions.Center;
             cameraView.VerticalOptions = LayoutOptions.Center;
-
             cameraView.WidthRequest = finalWidth;
             cameraView.HeightRequest = finalHeight;
+            cameraView.MinimumWidthRequest = finalWidth;
+            cameraView.MinimumHeightRequest = finalHeight;
         });
     }
 

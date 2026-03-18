@@ -14,7 +14,6 @@ namespace SnapDoc.Views;
 
 public partial class SetPin : ContentPage, IQueryAttributable
 {
-    public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
     public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
     private string PlanId;
     private string PinId;

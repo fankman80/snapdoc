@@ -12,14 +12,15 @@
             <TapGestureRecognizer Tapped="OnContainerTapped" />
         </Grid.GestureRecognizers>
 
-        <Grid x:Name="CameraContainer"
-              HorizontalOptions="Fill"
-              VerticalOptions="Fill"
+        <Grid x:Name="CameraContainer" 
+              HorizontalOptions="Fill" 
+              VerticalOptions="Fill" 
               BackgroundColor="Black">
-            <cv:CameraView x:Name="cameraView"
-                           HorizontalOptions="Center" 
-                           VerticalOptions="Center"
-                           Margin="0" />
+            <ContentView HorizontalOptions="Center" VerticalOptions="Center">
+                <cv:CameraView x:Name="cameraView"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"/>
+            </ContentView>
         </Grid>
 
         <controls:VerticalZoomSlider x:Name="customZoomSlider"

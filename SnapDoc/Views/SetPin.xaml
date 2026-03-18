@@ -191,17 +191,21 @@
                     Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8">
-                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0">
+                <Grid BindingContext="{Binding Pin}" 
+                      x:DataType="local:PinItem" 
+                      ColumnDefinitions="*,Auto" 
+                      ColumnSpacing="0">
                     <Picker Grid.Column="0"
                             BackgroundColor="Transparent"
                             ItemsSource="{Binding PinPriorites}"
-                            SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}"/>
-                    <Label Grid.Column="1" Text="{x:Static local:MaterialIcons.Traffic}"
+                            SelectedIndex="{Binding PinPriority, Mode=TwoWay}"/>
+                    <Label Grid.Column="1"
+                           Text="{x:Static local:MaterialIcons.Traffic}"
                            WidthRequest="60"
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
                            FontFamily="MaterialOutlined"
-                           TextColor="{Binding Pin.PriorityColor}"
+                           TextColor="{Binding PriorityColor}"
                            FontSize="34"/>
                 </Grid>
             </Border>
