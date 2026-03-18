@@ -7,6 +7,7 @@
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              BackgroundColor="DimGrey"             
@@ -83,14 +84,15 @@
 				                   TranslationY="{Binding TranslationY}"
 				                   AnchorX="{Binding AnchorX}"
 				                   AnchorY="{Binding AnchorY}">
-                    <ff:CachedImageView x:Name="PlanImage"
+                    <!--<ff:CachedImageView x:Name="PlanImage"
                                         CacheType="All"
                                         BitmapOptimizations="True"
                                         DownsampleUseDipUnits="False"
                                         DownsampleToViewSize="True"
                                         FadeAnimationEnabled ="False"
                                         FadeAnimationForCachedImages ="False"
-                                        LoadingDelay="40"/>
+                                        LoadingDelay="40"/>-->
+                    <controls:SkiaBackgroundView x:Name="PlanImage" />
                 </mr:AbsoluteLayout>
             </mr:ContentView>
 

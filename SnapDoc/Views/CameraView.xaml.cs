@@ -150,11 +150,9 @@ public partial class CameraView : ContentPage
                 UpdateFlashButtonUI();
 
                 MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(300);
-
+                    await Task.Delay(350);
                     UpdateCameraLayout(this.Width, this.Height);
                     this.InvalidateMeasure();
-                    if (this.Parent is View parent) parent.InvalidateMeasure();
                 });
             }
         }
@@ -211,21 +209,12 @@ public partial class CameraView : ContentPage
         if (availableWidth <= 0 || availableHeight <= 0)
             return;
 
-        // Reset
-        cameraView.WidthRequest = -1;
-        cameraView.HeightRequest = -1;
-
         double rawWidth = _optimalSize.Width;
         double rawHeight = _optimalSize.Height;
-
         bool isPortrait = availableHeight > availableWidth;
-        double targetRatio;
-
-        if (isPortrait)
-            targetRatio = rawHeight / rawWidth;
-        else
-            targetRatio = rawWidth / rawHeight;
-
+        double cameraWidth = isPortrait ? Math.Min(rawWidth, rawHeight) : Math.Max(rawWidth, rawHeight);
+        double cameraHeight = isPortrait ? Math.Max(rawWidth, rawHeight) : Math.Min(rawWidth, rawHeight);
+        double targetRatio = cameraWidth / cameraHeight;
         double containerRatio = availableWidth / availableHeight;
         double finalWidth, finalHeight;
 
@@ -240,16 +229,17 @@ public partial class CameraView : ContentPage
             finalHeight = availableWidth / targetRatio;
         }
 
-        MainThread.BeginInvokeOnMainThread(() =>
+        MainThread.BeginInvokeOnMainThread(async () =>
         {
-            // Erst zurücksetzen, dann hart setzen
+            cameraView.WidthRequest = 0;
+            cameraView.HeightRequest = 0;
+            await Task.Yield(); // Einen Frame warten
+
             cameraView.HorizontalOptions = LayoutOptions.Center;
             cameraView.VerticalOptions = LayoutOptions.Center;
 
             cameraView.WidthRequest = finalWidth;
             cameraView.HeightRequest = finalHeight;
-
-            Debug.WriteLine($"[Layout] Resolution: {rawWidth}x{rawHeight} | View: {finalWidth:F0}x{finalHeight:F0}");
         });
     }
 

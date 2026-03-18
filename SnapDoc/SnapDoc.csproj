@@ -128,7 +128,7 @@
 		<PackageReference Include="HarfBuzzSharp" Version="8.3.1.4-preview.1.1" />
 		<PackageReference Include="Mapsui" Version="5.1.0-beta.3" />
 		<PackageReference Include="Mapsui.Maui" Version="5.1.0-beta.3" />
-		<PackageReference Include="MetadataExtractor" Version="2.9.0" />
+		<PackageReference Include="MetadataExtractor" Version="2.9.2" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="11.0.0-preview.1.26104.118" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.50" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.50" />

@@ -195,8 +195,7 @@
                     <Picker Grid.Column="0"
                             BackgroundColor="Transparent"
                             ItemsSource="{Binding PinPriorites}"
-                            SelectedIndex="{Binding Pin.PinPriority}"
-                            SelectedIndexChanged="OnSelectedItemChanged"/>
+                            SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}"/>
                     <Label Grid.Column="1" Text="{x:Static local:MaterialIcons.Traffic}"
                            WidthRequest="60"
                            HorizontalTextAlignment="Center"

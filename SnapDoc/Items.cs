@@ -225,8 +225,6 @@ namespace SnapDoc
                 {
                     _pin.PinPriority = value;
                     OnPropertyChanged();
-
-                    // Hier neue Farbe laden
                     UpdatePriorityColor();
                 }
             }

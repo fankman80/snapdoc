@@ -16,7 +16,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
 {
     public List<string> PinPriorites { get; set; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
     public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
-    private readonly HashSet<Picker> _initializedPickers = [];
     private string PlanId;
     private string PinId;
 
@@ -288,15 +287,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
 #endif
         }
 
-    }
-
-    private void OnSelectedItemChanged(object sender, EventArgs e)
-    {
-        if (sender is not Picker picker)
-            return;
-
-        if (_initializedPickers.Add(picker) == false)
-            Pin.PinPriority = picker.SelectedIndex;
     }
 
     private void OnReorderCompleted(object sender, EventArgs e)
