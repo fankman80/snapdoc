@@ -97,7 +97,7 @@
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
 		
 		<!-- Splash Screen -->
-		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="256,256" />
+		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="218,218" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />

@@ -234,7 +234,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PlanImage.HeightRequest = thisPlan.ImageSize.Height;
         }
 
-        PlanImage.ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
         
         return Task.CompletedTask;
     }
@@ -1336,7 +1336,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         isFirstLoad = true;
 
-        PlanImage.ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        PlanImage.Source = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
     }
 
     private async void PlanRotate(int angle)

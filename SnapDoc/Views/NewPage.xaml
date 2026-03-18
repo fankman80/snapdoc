@@ -84,15 +84,14 @@
 				                   TranslationY="{Binding TranslationY}"
 				                   AnchorX="{Binding AnchorX}"
 				                   AnchorY="{Binding AnchorY}">
-                    <!--<ff:CachedImageView x:Name="PlanImage"
+                    <ff:CachedImageView x:Name="PlanImage"
                                         CacheType="All"
                                         BitmapOptimizations="True"
                                         DownsampleUseDipUnits="False"
                                         DownsampleToViewSize="True"
                                         FadeAnimationEnabled ="False"
                                         FadeAnimationForCachedImages ="False"
-                                        LoadingDelay="40"/>-->
-                    <controls:SkiaBackgroundView x:Name="PlanImage" />
+                                        LoadingDelay="40"/>
                 </mr:AbsoluteLayout>
             </mr:ContentView>
 
