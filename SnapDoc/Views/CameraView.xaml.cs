@@ -1,6 +1,7 @@
 using Camera.MAUI;
 using SnapDoc.Services;
 using System.Diagnostics;
+using System.Collections.ObjectModel;
 
 namespace SnapDoc.Views;
 
@@ -10,15 +11,15 @@ public partial class CameraView : ContentPage
     private Size _optimalSize;
     private double _userSelectedRatio = SettingsService.Instance.CaptureRatio;
     private FlashMode _currentFlashMode = (FlashMode)SettingsService.Instance.FlashMode;
-    private CancellationTokenSource? _resizeCts;
+    private bool _isZoomSupported = false;
     private bool _isRatioPickerExpanded = false;
     private CancellationTokenSource? _zoomTimerCts;
-    private bool _isZoomSupported = false;
+    private bool _isInitialized = false;
 
     public CameraView()
     {
         InitializeComponent();
-        cameraView.CamerasLoaded += CameraView_CamerasLoaded;
+        cameraView.CamerasLoaded += async (s, e) => await OnCamerasLoaded();
     }
 
     protected override void OnDisappearing()
@@ -28,87 +29,49 @@ public partial class CameraView : ContentPage
         _ = cameraView.StopCameraAsync();
     }
 
-    private void CameraView_CamerasLoaded(object? sender, EventArgs e)
+    private async Task OnCamerasLoaded()
     {
-        if (cameraView.Cameras.Count > 0)
-        {
-            switchCameraButton.IsVisible = cameraView.Cameras.Count > 1;
+        if (cameraView.Cameras.Count == 0) return;
 
-            cameraView.Camera = cameraView.Cameras.FirstOrDefault(c => c.Position == CameraPosition.Back)
-                                ?? cameraView.Cameras.First();
+        switchCameraButton.IsVisible = cameraView.Cameras.Count > 1;
 
-            MainThread.BeginInvokeOnMainThread(async () => {
-                await InitializeCameraSelection();
-            });
-        }
+        cameraView.Camera = cameraView.Cameras.FirstOrDefault(c => c.Position == CameraPosition.Back)
+                           ?? cameraView.Cameras.First();
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+
+        if (width <= 0 || height <= 0 || _isInitialized) return;
+
+        _isInitialized = true;
+        Dispatcher.Dispatch(async () => await InitializeCameraSelection());
     }
 
     private async Task InitializeCameraSelection()
     {
-        var photo = GetOptimalSize(_userSelectedRatio);
-        _optimalSize = photo;
+        _optimalSize = GetOptimalSize(_userSelectedRatio);
 
         if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
         {
-            // Prüfen, ob Zoom unterstützt wird
-            _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
-            if (_isZoomSupported)
-            {
-                customZoomSlider.Minimum = cameraView.MinZoomFactor;
-                customZoomSlider.Maximum = Math.Min(cameraView.MaxZoomFactor, 10);
-                customZoomSlider.Value = cameraView.ZoomFactor;
-            }
-            customZoomSlider.IsVisible = false;
-            customZoomSlider.Opacity = 0;
-
-            // Blitzmodus setzen
+            ConfigureZoom();
             cameraView.FlashMode = _currentFlashMode;
             UpdateFlashButtonUI();
-
-            // Ratio-Buttons befüllen
             PopulateRatioButtons();
-
-            // Layout anpassen
             UpdateCameraLayout(this.Width, this.Height);
         }
     }
 
-    private void PopulateRatioButtons()
+    private void ConfigureZoom()
     {
-        var available = cameraView.Camera?.AvailableResolutions;
-        if (available == null) return;
-
-        var uniqueRatios = available
-            .Select(r => new { Ratio = Math.Round((double)r.Width / r.Height, 2), Name = GetRatioName(Math.Round((double)r.Width / r.Height, 2)) })
-            .GroupBy(x => x.Name)
-            .Select(g => new RatioItem { Name = g.Key, Value = g.First().Ratio })
-            .OrderByDescending(r => r.Value)
-            .ToList();
-
-        BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
-
-        MainThread.BeginInvokeOnMainThread(async () => {
-            int timeout = 0;
-            while (ratioContainer.Children.Count == 0 && timeout < 10)
-            {
-                await Task.Delay(50);
-                timeout++;
-            }
-
-            _isRatioPickerExpanded = false;
-            UpdateRatioPickerUI(animate: false);
-            await ratioContainer.FadeToAsync(1, 200);
-        });
-    }
-
-    private static string GetRatioName(double ratio)
-    {
-        if (ratio >= 1.7) return "16:9";
-        if (ratio >= 1.5) return "3:2";
-        if (ratio >= 1.3) return "4:3";
-        if (ratio >= 1.2) return "5:4";
-        if (ratio == 1.0) return "1:1";
-        return ratio.ToString("F2");
+        _isZoomSupported = cameraView.MaxZoomFactor > cameraView.MinZoomFactor;
+        if (_isZoomSupported)
+        {
+            customZoomSlider.Minimum = cameraView.MinZoomFactor;
+            customZoomSlider.Maximum = Math.Min(cameraView.MaxZoomFactor, 10);
+            customZoomSlider.Value = cameraView.ZoomFactor;
+        }
     }
 
     private Size GetOptimalSize(double? targetRatio = null)
@@ -116,11 +79,9 @@ public partial class CameraView : ContentPage
         var available = cameraView.Camera?.AvailableResolutions;
         if (available == null || available.Count == 0) return new Size(0, 0);
 
-        double finalTarget;
-        if (targetRatio == -1.0)
-            finalTarget = Math.Max(this.Width, this.Height) / Math.Min(this.Width, this.Height);
-        else
-            finalTarget = targetRatio ?? 1.33;
+        double finalTarget = (targetRatio == -1.0)
+            ? Math.Max(Width, Height) / Math.Min(Width, Height)
+            : targetRatio ?? 1.33;
 
         return available
             .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
@@ -137,244 +98,83 @@ public partial class CameraView : ContentPage
             await cameraView.StopCameraAsync();
             cameraView.IsVisible = false;
 
-            cameraView.WidthRequest = -1;
-            cameraView.HeightRequest = -1;
+            if (specificSize.HasValue) _optimalSize = specificSize.Value;
 
-            if (specificSize.HasValue)
-                _optimalSize = specificSize.Value;
-
-            await Task.Delay(200);
+            await Task.Delay(150);
 
             if (await cameraView.StartCameraAsync(_optimalSize) == CameraResult.Success)
             {
                 cameraView.FlashMode = _currentFlashMode;
-                MainThread.BeginInvokeOnMainThread(async () => {
-                    await Task.Delay(250);
-                    UpdateCameraLayout(this.Width, this.Height);
-                    cameraView.IsVisible = true;
-                    this.InvalidateMeasure();
-                });
+                UpdateCameraLayout(Width, Height);
+                cameraView.IsVisible = true;
             }
         }
-        catch (Exception ex) { Debug.WriteLine(ex.Message); }
+        catch (Exception ex) { Debug.WriteLine($"Restart Error: {ex.Message}"); }
     }
 
-    private void OnFlashButtonClicked(object sender, EventArgs e)
+    private void UpdateCameraLayout(double width, double height)
     {
-        _currentFlashMode = cameraView.FlashMode switch
-        {
-            FlashMode.Auto => FlashMode.Enabled,
-            FlashMode.Enabled => FlashMode.Disabled,
-            _ => FlashMode.Auto
-        };
+        if (cameraView?.Camera == null || _optimalSize.Width <= 0) return;
 
-        cameraView.FlashMode = _currentFlashMode;
-        UpdateFlashButtonUI();
+        bool isPortrait = height > width;
+        double camW = isPortrait ? Math.Min(_optimalSize.Width, _optimalSize.Height) : Math.Max(_optimalSize.Width, _optimalSize.Height);
+        double camH = isPortrait ? Math.Max(_optimalSize.Width, _optimalSize.Height) : Math.Min(_optimalSize.Width, _optimalSize.Height);
 
-        SettingsService.Instance.FlashMode = (int)_currentFlashMode;
-    }
-
-    protected override void OnSizeAllocated(double width, double height)
-    {
-        base.OnSizeAllocated(width, height);
-        if (width <= 0 || height <= 0)
-            return;
-
-        UpdateCameraLayout(width, height);
-
-        _resizeCts?.Cancel();
-        _resizeCts = new CancellationTokenSource();
-        var token = _resizeCts.Token;
-
-        _ = Task.Run(async () => {
-            try
-            {
-                await Task.Delay(500, token);
-            }
-            catch (OperationCanceledException) { }
-        });
-    }
-
-    private void UpdateCameraLayout(double? overrideWidth = null, double? overrideHeight = null)
-    {
-        if (cameraView?.Camera == null || _optimalSize.Width <= 0 || _optimalSize.Height <= 0)
-            return;
-
-        double availableWidth = (overrideWidth > 0) ? overrideWidth.Value : this.Width;
-        double availableHeight = (overrideHeight > 0) ? overrideHeight.Value : this.Height;
-
-        if (availableWidth <= 0 || availableHeight <= 0)
-            return;
-
-        double rawWidth = _optimalSize.Width;
-        double rawHeight = _optimalSize.Height;
-        bool isPortrait = availableHeight > availableWidth;
-        double cameraWidth = isPortrait ? Math.Min(rawWidth, rawHeight) : Math.Max(rawWidth, rawHeight);
-        double cameraHeight = isPortrait ? Math.Max(rawWidth, rawHeight) : Math.Min(rawWidth, rawHeight);
-        double targetRatio = cameraWidth / cameraHeight;
-        double containerRatio = availableWidth / availableHeight;
+        double targetRatio = camW / camH;
         double finalWidth, finalHeight;
 
-        if (containerRatio > targetRatio)
+        if ((width / height) > targetRatio)
         {
-            finalHeight = availableHeight;
-            finalWidth = availableHeight * targetRatio;
+            finalHeight = height;
+            finalWidth = height * targetRatio;
         }
         else
         {
-            finalWidth = availableWidth;
-            finalHeight = availableWidth / targetRatio;
+            finalWidth = width;
+            finalHeight = width / targetRatio;
         }
 
-        MainThread.BeginInvokeOnMainThread(async () =>
-        {
-            cameraView.HorizontalOptions = LayoutOptions.Center;
-            cameraView.VerticalOptions = LayoutOptions.Center;
+        Dispatcher.Dispatch(() => {
             cameraView.WidthRequest = finalWidth;
             cameraView.HeightRequest = finalHeight;
-            cameraView.MinimumWidthRequest = finalWidth;
-            cameraView.MinimumHeightRequest = finalHeight;
+            cameraView.HorizontalOptions = LayoutOptions.Center;
+            cameraView.VerticalOptions = LayoutOptions.Center;
         });
     }
 
-    private void UpdateFlashButtonUI()
+    private void PopulateRatioButtons()
     {
-        if (liveButtons.Children.FirstOrDefault() is not Button flashBtn)
-            return;
+        var available = cameraView.Camera?.AvailableResolutions;
+        if (available == null) return;
 
-        flashBtn.Text = _currentFlashMode switch
-        {
-            FlashMode.Enabled => MaterialIcons.Flash_on,
-            FlashMode.Disabled => MaterialIcons.Flash_off,
-            _ => MaterialIcons.Flash_auto
-        };
-    }
+        var uniqueRatios = available
+            .Select(r => {
+                double ratio = Math.Round((double)r.Width / r.Height, 2);
+                return new { Ratio = ratio, Name = GetRatioName(ratio) };
+            })
+            .GroupBy(x => x.Name)
+            .Select(g => new { Name = g.Key, Value = g.First().Ratio })
+            .OrderByDescending(r => r.Value)
+            .ToList();
 
-    private void OnZoomSliderValueChanged(object sender, ValueChangedEventArgs e)
-    {
-        if (!_isZoomSupported)
-            return;
-
-        cameraView.ZoomFactor = (float)e.NewValue;
-        ShowZoomSliderWithTimeout();
-    }
-
-    private async void ShowZoomSliderWithTimeout()
-    {
-        _zoomTimerCts?.Cancel();
-        _zoomTimerCts = new CancellationTokenSource();
-        var token = _zoomTimerCts.Token;
-
-        try
-        {
-            if (!customZoomSlider.IsVisible)
-            {
-                customZoomSlider.IsVisible = true;
-                await customZoomSlider.FadeToAsync(1, 250, Easing.CubicOut);
-            }
-            await Task.Delay(3000, token);
-            await customZoomSlider.FadeToAsync(0, 500, Easing.CubicIn);
-            customZoomSlider.IsVisible = false;
-        }
-        catch (OperationCanceledException)
-        {
-        }
-    }
-
-    private async void OnCaptureClicked(object sender, EventArgs e)
-    {
-        if (flashOverlay.IsVisible)
-            return;
-
-        try
-        {
-            flashOverlay.IsVisible = true;
-            flashOverlay.Opacity = 1;
-
-            using var stream = await cameraView.TakePhotoAsync();
-
-            if (stream != null)
-            {
-                _tempFilePath = await SavePhotoToCache(stream);
-                await cameraView.StopCameraAsync();
-
-                if (!string.IsNullOrEmpty(_tempFilePath))
-                {
-                    previewImage.Source = ImageSource.FromFile(_tempFilePath);
-                    ToggleUI(isPreview: true);
-                    await flashOverlay.FadeToAsync(0, 400, Easing.CubicOut);
-                }
-            }
-            flashOverlay.IsVisible = false;
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Capture Fehler: {ex.Message}");
-            await RestartPreview();
-        }
-        finally
-        {
-            flashOverlay.IsVisible = false;
-        }
-    }
-
-    private async void OnRetakeClicked(object sender, EventArgs e)
-    {
-        if (File.Exists(_tempFilePath))
-            File.Delete(_tempFilePath);
-        _tempFilePath = string.Empty;
-
-        await RestartPreview();
-        ToggleUI(isPreview: false);
-    }
-
-    private async void OnConfirmClicked(object sender, EventArgs e)
-    {
-        CameraResultService.SetResult(!string.IsNullOrEmpty(_tempFilePath) ? new FileResult(_tempFilePath) : null);
-        await Shell.Current.GoToAsync("..");
-    }
-
-    private async void OnCloseClicked(object sender, EventArgs e)
-    {
-        await cameraView.StopCameraAsync();
-        await Shell.Current.GoToAsync("..");
-    }
-
-    private async void OnRatioClicked(object sender, EventArgs e)
-    {
-        if (sender is not Button selectedButton || selectedButton.CommandParameter == null)
-            return;
-
-        double newRatio = Convert.ToDouble(selectedButton.CommandParameter);
-
-        if (!_isRatioPickerExpanded)
-        {
-            _isRatioPickerExpanded = true;
-            UpdateRatioPickerUI();
-            return;
-        }
-
-        _userSelectedRatio = newRatio;
-        _isRatioPickerExpanded = false;
-        UpdateRatioPickerUI();
-
-        SettingsService.Instance.CaptureRatio = _userSelectedRatio;
-        SettingsService.Instance.SaveSettings();
-
-        var newSize = GetOptimalSize(_userSelectedRatio);
-        await RestartPreview(newSize);
-    }
-
-    private void OnContainerTapped(object sender, EventArgs e)
-    {
-        if (_isRatioPickerExpanded)
-        {
+        Dispatcher.Dispatch(() => {
+            BindableLayout.SetItemsSource(ratioContainer, uniqueRatios);
             _isRatioPickerExpanded = false;
-            UpdateRatioPickerUI();
-        }
+            UpdateRatioPickerUI(animate: false);
+        });
+    }
 
-        if (_isZoomSupported)
-            ShowZoomSliderWithTimeout();
+    private static string GetRatioName(double ratio)
+    {
+        return ratio switch
+        {
+            >= 1.7 => "16:9",
+            >= 1.5 => "3:2",
+            >= 1.3 => "4:3",
+            >= 1.2 => "5:4",
+            1.0 => "1:1",
+            _ => ratio.ToString("F2")
+        };
     }
 
     private void UpdateRatioPickerUI(bool animate = true)
@@ -386,30 +186,131 @@ public partial class CameraView : ContentPage
                 bool isSelected = Math.Abs(val - _userSelectedRatio) < 0.05;
                 bool shouldBeVisible = _isRatioPickerExpanded || isSelected;
 
-                // Farbe setzen
                 btn.TextColor = isSelected ? Colors.Yellow : Colors.White;
 
                 if (shouldBeVisible)
                 {
-                    if (!btn.IsVisible)
-                    {
-                        btn.IsVisible = true;
-                        if (animate)
-                        {
-                            btn.Opacity = 0;
-                            btn.FadeToAsync(0.8, 250);
-                        }
-                        else
-                        {
-                            btn.Opacity = 0.8;
-                        }
-                    }
+                    btn.IsVisible = true;
+                    if (animate) btn.FadeToAsync(0.8, 250); else btn.Opacity = 0.8;
                 }
                 else
                 {
                     btn.IsVisible = false;
                 }
             }
+        }
+    }
+
+    // --- Events ---
+
+    private async void OnCaptureClicked(object sender, EventArgs e)
+    {
+        if (flashOverlay.IsVisible) return;
+        try
+        {
+            flashOverlay.IsVisible = true;
+            flashOverlay.Opacity = 1;
+
+            using var stream = await cameraView.TakePhotoAsync();
+            if (stream != null)
+            {
+                _tempFilePath = await SavePhotoToCache(stream);
+                previewImage.Source = ImageSource.FromFile(_tempFilePath);
+                ToggleUI(isPreview: true);
+                await cameraView.StopCameraAsync();
+            }
+        }
+        catch (Exception ex) { Debug.WriteLine(ex.Message); await RestartPreview(); }
+        finally { await flashOverlay.FadeToAsync(0, 200); flashOverlay.IsVisible = false; }
+    }
+
+    private async void OnFlashButtonClicked(object sender, EventArgs e)
+    {
+        _currentFlashMode = cameraView.FlashMode switch
+        {
+            FlashMode.Auto => FlashMode.Enabled,
+            FlashMode.Enabled => FlashMode.Disabled,
+            _ => FlashMode.Auto
+        };
+        cameraView.FlashMode = _currentFlashMode;
+        SettingsService.Instance.FlashMode = (int)_currentFlashMode;
+        UpdateFlashButtonUI();
+    }
+
+    private void UpdateFlashButtonUI()
+    {
+        if (liveButtons.Children.FirstOrDefault() is Button btn)
+            btn.Text = _currentFlashMode switch
+            {
+                FlashMode.Enabled => MaterialIcons.Flash_on,
+                FlashMode.Disabled => MaterialIcons.Flash_off,
+                _ => MaterialIcons.Flash_auto
+            };
+    }
+
+    private async void OnRatioClicked(object sender, EventArgs e)
+    {
+        if (sender is not Button btn || btn.CommandParameter is not double val) return;
+
+        if (!_isRatioPickerExpanded) { _isRatioPickerExpanded = true; UpdateRatioPickerUI(); return; }
+
+        _userSelectedRatio = val;
+        _isRatioPickerExpanded = false;
+        UpdateRatioPickerUI();
+
+        SettingsService.Instance.CaptureRatio = val;
+        SettingsService.Instance.SaveSettings();
+        await RestartPreview(GetOptimalSize(val));
+    }
+
+    private void OnZoomSliderValueChanged(object sender, ValueChangedEventArgs e)
+    {
+        if (_isZoomSupported)
+        {
+            cameraView.ZoomFactor = (float)e.NewValue;
+            ShowZoomSliderWithTimeout();
+        }
+    }
+
+    private async void ShowZoomSliderWithTimeout()
+    {
+        _zoomTimerCts?.Cancel();
+        _zoomTimerCts = new CancellationTokenSource();
+        try
+        {
+            customZoomSlider.IsVisible = true;
+            await customZoomSlider.FadeToAsync(1, 200);
+            await Task.Delay(3000, _zoomTimerCts.Token);
+            await customZoomSlider.FadeToAsync(0, 500);
+            customZoomSlider.IsVisible = false;
+        }
+        catch (OperationCanceledException) { }
+    }
+
+    private async void OnRetakeClicked(object sender, EventArgs e)
+    {
+        if (File.Exists(_tempFilePath)) File.Delete(_tempFilePath);
+        _tempFilePath = string.Empty;
+        ToggleUI(isPreview: false);
+        await RestartPreview();
+    }
+
+    private async void OnConfirmClicked(object s, EventArgs e)
+    {
+        CameraResultService.SetResult(!string.IsNullOrEmpty(_tempFilePath) ? new FileResult(_tempFilePath) : null);
+        await Shell.Current.GoToAsync("..");
+    }
+
+    private async void OnCloseClicked(object s, EventArgs e) => await Shell.Current.GoToAsync("..");
+
+    private async void OnSwitchCameraClicked(object sender, EventArgs e)
+    {
+        if (cameraView.Cameras.Count > 1)
+        {
+            int nextIndex = (cameraView.Cameras.IndexOf(cameraView.Camera) + 1) % cameraView.Cameras.Count;
+            await cameraView.StopCameraAsync();
+            cameraView.Camera = cameraView.Cameras[nextIndex];
+            await RestartPreview(GetOptimalSize(_userSelectedRatio));
         }
     }
 
@@ -423,43 +324,22 @@ public partial class CameraView : ContentPage
 
     private static async Task<string?> SavePhotoToCache(Stream photoStream)
     {
-        if (photoStream == null) return null;
-        string cachePath = Path.Combine(FileSystem.CacheDirectory, $"Capture_{DateTime.Now:yyyyMMdd_HHmmss}.jpg");
-        using (FileStream fileStream = File.Create(cachePath))
-        {
-            if (photoStream.CanSeek)
-                photoStream.Position = 0;
-            await photoStream.CopyToAsync(fileStream);
-        }
-        return cachePath;
+        var path = Path.Combine(FileSystem.CacheDirectory, $"Cap_{DateTime.Now:yyyyMMdd_HHmmss}.jpg");
+        using var fs = File.Create(path);
+        await photoStream.CopyToAsync(fs);
+        return path;
     }
 
-    private async void OnSwitchCameraClicked(object sender, EventArgs e)
+    private void OnContainerTapped(object sender, EventArgs e)
     {
-        if (cameraView.Cameras.Count > 1)
-        {
-            int nextIndex = (cameraView.Cameras.IndexOf(cameraView.Camera) + 1) % cameraView.Cameras.Count;
-            await cameraView.StopCameraAsync();
-            cameraView.Camera = cameraView.Cameras[nextIndex];
-
-            var newSize = GetOptimalSize(_userSelectedRatio);
-            await RestartPreview(newSize);
-        }
+        if (_isRatioPickerExpanded) { _isRatioPickerExpanded = false; UpdateRatioPickerUI(); }
+        if (_isZoomSupported) ShowZoomSliderWithTimeout();
     }
 }
 
 public static class CameraResultService
 {
     private static TaskCompletionSource<FileResult?>? _tcs;
-
-    public static Task<FileResult?> WaitForCaptureAsync()
-    {
-        _tcs = new TaskCompletionSource<FileResult?>();
-        return _tcs.Task;
-    }
-
-    public static void SetResult(FileResult? result)
-    {
-        _tcs?.TrySetResult(result);
-    }
+    public static Task<FileResult?> WaitForCaptureAsync() { _tcs = new TaskCompletionSource<FileResult?>(); return _tcs.Task; }
+    public static void SetResult(FileResult? result) => _tcs?.TrySetResult(result);
 }

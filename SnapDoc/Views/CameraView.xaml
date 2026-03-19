@@ -16,11 +16,9 @@
               HorizontalOptions="Fill" 
               VerticalOptions="Fill" 
               BackgroundColor="Black">
-            <ContentView HorizontalOptions="Center" VerticalOptions="Center">
-                <cv:CameraView x:Name="cameraView"
-                               HorizontalOptions="Center"
-                               VerticalOptions="Center"/>
-            </ContentView>
+            <cv:CameraView x:Name="cameraView"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"/>
         </Grid>
 
         <controls:VerticalZoomSlider x:Name="customZoomSlider"
@@ -64,23 +62,26 @@
                 Clicked="OnCloseClicked"/>
 
         <VerticalStackLayout x:Name="ratioContainer" 
-                             HorizontalOptions="End" 
-                             VerticalOptions="Start" 
-                             Margin="0,16,16,0" 
-                             Spacing="10"
-                             Opacity="0">
+                     HorizontalOptions="End" 
+                     VerticalOptions="Start" 
+                     Margin="0,16,16,0" 
+                     Spacing="10"
+                     Opacity="1"
+                     InputTransparent="False"
+                     ZIndex="10">
             <BindableLayout.ItemTemplate>
-                <DataTemplate x:DataType="local:RatioItem">
+                <DataTemplate>
                     <Button Text="{Binding Name}"
-                            Clicked="OnRatioClicked"
-                            CommandParameter="{Binding Value}"
-                            WidthRequest="50"
-                            Padding="0"
-                            FontSize="12"
-                            CornerRadius="8"
-                            BackgroundColor="#404040"
-                            TextColor="White"
-                            Opacity="0.8" />
+                    CommandParameter="{Binding Value}"
+                    Clicked="OnRatioClicked"
+                    WidthRequest="50"
+                    HeightRequest="40"
+                    Padding="0"
+                    FontSize="12"
+                    CornerRadius="8"
+                    BackgroundColor="#404040"
+                    TextColor="White"
+                    Opacity="0.8" />
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </VerticalStackLayout>

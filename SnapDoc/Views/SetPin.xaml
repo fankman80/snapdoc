@@ -21,11 +21,14 @@
     </Shell.BackButtonBehavior>
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto"
+        <Grid x:DataType="views:SetPin"
+              ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Entry Grid.Column="0" 
-                   Text="{Binding Pin.PinName}"                
+                   BindingContext="{Binding Pin}"
+                   x:DataType="local:PinItem"
+                   Text="{Binding PinName}"                
                    TextColor="{DynamicResource PrimaryDark}"
                    Placeholder="{x:Static res:AppResources.titel_eingeben}"
                    PlaceholderColor="{DynamicResource PrimaryDark}"
@@ -68,7 +71,8 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid Margin="16">
+    <Grid Margin="16"
+          x:DataType="views:SetPin">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -121,8 +125,10 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <VerticalStackLayout Grid.Row="1">
-            <material:TextField Text="{Binding Pin.PinLocation}"
+        <VerticalStackLayout Grid.Row="1"
+                             BindingContext="{Binding Pin}" 
+                             x:DataType="local:PinItem" >
+            <material:TextField Text="{Binding PinLocation}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -130,7 +136,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"
                                 Title="{x:Static res:AppResources.standort}"/>
-            <material:EditorField Text="{Binding Pin.PinDesc}"
+            <material:EditorField Text="{Binding PinDesc}"
                                   MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -149,7 +155,7 @@
                 </Grid.RowDefinitions>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="0">
                     <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding Pin.IsAllowExport}"
+                                     IsToggled="{Binding IsAllowExport}"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
                                      BorderColorOff ="Transparent"
@@ -161,7 +167,7 @@
                 </Grid>
                 <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
                     <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding Pin.IsLockPosition}"
+                                     IsToggled="{Binding IsLockPosition}"
                                      HorizontalOptions="Start"
                                      VerticalOptions="Center"
                                      BorderColorOff ="Transparent"
@@ -172,14 +178,14 @@
                     <Label Text="{x:Static res:AppResources.position_sperren}" Grid.Column="1" VerticalOptions="Center" />
                 </Grid>
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"                      
-                        IsEnabled="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
+                        IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="Transparent"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
-                    <ImageButton Source="{Binding Pin.DisplayIconPath}"
+                    <ImageButton Source="{Binding DisplayIconPath}"
                                  BackgroundColor="Transparent"
                                  Aspect="AspectFit"
                                  Clicked="OnPinSelectClick"
@@ -187,13 +193,10 @@
                 </Border>
             </Grid>
 
-            <Border x:DataType="views:SetPin"
-                    Stroke="{DynamicResource SecondaryBackground}"
+            <Border Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8">
-                <Grid BindingContext="{Binding Pin}" 
-                      x:DataType="local:PinItem" 
-                      ColumnDefinitions="*,Auto" 
+                <Grid ColumnDefinitions="*,Auto" 
                       ColumnSpacing="0">
                     <Picker Grid.Column="0"
                             BackgroundColor="Transparent"
