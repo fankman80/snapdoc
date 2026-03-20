@@ -36,6 +36,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private Point mousePos;
     private bool isTappedHandled = false;
+    private double minScale = 0.1;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
 
@@ -472,6 +473,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnPinched(object sender, PinchEventArgs e)
     {
         planContainer.IsPanningEnabled = true;
+
+        if (planContainer.Scale < minScale)        
+            ImageFit(null, null);        
     }
 
     private void SetPinClicked(object sender, EventArgs e)
@@ -698,9 +702,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
 #if WINDOWS
         if (mousePos.X < 0 || !planContainer.IsPanningEnabled)
-            return; // Ignore scroll events when mouse is onto the flyout
+            return;
 
-        // Dynamischer Zoomfaktor basierend auf der aktuellen Skalierung
         double zoomFactor;
         if (planContainer.Scale > 2) // Sehr stark vergrößert
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.05 : 0.95;  // Sehr langsame Zoom-Änderung
@@ -709,7 +712,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else // Wenig vergrößert oder sehr klein
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;  // Moderate Zoom-Änderung
 
-        double targetScale = PlanContainer.Scale * zoomFactor; ;
+        double targetScale = PlanContainer.Scale * zoomFactor;
+        if (targetScale <= minScale)
+        {
+            ImageFit(null, null);
+            return; 
+        }
+
         double newAnchorX = 1.0 / PlanContainer.Width * (mousePos.X - planContainer.TranslationX);
         double newAnchorY = 1.0 / PlanContainer.Height * (mousePos.Y - planContainer.TranslationY);
         double deltaTranslationX = (PlanContainer.Width * (newAnchorX - planContainer.AnchorX)) * (targetScale / planContainer.Scale - 1);
@@ -741,8 +750,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void ImageFit(object sender, EventArgs e)
     {
+        var scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
+        minScale = scale;
         planContainer.Rotation = 0;
-        planContainer.Scale = Math.Min(this.Width / PlanContainer.Width, this.Height / PlanContainer.Height);
+        planContainer.Scale = scale;
         planContainer.TranslationX = (this.Width - PlanContainer.Width) / 2;
         planContainer.TranslationY = (this.Height - PlanContainer.Height) / 2;
         planContainer.AnchorX = 1.0 / PlanContainer.Width * ((this.Width / 2) - planContainer.TranslationX);

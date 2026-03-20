@@ -20,6 +20,7 @@ public partial class ImageViewPage : IQueryAttributable
     public string ImgSource = null;
     private bool isCleared = false;
     private bool hasFittedImage = false;
+    private double minScale = 0.1;
     private readonly TransformViewModel fotoContainer;
 
     // --- DrawingController ---
@@ -143,6 +144,11 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPinched(object sender, PinchEventArgs e)
     {
         fotoContainer.IsPanningEnabled = true;
+        
+        if (fotoContainer.Scale < minScale)
+            ImageFit(null, null);
+        
+        fotoContainer.IsPanningEnabled = true;
     }
 
     public void OnPanning(object sender, PanEventArgs e)
@@ -172,6 +178,12 @@ public partial class ImageViewPage : IQueryAttributable
             zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;
 
         double targetScale = fotoContainer.Scale * zoomFactor;
+        if (targetScale <= minScale)
+        {
+            ImageFit(null, null);
+            return;
+        }
+
         double newAnchorX = 1 / FotoContainer.Width * (mousePos.X - fotoContainer.TranslationX);
         double newAnchorY = 1 / FotoContainer.Height * (mousePos.Y - fotoContainer.TranslationY);
         double deltaTranslationX = (FotoContainer.Width * (newAnchorX - fotoContainer.AnchorX)) * (targetScale / fotoContainer.Scale - 1);
@@ -194,6 +206,7 @@ public partial class ImageViewPage : IQueryAttributable
     private void ImageFit(object sender, EventArgs e)
     {
         var scale = Math.Min(this.Width / FotoContainer.Width, this.Height / FotoContainer.Height);
+        minScale = scale;
         fotoContainer.Scale = scale;
         fotoContainer.TranslationX = (this.Width - FotoContainer.Width) / 2;
         fotoContainer.TranslationY = (this.Height - FotoContainer.Height) / 2;
