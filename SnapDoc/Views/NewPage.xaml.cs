@@ -206,15 +206,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             double scale = 1.0 / PlanContainer.Scale;
             double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-            foreach (MR.Gestures.Image img in PlanContainer.Children.OfType<MR.Gestures.Image>())
+            foreach (var img in _pinLookup.Values)
             {
+                var pinData = thisPlan.Pins[img.AutomationId];
                 if (img.AutomationId != null)
                 {
-                    if (!thisPlan.Pins[img.AutomationId].IsLockAutoScale)
-                        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
-                            img.Scale = scale * thisPlan.Pins[img.AutomationId].PinScale;
+                    if (!pinData.IsLockAutoScale)
+                        if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
+                            img.Scale = scale * pinData.PinScale;
 
-                    if (!thisPlan.Pins[img.AutomationId].IsLockRotate)
+                    if (!pinData.IsLockRotate)
                         img.Rotation = PlanContainer.Rotation * -1;
                 }
             }
@@ -766,7 +767,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             double scale = 1.0 / planContainer.Scale;
             double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-            if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
+            if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
                 return 1 / planContainer.Scale * thisPlan.Pins[pinId].PinScale;
             else
                 return scaleLimit * thisPlan.Pins[pinId].PinScale;
@@ -1182,7 +1183,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         double scale = 1.0 / PlanContainer.Scale;
         double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-        if (scale < scaleLimit & scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
+        if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
             doubleTappedPin.Scale = scale * sliderValue / 100.0;
         else
             doubleTappedPin.Scale = sliderValue / 100.0;
