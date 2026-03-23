@@ -25,9 +25,18 @@ public partial class ExportReport
 
     private static string storeItemId;
 
+    private record FotoWorkItem(string SourcePath, string TargetPath, float CompressValue);
+
     public static async Task DocX(string templateDoc, string savePath)
     {
         imageRelationshipIds.Clear();
+
+        // Cache-Verzeichnis sicherstellen
+        if (!Directory.Exists(Settings.CacheDirectory))
+            Directory.CreateDirectory(Settings.CacheDirectory);
+
+        // Alle Bilder parallel vorbereiten (BEVOR das Word-Dokument angefasst wird)
+        await PreProcessAllImagesAsync(GlobalJson.Data, CancellationToken.None);
 
         Dictionary<string, string> placeholders_single = new()
         {
@@ -257,44 +266,32 @@ public partial class ExportReport
                                                     case "${pin_fotoList}":
                                                         if (SettingsService.Instance.IsImageExport)
                                                         {
-                                                            foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos)
+                                                            foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos.Values)
                                                             {
-                                                                if (!img.Value.AllowExport) continue;
+                                                                if (!img.AllowExport) continue;
 
-                                                                string imgPath = Path.Combine(Settings.DataDirectory,
-                                                                                              GlobalJson.Data.ProjectPath,
-                                                                                              GlobalJson.Data.ImagePath,
-                                                                                              img.Value.File);
+                                                                string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
+                                                                string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
-                                                                if (!SettingsService.Instance.IsFotoOverlayExport &&
-                                                                    img.Value.HasOverlay)
+                                                                if (SettingsService.Instance.IsFotoCompressed && File.Exists(cachedPath))
+                                                                    imgPath = cachedPath;
+                                                                else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
+                                                                    imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
+
+                                                                if (File.Exists(imgPath))
                                                                 {
-                                                                    imgPath = Path.Combine(Settings.DataDirectory,
-                                                                                           GlobalJson.Data.ProjectPath,
-                                                                                           GlobalJson.Data.ImagePath,
-                                                                                           "originals",
-                                                                                           img.Value.File);
+                                                                    double factor = (double)img.ImageSize.Width / img.ImageSize.Height;
+                                                                    var scaledSize = new Size
+                                                                    {
+                                                                        Width = SettingsService.Instance.ImageExportSize,
+                                                                        Height = SettingsService.Instance.ImageExportSize / factor
+                                                                    };
+
+                                                                    var imageElement = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline");
+
+                                                                    if (imageElement != null)
+                                                                        newParagraph.Append(new Run(imageElement));
                                                                 }
-
-                                                                var factor = img.Value.ImageSize.Width / img.Value.ImageSize.Height;
-                                                                var scaledSize = new Size
-                                                                {
-                                                                    Width = SettingsService.Instance.ImageExportSize,
-                                                                    Height = SettingsService.Instance.ImageExportSize / factor
-                                                                };
-
-                                                                if (SettingsService.Instance.IsFotoCompressed)
-                                                                {
-                                                                    var newPath = Path.Combine(Settings.CacheDirectory,
-                                                                                               Path.GetFileName(img.Value.File));
-                                                                    Helper.BitmapResizer(imgPath, newPath,
-                                                                                         SettingsService.Instance.FotoCompressValue / 100f);
-                                                                    imgPath = newPath;
-                                                                }
-
-                                                                newParagraph.Append(new Run(GetImageElement(mainPart, imgPath,
-                                                                                                            scaledSize,
-                                                                                                            new Point(0, 0), 0, "inline")));
                                                             }
                                                         }
                                                         break;
@@ -428,7 +425,7 @@ public partial class ExportReport
                             {
                                 SizeF planMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
                                 string replaceText = "${plan_images/" + planMaxSize.Width.ToString() + "/" + planMaxSize.Height.ToString() + "}";
-                                
+
                                 // lese Textformatierung des Platzhalters ein
                                 string fontSizeVal = "28";
                                 Run firstRun = paragraph.Elements<Run>().FirstOrDefault();
@@ -1149,5 +1146,48 @@ public partial class ExportReport
                 }
             }
         }
+    }
+
+    private static async Task PreProcessAllImagesAsync(JsonDataModel data, CancellationToken ct)
+    {
+        var tasks = new List<FotoWorkItem>();
+
+        // 1. Alle Fotos sammeln, die komprimiert werden müssen
+        foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
+        {
+            if (plan.Pins == null)
+                continue;
+
+            foreach (var pin in plan.Pins.Values.Where(p => p.IsAllowExport))
+            {
+                foreach (var img in pin.Fotos.Values.Where(f => f.AllowExport))
+                {
+                    string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, img.File);
+                    if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
+                        sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, "originals", img.File);
+
+                    string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
+
+                    // Nur hinzufügen, wenn Kompression gewünscht und Ziel noch nicht existiert
+                    if (SettingsService.Instance.IsFotoCompressed && !File.Exists(targetPath))
+                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, SettingsService.Instance.FotoCompressValue / 100f));
+                }
+            }
+        }
+
+        // 2. Parallel abarbeiten
+        await Parallel.ForEachAsync(tasks, new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            CancellationToken = ct
+        }, async (work, taskCt) =>
+        {
+            await Task.Run(() => {
+                if (File.Exists(work.SourcePath))
+                {
+                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue);
+                }
+            }, taskCt);
+        });
     }
 }

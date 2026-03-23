@@ -126,8 +126,8 @@
   <data name="beschreibung" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="bildkomprimierung" xml:space="preserve">
-    <value>Image compression</value>
+  <data name="fotoqualitaet" xml:space="preserve">
+    <value>Photo quality</value>
   </data>
   <data name="datum" xml:space="preserve">
     <value>Date</value>

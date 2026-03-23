@@ -322,15 +322,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Bildkomprimierung ähnelt.
-        /// </summary>
-        internal static string bildkomprimierung {
-            get {
-                return ResourceManager.GetString("bildkomprimierung", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wähle ein Bild aus... ähnelt.
         /// </summary>
         internal static string bitte_waehle_bild {
@@ -741,6 +732,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string foto_loeschen {
             get {
                 return ResourceManager.GetString("foto_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fotoqualität ähnelt.
+        /// </summary>
+        internal static string fotoqualitaet {
+            get {
+                return ResourceManager.GetString("fotoqualitaet", resourceCulture);
             }
         }
         
