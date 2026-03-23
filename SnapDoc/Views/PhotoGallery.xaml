@@ -129,24 +129,17 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <Grid Grid.Row="0"
-              x:DataType="views:FotoGalleryView"              
-              HorizontalOptions="Start"
-              ColumnDefinitions="50, Auto"
-              HeightRequest="40">
-            <controls:Switch Grid.Column="0"
-                             IsToggled="{Binding IsActiveToggle}"
-                             HorizontalOptions="Start"
-                             VerticalOptions="Center"
-                             BorderColorOff ="Transparent"
-                             KnobColorOn="White"
-                             KnobColorOff="White"
-                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-            <Label Text="{x:Static res:AppResources.inaktive_fotos_ausblenden}" Grid.Column="1" VerticalOptions="Center" />
-        </Grid>
-
+        <controls:Switch x:DataType="views:FotoGalleryView"
+                        LabelText="{x:Static res:AppResources.inaktive_fotos_ausblenden}"
+                        IsToggled="{Binding IsActiveToggle}"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BorderColorOff ="Transparent"
+                        KnobColorOn="White"
+                        KnobColorOff="White"
+                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+ 
         <Button x:Name="SortDirection"
                 Text="{x:Static local:MaterialIcons.Sort}"
                 FontSize="36"

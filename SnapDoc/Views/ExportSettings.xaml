@@ -77,79 +77,66 @@
                                 ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
                                 Clicked="OnDeleteDocument"/>
                     </Grid>
-                    <VerticalStackLayout Spacing="0">
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsPlanExport}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.exportiere_plaene}" Grid.Column="1" VerticalOptions="Center" />
-                        </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsPosImageExport}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.exportiere_positionsbilder}" Grid.Column="1" VerticalOptions="Center" />
-                        </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsPinIconExport}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.exportiere_pin_icons}" Grid.Column="1" VerticalOptions="Center" />
-                        </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsImageExport}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.exportiere_fotos}" Grid.Column="1" VerticalOptions="Center" />
-                        </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40" IsVisible="{Binding IsImageExport}">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsFotoOverlayExport}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.exportiere_foto_overlays}" Grid.Column="1" VerticalOptions="Center" IsVisible="{Binding IsImageExport}"/>
-                        </Grid>
-                        <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                            <controls:Switch Grid.Column="0"
-                                             IsToggled="{Binding IsFotoCompressed}"
-                                             HorizontalOptions="Start"
-                                             VerticalOptions="Center"
-                                             BorderColorOff ="Transparent"
-                                             KnobColorOn="White"
-                                             KnobColorOff="White"
-                                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                            <Label Text="{x:Static res:AppResources.bildkomprimierung}" Grid.Column="1" VerticalOptions="Center" />
-                        </Grid>
+                    <VerticalStackLayout>
+                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
+                                        IsToggled="{Binding IsPlanExport}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_positionsbilder}"
+                                        IsToggled="{Binding IsPosImageExport}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_pin_icons}"
+                                        IsToggled="{Binding IsPinIconExport}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_fotos}"
+                                        IsToggled="{Binding IsImageExport}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_foto_overlays}"
+                                        IsToggled="{Binding IsFotoOverlayExport}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                        <controls:Switch LabelText="{x:Static res:AppResources.bildkomprimierung}"
+                                        IsToggled="{Binding IsFotoCompressed}"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        BorderColorOff ="Transparent"
+                                        KnobColorOn="White"
+                                        KnobColorOff="White"
+                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </VerticalStackLayout>
 
                     <controls:LocalizedLabel ResourceKey="bildkomprimierung"

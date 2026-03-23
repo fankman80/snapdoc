@@ -61,20 +61,18 @@
                         Clicked="OnColorPickerClicked"/>
             </Grid>
 
-            <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                <controls:Switch x:Name="allow_export"
-                                 Grid.Column="0"
-                                 HorizontalOptions="Start"
-                                 VerticalOptions="Center"
-                                 BorderColorOff ="Transparent"
-                                 KnobColorOn="White"
-                                 KnobColorOff="White"
-                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                <Label Text="{x:Static res:AppResources.plan_exportieren}" Grid.Column="1" VerticalOptions="Center" />
-            </Grid>
+            <controls:Switch x:Name="allow_export"
+                            HeightRequest="44"
+                            LabelText="{x:Static res:AppResources.plan_exportieren}"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            BorderColorOff ="Transparent"
+                            KnobColorOn="White"
+                            KnobColorOff="White"
+                            SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-            <Grid>
+                <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />

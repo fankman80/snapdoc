@@ -6,27 +6,35 @@
     x:Class="SnapDoc.Controls.Switch"
     x:Name="this">
 
-    <Grid x:DataType="controls:Switch"
-          HeightRequest="{Binding SwitchHeight, Source={x:Reference this}}"
-          WidthRequest="{Binding SwitchWidth, Source={x:Reference this}}"
-          HorizontalOptions="Center"
-          VerticalOptions="Start"
+    <Grid ColumnDefinitions="Auto, Auto" 
+          ColumnSpacing="16"
+          VerticalOptions="Center"
+          HorizontalOptions="Start"
+          x:DataType="controls:Switch"
           GestureRecognizers="{TapGestureRecognizer Tapped=OnTapped}">
 
-        <!-- Hintergrund -->
-        <Border x:Name="OuterContainer"
-                BackgroundColor="{Binding CurrentSwitchColor, Source={x:Reference this}}"/>
+        <Grid Grid.Column="0"
+              HeightRequest="{Binding SwitchHeight, Source={x:Reference this}}"
+              WidthRequest="{Binding SwitchWidth, Source={x:Reference this}}">
 
-        <!-- Knob -->
-        <Border x:Name="Knob"
-                BackgroundColor="{Binding CurrentKnobColor, Source={x:Reference this}}"
-                HorizontalOptions="Start"
-                VerticalOptions="Center"
-                WidthRequest="{Binding KnobSize, Source={x:Reference this}}"
-                HeightRequest="{Binding KnobSize, Source={x:Reference this}}"/>
+            <Border x:Name="OuterContainer"
+                    BackgroundColor="{Binding CurrentSwitchColor, Source={x:Reference this}}"/>
 
-        <!-- Dünne Linie als Path -->
-        <Path x:Name="CustomPath"
-              StrokeThickness="0.5"/>
+            <Border x:Name="Knob"
+                    BackgroundColor="{Binding CurrentKnobColor, Source={x:Reference this}}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    WidthRequest="{Binding KnobSize, Source={x:Reference this}}"
+                    HeightRequest="{Binding KnobSize, Source={x:Reference this}}"/>
+
+            <Path x:Name="CustomPath"
+                  StrokeThickness="0.5"/>
+        </Grid>
+
+        <Label Grid.Column="1"
+               Text="{Binding LabelText, Source={x:Reference this}}"
+               TextColor="{Binding TextColor, Source={x:Reference this}}"
+               FontSize="{Binding TextSize, Source={x:Reference this}}"
+               VerticalTextAlignment="Center" />
     </Grid>
 </ContentView>

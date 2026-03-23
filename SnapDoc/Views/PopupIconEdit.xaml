@@ -99,7 +99,7 @@
                         TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
 
-                <VerticalStackLayout Spacing="0">
+                <VerticalStackLayout>
                     <controls:LocalizedLabel ResourceKey="voreinstellung_skalierung"
                                              Value="{Binding IconScale, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
                                              ValueFormat="{}: {0:0}%"/>
@@ -109,56 +109,48 @@
                             ThumbColor="{DynamicResource Primary}"
                             MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                        <controls:Switch x:Name="allowRotate"
-                                         Grid.Column="0"
-                                         HorizontalOptions="Start"
-                                         VerticalOptions="Center"
-                                         BorderColorOff="Transparent"
-                                         KnobColorOn="White"
-                                         KnobColorOff="White"
-                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="{x:Static res:AppResources.rotation_sperren}" Grid.Column="1" VerticalOptions="Center" />
-                    </Grid>
-                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                        <controls:Switch x:Name="allowAutoScale"
-                                         Grid.Column="0"
-                                         HorizontalOptions="Start"
-                                         VerticalOptions="Center"
-                                         BorderColorOff="Transparent"
-                                         KnobColorOn="White"
-                                         KnobColorOff="White"
-                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="{x:Static res:AppResources.auto_skalierung_sperren}" Grid.Column="1" VerticalOptions="Center" />
-                    </Grid>                    
-                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40" x:Name="deleteIconContainer" IsVisible="False">
-                        <controls:Switch x:Name="deleteIcon"
-                                         Grid.Column="0"
-                                         IsToggled="False"
-                                         HorizontalOptions="Start"
-                                         VerticalOptions="Center"
-                                         BorderColorOff="Transparent"
-                                         KnobColorOn="White"
-                                         KnobColorOff="White"
-                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="{x:Static res:AppResources.icon_loeschen}" Grid.Column="1" VerticalOptions="Center" />
-                    </Grid>
-                    <Grid ColumnDefinitions="50, Auto" HeightRequest="40">
-                        <controls:Switch x:Name="setDefault"
-                                         Grid.Column="0"
-                                         IsToggled="False"
-                                         HorizontalOptions="Start"
-                                         VerticalOptions="Center"
-                                         BorderColorOff="Transparent"
-                                         KnobColorOn="White"
-                                         KnobColorOff="White"
-                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Label Text="{x:Static res:AppResources.standard_icon}" Grid.Column="1" VerticalOptions="Center" />
-                    </Grid>
+                    <controls:Switch x:Name="allowRotate"
+                                    LabelText="{x:Static res:AppResources.rotation_sperren}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                    <controls:Switch x:Name="allowAutoScale"
+                                    LabelText="{x:Static res:AppResources.auto_skalierung_sperren}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                    <controls:Switch x:Name="deleteIcon"
+                                    LabelText="{x:Static res:AppResources.icon_loeschen}"
+                                    IsVisible="False"
+                                    IsToggled="False"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                    <controls:Switch x:Name="setDefault"
+                                    LabelText="{x:Static res:AppResources.standard_icon}"
+                                    IsToggled="False"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>

@@ -1348,6 +1348,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin automatisch sperren ähnelt.
+        /// </summary>
+        internal static string pin_automatisch_sperren {
+            get {
+                return ResourceManager.GetString("pin_automatisch_sperren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin bearbeiten ähnelt.
         /// </summary>
         internal static string pin_bearbeiten {

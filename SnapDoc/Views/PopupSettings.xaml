@@ -26,7 +26,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout Margin="0,0,0,10">
+            <VerticalStackLayout>
                 <VerticalStackLayout Spacing="0">
                     <controls:LocalizedLabel ResourceKey="min_pingroesse_limitieren" Value="{Binding PinMinScaleLimit}" ValueFormat="{}: {0}%"/>
                     <Slider x:Name="MinScaleSlider"
@@ -47,56 +47,48 @@
                             MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                             Value="{Binding PinMaxScaleLimit}"/>
                 </VerticalStackLayout>
-                <VerticalStackLayout Spacing="0">
-                    <controls:LocalizedLabel ResourceKey="aufloesung_pdf_umwandlung" Value="{Binding MaxPdfPixelCount}" ValueFormat="{}: {0} MP"/>
-                    <Slider Maximum="50"
-                            Minimum="1"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding MaxPdfPixelCount}"/>
-                </VerticalStackLayout>
 
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsPlanRotateLocked}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="{x:Static res:AppResources.planrotation_sperren}" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
+                <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
+                                IsToggled="{Binding IsPlanRotateLocked}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsPlanListThumbnails}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="{x:Static res:AppResources.planliste_mit_vorschau}" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
+                <controls:Switch LabelText="{x:Static res:AppResources.planliste_mit_vorschau}"
+                                IsToggled="{Binding IsPlanListThumbnails}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsHideInactivePlans}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="{x:Static res:AppResources.inaktive_plaene_ausblenden}" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
-                
-            <Border Stroke="{DynamicResource SecondaryBackground}"
+                <controls:Switch LabelText="{x:Static res:AppResources.inaktive_plaene_ausblenden}"
+                                IsToggled="{Binding IsHideInactivePlans}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:Switch LabelText="{x:Static res:AppResources.pin_automatisch_sperren}"
+                                IsToggled="{Binding IsPinAutoLock}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <Border Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8"
                     Padding="8"
@@ -323,6 +315,15 @@
                                         ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
                                         Clicked="ResetIcon"/>
                             </Grid>
+                            <VerticalStackLayout Spacing="0">
+                                <controls:LocalizedLabel ResourceKey="aufloesung_pdf_umwandlung" Value="{Binding MaxPdfPixelCount}" ValueFormat="{}: {0} MP"/>
+                                <Slider Maximum="50"
+                                        Minimum="1"
+                                        ThumbColor="{DynamicResource Primary}"
+                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                        Value="{Binding MaxPdfPixelCount}"/>
+                            </VerticalStackLayout>
                             <Grid>     
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />

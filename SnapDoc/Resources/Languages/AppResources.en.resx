@@ -840,4 +840,7 @@
   <data name="kamera" xml:space="preserve">
     <value>Camera</value>
   </data>
+  <data name="pin_automatisch_sperren" xml:space="preserve">
+    <value>Auto-lock Pin</value>
+  </data>
 </root>

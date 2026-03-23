@@ -21,6 +21,32 @@ public partial class Switch : ContentView
         set => SetValue(LabelTextProperty, value);
     }
 
+    public static readonly BindableProperty TextColorProperty =
+        BindableProperty.Create(
+            nameof(TextColor),
+            typeof(Color),
+            typeof(Switch),
+            null); // null bedeutet: Nutze die Farbe vom System/Style
+
+    public Color TextColor
+    {
+        get => (Color)GetValue(TextColorProperty);
+        set => SetValue(TextColorProperty, value);
+    }
+
+    public static readonly BindableProperty TextSizeProperty =
+        BindableProperty.Create(
+            nameof(TextSize),
+            typeof(double),
+            typeof(Switch),
+            Label.FontSizeProperty.DefaultValue); // Fragt den echten MAUI-Standardwert ab
+
+    public double TextSize
+    {
+        get => (double)GetValue(TextSizeProperty);
+        set => SetValue(TextSizeProperty, value);
+    }
+
     public static readonly BindableProperty IsToggledProperty =
         BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
 

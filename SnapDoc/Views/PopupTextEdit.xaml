@@ -150,18 +150,17 @@
                         Value="{Binding TextPadding}"/>
             </VerticalStackLayout>
 
-            <Grid ColumnDefinitions="50, Auto" HeightRequest="30">
-                <controls:Switch Grid.Column="0"
-                                 IsToggled="{Binding AutoSize}"
-                                 HorizontalOptions="Start"
-                                 VerticalOptions="Center"
-                                 BorderColorOff ="Transparent"
-                                 KnobColorOn="White"
-                                 KnobColorOff="White"
-                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                <Label Text="{x:Static res:AppResources.automatische_schriftgroesse}" Grid.Column="1" VerticalOptions="Center" />
-            </Grid>
+            <controls:Switch LabelText="{x:Static res:AppResources.automatische_schriftgroesse}"
+                            HeightRequest="44"
+                            IsToggled="{Binding AutoSize}"
+                            HorizontalOptions="Start"
+                            VerticalOptions="Center"
+                            BorderColorOff ="Transparent"
+                            KnobColorOn="White"
+                            KnobColorOff="White"
+                            SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />

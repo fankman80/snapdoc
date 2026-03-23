@@ -33,7 +33,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         setDefault.IsToggled = iconItem.IsDefaultIcon;
 
         if (iconItem.IsCustomIcon)
-            deleteIconContainer.IsVisible = true;
+            deleteIcon.IsVisible = true;
 
         BindingContext = this;
 

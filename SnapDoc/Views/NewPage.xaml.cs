@@ -373,6 +373,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var dy = img.AnchorY * img.Height / plan.ImageSize.Height * densityY;
 
         plan.Pins[ctx.PinId].Pos = new Point(x + dx, y + dy);
+
+        // Wenn die Position automatisch gesperrt werden soll, setze die Sperre nach Bewegung
+        if (SettingsService.Instance.IsPinAutoLock)
+            plan.Pins[ctx.PinId].IsLockPosition = true;
+
         GlobalJson.SaveToFile();
     }
 

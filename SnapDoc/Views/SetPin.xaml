@@ -153,30 +153,29 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="0">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsAllowExport}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="{x:Static res:AppResources.pin_exportieren}" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
-                <Grid ColumnDefinitions="50, Auto" HeightRequest="40" Grid.Column="0" Grid.Row="1">
-                    <controls:Switch Grid.Column="0"
-                                     IsToggled="{Binding IsLockPosition}"
-                                     HorizontalOptions="Start"
-                                     VerticalOptions="Center"
-                                     BorderColorOff ="Transparent"
-                                     KnobColorOn="White"
-                                     KnobColorOff="White"
-                                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                    <Label Text="{x:Static res:AppResources.position_sperren}" Grid.Column="1" VerticalOptions="Center" />
-                </Grid>
+
+                <controls:Switch Grid.Row="0"
+                                LabelText="{x:Static res:AppResources.pin_exportieren}"
+                                IsToggled="{Binding IsAllowExport}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:Switch Grid.Row="1"
+                                LabelText="{x:Static res:AppResources.position_sperren}"
+                                IsToggled="{Binding IsLockPosition}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"                      
                         IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                         WidthRequest="100"
