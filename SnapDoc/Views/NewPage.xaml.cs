@@ -28,6 +28,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public string PlanId;
     public string PinDelete;
     public string PinZoom = null;
+
     private readonly Plan thisPlan;
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null; 
@@ -202,23 +203,29 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == "Scale" || e.PropertyName == "Rotation")
-        {
-            double scale = 1.0 / PlanContainer.Scale;
-            double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-            foreach (var img in _pinLookup.Values)
-            {
-                var pinData = thisPlan.Pins[img.AutomationId];
-                if (img.AutomationId != null)
-                {
-                    if (!pinData.IsLockAutoScale)
-                        if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
-                            img.Scale = scale * pinData.PinScale;
+        if (e.PropertyName != nameof(PlanContainer.Scale) && e.PropertyName != nameof(PlanContainer.Rotation))
+            return;
 
-                    if (!pinData.IsLockRotate)
-                        img.Rotation = PlanContainer.Rotation * -1;
-                }
-            }
+        double scale = 1.0 / PlanContainer.Scale;
+        double invRotation = PlanContainer.Rotation * -1;
+        double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
+        double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
+
+        foreach (var img in _pinLookup.Values)
+        {
+            var id = img.AutomationId;
+            if (string.IsNullOrEmpty(id))
+                continue;
+
+            if (!thisPlan.Pins.TryGetValue(id, out var pinData))
+                continue;
+
+            if (!pinData.IsLockAutoScale)
+                if (scale < maxLimit && scale > minLimit)
+                    img.Scale = scale * pinData.PinScale;
+
+            if (!pinData.IsLockRotate)
+                img.Rotation = invRotation;
         }
     }
 
@@ -271,14 +278,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Size _planSize = thisPlan.ImageSize;
         Size _pinSize = thisPlan.Pins[pinId].Size;
         Double _rotation = PlanContainer.Rotation * -1 + thisPlan.Pins[pinId].PinRotation;
-
         ImageSource pinSource = pinIcon;
+
         if (thisPlan.Pins[pinId].IsCustomPin)
         {
             _rotation = thisPlan.Pins[pinId].PinRotation;
-            pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
-            var bytes = File.ReadAllBytes(pinIcon);
-            pinSource = ImageSource.FromStream(() => new MemoryStream(bytes));
+            string fullPath = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.CustomPinsPath,
+                pinIcon);
+            pinSource = ImageSource.FromFile(fullPath);
         }
         else if (thisPlan.Pins[pinId].IsCustomIcon)
         {
@@ -636,26 +646,26 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         else
         {
-            thisPlan.Pins[doubleTappedPin.AutomationId].PinIcon = _newPin;
-            thisPlan.Pins[doubleTappedPin.AutomationId].Size = _size;
-            thisPlan.Pins[doubleTappedPin.AutomationId].Pos = _pos;
-            thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = _rotation;
-            thisPlan.Pins[doubleTappedPin.AutomationId].PinName = _displayName;
-            GlobalJson.SaveToFile(); // initial speichern
+            var pinData = thisPlan.Pins[doubleTappedPin.AutomationId];
+            pinData.PinIcon = _newPin;
+            pinData.Size = _size;
+            pinData.Pos = _pos;
+            pinData.PinRotation = _rotation;
+            pinData.PinName = _displayName;
 
-            Point _originAnchor = thisPlan.Pins[doubleTappedPin.AutomationId].Anchor;
-            Point _originPos = thisPlan.Pins[doubleTappedPin.AutomationId].Pos;
-            Size _planSize = thisPlan.ImageSize;
-            Size _pinSize = thisPlan.Pins[doubleTappedPin.AutomationId].Size;
+            GlobalJson.SaveToFile();
 
-            var pinIcon = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, _newPin);
-            var bytes = File.ReadAllBytes(pinIcon);
+            var pinPath = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.CustomPinsPath,
+                _newPin);
 
-            doubleTappedPin.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-            doubleTappedPin.WidthRequest = thisPlan.Pins[doubleTappedPin.AutomationId].Size.Width;
-            doubleTappedPin.HeightRequest = thisPlan.Pins[doubleTappedPin.AutomationId].Size.Height;
-            doubleTappedPin.TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width);
-            doubleTappedPin.TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height);
+            doubleTappedPin.Source = ImageSource.FromFile(pinPath);
+            doubleTappedPin.WidthRequest = pinData.Size.Width;
+            doubleTappedPin.HeightRequest = pinData.Size.Height;
+            doubleTappedPin.TranslationX = (thisPlan.ImageSize.Width * pinData.Pos.X / densityX) - (pinData.Anchor.X * pinData.Size.Width);
+            doubleTappedPin.TranslationY = (thisPlan.ImageSize.Height * pinData.Pos.Y / densityY) - (pinData.Anchor.Y * pinData.Size.Height);
             doubleTappedPin.Rotation = _rotation;
             doubleTappedPin.Scale = _scale;
             doubleTappedPin.IsVisible = true;
