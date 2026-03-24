@@ -1,68 +1,38 @@
-name: Build MAUI iOS (.NET 10 - Manual)
+name: Build MAUI iOS
 
 on:
-  workflow_dispatch:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch: # Das erlaubt dir, den Build manuell unter "Actions" zu starten
 
 jobs:
-  build-maui:
-    runs-on: macos-26
-
+  build:
+    runs-on: macos-latest
     steps:
-      - name: Checkout Repository
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup .NET 10
+      - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: 10.0.x
+          dotnet-version: '10.0.x' # Hier jetzt explizit 10
 
-      - name: Install MAUI workloads
-        run: dotnet workload restore
-
-      - name: Restore NuGet packages
-        run: dotnet restore SnapDoc.sln
-
-      # 🔐 Zertifikat korrekt importieren
-      - name: Install Apple certificate
-        env:
-          IOS_P12_PASSWORD: ${{ secrets.IOS_P12_PASSWORD }}
+      - name: Install MAUI Workloads
         run: |
-          echo "${{ secrets.IOS_P12_BASE64 }}" | base64 --decode > ios_cert.p12
+          dotnet workload install maui-ios
+          dotnet workload restore
 
-          security create-keychain -p "" build.keychain
-          security set-keychain-settings -lut 21600 build.keychain
-          security unlock-keychain -p "" build.keychain
-
-          security import ios_cert.p12 \
-            -k build.keychain \
-            -P "$IOS_P12_PASSWORD" \
-            -T /usr/bin/codesign \
-            -T /usr/bin/security
-
-          security list-keychains -d user -s build.keychain
-          security default-keychain -s build.keychain
-
-      # 📄 Provisioning Profile
-      - name: Install provisioning profile
+      - name: Decode Signing Files
         run: |
-          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
-          echo "${{ secrets.IOS_PROVISION_PROFILE_BASE64 }}" | base64 --decode \
-            > ~/Library/MobileDevice/Provisioning\ Profiles/snapdoc.mobileprovision
+          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          echo "${{ secrets.IOS_PROVISION_BASE64 }}" | base64 --decode > profile.mobileprovision
 
-      # 🏗️ Signierter IPA-Build
-      - name: Build iOS IPA (Release)
+      - name: Build and Sign IPA
         run: |
-          dotnet publish SnapDoc.sln \
-            -f net10.0-ios \
-            -c Release \
-            /p:BuildIpa=true \
-            /p:CodesignKey="${{ secrets.IOS_CODESIGN_KEY }}" \
-            /p:CodesignProvision="${{ secrets.IOS_PROVISION_NAME }}" \
-            /p:CodesignTeamId="${{ secrets.IOS_TEAM_ID }}"
-
-      - name: Upload iOS IPA
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-app
-          path: |
-            **/bin/Release/net10.0-ios/**/*.ipa
+          dotnet publish SnapDoc/SnapDoc.csproj -f net10.0-ios -c Release \
+          -p:ArchiveOnBuild=true \
+          -p:CodesignKey="Apple Distribution" \
+          -p:CodesignProvision="MAUI_AppStore_Distribution" \
+          -p:RuntimeIdentifier=ios-arm64 \
+          -p:MtouchLink=SdkOnly \
+          -p:UseMaui=true
