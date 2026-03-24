@@ -12,7 +12,8 @@
         <Grid Grid.Row="0"
               VerticalOptions="End"
               IsClippedToBounds="False"
-              Margin="0,0,0,-5">
+              Margin="0,0,0,-5"
+              ZIndex="1">
 
             <Label x:Name="LowerLabel"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
@@ -39,7 +40,8 @@
               VerticalOptions="Center"
               IsClippedToBounds="False">
             
-            <Border HeightRequest="4" 
+            <Border HeightRequest="4"
+                    ZIndex="0"
                     BackgroundColor="{Binding MaximumTrackColor, Source={x:Reference this}}" 
                     VerticalOptions="Center" 
                     HorizontalOptions="Fill"
@@ -47,6 +49,7 @@
                     InputTransparent="True"/>
 
             <BoxView x:Name="HighlightTrack"
+                     ZIndex="1"
                      BackgroundColor="{Binding MinimumTrackColor, Source={x:Reference this}}" 
                      HeightRequest="4"
                      VerticalOptions="Center"
@@ -54,6 +57,7 @@
                      InputTransparent="True"/>
 
             <Border x:Name="LowerThumb"
+                    ZIndex="10"
                     HorizontalOptions="Start" VerticalOptions="Center"
                     WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
                     HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
@@ -68,6 +72,7 @@
             </Border>
 
             <Border x:Name="UpperThumb"
+                    ZIndex="10"
                     HorizontalOptions="Start" VerticalOptions="Center"
                     WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
                     HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
