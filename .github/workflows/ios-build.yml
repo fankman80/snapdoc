@@ -1,14 +1,16 @@
-name: Build MAUI iOS (.NET 10 - Manual)
+name: Build MAUI iOS
 
 on:
   push:
-    branches: [ "main" ] # Oder dein Branch-Name
+    branches: [ "main" ]
+  workflow_dispatch: # Das erlaubt dir, den Build manuell unter "Actions" zu starten
 
 jobs:
   build:
     runs-on: macos-latest
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout
+        uses: actions/checkout@v4
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -28,4 +30,5 @@ jobs:
           dotnet publish -f net8.0-ios -c Release \
           -p:ArchiveOnBuild=true \
           -p:CodesignKey="Apple Distribution" \
-          -p:CodesignProvision="MAUI_AppStore_Distribution"
+          -p:CodesignProvision="MAUI_AppStore_Distribution" \
+          -p:CodesignEntitlements="Platforms/iOS/Entitlements.plist"
