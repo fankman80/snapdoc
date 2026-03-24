@@ -3,7 +3,7 @@ name: Build MAUI iOS
 on:
   push:
     branches: [ "main" ]
-  workflow_dispatch: # Das erlaubt dir, den Build manuell unter "Actions" zu starten
+  workflow_dispatch: 
 
 jobs:
   build:
@@ -22,16 +22,32 @@ jobs:
           dotnet workload install maui-ios
           dotnet workload restore
 
-      - name: Decode Signing Files
-        run: |
-          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
-          echo "${{ secrets.IOS_PROVISION_BASE64 }}" | base64 --decode > profile.mobileprovision
-
       - name: Select Xcode Version
         run: |
           sudo xcode-select -s /Applications/Xcode_26.2.app || sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
+
+      - name: Import Certificate (.p12)
+        run: |
+          # 1. Decode aus Secret
+          echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
+          echo "${{ secrets.IOS_PROVISION_BASE64 }}" | base64 --decode > profile.mobileprovision
           
+          # 2. Temporären Schlüsselbund erstellen
+          KEYCHAIN_PATH=$RUNNER_TEMP/app-signing.keychain-db
+          KEYCHAIN_PASSWORD=$(openssl rand -base64 21)
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          security set-keychain-settings -lut 21600 "$KEYCHAIN_PATH"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN_PATH"
+          
+          # 3. Zertifikat importieren
+          security import certificate.p12 -k "$KEYCHAIN_PATH" -P "${{ secrets.IOS_CERT_PASSWORD }}" -A -t cert -f pkcs12
+          security list-keychain -d user -s "$KEYCHAIN_PATH"
+          
+          # 4. Provisioning Profile in den richtigen Ordner schieben
+          mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
+          cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
+
       - name: Build and Sign IPA
         run: |
           dotnet publish SnapDoc/SnapDoc.csproj -f net10.0-ios -c Release \
@@ -39,6 +55,11 @@ jobs:
           -p:CodesignKey="Apple Distribution" \
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
           -p:RuntimeIdentifier=ios-arm64 \
-          -p:CheckEolTargetFramework=false \
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: SnapDoc-iOS-App
+          path: SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/*.ipa
