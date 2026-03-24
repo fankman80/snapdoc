@@ -1,4 +1,4 @@
-name: Build MAUI Android (.NET 10 - Manual)
+name: Build MAUI Android
 
 on:
   workflow_dispatch:
