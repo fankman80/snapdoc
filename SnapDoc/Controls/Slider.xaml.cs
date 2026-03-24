@@ -32,6 +32,7 @@ public partial class CustomRangeSlider : ContentView
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
 
     private double _startLower, _startUpper;
+    private bool _isDragging = false;
 
     public CustomRangeSlider()
     {
@@ -49,9 +50,21 @@ public partial class CustomRangeSlider : ContentView
     {
         switch (e.StatusType)
         {
-            case GestureStatus.Started: _startLower = GetXFromValue(LowerValue); break;
+            case GestureStatus.Started:
+                _isDragging = true;
+                _startLower = GetXFromValue(LowerValue);
+                break;
+
             case GestureStatus.Running:
-                UpdateValue(Math.Clamp(_startLower + e.TotalX, 0, MainContainer.Width - KnobSize), true);
+                double newX = Math.Clamp(_startLower + e.TotalX, 0, MainContainer.Width - KnobSize);
+                LowerThumb.TranslationX = newX;
+                UpdateValue(newX, true);
+                break;
+
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                _isDragging = false;
+                UpdateUI();
                 break;
         }
     }
@@ -60,9 +73,21 @@ public partial class CustomRangeSlider : ContentView
     {
         switch (e.StatusType)
         {
-            case GestureStatus.Started: _startUpper = GetXFromValue(UpperValue); break;
+            case GestureStatus.Started:
+                _isDragging = true;
+                _startUpper = GetXFromValue(UpperValue);
+                break;
+
             case GestureStatus.Running:
-                UpdateValue(Math.Clamp(_startUpper + e.TotalX, 0, MainContainer.Width - KnobSize), false);
+                double newX = Math.Clamp(_startUpper + e.TotalX, 0, MainContainer.Width - KnobSize);
+                UpperThumb.TranslationX = newX;
+                UpdateValue(newX, false);
+                break;
+
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                _isDragging = false;
+                UpdateUI();
                 break;
         }
     }
@@ -70,18 +95,18 @@ public partial class CustomRangeSlider : ContentView
     private void UpdateValue(double x, bool isLower)
     {
         double width = MainContainer.Width - KnobSize;
+        if (width <= 0) return;
 
-        if (width <= 0)
-            return;
+        x = Math.Clamp(x, 0, width);
+
+        if (isLower) LowerThumb.TranslationX = x;
+        else UpperThumb.TranslationX = x;
 
         double rawValue = Minimum + (x / width) * (Maximum - Minimum);
         double steppedValue = Math.Round(rawValue / Step) * Step;
-        steppedValue = Math.Clamp(steppedValue, Minimum, Maximum);
 
-        if (isLower)
-            LowerValue = IsRange ? Math.Min(steppedValue, UpperValue - Step) : steppedValue;
-        else
-            UpperValue = Math.Max(steppedValue, LowerValue + Step);
+        if (isLower) LowerValue = Math.Clamp(steppedValue, Minimum, UpperValue - (IsRange ? Step : 0));
+        else UpperValue = Math.Clamp(steppedValue, LowerValue + Step, Maximum);
     }
 
     private double GetXFromValue(double val)
@@ -101,8 +126,10 @@ public partial class CustomRangeSlider : ContentView
         {
             LowerLabel.Text = string.Format(ValueDisplayFormat, LowerValue);
             UpperLabel.Text = string.Format(ValueDisplayFormat, UpperValue);
+
             Size lowerSize = LowerLabel.Measure(double.PositiveInfinity, double.PositiveInfinity);
             Size upperSize = UpperLabel.Measure(double.PositiveInfinity, double.PositiveInfinity);
+
             double lWidth = lowerSize.Width;
             double uWidth = upperSize.Width;
             double xLower = GetXFromValue(LowerValue);
@@ -130,8 +157,12 @@ public partial class CustomRangeSlider : ContentView
 
             LowerLabel.TranslationX = targetXLower;
             UpperLabel.TranslationX = targetXUpper;
-            LowerThumb.TranslationX = xLower;
-            UpperThumb.TranslationX = xUpper;
+
+            if (!_isDragging)
+            {
+                LowerThumb.TranslationX = xLower;
+                UpperThumb.TranslationX = xUpper;
+            }
 
             if (IsRange)
             {
