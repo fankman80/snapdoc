@@ -15,12 +15,12 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
         with:
-          dotnet-version: '8.0.x' # Hier forcieren wir Version 8
+          dotnet-version: '10.0.x' # Hier jetzt explizit 10
 
       - name: Install MAUI Workloads
         run: |
           dotnet workload install maui-ios
-          dotnet workload restore # Das löst den Android-Fehler
+          dotnet workload restore
 
       - name: Decode Signing Files
         run: |
@@ -29,8 +29,10 @@ jobs:
 
       - name: Build and Sign IPA
         run: |
-          dotnet publish SnapDoc/SnapDoc.csproj -f net8.0-ios -c Release \
+          dotnet publish SnapDoc/SnapDoc.csproj -f net10.0-ios -c Release \
           -p:ArchiveOnBuild=true \
           -p:CodesignKey="Apple Distribution" \
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
-          -p:RuntimeIdentifier=ios-arm64
+          -p:RuntimeIdentifier=ios-arm64 \
+          -p:MtouchLink=SdkOnly \
+          -p:UseMaui=true
