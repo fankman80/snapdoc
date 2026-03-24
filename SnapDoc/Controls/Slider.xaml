@@ -1,0 +1,86 @@
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SnapDoc.Controls.CustomRangeSlider"
+             x:Name="this">
+
+    <Grid x:Name="MainContainer" 
+          VerticalOptions="Center" 
+          RowDefinitions="Auto, Auto"
+          ColumnDefinitions="*"
+          IsClippedToBounds="False">
+        
+        <Grid Grid.Row="0"
+              VerticalOptions="End"
+              IsClippedToBounds="False"
+              Margin="0,0,0,-5">
+
+            <Label x:Name="LowerLabel"
+                   TextColor="{Binding TextColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   HorizontalOptions="Start"
+                   VerticalOptions="End"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="NoWrap"
+                   InputTransparent="True" />
+
+            <Label x:Name="UpperLabel" 
+                   TextColor="{Binding TextColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   HorizontalOptions="Start"
+                   VerticalOptions="End"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="NoWrap"
+                   InputTransparent="True"
+                   IsVisible="{Binding IsRange, Source={x:Reference this}}"/>
+        </Grid>
+
+        <Grid Grid.Row="1" 
+              HeightRequest="{Binding KnobSize, Source={x:Reference this}}" 
+              VerticalOptions="Center"
+              IsClippedToBounds="False">
+            
+            <Border HeightRequest="4" 
+                    BackgroundColor="{Binding MaximumTrackColor, Source={x:Reference this}}" 
+                    VerticalOptions="Center" 
+                    HorizontalOptions="Fill"
+                    StrokeShape="RoundRectangle 2"
+                    InputTransparent="True"/>
+
+            <BoxView x:Name="HighlightTrack"
+                     BackgroundColor="{Binding MinimumTrackColor, Source={x:Reference this}}" 
+                     HeightRequest="4"
+                     VerticalOptions="Center"
+                     HorizontalOptions="Start"
+                     InputTransparent="True"/>
+
+            <Border x:Name="LowerThumb"
+                    HorizontalOptions="Start" VerticalOptions="Center"
+                    WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
+                    HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
+                    BackgroundColor="{Binding ThumbColor, Source={x:Reference this}}"
+                    Stroke="#D1D1D6" StrokeThickness="0.5" StrokeShape="Ellipse">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdatedLower" />
+                </Border.GestureRecognizers>
+            </Border>
+
+            <Border x:Name="UpperThumb"
+                    HorizontalOptions="Start" VerticalOptions="Center"
+                    WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
+                    HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
+                    BackgroundColor="{Binding ThumbColor, Source={x:Reference this}}"
+                    Stroke="#D1D1D6" StrokeThickness="0.5" StrokeShape="Ellipse"
+                    IsVisible="{Binding IsRange, Source={x:Reference this}}">
+                <Border.Shadow>
+                    <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
+                </Border.Shadow>
+                <Border.GestureRecognizers>
+                    <PanGestureRecognizer PanUpdated="OnPanUpdatedUpper" />
+                </Border.GestureRecognizers>
+            </Border>
+        </Grid>
+    </Grid>
+</ContentView>

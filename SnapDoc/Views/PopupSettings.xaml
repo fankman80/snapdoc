@@ -27,26 +27,20 @@
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
-                <VerticalStackLayout Spacing="0">
-                    <controls:LocalizedLabel ResourceKey="min_pingroesse_limitieren" Value="{Binding PinMinScaleLimit}" ValueFormat="{}: {0}%"/>
-                    <Slider x:Name="MinScaleSlider"
-                            Maximum="{Binding PinMaxScaleLimit}"
-                            Minimum="1"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinMinScaleLimit}"/>
-                </VerticalStackLayout>
-                <VerticalStackLayout Spacing="0">
-                    <controls:LocalizedLabel ResourceKey="max_pingroesse_limitieren" Value="{Binding PinMaxScaleLimit}" ValueFormat="{}: {0}%"/>
-                    <Slider x:Name="MaxScaleSlider"
-                            Maximum="100"
-                            Minimum="{Binding PinMinScaleLimit}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinMaxScaleLimit}"/>
-                </VerticalStackLayout>
+                <HorizontalStackLayout Spacing="0">
+                    <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
+                    <Label Text=":"/>
+                </HorizontalStackLayout>
+                <controls:CustomRangeSlider IsRange="True"
+                                            Minimum="1"
+                                            Maximum="100"
+                                            Step="1"
+                                            ValueDisplayFormat="{}{0:0} %"
+                                            LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
+                                            UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
+                                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                </controls:CustomRangeSlider>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
                                 IsToggled="{Binding IsPlanRotateLocked}"
@@ -89,10 +83,10 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <Border Stroke="{DynamicResource SecondaryBackground}"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="8"
-                    Margin="0,0,0,10">
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
                 <uranium:ExpanderView Margin="6,6,6,6">
                     <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.modus_fuer_pinplatzierung}"/>

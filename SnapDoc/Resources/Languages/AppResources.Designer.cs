@@ -1105,24 +1105,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Max. Pingrösse limitieren ähnelt.
-        /// </summary>
-        internal static string max_pingroesse_limitieren {
-            get {
-                return ResourceManager.GetString("max_pingroesse_limitieren", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Min. Pingrösse limitieren ähnelt.
-        /// </summary>
-        internal static string min_pingroesse_limitieren {
-            get {
-                return ResourceManager.GetString("min_pingroesse_limitieren", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Modus für Pinplatzierung ähnelt.
         /// </summary>
         internal static string modus_fuer_pinplatzierung {
@@ -1470,6 +1452,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string pingroesse {
             get {
                 return ResourceManager.GetString("pingroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pingrösse limitieren ähnelt.
+        /// </summary>
+        internal static string pingroesse_limitieren {
+            get {
+                return ResourceManager.GetString("pingroesse_limitieren", resourceCulture);
             }
         }
         

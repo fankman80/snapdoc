@@ -366,11 +366,8 @@
   <data name="icondefinitionen_zuruecksetzen" xml:space="preserve">
     <value>Icondefinitionen zurücksetzen</value>
   </data>
-  <data name="max_pingroesse_limitieren" xml:space="preserve">
-    <value>Max. Pingrösse limitieren</value>
-  </data>
-  <data name="min_pingroesse_limitieren" xml:space="preserve">
-    <value>Min. Pingrösse limitieren</value>
+  <data name="pingroesse_limitieren" xml:space="preserve">
+    <value>Pingrösse limitieren</value>
   </data>
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
     <value>Auflösung PDF-Umwandlung</value>

@@ -366,11 +366,8 @@
   <data name="icondefinitionen_zuruecksetzen" xml:space="preserve">
     <value>Réinitialiser les définitions d'icônes</value>
   </data>
-  <data name="max_pingroesse_limitieren" xml:space="preserve">
-    <value>Limiter la taille max du pin's</value>
-  </data>
-  <data name="min_pingroesse_limitieren" xml:space="preserve">
-    <value>Limiter la taille min du pin's</value>
+  <data name="pingroesse_limitieren" xml:space="preserve">
+    <value>Limiter la taille du pin's</value>
   </data>
   <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
     <value>Résolution conversion PDF</value>

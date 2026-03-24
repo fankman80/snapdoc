@@ -179,6 +179,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <MauiXaml Update="Controls\Slider.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
 	  <MauiXaml Update="Views\CameraView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
