@@ -273,7 +273,7 @@ public partial class ExportReport
                                                                 string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
                                                                 string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
-                                                                if (SettingsService.Instance.IsFotoCompressed && File.Exists(cachedPath))
+                                                                if (SettingsService.Instance.FotoCompressValue < 100 && File.Exists(cachedPath))
                                                                     imgPath = cachedPath;
                                                                 else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
                                                                     imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
@@ -1169,7 +1169,7 @@ public partial class ExportReport
                     string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
                     // Nur hinzufügen, wenn Kompression gewünscht und Ziel noch nicht existiert
-                    if (SettingsService.Instance.IsFotoCompressed && !File.Exists(targetPath))
+                    if (SettingsService.Instance.FotoCompressValue < 100 && !File.Exists(targetPath))
                         tasks.Add(new FotoWorkItem(sourcePath, targetPath, SettingsService.Instance.FotoCompressValue / 100f));
                 }
             }

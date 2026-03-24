@@ -140,7 +140,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] private bool _isImageExport = true;
     [ObservableProperty] private bool _isPinIconExport = true;
     [ObservableProperty] private bool _isFotoOverlayExport = true;
-    [ObservableProperty] private bool _isFotoCompressed = true;
     [ObservableProperty] private int _fotoCompressValue = 20;
     [ObservableProperty] private int _imageExportSize = 40;
     [ObservableProperty] private double _pinExportSize = 3.2;
@@ -346,7 +345,6 @@ public partial class SettingsService : ObservableObject
             IsPinIconExport = IsPinIconExport,
             IsImageExport = IsImageExport,
             IsFotoOverlayExport = IsFotoOverlayExport,
-            IsFotoCompressed = IsFotoCompressed,
             FotoCompressValue = FotoCompressValue,
             PinLabelPrefix = PinLabelPrefix,
             PinLabelFontSize = Math.Round(PinLabelFontSize, 1),
@@ -425,7 +423,6 @@ public partial class SettingsService : ObservableObject
             IsPinIconExport = settings.IsPinIconExport;
             IsImageExport = settings.IsImageExport;
             IsFotoOverlayExport = settings.IsFotoOverlayExport;
-            IsFotoCompressed = settings.IsFotoCompressed;
             FotoCompressValue = settings.FotoCompressValue;
             PinLabelPrefix = settings.PinLabelPrefix ?? string.Empty;
             PinLabelFontSize = settings.PinLabelFontSize;
@@ -500,7 +497,6 @@ public partial class SettingsService : ObservableObject
         IsPinIconExport = defaultSettings.IsPinIconExport;
         IsImageExport = defaultSettings.IsImageExport;
         IsFotoOverlayExport = defaultSettings.IsFotoOverlayExport;
-        IsFotoCompressed = defaultSettings.IsFotoCompressed;
         FotoCompressValue = defaultSettings.FotoCompressValue;
         PinLabelPrefix = defaultSettings.PinLabelPrefix;
         PinLabelFontSize = defaultSettings.PinLabelFontSize;

@@ -28,8 +28,7 @@ internal class SettingsModel
     public bool IsPinIconExport { get; set; } // Pin-Icons im Bericht exportieren
     public bool IsImageExport { get; set; } // Fotos im Bericht exportieren
     public bool IsFotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
-    public bool IsFotoCompressed { get; set; } // Fotos im Worddokument komprimieren
-    public int FotoCompressValue { get; set; } // Kompressionsqualität der Fotos im Worddokument (0-100)
+    public int FotoCompressValue { get; set; } // Bildqualität der Fotos im Worddokument (0-100%)
     public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
     public double PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
     public double PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter
