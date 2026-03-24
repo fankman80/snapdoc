@@ -1,6 +1,4 @@
 ﻿#nullable disable
-#pragma warning disable MVVMTK0045
-
 using SkiaSharp;
 using CommunityToolkit.Mvvm.ComponentModel;
 
@@ -35,11 +33,11 @@ public partial class Plan : ObservableObject
     public string Description { get; set; }
     public Dictionary<string, Pin> Pins { get; set; } = [];
 
-    [ObservableProperty] private bool _allowExport;
+    [ObservableProperty] public partial bool AllowExport { get; set; }
 
-    [ObservableProperty] private string _planColor;
+    [ObservableProperty] public partial string PlanColor { get; set; }
 
-    [ObservableProperty] private int _pinCount;
+    [ObservableProperty] public partial int PinCount { get; set; }
 }
 
 public partial class Pin : ObservableObject
@@ -60,12 +58,12 @@ public partial class Pin : ObservableObject
     public GeoLocData GeoLocation { get; set; }
     public bool IsCustomIcon { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
-    [ObservableProperty] private string _pinIcon;
-    [ObservableProperty] private bool _isCustomPin;
-    [ObservableProperty] private bool _isAllowExport;
-    [ObservableProperty] private bool _isLockPosition;
-    [ObservableProperty] private bool _isLockRotate;
-    [ObservableProperty] private bool _isLockAutoScale;
+    [ObservableProperty] public partial string PinIcon { get; set; }
+    [ObservableProperty] public partial bool IsCustomPin { get; set; }
+    [ObservableProperty] public partial bool IsAllowExport { get; set; }
+    [ObservableProperty] public partial bool IsLockPosition { get; set; }
+    [ObservableProperty] public partial bool IsLockRotate { get; set; }
+    [ObservableProperty] public partial bool IsLockAutoScale { get; set; }
 }
 
 public partial class Foto : ObservableObject
@@ -75,7 +73,7 @@ public partial class Foto : ObservableObject
     public DateTime DateTime { get; set; }
     public Size ImageSize { get; set; }
 
-    [ObservableProperty] private bool _allowExport;
+    [ObservableProperty] public partial bool AllowExport { get; set; }
 }
 
 public class GeoLocData
@@ -142,4 +140,3 @@ public class Position
     public float X { get; set; }
     public float Y { get; set; }
 }
-#pragma warning restore MVVMTK0045

@@ -1,6 +1,5 @@
 
 namespace SnapDoc.Controls;
-
 public partial class CustomRangeSlider : ContentView
 {
     public static readonly BindableProperty MinimumProperty = BindableProperty.Create(nameof(Minimum), typeof(double), typeof(CustomRangeSlider), 0.0, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
@@ -31,79 +30,99 @@ public partial class CustomRangeSlider : ContentView
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
 
-    private double _startLower, _startUpper;
     private bool _isDragging = false;
+    private Border? _activeThumb;
+    private double _startTranslationX;
 
     public CustomRangeSlider()
     {
         InitializeComponent();
+
+        HighlightTrack.AnchorX = 0;
+
         MainContainer.SizeChanged += (s, e) => {
             if (!_isDragging) UpdateUI();
         };
     }
 
-    protected override void OnSizeAllocated(double width, double height)
+    private void OnPointerPressed(object sender, PointerEventArgs e)
     {
-        base.OnSizeAllocated(width, height);
-        if (!_isDragging)
-            UpdateUI();
+        if (MainContainer.Width <= 0) return;
+
+        var position = e.GetPosition(TouchLayer);
+        if (position == null) return;
+
+        double touchX = position.Value.X;
+        double adjustedTouchX = touchX - (KnobSize / 2);
+        double width = MainContainer.Width - KnobSize;
+
+        if (!IsRange)
+            _activeThumb = LowerThumb;
+        else
+        {
+            double distLower = Math.Abs(adjustedTouchX - LowerThumb.TranslationX);
+            double distUpper = Math.Abs(adjustedTouchX - UpperThumb.TranslationX);
+
+            if (distLower < distUpper)
+                _activeThumb = LowerThumb;
+            else if (distUpper < distLower)
+                _activeThumb = UpperThumb;
+            else
+                _activeThumb = adjustedTouchX > LowerThumb.TranslationX ? UpperThumb : LowerThumb;
+        }
+
+        double newX = Math.Clamp(adjustedTouchX, 0, width);
+        if (IsRange)
+        {
+            if (_activeThumb == LowerThumb)
+                newX = Math.Min(newX, UpperThumb.TranslationX);
+            else
+                newX = Math.Max(newX, LowerThumb.TranslationX);
+        }
+
+        _activeThumb.TranslationX = newX;
+        _startTranslationX = newX;
+        _isDragging = true;
+
+        UpdateVisualsDuringDrag(LowerThumb.TranslationX, UpperThumb.TranslationX);
     }
 
-    private void OnPanUpdatedLower(object sender, PanUpdatedEventArgs e)
+    private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
+        if (_activeThumb == null) return;
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0) return;
 
         switch (e.StatusType)
         {
-            case GestureStatus.Started:
-                _isDragging = true;
-                _startLower = LowerThumb.TranslationX; // Direkt vom UI-Element lesen
-                break;
-
             case GestureStatus.Running:
-                double maxAllowedX = IsRange ? UpperThumb.TranslationX : width;
-                double translationX = Math.Clamp(_startLower + e.TotalX, 0, maxAllowedX);
-                LowerThumb.TranslationX = translationX;
+                double translationX = Math.Clamp(_startTranslationX + e.TotalX, 0, width);
+
+                if (IsRange)
+                {
+                    if (_activeThumb == LowerThumb)
+                        translationX = Math.Min(translationX, UpperThumb.TranslationX);
+                    else
+                        translationX = Math.Max(translationX, LowerThumb.TranslationX);
+                }
+
+                _activeThumb.TranslationX = translationX;
+
                 double rawVal = Minimum + (translationX / width) * (Maximum - Minimum);
-                LowerLabel.Text = string.Format(ValueDisplayFormat, rawVal);
-                UpdateVisualsDuringDrag(translationX, UpperThumb.TranslationX);
+                if (_activeThumb == LowerThumb)
+                    LowerLabel.Text = string.Format(ValueDisplayFormat, rawVal);
+                else
+                    UpperLabel.Text = string.Format(ValueDisplayFormat, rawVal);
+
+                UpdateVisualsDuringDrag(LowerThumb.TranslationX, UpperThumb.TranslationX);
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 _isDragging = false;
                 FinalizeValue(LowerThumb.TranslationX, true);
-                UpdateUI();
-                break;
-        }
-    }
+                if (IsRange) FinalizeValue(UpperThumb.TranslationX, false);
 
-    private void OnPanUpdatedUpper(object sender, PanUpdatedEventArgs e)
-    {
-        double width = MainContainer.Width - KnobSize;
-        if (width <= 0) return;
-
-        switch (e.StatusType)
-        {
-            case GestureStatus.Started:
-                _isDragging = true;
-                _startUpper = UpperThumb.TranslationX;
-                break;
-
-            case GestureStatus.Running:
-                double minAllowedX = LowerThumb.TranslationX;
-                double translationX = Math.Clamp(_startUpper + e.TotalX, minAllowedX, width);
-                UpperThumb.TranslationX = translationX;
-                double rawVal = Minimum + (translationX / width) * (Maximum - Minimum);
-                UpperLabel.Text = string.Format(ValueDisplayFormat, rawVal);
-                UpdateVisualsDuringDrag(LowerThumb.TranslationX, translationX);
-                break;
-
-            case GestureStatus.Completed:
-            case GestureStatus.Canceled:
-                _isDragging = false;
-                FinalizeValue(UpperThumb.TranslationX, false);
+                _activeThumb = null;
                 UpdateUI();
                 break;
         }
@@ -114,12 +133,16 @@ public partial class CustomRangeSlider : ContentView
         if (IsRange)
         {
             HighlightTrack.TranslationX = xLower + (KnobSize / 2);
-            HighlightTrack.WidthRequest = Math.Max(0, xUpper - xLower);
+            double newWidth = Math.Max(0, xUpper - xLower);
+            if (Math.Abs(HighlightTrack.WidthRequest - newWidth) > 0.5)
+                HighlightTrack.WidthRequest = newWidth;
         }
         else
         {
             HighlightTrack.TranslationX = 0;
-            HighlightTrack.WidthRequest = xLower + (KnobSize / 2);
+            double newWidth = xLower + (KnobSize / 2);
+            if (Math.Abs(HighlightTrack.WidthRequest - newWidth) > 0.5)
+                HighlightTrack.WidthRequest = newWidth;
         }
 
         AdjustLabelPositions(xLower, xUpper);
@@ -129,8 +152,8 @@ public partial class CustomRangeSlider : ContentView
     {
         double halfKnob = KnobSize / 2;
         double containerWidth = MainContainer.Width;
-        double lWidth = (LowerLabel.Width > 0) ? LowerLabel.Width : LowerLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
-        double uWidth = (UpperLabel.Width > 0) ? UpperLabel.Width : UpperLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
+        double lWidth = LowerLabel.Width > 0 ? LowerLabel.Width : 45;
+        double uWidth = UpperLabel.Width > 0 ? UpperLabel.Width : 45;
         double targetXLower = xLower + halfKnob - (lWidth / 2);
         double targetXUpper = xUpper + halfKnob - (uWidth / 2);
 
@@ -139,12 +162,13 @@ public partial class CustomRangeSlider : ContentView
 
         if (IsRange)
         {
-            double minGap = 10;
+            double minGap = 5;
             if (targetXLower + lWidth + minGap > targetXUpper)
             {
                 double overlap = (targetXLower + lWidth + minGap) - targetXUpper;
                 targetXLower -= overlap / 2;
                 targetXUpper += overlap / 2;
+
                 targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
                 targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
             }
@@ -165,9 +189,9 @@ public partial class CustomRangeSlider : ContentView
         steppedValue = Math.Clamp(steppedValue, Minimum, Maximum);
 
         if (isLower)
-            LowerValue = IsRange ? Math.Min(steppedValue, UpperValue - Step) : steppedValue;
+            LowerValue = steppedValue;
         else
-            UpperValue = Math.Max(steppedValue, LowerValue + Step); // [cite: 16, 37]
+            UpperValue = steppedValue;
     }
 
     private double GetXFromValue(double val)
@@ -175,30 +199,27 @@ public partial class CustomRangeSlider : ContentView
         double width = MainContainer.Width - KnobSize;
         if (width <= 0 || Maximum <= Minimum)
             return 0;
-
         return (Math.Clamp(val, Minimum, Maximum) - Minimum) / (Maximum - Minimum) * width;
     }
 
     public void UpdateUI()
     {
-
-        if (LowerLabel == null || UpperLabel == null || MainContainer == null || MainContainer.Width <= 0) return;
+        if (LowerLabel == null || MainContainer == null || MainContainer.Width <= 0) return;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
-
-            LowerLabel.Text = string.Format(ValueDisplayFormat, LowerValue);
-            UpperLabel.Text = string.Format(ValueDisplayFormat, UpperValue);
-            double xLower = GetXFromValue(LowerValue);
-            double xUpper = GetXFromValue(UpperValue);
-
             if (!_isDragging)
             {
+                LowerLabel.Text = string.Format(ValueDisplayFormat, LowerValue);
+                UpperLabel.Text = string.Format(ValueDisplayFormat, UpperValue);
+
+                double xLower = GetXFromValue(LowerValue);
+                double xUpper = GetXFromValue(UpperValue);
+
                 LowerThumb.TranslationX = xLower;
                 UpperThumb.TranslationX = xUpper;
+                UpdateVisualsDuringDrag(xLower, xUpper);
             }
-
-            UpdateVisualsDuringDrag(LowerThumb.TranslationX, UpperThumb.TranslationX);
         });
     }
 }

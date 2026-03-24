@@ -8,7 +8,7 @@
           RowDefinitions="Auto, Auto"
           ColumnDefinitions="*"
           IsClippedToBounds="False">
-        
+
         <Grid Grid.Row="0"
               VerticalOptions="End"
               IsClippedToBounds="False"
@@ -39,9 +39,9 @@
               HeightRequest="{Binding KnobSize, Source={x:Reference this}}" 
               VerticalOptions="Center"
               IsClippedToBounds="False">
-            
-            <Border HeightRequest="4"
-                    ZIndex="0"
+
+            <Border ZIndex="0"
+                    HeightRequest="4"
                     BackgroundColor="{Binding MaximumTrackColor, Source={x:Reference this}}" 
                     VerticalOptions="Center" 
                     HorizontalOptions="Fill"
@@ -58,6 +58,7 @@
 
             <Border x:Name="LowerThumb"
                     ZIndex="10"
+                    InputTransparent="True"
                     HorizontalOptions="Start" VerticalOptions="Center"
                     WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
                     HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
@@ -66,13 +67,11 @@
                 <Border.Shadow>
                     <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
                 </Border.Shadow>
-                <Border.GestureRecognizers>
-                    <PanGestureRecognizer PanUpdated="OnPanUpdatedLower" />
-                </Border.GestureRecognizers>
             </Border>
 
             <Border x:Name="UpperThumb"
                     ZIndex="10"
+                    InputTransparent="True"
                     HorizontalOptions="Start" VerticalOptions="Center"
                     WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
                     HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
@@ -82,10 +81,18 @@
                 <Border.Shadow>
                     <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
                 </Border.Shadow>
-                <Border.GestureRecognizers>
-                    <PanGestureRecognizer PanUpdated="OnPanUpdatedUpper" />
-                </Border.GestureRecognizers>
             </Border>
+
+            <Grid x:Name="TouchLayer"
+                  ZIndex="20"
+                  BackgroundColor="Transparent"
+                  HorizontalOptions="Fill"
+                  VerticalOptions="Fill">
+                <Grid.GestureRecognizers>
+                    <PointerGestureRecognizer PointerPressed="OnPointerPressed" />
+                    <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                </Grid.GestureRecognizers>
+            </Grid>
         </Grid>
     </Grid>
 </ContentView>

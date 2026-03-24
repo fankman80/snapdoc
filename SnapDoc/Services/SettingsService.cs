@@ -1,5 +1,4 @@
-﻿#pragma warning disable MVVMTK0045
-using CommunityToolkit.Mvvm.ComponentModel;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
@@ -76,7 +75,6 @@ public partial class SettingsService : ObservableObject
         // --- Standardwerte für Nicht-Nullable-Felder ---
         _selectedColorTheme = string.Empty;
         _selectedAppTheme = string.Empty;
-        _selectedTemplate = string.Empty;
 
         ColorThemes = [.. ColorThemeMapping.Keys];
         AppThemes = [AppResources.hell, AppResources.dunkel];
@@ -90,90 +88,90 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    [ObservableProperty] private string _selectedAppLanguage = Settings.Languages.First().Value;
-    [ObservableProperty] private string _selectedCameraTool = Settings.CameraTools.First();
-    [ObservableProperty] private int _flashMode = 0;
-    [ObservableProperty] private double _captureRatio = 1.33;
-    [ObservableProperty] private string _appVersion = AppInfo.VersionString;
-    [ObservableProperty] private bool _isProjectLoaded = false;
-    [ObservableProperty] private string _flyoutHeaderTitle = "by Emch+Berger AG Bern";
-    [ObservableProperty] private string _flyoutHeaderDesc = "SnapDoc";
-    [ObservableProperty] private string _flyoutHeaderImageThumb = "banner_thumbnail.png";
-    [ObservableProperty] private string _flyoutHeaderImage = "";
-    [ObservableProperty] private bool _iconGalleryGridView = false;
-    [ObservableProperty] private bool _photoGalleryGridView = false;
-    [ObservableProperty] private int _maxPdfImageSizeW = 8192;
-    [ObservableProperty] private int _maxPdfImageSizeH = 8192;
-    [ObservableProperty] private int _fotoThumbSize = 150;
-    [ObservableProperty] private int _fotoThumbQuality = 80;
-    [ObservableProperty] private int _fotoQuality = 90;
-    [ObservableProperty] private int _planPreviewSize = 150;
-    [ObservableProperty] private int _fotoPreviewSize = 150;
-    [ObservableProperty] private int _iconPreviewSize = 64;
-    [ObservableProperty] private int _gridViewMinColumns = 3;
-    [ObservableProperty] private double _defaultPinZoom = 2;
-    [ObservableProperty] private bool _isPlanRotateLocked = false;
-    [ObservableProperty] private bool _isPlanListThumbnails = false;
-    [ObservableProperty] private bool _isHideInactivePlans = false;
-    [ObservableProperty] private bool _isPinAutoLock = false;
-    [ObservableProperty] private int _pinMinScaleLimit = 80;
-    [ObservableProperty] private int _pinMaxScaleLimit = 100;
-    [ObservableProperty] private int _maxPdfPixelCount = 30;
-    [ObservableProperty] private int _pdfThumbDpi = 72;
-    [ObservableProperty] private int _mapService = 0;
-    [ObservableProperty] private int _mapIconSize = 85;
-    [ObservableProperty] private int _mapIcon = 0;
-    [ObservableProperty] private int _mapOverlay1 = 1;
-    [ObservableProperty] private int _mapOverlay2 = 5;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] private bool _isPinPlaceBtnManualHide = false;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] private int _pinPlaceMode = 0;
+    [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
+    [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
+    [ObservableProperty] public partial int FlashMode { get; set; } = 0;
+    [ObservableProperty] public partial double CaptureRatio { get; set; } = 1.33;
+    [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
+    [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
+    [ObservableProperty] public partial string FlyoutHeaderTitle { get; set; } = "by Emch+Berger AG Bern";
+    [ObservableProperty] public partial string FlyoutHeaderDesc { get; set; } = "SnapDoc";
+    [ObservableProperty] public partial string FlyoutHeaderImageThumb { get; set; } = "banner_thumbnail.png";
+    [ObservableProperty] public partial string FlyoutHeaderImage { get; set; } = "";
+    [ObservableProperty] public partial bool IconGalleryGridView { get; set; } = false;
+    [ObservableProperty] public partial bool PhotoGalleryGridView { get; set; } = false;
+    [ObservableProperty] public partial int MaxPdfImageSizeW { get; set; } = 8192;
+    [ObservableProperty] public partial int MaxPdfImageSizeH { get; set; } = 8192;
+    [ObservableProperty] public partial int FotoThumbSize { get; set; } = 150;
+    [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 80;
+    [ObservableProperty] public partial int FotoQuality { get; set; } = 90;
+    [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
+    [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
+    [ObservableProperty] public partial int IconPreviewSize { get; set; } = 64;
+    [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;
+    [ObservableProperty] public partial double DefaultPinZoom { get; set; } = 2;
+    [ObservableProperty] public partial bool IsPlanRotateLocked { get; set; } = false;
+    [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
+    [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
+    [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
+    [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 80;
+    [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 100;
+    [ObservableProperty] public partial int MaxPdfPixelCount { get; set; } = 30;
+    [ObservableProperty] public partial int PdfThumbDpi { get; set; } = 72;
+    [ObservableProperty] public partial int MapService { get; set; } = 0;
+    [ObservableProperty] public partial int MapIconSize { get; set; } = 85;
+    [ObservableProperty] public partial int MapIcon { get; set; } = 0;
+    [ObservableProperty] public partial int MapOverlay1 { get; set; } = 1;
+    [ObservableProperty] public partial int MapOverlay2 { get; set; } = 5;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial bool IsPinPlaceBtnManualHide { get; set; } = false;
+    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial int PinPlaceMode { get; set; } = 0;
     public bool IsButtonActuallyVisible => PinPlaceMode != 2 && !IsPinPlaceBtnManualHide;
-    [ObservableProperty] private double _pinDuplicateOffset = 0.01;
-    [ObservableProperty] private string _iconSortCrit;
-    [ObservableProperty] private string _pinSortCrit;
-    [ObservableProperty] private string _iconCategory;
-    [ObservableProperty] private int _imageExportQuality = 80;
-    [ObservableProperty] private double _pinLabelFontSize = 4;
-    [ObservableProperty] private string _pinLabelPrefix = "Pos. ";
-    [ObservableProperty] private bool _isPlanExport = true;
-    [ObservableProperty] private bool _isPosImageExport = true;
-    [ObservableProperty] private bool _isImageExport = true;
-    [ObservableProperty] private bool _isPinIconExport = true;
-    [ObservableProperty] private bool _isFotoOverlayExport = true;
-    [ObservableProperty] private int _fotoCompressValue = 20;
-    [ObservableProperty] private int _imageExportSize = 40;
-    [ObservableProperty] private double _pinExportSize = 3.2;
-    [ObservableProperty] private int _titleExportSize = 90;
-    [ObservableProperty] private int _pinPosExportSize = 25;
-    [ObservableProperty] private int _pinPosCropExportSize = 300;
-    [ObservableProperty] private double _gpsResponseTimeOut = 10;
-    [ObservableProperty] private float _gpsMinTimeUpdate = 2.0f;
-    [ObservableProperty] private bool _isGpsActive = false;
-    [ObservableProperty] private string _editorTheme = "material-darker";
-    [ObservableProperty] private float _polyLineHandleRadius = 10f;
-    [ObservableProperty] private float _polyLineHandleTouchRadius = 20f;
-    [ObservableProperty] private int _doubleClickThresholdMs = 300;
-    [ObservableProperty] private string _polyLineHandleColor = "#808080";
-    [ObservableProperty] private string _polyLineStartHandleColor = "#00FF00";
-    [ObservableProperty] private byte _polyLineHandleAlpha = 127;
-    [ObservableProperty] private Point _customPinOffset = new(0,0);
-    [ObservableProperty] private string _defaultPinIcon = "a_pin_red.png";
-    [ObservableProperty] private string _selectedTemplate;
-    [ObservableProperty] private ObservableCollection<string> _templates = [];
-    [ObservableProperty] private List<string> _colorThemes;
-    [ObservableProperty] private List<string> _appThemes;
-    [ObservableProperty] private List<string> _appLanguages;
-    [ObservableProperty] private List<string> _appCameraTools;
-    [ObservableProperty] private List<string> _iconCategories;
-    [ObservableProperty] private List<string> _mapIcons = Settings.MapIcons;
+    [ObservableProperty] public partial double PinDuplicateOffset { get; set; } = 0.01;
+    [ObservableProperty] public partial string IconSortCrit { get; set; }
+    [ObservableProperty] public partial string PinSortCrit { get; set; }
+    [ObservableProperty] public partial string IconCategory { get; set; }
+    [ObservableProperty] public partial int ImageExportQuality { get; set; } = 80;
+    [ObservableProperty] public partial double PinLabelFontSize { get; set; } = 4;
+    [ObservableProperty] public partial string PinLabelPrefix { get; set; } = "Pos. ";
+    [ObservableProperty] public partial bool IsPlanExport { get; set; } = true;
+    [ObservableProperty] public partial bool IsPosImageExport { get; set; } = true;
+    [ObservableProperty] public partial bool IsImageExport { get; set; } = true;
+    [ObservableProperty] public partial bool IsPinIconExport { get; set; } = true;
+    [ObservableProperty] public partial bool IsFotoOverlayExport { get; set; } = true;
+    [ObservableProperty] public partial int FotoCompressValue { get; set; } = 20;
+    [ObservableProperty] public partial int ImageExportSize { get; set; } = 40;
+    [ObservableProperty] public partial double PinExportSize { get; set; } = 3.2;
+    [ObservableProperty] public partial int TitleExportSize { get; set; } = 90;
+    [ObservableProperty] public partial int PinPosExportSize { get; set; } = 25;
+    [ObservableProperty] public partial int PinPosCropExportSize { get; set; } = 300;
+    [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
+    [ObservableProperty] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
+    [ObservableProperty] public partial bool IsGpsActive { get; set; } = false;
+    [ObservableProperty] public partial string EditorTheme { get; set; } = "material-darker";
+    [ObservableProperty] public partial float PolyLineHandleRadius { get; set; } = 10f;
+    [ObservableProperty] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
+    [ObservableProperty] public partial int DoubleClickThresholdMs { get; set; } = 300;
+    [ObservableProperty] public partial string PolyLineHandleColor { get; set; } = "#808080";
+    [ObservableProperty] public partial string PolyLineStartHandleColor { get; set; } = "#00FF00";
+    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 127;
+    [ObservableProperty] public partial Point CustomPinOffset { get; set; } = new(0,0);
+    [ObservableProperty] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
+    [ObservableProperty] public partial string? SelectedTemplate { get; set; }
+    [ObservableProperty] public partial ObservableCollection<string> Templates { get; set; } = [];
+    [ObservableProperty] public partial List<string> ColorThemes { get; set; }
+    [ObservableProperty] public partial List<string> AppThemes { get; set; }
+    [ObservableProperty] public partial List<string> AppLanguages { get; set; }
+    [ObservableProperty] public partial List<string> AppCameraTools { get; set; }
+    [ObservableProperty] public partial List<string> IconCategories { get; set; }
+    [ObservableProperty] public partial List<string> MapIcons { get; set; } = Settings.MapIcons;
 
     // Lists
-    [ObservableProperty] private List<string> _iconSortCrits =
+    [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
     [
         AppResources.nach_name,
         AppResources.nach_farbe
     ];
-    [ObservableProperty] private List<string> _pinSortCrits =
+    [ObservableProperty] public partial List<string> PinSortCrits { get; set; } =
     [
         AppResources.nach_plan,
         AppResources.nach_pin,
@@ -183,19 +181,19 @@ public partial class SettingsService : ObservableObject
         AppResources.nach_aufnahmedatum,
         AppResources.nach_prioritaet
     ];
-    [ObservableProperty] private List<PriorityItem> _priorityItems =
+    [ObservableProperty] public partial List<PriorityItem> PriorityItems { get; set; } =
     [
         new() { Key = "", Color = "#000000" },
         new() { Key = AppResources.empfehlung, Color = "#92D050" },
         new() { Key = AppResources.wichtig, Color = "#FFC000" },
         new() { Key = AppResources.kritisch, Color = "#FF0000" }
     ];
-    [ObservableProperty] private List<string> _colorList =
+    [ObservableProperty] public partial List<string> ColorList { get; set; } =
     [
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
-    [ObservableProperty] private List<StylePickerItem> _styleTemplateItems =
+    [ObservableProperty] public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
     [
         new() {
             Text = "Text",
@@ -534,4 +532,3 @@ public partial class SettingsService : ObservableObject
         StyleTemplateItems = [.. defaultSettings.StyleTemplateItems];
     }
 }
-#pragma warning restore MVVMTK0045

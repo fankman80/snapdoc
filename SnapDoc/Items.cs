@@ -1,6 +1,4 @@
 ﻿#nullable disable
-#pragma warning disable MVVMTK0045
-
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using SnapDoc.Models;
@@ -388,16 +386,14 @@ namespace SnapDoc
             }
         }
 
-        [ObservableProperty] private string _title;
-
-        [ObservableProperty] private bool _isSelected;
+        [ObservableProperty] public partial string Title { get; set; }
+        [ObservableProperty] public partial bool IsSelected { get; set; }
     }
 
     public partial class FotoItem : ObservableObject
     {
-        [ObservableProperty] private ImageSource _displayImage;        
-        [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayOpacity))]
-        private bool _allowExport;
+        [ObservableProperty] public partial ImageSource DisplayImage { get; set; }
+        [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayOpacity))] public partial bool AllowExport { get; set; }
         public string ImagePath { get; set; }
         public DateTime DateTime { get; set; }
         public string OnPlanId { get; set; }
@@ -455,9 +451,8 @@ namespace SnapDoc
 
     public partial class ColorBoxItem : ObservableObject
     {
-        [ObservableProperty] private Color backgroundColor;
-
-        [ObservableProperty] private bool isSelected;
+        [ObservableProperty] public partial Color BackgroundColor { get; set; }
+        [ObservableProperty] public partial bool IsSelected { get; set; }
         public bool IsAddButton { get; set; }
     }
 
@@ -467,4 +462,3 @@ namespace SnapDoc
         public double Value { get; set; }
     }
 }
-#pragma warning restore MVVMTK0045
