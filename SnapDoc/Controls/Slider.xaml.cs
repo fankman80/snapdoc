@@ -43,6 +43,12 @@ public partial class CustomRangeSlider : ContentView
     private double _lastReportedLowerValue = double.MinValue;
     private double _lastReportedUpperValue = double.MinValue;
 
+    // Bonus: Caching für Performance & Anti-Zittern
+    private double _cachedLowerWidth = 0;
+    private double _cachedUpperWidth = 0;
+    private string _lastLowerText = "";
+    private string _lastUpperText = "";
+
     public CustomRangeSlider()
     {
         InitializeComponent();
@@ -51,11 +57,23 @@ public partial class CustomRangeSlider : ContentView
         _painter.BaseColor = MaximumTrackColor;
         _painter.HighlightColor = MinimumTrackColor;
         _painter.IsRange = IsRange;
-        TrackCanvas.Drawable = _painter;
-        TrackCanvas.HeightRequest = KnobSize + 10;
+        _painter.ThumbColor = ThumbColor;
 
-        MainContainer.SizeChanged += (s, e) => {
-            if (!_isDragging) UpdateUI();
+        TrackCanvas.Drawable = _painter;
+        TrackCanvas.HeightRequest = KnobSize + 20;
+
+        // Initialer Touch-Bereich (Knob-Größe als Puffer)
+        TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
+
+        MainContainer.SizeChanged += (s, e) =>
+        {
+            if (MainContainer.Width > 0 && !_isDragging)
+            {
+                // Cache zurücksetzen bei Größenänderung des Containers
+                _cachedLowerWidth = 0;
+                _cachedUpperWidth = 0;
+                UpdateUI();
+            }
         };
     }
 
@@ -66,13 +84,13 @@ public partial class CustomRangeSlider : ContentView
         var position = e.GetPosition(TouchLayer);
         if (position == null) return;
 
+        ExpandTouchLayer(true);
+
         double touchX = position.Value.X;
         double adjustedTouchX = touchX - (KnobSize / 2);
 
         if (!IsRange)
-        {
             _activeThumbIsLower = true;
-        }
         else
         {
             double distLower = Math.Abs(adjustedTouchX - _currentXLower);
@@ -82,7 +100,6 @@ public partial class CustomRangeSlider : ContentView
 
         _touchStartPosX = touchX;
         _isDragging = true;
-
         UpdateThumbPosition(touchX);
     }
 
@@ -100,11 +117,9 @@ public partial class CustomRangeSlider : ContentView
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 _isDragging = false;
-
+                ExpandTouchLayer(false);
                 FinalizeValue(_currentXLower, true);
-                if (IsRange)
-                    FinalizeValue(_currentXUpper, false);
-
+                if (IsRange) FinalizeValue(_currentXUpper, false);
                 UpdateUI();
                 break;
         }
@@ -119,16 +134,12 @@ public partial class CustomRangeSlider : ContentView
 
         if (IsRange)
         {
-            if (_activeThumbIsLower)
-                newX = Math.Min(newX, _currentXUpper);
-            else
-                newX = Math.Max(newX, _currentXLower);
+            if (_activeThumbIsLower) newX = Math.Min(newX, _currentXUpper);
+            else newX = Math.Max(newX, _currentXLower);
         }
 
-        if (_activeThumbIsLower)
-            _currentXLower = newX;
-        else
-            _currentXUpper = newX;
+        if (_activeThumbIsLower) _currentXLower = newX;
+        else _currentXUpper = newX;
 
         double rawVal = Minimum + (newX / width) * (Maximum - Minimum);
         double steppedVal = Math.Round(rawVal / Step) * Step;
@@ -152,40 +163,79 @@ public partial class CustomRangeSlider : ContentView
         UpdateVisualsDuringDrag(_currentXLower, _currentXUpper);
     }
 
+    private void ExpandTouchLayer(bool expand)
+    {
+        if (TouchLayer == null) return;
+
+        if (expand)
+        {
+            TouchLayer.Margin = new Thickness(-2000);
+            TouchLayer.ZIndex = 9999;
+#if ANDROID
+            var androidView = this.Handler?.PlatformView as Android.Views.View;
+            androidView?.Parent?.RequestDisallowInterceptTouchEvent(true);
+#endif
+        }
+        else
+        {
+            TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
+            TouchLayer.ZIndex = 100;
+#if ANDROID
+            var androidView = this.Handler?.PlatformView as Android.Views.View;
+            androidView?.Parent?.RequestDisallowInterceptTouchEvent(false);
+#endif
+        }
+    }
+
     private void UpdateVisualsDuringDrag(double xLower, double xUpper)
     {
         _painter.XLower = xLower;
         _painter.XUpper = xUpper;
         _painter.IsRange = IsRange;
-
         TrackCanvas.Invalidate();
-
         AdjustLabelPositions(xLower, xUpper);
     }
 
     private void AdjustLabelPositions(double xLower, double xUpper)
     {
         UpperLabel.IsVisible = IsRange;
-
         double halfKnob = KnobSize / 2;
         double containerWidth = MainContainer.Width;
-        double lWidth = LowerLabel.Width > 0 ? LowerLabel.Width : 45;
-        double uWidth = UpperLabel.Width > 0 ? UpperLabel.Width : 45;
+
+        if (LowerLabel.Text != _lastLowerText || _cachedLowerWidth <= 0)
+        {
+            _lastLowerText = LowerLabel.Text;
+            // .Width direkt nach .Measure() nutzen
+            var measure = LowerLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
+            _cachedLowerWidth = Math.Max(_cachedLowerWidth, measure);
+        }
+
+        // Für das UpperLabel (falls IsRange)
+        if (IsRange && (UpperLabel.Text != _lastUpperText || _cachedUpperWidth <= 0))
+        {
+            _lastUpperText = UpperLabel.Text;
+            // .Width direkt nach .Measure() nutzen
+            var measure = UpperLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
+            _cachedUpperWidth = Math.Max(_cachedUpperWidth, measure);
+        }
+
+        double lWidth = _cachedLowerWidth > 0 ? _cachedLowerWidth : 60;
+        double uWidth = _cachedUpperWidth > 0 ? _cachedUpperWidth : 60;
+
         double targetXLower = xLower + halfKnob - (lWidth / 2);
         double targetXUpper = xUpper + halfKnob - (uWidth / 2);
 
         targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
-        targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
 
         if (IsRange)
         {
+            targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
             double minGap = 5;
             if (targetXLower + lWidth + minGap > targetXUpper)
             {
                 double overlap = (targetXLower + lWidth + minGap) - targetXUpper;
                 targetXLower -= overlap / 2;
                 targetXUpper += overlap / 2;
-
                 targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
                 targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
             }
@@ -197,17 +247,13 @@ public partial class CustomRangeSlider : ContentView
     private void FinalizeValue(double x, bool isLower)
     {
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0)
-            return;
-
+        if (width <= 0) return;
         double rawValue = Minimum + (x / width) * (Maximum - Minimum);
         double steppedValue = Math.Round(rawValue / Step) * Step;
         steppedValue = Math.Clamp(steppedValue, Minimum, Maximum);
 
-        if (isLower)
-            LowerValue = steppedValue;
-        else
-            UpperValue = steppedValue;
+        if (isLower) LowerValue = steppedValue;
+        else UpperValue = steppedValue;
 
         _lastReportedLowerValue = double.MinValue;
         _lastReportedUpperValue = double.MinValue;
@@ -216,15 +262,13 @@ public partial class CustomRangeSlider : ContentView
     private double GetXFromValue(double val)
     {
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0 || Maximum <= Minimum)
-            return 0;
+        if (width <= 0 || Maximum <= Minimum) return 0;
         return (Math.Clamp(val, Minimum, Maximum) - Minimum) / (Maximum - Minimum) * width;
     }
 
     public void UpdateUI()
     {
-        if (LowerLabel == null || MainContainer == null || MainContainer.Width <= 0 || _painter == null)
-            return;
+        if (MainContainer == null || MainContainer.Width <= 0 || _painter == null) return;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
@@ -242,21 +286,18 @@ public partial class CustomRangeSlider : ContentView
             LowerLabel.FontSize = FontSize;
             UpperLabel.FontSize = FontSize;
 
+            // Cache-Reset bei Schriftänderung
+            _cachedLowerWidth = 0;
+            _cachedUpperWidth = 0;
+
             if (!_isDragging)
             {
                 LowerLabel.Text = string.Format(MinimumValueDisplayFormat, LowerValue);
                 UpperLabel.Text = string.Format(MaximumValueDisplayFormat, UpperValue);
-
-                double xLower = GetXFromValue(LowerValue);
-                double xUpper = IsRange ? GetXFromValue(UpperValue) : 0;
-
-                _currentXLower = xLower;
-                _currentXUpper = xUpper;
-
-                UpdateVisualsDuringDrag(xLower, xUpper);
+                _currentXLower = GetXFromValue(LowerValue);
+                _currentXUpper = IsRange ? GetXFromValue(UpperValue) : 0;
             }
-            else
-                TrackCanvas.Invalidate();
+            UpdateVisualsDuringDrag(_currentXLower, _currentXUpper);
         });
     }
 }

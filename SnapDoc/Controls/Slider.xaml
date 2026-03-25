@@ -13,7 +13,7 @@
         <Grid Grid.Row="0"
               VerticalOptions="End"
               IsClippedToBounds="False"
-              Margin="0,0,0,-5"
+              Margin="0,0,0,-4"
               ZIndex="1">
 
             <Label x:Name="LowerLabel"
@@ -46,17 +46,14 @@
                           HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
                           HorizontalOptions="Fill"
                           VerticalOptions="Center"
-                          InputTransparent="True">
-                <GraphicsView.Drawable>
-                    <local:SliderDrawable x:Name="TrackPainter" />
-                </GraphicsView.Drawable>
-            </GraphicsView>
+                          InputTransparent="True" />
 
             <Grid x:Name="TouchLayer"
                   ZIndex="20"
                   BackgroundColor="Transparent"
                   HorizontalOptions="Fill"
-                  VerticalOptions="Fill">
+                  VerticalOptions="Fill"
+                  IsClippedToBounds="False">
                 <Grid.GestureRecognizers>
                     <PointerGestureRecognizer PointerPressed="OnPointerPressed" />
                     <PanGestureRecognizer PanUpdated="OnPanUpdated" />
