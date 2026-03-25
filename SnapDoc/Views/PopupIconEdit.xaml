@@ -108,7 +108,8 @@
                         Step="0.1"
                         FontSize="12"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0.#}"
+                        MinimumValueDisplayFormat="{}{0:0} %"
+                        LabelCalculation="*100"
                         LowerValue="{Binding IconScale}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
