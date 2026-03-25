@@ -175,6 +175,7 @@
                     <Label Text="{x:Static res:AppResources.deckkraft}" Margin="0,0,0,-10"/>
                     <controls:RangeSlider
                         IsRange="False"
+                        IsRealtime="True"
                         Minimum="0"
                         Maximum="255"
                         Step="1"

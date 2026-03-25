@@ -19,6 +19,7 @@ public partial class RangeSlider : ContentView
     public static readonly BindableProperty MaximumValueDisplayFormatProperty = BindableProperty.Create(nameof(MaximumValueDisplayFormat), typeof(string), typeof(RangeSlider), "{0:0}");
     public static readonly BindableProperty ShowLabelsProperty = BindableProperty.Create(nameof(ShowLabels), typeof(bool), typeof(RangeSlider), true, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty LabelCalculationProperty = BindableProperty.Create(nameof(LabelCalculation), typeof(string), typeof(RangeSlider), string.Empty);
+    public static readonly BindableProperty IsRealtimeProperty = BindableProperty.Create(nameof(IsRealtime), typeof(bool), typeof(RangeSlider), false);
 
     public double Step { get => (double)GetValue(StepProperty); set => SetValue(StepProperty, value); }
     public string MinimumValueDisplayFormat { get => (string)GetValue(MinimumValueDisplayFormatProperty); set => SetValue(MinimumValueDisplayFormatProperty, value); }
@@ -36,6 +37,7 @@ public partial class RangeSlider : ContentView
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
     public bool ShowLabels { get => (bool)GetValue(ShowLabelsProperty); set => SetValue(ShowLabelsProperty, value); }
     public string LabelCalculation { get => (string)GetValue(LabelCalculationProperty); set => SetValue(LabelCalculationProperty, value); }
+    public bool IsRealtime { get => (bool)GetValue(IsRealtimeProperty); set => SetValue(IsRealtimeProperty, value); }
     #endregion
 
     private bool _isDragging = false;
@@ -129,6 +131,20 @@ public partial class RangeSlider : ContentView
         }
     }
 
+    private void OnPointerReleased(object sender, PointerEventArgs e)
+    {
+        if (_isDragging)
+        {
+            _isDragging = false;
+            ExpandTouchLayer(false);
+
+            FinalizeValue(_currentXLower, true);
+            if (IsRange) FinalizeValue(_currentXUpper, false);
+
+            UpdateUI();
+        }
+    }
+
     private void UpdateThumbPosition(double absoluteX)
     {
         if (!_isDragging)
@@ -165,6 +181,9 @@ public partial class RangeSlider : ContentView
                 double displayVal = ApplyLabelCalculation(steppedVal);
                 LowerLabel.Text = string.Format(MinimumValueDisplayFormat, displayVal);
                 _lastReportedLowerValue = steppedVal;
+
+                if (IsRealtime)
+                    LowerValue = steppedVal;
             }
         }
         else
@@ -174,6 +193,9 @@ public partial class RangeSlider : ContentView
                 double displayVal = ApplyLabelCalculation(steppedVal);
                 UpperLabel.Text = string.Format(MaximumValueDisplayFormat, displayVal);
                 _lastReportedUpperValue = steppedVal;
+
+                if (IsRealtime)
+                    UpperValue = steppedVal;
             }
         }
         UpdateVisualsDuringDrag(_currentXLower, _currentXUpper);
@@ -267,7 +289,6 @@ public partial class RangeSlider : ContentView
 
         double rawValue = Minimum + (x / width) * (Maximum - Minimum);
         double steppedValue = Math.Round(rawValue / Step) * Step;
-
 
         int decimals = 0;
         string stepString = Step.ToString(System.Globalization.CultureInfo.InvariantCulture);

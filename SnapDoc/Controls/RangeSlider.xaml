@@ -56,7 +56,8 @@
                   VerticalOptions="Fill"
                   IsClippedToBounds="False">
                 <Grid.GestureRecognizers>
-                    <PointerGestureRecognizer PointerPressed="OnPointerPressed" />
+                    <PointerGestureRecognizer PointerPressed="OnPointerPressed" 
+                                              PointerReleased="OnPointerReleased"/>
                     <PanGestureRecognizer PanUpdated="OnPanUpdated" />
                 </Grid.GestureRecognizers>
             </Grid>
