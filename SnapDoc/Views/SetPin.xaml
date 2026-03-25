@@ -156,6 +156,7 @@
 
                 <controls:Switch Grid.Row="0"
                                 LabelText="{x:Static res:AppResources.pin_exportieren}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsAllowExport}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
@@ -167,6 +168,7 @@
 
                 <controls:Switch Grid.Row="1"
                                 LabelText="{x:Static res:AppResources.position_sperren}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsLockPosition}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"

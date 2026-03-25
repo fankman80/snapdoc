@@ -127,18 +127,20 @@
                             CornerRadius="0"
                             Clicked="OnTemplateAddClicked"/>
                 </Grid>
-                
-                <controls:LocalizedLabel ResourceKey="linienbreite"
-                                         Value="{Binding LineWidth}"
-                                         ValueFormat="{}: {0}"/>
 
-                <Slider x:Name="LineWidthSlider"
-                        Maximum="20"
+                <Label Text="{x:Static res:AppResources.linienbreite}" Margin="0,0,0,-10"/>
+                <controls:RangeSlider
+                        IsRange="False"
                         Minimum="0"
-                        Value="{Binding LineWidth}"
-                        ThumbColor="{DynamicResource Primary}"
+                        Maximum="20"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0}"
+                        LowerValue="{Binding LineWidth}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                </controls:RangeSlider>
 
                 <material:TextField Text="{Binding StrokeStyle}"
                                     Title="Linienmuster"

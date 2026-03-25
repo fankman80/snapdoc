@@ -27,24 +27,23 @@
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
-                <HorizontalStackLayout Spacing="0">
-                    <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
-                    <Label Text=":"/>
-                </HorizontalStackLayout>
-                <controls:CustomRangeSlider IsRange="True"
-                                            Minimum="1"
-                                            Maximum="100"
-                                            Step="1"
-                                            FontSize="12"
-                                            MinimumValueDisplayFormat="{}min. {0:0} %"
-                                            MaximumValueDisplayFormat="{}max. {0:0} %"
-                                            LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
-                                            UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
-                                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                </controls:CustomRangeSlider>
+                <Label Text="{x:Static res:AppResources.pingroesse_limitieren}" Margin="0,0,0,-10"/>
+                <controls:RangeSlider IsRange="True"
+                                    Minimum="1"
+                                    Maximum="100"
+                                    Step="1"
+                                    FontSize="12"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MinimumValueDisplayFormat="{}min. {0:0} %"
+                                    MaximumValueDisplayFormat="{}max. {0:0} %"
+                                    LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
+                                    UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                </controls:RangeSlider>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsPlanRotateLocked}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
@@ -55,6 +54,7 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.planliste_mit_vorschau}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsPlanListThumbnails}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
@@ -65,6 +65,7 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.inaktive_plaene_ausblenden}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsHideInactivePlans}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
@@ -75,6 +76,7 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.pin_automatisch_sperren}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsPinAutoLock}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
@@ -128,22 +130,20 @@
                         <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.kartenservice}"/>
                         </uranium:ExpanderView.Header>
-                        <VerticalStackLayout Spacing="0">
+                        <VerticalStackLayout>
                             <material:RadioButtonGroupView Spacing="16"
                                                            SelectedIndex="{Binding MapService, Mode=TwoWay}"
                                                            HorizontalOptions="Fill"
                                                            Orientation="Vertical">
                                 <material:RadioButton Value="0"
-                                                      FontFamily="OpenSansRegular"
-                                                      TextFontSize="14"
                                                       Text="{x:Static res:AppResources.swisstopo_karte}"
+                                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Start" />
                                 <material:RadioButton Value="1"
-                                                      FontFamily="OpenSansRegular"
-                                                      TextFontSize="14"
                                                       Text="{x:Static res:AppResources.osm_karte}"
+                                                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Start" />
@@ -213,13 +213,19 @@
                                        Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
                             </HorizontalStackLayout>
 
-                            <controls:LocalizedLabel ResourceKey="pingroesse" Value="{Binding MapIconSize}" ValueFormat="{}: {0:0.##}%"/>
-                            <Slider Maximum="100"
+                            <Label Text="{x:Static res:AppResources.pingroesse}" Margin="0,0,0,-10"/>
+                            <controls:RangeSlider
+                                    IsRange="False"
                                     Minimum="1"
-                                    ThumbColor="{DynamicResource Primary}"
+                                    Maximum="100"
+                                    Step="1"
+                                    FontSize="12"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MinimumValueDisplayFormat="{}{0:0} %"
+                                    LowerValue="{Binding MapIconSize}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                                    Value="{Binding MapIconSize}"/>
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
                         </VerticalStackLayout>
                     </uranium:ExpanderView>
                 </Border>
@@ -311,14 +317,20 @@
                                         ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
                                         Clicked="ResetIcon"/>
                             </Grid>
-                            <VerticalStackLayout Spacing="0">
-                                <controls:LocalizedLabel ResourceKey="aufloesung_pdf_umwandlung" Value="{Binding MaxPdfPixelCount}" ValueFormat="{}: {0} MP"/>
-                                <Slider Maximum="50"
-                                        Minimum="1"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                                        Value="{Binding MaxPdfPixelCount}"/>
+                            <VerticalStackLayout>
+                                <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    Minimum="1"
+                                    Maximum="50"
+                                    Step="1"
+                                    FontSize="12"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MinimumValueDisplayFormat="{}{0:0} MP"
+                                    LowerValue="{Binding MaxPdfPixelCount}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>
                             </VerticalStackLayout>
                             <Grid>     
                                 <Grid.ColumnDefinitions>
@@ -353,7 +365,6 @@
                         </VerticalStackLayout>                       
                     </uranium:ExpanderView>
                 </Border> 
-             
             </VerticalStackLayout>
         </ScrollView>
 

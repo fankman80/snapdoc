@@ -37,9 +37,8 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-                <VerticalStackLayout x:DataType="views:PopupColorPicker" Spacing="10">
-                    <Label Text="{x:Static res:AppResources.doppelklick_farbe_loeschen}"
-                           FontSize="12"/>
+                <VerticalStackLayout x:DataType="views:PopupColorPicker">
+                    <Label Text="{x:Static res:AppResources.doppelklick_farbe_loeschen}" FontSize="12"/>
                     <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
                                     ItemSizingStrategy="MeasureAllItems"
@@ -173,18 +172,20 @@
                         </uranium:ExpanderView>
                     </Border>
 
-                    <controls:LocalizedLabel ResourceKey="deckkraft"
-                                             IsVisible="{Binding FillOpacityVisibility}"
-                                             Value="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100/255'}"
-                                             ValueFormat="{}: {0:F0}%"/>
-                    <Slider x:Name="FillOpacitySlider"
-                            IsVisible="{Binding FillOpacityVisibility}"
-                            Maximum="255"
-                            Minimum="0"
-                            Value="{Binding FillOpacity}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Label Text="{x:Static res:AppResources.deckkraft}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsRange="False"
+                        Minimum="0"
+                        Maximum="255"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0}"
+                        LabelCalculation="*0.3921"
+                        LowerValue="{Binding FillOpacity}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
                 </VerticalStackLayout>
             </ScrollView>
 

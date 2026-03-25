@@ -62,8 +62,9 @@
             </Grid>
 
             <controls:Switch x:Name="allow_export"
-                            HeightRequest="44"
                             LabelText="{x:Static res:AppResources.plan_exportieren}"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            HeightRequest="44"                             
                             HorizontalOptions="Start"
                             VerticalOptions="Center"
                             BorderColorOff ="Transparent"

@@ -38,14 +38,17 @@
                                        SelectedItemChanged="OnRadioButtonChanged">
             <material:RadioButton Value="0"
                                   Text="{x:Static res:AppResources.auf_anderen_plan_kopieren}"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
             <material:RadioButton Value="1"
                                   Text="{x:Static res:AppResources.auf_anderen_plan_verschieben}"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
             <material:RadioButton Value="2"
                                   Text="{x:Static res:AppResources.an_ort_duplizieren}"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                   CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                   Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>            
         </material:RadioButtonGroupView>

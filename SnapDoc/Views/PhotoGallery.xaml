@@ -131,6 +131,7 @@
         </Grid.RowDefinitions>
         <controls:Switch x:DataType="views:FotoGalleryView"
                         LabelText="{x:Static res:AppResources.inaktive_fotos_ausblenden}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         IsToggled="{Binding IsActiveToggle}"
                         HorizontalOptions="Start"
                         VerticalOptions="Center"

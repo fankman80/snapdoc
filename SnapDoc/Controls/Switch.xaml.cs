@@ -10,134 +10,35 @@ public partial class Switch : ContentView
         UpdateUI();
     }
 
-    // ===== Bindable Properties =====
-
-    public static readonly BindableProperty LabelTextProperty =
-        BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnAnyPropertyChanged);
-
-    public string LabelText
-    {
-        get => (string)GetValue(LabelTextProperty);
-        set => SetValue(LabelTextProperty, value);
-    }
-
-    public static readonly BindableProperty TextColorProperty =
-        BindableProperty.Create(
-            nameof(TextColor),
-            typeof(Color),
-            typeof(Switch),
-            null); // null bedeutet: Nutze die Farbe vom System/Style
-
-    public Color TextColor
-    {
-        get => (Color)GetValue(TextColorProperty);
-        set => SetValue(TextColorProperty, value);
-    }
-
-    public static readonly BindableProperty TextSizeProperty =
-        BindableProperty.Create(
-            nameof(TextSize),
-            typeof(double),
-            typeof(Switch),
-            Label.FontSizeProperty.DefaultValue); // Fragt den echten MAUI-Standardwert ab
-
-    public double TextSize
-    {
-        get => (double)GetValue(TextSizeProperty);
-        set => SetValue(TextSizeProperty, value);
-    }
-
-    public static readonly BindableProperty IsToggledProperty =
-        BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
-
-    public bool IsToggled
-    {
-        get => (bool)GetValue(IsToggledProperty);
-        set => SetValue(IsToggledProperty, value);
-    }
-
-    public static readonly BindableProperty SwitchWidthProperty =
-        BindableProperty.Create(nameof(SwitchWidth), typeof(double), typeof(Switch), 44.0, propertyChanged: OnAnyPropertyChanged);
-
-    public double SwitchWidth
-    {
-        get => (double)GetValue(SwitchWidthProperty);
-        set => SetValue(SwitchWidthProperty, value);
-    }
-
-    public static readonly BindableProperty SwitchHeightProperty =
-        BindableProperty.Create(nameof(SwitchHeight), typeof(double), typeof(Switch), 24.0, propertyChanged: OnAnyPropertyChanged);
-
-    public double SwitchHeight
-    {
-        get => (double)GetValue(SwitchHeightProperty);
-        set => SetValue(SwitchHeightProperty, value);
-    }
-
-    public static readonly BindableProperty KnobMarginProperty =
-        BindableProperty.Create(nameof(KnobMargin), typeof(double), typeof(Switch), 3.0, propertyChanged: OnAnyPropertyChanged);
-
-    public double KnobMargin
-    {
-        get => (double)GetValue(KnobMarginProperty);
-        set => SetValue(KnobMarginProperty, value);
-    }
-
-    public static readonly BindableProperty BorderColorOnProperty =
-        BindableProperty.Create(nameof(BorderColorOn), typeof(Color), typeof(Switch), Colors.Transparent, propertyChanged: OnAnyPropertyChanged);
-
-    public Color BorderColorOn
-    {
-        get => (Color)GetValue(BorderColorOnProperty);
-        set => SetValue(BorderColorOnProperty, value);
-    }
-
-    public static readonly BindableProperty BorderColorOffProperty =
-    BindableProperty.Create(nameof(BorderColorOff), typeof(Color), typeof(Switch), Colors.Black, propertyChanged: OnAnyPropertyChanged);
-
-    public Color BorderColorOff
-    {
-        get => (Color)GetValue(BorderColorOffProperty);
-        set => SetValue(BorderColorOffProperty, value);
-    }
-
-    public static readonly BindableProperty KnobColorOnProperty =
-        BindableProperty.Create(nameof(KnobColorOn), typeof(Color), typeof(Switch), Colors.White, propertyChanged: OnAnyPropertyChanged);
-
-    public Color KnobColorOn
-    {
-        get => (Color)GetValue(KnobColorOnProperty);
-        set => SetValue(KnobColorOnProperty, value);
-    }
-
-    public static readonly BindableProperty KnobColorOffProperty =
-        BindableProperty.Create(nameof(KnobColorOff), typeof(Color), typeof(Switch), Colors.Gray, propertyChanged: OnAnyPropertyChanged);
-
-    public Color KnobColorOff
-    {
-        get => (Color)GetValue(KnobColorOffProperty);
-        set => SetValue(KnobColorOffProperty, value);
-    }
-
-    public static readonly BindableProperty SwitchColorOnProperty =
-        BindableProperty.Create(nameof(SwitchColorOn), typeof(Color), typeof(Switch), Colors.LimeGreen, propertyChanged: OnAnyPropertyChanged);
-
-    public Color SwitchColorOn
-    {
-        get => (Color)GetValue(SwitchColorOnProperty);
-        set => SetValue(SwitchColorOnProperty, value);
-    }
-
-    public static readonly BindableProperty SwitchColorOffProperty =
-        BindableProperty.Create(nameof(SwitchColorOff), typeof(Color), typeof(Switch), Colors.DarkGray, propertyChanged: OnAnyPropertyChanged);
-
-    public Color SwitchColorOff
-    {
-        get => (Color)GetValue(SwitchColorOffProperty);
-        set => SetValue(SwitchColorOffProperty, value);
-    }
-
-    // ===== Dynamisch berechnete Werte =====
+    #region BindableProperties
+    public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Switch), Label.TextColorProperty.DefaultValue);    
+    public static readonly BindableProperty TextSizeProperty = BindableProperty.Create( nameof(TextSize), typeof(double), typeof(Switch), Label.FontSizeProperty.DefaultValue);   
+    public static readonly BindableProperty IsToggledProperty = BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty SwitchWidthProperty = BindableProperty.Create(nameof(SwitchWidth), typeof(double), typeof(Switch), 44.0, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty SwitchHeightProperty = BindableProperty.Create(nameof(SwitchHeight), typeof(double), typeof(Switch), 24.0, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty KnobMarginProperty = BindableProperty.Create(nameof(KnobMargin), typeof(double), typeof(Switch), 3.0, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty BorderColorOnProperty = BindableProperty.Create(nameof(BorderColorOn), typeof(Color), typeof(Switch), Colors.Transparent, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty BorderColorOffProperty = BindableProperty.Create(nameof(BorderColorOff), typeof(Color), typeof(Switch), Colors.Black, propertyChanged: OnAnyPropertyChanged); 
+    public static readonly BindableProperty KnobColorOnProperty = BindableProperty.Create(nameof(KnobColorOn), typeof(Color), typeof(Switch), Colors.White, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty KnobColorOffProperty = BindableProperty.Create(nameof(KnobColorOff), typeof(Color), typeof(Switch), Colors.Gray, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty SwitchColorOnProperty = BindableProperty.Create(nameof(SwitchColorOn), typeof(Color), typeof(Switch), Colors.LimeGreen, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty SwitchColorOffProperty = BindableProperty.Create(nameof(SwitchColorOff), typeof(Color), typeof(Switch), Colors.DarkGray, propertyChanged: OnAnyPropertyChanged);
+    
+    public string LabelText { get => (string)GetValue(LabelTextProperty); set => SetValue(LabelTextProperty, value); } 
+    public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
+    public double TextSize { get => (double)GetValue(TextSizeProperty); set => SetValue(TextSizeProperty, value); }
+    public bool IsToggled { get => (bool)GetValue(IsToggledProperty); set => SetValue(IsToggledProperty, value); }
+    public double SwitchWidth { get => (double)GetValue(SwitchWidthProperty); set => SetValue(SwitchWidthProperty, value); }
+    public double SwitchHeight { get => (double)GetValue(SwitchHeightProperty); set => SetValue(SwitchHeightProperty, value); }
+    public double KnobMargin { get => (double)GetValue(KnobMarginProperty); set => SetValue(KnobMarginProperty, value); }
+    public Color BorderColorOn { get => (Color)GetValue(BorderColorOnProperty); set => SetValue(BorderColorOnProperty, value); }
+    public Color BorderColorOff { get => (Color)GetValue(BorderColorOffProperty); set => SetValue(BorderColorOffProperty, value); }
+    public Color KnobColorOn { get => (Color)GetValue(KnobColorOnProperty); set => SetValue(KnobColorOnProperty, value); }
+    public Color KnobColorOff { get => (Color)GetValue(KnobColorOffProperty); set => SetValue(KnobColorOffProperty, value); }
+    public Color SwitchColorOn { get => (Color)GetValue(SwitchColorOnProperty); set => SetValue(SwitchColorOnProperty, value); }
+    public Color SwitchColorOff { get => (Color)GetValue(SwitchColorOffProperty); set => SetValue(SwitchColorOffProperty, value); }
+    #endregion
 
     public float KnobSize => (float)(SwitchHeight - (2 * KnobMargin));
     public float CalculatedCornerRadius => (float)(SwitchHeight / 2.0);

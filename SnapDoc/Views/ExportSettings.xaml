@@ -37,15 +37,15 @@
 
             <ScrollView Grid.Row="0">
                 <VerticalStackLayout>
-                    <Grid ColumnSpacing="0">
+                    <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                             <ColumnDefinition Width="Auto" />
                         </Grid.ColumnDefinitions>
-                        <VerticalStackLayout Grid.Column="0" Spacing="4">
-                            <Label Text="{x:Static res:AppResources.export_vorlage}" FontSize="12" Margin="8,0,0,0"/>
+                        <VerticalStackLayout Grid.Column="0">
+                            <Label Text="{x:Static res:AppResources.export_vorlage}"/>
                             <Border Grid.Column="1"
                                 Stroke="{DynamicResource SecondaryBackground}"
                                 StrokeThickness="1"
@@ -79,6 +79,7 @@
                     </Grid>
                     <VerticalStackLayout>
                         <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         IsToggled="{Binding IsPlanExport}"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Center"
@@ -89,6 +90,7 @@
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                         <controls:Switch LabelText="{x:Static res:AppResources.exportiere_positionsbilder}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         IsToggled="{Binding IsPosImageExport}"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Center"
@@ -99,6 +101,7 @@
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                         <controls:Switch LabelText="{x:Static res:AppResources.exportiere_pin_icons}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         IsToggled="{Binding IsPinIconExport}"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Center"
@@ -109,6 +112,7 @@
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                         <controls:Switch LabelText="{x:Static res:AppResources.exportiere_fotos}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         IsToggled="{Binding IsImageExport}"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Center"
@@ -119,6 +123,7 @@
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                         <controls:Switch LabelText="{x:Static res:AppResources.exportiere_foto_overlays}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                         IsToggled="{Binding IsFotoOverlayExport}"
                                         HorizontalOptions="Start"
                                         VerticalOptions="Center"
@@ -128,18 +133,7 @@
                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </VerticalStackLayout>
-
-                    <controls:LocalizedLabel ResourceKey="fotoqualitaet"
-                                             Value="{Binding FotoCompressValue}"
-                                             ValueFormat="{}: {0}%"
-                                             Margin="0, 0, 0, -12"/>
-                    <Slider Maximum="100"
-                            Minimum="1"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding FotoCompressValue}"/>
-
+                    
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="{x:Static res:AppResources.pinbeschriftung}"
                             MaxLength="20"
@@ -149,79 +143,108 @@
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
+                    
+                    <Label Text="{x:Static res:AppResources.fotoqualitaet}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="100"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0} %"
+                        LowerValue="{Binding FotoCompressValue}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="groesse_pinbeschriftung"
-                                             Value="{Binding PinLabelFontSize}"
-                                             ValueFormat="{}: {0:0.#} pt"
-                                             Margin="0, 0, 0, -12"/>
-                    <Slider Maximum="20"
-                            Minimum="1"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinLabelFontSize}"/>
+                    <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="20"
+                        Step="0.1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0.#} pt"
+                        LowerValue="{Binding PinLabelFontSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="pin_icon_breite_hoehe"
-                                             Value="{Binding PinExportSize}"
-                                             ValueFormat="{}: {0:0.#} mm"
-                                             Margin="0, 0, 0, -12"
-                                             IsVisible="{Binding IsPinIconExport}"/>
-                    <Slider Maximum="20"
-                            Minimum="1"
-                            IsVisible="{Binding IsPinIconExport}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinExportSize}"/>
+                    <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}" IsVisible="{Binding IsPinIconExport}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsVisible="{Binding IsPinIconExport}"
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="20"
+                        Step="0.1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0.#} mm"
+                        LowerValue="{Binding PinExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="foto_breite"
-                                             Value="{Binding ImageExportSize}"
-                                             ValueFormat="{}: {0} mm" Margin="0, 0, 0, -12"
-                                             IsVisible="{Binding IsImageExport}"/>
-                    <Slider Maximum="160"
-                            Minimum="10"
-                            IsVisible="{Binding IsImageExport}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding ImageExportSize}"/>
+                    <Label Text="{x:Static res:AppResources.foto_breite}" IsVisible="{Binding IsImageExport}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsVisible="{Binding IsImageExport}"
+                        IsRange="False"
+                        Minimum="10"
+                        Maximum="160"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0} mm"
+                        LowerValue="{Binding ImageExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="positionsbilder_breite_hoehe"
-                                             Value="{Binding PinPosExportSize}"
-                                             ValueFormat="{}: {0} mm" 
-                                             Margin="0, 0, 0, -12"
-                                             IsVisible="{Binding IsPosImageExport}"/>
-                    <Slider Maximum="160"
-                            Minimum="10"
-                            IsVisible="{Binding IsPosImageExport}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinPosExportSize}"/>
+                    <Label Text="{x:Static res:AppResources.positionsbilder_breite_hoehe}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsVisible="{Binding IsPosImageExport}"
+                        IsRange="False"
+                        Minimum="10"
+                        Maximum="160"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0} mm"
+                        LowerValue="{Binding PinPosExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="positionsbilder_zuschnitt"
-                                             Value="{Binding PinPosCropExportSize}"
-                                             ValueFormat="{}: {0} Pixel"
-                                             Margin="0, 0, 0, -12"
-                                             IsVisible="{Binding IsPosImageExport}"/>
-                    <Slider Maximum="1000"
-                            Minimum="100"
-                            IsVisible="{Binding IsPosImageExport}"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding PinPosCropExportSize}"/>
+                    <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsVisible="{Binding IsPosImageExport}"
+                        IsRange="False"
+                        Minimum="100"
+                        Maximum="1000"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0} Pixel"
+                        LowerValue="{Binding PinPosCropExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
 
-                    <controls:LocalizedLabel ResourceKey="titelbild_hoehe"
-                                             Value="{Binding TitleExportSize}"
-                                             ValueFormat="{}: {0} mm"
-                                             Margin="0, 0, 0, -12"/>
-                    <Slider Maximum="300"
-                            Minimum="10"
-                            ThumbColor="{DynamicResource Primary}"
-                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
-                            Value="{Binding TitleExportSize}"/>
+                    <Label Text="{x:Static res:AppResources.titelbild_hoehe}" Margin="0,0,0,-10"/>
+                    <controls:RangeSlider
+                        IsRange="False"
+                        Minimum="10"
+                        Maximum="300"
+                        Step="1"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0} mm"
+                        LowerValue="{Binding TitleExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
                 </VerticalStackLayout>
             </ScrollView>
 

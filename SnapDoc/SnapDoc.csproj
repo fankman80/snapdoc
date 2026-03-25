@@ -142,6 +142,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+	  <Compile Update="Controls\RangeSlider.xaml.cs">
+	    <DependentUpon>RangeSlider.xaml</DependentUpon>
+	  </Compile>
 	  <Compile Update="Resources\Languages\AppResources.Designer.cs">
 	    <DesignTime>True</DesignTime>
 	    <AutoGen>True</AutoGen>
@@ -179,7 +182,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Controls\Slider.xaml">
+	  <MauiXaml Update="Controls\RangeSlider.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CameraView.xaml">

@@ -1,7 +1,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SnapDoc.Controls"
-             x:Class="SnapDoc.Controls.CustomRangeSlider"
+             x:Class="SnapDoc.Controls.RangeSlider"
              x:Name="this">
 
     <Grid x:Name="MainContainer" 
@@ -13,10 +13,11 @@
         <Grid Grid.Row="0"
               VerticalOptions="End"
               IsClippedToBounds="False"
-              Margin="0,0,0,-4"
+              Margin="0,0,0,-6"
               ZIndex="1">
 
             <Label x:Name="LowerLabel"
+                   IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding FontSize, Source={x:Reference this}}"
                    HorizontalOptions="Start"
@@ -26,14 +27,14 @@
                    InputTransparent="True" />
 
             <Label x:Name="UpperLabel" 
+                   IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding FontSize, Source={x:Reference this}}"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    HorizontalTextAlignment="Center"
                    LineBreakMode="NoWrap"
-                   InputTransparent="True"
-                   IsVisible="{Binding IsRange, Source={x:Reference this}}"/>
+                   InputTransparent="True" />
         </Grid>
 
         <Grid Grid.Row="1" 
