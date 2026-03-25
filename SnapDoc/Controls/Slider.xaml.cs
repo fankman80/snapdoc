@@ -42,8 +42,6 @@ public partial class CustomRangeSlider : ContentView
     private readonly SliderDrawable _painter = new();
     private double _lastReportedLowerValue = double.MinValue;
     private double _lastReportedUpperValue = double.MinValue;
-
-    // Bonus: Caching für Performance & Anti-Zittern
     private double _cachedLowerWidth = 0;
     private double _cachedUpperWidth = 0;
     private string _lastLowerText = "";
@@ -61,15 +59,12 @@ public partial class CustomRangeSlider : ContentView
 
         TrackCanvas.Drawable = _painter;
         TrackCanvas.HeightRequest = KnobSize + 20;
-
-        // Initialer Touch-Bereich (Knob-Größe als Puffer)
         TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
 
         MainContainer.SizeChanged += (s, e) =>
         {
             if (MainContainer.Width > 0 && !_isDragging)
             {
-                // Cache zurücksetzen bei Größenänderung des Containers
                 _cachedLowerWidth = 0;
                 _cachedUpperWidth = 0;
                 UpdateUI();
@@ -79,10 +74,12 @@ public partial class CustomRangeSlider : ContentView
 
     private void OnPointerPressed(object sender, PointerEventArgs e)
     {
-        if (MainContainer.Width <= 0) return;
+        if (MainContainer.Width <= 0)
+            return;
 
         var position = e.GetPosition(TouchLayer);
-        if (position == null) return;
+        if (position == null)
+            return;
 
         ExpandTouchLayer(true);
 
@@ -105,7 +102,8 @@ public partial class CustomRangeSlider : ContentView
 
     private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!_isDragging) return;
+        if (!_isDragging)
+            return;
 
         switch (e.StatusType)
         {
@@ -127,7 +125,8 @@ public partial class CustomRangeSlider : ContentView
 
     private void UpdateThumbPosition(double absoluteX)
     {
-        if (!_isDragging) return;
+        if (!_isDragging)
+            return;
 
         double width = MainContainer.Width - KnobSize;
         double newX = Math.Clamp(absoluteX - (KnobSize / 2), 0, width);
@@ -165,7 +164,8 @@ public partial class CustomRangeSlider : ContentView
 
     private void ExpandTouchLayer(bool expand)
     {
-        if (TouchLayer == null) return;
+        if (TouchLayer == null)
+            return;
 
         if (expand)
         {
@@ -205,23 +205,19 @@ public partial class CustomRangeSlider : ContentView
         if (LowerLabel.Text != _lastLowerText || _cachedLowerWidth <= 0)
         {
             _lastLowerText = LowerLabel.Text;
-            // .Width direkt nach .Measure() nutzen
             var measure = LowerLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
             _cachedLowerWidth = Math.Max(_cachedLowerWidth, measure);
         }
 
-        // Für das UpperLabel (falls IsRange)
         if (IsRange && (UpperLabel.Text != _lastUpperText || _cachedUpperWidth <= 0))
         {
             _lastUpperText = UpperLabel.Text;
-            // .Width direkt nach .Measure() nutzen
             var measure = UpperLabel.Measure(double.PositiveInfinity, double.PositiveInfinity).Width;
             _cachedUpperWidth = Math.Max(_cachedUpperWidth, measure);
         }
 
         double lWidth = _cachedLowerWidth > 0 ? _cachedLowerWidth : 60;
         double uWidth = _cachedUpperWidth > 0 ? _cachedUpperWidth : 60;
-
         double targetXLower = xLower + halfKnob - (lWidth / 2);
         double targetXUpper = xUpper + halfKnob - (uWidth / 2);
 
@@ -247,7 +243,8 @@ public partial class CustomRangeSlider : ContentView
     private void FinalizeValue(double x, bool isLower)
     {
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0) return;
+        if (width <= 0)
+            return;
         double rawValue = Minimum + (x / width) * (Maximum - Minimum);
         double steppedValue = Math.Round(rawValue / Step) * Step;
         steppedValue = Math.Clamp(steppedValue, Minimum, Maximum);
@@ -262,7 +259,8 @@ public partial class CustomRangeSlider : ContentView
     private double GetXFromValue(double val)
     {
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0 || Maximum <= Minimum) return 0;
+        if (width <= 0 || Maximum <= Minimum)
+            return 0;
         return (Math.Clamp(val, Minimum, Maximum) - Minimum) / (Maximum - Minimum) * width;
     }
 
@@ -285,8 +283,6 @@ public partial class CustomRangeSlider : ContentView
             }
             LowerLabel.FontSize = FontSize;
             UpperLabel.FontSize = FontSize;
-
-            // Cache-Reset bei Schriftänderung
             _cachedLowerWidth = 0;
             _cachedUpperWidth = 0;
 
