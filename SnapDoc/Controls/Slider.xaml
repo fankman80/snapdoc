@@ -1,5 +1,6 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:SnapDoc.Controls"
              x:Class="SnapDoc.Controls.CustomRangeSlider"
              x:Name="this">
 
@@ -40,21 +41,16 @@
               VerticalOptions="Center"
               IsClippedToBounds="False">
 
-            <Border ZIndex="0"
-                    HeightRequest="4"
-                    BackgroundColor="{Binding MaximumTrackColor, Source={x:Reference this}}" 
-                    VerticalOptions="Center" 
-                    HorizontalOptions="Fill"
-                    StrokeShape="RoundRectangle 2"
-                    InputTransparent="True"/>
-
-            <BoxView x:Name="HighlightTrack"
-                     ZIndex="1"
-                     BackgroundColor="{Binding MinimumTrackColor, Source={x:Reference this}}" 
-                     HeightRequest="4"
-                     VerticalOptions="Center"
-                     HorizontalOptions="Start"
-                     InputTransparent="True"/>
+            <GraphicsView x:Name="TrackCanvas"
+                          ZIndex="0"
+                          HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
+                          HorizontalOptions="Fill"
+                          VerticalOptions="Center"
+                          InputTransparent="True">
+                <GraphicsView.Drawable>
+                    <local:SliderDrawable x:Name="TrackPainter" />
+                </GraphicsView.Drawable>
+            </GraphicsView>
 
             <Border x:Name="LowerThumb"
                     ZIndex="10"
