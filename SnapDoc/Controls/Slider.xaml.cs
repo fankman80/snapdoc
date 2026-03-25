@@ -8,15 +8,15 @@ public partial class CustomRangeSlider : ContentView
     public static readonly BindableProperty LowerValueProperty = BindableProperty.Create(nameof(LowerValue), typeof(double), typeof(CustomRangeSlider), 0.0, BindingMode.TwoWay, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
     public static readonly BindableProperty UpperValueProperty = BindableProperty.Create(nameof(UpperValue), typeof(double), typeof(CustomRangeSlider), 100.0, BindingMode.TwoWay, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
     public static readonly BindableProperty IsRangeProperty = BindableProperty.Create(nameof(IsRange), typeof(bool), typeof(CustomRangeSlider), false, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
-    public static readonly BindableProperty MaximumTrackColorProperty = BindableProperty.Create(nameof(MaximumTrackColor), typeof(Color), typeof(CustomRangeSlider), Colors.Gray);
-    public static readonly BindableProperty MinimumTrackColorProperty = BindableProperty.Create(nameof(MinimumTrackColor), typeof(Color), typeof(CustomRangeSlider), Colors.Green);
-    public static readonly BindableProperty ThumbColorProperty = BindableProperty.Create(nameof(ThumbColor), typeof(Color), typeof(CustomRangeSlider), Colors.White);
+    public static readonly BindableProperty MaximumTrackColorProperty = BindableProperty.Create(nameof(MaximumTrackColor), typeof(Color), typeof(CustomRangeSlider), Colors.Gray, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
+    public static readonly BindableProperty MinimumTrackColorProperty = BindableProperty.Create(nameof(MinimumTrackColor), typeof(Color), typeof(CustomRangeSlider), Colors.Green, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
+    public static readonly BindableProperty ThumbColorProperty = BindableProperty.Create(nameof(ThumbColor), typeof(Color), typeof(CustomRangeSlider), Colors.White, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
+    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(CustomRangeSlider), null, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
+    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CustomRangeSlider), null, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
+    public static readonly BindableProperty StepProperty = BindableProperty.Create(nameof(Step), typeof(double), typeof(CustomRangeSlider), 1.0, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
     public static readonly BindableProperty KnobSizeProperty = BindableProperty.Create(nameof(KnobSize), typeof(double), typeof(CustomRangeSlider), 22.0, propertyChanged: (b, o, n) => ((CustomRangeSlider)b).UpdateUI());
-    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(CustomRangeSlider), null);
-    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(CustomRangeSlider), Label.FontSizeProperty.DefaultValue);
     public static readonly BindableProperty MinimumValueDisplayFormatProperty = BindableProperty.Create(nameof(MinimumValueDisplayFormat), typeof(string), typeof(CustomRangeSlider), "{0:0} %");
     public static readonly BindableProperty MaximumValueDisplayFormatProperty = BindableProperty.Create(nameof(MaximumValueDisplayFormat), typeof(string), typeof(CustomRangeSlider), "{0:0} %");
-    public static readonly BindableProperty StepProperty = BindableProperty.Create(nameof(Step), typeof(double), typeof(CustomRangeSlider), 1.0);
 
     public double Step { get => (double)GetValue(StepProperty); set => SetValue(StepProperty, value); }
     public string MinimumValueDisplayFormat { get => (string)GetValue(MinimumValueDisplayFormatProperty); set => SetValue(MinimumValueDisplayFormatProperty, value); }
@@ -35,12 +35,11 @@ public partial class CustomRangeSlider : ContentView
     #endregion
 
     private bool _isDragging = false;
-    private Border? _activeThumb;
     private double _touchStartPosX;
-    private double _thumbStartPosX;
+    private bool _activeThumbIsLower = true;
+    private double _currentXLower;
+    private double _currentXUpper;
     private readonly SliderDrawable _painter = new();
-
-    // Throttling Variablen für butterweiche Text-Updates
     private double _lastReportedLowerValue = double.MinValue;
     private double _lastReportedUpperValue = double.MinValue;
 
@@ -53,6 +52,7 @@ public partial class CustomRangeSlider : ContentView
         _painter.HighlightColor = MinimumTrackColor;
         _painter.IsRange = IsRange;
         TrackCanvas.Drawable = _painter;
+        TrackCanvas.HeightRequest = KnobSize + 10;
 
         MainContainer.SizeChanged += (s, e) => {
             if (!_isDragging) UpdateUI();
@@ -67,19 +67,20 @@ public partial class CustomRangeSlider : ContentView
         if (position == null) return;
 
         double touchX = position.Value.X;
-        double adjustedX = touchX - (KnobSize / 2);
+        double adjustedTouchX = touchX - (KnobSize / 2);
 
         if (!IsRange)
-            _activeThumb = LowerThumb;
+        {
+            _activeThumbIsLower = true;
+        }
         else
         {
-            double distLower = Math.Abs(adjustedX - LowerThumb.TranslationX);
-            double distUpper = Math.Abs(adjustedX - UpperThumb.TranslationX);
-            _activeThumb = distLower < distUpper ? LowerThumb : UpperThumb;
+            double distLower = Math.Abs(adjustedTouchX - _currentXLower);
+            double distUpper = Math.Abs(adjustedTouchX - _currentXUpper);
+            _activeThumbIsLower = distLower < distUpper;
         }
 
         _touchStartPosX = touchX;
-        _thumbStartPosX = _activeThumb.TranslationX;
         _isDragging = true;
 
         UpdateThumbPosition(touchX);
@@ -87,7 +88,7 @@ public partial class CustomRangeSlider : ContentView
 
     private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!_isDragging || _activeThumb == null) return;
+        if (!_isDragging) return;
 
         switch (e.StatusType)
         {
@@ -99,9 +100,11 @@ public partial class CustomRangeSlider : ContentView
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 _isDragging = false;
-                FinalizeValue(LowerThumb.TranslationX, true);
-                if (IsRange) FinalizeValue(UpperThumb.TranslationX, false);
-                _activeThumb = null;
+
+                FinalizeValue(_currentXLower, true);
+                if (IsRange)
+                    FinalizeValue(_currentXUpper, false);
+
                 UpdateUI();
                 break;
         }
@@ -109,25 +112,28 @@ public partial class CustomRangeSlider : ContentView
 
     private void UpdateThumbPosition(double absoluteX)
     {
-        if (_activeThumb == null) return;
+        if (!_isDragging) return;
 
         double width = MainContainer.Width - KnobSize;
         double newX = Math.Clamp(absoluteX - (KnobSize / 2), 0, width);
 
         if (IsRange)
         {
-            if (_activeThumb == LowerThumb)
-                newX = Math.Min(newX, UpperThumb.TranslationX);
+            if (_activeThumbIsLower)
+                newX = Math.Min(newX, _currentXUpper);
             else
-                newX = Math.Max(newX, LowerThumb.TranslationX);
+                newX = Math.Max(newX, _currentXLower);
         }
 
-        _activeThumb.TranslationX = newX;
+        if (_activeThumbIsLower)
+            _currentXLower = newX;
+        else
+            _currentXUpper = newX;
 
         double rawVal = Minimum + (newX / width) * (Maximum - Minimum);
         double steppedVal = Math.Round(rawVal / Step) * Step;
 
-        if (_activeThumb == LowerThumb)
+        if (_activeThumbIsLower)
         {
             if (Math.Abs(steppedVal - _lastReportedLowerValue) > 0.001)
             {
@@ -143,18 +149,15 @@ public partial class CustomRangeSlider : ContentView
                 _lastReportedUpperValue = steppedVal;
             }
         }
-
-        UpdateVisualsDuringDrag(LowerThumb.TranslationX, UpperThumb.TranslationX);
+        UpdateVisualsDuringDrag(_currentXLower, _currentXUpper);
     }
 
     private void UpdateVisualsDuringDrag(double xLower, double xUpper)
     {
-        // Werte an den Painter übergeben
         _painter.XLower = xLower;
         _painter.XUpper = xUpper;
-        _painter.IsRange = IsRange; // Falls es sich dynamisch ändert
+        _painter.IsRange = IsRange;
 
-        // Den Befehl zum Neuzeichnen geben (passiert fast instantan auf der GPU)
         TrackCanvas.Invalidate();
 
         AdjustLabelPositions(xLower, xUpper);
@@ -162,6 +165,8 @@ public partial class CustomRangeSlider : ContentView
 
     private void AdjustLabelPositions(double xLower, double xUpper)
     {
+        UpperLabel.IsVisible = IsRange;
+
         double halfKnob = KnobSize / 2;
         double containerWidth = MainContainer.Width;
         double lWidth = LowerLabel.Width > 0 ? LowerLabel.Width : 45;
@@ -184,10 +189,9 @@ public partial class CustomRangeSlider : ContentView
                 targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
                 targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
             }
+            UpperLabel.TranslationX = targetXUpper;
         }
-
         LowerLabel.TranslationX = targetXLower;
-        UpperLabel.TranslationX = targetXUpper;
     }
 
     private void FinalizeValue(double x, bool isLower)
@@ -219,25 +223,36 @@ public partial class CustomRangeSlider : ContentView
 
     public void UpdateUI()
     {
-        if (LowerLabel == null || MainContainer == null || MainContainer.Width <= 0)
+        if (LowerLabel == null || MainContainer == null || MainContainer.Width <= 0 || _painter == null)
             return;
-
-        _painter.BaseColor = MaximumTrackColor;
-        _painter.HighlightColor = MinimumTrackColor;
-        _painter.KnobSize = KnobSize;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {
+            _painter.BaseColor = MaximumTrackColor;
+            _painter.HighlightColor = MinimumTrackColor;
+            _painter.ThumbColor = ThumbColor;
+            _painter.KnobSize = KnobSize;
+            _painter.IsRange = IsRange;
+
+            if (TextColor != null)
+            {
+                LowerLabel.TextColor = TextColor;
+                UpperLabel.TextColor = TextColor;
+            }
+            LowerLabel.FontSize = FontSize;
+            UpperLabel.FontSize = FontSize;
+
             if (!_isDragging)
             {
                 LowerLabel.Text = string.Format(MinimumValueDisplayFormat, LowerValue);
                 UpperLabel.Text = string.Format(MaximumValueDisplayFormat, UpperValue);
 
                 double xLower = GetXFromValue(LowerValue);
-                double xUpper = GetXFromValue(UpperValue);
+                double xUpper = IsRange ? GetXFromValue(UpperValue) : 0;
 
-                LowerThumb.TranslationX = xLower;
-                UpperThumb.TranslationX = xUpper;
+                _currentXLower = xLower;
+                _currentXUpper = xUpper;
+
                 UpdateVisualsDuringDrag(xLower, xUpper);
             }
             else
@@ -253,10 +268,12 @@ public class SliderDrawable : IDrawable
     public double KnobSize { get; set; }
     public Color? BaseColor { get; set; }
     public Color? HighlightColor { get; set; }
+    public Color? ThumbColor { get; set; }
     public bool IsRange { get; set; }
 
     public void Draw(ICanvas canvas, RectF dirtyRect)
     {
+        canvas.Antialias = true;
         float trackHeight = 4;
         float y = dirtyRect.Height / 2;
         float halfKnob = (float)KnobSize / 2;
@@ -271,5 +288,23 @@ public class SliderDrawable : IDrawable
             canvas.DrawLine((float)XLower + halfKnob, y, (float)XUpper + halfKnob, y);
         else
             canvas.DrawLine(halfKnob, y, (float)XLower + halfKnob, y);
+
+        DrawKnob(canvas, (float)XLower + halfKnob, y);
+
+        if (IsRange)
+            DrawKnob(canvas, (float)XUpper + halfKnob, y);
+    }
+
+    private void DrawKnob(ICanvas canvas, float x, float y)
+    {
+        float radius = (float)KnobSize / 2;
+
+        canvas.SetShadow(new SizeF(0, 3), 4, Colors.Black.WithAlpha(0.2f));
+        canvas.FillColor = ThumbColor;
+        canvas.FillCircle(x, y, radius);
+        canvas.SetShadow(SizeF.Zero, 0, Colors.Transparent);
+        canvas.StrokeColor = Color.FromArgb("#D1D1D6");
+        canvas.StrokeSize = 0.5f;
+        canvas.DrawCircle(x, y, radius);
     }
 }

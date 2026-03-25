@@ -52,33 +52,6 @@
                 </GraphicsView.Drawable>
             </GraphicsView>
 
-            <Border x:Name="LowerThumb"
-                    ZIndex="10"
-                    InputTransparent="True"
-                    HorizontalOptions="Start" VerticalOptions="Center"
-                    WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
-                    HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
-                    BackgroundColor="{Binding ThumbColor, Source={x:Reference this}}"
-                    Stroke="#D1D1D6" StrokeThickness="0.5" StrokeShape="Ellipse">
-                <Border.Shadow>
-                    <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
-                </Border.Shadow>
-            </Border>
-
-            <Border x:Name="UpperThumb"
-                    ZIndex="10"
-                    InputTransparent="True"
-                    HorizontalOptions="Start" VerticalOptions="Center"
-                    WidthRequest="{Binding KnobSize, Source={x:Reference this}}" 
-                    HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
-                    BackgroundColor="{Binding ThumbColor, Source={x:Reference this}}"
-                    Stroke="#D1D1D6" StrokeThickness="0.5" StrokeShape="Ellipse"
-                    IsVisible="{Binding IsRange, Source={x:Reference this}}">
-                <Border.Shadow>
-                    <Shadow Brush="Black" Offset="0,2" Radius="2" Opacity="0.2"/>
-                </Border.Shadow>
-            </Border>
-
             <Grid x:Name="TouchLayer"
                   ZIndex="20"
                   BackgroundColor="Transparent"
