@@ -111,63 +111,105 @@
                                            HeightRequest="44"/>
                                 </Grid>
                             </uranium:ExpanderView.Header>
-                            <VerticalStackLayout Spacing="0" Margin="10,0,10,0">
+                            <VerticalStackLayout Margin="10,0,10,10" Spacing="10">
                                 <!-- Slider for Red -->
-                                <controls:LocalizedLabel ResourceKey="rot_r"
-                                                         Value="{Binding RedValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
-                                                         ValueFormat="{}: {0:0}"
-                                                         TextColor="Red"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding RedValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                                <Label Text="{x:Static res:AppResources.rot_r}" TextColor="Red" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    TextColor="Red"
+                                    MinimumValueDisplayFormat="{}{0:0}"
+                                    LabelCalculation="*255"
+                                    LowerValue="{Binding RedValue, Mode=TwoWay}"
+                                    MinimumTrackColor="Red"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>
 
                                 <!-- Slider for Green -->
-                                <controls:LocalizedLabel ResourceKey="gruen_g"
-                                                         Value="{Binding GreenValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
-                                                         ValueFormat="{}: {0:0}"
-                                                         TextColor="Green"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding GreenValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                                <Label Text="{x:Static res:AppResources.gruen_g}" TextColor="Green" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    TextColor="Green"
+                                    MinimumValueDisplayFormat="{}{0:0}"
+                                    LabelCalculation="*255"
+                                    LowerValue="{Binding GreenValue, Mode=TwoWay}"
+                                    MinimumTrackColor="Green"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>
+                                
                                 <!-- Slider for Blue -->
-                                <controls:LocalizedLabel ResourceKey="blau_b"
-                                                         Value="{Binding BlueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*255'}"
-                                                         ValueFormat="{}: {0:0}"
-                                                         TextColor="Blue"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding BlueValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                                <Label Text="{x:Static res:AppResources.blau_b}" TextColor="Blue" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    TextColor="Blue"
+                                    MinimumValueDisplayFormat="{}{0:0}"
+                                    LabelCalculation="*255"
+                                    LowerValue="{Binding BlueValue, Mode=TwoWay}"
+                                    MinimumTrackColor="Blue"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>  
+                                
                                 <!-- Slider for Hue -->
-                                <controls:LocalizedLabel ResourceKey="farbwert_h"
-                                                         Value="{Binding HueValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*360'}"
-                                                         ValueFormat="{}: {0:0}°"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding HueValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                                <Label Text="{x:Static res:AppResources.farbwert_h}" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    MinimumValueDisplayFormat="{}{0:0}°"
+                                    LabelCalculation="*360"
+                                    LowerValue="{Binding HueValue, Mode=TwoWay}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>
+                                
                                 <!-- Slider for Saturation -->
-                                <controls:LocalizedLabel ResourceKey="saettigung_s"
-                                                         Value="{Binding SaturationValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
-                                                         ValueFormat="{}: {0:0}%"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding SaturationValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                                <Label Text="{x:Static res:AppResources.saettigung_s}" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    MinimumValueDisplayFormat="{}{0:0}%"
+                                    LabelCalculation="*100"
+                                    LowerValue="{Binding SaturationValue, Mode=TwoWay}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>                                
+                                
                                 <!-- Slider for Brightness -->
-                                <controls:LocalizedLabel ResourceKey="helligkeit_l"
-                                                         Value="{Binding BrightnessValue, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x*100'}"
-                                                         ValueFormat="{}: {0:0}%"/>
-                                <Slider Minimum="0" Maximum="1" Value="{Binding BrightnessValue, Mode=TwoWay}"
-                                        ThumbColor="{DynamicResource Primary}"
-                                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                                <Label Text="{x:Static res:AppResources.helligkeit_l}" FontSize="12" Margin="0,0,0,-10"/>
+                                <controls:RangeSlider
+                                    IsRange="False"
+                                    IsRealtime="True"
+                                    Minimum="0"
+                                    Maximum="1"
+                                    Step="0.001"
+                                    FontSize="12"
+                                    MinimumValueDisplayFormat="{}{0:0}%"
+                                    LabelCalculation="*100"
+                                    LowerValue="{Binding BrightnessValue, Mode=TwoWay}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                                </controls:RangeSlider>
                             </VerticalStackLayout>
                         </uranium:ExpanderView>
                     </Border>
