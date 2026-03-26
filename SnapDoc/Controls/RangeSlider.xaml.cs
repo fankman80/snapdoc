@@ -52,6 +52,11 @@ public partial class RangeSlider : ContentView
     private double _cachedUpperWidth = 0;
     private string _lastLowerText = "";
     private string _lastUpperText = "";
+    private bool _pannedDuringTouch = false;
+    private bool _isDirectionLocked;
+    private bool _isScrollingTriggered;
+    private const double GestureThreshold = 10.0;
+    private bool _wasPressedOnThisControl;
 
     public RangeSlider()
     {
@@ -62,8 +67,6 @@ public partial class RangeSlider : ContentView
         _painter.HighlightColor = MinimumTrackColor;
         _painter.IsRange = IsRange;
         _painter.ThumbColor = ThumbColor;
-
-
 
         TrackCanvas.Drawable = _painter;
         TrackCanvas.HeightRequest = KnobSize + 20;
@@ -82,6 +85,11 @@ public partial class RangeSlider : ContentView
 
     private void OnPointerPressed(object sender, PointerEventArgs e)
     {
+        _wasPressedOnThisControl = true;
+        _pannedDuringTouch = false;
+        _isDirectionLocked = false;
+        _isScrollingTriggered = false;
+
         if (MainContainer.Width <= 0)
             return;
 
@@ -89,11 +97,9 @@ public partial class RangeSlider : ContentView
         if (position == null)
             return;
 
-        ExpandTouchLayer(true);
+        _touchStartPosX = position.Value.X;
 
-        double touchX = position.Value.X;
-        double adjustedTouchX = touchX - (KnobSize / 2);
-
+        double adjustedTouchX = _touchStartPosX - (KnobSize / 2);
         if (!IsRange)
             _activeThumbIsLower = true;
         else
@@ -102,47 +108,83 @@ public partial class RangeSlider : ContentView
             double distUpper = Math.Abs(adjustedTouchX - _currentXUpper);
             _activeThumbIsLower = distLower < distUpper;
         }
-
-        _touchStartPosX = touchX;
-        _isDragging = true;
-        UpdateThumbPosition(touchX);
     }
 
     private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!_isDragging)
-            return;
-
         switch (e.StatusType)
         {
+            case GestureStatus.Started:
+                _isDragging = true;
+                break;
+
             case GestureStatus.Running:
-                double currentAbsoluteX = _touchStartPosX + e.TotalX;
-                UpdateThumbPosition(currentAbsoluteX);
+                if (!_isDragging || _isScrollingTriggered)
+                    return;
+
+                if (!_isDirectionLocked)
+                {
+                    if (Math.Abs(e.TotalX) > GestureThreshold || Math.Abs(e.TotalY) > GestureThreshold)
+                    {
+                        if (Math.Abs(e.TotalY) > Math.Abs(e.TotalX))
+                        {
+                            _isScrollingTriggered = true;
+                            _isDragging = false;
+                            return;
+                        }
+                        else
+                        {
+                            _isDirectionLocked = true;
+                            _pannedDuringTouch = true;
+                            ExpandTouchLayer(true);
+                        }
+                    }
+                    else return;
+                }
+
+                double currentFingerX = _touchStartPosX + e.TotalX;
+                UpdateThumbPosition(currentFingerX);
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
-                _isDragging = false;
-                ExpandTouchLayer(false);
-                FinalizeValue(_currentXLower, true);
-                if (IsRange) FinalizeValue(_currentXUpper, false);
-                UpdateUI();
+                EndInteraction();
                 break;
         }
     }
 
     private void OnPointerReleased(object sender, PointerEventArgs e)
     {
-        if (_isDragging)
+        if (_wasPressedOnThisControl && !_pannedDuringTouch && !_isScrollingTriggered)
         {
-            _isDragging = false;
-            ExpandTouchLayer(false);
-
-            FinalizeValue(_currentXLower, true);
-            if (IsRange) FinalizeValue(_currentXUpper, false);
-
-            UpdateUI();
+            var position = e.GetPosition(this);
+            if (position.HasValue && position.Value.Y >= 0 && position.Value.Y <= this.Height)
+            {
+                _isDragging = true;
+                UpdateThumbPosition(position.Value.X);
+            }
         }
+        EndInteraction();
+    }
+
+    private void EndInteraction()
+    {
+        if (!_wasPressedOnThisControl)
+            return;
+
+        _isDragging = false;
+        _pannedDuringTouch = false;
+        _isDirectionLocked = false;
+        _isScrollingTriggered = false;
+        _wasPressedOnThisControl = false;
+
+        ExpandTouchLayer(false);
+
+        FinalizeValue(_currentXLower, true);
+        if (IsRange)
+            FinalizeValue(_currentXUpper, false);
+
+        UpdateUI();
     }
 
     private void UpdateThumbPosition(double absoluteX)
@@ -293,15 +335,15 @@ public partial class RangeSlider : ContentView
         int decimals = 0;
         string stepString = Step.ToString(System.Globalization.CultureInfo.InvariantCulture);
         if (stepString.Contains('.'))
-        {
             decimals = stepString.Split('.')[1].Length;
-        }
 
         steppedValue = Math.Round(steppedValue, decimals);
         steppedValue = Math.Clamp(steppedValue, Minimum, Maximum);
 
-        if (isLower) LowerValue = steppedValue;
-        else UpperValue = steppedValue;
+        if (isLower)
+            LowerValue = steppedValue;
+        else
+            UpperValue = steppedValue;
 
         _lastReportedLowerValue = double.MinValue;
         _lastReportedUpperValue = double.MinValue;
