@@ -107,7 +107,7 @@
                         IsRange="False"
                         Minimum="0"
                         Maximum="1"
-                        Step="0.1"
+                        Step="0.01"
                         FontSize="12"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         MinimumValueDisplayFormat="{}{0:0} %"
