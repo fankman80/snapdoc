@@ -43,9 +43,20 @@ public partial class LoadPDFPages : ContentPage
 
     private async void LoadPreviewPDFImages()
     {
+        // Lösche vorherige Cache-Dateien
+        if (Directory.Exists(Settings.CacheDirectory))
+        {
+            var files = Directory.GetFiles(Settings.CacheDirectory);
+            foreach (var file in files)
+            {
+                try { File.Delete(file); } catch { /* Ignore */ }
+            }
+        }
+
         resultList = await PickPdfFileAsync();
         if (resultList != null && resultList.Any())
         {
+            string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
             List<PdfItem> pdfImages = [];
             busyOverlay.IsOverlayVisible = true;
             busyOverlay.IsActivityRunning = true;
@@ -65,11 +76,9 @@ public partial class LoadPDFPages : ContentPage
 
                     for (int i = 0; i < pagecount; i++)
                     {
-                        string imgBaseName = $"pdf_{pdfIndex}_page_{i}";
+                        string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
                         string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, imgBaseName + ".jpg");
                         string previewPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
-
-                        // Schritt 1: Seite bei 72 DPI rendern, um Größe zu ermitteln
                         var probeRenderOptions = new RenderOptions
                         {
                             AntiAliasing = PdfAntiAliasing.None,
@@ -84,8 +93,6 @@ public partial class LoadPDFPages : ContentPage
 
                         int width72dpi = probeBitmap.Width;
                         int height72dpi = probeBitmap.Height;
-
-                        // Schritt 2: DPI berechnen anhand MaxPixelCount
                         int targetDpi = CalculateMaxDpiFromPixelLimit(width72dpi, height72dpi, SettingsService.Instance.MaxPdfPixelCount * 1000000);
 
                         pdfImages.Add(new PdfItem

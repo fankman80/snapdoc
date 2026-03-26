@@ -61,7 +61,7 @@
                         <VerticalStackLayout>
                             <Grid Margin="8">
                                 <Image Source="{Binding PreviewPath}"
-                                       Aspect="AspectFill"/>
+                                       Aspect="AspectFill" />
                                 <CheckBox IsChecked="{Binding IsChecked}"
                                           Color="{DynamicResource Primary}"
                                           VerticalOptions="End"

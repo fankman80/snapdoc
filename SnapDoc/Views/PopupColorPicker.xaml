@@ -181,7 +181,7 @@
                         Step="1"
                         FontSize="12"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0}"
+                        MinimumValueDisplayFormat="{}{0:0} %"
                         LabelCalculation="*0.3921"
                         LowerValue="{Binding FillOpacity}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"

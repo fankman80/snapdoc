@@ -85,6 +85,8 @@
 
                 <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                                 x:Name="iconCategory"
+                                                FontFamily="{StaticResource AppFontFamily}"
+                                                FontSize="{StaticResource AppFontSizeNormal}"                                                
                                                 Title="{x:Static res:AppResources.kategorie}"
                                                 TitleColor="{DynamicResource SecondaryBackground}"
                                                 BorderColor="{DynamicResource SecondaryBackground}"

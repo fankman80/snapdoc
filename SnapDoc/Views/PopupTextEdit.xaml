@@ -155,7 +155,7 @@
                         Step="1"
                         FontSize="12"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0}"
+                        MinimumValueDisplayFormat="{}{0} px"
                         LowerValue="{Binding TextPadding}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
