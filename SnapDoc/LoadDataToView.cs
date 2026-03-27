@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using Microsoft.Maui.Controls;
+using SnapDoc.Views;
 
 namespace SnapDoc;
 
@@ -26,12 +27,12 @@ public partial class LoadDataToView
 
     public static void AddPlan(KeyValuePair<string, Models.Plan> plan)
     {
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
+
         string planId = plan.Key;
         string planTitle = plan.Value.Name;
         string thumbnail = plan.Value.File;
-
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
 
         // Neue Plan-Seite
         var newPage = new Views.NewPage(planId)
@@ -63,6 +64,35 @@ public partial class LoadDataToView
                 GlobalJson.Data.PlanPath,
                 "thumbnails",
                 thumbnail)
+        };
+
+        shell.AllPlanItems.Add(item);
+    }
+
+    public static void AddMapPlan(KeyValuePair<string, Models.Plan> plan)
+    {
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
+
+        string planId = plan.Key;
+        string planTitle = plan.Value.Name;
+
+        // ShellContent erzeugen
+        var shellContent = new ShellContent
+        {
+            Title = planTitle,
+            ContentTemplate = new DataTemplate(typeof(MapViewOSM)),
+            Route = $"mapviewosm",
+            AutomationId = planId
+        };
+
+        shell.Items.Add(shellContent);
+
+        var item = new PlanItem(plan.Value)
+        {
+            Title = planTitle,
+            PlanId = planId,
+            PlanRoute = $"mapviewosm"
         };
 
         shell.AllPlanItems.Add(item);

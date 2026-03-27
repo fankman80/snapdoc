@@ -934,6 +934,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan aus Onlinekartendienst hinzufügen ähnelt.
+        /// </summary>
+        internal static string karte_aus_webmap {
+            get {
+                return ResourceManager.GetString("karte_aus_webmap", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kartenservice ähnelt.
         /// </summary>
         internal static string kartenservice {

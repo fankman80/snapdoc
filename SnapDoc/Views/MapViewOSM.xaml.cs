@@ -4,6 +4,7 @@ using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
+using DocumentFormat.OpenXml.Presentation;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -17,11 +18,13 @@ using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.InfoWidgets;
 using Mapsui.Widgets.ScaleBar;
+using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Diagnostics;
+using System.Security.AccessControl;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
@@ -112,15 +115,12 @@ public partial class MapViewOSM : IQueryAttributable
         string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
-        foreach (var plan in GlobalJson.Data.Plans)
+        foreach (var pin in GlobalJson.Data.Plans[PlanId].Pins ?? [])
         {
-            foreach (var pin in plan.Value.Pins ?? [])
+            if (pin.Value.GeoLocation != null)
             {
-                if (pin.Value.GeoLocation != null)
-                {
-                    var loc = pin.Value.GeoLocation.WGS84;
-                    AddPin(map, new Point(loc.Longitude, loc.Latitude), plan.Key, pin.Key);
-                }
+                var loc = pin.Value.GeoLocation.WGS84;
+                AddPin(map, new Point(loc.Longitude, loc.Latitude), PlanId, pin.Key);
             }
         }
 
@@ -358,8 +358,6 @@ public partial class MapViewOSM : IQueryAttributable
 
             if (result.Result == "export")
             {
-                await Task.Delay(300);
-
                 var imageSize = new System.Drawing.Size(2000, 2000);
                 var imageBytes = await ExportMapAsImageAsync(imageSize, feature.Geometry.Centroid);
 
@@ -468,7 +466,62 @@ public partial class MapViewOSM : IQueryAttributable
 
     private async void SetPinClicked(object sender, EventArgs e)
     {
+        if (!SettingsService.Instance.IsGpsActive)
+        {
+            await ShowGpsDisabledMessageAsync();
+            return;
+        }
 
+        var location = await geoViewModel.TryGetLocationAsync();
+        if (location == null)
+            return;
+
+        lon = location.Longitude;
+        lat = location.Latitude;
+        zoom = 18;
+
+        var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
+        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[zoom]);
+
+        var currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+        Models.Pin newPinData = new()
+        {
+            Pos = new Microsoft.Maui.Graphics.Point(0,0),
+            Anchor = new Microsoft.Maui.Graphics.Point(0, 0),
+            Size = new Microsoft.Maui.Graphics.Size(0,0),
+            IsLockPosition = false,
+            IsLockRotate = true,
+            IsLockAutoScale = true,
+            IsCustomPin = false,
+            IsCustomIcon = false,
+            PinName = "WebMap-Pin",
+            PinDesc = "",
+            PinPriority = 0,
+            PinLocation = "",
+            PinIcon = SettingsService.Instance.DefaultPinIcon,
+            Fotos = [],
+            OnPlanId = PlanId,
+            SelfId = currentDateTime,
+            DateTime = DateTime.Now,
+            PinColor = SKColors.Red,
+            PinScale = 1,
+            PinRotation = 0,
+            GeoLocation = new GeoLocData(location),
+            IsAllowExport = true,
+        };
+
+        // Sicherstellen, dass der Plan existiert
+        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+        {
+            plan.Pins ??= [];
+            plan.Pins[currentDateTime] = newPinData;
+
+            GlobalJson.Data.Plans[PlanId].PinCount += 1;
+            GlobalJson.SaveToFile();
+        }
+
+        AddPin(map, new Point(lon, lat), PlanId, plan.Pins[currentDateTime].SelfId);
     }
 
     private static TextBoxWidget CreateInstructionTextBox(string text) => new()
@@ -509,71 +562,71 @@ public partial class MapViewOSM : IQueryAttributable
 
     public async Task<byte[]> ExportMapAsImageAsync(System.Drawing.Size targetSize, NetTopologySuite.Geometries.Geometry targetCenter)
     {
-        var originalResolution = MapControl.Map.Navigator.Viewport.Resolution;
-        var originalCenter = new Mapsui.MPoint(MapControl.Map.Navigator.Viewport.CenterX, MapControl.Map.Navigator.Viewport.CenterY);
+        double exportResolution = 0.2;
+        var center = new MPoint(targetCenter.Centroid.X, targetCenter.Centroid.Y);
+        var exportViewport = new Viewport(
+            center.X,
+            center.Y,
+            exportResolution,
+            0,
+            targetSize.Width,
+            targetSize.Height
+        );
 
-        return await MainThread.InvokeOnMainThreadAsync(async () =>
+        var tempMap = new Map();
+        foreach (var layer in MapControl.Map.Layers)
+        {
+            tempMap.Layers.Add(layer);
+        }
+
+        tempMap.RefreshData(exportViewport);
+
+        int timeoutCounter = 0;
+        bool stillLoading = true;
+
+        await Task.Delay(100);
+
+        while (stillLoading && timeoutCounter < 50)
+        {
+            stillLoading = tempMap.Layers.OfType<TileLayer>().Any(l => l.Busy);
+            if (stillLoading)
+            {
+                await Task.Delay(200);
+                timeoutCounter++;
+            }
+        }
+
+        return await Task.Run(() =>
         {
             try
             {
-                double exportResolution = 0.5;
-                bool stillLoading = true;
-                int timeoutCounter = 0;
-
-                MapControl.Map.Navigator.CenterOn(targetCenter.Centroid.X, targetCenter.Centroid.Y);
-                MapControl.Map.Navigator.ZoomTo(exportResolution);
-
-                while (stillLoading && timeoutCounter < 25)
-                {
-                    var tileLayers = MapControl.Map.Layers.OfType<Mapsui.Tiling.Layers.TileLayer>();
-                    stillLoading = tileLayers.Any(l => l.Busy);
-                    if (stillLoading)
-                    {
-                        await Task.Delay(200);
-                        timeoutCounter++;
-                    }
-                }
-
-                var exportViewport = new Mapsui.Viewport(
-                    targetCenter.Centroid.X,
-                    targetCenter.Centroid.Y,
-                    exportResolution,
-                    0,
-                    targetSize.Width,
-                    targetSize.Height
-                );
-
                 var renderer = new Mapsui.Rendering.Skia.MapRenderer();
                 var renderService = new Mapsui.Rendering.RenderService();
 
                 using var bitmapStream = renderer.RenderToBitmapStream(
                     exportViewport,
-                    MapControl.Map.Layers,
+                    tempMap.Layers,
                     renderService,
-                    background: Mapsui.Styles.Color.White,
-                    pixelDensity: 1.0f,
-                    widgets: null,
-                    renderFormat: Mapsui.Rendering.RenderFormat.Jpeg,
-                    quality: 90
+                    Color.White,
+                    1.0f,
+                    null,
+                    Mapsui.Rendering.RenderFormat.Jpeg,
+                    90
                 );
 
-                MapControl.Map.Navigator.CenterOn(originalCenter);
-                MapControl.Map.Navigator.ZoomTo(originalResolution);
-
-                if (bitmapStream == null)
-                    return null;
+                if (bitmapStream == null) return null;
 
                 using var ms = new MemoryStream();
                 bitmapStream.Position = 0;
-                await bitmapStream.CopyToAsync(ms);
+                bitmapStream.CopyTo(ms);
+                tempMap.Layers.Clear();
 
                 return ms.ToArray();
             }
             catch (Exception ex)
             {
-                MapControl.Map.Navigator.CenterOn(originalCenter);
-                MapControl.Map.Navigator.ZoomTo(originalResolution);
-                System.Diagnostics.Debug.WriteLine("Export Fehler: " + ex.Message);
+                Debug.WriteLine("Export Fehler: " + ex.Message);
+                tempMap.Layers.Clear();
                 return null;
             }
         });
@@ -603,5 +656,57 @@ public partial class MapViewOSM : IQueryAttributable
             map.Layers.Insert(0, OpenStreetMap.CreateTileLayer());
 
         map.RefreshGraphics();
+    }
+
+    private async void OnDeleteButtonClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result.Result == null)
+            return;
+
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
+
+        // Shell-Navigation entfernen
+        var shellContent = shell
+            .FindByName<ShellContent>(PlanId);
+
+        if (shellContent?.Parent is ShellSection section)
+            section.Items.Remove(shellContent);
+
+        // Masterliste bereinigen
+        var masterItem = shell.AllPlanItems
+            .FirstOrDefault(p => p.PlanId == PlanId);
+
+        if (masterItem != null)
+            shell.AllPlanItems.Remove(masterItem);
+
+        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
+            return;
+
+        // JSON + Files löschen
+        plan = GlobalJson.Data.Plans[PlanId];
+
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+
+        GlobalJson.Data.Plans.Remove(PlanId);
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Anzeige neu aufbauen
+        shell.ApplyFilterAndSorting();
+
+        await Shell.Current.GoToAsync("//homescreen");
+    }
+
+    private static void DeleteIfExists(string path)
+    {
+        if (File.Exists(path))
+            File.Delete(path);
     }
 }

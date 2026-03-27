@@ -840,4 +840,7 @@
   <data name="pin_automatisch_sperren" xml:space="preserve">
     <value>Pin automatisch sperren</value>
   </data>
+  <data name="karte_aus_webmap" xml:space="preserve">
+    <value>Plan aus Onlinekartendienst hinzufügen</value>
+  </data>
 </root>

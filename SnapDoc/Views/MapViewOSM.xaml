@@ -16,7 +16,7 @@
             Title="{x:Static res:AppResources.osm_karte}">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
@@ -39,6 +39,16 @@
                     HorizontalOptions="End"
                     ToolTipProperties.Text="{x:Static res:AppResources.kml_datei_exportieren}"                    
                     Clicked="KmlExportClicked"/>
+            <Button Grid.Column="2"
+                    Text="{x:Static local:MaterialIcons.Delete}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    Clicked="OnDeleteButtonClicked"/>
         </Grid>
     </Shell.TitleView>
 

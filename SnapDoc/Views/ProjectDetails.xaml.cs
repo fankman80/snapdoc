@@ -1,6 +1,7 @@
 ﻿#nullable disable
 
 using SkiaSharp;
+using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
@@ -115,6 +116,39 @@ public partial class ProjectDetails : ContentPage
         UpdateProjectData();
 
         await Shell.Current.GoToAsync("loadPdfImages");
+    }
+
+    private async void OnAddWebMapClicked(object sender, EventArgs e)
+    {
+        UpdateProjectData();
+
+        string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        Plan plan = new()
+        {
+            Name = "Online Map",
+            File = "",
+            ImageSize = new Size(0,0),
+            IsGrayscale = false,
+            Description = "",
+            AllowExport = true,
+            PlanColor = "#00FFFFFF"
+        };
+
+        var newPlan = new KeyValuePair<string, Plan>(planId, plan);
+        LoadDataToView.AddMapPlan(newPlan);
+
+        // Überprüfen, ob die Plans-Struktur initialisiert ist
+        GlobalJson.Data.Plans ??= [];
+        GlobalJson.Data.Plans[planId] = plan;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Shell aktualisieren
+        var shell = Application.Current.Windows[0].Page as AppShell;
+        shell.ApplyFilterAndSorting();
+
+        await Shell.Current.GoToAsync($"mapviewosm?planId={planId}");
     }
 
     private void UpdateProjectData()

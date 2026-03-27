@@ -159,8 +159,17 @@
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
+                        Padding="0"
+                        MinimumWidthRequest="100"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.karte_aus_webmap}"
+                        Clicked="OnAddWebMapClicked"/>
+                <Button Grid.Column="2"
                         Padding="0"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -168,7 +177,7 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
                         Clicked="OnAddPdfClicked"/>
-                <Button Grid.Column="2"
+                <Button Grid.Column="3"
                         Text="{x:Static res:AppResources.ok}"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
