@@ -44,7 +44,7 @@ public partial class ProjectDetails : ContentPage
     {
         string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 
-        (FileResult result, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), GlobalJson.Data.ProjectPath, thumbFileName);
+        (FileResult result, System.Drawing.Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), GlobalJson.Data.ProjectPath, thumbFileName);
         if (result != null)
         {
             if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
@@ -96,9 +96,9 @@ public partial class ProjectDetails : ContentPage
                 GlobalJson.Data.TitleImage = thumbFileName;
 
                 if (codec != null)
-                    GlobalJson.Data.TitleImageSize = new Size(codec.Info.Size.Width, codec.Info.Size.Height);
+                    GlobalJson.Data.TitleImageSize = new System.Drawing.Size(codec.Info.Size.Width, codec.Info.Size.Height);
                 else
-                    GlobalJson.Data.TitleImageSize = new Size(500, 500);
+                    GlobalJson.Data.TitleImageSize = new System.Drawing.Size(500, 500);
 
                 GlobalJson.SaveToFile();
                 Helper.HeaderUpdate();

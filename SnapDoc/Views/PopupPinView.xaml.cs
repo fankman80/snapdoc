@@ -30,4 +30,9 @@ public partial class PopupPinView : Popup<string>
     {
         await CloseAsync(null);
     }
+
+    private async void OnExportClicked(object sender, EventArgs e)
+    {
+        await CloseAsync("export");
+    }
 }

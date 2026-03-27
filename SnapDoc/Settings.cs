@@ -34,7 +34,7 @@ public static class Settings
     public static readonly string TemplateDirectory = Path.Combine(dataDirectory, "templates");
 
     public static readonly List<MapViewItem> SwissTopoLayers = [
-        new MapViewItem { Desc = "kein Map-Layer", Id = "" },
+        new MapViewItem { Desc = "OPEN_STREET_MAP", Id = "OpenStreetMap" },
         new MapViewItem { Desc = "PIXELKARTE_FARBE", Id = "ch.swisstopo.pixelkarte-farbe" },
         new MapViewItem { Desc = "PIXELKARTE_FARK_PK1000", Id = "ch.swisstopo.pixelkarte-farbe-pk1000.noscale" },
         new MapViewItem { Desc = "PIXELKARTE_GRAUSTUFEN", Id = "ch.swisstopo.pixelkarte-grau" },

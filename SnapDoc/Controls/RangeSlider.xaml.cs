@@ -301,21 +301,27 @@ public partial class RangeSlider : ContentView
 
         double lWidth = _cachedLowerWidth > 0 ? _cachedLowerWidth : 60;
         double uWidth = _cachedUpperWidth > 0 ? _cachedUpperWidth : 60;
-        double targetXLower = xLower + halfKnob - (lWidth / 2);
-        double targetXUpper = xUpper + halfKnob - (uWidth / 2);
-
-        targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
+        double targetXLower = Math.Clamp(xLower + halfKnob - (lWidth / 2), 0, containerWidth - lWidth);
+        double targetXUpper = IsRange ? Math.Clamp(xUpper + halfKnob - (uWidth / 2), 0, containerWidth - uWidth) : 0;
 
         if (IsRange)
         {
-            targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
-            double minGap = 5;
+            double minGap = 8;
             if (targetXLower + lWidth + minGap > targetXUpper)
             {
                 double overlap = (targetXLower + lWidth + minGap) - targetXUpper;
-                targetXLower -= overlap / 2;
-                targetXUpper += overlap / 2;
+                if (targetXLower <= 0)
+                    targetXUpper = lWidth + minGap;
+                else if (targetXUpper >= containerWidth - uWidth)
+                    targetXLower = containerWidth - uWidth - minGap - lWidth;
+                else
+                {
+                    targetXLower -= overlap / 2;
+                    targetXUpper += overlap / 2;
+                }
+
                 targetXLower = Math.Clamp(targetXLower, 0, containerWidth - lWidth);
+                targetXUpper = Math.Max(targetXUpper, targetXLower + lWidth + minGap);
                 targetXUpper = Math.Clamp(targetXUpper, 0, containerWidth - uWidth);
             }
             UpperLabel.TranslationX = targetXUpper;

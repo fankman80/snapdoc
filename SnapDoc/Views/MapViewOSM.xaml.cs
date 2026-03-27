@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using BruTile.Predefined;
+using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
@@ -10,6 +12,7 @@ using Mapsui.Nts.Extensions;
 using Mapsui.Projections;
 using Mapsui.Styles;
 using Mapsui.Tiling;
+using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.InfoWidgets;
@@ -76,9 +79,10 @@ public partial class MapViewOSM : IQueryAttributable
             ColorOfBeginAndEndDots = widgetColor
         };
 
+        LayerPicker.ItemsSource = Settings.SwissTopoLayers;
+        LayerPicker.SelectedIndex = 1;
         map.Widgets.Clear();
-
-        map.Layers.Add(OpenStreetMap.CreateTileLayer());
+        map.Layers.Add(CreateSwissTopoLayer("ch.swisstopo.pixelkarte-farbe"));
         map.Layers.Add(CreatePinLayer());
 
         map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
@@ -343,12 +347,40 @@ public partial class MapViewOSM : IQueryAttributable
         {
             var pinId = feature["PinId"].ToString();
             var planId = feature["PlanId"].ToString();
-
             var popup = new PopupPinView(planId, pinId);
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
             if (result.Result == "edit")
                 _mapInitialized = false;
+
+            if (result.Result == "export")
+            {
+                await Task.Delay(300);
+
+                var imageSize = new System.Drawing.Size(2000, 2000);
+                var imageBytes = await ExportMapAsImageAsync(imageSize.Width, imageSize.Height);
+
+                if (imageBytes == null || imageBytes.Length == 0)
+                    return;
+
+                string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
+                string filepath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, filename);
+                string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, filename);
+
+                await File.WriteAllBytesAsync(filepath, imageBytes);
+
+                Thumbnail.Generate(filepath, thumbPath);
+
+                Foto newImageData = new()
+                {
+                    AllowExport = true,
+                    File = filename,
+                    DateTime = DateTime.Now,
+                    ImageSize = imageSize
+                };
+                GlobalJson.Data.Plans[planId].Pins[pinId].Fotos[filename] = newImageData;
+                GlobalJson.SaveToFile();
+            }
         }
     }
 
@@ -416,12 +448,9 @@ public partial class MapViewOSM : IQueryAttributable
 
             var pin = GlobalJson.Data.Plans[planKey].Pins[pinKey];
 
-            // Geometry ist Spherical Mercator -> zurück zu WGS84
             if (feature.Geometry is Point point)
             {
                 var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
-
-                // Prüfen, ob sich die Koordinaten geändert haben
                 pin.GeoLocation ??= new GeoLocData();
 
                 if (pin.GeoLocation.WGS84.Latitude != wgs84.lat || pin.GeoLocation.WGS84.Longitude != wgs84.lon)
@@ -457,4 +486,99 @@ public partial class MapViewOSM : IQueryAttributable
         BackColor = new Color(108, 117, 125, 128),
         TextColor = Color.White,
     };
+
+    private static TileLayer CreateSwissTopoLayer(string layerName)
+    {
+        string version = "1.0.0";
+        string style = "default";
+        string time = "current"; // Stand der Karte
+        string projection = "3857"; // Web Mercator für MAUI/OSM Kompatibilität
+        string format = "jpeg";
+
+        var swisstopoUrl = $"https://wmts.geo.admin.ch/{version}/{layerName}/{style}/{time}/{projection}/{{z}}/{{x}}/{{y}}.{format}";
+
+        var tileSource = new HttpTileSource(
+            new GlobalSphericalMercator(0, 18),
+            swisstopoUrl,
+            name: layerName
+        );
+
+        return new TileLayer(tileSource)
+        {
+            Name = "SwissTopo",
+            Enabled = true
+        };
+    }
+
+    public async Task<byte[]> ExportMapAsImageAsync(int targetWidth = 2000, int targetHeight = 2000)
+    {
+        return await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            try
+            {
+                var currentViewport = MapControl.Map.Navigator.Viewport;
+                var exportViewport = new Mapsui.Viewport(
+                    currentViewport.CenterX,    // Aktuelle X-Koordinate
+                    currentViewport.CenterY,    // Aktuelle Y-Koordinate
+                    currentViewport.Resolution, // Aktueller Zoom-Level
+                    currentViewport.Rotation,   // Aktuelle Drehung (meist 0)
+                    targetWidth,                // Deine Zielbreite (z.B. 2500)
+                    targetHeight                // Deine Zielhöhe (z.B. 2000)
+                );
+
+                var renderer = new Mapsui.Rendering.Skia.MapRenderer();
+                var renderService = new Mapsui.Rendering.RenderService();
+
+                using var bitmapStream = renderer.RenderToBitmapStream(
+                    exportViewport,
+                    MapControl.Map.Layers,
+                    renderService,
+                    background: Mapsui.Styles.Color.White,
+                    pixelDensity: 1.0f,
+                    widgets: null,
+                    renderFormat: Mapsui.Rendering.RenderFormat.Jpeg,
+                    quality: 90
+                );
+
+                if (bitmapStream == null) return null;
+
+                using var ms = new MemoryStream();
+                bitmapStream.Position = 0;
+                await bitmapStream.CopyToAsync(ms);
+
+                return ms.ToArray();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("JPG Export Fehler: " + ex.Message);
+                return null;
+            }
+        });
+    }
+
+    private void OnLayerChanged(object sender, EventArgs e)
+    {
+        var picker = (Picker)sender;
+
+        if (picker.SelectedItem is not MapViewItem selectedItem || map == null)
+            return;
+
+        var baseLayers = map.Layers.Where(l => l.Name != "Pins").ToList();
+        foreach (var layer in baseLayers)
+        {
+            map.Layers.Remove(layer);
+        }
+
+        if (!string.IsNullOrEmpty(selectedItem.Id))
+        {
+            if (selectedItem.Id.Contains("OpenStreetMap"))
+                map.Layers.Insert(0, OpenStreetMap.CreateTileLayer());
+            else
+                map.Layers.Insert(0, CreateSwissTopoLayer(selectedItem.Id));
+        }
+        else
+            map.Layers.Insert(0, OpenStreetMap.CreateTileLayer());
+
+        map.RefreshGraphics();
+    }
 }

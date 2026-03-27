@@ -60,9 +60,32 @@
                 VerticalOptions="Start"
                 Clicked="OnRulerClicked">
             <Button.Shadow>
-                <Shadow Brush="Black" Opacity="0.2" Offset="2,2" Radius="4"/>
+                <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
             </Button.Shadow>
         </Button>
+
+        <Border VerticalOptions="Start"
+                HorizontalOptions="Center"
+                Margin="10"
+                MinimumHeightRequest="32"
+                BackgroundColor="White"
+                StrokeThickness="0.5"
+                Stroke="#999"
+                StrokeShape="RoundRectangle 4">
+            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
+                <Picker x:Name="LayerPicker"
+                        MinimumHeightRequest="32"  
+                        FontSize="10"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill"
+                        ItemDisplayBinding="{Binding Desc}"
+                        SelectedIndexChanged="OnLayerChanged">
+                </Picker>
+            </Grid>
+            <Border.Shadow>
+                <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+            </Border.Shadow>            
+        </Border>
 
         <VerticalStackLayout HorizontalOptions="End"
                              VerticalOptions="End"
@@ -77,7 +100,7 @@
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="GetCoordinatesClicked">
                     <Button.Shadow>
-                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6"/>
+                        <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
                     </Button.Shadow>
                 </Button>
                 <Border x:Name="SetPosBtn"
@@ -91,7 +114,7 @@
                         <TapGestureRecognizer Tapped="SetPosClicked"/>
                     </Border.GestureRecognizers>
                     <Border.Shadow>
-                        <Shadow Brush="Black" Opacity="0.4" Offset="4,4" Radius="6" />
+                        <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
                     </Border.Shadow>
                     <Grid x:DataType="views:MapViewOSM"
                           ColumnDefinitions="60,*"

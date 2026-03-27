@@ -256,7 +256,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void TakeFoto(object sender, EventArgs e)
     {
-        (FileResult path, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
+        (FileResult path, System.Drawing.Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
         if (path != null)
         {
