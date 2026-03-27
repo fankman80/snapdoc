@@ -1,19 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-                xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
-                xmlns:views="clr-namespace:SnapDoc.Views"             
-                xmlns:services="clr-namespace:SnapDoc.Services"
-                xmlns:controls="clr-namespace:SnapDoc.Controls"
-                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-                xmlns:local="clr-namespace:SnapDoc"
-                Shell.TitleColor="{DynamicResource PrimaryDark}"
-                Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-                x:Class="SnapDoc.Views.MapViewOSM"
-                x:Name="ThisPage"
-                Title="{x:Static res:AppResources.osm_karte}">
+            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+            xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+            xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+            xmlns:views="clr-namespace:SnapDoc.Views"             
+            xmlns:services="clr-namespace:SnapDoc.Services"
+            xmlns:controls="clr-namespace:SnapDoc.Controls"
+            xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+            xmlns:local="clr-namespace:SnapDoc"
+            Shell.TitleColor="{DynamicResource PrimaryDark}"
+            Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+            x:Class="SnapDoc.Views.MapViewOSM"
+            x:Name="ThisPage"
+            Title="{x:Static res:AppResources.osm_karte}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
@@ -65,7 +65,7 @@
         </Button>
 
         <Border VerticalOptions="Start"
-                HorizontalOptions="Center"
+                HorizontalOptions="Start"
                 Margin="10"
                 MinimumHeightRequest="32"
                 BackgroundColor="White"
@@ -74,6 +74,7 @@
                 StrokeShape="RoundRectangle 4">
             <Grid VerticalOptions="Center" HorizontalOptions="Fill">
                 <Picker x:Name="LayerPicker"
+                        x:DataType="local:MapViewItem"
                         MinimumHeightRequest="32"  
                         FontSize="10"
                         VerticalOptions="Center"
@@ -91,46 +92,45 @@
                              VerticalOptions="End"
                              Spacing="14"
                              Padding="14">
-            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
-                        WidthRequest="60"
-                        HeightRequest="60"
-                        CornerRadius="30"
-                        HorizontalOptions="End"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="GetCoordinatesClicked">
-                    <Button.Shadow>
-                        <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
-                    </Button.Shadow>
-                </Button>
-                <Border x:Name="SetPosBtn"
-                        IsVisible="false"
-                        Padding="10,10,14,10"
-                        HeightRequest="60"
-                        StrokeThickness="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        StrokeShape="RoundRectangle 30">
-                    <Border.GestureRecognizers>
-                        <TapGestureRecognizer Tapped="SetPosClicked"/>
-                    </Border.GestureRecognizers>
-                    <Border.Shadow>
-                        <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
-                    </Border.Shadow>
-                    <Grid x:DataType="views:MapViewOSM"
-                          ColumnDefinitions="60,*"
-                          ColumnSpacing="6"
-                          VerticalOptions="Center"
-                          HorizontalOptions="Center">
-                        <Image Grid.Column="0"
-                               Source="{Binding Pin.DisplayIconPath}" />
-                        <Label Grid.Column="1"
-                               Text="{x:Static res:AppResources.neu_setzen}"
-                               HorizontalTextAlignment="Center"
-                               VerticalTextAlignment="Center"
-                               TextColor="{DynamicResource PrimaryDarkText}" />
-                    </Grid>
-                </Border>
-                </VerticalStackLayout>
-
+            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    HorizontalOptions="End"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="SetPinClicked">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                </Button.Shadow>
+            </Button>
+            <Border x:Name="SetPosBtn"
+                    IsVisible="false"
+                    Padding="10,10,14,10"
+                    HeightRequest="60"
+                    StrokeThickness="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    StrokeShape="RoundRectangle 30">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="SetPosClicked"/>
+                </Border.GestureRecognizers>
+                <Border.Shadow>
+                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                </Border.Shadow>
+                <Grid x:DataType="views:MapViewOSM"
+                        ColumnDefinitions="60,*"
+                        ColumnSpacing="6"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Center">
+                    <Image Grid.Column="0"
+                           Source="{Binding Pin.DisplayIconPath}" />
+                    <Label Grid.Column="1"
+                           Text="{x:Static res:AppResources.neu_setzen}"
+                           HorizontalTextAlignment="Center"
+                           VerticalTextAlignment="Center"
+                           TextColor="{DynamicResource PrimaryDarkText}" />
+                </Grid>
+            </Border>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>

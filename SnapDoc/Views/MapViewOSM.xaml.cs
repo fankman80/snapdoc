@@ -4,7 +4,6 @@ using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using DocumentFormat.OpenXml.Bibliography;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -22,6 +21,7 @@ using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using System.Diagnostics;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
@@ -395,9 +395,7 @@ public partial class MapViewOSM : IQueryAttributable
             return;
 
         var mapInfo = e.GetMapInfo([pinLayer]);
-
-        if (mapInfo?.Feature is GeometryFeature feature &&
-            feature["PinId"] != null)
+        if (mapInfo?.Feature is GeometryFeature feature && feature["PinId"] != null)
         {
             _draggedPin = feature;
             _isDraggingPin = true;
@@ -421,39 +419,26 @@ public partial class MapViewOSM : IQueryAttributable
         layer.DataHasChanged();
     }
 
-    private void OnReleased(object sender, MapEventArgs e)
+    private async void OnReleased(object sender, MapEventArgs e)
     {
-        if (!_isDraggingPin)
-            return;
-
-        _isDraggingPin = false;
-        _draggedPin = null;
-       
-        MapControl.Map.Navigator.PanLock = false; // Karte wieder aktivieren
-    }
-
-    private async void GetCoordinatesClicked(object sender, EventArgs e)
-    {
-        var pinLayer = map.Layers.OfType<MemoryLayer>()
-                                 .FirstOrDefault(l => l.Name == "Pins");
-
-        if (pinLayer == null)
-            return;
-
-        foreach (var feature in pinLayer.Features.Cast<GeometryFeature>())
+        if (!_isDraggingPin || _draggedPin == null)
         {
-            // Feature-Attribute
-            var planKey = feature["PlanId"]?.ToString();
-            var pinKey = feature["PinId"]?.ToString();
+            _isDraggingPin = false;
+            _draggedPin = null;
+            MapControl.Map.Navigator.PanLock = false;
+            return;
+        }
 
-            if (planKey == null || pinKey == null)
-                continue;
+        try
+        {
+            var planKey = _draggedPin["PlanId"]?.ToString();
+            var pinKey = _draggedPin["PinId"]?.ToString();
 
-            var pin = GlobalJson.Data.Plans[planKey].Pins[pinKey];
-
-            if (feature.Geometry is Point point)
+            if (planKey != null && pinKey != null && _draggedPin.Geometry is Point point)
             {
+                var pin = GlobalJson.Data.Plans[planKey].Pins[pinKey];
                 var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
+
                 pin.GeoLocation ??= new GeoLocData();
 
                 if (pin.GeoLocation.WGS84.Latitude != wgs84.lat || pin.GeoLocation.WGS84.Longitude != wgs84.lon)
@@ -462,19 +447,28 @@ public partial class MapViewOSM : IQueryAttributable
                     pin.GeoLocation.WGS84.Longitude = wgs84.lon;
                     pin.GeoLocation.Accuracy = 0;
 
-                    await pin.GeoLocation.UpdateCH1903Async(); // optional: CH1903 konvertieren
+                    await pin.GeoLocation.UpdateCH1903Async();
+
+                    // GlobalJson speichern
+                    GlobalJson.SaveToFile();
                 }
             }
         }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler beim Speichern des Pins: {ex.Message}");
+        }
+        finally
+        {
+            _isDraggingPin = false;
+            _draggedPin = null;
+            MapControl.Map.Navigator.PanLock = false;
+        }
+    }
 
-        // GlobalJson speichern
-        GlobalJson.SaveToFile();
+    private async void SetPinClicked(object sender, EventArgs e)
+    {
 
-        // Feedback an User
-        if (DeviceInfo.Platform == DevicePlatform.WinUI)
-            await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.pin_positionen_aktualisiert, AppResources.ok);
-        else
-            await Toast.Make(AppResources.pin_positionen_aktualisiert).Show();
     }
 
     private static TextBoxWidget CreateInstructionTextBox(string text) => new()
