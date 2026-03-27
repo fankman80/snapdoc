@@ -4,6 +4,7 @@ using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
+using DocumentFormat.OpenXml.Bibliography;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -335,11 +336,13 @@ public partial class MapViewOSM : IQueryAttributable
     private async void OnMapTapped(object sender, MapEventArgs e)
     {
         var map = MapControl.Map;
-        if (map == null) return;
+        if (map == null)
+            return;
 
         // Nur Pins-Layer abfragen
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
-        if (pinLayer == null) return;
+        if (pinLayer == null)
+            return;
 
         var mapInfo = e.GetMapInfo([pinLayer]);
 
@@ -358,7 +361,7 @@ public partial class MapViewOSM : IQueryAttributable
                 await Task.Delay(300);
 
                 var imageSize = new System.Drawing.Size(2000, 2000);
-                var imageBytes = await ExportMapAsImageAsync(imageSize.Width, imageSize.Height);
+                var imageBytes = await ExportMapAsImageAsync(imageSize, feature.Geometry.Centroid);
 
                 if (imageBytes == null || imageBytes.Length == 0)
                     return;
@@ -510,20 +513,40 @@ public partial class MapViewOSM : IQueryAttributable
         };
     }
 
-    public async Task<byte[]> ExportMapAsImageAsync(int targetWidth = 2000, int targetHeight = 2000)
+    public async Task<byte[]> ExportMapAsImageAsync(System.Drawing.Size targetSize, NetTopologySuite.Geometries.Geometry targetCenter)
     {
+        var originalResolution = MapControl.Map.Navigator.Viewport.Resolution;
+        var originalCenter = new Mapsui.MPoint(MapControl.Map.Navigator.Viewport.CenterX, MapControl.Map.Navigator.Viewport.CenterY);
+
         return await MainThread.InvokeOnMainThreadAsync(async () =>
         {
             try
             {
-                var currentViewport = MapControl.Map.Navigator.Viewport;
+                double exportResolution = 0.5;
+                bool stillLoading = true;
+                int timeoutCounter = 0;
+
+                MapControl.Map.Navigator.CenterOn(targetCenter.Centroid.X, targetCenter.Centroid.Y);
+                MapControl.Map.Navigator.ZoomTo(exportResolution);
+
+                while (stillLoading && timeoutCounter < 25)
+                {
+                    var tileLayers = MapControl.Map.Layers.OfType<Mapsui.Tiling.Layers.TileLayer>();
+                    stillLoading = tileLayers.Any(l => l.Busy);
+                    if (stillLoading)
+                    {
+                        await Task.Delay(200);
+                        timeoutCounter++;
+                    }
+                }
+
                 var exportViewport = new Mapsui.Viewport(
-                    currentViewport.CenterX,    // Aktuelle X-Koordinate
-                    currentViewport.CenterY,    // Aktuelle Y-Koordinate
-                    currentViewport.Resolution, // Aktueller Zoom-Level
-                    currentViewport.Rotation,   // Aktuelle Drehung (meist 0)
-                    targetWidth,                // Deine Zielbreite (z.B. 2500)
-                    targetHeight                // Deine Zielhöhe (z.B. 2000)
+                    targetCenter.Centroid.X,
+                    targetCenter.Centroid.Y,
+                    exportResolution,
+                    0,
+                    targetSize.Width,
+                    targetSize.Height
                 );
 
                 var renderer = new Mapsui.Rendering.Skia.MapRenderer();
@@ -540,7 +563,11 @@ public partial class MapViewOSM : IQueryAttributable
                     quality: 90
                 );
 
-                if (bitmapStream == null) return null;
+                MapControl.Map.Navigator.CenterOn(originalCenter);
+                MapControl.Map.Navigator.ZoomTo(originalResolution);
+
+                if (bitmapStream == null)
+                    return null;
 
                 using var ms = new MemoryStream();
                 bitmapStream.Position = 0;
@@ -550,7 +577,9 @@ public partial class MapViewOSM : IQueryAttributable
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine("JPG Export Fehler: " + ex.Message);
+                MapControl.Map.Navigator.CenterOn(originalCenter);
+                MapControl.Map.Navigator.ZoomTo(originalResolution);
+                System.Diagnostics.Debug.WriteLine("Export Fehler: " + ex.Message);
                 return null;
             }
         });
