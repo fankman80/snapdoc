@@ -57,6 +57,7 @@ public partial class Pin : ObservableObject
     public double PinRotation { get; set; }
     public GeoLocData GeoLocation { get; set; }
     public bool IsCustomIcon { get; set; }
+    public bool IsWebMapPin { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; }
     [ObservableProperty] public partial string PinIcon { get; set; }
     [ObservableProperty] public partial bool IsCustomPin { get; set; }

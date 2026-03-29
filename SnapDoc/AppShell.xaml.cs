@@ -182,7 +182,7 @@ public partial class AppShell : Shell
 #if ANDROID     
                 Shell.Current.FlyoutIsPresented = false;
 #endif
-                if (parameter.Contains("webmap"))
+                if (parameter.Contains("webmap", StringComparison.OrdinalIgnoreCase))
                     await Shell.Current.GoToAsync($"mapviewosm?planId={parameter}");
                 else
                     await Shell.Current.GoToAsync($"//{parameter}");

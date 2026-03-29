@@ -616,6 +616,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             IsLockAutoScale = _isAutoScaleLocked,
             IsCustomPin = _isCustomPin,
             IsCustomIcon = _isCustomIcon,
+            IsWebMapPin = false,
             PinName = _displayName,
             PinDesc = "",
             PinPriority = 0,

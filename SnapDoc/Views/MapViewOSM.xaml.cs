@@ -4,7 +4,6 @@ using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using DocumentFormat.OpenXml.Presentation;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -24,7 +23,6 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Diagnostics;
-using System.Security.AccessControl;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
@@ -80,15 +78,16 @@ public partial class MapViewOSM : IQueryAttributable
         {
             IsActive = false,
             Color = widgetColor,
-            ColorOfBeginAndEndDots = widgetColor
+            ColorOfBeginAndEndDots = widgetColor,
         };
 
         LayerPicker.ItemsSource = Settings.SwissTopoLayers;
         LayerPicker.SelectedIndex = 1;
-        map.Widgets.Clear();
+
         map.Layers.Add(CreateSwissTopoLayer("ch.swisstopo.pixelkarte-farbe"));
         map.Layers.Add(CreatePinLayer());
 
+        map.Widgets.Clear();
         map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
         map.Widgets.Add(_instructionWidget);
         map.Widgets.Add(_rulerWidget);
@@ -115,18 +114,37 @@ public partial class MapViewOSM : IQueryAttributable
         string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
-        foreach (var pin in GlobalJson.Data.Plans[PlanId].Pins ?? [])
+        // Bestimme die Liste der Pläne, die durchsucht werden sollen
+        var plansToSearch = string.IsNullOrEmpty(PlanId)
+            ? GlobalJson.Data.Plans  // Alle Pläne
+            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId); // Nur der eine
+
+        // Durchsuche die Pins der ausgewählten Pläne und füge sie der Karte hinzu
+        foreach (var planEntry in plansToSearch)
         {
-            if (pin.Value.GeoLocation != null)
+            var currentPlanId = planEntry.Key;
+            var pins = planEntry.Value.Pins ?? [];
+            foreach (var pinEntry in pins)
             {
-                var loc = pin.Value.GeoLocation.WGS84;
-                AddPin(map, new Point(loc.Longitude, loc.Latitude), PlanId, pin.Key);
+                var pin = pinEntry.Value;
+                if (pin.GeoLocation != null)
+                {
+                    var loc = pin.GeoLocation.WGS84;
+                    AddPin(map, new Point(loc.Longitude, loc.Latitude), currentPlanId, pinEntry.Key);
+                }
             }
         }
 
         var center = new MPoint(lon, lat);
         var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(center.X, center.Y).ToMPoint();
         map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
+
+        // Markiere den Plan im ShellManü
+        var appShell = Application.Current.Windows[0].Page as AppShell;
+        appShell?.HighlightCurrentPlan(this.PlanId);
+
+        if (!string.IsNullOrEmpty(PlanId))
+            Title = GlobalJson.Data.Plans[PlanId].Name;
     }
 
     private void AddPin(Map map, Point pos, string planId, string pinId)
@@ -227,14 +245,8 @@ public partial class MapViewOSM : IQueryAttributable
         if (location == null)
             return;
 
-        lon = location.Longitude;
-        lat = location.Latitude;
-        zoom = 18;
+        await UpdateAndSavePinLocationAsync(PlanId, PinId, location.Longitude, location.Latitude);
 
-        GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation =
-            new GeoLocData(location);
-
-        // 2Pin-Feature in der Map verschieben
         var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
         if (pinLayer != null)
         {
@@ -245,18 +257,20 @@ public partial class MapViewOSM : IQueryAttributable
 
             if (feature != null)
             {
-                // WGS84 → Spherical Mercator
                 var (x, y) = SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
                 feature.Geometry = new Point(x, y);
 
-                // Layer updaten
                 pinLayer.FeaturesWereModified();
                 pinLayer.DataHasChanged();
+            }
+            else
+            {
+                AddPin(map, new Point(location.Longitude, location.Latitude), PlanId, PinId);
             }
         }
 
         var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[zoom]);
+        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
     }
 
     private async void OnRulerClicked(object sender, EventArgs e)
@@ -421,9 +435,7 @@ public partial class MapViewOSM : IQueryAttributable
     {
         if (!_isDraggingPin || _draggedPin == null)
         {
-            _isDraggingPin = false;
-            _draggedPin = null;
-            MapControl.Map.Navigator.PanLock = false;
+            CleanupDragging();
             return;
         }
 
@@ -434,22 +446,10 @@ public partial class MapViewOSM : IQueryAttributable
 
             if (planKey != null && pinKey != null && _draggedPin.Geometry is Point point)
             {
-                var pin = GlobalJson.Data.Plans[planKey].Pins[pinKey];
                 var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
 
-                pin.GeoLocation ??= new GeoLocData();
-
-                if (pin.GeoLocation.WGS84.Latitude != wgs84.lat || pin.GeoLocation.WGS84.Longitude != wgs84.lon)
-                {
-                    pin.GeoLocation.WGS84.Latitude = wgs84.lat;
-                    pin.GeoLocation.WGS84.Longitude = wgs84.lon;
-                    pin.GeoLocation.Accuracy = 0;
-
-                    await pin.GeoLocation.UpdateCH1903Async();
-
-                    // GlobalJson speichern
-                    GlobalJson.SaveToFile();
-                }
+                // Aufruf der neuen Funktion
+                await UpdateAndSavePinLocationAsync(planKey, pinKey, wgs84.lon, wgs84.lat);
             }
         }
         catch (Exception ex)
@@ -458,10 +458,15 @@ public partial class MapViewOSM : IQueryAttributable
         }
         finally
         {
-            _isDraggingPin = false;
-            _draggedPin = null;
-            MapControl.Map.Navigator.PanLock = false;
+            CleanupDragging();
         }
+    }
+
+    private void CleanupDragging()
+    {
+        _isDraggingPin = false;
+        _draggedPin = null;
+        MapControl.Map.Navigator.PanLock = false;
     }
 
     private async void SetPinClicked(object sender, EventArgs e)
@@ -495,7 +500,8 @@ public partial class MapViewOSM : IQueryAttributable
             IsLockAutoScale = true,
             IsCustomPin = false,
             IsCustomIcon = false,
-            PinName = "WebMap-Pin",
+            IsWebMapPin = true,
+            PinName = "",
             PinDesc = "",
             PinPriority = 0,
             PinLocation = "",
@@ -708,5 +714,83 @@ public partial class MapViewOSM : IQueryAttributable
     {
         if (File.Exists(path))
             File.Delete(path);
+    }
+
+    private static async Task UpdateAndSavePinLocationAsync(string planId, string pinId, double lon, double lat)
+    {
+        if (string.IsNullOrEmpty(planId) || string.IsNullOrEmpty(pinId))
+            return;
+
+        var pin = GlobalJson.Data.Plans[planId].Pins[pinId];
+
+        pin.GeoLocation ??= new GeoLocData();
+
+        if (pin.GeoLocation.WGS84 == null ||
+            Math.Abs(pin.GeoLocation.WGS84.Latitude - lat) > 0.0000001 ||
+            Math.Abs(pin.GeoLocation.WGS84.Longitude - lon) > 0.0000001)
+        {
+            pin.GeoLocation.WGS84 ??= new LocationWGS84(lat, lon);
+            pin.GeoLocation.WGS84.Latitude = lat;
+            pin.GeoLocation.WGS84.Longitude = lon;
+            pin.GeoLocation.Accuracy = 0;
+
+            await pin.GeoLocation.UpdateCH1903Async();
+
+            // In Datei schreiben
+            await Task.Run(() => GlobalJson.SaveToFile());
+        }
+    }
+
+    private void OnTitleChanged(object sender, EventArgs e)
+    {
+        if (sender is not Microsoft.Maui.Controls.Entry entry)
+            return;
+
+        // Titel speichern
+        (Application.Current.Windows[0].Page as AppShell)
+            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
+
+        GlobalJson.Data.Plans[PlanId].Name = Title;
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        // Fokus entfernen
+        entry.Unfocus();
+
+#if ANDROID
+        try
+        {
+            if (entry.Handler?.PlatformView is Android.Views.View nativeView)
+            {
+                var inputMethodManager = nativeView.Context?.GetSystemService(
+                    Android.Content.Context.InputMethodService) as Android.Views.InputMethods.InputMethodManager;
+
+                // Tastatur schließen
+                inputMethodManager?.HideSoftInputFromWindow(nativeView.WindowToken, 0);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Android keyboard hide failed: {ex.Message}");
+        }
+#endif
+
+#if IOS
+        try
+        {
+            UIKit.UIApplication.SharedApplication.InvokeOnMainThread(() =>
+            {
+                if (entry.Handler?.PlatformView is UIKit.UITextField textField)
+                {
+                    textField.ResignFirstResponder(); // Tastatur schließen
+                }
+            });
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
+        }
+#endif
     }
 }

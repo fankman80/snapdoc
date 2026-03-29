@@ -92,6 +92,9 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 
         var filteredPlans = shell.PlanItems.Where(plan =>
         {
+            if (plan.PlanId != null && plan.PlanId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
+                return false;
+
             if (index == 2) 
                 return plan.PlanId == PlanId;
 

@@ -12,22 +12,26 @@
             Shell.TitleColor="{DynamicResource PrimaryDark}"
             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
             x:Class="SnapDoc.Views.MapViewOSM"
+            x:DataType="views:MapViewOSM"             
             x:Name="ThisPage"
-            Title="{x:Static res:AppResources.osm_karte}">
+            Title="{Binding PageTitle}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
-            <Label Grid.Column="0"
-                   x:DataType="views:MapView"
+            <Entry Grid.Column="0"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
+                   Placeholder="{x:Static res:AppResources.titel_eingeben}"
+                   PlaceholderColor="{DynamicResource PrimaryDark}"
+                   IsSpellCheckEnabled="False"
                    Background="Transparent"
                    BackgroundColor="Transparent"
                    FontSize="18"
                    VerticalOptions="Center"
-                   HorizontalOptions="Start"/>
+                   Completed="OnTitleChanged"
+                   Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"
                     Text="{x:Static local:MaterialIcons.Moved_location}"
                     FontSize="24"
@@ -98,24 +102,13 @@
             </Border.Shadow>            
         </Border>
 
-        <VerticalStackLayout HorizontalOptions="End"
+        <HorizontalStackLayout x:DataType="views:MapViewOSM"
+                             HorizontalOptions="End"
                              VerticalOptions="End"
                              Spacing="14"
                              Padding="14">
-            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    HorizontalOptions="End"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    Clicked="SetPinClicked">
-                <Button.Shadow>
-                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
-                </Button.Shadow>
-            </Button>
             <Border x:Name="SetPosBtn"
-                    IsVisible="false"
+                    IsVisible="False"
                     Padding="10,10,14,10"
                     HeightRequest="60"
                     StrokeThickness="0"
@@ -127,11 +120,10 @@
                 <Border.Shadow>
                     <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
                 </Border.Shadow>
-                <Grid x:DataType="views:MapViewOSM"
-                        ColumnDefinitions="60,*"
-                        ColumnSpacing="6"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Center">
+                <Grid ColumnDefinitions="60,*"
+                      ColumnSpacing="6"
+                      VerticalOptions="Center"
+                      HorizontalOptions="Center">
                     <Image Grid.Column="0"
                            Source="{Binding Pin.DisplayIconPath}" />
                     <Label Grid.Column="1"
@@ -141,6 +133,18 @@
                            TextColor="{DynamicResource PrimaryDarkText}" />
                 </Grid>
             </Border>
-        </VerticalStackLayout>
+            <Button IsVisible="{Binding Pin.IsWebMapPin}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="SetPinClicked">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                </Button.Shadow>
+            </Button>
+        </HorizontalStackLayout>
     </Grid>
 </ContentPage>

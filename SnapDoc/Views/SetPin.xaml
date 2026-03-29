@@ -40,6 +40,7 @@
                    Completed="OnTitleChanged"
                    Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"
+                    IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                     Text="{x:Static local:MaterialIcons.Move_down}"
                     FontSize="24"
                     Padding="0"
@@ -178,7 +179,7 @@
                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"                      
+                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" 
                         IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                         WidthRequest="100"
                         Stroke="Grey"
@@ -222,6 +223,7 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="GeoLocButton"
+                        IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                         Grid.Column="0"
                         FontFamily="MaterialOutlined"
                         FontSize="30"  

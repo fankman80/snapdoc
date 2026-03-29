@@ -117,6 +117,8 @@ namespace SnapDoc
                 }
                 else if (_pin.IsCustomPin)
                     return "shapes64.png";
+                else if (_pin.IsWebMapPin)
+                    return "map128.png";
 
                 return PinIcon;
             }
@@ -196,6 +198,19 @@ namespace SnapDoc
                 if (_pin.IsCustomPin != value)
                 {
                     _pin.IsCustomPin = value;
+                    OnPropertyChanged();
+                }
+            }
+        }
+
+        public bool IsWebMapPin
+        {
+            get => _pin.IsWebMapPin;
+            set
+            {
+                if (_pin.IsWebMapPin != value)
+                {
+                    _pin.IsWebMapPin = value;
                     OnPropertyChanged();
                 }
             }
