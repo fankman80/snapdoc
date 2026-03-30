@@ -4,6 +4,7 @@ using BruTile.Web;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
+using CommunityToolkit.Mvvm.Messaging;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -21,6 +22,7 @@ using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
+using SnapDoc.Messages;
 using System.Diagnostics;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
@@ -51,6 +53,7 @@ public partial class MapViewOSM : IQueryAttributable
     private readonly List<MPoint> _measurePoints = [];
     private int _draggedMeasurePointIndex = -1;
     private bool _isPolygonClosed = false;
+    private readonly Mapsui.Styles.Color _widgetColor;
 
     private PinItem pin;
     public PinItem Pin
@@ -74,21 +77,14 @@ public partial class MapViewOSM : IQueryAttributable
 
         PlanId = planId;
 
-        // casting Colors from MAUI to Mapsui
-        var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
-        var widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
+        _widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
 
         _instructionWidget = CreateInstructionTextBox(AppResources.tippen_und_ziehen_messvorgang);
         _instructionWidget.Enabled = false; // initial unsichtbar
         _instructionWidget.BackColor = new Color(0, 0, 0, 180);
 
         _measureLayer.Features = _measureFeatures;
-        _measureLayer.Style = new VectorStyle
-        {
-            Fill = null,
-            Outline = new Pen { Color = widgetColor, Width = 0 },
-            Line = new Pen { Color = widgetColor, Width = 3 }             
-        };
+        _measureLayer.Style = null;
 
         LayerPicker.ItemsSource = Settings.SwissTopoLayers;
         LayerPicker.SelectedIndex = 1;
@@ -110,15 +106,28 @@ public partial class MapViewOSM : IQueryAttributable
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
             var pinId = m.Value;
+
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                if (_pinLookup.TryGetValue(pinId, out var image))
+                var map = MapControl.Map;
+                var pinLayer = map?.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+
+                if (pinLayer != null)
                 {
-                    PlanContainer.Remove(image);
-                    _pinLookup.Remove(pinId);
+                    var featureToRemove = pinLayer.Features
+                        .OfType<GeometryFeature>()
+                        .FirstOrDefault(f => f["PinId"]?.ToString() == pinId);
+
+                    if (featureToRemove != null)
+                    {
+                        var updatedFeatures = pinLayer.Features.Where(f => f != featureToRemove).ToList();
+                        pinLayer.Features = updatedFeatures;
+                        pinLayer.DataHasChanged();
+                        MapControl.RefreshGraphics();
+                    }
                 }
             });
-        });        
+        });
     }
 
     protected override bool OnBackButtonPressed()
@@ -567,7 +576,9 @@ public partial class MapViewOSM : IQueryAttributable
         {
             _measureFeatures.Add(new GeometryFeature(new Point(p.X, p.Y))
             {
-                Styles = { new SymbolStyle { SymbolScale = 0.5, Fill = new Mapsui.Styles.Brush(Color.White), Outline = new Pen(Color.Black) } }
+                Styles = { new SymbolStyle { SymbolScale = 0.5,
+                                             Fill = new Mapsui.Styles.Brush(Color.White),
+                                             Outline = new Pen(Color.Black, 1) } }
             });
         }
 
@@ -578,11 +589,13 @@ public partial class MapViewOSM : IQueryAttributable
             double cosLat = Math.Cos(centerWgs84.lat * Math.PI / 180.0);
             var ringCoords = new List<NetTopologySuite.Geometries.Coordinate>(coordinates) { coordinates[0] };
             var polygon = new NetTopologySuite.Geometries.Polygon(new NetTopologySuite.Geometries.LinearRing([.. ringCoords]));
-
-            _measureFeatures.Add(new GeometryFeature(polygon)
+            var polygonFeature = new GeometryFeature(polygon);
+            polygonFeature.Styles.Add(new VectorStyle
             {
-                Styles = { new VectorStyle { Fill = new Mapsui.Styles.Brush(new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255), 128)), Line = new Pen(Color.Black, 1) } }
+                Fill = new Mapsui.Styles.Brush(new Mapsui.Styles.Color(_widgetColor.R, _widgetColor.G, _widgetColor.B, 128)),
+                Line = new Pen(Mapsui.Styles.Color.Black, 1)
             });
+            _measureFeatures.Add(polygonFeature);
 
             double realArea = polygon.Area * (cosLat * cosLat);
             measurementResult = realArea >= 1000000
@@ -591,7 +604,13 @@ public partial class MapViewOSM : IQueryAttributable
         }
         else if (_measurePoints.Count > 1)
         {
-            _measureFeatures.Add(new GeometryFeature(new NetTopologySuite.Geometries.LineString([.. coordinates])));
+            var lineFeature = new GeometryFeature(new NetTopologySuite.Geometries.LineString([.. coordinates]));
+            lineFeature.Styles.Add(new VectorStyle
+            {
+                Line = new Pen { Color = _widgetColor, Width = 2 }
+            });
+
+            _measureFeatures.Add(lineFeature);
             double totalRealDistanceInMeters = 0;
             for (int i = 1; i < _measurePoints.Count; i++)
             {

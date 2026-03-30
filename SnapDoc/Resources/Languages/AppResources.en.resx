@@ -219,8 +219,8 @@
   <data name="pinbeschriftung" xml:space="preserve">
     <value>Pin labeling</value>
   </data>
-  <data name="pin_auf_swisstopo_karte_anzeigen" xml:space="preserve">
-    <value>Show pin on swisstopo map</value>
+  <data name="auf_pin_zentrieren" xml:space="preserve">
+    <value>Center on pin</value>
   </data>
   <data name="pin_bearbeiten" xml:space="preserve">
     <value>Edit pin</value>

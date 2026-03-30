@@ -160,6 +160,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf Pin zentrieren ähnelt.
+        /// </summary>
+        internal static string auf_pin_zentrieren {
+            get {
+                return ResourceManager.GetString("auf_pin_zentrieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Auflösung PDF-Umwandlung ähnelt.
         /// </summary>
         internal static string aufloesung_pdf_umwandlung {
@@ -1353,15 +1362,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string pin_auf_plan_verschieben {
             get {
                 return ResourceManager.GetString("pin_auf_plan_verschieben", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf swisstopo-Karte anzeigen ähnelt.
-        /// </summary>
-        internal static string pin_auf_swisstopo_karte_anzeigen {
-            get {
-                return ResourceManager.GetString("pin_auf_swisstopo_karte_anzeigen", resourceCulture);
             }
         }
         

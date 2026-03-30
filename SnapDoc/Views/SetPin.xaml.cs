@@ -82,11 +82,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
-            GeoLocButton.Text = Settings.GPSButtonOnIcon;
-        else
-            GeoLocButton.Text = Settings.GPSButtonUnknownIcon;
-
         Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
     }
 
@@ -244,7 +239,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         GlobalJson.SaveToFile();
     }
 
-    private async void ShowGeoLoc(object sender, EventArgs e)
+    private async void ZoomToPinClicked(object sender, EventArgs e)
     {
         await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
     }

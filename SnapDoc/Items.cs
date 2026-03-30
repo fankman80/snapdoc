@@ -80,6 +80,8 @@ namespace SnapDoc
         public PinItem(Pin pin)
         {
             _pin = pin ?? throw new ArgumentNullException(nameof(pin));
+            _isCustomPin = _pin.IsCustomPin;
+            _isWebMapPin = _pin.IsWebMapPin;
 
             // UI-Update bei Änderungen am Modell
             _pin.PropertyChanged += (s, e) =>

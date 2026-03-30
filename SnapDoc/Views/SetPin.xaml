@@ -26,7 +26,6 @@
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Entry Grid.Column="0" 
-                   BindingContext="{Binding Pin}"
                    x:DataType="local:PinItem"
                    Text="{Binding PinName}"                
                    TextColor="{DynamicResource PrimaryDark}"
@@ -40,7 +39,7 @@
                    Completed="OnTitleChanged"
                    Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"
-                    IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
+                    IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                     Text="{x:Static local:MaterialIcons.Move_down}"
                     FontSize="24"
                     Padding="0"
@@ -127,9 +126,8 @@
         </CollectionView>
 
         <VerticalStackLayout Grid.Row="1"
-                             BindingContext="{Binding Pin}" 
-                             x:DataType="local:PinItem" >
-            <material:TextField Text="{Binding PinLocation}"
+                             x:DataType="views:SetPin" >
+            <material:TextField Text="{Binding Pin.PinLocation}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -137,7 +135,7 @@
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"
                                 Title="{x:Static res:AppResources.standort}"/>
-            <material:EditorField Text="{Binding PinDesc}"
+            <material:EditorField Text="{Binding Pin.PinDesc}"
                                   MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -158,7 +156,7 @@
                 <controls:Switch Grid.Row="0"
                                 LabelText="{x:Static res:AppResources.pin_exportieren}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                IsToggled="{Binding IsAllowExport}"
+                                IsToggled="{Binding Pin.IsAllowExport}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
                                 BorderColorOff ="Transparent"
@@ -170,7 +168,7 @@
                 <controls:Switch Grid.Row="1"
                                 LabelText="{x:Static res:AppResources.position_sperren}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                IsToggled="{Binding IsLockPosition}"
+                                IsToggled="{Binding Pin.IsLockPosition}"
                                 HorizontalOptions="Start"
                                 VerticalOptions="Center"
                                 BorderColorOff ="Transparent"
@@ -179,15 +177,15 @@
                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" 
-                        IsEnabled="{Binding CanEditIcon, Converter={StaticResource InvertedBoolConverter}}"
+                <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
+                        IsEnabled="{Binding Pin.CanEditIcon}"
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"
                         BackgroundColor="Transparent"
                         VerticalOptions="Fill"
                         StrokeShape="RoundRectangle 10">
-                    <ImageButton Source="{Binding DisplayIconPath}"
+                    <ImageButton Source="{Binding Pin.DisplayIconPath}"
                                  BackgroundColor="Transparent"
                                  Aspect="AspectFit"
                                  Clicked="OnPinSelectClick"
@@ -202,15 +200,15 @@
                       ColumnSpacing="0">
                     <Picker Grid.Column="0"
                             BackgroundColor="Transparent"
-                            ItemsSource="{Binding PinPriorites}"
-                            SelectedIndex="{Binding PinPriority, Mode=TwoWay}"/>
+                            ItemsSource="{Binding Pin.PinPriorites}"
+                            SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}"/>
                     <Label Grid.Column="1"
                            Text="{x:Static local:MaterialIcons.Traffic}"
                            WidthRequest="60"
                            HorizontalTextAlignment="Center"
                            VerticalTextAlignment="Center"
                            FontFamily="MaterialOutlined"
-                           TextColor="{Binding PriorityColor}"
+                           TextColor="{Binding Pin.PriorityColor}"
                            FontSize="34"/>
                 </Grid>
             </Border>
@@ -222,16 +220,16 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button x:Name="GeoLocButton"
-                        Grid.Column="0"
-                        FontFamily="MaterialOutlined"
-                        FontSize="30"  
+                <Button Grid.Column="0"
                         Padding="0"
-                        MinimumWidthRequest="50"
+                        MinimumWidthRequest="50"                        
+                        Text="{x:Static local:MaterialIcons.Recenter}"
+                        FontSize="30"
+                        FontFamily="MaterialOutlined"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_swisstopo_karte_anzeigen}"                        
-                        Clicked="ShowGeoLoc"/>
+                        ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"                        
+                        Clicked="ZoomToPinClicked"/>
                 <Button Grid.Column="2"
                         Padding="0"
                         MinimumWidthRequest="100"

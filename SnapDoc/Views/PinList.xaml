@@ -151,9 +151,10 @@
                                        Text="{Binding PinDesc}"/>
 
                                 <Image Grid.Column="1" Grid.Row="3"
+                                       x:DataType="local:PinItem"
                                        WidthRequest="52"
                                        HeightRequest="52"
-                                       IsEnabled="{Binding CanEditIcon, Converter={StaticResource InvertedBoolConverter}}"
+                                       IsEnabled="{Binding CanEditIcon}"
                                        Margin="6"
                                        ClassId="{Binding SelfId}"
                                        AutomationId = "{Binding OnPlanId}"
