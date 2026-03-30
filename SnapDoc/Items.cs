@@ -190,31 +190,37 @@ namespace SnapDoc
             }
         }
 
+        private bool _isCustomPin;
         public bool IsCustomPin
         {
-            get => _pin.IsCustomPin;
+            get => _isCustomPin;
             set
             {
-                if (_pin.IsCustomPin != value)
+                if (_isCustomPin != value)
                 {
-                    _pin.IsCustomPin = value;
-                    OnPropertyChanged();
+                    _isCustomPin = value;
+                    OnPropertyChanged(nameof(IsCustomPin));
+                    OnPropertyChanged(nameof(CanEditIcon));
                 }
             }
         }
 
+        private bool _isWebMapPin;
         public bool IsWebMapPin
         {
-            get => _pin.IsWebMapPin;
+            get => _isWebMapPin;
             set
             {
-                if (_pin.IsWebMapPin != value)
+                if (_isWebMapPin != value)
                 {
-                    _pin.IsWebMapPin = value;
-                    OnPropertyChanged();
+                    _isWebMapPin = value;
+                    OnPropertyChanged(nameof(IsWebMapPin));
+                    OnPropertyChanged(nameof(CanEditIcon));
                 }
             }
         }
+
+        public bool CanEditIcon => !IsCustomPin && !IsWebMapPin;
 
         public bool IsLockPosition
         {

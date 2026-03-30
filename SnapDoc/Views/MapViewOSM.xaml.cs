@@ -45,8 +45,12 @@ public partial class MapViewOSM : IQueryAttributable
     private GeometryFeature _draggedPin;
     private Mapsui.Styles.Image pinImage;
     private readonly TextBoxWidget _instructionWidget;
-    private readonly RulerWidget _rulerWidget;
     private readonly Microsoft.Maui.Graphics.Color hexColor = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
+    private readonly MemoryLayer _measureLayer = new() { Name = "MeasureLayer" };
+    private readonly List<GeometryFeature> _measureFeatures = [];
+    private readonly List<MPoint> _measurePoints = [];
+    private int _draggedMeasurePointIndex = -1;
+    private bool _isPolygonClosed = false;
 
     private PinItem pin;
     public PinItem Pin
@@ -72,13 +76,16 @@ public partial class MapViewOSM : IQueryAttributable
         var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
         var widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
 
-        _instructionWidget = CreateInstructionTextBox(AppResources.tippen_ziehen_messen);
+        _instructionWidget = CreateInstructionTextBox(AppResources.tippen_und_ziehen_messvorgang);
         _instructionWidget.Enabled = false; // initial unsichtbar
-        _rulerWidget = new RulerWidget // Ruler am Anfang inaktiv
+        _instructionWidget.BackColor = new Color(0, 0, 0, 180);
+
+        _measureLayer.Features = _measureFeatures;
+        _measureLayer.Style = new VectorStyle
         {
-            IsActive = false,
-            Color = widgetColor,
-            ColorOfBeginAndEndDots = widgetColor,
+            Fill = null,
+            Outline = new Pen { Color = widgetColor, Width = 0 },
+            Line = new Pen { Color = widgetColor, Width = 3 }             
         };
 
         LayerPicker.ItemsSource = Settings.SwissTopoLayers;
@@ -86,17 +93,23 @@ public partial class MapViewOSM : IQueryAttributable
 
         map.Layers.Add(CreateSwissTopoLayer("ch.swisstopo.pixelkarte-farbe"));
         map.Layers.Add(CreatePinLayer());
+        map.Layers.Add(_measureLayer);
 
         map.Widgets.Clear();
         map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
         map.Widgets.Add(_instructionWidget);
-        map.Widgets.Add(_rulerWidget);
 
         MapControl.Map = map;
         MapControl.Map.Tapped += OnMapTapped;
         MapControl.Map.PointerPressed += OnPressed;
         MapControl.Map.PointerMoved += OnMoved;
         MapControl.Map.PointerReleased += OnReleased;
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        // Zurück-Taste ignorieren
+        return true;
     }
 
     protected async override void OnAppearing()
@@ -273,17 +286,23 @@ public partial class MapViewOSM : IQueryAttributable
         map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
     }
 
-    private async void OnRulerClicked(object sender, EventArgs e)
+    private void OnRulerClicked(object sender, EventArgs e)
     {
-        _rulerWidget.IsActive = !_rulerWidget.IsActive;
-        _instructionWidget.Enabled = _rulerWidget.IsActive;
+        bool isActivating = RulerButton.Text != AppResources.abbrechen;
+        _measurePoints.Clear();
+        _draggedMeasurePointIndex = -1;
+        _isPolygonClosed = false;
 
-        if (_rulerWidget.IsActive)
-            RulerButton.Text = AppResources.abbrechen;
-        else
-            RulerButton.Text = AppResources.distanz_messen;
+        _instructionWidget.Enabled = isActivating;
+        RulerButton.Text = isActivating ? AppResources.abbrechen : AppResources.distanz_messen;
 
-        MapControl.Map.RefreshGraphics();
+        if (!isActivating)
+        {
+            _measureFeatures.Clear();
+            _measureLayer.FeaturesWereModified();
+            _instructionWidget.Text = AppResources.tippen_und_ziehen_messvorgang;
+        }
+        MapControl.RefreshGraphics();
     }
 
     private static async Task ShowGpsDisabledMessageAsync()
@@ -401,7 +420,33 @@ public partial class MapViewOSM : IQueryAttributable
 
     private void OnPressed(object sender, MapEventArgs e)
     {
-        // Nur Pins-Layer abfragen
+        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
+
+        if (RulerButton.Text == AppResources.abbrechen)
+        {
+            double tolerance = MapControl.Map.Navigator.Viewport.Resolution * 15;
+            int hitIndex = _measurePoints.FindIndex(p => p.Distance(worldPos) < tolerance);
+
+            if (hitIndex == 0 && _measurePoints.Count >= 3)
+            {
+                _isPolygonClosed = true;
+                _draggedMeasurePointIndex = 0; // Erlaubt das Verschieben des "Schlusspunkts"
+            }
+            else if (hitIndex != -1)
+            {
+                _draggedMeasurePointIndex = hitIndex;
+            }
+            else if (!_isPolygonClosed) // Nur neue Punkte hinzufügen, wenn noch nicht geschlossen
+            {
+                _measurePoints.Add(worldPos);
+                _draggedMeasurePointIndex = _measurePoints.Count - 1;
+            }
+
+            MapControl.Map.Navigator.PanLock = true;
+            UpdateMeasureLayer();
+            return;
+        }
+
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
         if (pinLayer == null)
             return;
@@ -418,48 +463,53 @@ public partial class MapViewOSM : IQueryAttributable
 
     private void OnMoved(object sender, MapEventArgs e)
     {
-        if (!_isDraggingPin || _draggedPin == null)
+        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(
+            new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
+
+        if (RulerButton.Text == AppResources.abbrechen && _draggedMeasurePointIndex != -1)
+        {
+            _measurePoints[_draggedMeasurePointIndex] = worldPos;
+            UpdateMeasureLayer();
             return;
+        }
 
-        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
-
-        _draggedPin.Geometry = new Point(worldPos.X, worldPos.Y);
-
-        var layer = map.Layers.OfType<MemoryLayer>()
-                              .First(l => l.Name == "Pins");
-        layer.FeaturesWereModified();
-        layer.DataHasChanged();
+        if (_isDraggingPin && _draggedPin != null)
+        {
+            _draggedPin.Geometry = new Point(worldPos.X, worldPos.Y);
+            MapControl.RefreshGraphics();
+            return;
+        }
     }
 
     private async void OnReleased(object sender, MapEventArgs e)
     {
-        if (!_isDraggingPin || _draggedPin == null)
-        {
-            CleanupDragging();
-            return;
-        }
+        MapControl.Map.Navigator.PanLock = false;
 
-        try
+        if (_isDraggingPin && _draggedPin != null)
         {
-            var planKey = _draggedPin["PlanId"]?.ToString();
-            var pinKey = _draggedPin["PinId"]?.ToString();
-
-            if (planKey != null && pinKey != null && _draggedPin.Geometry is Point point)
+            try
             {
-                var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
+                var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+                pinLayer?.FeaturesWereModified();
+                pinLayer?.DataHasChanged();
 
-                // Aufruf der neuen Funktion
-                await UpdateAndSavePinLocationAsync(planKey, pinKey, wgs84.lon, wgs84.lat);
+                var planKey = _draggedPin["PlanId"]?.ToString();
+                var pinKey = _draggedPin["PinId"]?.ToString();
+
+                if (planKey != null && pinKey != null && _draggedPin.Geometry is Point point)
+                {
+                    var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
+                    await UpdateAndSavePinLocationAsync(planKey, pinKey, wgs84.lon, wgs84.lat);
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fehler beim Speichern des Pins: {ex.Message}");
             }
         }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Fehler beim Speichern des Pins: {ex.Message}");
-        }
-        finally
-        {
-            CleanupDragging();
-        }
+
+        _draggedMeasurePointIndex = -1;
+        CleanupDragging();
     }
 
     private void CleanupDragging()
@@ -467,6 +517,64 @@ public partial class MapViewOSM : IQueryAttributable
         _isDraggingPin = false;
         _draggedPin = null;
         MapControl.Map.Navigator.PanLock = false;
+    }
+
+    private void UpdateMeasureLayer()
+    {
+        _measureFeatures.Clear();
+        if (_measurePoints.Count < 1)
+            return;
+
+        var coordinates = _measurePoints.Select(p => new NetTopologySuite.Geometries.Coordinate(p.X, p.Y)).ToList();
+
+        foreach (var p in _measurePoints)
+        {
+            _measureFeatures.Add(new GeometryFeature(new Point(p.X, p.Y))
+            {
+                Styles = { new SymbolStyle { SymbolScale = 0.5, Fill = new Mapsui.Styles.Brush(Color.White), Outline = new Pen(Color.Black) } }
+            });
+        }
+
+        string measurementResult = "";
+        if (_isPolygonClosed && _measurePoints.Count >= 3)
+        {
+            var centerWgs84 = SphericalMercator.ToLonLat(_measurePoints[0].X, _measurePoints[0].Y);
+            double cosLat = Math.Cos(centerWgs84.lat * Math.PI / 180.0);
+            var ringCoords = new List<NetTopologySuite.Geometries.Coordinate>(coordinates) { coordinates[0] };
+            var polygon = new NetTopologySuite.Geometries.Polygon(new NetTopologySuite.Geometries.LinearRing([.. ringCoords]));
+
+            _measureFeatures.Add(new GeometryFeature(polygon)
+            {
+                Styles = { new VectorStyle { Fill = new Mapsui.Styles.Brush(new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255), 128)), Line = new Pen(Color.Black, 1) } }
+            });
+
+            double realArea = polygon.Area * (cosLat * cosLat);
+            measurementResult = realArea >= 1000000
+                ? $"{(realArea / 1000000.0):0.##} km²"
+                : $"{realArea:N1} m²";
+        }
+        else if (_measurePoints.Count > 1)
+        {
+            _measureFeatures.Add(new GeometryFeature(new NetTopologySuite.Geometries.LineString([.. coordinates])));
+            double totalRealDistanceInMeters = 0;
+            for (int i = 1; i < _measurePoints.Count; i++)
+            {
+                var p1 = SphericalMercator.ToLonLat(_measurePoints[i - 1].X, _measurePoints[i - 1].Y);
+                var p2 = SphericalMercator.ToLonLat(_measurePoints[i].X, _measurePoints[i].Y);
+
+                totalRealDistanceInMeters += Microsoft.Maui.Devices.Sensors.Location.CalculateDistance(
+                    p1.lat, p1.lon, p2.lat, p2.lon, DistanceUnits.Kilometers) * 1000;
+            }
+
+            measurementResult = totalRealDistanceInMeters >= 1000
+                ? $"{(totalRealDistanceInMeters / 1000.0):0.##} km"
+                : $"{totalRealDistanceInMeters:N1} m";
+        }
+
+        string prefix = _isPolygonClosed ? $"{AppResources.flaeche}" : $"{AppResources.distanz}";
+        _instructionWidget.Text = $"{prefix}: {measurementResult}";
+        _measureLayer.FeaturesWereModified();
+        MapControl.RefreshGraphics();
     }
 
     private async void SetPinClicked(object sender, EventArgs e)

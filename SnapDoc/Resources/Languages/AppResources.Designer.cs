@@ -394,6 +394,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Distanz ähnelt.
+        /// </summary>
+        internal static string distanz {
+            get {
+                return ResourceManager.GetString("distanz", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Distanz messen ähnelt.
         /// </summary>
         internal static string distanz_messen {
@@ -660,6 +669,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string fehler_standortabfrage {
             get {
                 return ResourceManager.GetString("fehler_standortabfrage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fläche ähnelt.
+        /// </summary>
+        internal static string flaeche {
+            get {
+                return ResourceManager.GetString("flaeche", resourceCulture);
             }
         }
         
@@ -1272,6 +1290,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string ok {
             get {
                 return ResourceManager.GetString("ok", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die (Diese Funktion erfordert eine schnelle Internetverbindung und aktivierte Standortdienste) ähnelt.
+        /// </summary>
+        internal static string online_map_requirement_hint {
+            get {
+                return ResourceManager.GetString("online_map_requirement_hint", resourceCulture);
             }
         }
         
@@ -1969,11 +1996,11 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Tippen und ziehen, um Distanz zu messen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tippen und ziehen, um den Messvorgang zu starten ähnelt.
         /// </summary>
-        internal static string tippen_ziehen_messen {
+        internal static string tippen_und_ziehen_messvorgang {
             get {
-                return ResourceManager.GetString("tippen_ziehen_messen", resourceCulture);
+                return ResourceManager.GetString("tippen_und_ziehen_messvorgang", resourceCulture);
             }
         }
         

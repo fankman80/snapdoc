@@ -783,8 +783,8 @@
   <data name="kartenservice" xml:space="preserve">
     <value>Map service</value>
   </data>
-  <data name="tippen_ziehen_messen" xml:space="preserve">
-    <value>Tap and drag to measure distance</value>
+  <data name="tippen_und_ziehen_messvorgang" xml:space="preserve">
+    <value>Tap and drag to start measuring</value>
   </data>
   <data name="rechtsklick_icon_bearbeiten" xml:space="preserve">
     <value>Right-click to edit icon</value>
@@ -842,5 +842,14 @@
   </data>
   <data name="karte_aus_webmap" xml:space="preserve">
     <value>Add plan from online map service</value>
+  </data>
+  <data name="online_map_requirement_hint" xml:space="preserve">
+    <value>(This feature requires a high-speed internet connection and enabled location services)</value>
+  </data>
+  <data name="flaeche" xml:space="preserve">
+    <value>Area</value>
+  </data>
+  <data name="distanz" xml:space="preserve">
+    <value>Distance</value>
   </data>
 </root>

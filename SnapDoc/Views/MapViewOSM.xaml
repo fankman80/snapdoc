@@ -14,7 +14,7 @@
             x:Class="SnapDoc.Views.MapViewOSM"
             x:DataType="views:MapViewOSM"             
             x:Name="ThisPage"
-            Title="{Binding PageTitle}">
+            Title="">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
@@ -59,10 +59,9 @@
     <Grid>
         <mapsui:MapControl x:Name="MapControl"/>
         <Button x:Name="RulerButton"
-                Text="{x:Static res:AppResources.distanz_messen}"
+                Text="{x:Static res:AppResources.vermessung}"
                 MinimumHeightRequest="32"                
-                FontSize="13"
-                FontFamily="Segoe UI"
+                FontSize="11"
                 Padding="8,0,8,0"
                 Margin="10"
                 CornerRadius="4"
@@ -90,7 +89,9 @@
                 <Picker x:Name="LayerPicker"
                         x:DataType="local:MapViewItem"
                         MinimumHeightRequest="32"  
-                        FontSize="10"
+                        FontSize="11"
+                        BackgroundColor="White"
+                        TextColor="Black"
                         VerticalOptions="Center"
                         HorizontalOptions="Fill"
                         ItemDisplayBinding="{Binding Desc}"

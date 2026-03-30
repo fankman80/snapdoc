@@ -180,7 +180,7 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3" 
-                        IsEnabled="{Binding IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
+                        IsEnabled="{Binding CanEditIcon, Converter={StaticResource InvertedBoolConverter}}"
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"

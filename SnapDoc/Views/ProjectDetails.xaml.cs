@@ -1,5 +1,6 @@
 ﻿#nullable disable
 
+using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
@@ -122,33 +123,38 @@ public partial class ProjectDetails : ContentPage
     {
         UpdateProjectData();
 
-        string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-        Plan plan = new()
+        var popup = new PopupEntry(title: AppResources.karte_aus_webmap + "." + Environment.NewLine + AppResources.online_map_requirement_hint, okText: AppResources.erstellen);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result.Result != null)
         {
-            Name = "Online Map",
-            File = "",
-            ImageSize = new Size(0,0),
-            IsGrayscale = false,
-            Description = "",
-            AllowExport = true,
-            PlanColor = "#00FFFFFF"
-        };
+            string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            Plan plan = new()
+            {
+                Name = result.Result == "" ? "Online Map" : result.Result,
+                File = "",
+                ImageSize = new Size(0,0),
+                IsGrayscale = false,
+                Description = "",
+                AllowExport = true,
+                PlanColor = "#00FFFFFF"
+            };
 
-        var newPlan = new KeyValuePair<string, Plan>(planId, plan);
-        LoadDataToView.AddMapPlan(newPlan);
+            var newPlan = new KeyValuePair<string, Plan>(planId, plan);
+            LoadDataToView.AddMapPlan(newPlan);
 
-        // Überprüfen, ob die Plans-Struktur initialisiert ist
-        GlobalJson.Data.Plans ??= [];
-        GlobalJson.Data.Plans[planId] = plan;
+            // Überprüfen, ob die Plans-Struktur initialisiert ist
+            GlobalJson.Data.Plans ??= [];
+            GlobalJson.Data.Plans[planId] = plan;
 
-        // save data to file
-        GlobalJson.SaveToFile();
+            // save data to file
+            GlobalJson.SaveToFile();
 
-        // Shell aktualisieren
-        var shell = Application.Current.Windows[0].Page as AppShell;
-        shell.ApplyFilterAndSorting();
+            // Shell aktualisieren
+            var shell = Application.Current.Windows[0].Page as AppShell;
+            shell.ApplyFilterAndSorting();
 
-        await Shell.Current.GoToAsync($"mapviewosm?planId={planId}");
+            await Shell.Current.GoToAsync($"mapviewosm?planId={planId}");
+        }
     }
 
     private void UpdateProjectData()
