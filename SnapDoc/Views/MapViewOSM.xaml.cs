@@ -106,6 +106,19 @@ public partial class MapViewOSM : IQueryAttributable
         MapControl.Map.PointerPressed += OnPressed;
         MapControl.Map.PointerMoved += OnMoved;
         MapControl.Map.PointerReleased += OnReleased;
+
+        WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
+        {
+            var pinId = m.Value;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                if (_pinLookup.TryGetValue(pinId, out var image))
+                {
+                    PlanContainer.Remove(image);
+                    _pinLookup.Remove(pinId);
+                }
+            });
+        });        
     }
 
     protected override bool OnBackButtonPressed()
