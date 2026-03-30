@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;

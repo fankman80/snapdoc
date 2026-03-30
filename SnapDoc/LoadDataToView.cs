@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using Microsoft.Maui.Controls;
 using SnapDoc.Views;
 
 namespace SnapDoc;
@@ -35,7 +34,7 @@ public partial class LoadDataToView
         string thumbnail = plan.Value.File;
 
         // Neue Plan-Seite
-        var newPage = new Views.NewPage(planId)
+        var newPage = new NewPage(planId)
         {
             Title = planTitle,
             AutomationId = planId,
