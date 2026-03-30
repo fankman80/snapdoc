@@ -40,7 +40,7 @@
                    Completed="OnTitleChanged"
                    Unfocused="OnTitleChanged"/>
             <Button Grid.Column="1"
-                    IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
+                    IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                     Text="{x:Static local:MaterialIcons.Move_down}"
                     FontSize="24"
                     Padding="0"
@@ -223,7 +223,6 @@
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button x:Name="GeoLocButton"
-                        IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                         Grid.Column="0"
                         FontFamily="MaterialOutlined"
                         FontSize="30"  
