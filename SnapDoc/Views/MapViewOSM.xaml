@@ -134,8 +134,7 @@
                            TextColor="{DynamicResource PrimaryDarkText}" />
                 </Grid>
             </Border>
-            <Button IsVisible="{Binding Pin.IsWebMapPin}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
                     WidthRequest="60"
                     HeightRequest="60"
                     CornerRadius="30"

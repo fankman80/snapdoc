@@ -31,21 +31,33 @@ public partial class LoadDataToView
 
         string planId = plan.Key;
         string planTitle = plan.Value.Name;
-        string thumbnail = plan.Value.File;
 
-        // Neue Plan-Seite
-        var newPage = new NewPage(planId)
+        // 1. Die richtige Seite basierend auf der ID auswählen
+        ContentPage page;
+        if (planId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
         {
-            Title = planTitle,
-            AutomationId = planId,
-            PlanId = planId,
-        };
+            page = new MapViewOSM(planId) // Falls du den Konstruktor mit Parameter hast: new MapViewOSM(planId)
+            {
+                Title = planTitle,
+                AutomationId = planId,
+                PlanId = planId
+            };
+        }
+        else
+        {
+            page = new NewPage(planId)
+            {
+                Title = planTitle,
+                AutomationId = planId,
+                PlanId = planId
+            };
+        }
 
-        // ShellContent erzeugen
+        // 2. ShellContent mit der fertigen Instanz erzeugen
         var shellContent = new ShellContent
         {
-            Content = newPage,
-            Route = planId,
+            Content = page,      // Hier wird die fertige Seite übergeben
+            Route = planId,      // Die planId ist die eindeutige Route
             Title = planTitle,
             AutomationId = planId
         };
@@ -56,43 +68,18 @@ public partial class LoadDataToView
         {
             Title = planTitle,
             PlanId = planId,
-            PlanRoute = planId,
-            Thumbnail = Path.Combine(
+            PlanRoute = planId
+        };
+
+        if (!planId.Contains("webmap"))
+        {
+            item.Thumbnail = Path.Combine(
                 Settings.DataDirectory,
                 GlobalJson.Data.ProjectPath,
                 GlobalJson.Data.PlanPath,
                 "thumbnails",
-                thumbnail)
-        };
-
-        shell.AllPlanItems.Add(item);
-    }
-
-    public static void AddMapPlan(KeyValuePair<string, Models.Plan> plan)
-    {
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
-
-        string planId = plan.Key;
-        string planTitle = plan.Value.Name;
-
-        // ShellContent erzeugen
-        var shellContent = new ShellContent
-        {
-            Title = planTitle,
-            ContentTemplate = new DataTemplate(typeof(MapViewOSM)),
-            Route = $"mapviewosm",
-            AutomationId = planId
-        };
-
-        shell.Items.Add(shellContent);
-
-        var item = new PlanItem(plan.Value)
-        {
-            Title = planTitle,
-            PlanId = planId,
-            PlanRoute = $"mapviewosm"
-        };
+                plan.Value.File);
+        }
 
         shell.AllPlanItems.Add(item);
     }

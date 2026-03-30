@@ -15,7 +15,6 @@ using Mapsui.Tiling;
 using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
-using Mapsui.Widgets.InfoWidgets;
 using Mapsui.Widgets.ScaleBar;
 using SkiaSharp;
 using SnapDoc.Models;
@@ -32,7 +31,8 @@ namespace SnapDoc.Views;
 
 public partial class MapViewOSM : IQueryAttributable
 {
-    private string PlanId = string.Empty;
+    public string PlanId;
+
     private string PinId = string.Empty;
     private double lon = 8.226692;  // Default: Schweiz
     private double lat = 46.80121;
@@ -66,11 +66,13 @@ public partial class MapViewOSM : IQueryAttributable
         }
     }
 
-    public MapViewOSM()
+    public MapViewOSM(string planId)
     {
         InitializeComponent();
 
         BindingContext = this;
+
+        PlanId = planId;
 
         // casting Colors from MAUI to Mapsui
         var c1 = (Microsoft.Maui.Graphics.Color)Application.Current.Resources["Primary"];
@@ -116,23 +118,27 @@ public partial class MapViewOSM : IQueryAttributable
     {
         base.OnAppearing();
 
+        // Markiere den Plan im ShellManü
+        var appShell = Application.Current.Windows[0].Page as AppShell;
+        appShell?.HighlightCurrentPlan(this.PlanId);
+
+        if (!string.IsNullOrEmpty(PlanId))
+            Title = GlobalJson.Data.Plans[PlanId].Name;
+
+        await UpdateUiFromQueryAsync();
+
         if (_mapInitialized)
             return;
 
         _mapInitialized = true;
 
-        await UpdateUiFromQueryAsync();
-
-        // load Pin image with app primary color
         string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
-        // Bestimme die Liste der Pläne, die durchsucht werden sollen
         var plansToSearch = string.IsNullOrEmpty(PlanId)
             ? GlobalJson.Data.Plans  // Alle Pläne
-            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId); // Nur der eine
+            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId);
 
-        // Durchsuche die Pins der ausgewählten Pläne und füge sie der Karte hinzu
         foreach (var planEntry in plansToSearch)
         {
             var currentPlanId = planEntry.Key;
@@ -147,17 +153,6 @@ public partial class MapViewOSM : IQueryAttributable
                 }
             }
         }
-
-        var center = new MPoint(lon, lat);
-        var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(center.X, center.Y).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
-
-        // Markiere den Plan im ShellManü
-        var appShell = Application.Current.Windows[0].Page as AppShell;
-        appShell?.HighlightCurrentPlan(this.PlanId);
-
-        if (!string.IsNullOrEmpty(PlanId))
-            Title = GlobalJson.Data.Plans[PlanId].Name;
     }
 
     private void AddPin(Map map, Point pos, string planId, string pinId)
@@ -199,9 +194,9 @@ public partial class MapViewOSM : IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        if (query.TryGetValue("planId", out var planIdObj))
-            PlanId = planIdObj as string ?? string.Empty;
-        if (query.TryGetValue("pinId", out var pinIdObj))
+        PinId = null;
+
+        if (query.TryGetValue("pinZoom", out var pinIdObj))
             PinId = pinIdObj as string ?? string.Empty;
 
         _ = UpdateUiFromQueryAsync();
@@ -209,40 +204,68 @@ public partial class MapViewOSM : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
+        // 1. Initialzustand: Button verstecken
+        SetPosBtn.IsVisible = false;
+
+        // Standardwerte (Schweiz-Zentrum) als Fallback
+        double targetLon = 8.226692;
+        double targetLat = 46.80121;
+        int targetZoom = 8; // Default Zoom für die Übersicht
+
+        // FALL A: Ein Pin wurde übergeben
         if (!string.IsNullOrEmpty(PlanId) && !string.IsNullOrEmpty(PinId))
         {
-            Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
-            SetPosBtn.IsVisible = true;
-
-            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation != null)
+            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
+                plan.Pins.TryGetValue(PinId, out var pinData))
             {
-                // Zoom auf Pin
-                lon = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Longitude;
-                lat = GlobalJson.Data.Plans[PlanId].Pins[PinId].GeoLocation.WGS84.Latitude;
-                zoom = 18;
-            }
-            else if (SettingsService.Instance.IsGpsActive)
-            {
-                var location = await geoViewModel.TryGetLocationAsync();
-                if (location == null)
-                    return;
+                Pin = new PinItem(pinData);
+                SetPosBtn.IsVisible = true; // Button einblenden, da wir im "Pin-Modus" sind
 
-                // Zoom auf GPS
-                lon = location.Longitude;
-                lat = location.Latitude;
-                zoom = 18;
+                // Hat der Pin bereits Koordinaten?
+                if (pinData.GeoLocation?.WGS84 != null)
+                {
+                    targetLon = pinData.GeoLocation.WGS84.Longitude;
+                    targetLat = pinData.GeoLocation.WGS84.Latitude;
+                    targetZoom = 18; // Nah ran
+                }
+                // Falls Pin neu/ohne Ort, aber GPS aktiv -> Nutze GPS für den Zoom
+                else if (SettingsService.Instance.IsGpsActive)
+                {
+                    var location = await geoViewModel.TryGetLocationAsync();
+                    if (location != null)
+                    {
+                        targetLon = location.Longitude;
+                        targetLat = location.Latitude;
+                        targetZoom = 18; // Auch hier nah ran
+                    }
+                }
             }
         }
+        // FALL B: Kein Pin vorhanden, aber GPS ist aktiv
         else if (SettingsService.Instance.IsGpsActive)
         {
             var location = await geoViewModel.TryGetLocationAsync();
-            if (location == null)
-                return;
+            if (location != null)
+            {
+                targetLon = location.Longitude;
+                targetLat = location.Latitude;
+                targetZoom = 18; // Dein Wunsch: Auch ohne Pin auf Zoom 18
+            }
+        }
 
-            // Zoom auf GPS (wenn kein Pin)
-            lon = location.Longitude;
-            lat = location.Latitude;
-            zoom = 18;
+        // Werte für die Klasse übernehmen
+        lon = targetLon;
+        lat = targetLat;
+        zoom = targetZoom;
+
+        // Karte positionieren
+        if (map?.Navigator != null)
+        {
+            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(lon, lat).ToMPoint();
+
+            // Navigator auf die Auflösung des Ziel-Zooms setzen
+            map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
+            MapControl.RefreshGraphics();
         }
     }
 

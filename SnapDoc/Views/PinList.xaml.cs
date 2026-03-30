@@ -120,11 +120,6 @@ public partial class PinList : ContentPage
         string pinId = button.ClassId;
 
         await Shell.Current.GoToAsync($"///{planId}?pinZoom={pinId}");
-
-        if (planId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
-            await Shell.Current.GoToAsync($"mapviewosm?planId={planId}&pinId={pinId}");
-        else
-            await Shell.Current.GoToAsync($"///{planId}?pinZoom={pinId}");
     }
 
     private async void OnPinIconClicked(object sender, EventArgs e)

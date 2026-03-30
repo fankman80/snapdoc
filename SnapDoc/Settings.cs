@@ -34,12 +34,12 @@ public static class Settings
     public static readonly string TemplateDirectory = Path.Combine(dataDirectory, "templates");
 
     public static readonly List<MapViewItem> SwissTopoLayers = [
-        new MapViewItem { Desc = "OpenStreetMap", Id = "OpenStreetMap" },
-        new MapViewItem { Desc = "Pixelkarte Farbe", Id = "ch.swisstopo.pixelkarte-farbe" },
-        new MapViewItem { Desc = "Pixelkarte Farbe PK1000", Id = "ch.swisstopo.pixelkarte-farbe-pk1000.noscale" },
-        new MapViewItem { Desc = "Pixelkarte Graustufen", Id = "ch.swisstopo.pixelkarte-grau" },
-        new MapViewItem { Desc = "Pixelkarte Farbe Winter", Id = "ch.swisstopo.pixelkarte-farbe-winter" },
-        new MapViewItem { Desc = "Swissimage", Id = "ch.swisstopo.swissimage" }];
+        new MapViewItem { Desc = "OpenStreetMap Farbe", Id = "OpenStreetMap" },
+        new MapViewItem { Desc = "SwissTopo Farbe", Id = "ch.swisstopo.pixelkarte-farbe" },
+        new MapViewItem { Desc = "SwissTopo Farbe PK1000", Id = "ch.swisstopo.pixelkarte-farbe-pk1000.noscale" },
+        new MapViewItem { Desc = "SwissTopo Graustufen", Id = "ch.swisstopo.pixelkarte-grau" },
+        new MapViewItem { Desc = "SwissTopo Farbe Winter", Id = "ch.swisstopo.pixelkarte-farbe-winter" },
+        new MapViewItem { Desc = "SwissTopo Satellit", Id = "ch.swisstopo.swissimage" }];
         //new MapViewItem { Desc = "Swissimage 1946", Id = "ch.swisstopo.swissimage-product_1946" },
         //new MapViewItem { Desc = "Luftfahrtkarten ICAO", Id = "ch.bazl.luftfahrtkarten-icao" },
         //new MapViewItem { Desc = "Segelflugkarte", Id = "ch.bazl.segelflugkarte" },

@@ -69,16 +69,28 @@ public class ExportToGlyphConverter : IValueConverter
         => throw new NotImplementedException();
 }
 
-public class SelectedToGlyphConverter : IValueConverter
+public class SelectedToGlyphConverter : IMultiValueConverter
 {
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
+    public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
-        bool allow = value is bool b && b;
-        return allow ? MaterialIcons.Check_box : MaterialIcons.Layers;
+        if (values == null || values.Length < 2)
+            return MaterialIcons.Layers;
+
+        bool isSelected = values[0] is bool b && b;
+        string id = values[1] as string ?? string.Empty;
+        string icon;
+        if (id.Contains("webmap"))
+            icon = MaterialIcons.Globe;
+        else
+            icon = MaterialIcons.Layers;
+
+        return isSelected ? MaterialIcons.Check_box : icon;
     }
 
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-        => throw new NotImplementedException();
+    public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
+    {
+        return null;
+    }
 }
 
 public class BoolToFontAttributesConverter : IValueConverter
@@ -102,7 +114,6 @@ public class ColorWithoutAlphaConverter : IValueConverter
         if (value is not Color color)
             return Colors.Transparent;
 
-        // Alpha ignorieren → 100 % Deckkraft
         return new Color(color.Red, color.Green, color.Blue, 1f);
     }
 

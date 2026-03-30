@@ -37,12 +37,18 @@
                             BackgroundColor="{Binding PlanColor}"
                             StrokeThickness="0"/>
                     <Label Grid.Column="0"
-                           Text="{Binding IsSelected, Converter={StaticResource SelectedToGlyphConverter}}"
                            FontFamily="MaterialOutlined"
                            FontSize="22" 
                            HorizontalOptions="Center"
                            VerticalOptions="Center"
-                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}">
+                        <Label.Text>
+                            <MultiBinding Converter="{StaticResource SelectedToGlyphConverter}">
+                                <Binding Path="IsSelected" />
+                                <Binding Path="PlanId" />
+                            </MultiBinding>
+                        </Label.Text>
+                    </Label>
                     <Label Grid.Column="1"
                            Text="{Binding Title}"
                            Margin="12,0,0,0"
@@ -203,32 +209,6 @@
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.projektverwaltung}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                    </Grid>
-
-                    <!-- swisstopo Karte -->
-                    <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsSwissTopoVisible}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="mapview" />
-                        </Grid.GestureRecognizers>
-                        <Label Grid.Column="0"
-                                Text="{x:Static local:MaterialIcons.Map}"
-                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="{x:Static res:AppResources.swisstopo_karte}" FontSize="14" VerticalOptions="Center"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                    </Grid>
-
-                    <!-- OSM Karte -->
-                    <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsOsmVisible}">
-                        <Grid.GestureRecognizers>
-                            <TapGestureRecognizer Tapped="OnNavigateTapped" CommandParameter="mapviewosm" />
-                        </Grid.GestureRecognizers>
-                        <Label Grid.Column="0"
-                                   Text="{x:Static local:MaterialIcons.Map}"
-                                   FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="{x:Static res:AppResources.osm_karte}" FontSize="14" VerticalOptions="Center"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
 
                     <!-- Pins -->

@@ -140,7 +140,7 @@ public partial class ProjectDetails : ContentPage
             };
 
             var newPlan = new KeyValuePair<string, Plan>(planId, plan);
-            LoadDataToView.AddMapPlan(newPlan);
+            LoadDataToView.AddPlan(newPlan);
 
             // Überprüfen, ob die Plans-Struktur initialisiert ist
             GlobalJson.Data.Plans ??= [];
@@ -153,7 +153,7 @@ public partial class ProjectDetails : ContentPage
             var shell = Application.Current.Windows[0].Page as AppShell;
             shell.ApplyFilterAndSorting();
 
-            await Shell.Current.GoToAsync($"mapviewosm?planId={planId}");
+            await Shell.Current.GoToAsync($"//{planId}");
         }
     }
 
