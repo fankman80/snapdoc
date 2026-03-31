@@ -37,9 +37,6 @@ public partial class MapViewOSM : IQueryAttributable
     public string PlanId;
 
     private string PinId = string.Empty;
-    private double lon = 8.226692;  // Default: Schweiz
-    private double lat = 46.80121;
-    private int zoom = 8;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly List<GeometryFeature> _features = [];
     private readonly Map map = new();
@@ -99,30 +96,28 @@ public partial class MapViewOSM : IQueryAttributable
         map.Widgets.Add(_instructionWidget);
 
         MapControl.Map = map;
-        MapControl.Map.Tapped += OnMapTapped;
-        MapControl.Map.PointerPressed += OnPressed;
-        MapControl.Map.PointerMoved += OnMoved;
-        MapControl.Map.PointerReleased += OnReleased;
+        map.Tapped += OnMapTapped;
+        map.PointerPressed += OnPressed;
+        map.PointerMoved += OnMoved;
+        map.PointerReleased += OnReleased;
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
-            var pinId = m.Value;
-
+            var pinIdToDelete = m.Value;
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                var map = MapControl.Map;
-                var pinLayer = map?.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
-
+                var pinLayer = map?.Layers
+                    .OfType<MemoryLayer>()
+                    .FirstOrDefault(l => l.Name == "Pins");
                 if (pinLayer != null)
                 {
-                    var featureToRemove = pinLayer.Features
-                        .OfType<GeometryFeature>()
-                        .FirstOrDefault(f => f["PinId"]?.ToString() == pinId);
+                    var featureToRemove = _features
+                        .FirstOrDefault(f => f["PinId"]?.ToString() == pinIdToDelete);
 
                     if (featureToRemove != null)
                     {
-                        var updatedFeatures = pinLayer.Features.Where(f => f != featureToRemove).ToList();
-                        pinLayer.Features = updatedFeatures;
+                        _features.Remove(featureToRemove);
+                        pinLayer.Features = [.. _features.Cast<IFeature>()];
                         pinLayer.DataHasChanged();
                         MapControl.RefreshGraphics();
                     }
@@ -141,68 +136,42 @@ public partial class MapViewOSM : IQueryAttributable
     {
         base.OnAppearing();
 
-        // Markiere den Plan im ShellManü
         var appShell = Application.Current.Windows[0].Page as AppShell;
         appShell?.HighlightCurrentPlan(this.PlanId);
 
         if (!string.IsNullOrEmpty(PlanId))
             Title = GlobalJson.Data.Plans[PlanId].Name;
 
-        await UpdateUiFromQueryAsync();
-
-        if (_mapInitialized)
-            return;
-
-        _mapInitialized = true;
-
-        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
-        pinImage = new Mapsui.Styles.Image { Source = uri };
-
-        var plansToSearch = string.IsNullOrEmpty(PlanId)
-            ? GlobalJson.Data.Plans  // Alle Pläne
-            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId);
-
-        foreach (var planEntry in plansToSearch)
+        if (!_mapInitialized)
         {
-            var currentPlanId = planEntry.Key;
-            var pins = planEntry.Value.Pins ?? [];
-            foreach (var pinEntry in pins)
-            {
-                var pin = pinEntry.Value;
-                if (pin.GeoLocation != null)
-                {
-                    var loc = pin.GeoLocation.WGS84;
-                    AddPin(map, new Point(loc.Longitude, loc.Latitude), currentPlanId, pinEntry.Key);
-                }
-            }
+            _mapInitialized = true;
+            LoadPins();
+            await UpdateUiFromQueryAsync();
         }
     }
 
     private void AddPin(Map map, Point pos, string planId, string pinId)
     {
-        // WGS84 → Spherical Mercator
         var (x, y) = SphericalMercator.FromLonLat(pos.X, pos.Y);
         double scale = (double)SettingsService.Instance.MapIconSize / 100.0;
 
-        _features.Add(new GeometryFeature
+        var newFeature = new GeometryFeature
         {
             Geometry = new Point(x, y),
             ["PinId"] = pinId,
             ["PlanId"] = planId,
-            Styles =
-            {
-                new ImageStyle
-                {
-                    Image = pinImage,
-                    SymbolScale = scale,
-                    RelativeOffset = new RelativeOffset(0, 0.5)
-                }
-            }
-        });
+            Styles = { new ImageStyle { Image = pinImage, SymbolScale = scale, RelativeOffset = new RelativeOffset(0, 0.5) } }
+        };
 
-        var layer = map.Layers.OfType<MemoryLayer>().First(l => l.Name == "Pins");
-        layer.FeaturesWereModified();
-        layer.DataHasChanged();
+        _features.Add(newFeature);
+
+        var layer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+        if (layer != null)
+        {
+            layer.Features = [.. _features.Cast<IFeature>()];
+            layer.DataHasChanged();
+            MapControl.RefreshGraphics();
+        }
     }
 
     private MemoryLayer CreatePinLayer()
@@ -215,14 +184,47 @@ public partial class MapViewOSM : IQueryAttributable
         };
     }
 
+    private void LoadPins()
+    {
+        _features.Clear();
+        var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+        pinLayer?.Features = [];
+
+        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
+        pinImage = new Mapsui.Styles.Image { Source = uri };
+
+        var plansToSearch = string.IsNullOrEmpty(PlanId)
+            ? GlobalJson.Data.Plans
+            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId);
+
+        foreach (var planEntry in plansToSearch)
+        {
+            var currentPlanId = planEntry.Key;
+            var pins = planEntry.Value.Pins ?? [];
+            foreach (var pinEntry in pins)
+            {
+                var p = pinEntry.Value;
+                if (p.GeoLocation?.WGS84 != null)
+                {
+                    var loc = p.GeoLocation.WGS84;
+                    AddPin(map, new Point(loc.Longitude, loc.Latitude), currentPlanId, pinEntry.Key);
+                }
+            }
+        }
+        MapControl.RefreshGraphics();
+    }
+
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
-        PinId = null;
-
+        string newPinId = string.Empty;
         if (query.TryGetValue("pinZoom", out var pinIdObj))
-            PinId = pinIdObj as string ?? string.Empty;
+            newPinId = pinIdObj as string ?? string.Empty;
 
-        _ = UpdateUiFromQueryAsync();
+        if (newPinId != PinId)
+        {
+            PinId = newPinId;
+            _ = UpdateUiFromQueryAsync();
+        }
     }
 
     private async Task UpdateUiFromQueryAsync()
@@ -270,14 +272,10 @@ public partial class MapViewOSM : IQueryAttributable
             }
         }
 
-        lon = targetLon;
-        lat = targetLat;
-        zoom = targetZoom;
-
         if (map?.Navigator != null)
         {
-            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(lon, lat).ToMPoint();
-            map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
+            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(targetLon, targetLat).ToMPoint();
+            map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[targetZoom]);
             MapControl.RefreshGraphics();
         }
     }
@@ -404,7 +402,6 @@ public partial class MapViewOSM : IQueryAttributable
 
     private async void OnMapTapped(object sender, MapEventArgs e)
     {
-        var map = MapControl.Map;
         if (map == null)
             return;
 
@@ -426,7 +423,7 @@ public partial class MapViewOSM : IQueryAttributable
             var result = await this.ShowPopupAsync<string>(popup, popupOptions);
 
             if (result.Result == "edit")
-                _mapInitialized = false;
+                LoadPins();
 
             if (result.Result == "export")
             {
@@ -459,11 +456,11 @@ public partial class MapViewOSM : IQueryAttributable
 
     private void OnPressed(object sender, MapEventArgs e)
     {
-        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
+        var worldPos = map.Navigator.Viewport.ScreenToWorld(new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
 
         if (RulerButton.Text == AppResources.abbrechen)
         {
-            double tolerance = MapControl.Map.Navigator.Viewport.Resolution * 15;
+            double tolerance = map.Navigator.Viewport.Resolution * 15;
             int hitIndex = _measurePoints.FindIndex(p => p.Distance(worldPos) < tolerance);
 
             if (hitIndex == 0 && _measurePoints.Count >= 3)
@@ -481,7 +478,7 @@ public partial class MapViewOSM : IQueryAttributable
                 _draggedMeasurePointIndex = _measurePoints.Count - 1;
             }
 
-            MapControl.Map.Navigator.PanLock = true;
+            map.Navigator.PanLock = true;
             UpdateMeasureLayer();
             return;
         }
@@ -496,13 +493,13 @@ public partial class MapViewOSM : IQueryAttributable
             _draggedPin = feature;
             _isDraggingPin = true;
 
-            MapControl.Map.Navigator.PanLock = true; // verhindert Verschieben
+            map.Navigator.PanLock = true; // verhindert Verschieben
         }
     }
 
     private void OnMoved(object sender, MapEventArgs e)
     {
-        var worldPos = MapControl.Map.Navigator.Viewport.ScreenToWorld(
+        var worldPos = map.Navigator.Viewport.ScreenToWorld(
             new Mapsui.Manipulations.ScreenPosition(e.ScreenPosition.X, e.ScreenPosition.Y));
 
         if (RulerButton.Text == AppResources.abbrechen && _draggedMeasurePointIndex != -1)
@@ -522,7 +519,7 @@ public partial class MapViewOSM : IQueryAttributable
 
     private async void OnReleased(object sender, MapEventArgs e)
     {
-        MapControl.Map.Navigator.PanLock = false;
+        map.Navigator.PanLock = false;
 
         if (_isDraggingPin && _draggedPin != null)
         {
@@ -537,8 +534,8 @@ public partial class MapViewOSM : IQueryAttributable
 
                 if (planKey != null && pinKey != null && _draggedPin.Geometry is Point point)
                 {
-                    var wgs84 = SphericalMercator.ToLonLat(point.X, point.Y);
-                    await UpdateAndSavePinLocationAsync(planKey, pinKey, wgs84.lon, wgs84.lat);
+                    var (lon, lat) = SphericalMercator.ToLonLat(point.X, point.Y);
+                    await UpdateAndSavePinLocationAsync(planKey, pinKey, lon, lat);
                 }
             }
             catch (Exception ex)
@@ -555,7 +552,7 @@ public partial class MapViewOSM : IQueryAttributable
     {
         _isDraggingPin = false;
         _draggedPin = null;
-        MapControl.Map.Navigator.PanLock = false;
+        map.Navigator.PanLock = false;
     }
 
     private void UpdateMeasureLayer()
@@ -579,8 +576,8 @@ public partial class MapViewOSM : IQueryAttributable
         string measurementResult = "";
         if (_isPolygonClosed && _measurePoints.Count >= 3)
         {
-            var centerWgs84 = SphericalMercator.ToLonLat(_measurePoints[0].X, _measurePoints[0].Y);
-            double cosLat = Math.Cos(centerWgs84.lat * Math.PI / 180.0);
+            var (lon, lat) = SphericalMercator.ToLonLat(_measurePoints[0].X, _measurePoints[0].Y);
+            double cosLat = Math.Cos(lat * Math.PI / 180.0);
             var ringCoords = new List<NetTopologySuite.Geometries.Coordinate>(coordinates) { coordinates[0] };
             var polygon = new NetTopologySuite.Geometries.Polygon(new NetTopologySuite.Geometries.LinearRing([.. ringCoords]));
             var polygonFeature = new GeometryFeature(polygon);
@@ -611,7 +608,7 @@ public partial class MapViewOSM : IQueryAttributable
                 var p1 = SphericalMercator.ToLonLat(_measurePoints[i - 1].X, _measurePoints[i - 1].Y);
                 var p2 = SphericalMercator.ToLonLat(_measurePoints[i].X, _measurePoints[i].Y);
 
-                totalRealDistanceInMeters += Microsoft.Maui.Devices.Sensors.Location.CalculateDistance(
+                totalRealDistanceInMeters += Location.CalculateDistance(
                     p1.lat, p1.lon, p2.lat, p2.lon, DistanceUnits.Kilometers) * 1000;
             }
 
@@ -638,12 +635,8 @@ public partial class MapViewOSM : IQueryAttributable
         if (location == null)
             return;
 
-        lon = location.Longitude;
-        lat = location.Latitude;
-        zoom = 18;
-
         var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[zoom]);
+        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
 
         var currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
@@ -684,7 +677,7 @@ public partial class MapViewOSM : IQueryAttributable
             GlobalJson.SaveToFile();
         }
 
-        AddPin(map, new Point(lon, lat), PlanId, plan.Pins[currentDateTime].SelfId);
+        AddPin(map, new Point(location.Longitude, location.Latitude), PlanId, plan.Pins[currentDateTime].SelfId);
     }
 
     private static TextBoxWidget CreateInstructionTextBox(string text) => new()
@@ -737,7 +730,7 @@ public partial class MapViewOSM : IQueryAttributable
         );
 
         var tempMap = new Map();
-        foreach (var layer in MapControl.Map.Layers)
+        foreach (var layer in map.Layers)
         {
             tempMap.Layers.Add(layer);
         }
@@ -887,8 +880,6 @@ public partial class MapViewOSM : IQueryAttributable
             Math.Abs(pin.GeoLocation.WGS84.Longitude - lon) > 0.0000001)
         {
             pin.GeoLocation.WGS84 ??= new LocationWGS84(lat, lon);
-            pin.GeoLocation.WGS84.Latitude = lat;
-            pin.GeoLocation.WGS84.Longitude = lon;
             pin.GeoLocation.Accuracy = 0;
 
             await pin.GeoLocation.UpdateCH1903Async();
