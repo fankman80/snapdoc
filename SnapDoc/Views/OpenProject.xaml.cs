@@ -80,7 +80,9 @@ public partial class OpenProject : ContentPage
 
     private async void OnNewClicked(object sender, EventArgs e)
     {
-        var popup = new PopupEntry(title: AppResources.neues_projekt_eroeffnen, okText: AppResources.erstellen);
+        var popup = new PopupEntry(desc: AppResources.neues_projekt_eroeffnen,
+                                   title: AppResources.plan_name,
+                                   okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {

@@ -69,7 +69,7 @@
                         <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
                     </VerticalStackLayout>
                     <HorizontalStackLayout Grid.Column="2" Spacing="0">
-                        <Button Text="{x:Static local:MaterialIcons.Keep}"
+                        <Button Text="{x:Static local:MaterialIcons.Pinboard}"
                                 Padding="0"
                                 FontFamily="MaterialOutlined"
                                 FontSize="30"

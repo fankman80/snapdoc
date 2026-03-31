@@ -123,7 +123,10 @@ public partial class ProjectDetails : ContentPage
     {
         UpdateProjectData();
 
-        var popup = new PopupEntry(title: AppResources.karte_aus_webmap + "." + Environment.NewLine + AppResources.online_map_requirement_hint, okText: AppResources.erstellen);
+        var popup = new PopupEntry(header: AppResources.karte_aus_webmap,
+                                   desc: AppResources.online_map_requirement_hint + ".",
+                                   title: AppResources.plan_name,
+                                   okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {

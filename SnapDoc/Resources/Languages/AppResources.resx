@@ -852,4 +852,10 @@
   <data name="distanz" xml:space="preserve">
     <value>Distanz</value>
   </data>
+  <data name="plan_name" xml:space="preserve">
+    <value>Planbezeichnung</value>
+  </data>
+  <data name="kartenausschnitt_speichern" xml:space="preserve">
+    <value>Kartenausschnitt speichern</value>
+  </data>
 </root>

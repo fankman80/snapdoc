@@ -7,18 +7,22 @@ namespace SnapDoc.Views;
 
 public partial class PopupEntry : Popup<string>
 {
-    public PopupEntry(string title, string inputTxt = "", string okText = null, string cancelText = null)
+    public PopupEntry(string desc, string header = null, string title = null, string input = null, string okText = null, string cancelText = null)
     {
         InitializeComponent();
-        titleText.Text = title;
+
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
-        text_entry.Text = inputTxt;
+        headerText.IsVisible = header != null;
+        headerText.Text = header;
+        titleText.Text = desc;
+        textEntry.Text = input;
+        textEntry.Title = title;
     }
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(text_entry.Text);
+        await CloseAsync(textEntry.Text);
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

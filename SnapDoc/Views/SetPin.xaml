@@ -21,13 +21,11 @@
     </Shell.BackButtonBehavior>
 
     <Shell.TitleView>
-        <Grid x:DataType="views:SetPin"
-              ColumnDefinitions="*,Auto,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Entry Grid.Column="0" 
-                   x:DataType="local:PinItem"
-                   Text="{Binding PinName}"                
+                   Text="{Binding Pin.PinName}"                
                    TextColor="{DynamicResource PrimaryDark}"
                    Placeholder="{x:Static res:AppResources.titel_eingeben}"
                    PlaceholderColor="{DynamicResource PrimaryDark}"
@@ -71,8 +69,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid Margin="16"
-          x:DataType="views:SetPin">
+    <Grid Margin="16">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
@@ -125,8 +122,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <VerticalStackLayout Grid.Row="1"
-                             x:DataType="views:SetPin" >
+        <VerticalStackLayout Grid.Row="1">
             <material:TextField Text="{Binding Pin.PinLocation}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"

@@ -32,11 +32,10 @@ public partial class LoadDataToView
         string planId = plan.Key;
         string planTitle = plan.Value.Name;
 
-        // 1. Die richtige Seite basierend auf der ID auswählen
         ContentPage page;
         if (planId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
         {
-            page = new MapViewOSM(planId) // Falls du den Konstruktor mit Parameter hast: new MapViewOSM(planId)
+            page = new MapViewOSM(planId)
             {
                 Title = planTitle,
                 AutomationId = planId,
@@ -53,11 +52,10 @@ public partial class LoadDataToView
             };
         }
 
-        // 2. ShellContent mit der fertigen Instanz erzeugen
         var shellContent = new ShellContent
         {
-            Content = page,      // Hier wird die fertige Seite übergeben
-            Route = planId,      // Die planId ist die eindeutige Route
+            Content = page,
+            Route = planId,
             Title = planTitle,
             AutomationId = planId
         };
@@ -93,7 +91,12 @@ public partial class LoadDataToView
         shell.AllPlanItems.Clear();
 
         var itemsToRemove = shell.Items.Where(item =>
-            item.Items.Any(section => section.Items.Any(content => content.Content is Views.NewPage))
+            item.Items.Any(section =>
+                section.Items.Any(content =>
+                    content.Content is MapViewOSM ||
+                    content.Content is NewPage
+                )
+            )
         ).ToList();
 
         foreach (var item in itemsToRemove)

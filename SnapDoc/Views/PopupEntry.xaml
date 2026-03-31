@@ -13,11 +13,16 @@
     <Grid Padding="12"
           WidthRequest="320">
         <VerticalStackLayout>
+            <Label x:Name="headerText"
+                   IsVisible="False"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"
+                   Text=""/>
             <Label x:Name="titleText"
                    HorizontalOptions="Start"
                    Text=""/>
 
-            <material:TextField x:Name="text_entry"
+            <material:TextField x:Name="textEntry"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"

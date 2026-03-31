@@ -13,37 +13,47 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupPinView">
 
-    <Grid Padding="12"
-          WidthRequest="320">
-        <VerticalStackLayout Spacing="6">
-            <HorizontalStackLayout>
-                <Image Source="{Binding Pin.DisplayIconPath}"
+    <Grid Padding="0"
+          WidthRequest="220">
+        <VerticalStackLayout Spacing="4">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Image Grid.Column="0"
+                       Source="{Binding Pin.DisplayIconPath}"
                        WidthRequest="50"
                        HeightRequest="50"/>
-                <VerticalStackLayout Spacing="6">
+                <VerticalStackLayout Grid.Column="1" Spacing="6">
                     <HorizontalStackLayout Spacing="0">
-                        <Label Text="{x:Static res:AppResources.bezeichnung}"
+                        <Label Text="{x:Static res:AppResources.bezeichnung}" FontSize="12"
                            TextColor="{DynamicResource Primary}"/>
-                        <Label Text=":"
+                        <Label Text=":" FontSize="12"
                            TextColor="{DynamicResource Primary}"/>
                     </HorizontalStackLayout>
-                    <Label Text="{Binding Pin.PinName}"/>
+                    <Label Text="{Binding Pin.PinName}" FontSize="12" LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
-            </HorizontalStackLayout>
+                <Button Grid.Column="2"
+                        Padding="0"
+                        VerticalOptions="Start"
+                        Text="{x:Static local:MaterialIcons.Cancel}"
+                        FontSize="30"
+                        FontFamily="MaterialOutlined"
+                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        BackgroundColor="Transparent"
+                        Clicked="OnCancelClicked" />                
+            </Grid>
             
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                      HeightRequest="1"
-                     Margin="0,6,0,6"/>
+                     Margin="0,4,0,4"/>
             
             <HorizontalStackLayout Spacing="0">
-                <Label Text="{x:Static res:AppResources.standort}"
+                <Label Text="{x:Static res:AppResources.standort}" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
-                <Label Text=":"
+                <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <Label Text="{Binding Pin.PinLocation}"/>
+            <Label Text="{Binding Pin.PinLocation}" FontSize="12" LineBreakMode="TailTruncation"/>
 
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
@@ -52,37 +62,32 @@
                      Margin="0,6,0,6"/>
 
             <HorizontalStackLayout Spacing="0">
-                <Label Text="{x:Static res:AppResources.beschreibung}"
+                <Label Text="{x:Static res:AppResources.beschreibung}" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
-                <Label Text=":"
+                <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <Label Text="{Binding Pin.PinDesc}" Margin="0,0,0,16"/>
+            <Label Text="{Binding Pin.PinDesc}" FontSize="12" Margin="0,0,0,16"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="50" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="50" />                    
+                    <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
+                <Button Grid.Column="1"
                         Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Cancel}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Add_photo_alternate}}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnCancelClicked" />
+                        ToolTipProperties.Text="{x:Static res:AppResources.kartenausschnitt_speichern}"
+                        Clicked="OnExportClicked" />
                 <Button Grid.Column="2"
                         Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Screenshot_region}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Pinboard}}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnExportClicked" />
-                <Button Grid.Column="3"
-                        Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Edit_location_alt}}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"
                         Clicked="OnGoToClicked" />
             </Grid>
         </VerticalStackLayout>

@@ -970,6 +970,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt speichern ähnelt.
+        /// </summary>
+        internal static string kartenausschnitt_speichern {
+            get {
+                return ResourceManager.GetString("kartenausschnitt_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kartenservice ähnelt.
         /// </summary>
         internal static string kartenservice {
@@ -1560,6 +1569,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string plan_loeschen {
             get {
                 return ResourceManager.GetString("plan_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planbezeichnung ähnelt.
+        /// </summary>
+        internal static string plan_name {
+            get {
+                return ResourceManager.GetString("plan_name", resourceCulture);
             }
         }
         
