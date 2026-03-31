@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Maui;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -53,7 +54,7 @@ public partial class MapViewOSM : IQueryAttributable
     private readonly List<MPoint> _measurePoints = [];
     private int _draggedMeasurePointIndex = -1;
     private bool _isPolygonClosed = false;
-    private readonly Mapsui.Styles.Color _widgetColor;
+    private readonly Color _widgetColor;
 
     private PinItem pin;
     public PinItem Pin
@@ -226,31 +227,26 @@ public partial class MapViewOSM : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
-        // 1. Initialzustand: Button verstecken
         SetPosBtn.IsVisible = false;
 
-        // Standardwerte (Schweiz-Zentrum) als Fallback
         double targetLon = 8.226692;
         double targetLat = 46.80121;
         int targetZoom = 8; // Default Zoom für die Übersicht
 
-        // FALL A: Ein Pin wurde übergeben
         if (!string.IsNullOrEmpty(PlanId) && !string.IsNullOrEmpty(PinId))
         {
             if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
                 plan.Pins.TryGetValue(PinId, out var pinData))
             {
                 Pin = new PinItem(pinData);
-                SetPosBtn.IsVisible = true; // Button einblenden, da wir im "Pin-Modus" sind
+                SetPosBtn.IsVisible = true;
 
-                // Hat der Pin bereits Koordinaten?
                 if (pinData.GeoLocation?.WGS84 != null)
                 {
                     targetLon = pinData.GeoLocation.WGS84.Longitude;
                     targetLat = pinData.GeoLocation.WGS84.Latitude;
                     targetZoom = 18; // Nah ran
                 }
-                // Falls Pin neu/ohne Ort, aber GPS aktiv -> Nutze GPS für den Zoom
                 else if (SettingsService.Instance.IsGpsActive)
                 {
                     var location = await geoViewModel.TryGetLocationAsync();
@@ -263,7 +259,6 @@ public partial class MapViewOSM : IQueryAttributable
                 }
             }
         }
-        // FALL B: Kein Pin vorhanden, aber GPS ist aktiv
         else if (SettingsService.Instance.IsGpsActive)
         {
             var location = await geoViewModel.TryGetLocationAsync();
@@ -271,21 +266,17 @@ public partial class MapViewOSM : IQueryAttributable
             {
                 targetLon = location.Longitude;
                 targetLat = location.Latitude;
-                targetZoom = 18; // Dein Wunsch: Auch ohne Pin auf Zoom 18
+                targetZoom = 18;
             }
         }
 
-        // Werte für die Klasse übernehmen
         lon = targetLon;
         lat = targetLat;
         zoom = targetZoom;
 
-        // Karte positionieren
         if (map?.Navigator != null)
         {
             var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(lon, lat).ToMPoint();
-
-            // Navigator auf die Auflösung des Ziel-Zooms setzen
             map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[zoom]);
             MapControl.RefreshGraphics();
         }
@@ -429,7 +420,10 @@ public partial class MapViewOSM : IQueryAttributable
             var pinId = feature["PinId"].ToString();
             var planId = feature["PlanId"].ToString();
             var popup = new PopupPinView(planId, pinId);
-            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+            PopupOptions popupOptions = new()
+            { CanBeDismissedByTappingOutsideOfPopup = true, Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle {CornerRadius = new CornerRadius(8), StrokeThickness = 0 }};
+            var result = await this.ShowPopupAsync<string>(popup, popupOptions);
 
             if (result.Result == "edit")
                 _mapInitialized = false;
