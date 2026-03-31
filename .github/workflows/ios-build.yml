@@ -63,3 +63,12 @@ jobs:
         with:
           name: SnapDoc-iOS-App
           path: SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/*.ipa
+
+      - name: Upload to App Store Connect (TestFlight)
+        run: |
+          # Dieses Tool lädt die .ipa direkt zu Apple hoch
+          xcrun altool --upload-app \
+            -f SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/*.ipa \
+            -t ios \
+            -u "m.fankhauser@gmx.net" \
+            -p "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}"
