@@ -153,7 +153,7 @@ public partial class CameraView : ContentPage
                 return new { Ratio = ratio, Name = GetRatioName(ratio) };
             })
             .GroupBy(x => x.Name)
-            .Select(g => new { Name = g.Key, Value = g.First().Ratio })
+            .Select(g => new CameraRatio { Name = g.Key, Value = g.First().Ratio })
             .OrderByDescending(r => r.Value)
             .ToList();
 
@@ -342,4 +342,10 @@ public static class CameraResultService
     private static TaskCompletionSource<FileResult?>? _tcs;
     public static Task<FileResult?> WaitForCaptureAsync() { _tcs = new TaskCompletionSource<FileResult?>(); return _tcs.Task; }
     public static void SetResult(FileResult? result) => _tcs?.TrySetResult(result);
+}
+
+public class CameraRatio
+{
+    public string? Name { get; set; }
+    public double Value { get; set; }
 }

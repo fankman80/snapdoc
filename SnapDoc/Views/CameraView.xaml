@@ -3,8 +3,10 @@
              xmlns:cv="clr-namespace:Camera.MAUI;assembly=Camera.MAUI"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"           
              x:Class="SnapDoc.Views.CameraView"
+             x:DataType="views:CameraView"
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill" BackgroundColor="Black">
@@ -62,26 +64,26 @@
                 Clicked="OnCloseClicked"/>
 
         <VerticalStackLayout x:Name="ratioContainer" 
-                     HorizontalOptions="End" 
-                     VerticalOptions="Start" 
-                     Margin="0,16,16,0" 
-                     Spacing="10"
-                     Opacity="1"
-                     InputTransparent="False"
-                     ZIndex="10">
+                             HorizontalOptions="End" 
+                             VerticalOptions="Start" 
+                             Margin="0,16,16,0" 
+                             Spacing="10"
+                             Opacity="1"
+                             InputTransparent="False"
+                             ZIndex="10">
             <BindableLayout.ItemTemplate>
-                <DataTemplate>
+                <DataTemplate x:DataType="views:CameraRatio">
                     <Button Text="{Binding Name}"
-                    CommandParameter="{Binding Value}"
-                    Clicked="OnRatioClicked"
-                    WidthRequest="50"
-                    HeightRequest="40"
-                    Padding="0"
-                    FontSize="12"
-                    CornerRadius="8"
-                    BackgroundColor="#404040"
-                    TextColor="White"
-                    Opacity="0.8" />
+                            CommandParameter="{Binding Value}"
+                            Clicked="OnRatioClicked"
+                            WidthRequest="50"
+                            HeightRequest="40"
+                            Padding="0"
+                            FontSize="12"
+                            CornerRadius="8"
+                            BackgroundColor="#404040"
+                            TextColor="White"
+                            Opacity="0.8" />
                 </DataTemplate>
             </BindableLayout.ItemTemplate>
         </VerticalStackLayout>
