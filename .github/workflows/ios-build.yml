@@ -59,12 +59,6 @@ jobs:
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
 
-      # Dieser Schritt behebt den Fehler ITMS-90426 (SwiftSupport)
-      - name: Add Swift Support
-        uses: NityaSantosh26/add-swift-support@main
-        with:
-          ipa-path: 'SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa'
-
       - name: Upload Artifact (Optional zum Download)
         uses: actions/upload-artifact@v4
         with:
