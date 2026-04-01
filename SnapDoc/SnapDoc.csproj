@@ -22,6 +22,11 @@
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
+		<IncludeSwiftStandardLibraries>true</IncludeSwiftStandardLibraries>
+	</PropertyGroup>
+
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<PublishSingleFile>true</PublishSingleFile>
