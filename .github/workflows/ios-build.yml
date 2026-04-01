@@ -61,7 +61,7 @@ jobs:
 
       # Dieser Schritt behebt den Fehler ITMS-90426 (SwiftSupport)
       - name: Add Swift Support
-        uses: NityaSantosh26/add-swift-support@v3
+        uses: NityaSantosh26/add-swift-support@main
         with:
           ipa-path: 'SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa'
 
