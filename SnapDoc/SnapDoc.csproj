@@ -5,7 +5,7 @@
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.2.0</ApplicationDisplayVersion>
-		<ApplicationVersion>12</ApplicationVersion> <UseMaui>true</UseMaui>
+		<ApplicationVersion>13</ApplicationVersion> <UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -214,9 +214,12 @@
 	  </None>
 	</ItemGroup>
 
-	<Target Name="FinalAppBundleFix" AfterTargets="_CreateAppBundle" Condition="$(TargetFramework.Contains('-ios'))">
-	    <Message Importance="high" Text="INFO: Starte finale Apple-Konformitäts-Prüfung..." />
-	    <MakeDir Directories="$(AppBundleDir)/Frameworks" />
-	    <Exec Command="if [ -f &quot;$(AppBundleDir)/libpdfium.dylib&quot; ]; then mv &quot;$(AppBundleDir)/libpdfium.dylib&quot; &quot;$(AppBundleDir)/Frameworks/libpdfium.dylib&quot;; echo &quot;SUCCESS: libpdfium.dylib nach Frameworks verschoben.&quot;; else echo &quot;SKIP: libpdfium.dylib nicht im Root gefunden.&quot;; fi" />
-	</Target>
+    <Target Name="FinalAppBundleFix" AfterTargets="_CreateAppBundle" Condition="$(TargetFramework.Contains('-ios'))">
+        <Message Importance="high" Text="INFO: Starte finale Apple-Konformitäts-Prüfung und Swift-Fix..." />
+        <MakeDir Directories="$(AppBundleDir)/Frameworks" />
+        <Exec Command="if [ -f &quot;$(AppBundleDir)/libpdfium.dylib&quot; ]; then mv &quot;$(AppBundleDir)/libpdfium.dylib&quot; &quot;$(AppBundleDir)/Frameworks/libpdfium.dylib&quot;; echo &quot;SUCCESS: libpdfium.dylib verschoben.&quot;; fi" />
+        <Exec Command="mkdir -p &quot;$(AppBundleDir)/../SwiftSupport/iphoneos&quot;" />
+        <Exec Command="find &quot;$(AppBundleDir)/Frameworks&quot; -name 'libswift*' -exec cp {} &quot;$(AppBundleDir)/../SwiftSupport/iphoneos/&quot; \;" />
+        <Message Importance="high" Text="SUCCESS: SwiftSupport Ordner wurde für Apple vorbereitet." />
+    </Target>
 </Project>
