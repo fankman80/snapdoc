@@ -5,7 +5,7 @@
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.2.0</ApplicationDisplayVersion>
-		<ApplicationVersion>5</ApplicationVersion> <UseMaui>true</UseMaui>
+		<ApplicationVersion>6</ApplicationVersion> <UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -209,9 +209,15 @@
 	  </None>
 	</ItemGroup>
 
-	<Target Name="FixPdfiumFinal" AfterTargets="_CopyFilesToBundle" Condition="$(TargetFramework.Contains('-ios'))">
-	    <Message Importance="high" Text="Verschiebe alle losen dylibs in den Frameworks-Ordner..." />
-	    <MakeDir Directories="$(AppBundleDir)/Frameworks" />
-	    <Exec Command="[ -f $(AppBundleDir)/libpdfium.dylib ] &amp;&amp; mv $(AppBundleDir)/libpdfium.dylib $(AppBundleDir)/Frameworks/libpdfium.dylib || echo 'libpdfium.dylib nicht im Root gefunden'" />
+	<ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+	    <NativeReference Include="libpdfium.dylib">
+	        <Kind>Framework</Kind>
+	        <SmartLink>False</SmartLink>
+	    </NativeReference>
+	</ItemGroup>
+	
+	<Target Name="RemoveDuplicatePdfium" AfterTargets="_CopyFilesToBundle" Condition="$(TargetFramework.Contains('-ios'))">
+	    <Message Importance="high" Text="Lösche doppelte libpdfium.dylib aus dem App-Root..." />
+	    <Exec Command="rm -f $(AppBundleDir)/libpdfium.dylib" />
 	</Target>
 </Project>
