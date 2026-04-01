@@ -7,7 +7,7 @@
 	    <ApplicationId>com.ebbe.snapdoc</ApplicationId>
 	    
 	    <ApplicationDisplayVersion>2.2.0</ApplicationDisplayVersion>
-	    <ApplicationVersion>2</ApplicationVersion> <Title>SnapDoc</Title>
+	    <ApplicationVersion>3</ApplicationVersion> <Title>SnapDoc</Title>
 
 		<!-- MAUI Basis -->
 		<UseMaui>true</UseMaui>
@@ -211,16 +211,15 @@
 	  </MauiXaml>
 	</ItemGroup>
 	
-	<ItemGroup>
-	  <None Update="Resources\AppIcon\appicon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+	<ItemGroup Condition="$(TargetFramework.Contains('-ios'))">
+	    <NativeReference Include="libpdfium.dylib">
+	        <Kind>Dynamic</Kind>
+	        <SmartLink>False</SmartLink>
+	    </NativeReference>
 	</ItemGroup>
-
-	<Target Name="FixPdfiumBundle" AfterTargets="_CopyFilesToBundle" Condition="$(TargetFramework.Contains('-ios'))">
-        <Message Importance="high" Text="Verschiebe libpdfium.dylib in den Frameworks-Ordner für Apple Konformität..." />
-        <MakeDir Directories="$(AppBundleDir)/Frameworks" />
-        <Exec Command="mv $(AppBundleDir)/libpdfium.dylib $(AppBundleDir)/Frameworks/libpdfium.dylib" ContinueOnError="true" />
-    </Target>
+	
+	<Target Name="CleanUpPdfium" AfterTargets="_CopyFilesToBundle" Condition="$(TargetFramework.Contains('-ios'))">
+	    <Message Importance="high" Text="Entferne lose libpdfium.dylib aus dem Root-Verzeichnis..." />
+	    <Exec Command="rm -f $(AppBundleDir)/libpdfium.dylib" ContinueOnError="true" />
+	</Target>
 </Project>
