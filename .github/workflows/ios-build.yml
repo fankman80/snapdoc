@@ -24,13 +24,12 @@ jobs:
 
       - name: Select Xcode Version
         run: |
-          # Versucht Xcode 16.2 zu nutzen, sonst Standard
-          sudo xcode-select -s /Applications/Xcode_16.2.app || sudo xcode-select -s /Applications/Xcode.app
+          sudo xcode-select -s /Applications/Xcode_26.2.app || sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
       - name: Import Certificate (.p12)
         run: |
-          # 1. Decode aus Secrets
+          # 1. Decode aus Secret
           echo "${{ secrets.IOS_CERTIFICATE_BASE64 }}" | base64 --decode > certificate.p12
           echo "${{ secrets.IOS_PROVISION_BASE64 }}" | base64 --decode > profile.mobileprovision
           
@@ -45,7 +44,7 @@ jobs:
           security import certificate.p12 -k "$KEYCHAIN_PATH" -P "${{ secrets.IOS_CERT_PASSWORD }}" -A -t cert -f pkcs12
           security list-keychain -d user -s "$KEYCHAIN_PATH"
           
-          # 4. Provisioning Profile installieren
+          # 4. Provisioning Profile in den richtigen Ordner schieben
           mkdir -p ~/Library/MobileDevice/Provisioning\ Profiles
           cp profile.mobileprovision ~/Library/MobileDevice/Provisioning\ Profiles/
 
@@ -59,17 +58,17 @@ jobs:
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
 
-      - name: Upload Artifact (Optional zum Download)
+      - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SnapDoc-iOS-App-Fixed
-          path: SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa
+          name: SnapDoc-iOS-App
+          path: SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/*.ipa
 
       - name: Upload to App Store Connect (TestFlight)
         run: |
-          # Lädt die durch 'Add Swift Support' korrigierte Datei zu Apple hoch
+          # Dieses Tool lädt die .ipa direkt zu Apple hoch
           xcrun altool --upload-app \
-            -f "SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa" \
+            -f SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/*.ipa \
             -t ios \
             -u "m.fankhauser@gmx.net" \
             -p "${{ secrets.APPLE_APP_SPECIFIC_PASSWORD }}"
