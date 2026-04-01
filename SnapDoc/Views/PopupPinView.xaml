@@ -13,15 +13,23 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupPinView">
 
+    <toolkit:Popup.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </toolkit:Popup.Resources>
+    
     <Grid Padding="0"
           WidthRequest="220">
         <VerticalStackLayout Spacing="4">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0">
                 <Image Grid.Column="0"
+                       Margin="0,0,8,0"
+                       IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                        Source="{Binding Pin.DisplayIconPath}"
                        WidthRequest="50"
                        HeightRequest="50"/>
-                <VerticalStackLayout Grid.Column="1" Spacing="6">
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
                     <HorizontalStackLayout Spacing="0">
                         <Label Text="{x:Static res:AppResources.bezeichnung}" FontSize="12"
                            TextColor="{DynamicResource Primary}"/>
@@ -30,15 +38,6 @@
                     </HorizontalStackLayout>
                     <Label Text="{Binding Pin.PinName}" FontSize="12" LineBreakMode="TailTruncation" />
                 </VerticalStackLayout>
-                <Button Grid.Column="2"
-                        Padding="0"
-                        VerticalOptions="Start"
-                        Text="{x:Static local:MaterialIcons.Cancel}"
-                        FontSize="30"
-                        FontFamily="MaterialOutlined"
-                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        BackgroundColor="Transparent"
-                        Clicked="OnCancelClicked" />                
             </Grid>
             
             <!-- Trennlinie -->
@@ -77,14 +76,22 @@
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="1"
                         Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Add_photo_alternate}}"
+                        HeightRequest="36"
+                        MinimumHeightRequest="36"
+                        Text="{x:Static local:MaterialIcons.Add_photo_alternate}"
+                        FontSize="26"
+                        FontFamily="MaterialOutlined"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ToolTipProperties.Text="{x:Static res:AppResources.kartenausschnitt_speichern}"
                         Clicked="OnExportClicked" />
                 <Button Grid.Column="2"
                         Padding="0"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Pinboard}}"
+                        HeightRequest="36"
+                        MinimumHeightRequest="36"
+                        Text="{x:Static local:MaterialIcons.Pinboard}"
+                        FontSize="26"
+                        FontFamily="MaterialOutlined"                        
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"

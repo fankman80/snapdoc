@@ -26,11 +26,6 @@ public partial class PopupPinView : Popup<string>
         await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");
     }
 
-    private async void OnCancelClicked(object sender, EventArgs e)
-    {
-        await CloseAsync(null);
-    }
-
     private async void OnExportClicked(object sender, EventArgs e)
     {
         await CloseAsync("export");

@@ -1,20 +1,21 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-            xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-            xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-            xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-            xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
-            xmlns:views="clr-namespace:SnapDoc.Views"             
-            xmlns:services="clr-namespace:SnapDoc.Services"
-            xmlns:controls="clr-namespace:SnapDoc.Controls"
-            xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-            xmlns:local="clr-namespace:SnapDoc"
-            Shell.TitleColor="{DynamicResource PrimaryDark}"
-            Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-            x:Class="SnapDoc.Views.MapViewOSM"
-            x:DataType="views:MapViewOSM"             
-            x:Name="ThisPage"
-            Title="">
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"             
+             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
+             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+             xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
+             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:local="clr-namespace:SnapDoc"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+             x:Class="SnapDoc.Views.MapViewOSM"
+             x:DataType="views:MapViewOSM"             
+             x:Name="ThisPage"
+             Title="">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
@@ -41,20 +42,26 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.kml_datei_exportieren}"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.kml_datei_exportieren}"
                     Clicked="KmlExportClicked"/>
             <Button Grid.Column="2"
+                    Padding="0"
                     Text="{x:Static local:MaterialIcons.Delete}"
                     FontSize="24"
-                    Padding="0"
+                    FontFamily="MaterialOutlined"
                     TextColor="{DynamicResource PrimaryDark}"
                     Background="Transparent"
-                    FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     Clicked="OnDeleteButtonClicked"/>
         </Grid>
     </Shell.TitleView>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Grid>
         <mapsui:MapControl x:Name="MapControl"/>
@@ -121,11 +128,12 @@
                 <Border.Shadow>
                     <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
                 </Border.Shadow>
-                <Grid ColumnDefinitions="60,*"
+                <Grid ColumnDefinitions="Auto,*"
                       ColumnSpacing="6"
                       VerticalOptions="Center"
                       HorizontalOptions="Center">
                     <Image Grid.Column="0"
+                           IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                            Source="{Binding Pin.DisplayIconPath}" />
                     <Label Grid.Column="1"
                            Text="{x:Static res:AppResources.neu_setzen}"

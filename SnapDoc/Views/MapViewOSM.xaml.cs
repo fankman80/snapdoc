@@ -328,7 +328,7 @@ public partial class MapViewOSM : IQueryAttributable
         _isPolygonClosed = false;
 
         _instructionWidget.Enabled = isActivating;
-        RulerButton.Text = isActivating ? AppResources.abbrechen : AppResources.distanz_messen;
+        RulerButton.Text = isActivating ? AppResources.abbrechen : AppResources.vermessung;
 
         if (!isActivating)
         {
@@ -795,21 +795,31 @@ public partial class MapViewOSM : IQueryAttributable
         if (picker.SelectedItem is not MapViewItem selectedItem || map == null)
             return;
 
-        var baseLayers = map.Layers.Where(l => l.Name != "Pins").ToList();
-        foreach (var layer in baseLayers)
-        {
-            map.Layers.Remove(layer);
-        }
+        var functionalLayers = map.Layers
+            .Where(l => l.Name == "Pins" || l.Name == "MeasureLayer")
+            .ToList();
 
+        map.Layers.Clear();
+
+        ILayer baseLayer;
         if (!string.IsNullOrEmpty(selectedItem.Id))
         {
             if (selectedItem.Id.Contains("OpenStreetMap"))
-                map.Layers.Insert(0, OpenStreetMap.CreateTileLayer());
+                baseLayer = OpenStreetMap.CreateTileLayer();
             else
-                map.Layers.Insert(0, CreateSwissTopoLayer(selectedItem.Id));
+                baseLayer = CreateSwissTopoLayer(selectedItem.Id);
         }
         else
-            map.Layers.Insert(0, OpenStreetMap.CreateTileLayer());
+        {
+            baseLayer = OpenStreetMap.CreateTileLayer();
+        }
+
+        map.Layers.Add(baseLayer);
+
+        foreach (var layer in functionalLayers)
+        {
+            map.Layers.Add(layer);
+        }
 
         map.RefreshGraphics();
     }
