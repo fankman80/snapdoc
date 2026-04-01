@@ -30,5 +30,15 @@
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>CFBundleShortVersionString</key>
 	<string>2.2.0</string>
+
+	<key>NSCameraUsageDescription</key>
+	<string>SnapDoc benötigt Zugriff auf die Kamera, um Dokumente zu fotografieren und zu scannen.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>SnapDoc benötigt Zugriff auf die Fotogalerie, um aufgenommene Dokumente zu speichern oder zu importieren.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>SnapDoc benötigt die Erlaubnis, Bilder in deiner Galerie zu speichern.</string>
+    
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>SnapDoc nutzt deinen Standort, um Fotos auf der Karte zu verorten.</string>
 </dict>
 </plist>
