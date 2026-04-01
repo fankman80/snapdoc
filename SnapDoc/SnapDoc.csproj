@@ -211,4 +211,10 @@
 	    <PackagePath>\</PackagePath>
 	  </None>
 	</ItemGroup>
+
+	<Target Name="FixPdfiumBundle" AfterTargets="_CopyFilesToBundle" Condition="$(TargetFramework.Contains('-ios'))">
+        <Message Importance="high" Text="Verschiebe libpdfium.dylib in den Frameworks-Ordner für Apple Konformität..." />
+        <MakeDir Directories="$(AppBundleDir)/Frameworks" />
+        <Exec Command="mv $(AppBundleDir)/libpdfium.dylib $(AppBundleDir)/Frameworks/libpdfium.dylib" ContinueOnError="true" />
+    </Target>
 </Project>
