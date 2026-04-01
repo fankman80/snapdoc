@@ -58,6 +58,23 @@ jobs:
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
 
+      - name: Fix IPA Structure (Swift & PDFium)
+        run: |
+          unzip SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa -d temp_ipa
+          mkdir -p temp_ipa/Payload/SnapDoc.app/Frameworks
+          if [ -f "temp_ipa/Payload/SnapDoc.app/libpdfium.dylib" ]; then
+            mv temp_ipa/Payload/SnapDoc.app/libpdfium.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
+            echo "PDFium dylib moved to Frameworks."
+          fi
+          cp /Applications/Xcode_26.2.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/ || true
+          mkdir -p temp_ipa/SwiftSupport/iphoneos
+          cp temp_ipa/Payload/SnapDoc.app/Frameworks/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/ || true
+          cd temp_ipa
+          zip -y -r ../SnapDoc_Fixed.ipa .
+          cd ..
+          mv SnapDoc_Fixed.ipa SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa
+          echo "IPA successfully restructured and fixed"
+
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
