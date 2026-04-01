@@ -215,11 +215,14 @@
 	</ItemGroup>
 
     <Target Name="FinalAppBundleFix" AfterTargets="_CreateAppBundle" Condition="$(TargetFramework.Contains('-ios'))">
-        <Message Importance="high" Text="INFO: Starte finale Apple-Konformitäts-Prüfung und Swift-Fix..." />
+        <Message Importance="high" Text="INFO: Starte erweiterten SwiftSupport &amp; Framework Fix..." />
         <MakeDir Directories="$(AppBundleDir)/Frameworks" />
         <Exec Command="if [ -f &quot;$(AppBundleDir)/libpdfium.dylib&quot; ]; then mv &quot;$(AppBundleDir)/libpdfium.dylib&quot; &quot;$(AppBundleDir)/Frameworks/libpdfium.dylib&quot;; echo &quot;SUCCESS: libpdfium.dylib verschoben.&quot;; fi" />
-        <Exec Command="mkdir -p &quot;$(AppBundleDir)/../SwiftSupport/iphoneos&quot;" />
-        <Exec Command="find &quot;$(AppBundleDir)/Frameworks&quot; -name 'libswift*' -exec cp {} &quot;$(AppBundleDir)/../SwiftSupport/iphoneos/&quot; \;" />
-        <Message Importance="high" Text="SUCCESS: SwiftSupport Ordner wurde für Apple vorbereitet." />
+        <PropertyGroup>
+            <SwiftSupportDir>$(AppBundleDir)/../SwiftSupport/iphoneos</SwiftSupportDir>
+        </PropertyGroup>
+        <MakeDir Directories="$(SwiftSupportDir)" />
+        <Exec Command="find &quot;$(AppBundleDir)/Frameworks&quot; -name 'libswift*' -exec cp {} &quot;$(SwiftSupportDir)/&quot; \;" />
+        <Message Importance="high" Text="SUCCESS: SwiftSupport Ordner wurde mit Inhalten gefüllt." />
     </Target>
 </Project>
