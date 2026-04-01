@@ -37,8 +37,15 @@
 	<string>SnapDoc benötigt Zugriff auf die Fotogalerie, um aufgenommene Dokumente zu speichern oder zu importieren.</string>
 	<key>NSPhotoLibraryAddUsageDescription</key>
 	<string>SnapDoc benötigt die Erlaubnis, Bilder in deiner Galerie zu speichern.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>SnapDoc nutzt deinen Standort, um Fotos auf der Karte zu verorten.</string>
+
+	<key>ITSAppUsesNonExemptEncryption</key>
+	<false/>
     
-    <key>NSLocationWhenInUseUsageDescription</key>
-    <string>SnapDoc nutzt deinen Standort, um Fotos auf der Karte zu verorten.</string>
+	<key>CFBundleIdentifier</key>
+	<string></string>
+	<key>CFBundleDisplayName</key>
+	<string>SnapDoc</string>
 </dict>
 </plist>
