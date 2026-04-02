@@ -24,6 +24,8 @@ jobs:
 
       - name: Select Xcode Version
         run: |
+          sudo mkdir -p /Applications/Xcode_26.2.app
+          sudo ln -s /Applications/Xcode.app/* /Applications/Xcode_26.2.app/ 2>/dev/null || true
           sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
@@ -55,8 +57,9 @@ jobs:
           -p:CodesignKey="Apple Distribution" \
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
           -p:RuntimeIdentifier=ios-arm64 \
-          -p:MtouchNoWarn=7091 \
-          -p:SuppressXCodeVersionMismatch=true
+          -p:SuppressXCodeVersionMismatch=true \
+          -p:MD_APPLE_SDK_ROOT=/Applications/Xcode.app \
+          -p:MtouchNoWarn=7091
 
       - name: Fix IPA Structure and RE-SIGN (Build 18)
         run: |
