@@ -24,9 +24,7 @@ jobs:
 
       - name: Select Xcode Version
         run: |
-          sudo mkdir -p /Applications/Xcode_26.2.app
-          sudo ln -s /Applications/Xcode.app/* /Applications/Xcode_26.2.app/ 2>/dev/null || true
-          sudo xcode-select -s /Applications/Xcode.app
+          sudo xcode-select -s /Applications/Xcode_26.2.app || sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
       - name: Import Certificate (.p12)
@@ -57,11 +55,9 @@ jobs:
           -p:CodesignKey="Apple Distribution" \
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
           -p:RuntimeIdentifier=ios-arm64 \
-          -p:SuppressXCodeVersionMismatch=true \
-          -p:MD_APPLE_SDK_ROOT=/Applications/Xcode.app \
-          -p:MtouchNoWarn=7091
+          -p:SuppressXCodeVersionMismatch=true
 
-      - name: Fix IPA Structure and RE-SIGN (Build 18)
+      - name: Fix IPA Structure and RE-SIGN (Build 19)
         run: |
           unzip SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa -d temp_ipa
           codesign -d --entitlements :- "temp_ipa/Payload/SnapDoc.app" > entitlements.xml
@@ -71,7 +67,10 @@ jobs:
           fi
           XCODE_PATH=$(xcode-select -p)
           SWIFT_LIB_PATH="$XCODE_PATH/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos"
-          echo "Das System nutzt aktuell: $XCODE_PATH"
+          
+          echo "System nutzt Xcode unter: $XCODE_PATH"
+          echo "Kopiere Swift-Libs aus: $SWIFT_LIB_PATH"
+
           cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
           mkdir -p temp_ipa/SwiftSupport/iphoneos
           cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/
