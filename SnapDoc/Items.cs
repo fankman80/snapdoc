@@ -368,6 +368,9 @@ namespace SnapDoc
         public string PlanRoute { get; set; } = string.Empty;
         public string Thumbnail { get; set; } = string.Empty;
         public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
+        public bool IsWebMapPlan { get; set; }
+
+        public bool ShowThumbnail => !IsWebMapPlan;
 
         public bool AllowExport
         {

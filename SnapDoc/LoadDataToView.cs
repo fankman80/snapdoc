@@ -31,9 +31,10 @@ public partial class LoadDataToView
 
         string planId = plan.Key;
         string planTitle = plan.Value.Name;
+        bool isWebMap = planId.Contains("webmap", StringComparison.OrdinalIgnoreCase);
 
         ContentPage page;
-        if (planId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
+        if (isWebMap)
         {
             page = new MapViewOSM(planId)
             {
@@ -48,7 +49,7 @@ public partial class LoadDataToView
             {
                 Title = planTitle,
                 AutomationId = planId,
-                PlanId = planId
+                PlanId = planId,
             };
         }
 
@@ -66,10 +67,11 @@ public partial class LoadDataToView
         {
             Title = planTitle,
             PlanId = planId,
-            PlanRoute = planId
+            PlanRoute = planId,
+            IsWebMapPlan = isWebMap
         };
 
-        if (!planId.Contains("webmap"))
+        if (!isWebMap)
         {
             item.Thumbnail = Path.Combine(
                 Settings.DataDirectory,

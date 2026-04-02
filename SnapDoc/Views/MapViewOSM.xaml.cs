@@ -148,6 +148,9 @@ public partial class MapViewOSM : IQueryAttributable
             LoadPins();
             await UpdateUiFromQueryAsync();
         }
+
+        if (!geoViewModel.IsGpsActive)
+            await geoViewModel.OnToggleGPSAsync();
     }
 
     private void AddPin(Map map, Point pos, string planId, string pinId)
@@ -525,10 +528,6 @@ public partial class MapViewOSM : IQueryAttributable
         {
             try
             {
-                var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
-                pinLayer?.FeaturesWereModified();
-                pinLayer?.DataHasChanged();
-
                 var planKey = _draggedPin["PlanId"]?.ToString();
                 var pinKey = _draggedPin["PinId"]?.ToString();
 
@@ -536,16 +535,20 @@ public partial class MapViewOSM : IQueryAttributable
                 {
                     var (lon, lat) = SphericalMercator.ToLonLat(point.X, point.Y);
                     await UpdateAndSavePinLocationAsync(planKey, pinKey, lon, lat);
+
+                    var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+                    pinLayer?.FeaturesWereModified();
+                    pinLayer?.DataHasChanged();
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Fehler beim Speichern des Pins: {ex.Message}");
+                Debug.WriteLine($"Fehler beim Speichern: {ex.Message}");
             }
         }
-
         _draggedMeasurePointIndex = -1;
         CleanupDragging();
+        MapControl.RefreshGraphics();
     }
 
     private void CleanupDragging()
@@ -583,8 +586,8 @@ public partial class MapViewOSM : IQueryAttributable
             var polygonFeature = new GeometryFeature(polygon);
             polygonFeature.Styles.Add(new VectorStyle
             {
-                Fill = new Mapsui.Styles.Brush(new Mapsui.Styles.Color(_widgetColor.R, _widgetColor.G, _widgetColor.B, 128)),
-                Line = new Pen(Mapsui.Styles.Color.Black, 1)
+                Fill = new Mapsui.Styles.Brush(new Color(_widgetColor.R, _widgetColor.G, _widgetColor.B, 128)),
+                Line = new Pen(Color.Black, 1)
             });
             _measureFeatures.Add(polygonFeature);
 
@@ -860,8 +863,6 @@ public partial class MapViewOSM : IQueryAttributable
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         GlobalJson.Data.Plans.Remove(PlanId);
-
-        // save data to file
         GlobalJson.SaveToFile();
 
         // Anzeige neu aufbauen
@@ -889,19 +890,18 @@ public partial class MapViewOSM : IQueryAttributable
             Math.Abs(pin.GeoLocation.WGS84.Latitude - lat) > 0.0000001 ||
             Math.Abs(pin.GeoLocation.WGS84.Longitude - lon) > 0.0000001)
         {
-            pin.GeoLocation.WGS84 ??= new LocationWGS84(lat, lon);
+            pin.GeoLocation.WGS84 = new LocationWGS84(lat, lon);
             pin.GeoLocation.Accuracy = 0;
 
             await pin.GeoLocation.UpdateCH1903Async();
 
-            // In Datei schreiben
-            await Task.Run(() => GlobalJson.SaveToFile());
+            GlobalJson.SaveToFile();
         }
     }
 
     private void OnTitleChanged(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Entry entry)
+        if (sender is not Entry entry)
             return;
 
         // Titel speichern
@@ -909,8 +909,6 @@ public partial class MapViewOSM : IQueryAttributable
             ?.AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
 
         GlobalJson.Data.Plans[PlanId].Name = Title;
-
-        // save data to file
         GlobalJson.SaveToFile();
 
         // Fokus entfernen

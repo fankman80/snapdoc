@@ -96,9 +96,9 @@
                             StrokeThickness="0"/>
                     <Border Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="4" Margin="12,0,12,12"
                             Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            StrokeThickness="1"
+                            StrokeThickness="{Binding ShowThumbnail, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?1:0'}"
                             StrokeShape="RoundRectangle 6">
-                        <Image Source="{Binding Thumbnail}"/>
+                        <Image Source="{Binding Thumbnail}" IsVisible="{Binding ShowThumbnail}"/>
                     </Border>
                     <Label Grid.Column="0" Grid.Row="0"
                            FontFamily="MaterialOutlined"

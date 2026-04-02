@@ -283,6 +283,9 @@ public partial class GeolocationViewModel : BaseViewModel
     // ----------------------------------------------------------------------
     private void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)
     {
+        if (LastKnownLocation != null && e.Location.Accuracy > LastKnownLocation.Accuracy)
+            return;
+
         LastKnownLocation = e.Location;
         ListeningLocation = FormatLocation(e.Location);
     }
@@ -304,7 +307,6 @@ public partial class GeolocationViewModel : BaseViewModel
     public override void OnDisappearing()
     {
         cts?.Cancel();
-        StopListening();
         base.OnDisappearing();
     }
 
