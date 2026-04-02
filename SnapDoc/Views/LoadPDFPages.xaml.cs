@@ -1,6 +1,4 @@
 ﻿#nullable disable
-
-using PDFtoImage;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
