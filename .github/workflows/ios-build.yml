@@ -58,9 +58,10 @@ jobs:
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
 
-      - name: Fix IPA Structure and RE-SIGN
+      - name: Fix IPA Structure and RE-SIGN with Entitlements
         run: |
           unzip SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa -d temp_ipa
+          codesign -d --entitlements :- "temp_ipa/Payload/SnapDoc.app" > entitlements.xml
           mkdir -p temp_ipa/Payload/SnapDoc.app/Frameworks
           if [ -f "temp_ipa/Payload/SnapDoc.app/libpdfium.dylib" ]; then
             mv temp_ipa/Payload/SnapDoc.app/libpdfium.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
@@ -69,7 +70,7 @@ jobs:
           mkdir -p temp_ipa/SwiftSupport/iphoneos
           cp temp_ipa/Payload/SnapDoc.app/Frameworks/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/ || true
           /usr/bin/codesign --force --sign "Apple Distribution" --timestamp --options runtime temp_ipa/Payload/SnapDoc.app/Frameworks/*.dylib || true
-          /usr/bin/codesign --force --sign "Apple Distribution" --timestamp --options runtime temp_ipa/Payload/SnapDoc.app
+          /usr/bin/codesign --force --sign "Apple Distribution" --entitlements entitlements.xml --timestamp --options runtime temp_ipa/Payload/SnapDoc.app
           cd temp_ipa
           zip -y -r ../SnapDoc_Fixed.ipa .
           cd ..
