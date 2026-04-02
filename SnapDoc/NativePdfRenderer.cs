@@ -77,8 +77,11 @@ namespace SnapDoc
 #elif ANDROID
             if (doc.Renderer == null)
                 return;
-            using (var page = doc.Renderer.OpenPage(pageIndex))
+
+            Android.Graphics.Pdf.PdfRenderer.Page page = null;
+            try
             {
+                page = doc.Renderer.OpenPage(pageIndex);
                 int width = (int)(page.Width * scale);
                 int height = (int)(page.Height * scale);
                 using (var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
@@ -87,7 +90,7 @@ namespace SnapDoc
                     {
                         canvas.DrawColor(Android.Graphics.Color.White);
                         page.Render(bitmap, null, null, PdfRenderMode.ForDisplay);
-                        using (var stream = File.OpenWrite(imgPath))
+                        using (var stream = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
                         {
                             await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 80, stream);
                             await stream.FlushAsync();
@@ -95,8 +98,16 @@ namespace SnapDoc
                     }
                     bitmap.Recycle();
                 }
-            } 
-            await Task.Yield(); 
+            }
+            finally
+            {
+                if (page != null)
+                {
+                    page.Close(); // Expliziter Java-Aufruf
+                    page.Dispose(); // .NET-Bereinigung
+                }
+            }
+            await Task.Delay(50); 
 #endif
         }
     }
