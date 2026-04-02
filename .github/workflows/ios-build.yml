@@ -24,7 +24,7 @@ jobs:
 
       - name: Select Xcode Version
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.2.app || sudo xcode-select -s /Applications/Xcode.app
+          sudo xcode-select -s /Applications/Xcode.app
           xcodebuild -version
 
       - name: Import Certificate (.p12)
@@ -58,7 +58,7 @@ jobs:
           -p:MtouchNoWarn=7091 \
           -p:SuppressXCodeVersionMismatch=true
 
-      - name: Fix IPA Structure and RE-SIGN
+      - name: Fix IPA Structure and RE-SIGN (Build 18)
         run: |
           unzip SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa -d temp_ipa
           codesign -d --entitlements :- "temp_ipa/Payload/SnapDoc.app" > entitlements.xml
@@ -66,11 +66,12 @@ jobs:
           if [ -f "temp_ipa/Payload/SnapDoc.app/libpdfium.dylib" ]; then
             mv temp_ipa/Payload/SnapDoc.app/libpdfium.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
           fi
-          SWIFT_LIB_PATH=$(xcode-select -p)/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos
-          cp $SWIFT_LIB_PATH/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
+          XCODE_PATH=$(xcode-select -p)
+          SWIFT_LIB_PATH="$XCODE_PATH/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos"
+          echo "Das System nutzt aktuell: $XCODE_PATH"
+          cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
           mkdir -p temp_ipa/SwiftSupport/iphoneos
-          cp $SWIFT_LIB_PATH/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/
-          ls -l temp_ipa/SwiftSupport/iphoneos/
+          cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/
           /usr/bin/codesign --force --sign "Apple Distribution" --timestamp --options runtime temp_ipa/Payload/SnapDoc.app/Frameworks/*.dylib || true
           /usr/bin/codesign --force --sign "Apple Distribution" --entitlements entitlements.xml --timestamp --options runtime temp_ipa/Payload/SnapDoc.app
           cd temp_ipa
