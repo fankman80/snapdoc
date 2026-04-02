@@ -57,23 +57,26 @@ jobs:
           -p:RuntimeIdentifier=ios-arm64 \
           -p:SuppressXCodeVersionMismatch=true
 
-      - name: Fix IPA Structure and RE-SIGN (Build 19)
+      - name: Fix IPA Structure and RE-SIGN
         run: |
           unzip SnapDoc/bin/Release/net10.0-ios/ios-arm64/publish/SnapDoc.ipa -d temp_ipa
           codesign -d --entitlements :- "temp_ipa/Payload/SnapDoc.app" > entitlements.xml
           mkdir -p temp_ipa/Payload/SnapDoc.app/Frameworks
           if [ -f "temp_ipa/Payload/SnapDoc.app/libpdfium.dylib" ]; then
             mv temp_ipa/Payload/SnapDoc.app/libpdfium.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
+            echo "PDFium dylib moved."
           fi
-          XCODE_PATH=$(xcode-select -p)
-          SWIFT_LIB_PATH="$XCODE_PATH/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos"
-          
-          echo "System nutzt Xcode unter: $XCODE_PATH"
-          echo "Kopiere Swift-Libs aus: $SWIFT_LIB_PATH"
-
-          cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
-          mkdir -p temp_ipa/SwiftSupport/iphoneos
-          cp "$SWIFT_LIB_PATH"/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/
+          REAL_SWIFT_PATH="/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/iphoneos"
+          echo "Kopiere echte Swift-Libs aus: $REAL_SWIFT_PATH"
+          if [ -d "$REAL_SWIFT_PATH" ]; then
+            cp "$REAL_SWIFT_PATH"/libswift*.dylib temp_ipa/Payload/SnapDoc.app/Frameworks/
+            mkdir -p temp_ipa/SwiftSupport/iphoneos
+            cp "$REAL_SWIFT_PATH"/libswift*.dylib temp_ipa/SwiftSupport/iphoneos/
+            echo "SUCCESS: Swift Libraries kopiert."
+          else
+            echo "FEHLER: Pfad $REAL_SWIFT_PATH nicht gefunden!"
+            exit 1
+          fi
           /usr/bin/codesign --force --sign "Apple Distribution" --timestamp --options runtime temp_ipa/Payload/SnapDoc.app/Frameworks/*.dylib || true
           /usr/bin/codesign --force --sign "Apple Distribution" --entitlements entitlements.xml --timestamp --options runtime temp_ipa/Payload/SnapDoc.app
           cd temp_ipa
