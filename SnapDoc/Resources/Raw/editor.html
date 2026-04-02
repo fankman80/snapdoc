@@ -139,18 +139,32 @@
 
         function sendJsonToCSharp() {
             const payload = JSON.stringify({ json: editor.getValue() });
-            if (window.chrome?.webview)
-                window.chrome.webview.postMessage(payload); // Windows
-            else if (window.jsBridge?.invokeAction)
-                window.jsBridge.invokeAction(payload);      // Android
+
+            if (window.chrome?.webview) {
+                // Windows (WebView2)
+                window.chrome.webview.postMessage(payload);
+            } else if (window.jsBridge?.invokeAction) {
+                // Android
+                window.jsBridge.invokeAction(payload);
+            } else if (window.webkit?.messageHandlers?.webBridge) {
+                // iOS / macOS (WKWebView)
+                window.webkit.messageHandlers.webBridge.postMessage(payload);
+            }
         }
 
         function sendCancel() {
             const payload = JSON.stringify({ cancel: "true" });
-            if (window.chrome?.webview)
-                window.chrome.webview.postMessage(payload); // Windows
-            else if (window.jsBridge?.invokeAction)
-                window.jsBridge.invokeAction(payload);      // Android
+
+            if (window.chrome?.webview) {
+                // Windows (WebView2)
+                window.chrome.webview.postMessage(payload);
+            } else if (window.jsBridge?.invokeAction) {
+                // Android
+                window.jsBridge.invokeAction(payload);
+            } else if (window.webkit?.messageHandlers?.webBridge) {
+                // iOS / macOS (WKWebView)
+                window.webkit.messageHandlers.webBridge.postMessage(payload);
+            }
         }
 
         // JSON formatieren

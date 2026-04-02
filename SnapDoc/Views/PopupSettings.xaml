@@ -271,6 +271,7 @@
                                     <RowDefinition Height="Auto" />
                                 </Grid.RowDefinitions>
                                 <Button Grid.Column="0" Grid.Row="0"
+                                        IsVisible="{Binding IsProjectLoaded}"
                                         Text="{x:Static res:AppResources.projektdaten}"
                                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                         TextColor="{DynamicResource PrimaryDarkText}"                                                    

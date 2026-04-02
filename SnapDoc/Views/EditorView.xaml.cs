@@ -5,18 +5,24 @@ using SnapDoc.Resources.Languages;
 
 #if ANDROID
 using Android.Webkit;
+#elif IOS || MACCATALYST
+using WebKit;
+using Foundation;
 #endif
 
 namespace SnapDoc.Views;
 
 public partial class EditorView : ContentPage, IQueryAttributable
 {
-    private string _jsonString = string.Empty;
     private string _filePath = null;
     private string _fileType = null;
     private string _stringTxt = null;
-    private bool _editorReady = false;
     private bool _isReadOnly = false;
+
+#if ANDROID || WINDOWS || IOS || MACCATALYST
+    private string _jsonString = string.Empty;
+    private bool _editorReady = false;
+#endif
 
     public EditorView()
     {
@@ -24,10 +30,10 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
 #if WINDOWS
         EditorWebView.HandlerChanged += OnWindowsHandlerChanged;
-#endif
-
-#if ANDROID
+#elif ANDROID
         EditorWebView.HandlerChanged += OnAndroidHandlerChanged;
+#elif IOS || MACCATALYST
+        EditorWebView.HandlerChanged += OnIOSHandlerChanged;
 #endif
 
         Loaded += OnLoaded;
@@ -130,7 +136,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     private static string LoadHtmlFromFile(bool isReadOnly = true)
     {
-        var assembly = typeof(MapView).Assembly;
+        var assembly = typeof(EditorView).Assembly;
         using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.editor.html")!;
         using var reader = new StreamReader(stream);
         string htmlContent = reader.ReadToEnd();
@@ -150,46 +156,64 @@ public partial class EditorView : ContentPage, IQueryAttributable
         return htmlContent;
     }
 
-    private static async Task<string> LoadHtmlAsync(string fileName)
-    {
-        using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
-        using var reader = new StreamReader(stream);
-        return await reader.ReadToEndAsync();
-    }
-
     #region JSON Helpers
-
     private static readonly JsonSerializerOptions JsSafeOptions = new()
     {
         WriteIndented = true,
         Encoder = System.Text.Encodings.Web.JavaScriptEncoder.UnsafeRelaxedJsonEscaping
     };
 
-    private static string ToJsSafeJson(string json)
+    private static string ToJsSafeJson(string json) => JsonSerializer.Serialize(json, JsSafeOptions);
+
+    // Zentrale Logik für alle Plattformen
+    private async void HandleWebMessage(string msg)
     {
-        return JsonSerializer.Serialize(json, JsSafeOptions);
+        if (string.IsNullOrEmpty(msg)) return;
+        try
+        {
+            var data = JsonSerializer.Deserialize<Dictionary<string, string>>(msg);
+            if (data == null) return;
+
+            if (data.ContainsKey("cancel"))
+            {
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
+
+            if (data.TryGetValue("json", out var json))
+                await SaveJsonAsync(json);
+
+            if (data.TryGetValue("theme", out var themeName))
+            {
+                SettingsService.Instance.EditorTheme = themeName;
+                SettingsService.Instance.SaveSettings();
+            }
+        }
+        catch { /* Log error if needed */ }
     }
 
     public async Task SetJsonAsync(string json)
     {
         _jsonString = json;
+        if (!_editorReady) return;
 
 #if ANDROID
-        if (EditorWebView.Handler?.PlatformView is Android.Webkit.WebView webView && _editorReady)
+        if (EditorWebView.Handler?.PlatformView is Android.Webkit.WebView webView)
             webView.EvaluateJavascript($"window.setJsonText({ToJsSafeJson(json)});", null);
 #elif WINDOWS
-        if (EditorWebView.Handler?.PlatformView is Microsoft.UI.Xaml.Controls.WebView2 webView2 && _editorReady)
-            await webView2.ExecuteScriptAsync($"window.setJsonText({EditorView.ToJsSafeJson(json)});");
+        if (EditorWebView.Handler?.PlatformView is Microsoft.UI.Xaml.Controls.WebView2 webview2)
+            await webview2.ExecuteScriptAsync($"window.setJsonText({ToJsSafeJson(json)});");
+#elif IOS || MACCATALYST
+        if (EditorWebView.Handler?.PlatformView is WKWebView wkWebView)
+            await wkWebView.EvaluateJavaScriptAsync($"window.setJsonText({ToJsSafeJson(json)});");
 #endif
     }
-
     public async Task SaveJsonAsync(string json)
     {
         File.WriteAllText(_filePath, json);
         await DisplayAlertAsync(Path.GetFileName(_filePath), "Einstellungen gespeichert!", "OK");
         await Shell.Current.GoToAsync($"..?fileType={_fileType}");
     }
-
     #endregion
 
 #if ANDROID
@@ -203,30 +227,10 @@ public partial class EditorView : ContentPage, IQueryAttributable
         [Java.Interop.Export("invokeAction")]
         public void InvokeAction(string message)
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                if (!_weakRef.TryGetTarget(out var view)) return;
-
-                var data = JsonSerializer.Deserialize<Dictionary<string, string>>(message);
-                if (data == null) return;
-
-                // Abbrechen
-                if (data.ContainsKey("cancel"))
-                {
-                    await Shell.Current.GoToAsync("..");
-                    return;
-                }
-
-                // Speichern
-                if (data.TryGetValue("json", out var json))
-                    await view.SaveJsonAsync(json);
-
-                // Thema wechsel speichern
-                if (data.TryGetValue("theme", out var themeName))
-                {
-                    SettingsService.Instance.EditorTheme = themeName;
-                    SettingsService.Instance.SaveSettings();
-                }
+                if (_weakRef.TryGetTarget(out var view))
+                    view.HandleWebMessage(message); // Nutzt jetzt die zentrale Methode!
             });
         }
     }
@@ -249,4 +253,47 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     #endregion
 #endif
+
+    #region iOS Setup
+#if IOS || MACCATALYST
+    private void OnIOSHandlerChanged(object sender, EventArgs e)
+    {
+        if (EditorWebView.Handler?.PlatformView is WKWebView wkWebView)
+        {
+            // Erlaubt JavaScript-Kommunikation
+            wkWebView.Configuration.UserContentController.RemoveAllScriptMessageHandlers();
+            
+            // Wir registrieren einen Handler namens "webBridge"
+            // WKScriptMessageHandler ist ein Interface, das wir implementieren müssen
+            var handler = new ScriptMessageHandler(this);
+            wkWebView.Configuration.UserContentController.AddScriptMessageHandler(handler, "webBridge");
+
+            // Überprüfung, ob das Dokument geladen ist
+            wkWebView.NavigationDelegate = new NavigationDelegate(this);
+        }
+    }
+
+    private class NavigationDelegate(EditorView view) : WKNavigationDelegate
+    {
+        public override async void DidFinishNavigation(WKWebView webView, WKNavigation navigation)
+        {
+            view._editorReady = true;
+            if (!string.IsNullOrEmpty(view._jsonString))
+            {
+                await view.SetJsonAsync(view._jsonString);
+            }
+        }
+    }
+
+    private class ScriptMessageHandler(EditorView view) : NSObject, IWKScriptMessageHandler
+    {
+        public void DidReceiveScriptMessage(WKUserContentController userContentController, WKScriptMessage message)
+        {
+            var msg = message.Body.ToString();
+            // Hier rufen wir die Logik auf, die du bereits für Android/Windows hast
+            view.HandleWebMessage(msg);
+        }
+    }
+#endif
+    #endregion
 }

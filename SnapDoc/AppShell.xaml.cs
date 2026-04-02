@@ -58,7 +58,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("loadPdfImages", typeof(LoadPDFPages));
         Routing.RegisterRoute("pinList", typeof(PinList));
         Routing.RegisterRoute("exportSettings", typeof(ExportSettings));
-        Routing.RegisterRoute("mapview", typeof(MapView));
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
         Routing.RegisterRoute("cameraView", typeof(CameraView));
 

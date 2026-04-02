@@ -605,11 +605,11 @@ public partial class MapViewOSM : IQueryAttributable
             double totalRealDistanceInMeters = 0;
             for (int i = 1; i < _measurePoints.Count; i++)
             {
-                var p1 = SphericalMercator.ToLonLat(_measurePoints[i - 1].X, _measurePoints[i - 1].Y);
-                var p2 = SphericalMercator.ToLonLat(_measurePoints[i].X, _measurePoints[i].Y);
+                var (lon1, lat1) = SphericalMercator.ToLonLat(_measurePoints[i - 1].X, _measurePoints[i - 1].Y);
+                var (lon2, lat2) = SphericalMercator.ToLonLat(_measurePoints[i].X, _measurePoints[i].Y);
 
                 totalRealDistanceInMeters += Location.CalculateDistance(
-                    p1.lat, p1.lon, p2.lat, p2.lon, DistanceUnits.Kilometers) * 1000;
+                    lat1, lon1, lat2, lon2, DistanceUnits.Kilometers) * 1000;
             }
 
             measurementResult = totalRealDistanceInMeters >= 1000
