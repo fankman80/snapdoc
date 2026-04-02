@@ -73,17 +73,30 @@ namespace SnapDoc
             using var jpegData = image.AsJPEG(0.8f);
             if (jpegData != null)
                 File.WriteAllBytes(imgPath, [.. jpegData]);
+
 #elif ANDROID
-            if (doc.Renderer == null) return;
-            using var page = doc.Renderer.OpenPage(pageIndex);
-            int width = (int)(page.Width * scale);
-            int height = (int)(page.Height * scale);
-            using var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
-            using var canvas = new Canvas(bitmap);
-            canvas.DrawColor(Android.Graphics.Color.White);
-            page.Render(bitmap, null, null, PdfRenderMode.ForDisplay);
-            using var stream = File.OpenWrite(imgPath);
-            await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 80, stream);
+            if (doc.Renderer == null)
+                return;
+            using (var page = doc.Renderer.OpenPage(pageIndex))
+            {
+                int width = (int)(page.Width * scale);
+                int height = (int)(page.Height * scale);
+                using (var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+                {
+                    using (var canvas = new Canvas(bitmap))
+                    {
+                        canvas.DrawColor(Android.Graphics.Color.White);
+                        page.Render(bitmap, null, null, PdfRenderMode.ForDisplay);
+                        using (var stream = File.OpenWrite(imgPath))
+                        {
+                            await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 80, stream);
+                            await stream.FlushAsync();
+                        }
+                    }
+                    bitmap.Recycle();
+                }
+            } 
+            await Task.Yield(); 
 #endif
         }
     }
