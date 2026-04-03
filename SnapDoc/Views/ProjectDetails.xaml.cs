@@ -37,7 +37,7 @@ public partial class ProjectDetails : ContentPage
 
         await Shell.Current.GoToAsync("//homescreen");
 
-#if ANDROID
+#if ANDROID || IOS
         Shell.Current.FlyoutIsPresented = true;
 #endif
     }

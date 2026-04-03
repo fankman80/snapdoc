@@ -124,7 +124,7 @@ public partial class OpenProject : ContentPage
             GlobalJson.SaveToFile();
 
             await Shell.Current.GoToAsync("project_details");
-#if ANDROID
+#if ANDROID || IOS
             Shell.Current.FlyoutIsPresented = false;
 #endif
         }
@@ -178,7 +178,7 @@ public partial class OpenProject : ContentPage
         }
     }
 
-    private async void OnProjectClicked(object sender, EventArgs e)
+    private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.IsActivityRunning = true;
@@ -186,8 +186,8 @@ public partial class OpenProject : ContentPage
 
         try
         {
-            var button = sender as Button;
-            if (button?.BindingContext is not FileItem item)
+            var layout = sender as BindableObject;
+            if (layout?.BindingContext is not FileItem item)
                 return;
 
             if (item.IsActive)
@@ -237,7 +237,7 @@ public partial class OpenProject : ContentPage
 
             await Shell.Current.GoToAsync("project_details");
 
-#if ANDROID
+#if ANDROID || IOS
             Shell.Current.FlyoutIsPresented = false;
 #endif
         }

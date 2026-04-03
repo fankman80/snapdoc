@@ -81,6 +81,9 @@
                                 <RowDefinition Height="25" />
                                 <RowDefinition Height="35" />
                             </Grid.RowDefinitions>
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnProjectClicked" />
+                            </Grid.GestureRecognizers>
                             <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6">
                                 <Label Text="{x:Static local:MaterialIcons.Check_circle}"
                                        FontFamily="MaterialOutlined"
@@ -101,9 +104,6 @@
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
-                            <Button Grid.Column="0" Grid.ColumnSpan="2" Grid.RowSpan="2"
-                                    Background="Transparent"
-                                    Clicked="OnProjectClicked"/>
                             <Button Grid.Column="2" Grid.RowSpan="2"
                                     Padding="0"
                                     Text="{x:Static local:MaterialIcons.Edit_square}"

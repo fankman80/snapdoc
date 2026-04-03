@@ -108,11 +108,9 @@
                                 StrokeThickness="1"
                                 Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                 StrokeShape="RoundRectangle 4">
-
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnEditClicked" />
                             </Border.GestureRecognizers>
-
                             <Grid ColumnDefinitions="16, Auto, *, 50, 50"
                                   RowDefinitions="Auto, Auto, Auto, Auto"
                                   RowSpacing="0" ColumnSpacing="0">

@@ -146,7 +146,7 @@ public partial class AppShell : Shell
 #if WINDOWS     
                 Shell.Current.FlyoutIsPresented = true;
 #endif
-#if ANDROID     
+#if ANDROID || IOS 
                 Shell.Current.FlyoutIsPresented = false;
 #endif
                 // vermeide Navigation auf bestimmte Seiten wenn keine Pläne vorhanden sind
@@ -175,7 +175,7 @@ public partial class AppShell : Shell
 #if WINDOWS     
                 Shell.Current.FlyoutIsPresented = true;
 #endif
-#if ANDROID     
+#if ANDROID || IOS
                 Shell.Current.FlyoutIsPresented = false;
 #endif
                 await Shell.Current.GoToAsync($"//{parameter}");
