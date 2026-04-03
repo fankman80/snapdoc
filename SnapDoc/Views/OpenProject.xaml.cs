@@ -132,16 +132,13 @@ public partial class OpenProject : ContentPage
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
-        // 1. BusyIndicator SOFORT einschalten
-        // Damit ist er sichtbar, sobald der Picker sich schließt und der Download läuft
         busyOverlay.BusyMessage = AppResources.warte_auf_datei;
         busyOverlay.IsActivityRunning = true;
         busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
 
         try
         {
-            // 2. FilePicker öffnen
-            // Der Code "wartet" hier, während der User wählt UND während das OS herunterlädt
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = AppResources.bitte_waehle_zip
@@ -175,14 +172,16 @@ public partial class OpenProject : ContentPage
         {
             busyOverlay.IsActivityRunning = false;
             busyOverlay.IsOverlayVisible = false;
+            busyOverlay.InputTransparent = true;
         }
     }
 
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = AppResources.projekt_wird_geladen;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
 
         try
         {
@@ -194,6 +193,7 @@ public partial class OpenProject : ContentPage
             {
                 busyOverlay.IsActivityRunning = false;
                 busyOverlay.IsOverlayVisible = false;
+                busyOverlay.InputTransparent = true;
                 return;
             }
 
@@ -245,6 +245,7 @@ public partial class OpenProject : ContentPage
         {
             busyOverlay.IsActivityRunning = false;
             busyOverlay.IsOverlayVisible = false;
+            busyOverlay.InputTransparent = true;
         }
     }
 
@@ -293,16 +294,17 @@ public partial class OpenProject : ContentPage
                 {
                     string sourceDirectory = Path.GetDirectoryName(item.FilePath);
                     string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
-
+                    busyOverlay.BusyMessage = AppResources.daten_werden_komprimiert;
                     busyOverlay.IsOverlayVisible = true;
                     busyOverlay.IsActivityRunning = true;
-                    busyOverlay.BusyMessage = AppResources.daten_werden_komprimiert;
+                    busyOverlay.InputTransparent = false;
 
                     // Hintergrundoperation (nicht UI-Operationen)
                     await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
 
                     busyOverlay.IsActivityRunning = false;
                     busyOverlay.IsOverlayVisible = false;
+                    busyOverlay.InputTransparent = true;
 
                     var saveStream = File.Open(outputPath, FileMode.Open);
                     try

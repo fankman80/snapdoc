@@ -49,9 +49,11 @@ public partial class ExportSettings : ContentPage
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = AppResources.bericht_wird_geteilt;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
+
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
@@ -59,6 +61,7 @@ public partial class ExportSettings : ContentPage
         });
         busyOverlay.IsActivityRunning = false;
         busyOverlay.IsOverlayVisible = false;
+        busyOverlay.InputTransparent = true;
 
         try
         {
@@ -94,9 +97,10 @@ public partial class ExportSettings : ContentPage
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = AppResources.bericht_wird_gespeichert;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
@@ -104,6 +108,7 @@ public partial class ExportSettings : ContentPage
         });
         busyOverlay.IsActivityRunning = false;
         busyOverlay.IsOverlayVisible = false;
+        busyOverlay.InputTransparent = true;
 
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);

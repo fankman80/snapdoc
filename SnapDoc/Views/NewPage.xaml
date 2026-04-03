@@ -409,6 +409,8 @@
 
         <!-- Overlay für Busy-Indikator -->
         <local:BusyOverlayView x:Name="busyOverlay"
+                               IsVisible="False"
+                               InputTransparent="True"                              
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
                                AbsoluteLayout.LayoutFlags="All"/>
     </Grid>

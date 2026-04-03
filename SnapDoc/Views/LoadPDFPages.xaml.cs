@@ -61,9 +61,10 @@ public partial class LoadPDFPages : ContentPage
         string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
         List<PdfItem> pdfImages = [];
 
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = AppResources.lade_pdf_seiten;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
 
         await Task.Run(async () =>
         {
@@ -123,6 +124,7 @@ public partial class LoadPDFPages : ContentPage
         fileListView.ItemsSource = pdfImages;
         busyOverlay.IsActivityRunning = false;
         busyOverlay.IsOverlayVisible = false;
+        busyOverlay.InputTransparent = true;
     }
 
     private static int CalculateMaxDpiFromPixelLimit(int width72dpi, int height72dpi, int maxPixelCount)
@@ -136,9 +138,10 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.IsActivityRunning = true;
         busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
 
         if (!Directory.Exists(Settings.CacheDirectory))
             Directory.CreateDirectory(Settings.CacheDirectory);
@@ -165,6 +168,7 @@ public partial class LoadPDFPages : ContentPage
 
         busyOverlay.IsActivityRunning = false;
         busyOverlay.IsOverlayVisible = false;
+        busyOverlay.InputTransparent = true;
     }
 
     public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()

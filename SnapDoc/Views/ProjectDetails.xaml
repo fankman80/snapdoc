@@ -185,10 +185,5 @@
                         Clicked="OnOkayClicked"/>
             </Grid>
         </Grid>
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
 </ContentPage>

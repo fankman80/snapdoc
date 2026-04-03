@@ -13,11 +13,26 @@
              x:Name="ThisPage"
              Title="PDF Seiten hinzufügen">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto"
+        <Grid ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
-            <Label Grid.Column="0"
+
+            <Button Grid.Column="0"
+                    Text="{x:Static local:MaterialIcons.Arrow_back}"
+                    FontFamily="MaterialOutlined"
+                    FontSize="24"
+                    Padding="12,0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    BackgroundColor="Transparent"
+                    VerticalOptions="Center"
+                    Clicked="OnCancelClicked"/>
+            <Label Grid.Column="1"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
@@ -25,62 +40,58 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-            <Button Grid.Column="1"
+
+            <Button Grid.Column="2"
                     x:Name="btnRows"
                     FontSize="24"
-                    Padding="0"
+                    Padding="10,0"
                     TextColor="{DynamicResource PrimaryDark}"
                     Background="Transparent"
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     ToolTipProperties.Text="{x:Static res:AppResources.raster_liste_umschalten}"                    
-                    Clicked="OnChangeRowsClicked"/>            
+                    Clicked="OnChangeRowsClicked"/>
         </Grid>
     </Shell.TitleView>
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>
-
     <Grid>
-        <Grid>
+        <Grid Margin="0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
+
             <CollectionView x:Name="fileListView"
                             Grid.Row="0"
-                             ItemSizingStrategy="MeasureAllItems"
+                            ItemSizingStrategy="MeasureAllItems"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}" />
+                    <GridItemsLayout Orientation="Vertical"
+                                     Span="{Binding DynamicSpan}" 
+                                     HorizontalItemSpacing="4"
+                                     VerticalItemSpacing="4"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PdfItem">
-                        <VerticalStackLayout>
-                            <Grid Margin="8">
-                                <Image Source="{Binding PreviewPath}"
-                                       Aspect="AspectFill" />
-                                <CheckBox IsChecked="{Binding IsChecked}"
-                                          Color="{DynamicResource Primary}"
-                                          VerticalOptions="End"
-                                          HorizontalOptions="End"/>
-                                <Label Text="{Binding Dpi, StringFormat='{0:0.##} dpi'}"
-                                       FontSize="12"
-                                       Padding="4"
-                                       HorizontalTextAlignment="Center"
-                                       Background="White"
-                                       TextColor="{DynamicResource Primary}"
-                                       VerticalOptions="End"
-                                       HorizontalOptions="Start"/>
-                            </Grid>
-                        </VerticalStackLayout>
+                        <Grid MinimumHeightRequest="140"
+                              BackgroundColor="Gray">
+                            <Image Source="{Binding PreviewPath}"
+                                   Aspect="AspectFit"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   HeightRequest="180"/>
+                            <CheckBox IsChecked="{Binding IsChecked}"
+                                      Color="{DynamicResource Primary}"
+                                      VerticalOptions="End"
+                                      HorizontalOptions="End"
+                                      ZIndex="2"/>
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
-            <Grid Grid.Row="1" Margin="0,6,16,16">
+            <Grid Grid.Row="1" Margin="0,6,16,16" ColumnSpacing="10">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -99,8 +110,9 @@
             </Grid>
         </Grid>
 
-        <!-- Overlay für Busy-Indikator -->
         <local:BusyOverlayView x:Name="busyOverlay"
+                               IsVisible="False"
+                               InputTransparent="True"
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
                                AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
