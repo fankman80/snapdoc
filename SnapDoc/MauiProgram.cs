@@ -38,6 +38,13 @@ public static class MauiProgram
             });
 
         builder.UseMauiCameraView();
+        
+#if IOS || MACCATALYST
+        builder.ConfigureMauiHandlers(handlers =>
+        {
+            handlers.AddHandler<Microsoft.Maui.Controls.CollectionView, Microsoft.Maui.Controls.Handlers.Items.CollectionViewHandler>();
+        });
+#endif
 
         // Registriere die AppShell
         builder.Services.AddSingleton<AppShell>();
