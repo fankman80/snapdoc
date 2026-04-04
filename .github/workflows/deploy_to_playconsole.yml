@@ -24,15 +24,12 @@ jobs:
 
       - name: Decode and save keystore
         shell: pwsh
-        env:
-          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
           [System.IO.File]::WriteAllBytes("SnapDoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
 
       - name: Build Android App (Release)
         shell: pwsh
         run: |
-          # Wir nutzen die GitHub Run-Nummer als VersionCode, damit jeder Upload einzigartig ist
           dotnet publish SnapDoc/SnapDoc.csproj -c Release -f net10.0-android `
             /p:AndroidKeyStore=true `
             /p:AndroidKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" `
@@ -49,13 +46,11 @@ jobs:
           path: |
             SnapDoc/bin/Release/net10.0-android/**/*.aab
 
-      # NEU: Der automatische Upload in den "Geschlossenen Test" (Alpha)
       - name: Upload to Google Play Console
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonRaw: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: com.deinefirma.snapdoc  # <-- HIER DEINE APP-ID EINTRAGEN
+          packageName: com.ebbe.snapdoc
           releaseFiles: SnapDoc/bin/Release/net10.0-android/**/*.aab
-          track: alpha
+          track: Alpha
           status: completed
-          
