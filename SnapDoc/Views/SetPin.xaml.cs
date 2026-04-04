@@ -244,6 +244,11 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
     }
 
+    private async void ZoomToWebMapPinClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}?pinZoom={PinId}");
+    }
+
     private async void TakeFoto(object sender, EventArgs e)
     {
         (FileResult path, System.Drawing.Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));

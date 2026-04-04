@@ -32,7 +32,7 @@ using Point = NetTopologySuite.Geometries.Point;
 
 namespace SnapDoc.Views;
 
-public partial class MapViewOSM : IQueryAttributable
+public partial class MapView : IQueryAttributable
 {
     public string PlanId;
 
@@ -67,7 +67,7 @@ public partial class MapViewOSM : IQueryAttributable
         }
     }
 
-    public MapViewOSM(string planId)
+    public MapView(string planId)
     {
         InitializeComponent();
 
@@ -148,9 +148,6 @@ public partial class MapViewOSM : IQueryAttributable
             LoadPins();
             await UpdateUiFromQueryAsync();
         }
-
-        if (!geoViewModel.IsGpsActive)
-            await geoViewModel.OnToggleGPSAsync();
     }
 
     private void AddPin(Map map, Point pos, string planId, string pinId)
@@ -422,7 +419,7 @@ public partial class MapViewOSM : IQueryAttributable
             var popup = new PopupPinView(planId, pinId);
 
             PopupOptions popupOptions = new()
-            { CanBeDismissedByTappingOutsideOfPopup = true, Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle {CornerRadius = new CornerRadius(8), StrokeThickness = 0 }};
+            { CanBeDismissedByTappingOutsideOfPopup = true, Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = new CornerRadius(8), StrokeThickness = 0 } };
             var result = await this.ShowPopupAsync<string>(popup, popupOptions);
 
             if (result.Result == "edit")
@@ -645,9 +642,9 @@ public partial class MapViewOSM : IQueryAttributable
 
         Models.Pin newPinData = new()
         {
-            Pos = new Microsoft.Maui.Graphics.Point(0,0),
+            Pos = new Microsoft.Maui.Graphics.Point(0, 0),
             Anchor = new Microsoft.Maui.Graphics.Point(0, 0),
-            Size = new Microsoft.Maui.Graphics.Size(0,0),
+            Size = new Microsoft.Maui.Graphics.Size(0, 0),
             IsLockPosition = false,
             IsLockRotate = true,
             IsLockAutoScale = true,

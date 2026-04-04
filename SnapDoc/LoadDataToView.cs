@@ -36,7 +36,7 @@ public partial class LoadDataToView
         ContentPage page;
         if (isWebMap)
         {
-            page = new MapViewOSM(planId)
+            page = new MapView(planId)
             {
                 Title = planTitle,
                 AutomationId = planId,
@@ -95,7 +95,7 @@ public partial class LoadDataToView
         var itemsToRemove = shell.Items.Where(item =>
             item.Items.Any(section =>
                 section.Items.Any(content =>
-                    content.Content is MapViewOSM ||
+                    content.Content is MapView ||
                     content.Content is NewPage
                 )
             )

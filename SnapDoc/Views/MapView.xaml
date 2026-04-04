@@ -12,8 +12,8 @@
              xmlns:local="clr-namespace:SnapDoc"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-             x:Class="SnapDoc.Views.MapViewOSM"
-             x:DataType="views:MapViewOSM"             
+             x:Class="SnapDoc.Views.MapView"
+             x:DataType="views:MapView"             
              x:Name="ThisPage"
              Title="">
 
@@ -110,7 +110,7 @@
             </Border.Shadow>            
         </Border>
 
-        <HorizontalStackLayout x:DataType="views:MapViewOSM"
+        <HorizontalStackLayout x:DataType="views:MapView"
                                HorizontalOptions="End"
                                VerticalOptions="End"
                                Spacing="14"

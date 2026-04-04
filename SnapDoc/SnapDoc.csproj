@@ -154,8 +154,11 @@
 	  <Compile Update="Views\FotoGallery.xaml.cs">
 	    <DependentUpon>FotoGallery.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\MapViewOSM.xaml.cs">
-	    <DependentUpon>MapViewOSM.xaml</DependentUpon>
+	  <Compile Update="Views\MapView.xaml.cs">
+	    <DependentUpon>MapView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\MapView.xaml.cs">
+	    <DependentUpon>MapView.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\PopupTextEdit.xaml.cs">
 	    <DependentUpon>PopupTextEdit.xaml</DependentUpon>
@@ -192,7 +195,7 @@
 	  <MauiXaml Update="Views\FotoGallery.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="Views\MapViewOSM.xaml">
+	  <MauiXaml Update="Views\MapView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PopupTextEdit.xaml">
