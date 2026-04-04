@@ -50,8 +50,7 @@ jobs:
         uses: r0adkll/upload-google-play@v1
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          # Stelle sicher, dass diese ID exakt stimmt:
-          packageName: com.ebbe.snapdoc 
-          releaseFiles: SnapDoc/bin/Release/net10.0-android/**/*.aab
+          packageName: com.ebbe.snapdoc
+          releaseFiles: SnapDoc/bin/Release/net10.0-android/**/*-Signed.aab
           track: alpha
           status: completed
