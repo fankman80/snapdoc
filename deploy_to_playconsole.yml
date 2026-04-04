@@ -1,0 +1,61 @@
+name: Build and Deploy MAUI Android
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-android:
+    runs-on: windows-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v5
+
+      - name: Setup .NET 10
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: 10.0.x
+
+      - name: Install MAUI workload
+        run: dotnet workload install maui
+
+      - name: Restore dependencies
+        run: dotnet restore SnapDoc.sln
+
+      - name: Decode and save keystore
+        shell: pwsh
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          [System.IO.File]::WriteAllBytes("SnapDoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
+
+      - name: Build Android App (Release)
+        shell: pwsh
+        run: |
+          # Wir nutzen die GitHub Run-Nummer als VersionCode, damit jeder Upload einzigartig ist
+          dotnet publish SnapDoc/SnapDoc.csproj -c Release -f net10.0-android `
+            /p:AndroidKeyStore=true `
+            /p:AndroidKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" `
+            /p:AndroidKeyPassword="${{ secrets.ANDROID_KEY_PASSWORD }}" `
+            /p:AndroidStorePassword="${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" `
+            /p:AndroidKeyStorePath="SnapDoc.keystore" `
+            /p:AndroidPackageFormat=aab `
+            /p:ApplicationVersion=${{ github.run_number }}
+
+      - name: Upload artifact to GitHub (Backup)
+        uses: actions/upload-artifact@v5
+        with:
+          name: AndroidApp
+          path: |
+            SnapDoc/bin/Release/net10.0-android/**/*.aab
+
+      # NEU: Der automatische Upload in den "Geschlossenen Test" (Alpha)
+      - name: Upload to Google Play Console
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonRaw: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: com.deinefirma.snapdoc  # <-- HIER DEINE APP-ID EINTRAGEN
+          releaseFiles: SnapDoc/bin/Release/net10.0-android/**/*.aab
+          track: alpha
+          status: completed
+          
