@@ -114,6 +114,15 @@ public partial class GeolocationViewModel : BaseViewModel
                 intent.AddFlags(Android.Content.ActivityFlags.NewTask);
                 Android.App.Application.Context.StartActivity(intent);
             }
+#elif IOS
+            if (openSettings)
+            {
+                var url = new Foundation.NSUrl(UIKit.UIApplication.OpenSettingsUrlString);
+                if (UIKit.UIApplication.SharedApplication.CanOpenUrl(url))
+                {
+                    UIKit.UIApplication.SharedApplication.OpenUrl(url);
+                }
+            }
 #endif
             return;
         }
@@ -147,20 +156,22 @@ public partial class GeolocationViewModel : BaseViewModel
     public static async Task<bool> IsSystemGpsEnabledAsync()
     {
 #if ANDROID
-    try
-    {
-        var locationManager = (Android.Locations.LocationManager)
-            Android.App.Application.Context.GetSystemService(Android.Content.Context.LocationService);
-        return locationManager.IsProviderEnabled(Android.Locations.LocationManager.GpsProvider)
-            || locationManager.IsProviderEnabled(Android.Locations.LocationManager.NetworkProvider);
-    }
-    catch
-    {
-        return false;
-    }
+        try
+        {
+            var locationManager = (Android.Locations.LocationManager)
+                Android.App.Application.Context.GetSystemService(Android.Content.Context.LocationService);
+            return locationManager.IsProviderEnabled(Android.Locations.LocationManager.GpsProvider)
+                || locationManager.IsProviderEnabled(Android.Locations.LocationManager.NetworkProvider);
+        }
+        catch
+        {
+            return false;
+        }
+#elif IOS
+    return CoreLocation.CLLocationManager.LocationServicesEnabled;
 #else
-        await Task.CompletedTask;
-        return true; // Unter Windows immer true, da kein System-GPS-Schalter
+    await Task.CompletedTask;
+    return true; 
 #endif
     }
 

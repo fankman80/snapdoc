@@ -3,12 +3,6 @@ namespace SnapDoc.Services;
 
 public static class MauiResourceLoader
 {
-    /// <summary>
-    /// Lädt eine Datei aus dem App-Paket (plattformübergreifend).
-    /// Funktioniert mit Drawable-Ressourcen (Android) und MauiAssets.
-    /// </summary>
-    /// <param name="fileName">Dateiname oder relativer Pfad zur Ressource</param>
-    /// <returns>Stream oder null, wenn nicht gefunden</returns>
     public static async Task<Stream> GetAppPackageFileStreamAsync(string fileName)
     {
         Stream stream = null;
@@ -56,10 +50,23 @@ public static class MauiResourceLoader
             stream = await FileSystem.Current.OpenAppPackageFileAsync(fileName);
 
 #elif IOS || MACCATALYST
-            var root = Foundation.NSBundle.MainBundle.BundlePath;
-            var path = Path.Combine(root, fileName);
-            if (File.Exists(path))
-                stream = File.OpenRead(path);
+            // 1. Versuch: Der Standard-MAUI-Weg (funktioniert für alle MauiAssets)
+            try 
+            {
+                stream = await FileSystem.Current.OpenAppPackageFileAsync(fileName);
+            }
+            catch (FileNotFoundException)
+            {
+                // Falls nicht gefunden, probieren wir den nativen iOS-Weg
+                var name = Path.GetFileNameWithoutExtension(fileName);
+                var extension = Path.GetExtension(fileName).TrimStart('.');
+                
+                // PathForResource sucht die Datei im gesamten Bundle, unabhängig von der Ordnerstruktur
+                var path = Foundation.NSBundle.MainBundle.PathForResource(name, extension);
+                
+                if (path != null)
+                    stream = File.OpenRead(path);
+            }
 #endif
         }
         catch (Exception ex)
@@ -70,9 +77,6 @@ public static class MauiResourceLoader
         return stream;
     }
 
-    /// <summary>
-    /// Kopiert eine Datei aus dem App-Paket in ein Zielverzeichnis.
-    /// </summary>
     public static async Task<bool> CopyAppPackageFileAsync(string targetDirectory, string fileName)
     {
         try

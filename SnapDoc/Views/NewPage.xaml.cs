@@ -1516,13 +1516,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 #if IOS
         try
         {
-            UIKit.UIApplication.SharedApplication.InvokeOnMainThread(() =>
-            {
-                if (entry.Handler?.PlatformView is UIKit.UITextField textField)
-                {
-                    textField.ResignFirstResponder(); // Tastatur schließen
-                }
-            });
+            UIKit.UIApplication.SharedApplication.SendAction(
+                new ObjCRuntime.Selector("resignFirstResponder"), null, null, null);
         }
         catch (Exception ex)
         {

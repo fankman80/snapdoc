@@ -341,13 +341,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
 #if IOS
         try
         {
-            UIKit.UIApplication.SharedApplication.InvokeOnMainThread(() =>
-            {
-                if (entry.Handler?.PlatformView is UIKit.UITextField textField)
-                {
-                    textField.ResignFirstResponder(); // Tastatur schließen
-                }
-            });
+            UIKit.UIApplication.SharedApplication.SendAction(
+                new ObjCRuntime.Selector("resignFirstResponder"), null, null, null);
         }
         catch (Exception ex)
         {
