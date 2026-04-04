@@ -44,4 +44,3 @@ jobs:
           name: AndroidApp
           path: |
             **/bin/Release/net10.0-android/**/*.aab
-            **/bin/Release/net10.0-android/**/*.apk
