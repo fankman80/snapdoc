@@ -1,4 +1,4 @@
-name: Build and Deploy MAUI Android
+name: Build + Deploy to PlayConsole
 
 on:
   workflow_dispatch:
