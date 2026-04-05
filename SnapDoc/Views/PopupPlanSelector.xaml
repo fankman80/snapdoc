@@ -79,7 +79,7 @@
             <CollectionView x:DataType="local:Views.PopupPlanSelector"
                             ItemsSource="{Binding PlanItems}"
                             CanReorderItems="False"
-                            SelectionMode="Single"
+                            SelectionMode="None"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PlanItem">

@@ -176,8 +176,15 @@ public partial class OpenProject : ContentPage
         }
     }
 
-    private async void OnProjectClicked(object sender, TappedEventArgs e)
+    private async void OnProjectClicked(object sender, SelectionChangedEventArgs e)
     {
+        var item = e.CurrentSelection.FirstOrDefault() as FileItem;
+
+        if (item == null)
+            return;
+
+        ((CollectionView)sender).SelectedItem = null;
+
         busyOverlay.BusyMessage = AppResources.projekt_wird_geladen;
         busyOverlay.IsActivityRunning = true;
         busyOverlay.IsOverlayVisible = true;
@@ -185,10 +192,6 @@ public partial class OpenProject : ContentPage
 
         try
         {
-            var layout = sender as BindableObject;
-            if (layout?.BindingContext is not FileItem item)
-                return;
-
             if (item.IsActive)
             {
                 busyOverlay.IsActivityRunning = false;

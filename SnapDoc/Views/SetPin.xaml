@@ -212,11 +212,13 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
+                        IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                         Padding="0"
                         MinimumWidthRequest="50"                        
                         Text="{x:Static local:MaterialIcons.Recenter}"
@@ -226,14 +228,24 @@
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"                        
                         Clicked="ZoomToPinClicked"/>
-                <Button Grid.Column="2"
+                <Button Grid.Column="1"
+                        IsVisible="{Binding Pin.IsWebMapPin}"
+                        Padding="0"
+                        MinimumWidthRequest="50"                        
+                        Text="{x:Static local:MaterialIcons.Globe_location_pin}"
+                        FontSize="30"
+                        FontFamily="MaterialOutlined"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"                  
+                        Clicked="ZoomToPinClicked"/>
+                <Button Grid.Column="3"
                         Padding="0"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Photo_camera}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
                         Clicked="TakeFoto"/>
-                <Button Grid.Column="3"
+                <Button Grid.Column="4"
                         Padding="0"
                         Text="{x:Static res:AppResources.ok}"
                         MinimumWidthRequest="100"
