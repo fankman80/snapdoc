@@ -64,7 +64,7 @@
 
             <CollectionView x:Name="fileListView"
                             Grid.Row="0"
-                            SelectionMode="None"
+                            SelectionMode="Single"
                             ItemSizingStrategy="MeasureAllItems"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
@@ -112,8 +112,8 @@
         </Grid>
 
         <local:BusyOverlayView x:Name="busyOverlay"
-                               IsVisible="False"
-                               InputTransparent="True"
+                               IsOverlayVisible="False"
+                               InputTransparent="False"
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
                                AbsoluteLayout.LayoutFlags="All"/>
     </Grid>

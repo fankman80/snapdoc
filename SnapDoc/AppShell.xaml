@@ -353,7 +353,7 @@
                             ItemTemplate="{StaticResource PlanListTemplate}"
                             ItemsSource="{Binding PlanItems}"
                             CanReorderItems="True"
-                            SelectionMode="None"
+                            SelectionMode="Single"
                             ReorderCompleted="OnReorderCompleted"
                             SelectionChanged="OnPlanSelectionChanged">
             </CollectionView>

@@ -42,7 +42,7 @@
                     <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
                                     ItemSizingStrategy="MeasureAllItems"
-                                    SelectionMode="None">
+                                    SelectionMode="Single">
                         <CollectionView.ItemsLayout>
                             <GridItemsLayout Orientation="Vertical" Span="6" HorizontalItemSpacing="0" VerticalItemSpacing="0"/>
                         </CollectionView.ItemsLayout>

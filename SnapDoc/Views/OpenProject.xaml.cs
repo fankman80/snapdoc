@@ -190,6 +190,8 @@ public partial class OpenProject : ContentPage
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.InputTransparent = false;
 
+        await Task.Delay(100);
+
         try
         {
             if (item.IsActive)

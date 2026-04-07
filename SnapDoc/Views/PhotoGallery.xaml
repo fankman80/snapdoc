@@ -166,7 +166,7 @@
                         ItemTemplate="{StaticResource GalleryGridTemplate}"
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="False"
-                        SelectionMode="None"
+                        SelectionMode="Single"
                         RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"
