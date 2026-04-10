@@ -138,37 +138,29 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
-
         if (!Directory.Exists(Settings.CacheDirectory))
             Directory.CreateDirectory(Settings.CacheDirectory);
 
         await Task.Run(async () =>
         {
-            var groups = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).GroupBy(x => x.PdfPath);
+            var groups = fileListView.ItemsSource.Cast<PdfItem>()
+                            .Where(x => x.IsChecked)
+                            .GroupBy(x => x.PdfPath);
 
             foreach (var group in groups)
             {
-                byte[] pdfBytes = File.ReadAllBytes(group.Key);
-
-                using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
-
-                foreach (var item in group)
+                byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key);
+                using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
                 {
-                    string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
-                    await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
-                    using var stream = File.OpenRead(imgPath);
-                    using var codec = SKCodec.Create(stream);
+                    foreach (var item in group)
+                    {
+                        string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
+                        await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
+                    }
                 }
+                pdfBytes = null;
             }
         });
-
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
-        busyOverlay.InputTransparent = true;
     }
 
     public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()
@@ -208,29 +200,63 @@ public partial class LoadPDFPages : ContentPage
 
     private async void AddPdfImages()
     {
-        await LoadPDFImages(); //generiere High-Res Images
+        busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert;
+        busyOverlay.IsActivityRunning = true;
+        busyOverlay.IsOverlayVisible = true;
+        busyOverlay.InputTransparent = false;
 
-        string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
-        int i = 0;
-
-        GlobalJson.Data.Plans ??= [];  // Initialisiere Plans, wenn es null ist
-
-        foreach (var item in fileListView.ItemsSource.Cast<PdfItem>())
+        try
         {
-            if (item.IsChecked)
+            await LoadPDFImages();
+
+            MainThread.BeginInvokeOnMainThread(() =>
+                busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert);
+
+            await ProcessFileOrganizationLogic();
+
+            GlobalJson.SaveToFile();
+
+            if (Application.Current.Windows[0].Page is AppShell shell)
+                shell.ApplyFilterAndSorting();
+
+            await Shell.Current.GoToAsync("project_details");
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+        }
+        finally
+        {
+            busyOverlay.IsActivityRunning = false;
+            busyOverlay.IsOverlayVisible = false;
+            busyOverlay.InputTransparent = true;
+        }
+    }
+
+    private async Task ProcessFileOrganizationLogic()
+    {
+        await Task.Run(() =>
+        {
+            string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
+            if (!Directory.Exists(Path.Combine(imageDirectory, "thumbnails")))
+                Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
+
+            int i = 0;
+            var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
+
+            foreach (var item in items)
             {
-                string sourceFilePath = item.ImagePath;
-                string fileName = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i + ".jpg";
-                string planId = "plan_" + DateTime.Now.ToString("yyyyMMdd_HHmmss") + "_" + i;
+                string fileName = $"plan_{DateTime.Now:yyyyMMdd_HHmmss}_{i}.jpg";
+                string planId = $"plan_{DateTime.Now:yyyyMMdd_HHmmss}_{i}";
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
-                if (!Path.Exists(Path.Combine(imageDirectory, "thumbnails")))
-                    Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
-
-                var stream = File.OpenRead(Path.Combine(Settings.CacheDirectory, item.ImagePath));
-                var skBitmap = SKBitmap.Decode(stream);
-                Size _imgSize = new(skBitmap.Width, skBitmap.Height);
+                Size _imgSize;
+                using (var stream = File.OpenRead(item.ImagePath))
+                using (var codec = SkiaSharp.SKCodec.Create(stream))
+                {
+                    _imgSize = new Size(codec.Info.Width, codec.Info.Height);
+                }
 
                 Plan plan = new()
                 {
@@ -238,40 +264,32 @@ public partial class LoadPDFPages : ContentPage
                     File = fileName,
                     ImageSize = _imgSize,
                     IsGrayscale = false,
-                    Description = "",
                     AllowExport = true,
                     PlanColor = "#00FFFFFF"
                 };
 
-                GlobalJson.Data.Plans ??= [];
-                GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
+                lock (GlobalJson.Data)
+                {
+                    GlobalJson.Data.Plans ??= [];
+                    GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
+                }
 
-                File.Copy(sourceFilePath, destinationFilePath, overwrite: true);
+                File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
                 File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
 
-                i += 1;
+                i++;
 
-                var newPlan = new KeyValuePair<string, Models.Plan>(planId, plan);
-                LoadDataToView.AddPlan(newPlan);
+                MainThread.BeginInvokeOnMainThread(() => {
+                    LoadDataToView.AddPlan(new KeyValuePair<string, Plan>(planId, plan));
+                });
             }
-            if (File.Exists(item.PreviewPath))
-                File.Delete(item.PreviewPath);
-        }
 
-        var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
-        foreach (var cacheFile in cacheFiles)
-        {
-            File.Delete(cacheFile);
-        }
-
-        // save data to file
-        GlobalJson.SaveToFile();
-
-        // Shell aktualisieren
-        var shell = Application.Current.Windows[0].Page as AppShell;
-        shell.ApplyFilterAndSorting();
-
-        await Shell.Current.GoToAsync("project_details");
+            var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
+            foreach (var cacheFile in cacheFiles)
+            {
+                try { File.Delete(cacheFile); } catch { }
+            }
+        });
     }
 
     private void OnChangeRowsClicked(object sender, EventArgs e)

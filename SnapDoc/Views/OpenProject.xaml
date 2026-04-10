@@ -64,8 +64,7 @@
                 <RowDefinition Height="Auto" />
             </Grid.RowDefinitions>
             <CollectionView x:Name="FileListView" Grid.Row="0"
-                            SelectionMode="Single"
-                            SelectionChanged="OnProjectClicked"
+                            SelectionMode="None"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
@@ -82,7 +81,10 @@
                                 <RowDefinition Height="25" />
                                 <RowDefinition Height="35" />
                             </Grid.RowDefinitions>
-                            <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6" InputTransparent="True">
+                            <Grid.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnProjectClicked" />
+                            </Grid.GestureRecognizers>
+                            <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6">
                                 <Label Text="{x:Static local:MaterialIcons.Check_circle}"
                                        FontFamily="MaterialOutlined"
                                        FontSize="20"
@@ -95,13 +97,11 @@
                                        Text="{Binding FileName}"/>
                             </HorizontalStackLayout>
                             <Label Grid.Column="1" Grid.Row="1"
-                                   InputTransparent="True"
                                    FontSize="12"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
                                    Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
-                                   InputTransparent="True"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
                             <Button Grid.Column="2" Grid.RowSpan="2"
@@ -124,7 +124,7 @@
         <!-- Overlay für Busy-Indikator -->
         <local:BusyOverlayView x:Name="busyOverlay"
                                IsOverlayVisible="False"
-                               InputTransparent="False"
+                               InputTransparent="True"
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
                                AbsoluteLayout.LayoutFlags="All"/>
     </Grid>

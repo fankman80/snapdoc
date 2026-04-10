@@ -113,7 +113,7 @@
 
         <local:BusyOverlayView x:Name="busyOverlay"
                                IsOverlayVisible="False"
-                               InputTransparent="False"
+                               InputTransparent="True"
                                AbsoluteLayout.LayoutBounds="0,0,1,1"
                                AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
