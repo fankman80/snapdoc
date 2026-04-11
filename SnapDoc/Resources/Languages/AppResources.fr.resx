@@ -412,7 +412,7 @@
     <value>Double-clic pour supprimer la couleur</value>
   </data>
   <data name="farbdefinition" xml:space="preserve">
-    <value>▼      Définition de couleur      ▼</value>
+    <value>Définition de couleur</value>
   </data>
   <data name="rot_r" xml:space="preserve">
     <value>Rouge (R)</value>

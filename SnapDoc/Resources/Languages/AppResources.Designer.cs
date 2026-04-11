@@ -574,7 +574,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ▼      Farbdefinition      ▼ ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farbdefinition ähnelt.
         /// </summary>
         internal static string farbdefinition {
             get {

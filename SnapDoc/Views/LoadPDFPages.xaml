@@ -64,7 +64,7 @@
 
             <CollectionView x:Name="fileListView"
                             Grid.Row="0"
-                            SelectionMode="Single"
+                            SelectionMode="None"
                             ItemSizingStrategy="MeasureAllItems"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>

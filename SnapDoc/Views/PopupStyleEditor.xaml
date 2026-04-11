@@ -160,7 +160,7 @@
                             <Label Text="{x:Static res:AppResources.vorlagen}"/>
                         </uranium:ExpanderView.Header>
                         <CollectionView ItemsSource="{Binding Items}"
-                                        SelectionMode="Single"
+                                        SelectionMode="None"
                                         Margin="0">
                             <CollectionView.ItemsLayout>
                                 <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />

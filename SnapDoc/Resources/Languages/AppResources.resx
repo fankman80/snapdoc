@@ -412,7 +412,7 @@
     <value>Doppelklick, um Farbe zu löschen</value>
   </data>
   <data name="farbdefinition" xml:space="preserve">
-    <value>▼      Farbdefinition      ▼</value>
+    <value>Farbdefinition</value>
   </data>
   <data name="rot_r" xml:space="preserve">
     <value>Rot (R)</value>

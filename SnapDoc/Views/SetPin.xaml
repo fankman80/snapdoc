@@ -80,7 +80,7 @@
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="True"
                         ReorderCompleted="OnReorderCompleted"
-                        SelectionMode="Single"
+                        SelectionMode="None"
                         RemainingItemsThreshold="5">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical"

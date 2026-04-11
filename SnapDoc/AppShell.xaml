@@ -146,6 +146,7 @@
         </ResourceDictionary>
     </Shell.Resources>
 
+    <!-- Header -->
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
             <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
@@ -187,10 +188,20 @@
                        TextColor="{DynamicResource PrimaryDark}"
                        VerticalTextAlignment="Center"
                        HorizontalTextAlignment="Start"/>
+            </Grid>
+        </DataTemplate>
+    </Shell.FlyoutHeaderTemplate>
 
-                <VerticalStackLayout Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2"
-                                     BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
-                                     Spacing="0">
+    <!-- Homescreen -->
+    <ShellContent Route="homescreen"
+                  ContentTemplate="{DataTemplate views:HomeScreen}"
+                  FlyoutItemIsVisible="False" />
+
+    <!-- MenuItems -->
+    <Shell.FlyoutContent>
+        <ContentView x:DataType="local:AppShell">
+            <Grid RowDefinitions="Auto, *" VerticalOptions="Fill">
+                <VerticalStackLayout Grid.Row="0" BackgroundColor="White" Spacing="0" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
                     <!-- Open Project -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0">
                         <Grid.GestureRecognizers>
@@ -203,7 +214,6 @@
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.projektliste}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
-
                     <!-- Details -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
@@ -216,7 +226,6 @@
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.projektverwaltung}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
-
                     <!-- Pins -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
@@ -229,7 +238,6 @@
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.pin_liste}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
-
                     <!-- Foto Galerie -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
@@ -242,7 +250,6 @@
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.foto_galerie}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
-
                     <!-- Bericht exportieren -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0" IsVisible="{Binding IsProjectLoaded}">
                         <Grid.GestureRecognizers>
@@ -255,12 +262,11 @@
                         <Label Grid.Column="1" Text="{x:Static res:AppResources.bericht_exportieren}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
-                    
                     <!-- Trennlinie -->
                     <Grid Margin="14,6,14,6" IsVisible="{Binding IsProjectLoaded}">
                         <Line X1="0" Y1="0" X2="500" Y2="0" Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" StrokeThickness="1" />
                     </Grid>
-
+                    <!-- PDF-Button -->
                     <Button x:DataType="local:AppShell"
                             Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
                             IsVisible="{Binding ShowAddPdfButton, Source={RelativeSource AncestorType={x:Type local:AppShell}}}"
@@ -271,10 +277,22 @@
                             ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
                             Clicked="OnAddPdfClicked"/>
                 </VerticalStackLayout>
-            </Grid>
-        </DataTemplate>
-    </Shell.FlyoutHeaderTemplate>
 
+                <CollectionView Grid.Row="1"
+                                x:Name="PlanCollectionView"
+                                ItemTemplate="{StaticResource PlanListTemplate}"
+                                ItemsSource="{Binding PlanItems}"
+                                CanReorderItems="True"
+                                SelectionMode="None"
+                                ReorderCompleted="OnReorderCompleted"
+                                SelectionChanged="OnPlanSelectionChanged">
+
+                </CollectionView>
+            </Grid>
+        </ContentView>
+    </Shell.FlyoutContent>
+
+    <!-- Footer -->
     <Shell.FlyoutFooterTemplate>
         <DataTemplate>
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}"
@@ -341,22 +359,5 @@
                 </ImageButton>
             </Grid>
         </DataTemplate>
-    </Shell.FlyoutFooterTemplate>
-
-    <ShellContent Route="homescreen"
-                  ContentTemplate="{DataTemplate views:HomeScreen}"
-                  FlyoutItemIsVisible="False" />
-
-    <Shell.FlyoutContent>
-        <ContentView x:DataType="local:AppShell">
-            <CollectionView x:Name="PlanCollectionView"
-                            ItemTemplate="{StaticResource PlanListTemplate}"
-                            ItemsSource="{Binding PlanItems}"
-                            CanReorderItems="True"
-                            SelectionMode="Single"
-                            ReorderCompleted="OnReorderCompleted"
-                            SelectionChanged="OnPlanSelectionChanged">
-            </CollectionView>
-        </ContentView>
-    </Shell.FlyoutContent>
+    </Shell.FlyoutFooterTemplate>    
 </Shell>

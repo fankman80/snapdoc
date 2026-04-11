@@ -94,7 +94,8 @@
                                         FadeAnimationEnabled ="False"
                                         LoadingPriority="High"
                                         FadeAnimationForCachedImages ="False"
-                                        LoadingDelay="40"/>
+                                        LoadingDelay="40"
+                                        ZIndex="0"/>
                 </mr:AbsoluteLayout>
             </mr:ContentView>
 

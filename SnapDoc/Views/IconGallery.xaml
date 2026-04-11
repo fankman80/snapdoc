@@ -182,7 +182,7 @@
                             ItemTemplate="{StaticResource IconListTemplate}"
                             ItemsUpdatingScrollMode="KeepItemsInView"
                             CanReorderItems="False"
-                            SelectionMode="Single">
+                            SelectionMode="None">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical" Span="{Binding DynamicSpan}"/>
                 </CollectionView.ItemsLayout>

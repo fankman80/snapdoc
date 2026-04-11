@@ -75,7 +75,15 @@ public partial class LoadPDFPages : ContentPage
 
             foreach (var file in resultList)
             {
-                byte[] pdfBytes = await File.ReadAllBytesAsync(file.FullPath);
+                string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}_{file.FileName}");
+                using (var sourceStream = await file.OpenReadAsync())
+                using (var destStream = File.Create(localPdfPath))
+                {
+                    await sourceStream.CopyToAsync(destStream);
+                }
+
+                byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
+
                 using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
                 {
                     int pageCount = nativeDoc.PageCount;
@@ -86,8 +94,10 @@ public partial class LoadPDFPages : ContentPage
                         string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, imgBaseName + ".jpg");
                         string previewPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
 
+                        // Preview generieren
                         await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
 
+                        // Größe auslesen
                         int width = 0;
                         int height = 0;
                         using (var stream = File.OpenRead(previewPath))
@@ -106,7 +116,7 @@ public partial class LoadPDFPages : ContentPage
                         {
                             ImagePath = imgPath,
                             PreviewPath = previewPath,
-                            PdfPath = file.FullPath,
+                            PdfPath = localPdfPath,
                             IsChecked = true,
                             Dpi = targetDpi,
                             DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
@@ -115,7 +125,6 @@ public partial class LoadPDFPages : ContentPage
                         });
                     }
                 }
-
                 pdfIndex++;
                 pdfBytes = null;
             }
@@ -134,33 +143,6 @@ public partial class LoadPDFPages : ContentPage
 
         double dpi = 72 * Math.Sqrt((double)maxPixelCount / (width72dpi * height72dpi));
         return Math.Max(10, (int)Math.Floor(dpi)); // Mindestwert 10 dpi zur Sicherheit    
-    }
-
-    private async Task LoadPDFImages()
-    {
-        if (!Directory.Exists(Settings.CacheDirectory))
-            Directory.CreateDirectory(Settings.CacheDirectory);
-
-        await Task.Run(async () =>
-        {
-            var groups = fileListView.ItemsSource.Cast<PdfItem>()
-                            .Where(x => x.IsChecked)
-                            .GroupBy(x => x.PdfPath);
-
-            foreach (var group in groups)
-            {
-                byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key);
-                using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
-                {
-                    foreach (var item in group)
-                    {
-                        string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
-                        await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
-                    }
-                }
-                pdfBytes = null;
-            }
-        });
     }
 
     public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()
@@ -223,7 +205,7 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+            await DisplayAlertAsync("PDF-Error", ex.Message, "OK");
         }
         finally
         {
@@ -231,6 +213,31 @@ public partial class LoadPDFPages : ContentPage
             busyOverlay.IsOverlayVisible = false;
             busyOverlay.InputTransparent = true;
         }
+    }
+
+    private async Task LoadPDFImages()
+    {
+        await Task.Run(async () =>
+        {
+            var groups = fileListView.ItemsSource.Cast<PdfItem>()
+                            .Where(x => x.IsChecked)
+                            .GroupBy(x => x.PdfPath);
+
+            foreach (var group in groups)
+            {
+                // group.Key ist jetzt unser sicherer lokaler Pfad im Cache
+                byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key);
+                using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
+                {
+                    foreach (var item in group)
+                    {
+                        string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
+                        await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
+                    }
+                }
+                pdfBytes = null;
+            }
+        });
     }
 
     private async Task ProcessFileOrganizationLogic()
@@ -251,6 +258,7 @@ public partial class LoadPDFPages : ContentPage
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
+                // Bildgröße ermitteln (Schonend!)
                 Size _imgSize;
                 using (var stream = File.OpenRead(item.ImagePath))
                 using (var codec = SkiaSharp.SKCodec.Create(stream))
@@ -274,6 +282,7 @@ public partial class LoadPDFPages : ContentPage
                     GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
                 }
 
+                // Kopieren der generierten Dateien vom Cache zum Projektordner
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
                 File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
 
@@ -284,10 +293,14 @@ public partial class LoadPDFPages : ContentPage
                 });
             }
 
-            var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
-            foreach (var cacheFile in cacheFiles)
+            // Am Ende den gesamten Cache leeren
+            if (Directory.Exists(Settings.CacheDirectory))
             {
-                try { File.Delete(cacheFile); } catch { }
+                var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
+                foreach (var cacheFile in cacheFiles)
+                {
+                    try { File.Delete(cacheFile); } catch { }
+                }
             }
         });
     }
