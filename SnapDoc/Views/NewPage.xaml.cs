@@ -33,7 +33,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null; 
     private MR.Gestures.Image doubleTappedPin = null;
-    private double densityX, densityY;
     private bool isFirstLoad = true;
     private Point mousePos;
     private bool isTappedHandled = false;
@@ -275,7 +274,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         Point _originAnchor = thisPlan.Pins[pinId].Anchor;
         Point _originPos = thisPlan.Pins[pinId].Pos;
-        Size _planSize = thisPlan.ImageSize;
         Size _pinSize = thisPlan.Pins[pinId].Size;
         Double _rotation = PlanContainer.Rotation * -1 + thisPlan.Pins[pinId].PinRotation;
         ImageSource pinSource = pinIcon;
@@ -314,8 +312,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             HeightRequest = thisPlan.Pins[pinId].Size.Height,
             AnchorX = thisPlan.Pins[pinId].Anchor.X,
             AnchorY = thisPlan.Pins[pinId].Anchor.Y,
-            TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * _pinSize.Width),
-            TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * _pinSize.Height),
+            TranslationX = (PlanImage.Width * _originPos.X) - (_originAnchor.X * _pinSize.Width),
+            TranslationY = (PlanImage.Height * _originPos.Y) - (_originAnchor.Y * _pinSize.Height),
             Rotation = _rotation,
             Scale = PinScaling(pinId),
             InputTransparent = false,
@@ -366,11 +364,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         var plan = GlobalJson.Data.Plans[ctx.PlanId];
 
-        var x = img.TranslationX / plan.ImageSize.Width * densityX;
-        var y = img.TranslationY / plan.ImageSize.Height * densityY;
+        var x = img.TranslationX / plan.ImageSize.Width;
+        var y = img.TranslationY / plan.ImageSize.Height;
 
-        var dx = img.AnchorX * img.Width / plan.ImageSize.Width * densityX;
-        var dy = img.AnchorY * img.Height / plan.ImageSize.Height * densityY;
+        var dx = img.AnchorX * img.Width / plan.ImageSize.Width;
+        var dy = img.AnchorY * img.Height / plan.ImageSize.Height;
 
         plan.Pins[ctx.PinId].Pos = new Point(x + dx, y + dy);
 
@@ -442,15 +440,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         Point _originAnchor = thisPlan.Pins[image.AutomationId].Anchor;
         Point _originPos = thisPlan.Pins[image.AutomationId].Pos;
-        Size _planSize = thisPlan.ImageSize;
         Size _pinSize = thisPlan.Pins[image.AutomationId].Size;
 
         image.AnchorX = _originAnchor.X;
         image.AnchorY = _originAnchor.Y;
         image.WidthRequest = _pinSize.Width;
         image.HeightRequest = _pinSize.Height;
-        image.TranslationX = (_planSize.Width * _originPos.X / densityX) - (_originAnchor.X * image.Width);
-        image.TranslationY = (_planSize.Height * _originPos.Y / densityY) - (_originAnchor.Y * image.Height);
+        image.TranslationX = (PlanImage.Width * _originPos.X) - (_originAnchor.X * image.Width);
+        image.TranslationY = (PlanImage.Height * _originPos.Y) - (_originAnchor.Y * image.Height);
     }
 
     private void PlanImage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -463,10 +460,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             if (PlanImage.Width > 0 && PlanImage.Height > 0)
             {
-                // Größe des Bildes ist korrekt gesetzt
-                densityX = thisPlan.ImageSize.Width / PlanImage.Width;
-                densityY = thisPlan.ImageSize.Height / PlanImage.Height;
-
                 // Entferne das Event-Handler, damit es nicht mehr ausgelöst wird
                 PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
 
@@ -511,8 +504,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (isPinSet)
         {
-            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X * densityX;
-            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y * densityY;
+            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X;
+            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y;
 
             SetPin(new Point(x, y));
 
@@ -526,8 +519,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
-            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X  * densityX;
-            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y * densityY;
+            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X;
+            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y;
 
             SetPin(new Point(x, y));
         }
@@ -670,8 +663,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             doubleTappedPin.Source = ImageSource.FromFile(pinPath);
             doubleTappedPin.WidthRequest = pinData.Size.Width;
             doubleTappedPin.HeightRequest = pinData.Size.Height;
-            doubleTappedPin.TranslationX = (thisPlan.ImageSize.Width * pinData.Pos.X / densityX) - (pinData.Anchor.X * pinData.Size.Width);
-            doubleTappedPin.TranslationY = (thisPlan.ImageSize.Height * pinData.Pos.Y / densityY) - (pinData.Anchor.Y * pinData.Size.Height);
+            doubleTappedPin.TranslationX = (PlanImage.Width * pinData.Pos.X) - (pinData.Anchor.X * pinData.Size.Width);
+            doubleTappedPin.TranslationY = (PlanImage.Height * pinData.Pos.Y) - (pinData.Anchor.Y * pinData.Size.Height);
             doubleTappedPin.Rotation = _rotation;
             doubleTappedPin.Scale = _scale;
             doubleTappedPin.IsVisible = true;
@@ -779,17 +772,34 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private double PinScaling(string pinId)
     {
-        if (thisPlan.Pins[pinId].IsCustomPin != true)
+        double baseScale = 1.0;
+#if IOS
+        baseScale = 2.0; 
+#endif
+
+        var pin = thisPlan.Pins[pinId];
+        double userPinScale = pin.PinScale; // Der individuelle Scale-Wert des Pins
+
+        if (!pin.IsCustomPin)
         {
-            double scale = 1.0 / planContainer.Scale;
-            double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-            if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
-                return 1 / planContainer.Scale * thisPlan.Pins[pinId].PinScale;
-            else
-                return scaleLimit * thisPlan.Pins[pinId].PinScale;
+            // Sicherstellen, dass wir nicht durch 0 teilen
+            double currentScale = planContainer.Scale > 0 ? planContainer.Scale : 1.0;
+            double dynamicScale = 1.0 / currentScale;
+
+            double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
+            double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
+
+            // Begrenzung anwenden
+            if (dynamicScale > maxLimit) dynamicScale = maxLimit;
+            if (dynamicScale < minLimit) dynamicScale = minLimit;
+
+            return baseScale * dynamicScale * userPinScale;
         }
         else
-            return thisPlan.Pins[pinId].PinScale;
+        {
+            // Auch Custom Pins profitieren vom baseScale auf iOS
+            return baseScale * userPinScale;
+        }
     }
 
     private void DrawingClicked(object sender, EventArgs e)

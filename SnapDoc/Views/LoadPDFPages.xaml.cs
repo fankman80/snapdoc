@@ -41,13 +41,11 @@ public partial class LoadPDFPages : ContentPage
 
     private async void LoadPreviewPDFImages()
     {
-        // 1. Cache bereinigen
         if (Directory.Exists(Settings.CacheDirectory))
         {
-            var files = Directory.GetFiles(Settings.CacheDirectory);
-            foreach (var file in files)
+            foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
             {
-                try { File.Delete(file); } catch { /* Ignore */ }
+                try { File.Delete(file); } catch { }
             }
         }
 
@@ -66,74 +64,73 @@ public partial class LoadPDFPages : ContentPage
         busyOverlay.IsOverlayVisible = true;
         busyOverlay.InputTransparent = false;
 
-        await Task.Run(async () =>
+        try
         {
-            if (!Directory.Exists(Settings.CacheDirectory))
-                Directory.CreateDirectory(Settings.CacheDirectory);
-
             int pdfIndex = 0;
-
             foreach (var file in resultList)
             {
-                string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}_{file.FileName}");
+                string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}.pdf");
                 using (var sourceStream = await file.OpenReadAsync())
-                using (var destStream = File.Create(localPdfPath))
                 {
-                    await sourceStream.CopyToAsync(destStream);
-                }
-
-                byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
-
-                using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
-                {
-                    int pageCount = nativeDoc.PageCount;
-
-                    for (int i = 0; i < pageCount; i++)
+                    await Task.Run(async () =>
                     {
-                        string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
-                        string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, imgBaseName + ".jpg");
-                        string previewPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
+                        if (!Directory.Exists(Settings.CacheDirectory))
+                            Directory.CreateDirectory(Settings.CacheDirectory);
 
-                        // Preview generieren
-                        await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-
-                        // Größe auslesen
-                        int width = 0;
-                        int height = 0;
-                        using (var stream = File.OpenRead(previewPath))
-                        using (var codec = SkiaSharp.SKCodec.Create(stream))
+                        using (var destStream = File.Create(localPdfPath))
                         {
-                            if (codec != null)
-                            {
-                                width = codec.Info.Width;
-                                height = codec.Info.Height;
-                            }
+                            await sourceStream.CopyToAsync(destStream);
                         }
 
-                        int targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
-
-                        pdfImages.Add(new PdfItem
+                        byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
+                        using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
                         {
-                            ImagePath = imgPath,
-                            PreviewPath = previewPath,
-                            PdfPath = localPdfPath,
-                            IsChecked = true,
-                            Dpi = targetDpi,
-                            DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
-                            ImageName = imgBaseName,
-                            PdfPage = i,
-                        });
-                    }
+                            for (int i = 0; i < nativeDoc.PageCount; i++)
+                            {
+                                string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
+                                string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
+                                string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
+
+                                await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
+
+                                int width = 0, height = 0;
+                                using (var stream = File.OpenRead(previewPath))
+                                using (var codec = SKCodec.Create(stream))
+                                {
+                                    if (codec != null) { width = codec.Info.Width; height = codec.Info.Height; }
+                                }
+
+                                int targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
+
+                                pdfImages.Add(new PdfItem
+                                {
+                                    ImagePath = imgPath,
+                                    PreviewPath = previewPath,
+                                    PdfPath = localPdfPath,
+                                    IsChecked = true,
+                                    Dpi = targetDpi,
+                                    DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
+                                    ImageName = imgBaseName,
+                                    PdfPage = i,
+                                });
+                            }
+                        }
+                    });
                 }
                 pdfIndex++;
-                pdfBytes = null;
             }
-        });
-
-        fileListView.ItemsSource = pdfImages;
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
-        busyOverlay.InputTransparent = true;
+            fileListView.ItemsSource = pdfImages;
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+        }
+        finally
+        {
+            busyOverlay.IsActivityRunning = false;
+            busyOverlay.IsOverlayVisible = false;
+            busyOverlay.InputTransparent = true;
+        }
     }
 
     private static int CalculateMaxDpiFromPixelLimit(int width72dpi, int height72dpi, int maxPixelCount)
