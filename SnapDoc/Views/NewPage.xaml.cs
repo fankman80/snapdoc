@@ -802,7 +802,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private void DrawingClicked(object sender, EventArgs e)
+    private async void DrawingClicked(object sender, EventArgs e)
     {
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
@@ -816,26 +816,29 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
+        await Task.Delay(50);
+
         // 2) DrawingController initialisieren
-        drawingController.InitializeDrawing(
-            SelectedBorderColor.ToSKColor(),
-            lineWidth,
-            strokeStyle,
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-            (float)SettingsService.Instance.PolyLineHandleRadius,
-            SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            false,
-            (float)planContainer.Rotation
-        );
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            drawingController.InitializeDrawing(
+                SelectedBorderColor.ToSKColor(),
+                lineWidth,
+                strokeStyle,
+                SelectedFillColor.ToSKColor(),
+                SelectedTextColor.ToSKColor(),
+                (float)SettingsService.Instance.PolyLineHandleTouchRadius,
+                (float)SettingsService.Instance.PolyLineHandleRadius,
+                SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                false,
+                (float)planContainer.Rotation
+            );
 
-        drawingController.InitialRotation = (float)planContainer.Rotation;
-
-        // 3) initialer Modus
-        drawingController.DrawMode = DrawMode.None;
-        drawMode = DrawMode.None;
+            drawingController.InitialRotation = (float)planContainer.Rotation;
+            drawingController.DrawMode = DrawMode.None;
+            drawMode = DrawMode.None;
+        });
     }
 
     private void DrawFreeClicked(object sender, EventArgs e)
