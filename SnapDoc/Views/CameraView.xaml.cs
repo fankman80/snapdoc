@@ -43,7 +43,8 @@ public partial class CameraView : ContentPage
     {
         base.OnSizeAllocated(width, height);
 
-        if (width <= 0 || height <= 0) return;
+        if (width <= 0 || height <= 0)
+            return;
 
         if (!_isInitialized)
         {
@@ -52,7 +53,11 @@ public partial class CameraView : ContentPage
         }
         else
         {
-            UpdateCameraLayout(width, height);
+            Dispatcher.Dispatch(async () => 
+            {
+                await Task.Delay(100); 
+                await RestartPreview(); 
+            });
         }
     }
 
