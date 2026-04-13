@@ -308,8 +308,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             HeightRequest = thisPlan.Pins[pinId].Size.Height,
             AnchorX = thisPlan.Pins[pinId].Anchor.X,
             AnchorY = thisPlan.Pins[pinId].Anchor.Y,
-            TranslationX = (PlanImage.WidthRequest * _originPos.X) - (_originAnchor.X * _pinSize.Width),
-            TranslationY = (PlanImage.HeightRequest * _originPos.Y) - (_originAnchor.Y * _pinSize.Height),
+            TranslationX = (thisPlan.ImageSize.Width * _originPos.X) - (_originAnchor.X * _pinSize.Width),
+            TranslationY = (thisPlan.ImageSize.Height * _originPos.Y) - (_originAnchor.Y * _pinSize.Height),
             Rotation = _rotation,
             Scale = PinScaling(pinId),
             InputTransparent = false,
@@ -442,8 +442,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         image.AnchorY = _originAnchor.Y;
         image.WidthRequest = _pinSize.Width;
         image.HeightRequest = _pinSize.Height;
-        image.TranslationX = (PlanImage.WidthRequest * _originPos.X) - (_originAnchor.X * image.Width);
-        image.TranslationY = (PlanImage.HeightRequest * _originPos.Y) - (_originAnchor.Y * image.Height);
+        image.TranslationX = (thisPlan.ImageSize.Width * _originPos.X) - (_originAnchor.X * image.Width);
+        image.TranslationY = (thisPlan.ImageSize.Height * _originPos.Y) - (_originAnchor.Y * image.Height);
     }
 
     private void PlanImage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
