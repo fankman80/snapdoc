@@ -16,7 +16,7 @@
              x:Class="SnapDoc.Views.NewPage"
              x:DataType="views:NewPage"
              x:Name="ThisPage"
-             Title="{Binding PageTitle}">
+             Title="{Binding Title}">
     
     <ContentPage.Resources>
         <ResourceDictionary>

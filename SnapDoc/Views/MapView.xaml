@@ -15,7 +15,7 @@
              x:Class="SnapDoc.Views.MapView"
              x:DataType="views:MapView"             
              x:Name="ThisPage"
-             Title="">
+             Title="{Binding Title}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"

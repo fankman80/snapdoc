@@ -34,9 +34,8 @@ namespace SnapDoc.Views;
 
 public partial class MapView : IQueryAttributable
 {
-    public string PlanId;
-
-    private string PinId = string.Empty;
+    private readonly string planId;
+    private string pinId = string.Empty;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly List<GeometryFeature> _features = [];
     private readonly Map map = new();
@@ -67,13 +66,11 @@ public partial class MapView : IQueryAttributable
         }
     }
 
-    public MapView(string planId)
+    public MapView(string _planId)
     {
         InitializeComponent();
-
         BindingContext = this;
-
-        PlanId = planId;
+        planId = _planId;
 
         _widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
 
@@ -137,10 +134,7 @@ public partial class MapView : IQueryAttributable
         base.OnAppearing();
 
         var appShell = Application.Current.Windows[0].Page as AppShell;
-        appShell?.HighlightCurrentPlan(this.PlanId);
-
-        if (!string.IsNullOrEmpty(PlanId))
-            Title = GlobalJson.Data.Plans[PlanId].Name;
+        appShell?.HighlightCurrentPlan(planId);
 
         if (!_mapInitialized)
         {
@@ -193,9 +187,9 @@ public partial class MapView : IQueryAttributable
         string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
-        var plansToSearch = string.IsNullOrEmpty(PlanId)
+        var plansToSearch = string.IsNullOrEmpty(planId)
             ? GlobalJson.Data.Plans
-            : GlobalJson.Data.Plans.Where(p => p.Key == PlanId);
+            : GlobalJson.Data.Plans.Where(p => p.Key == planId);
 
         foreach (var planEntry in plansToSearch)
         {
@@ -220,9 +214,9 @@ public partial class MapView : IQueryAttributable
         if (query.TryGetValue("pinZoom", out var pinIdObj))
             newPinId = pinIdObj as string ?? string.Empty;
 
-        if (newPinId != PinId)
+        if (newPinId != pinId)
         {
-            PinId = newPinId;
+            pinId = newPinId;
             _ = UpdateUiFromQueryAsync();
         }
     }
@@ -235,10 +229,10 @@ public partial class MapView : IQueryAttributable
         double targetLat = 46.80121;
         int targetZoom = 8; // Default Zoom für die Übersicht
 
-        if (!string.IsNullOrEmpty(PlanId) && !string.IsNullOrEmpty(PinId))
+        if (!string.IsNullOrEmpty(planId) && !string.IsNullOrEmpty(pinId))
         {
-            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
-                plan.Pins.TryGetValue(PinId, out var pinData))
+            if (GlobalJson.Data.Plans.TryGetValue(planId, out var plan) &&
+                plan.Pins.TryGetValue(pinId, out var pinData))
             {
                 Pin = new PinItem(pinData);
                 SetPosBtn.IsVisible = true;
@@ -292,15 +286,15 @@ public partial class MapView : IQueryAttributable
         if (location == null)
             return;
 
-        await UpdateAndSavePinLocationAsync(PlanId, PinId, location.Longitude, location.Latitude);
+        await UpdateAndSavePinLocationAsync(planId, pinId, location.Longitude, location.Latitude);
 
         var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
         if (pinLayer != null)
         {
             var feature = pinLayer.Features
                                   .OfType<GeometryFeature>()
-                                  .FirstOrDefault(f => f["PinId"]?.ToString() == PinId &&
-                                                       f["PlanId"]?.ToString() == PlanId);
+                                  .FirstOrDefault(f => f["PinId"]?.ToString() == pinId &&
+                                                       f["PlanId"]?.ToString() == planId);
 
             if (feature != null)
             {
@@ -312,7 +306,7 @@ public partial class MapView : IQueryAttributable
             }
             else
             {
-                AddPin(map, new Point(location.Longitude, location.Latitude), PlanId, PinId);
+                AddPin(map, new Point(location.Longitude, location.Latitude), planId, pinId);
             }
         }
 
@@ -657,7 +651,7 @@ public partial class MapView : IQueryAttributable
             PinLocation = "",
             PinIcon = SettingsService.Instance.DefaultPinIcon,
             Fotos = [],
-            OnPlanId = PlanId,
+            OnPlanId = planId,
             SelfId = currentDateTime,
             DateTime = DateTime.Now,
             PinColor = SKColors.Red,
@@ -668,16 +662,16 @@ public partial class MapView : IQueryAttributable
         };
 
         // Sicherstellen, dass der Plan existiert
-        if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+        if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
         {
             plan.Pins ??= [];
             plan.Pins[currentDateTime] = newPinData;
 
-            GlobalJson.Data.Plans[PlanId].PinCount += 1;
+            GlobalJson.Data.Plans[planId].PinCount += 1;
             GlobalJson.SaveToFile();
         }
 
-        AddPin(map, new Point(location.Longitude, location.Latitude), PlanId, plan.Pins[currentDateTime].SelfId);
+        AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
     }
 
     private static TextBoxWidget CreateInstructionTextBox(string text) => new()
@@ -837,29 +831,29 @@ public partial class MapView : IQueryAttributable
 
         // Shell-Navigation entfernen
         var shellContent = shell
-            .FindByName<ShellContent>(PlanId);
+            .FindByName<ShellContent>(planId);
 
         if (shellContent?.Parent is ShellSection section)
             section.Items.Remove(shellContent);
 
         // Masterliste bereinigen
         var masterItem = shell.AllPlanItems
-            .FirstOrDefault(p => p.PlanId == PlanId);
+            .FirstOrDefault(p => p.PlanId == planId);
 
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan))
             return;
 
         // JSON + Files löschen
-        plan = GlobalJson.Data.Plans[PlanId];
+        plan = GlobalJson.Data.Plans[planId];
 
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
-        GlobalJson.Data.Plans.Remove(PlanId);
+        GlobalJson.Data.Plans.Remove(planId);
         GlobalJson.SaveToFile();
 
         // Anzeige neu aufbauen
@@ -903,9 +897,9 @@ public partial class MapView : IQueryAttributable
 
         // Titel speichern
         (Application.Current.Windows[0].Page as AppShell)
-            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
+            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
-        GlobalJson.Data.Plans[PlanId].Name = Title;
+        GlobalJson.Data.Plans[planId].Name = Title;
         GlobalJson.SaveToFile();
 
         // Fokus entfernen

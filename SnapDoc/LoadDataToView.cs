@@ -40,7 +40,6 @@ public partial class LoadDataToView
             {
                 Title = planTitle,
                 AutomationId = planId,
-                PlanId = planId
             };
         }
         else
@@ -49,7 +48,6 @@ public partial class LoadDataToView
             {
                 Title = planTitle,
                 AutomationId = planId,
-                PlanId = planId,
             };
         }
 

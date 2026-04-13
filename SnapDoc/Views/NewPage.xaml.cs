@@ -23,11 +23,8 @@ namespace SnapDoc.Views;
 
 public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 {
-    public string PageTitle { get; set; } = "";
-    public string PinUpdate;
-    public string PlanId;
-    public string PinDelete;
-    public string PinZoom = null;
+    private readonly string planId;
+    private string pinZoom = null;
     private readonly Plan thisPlan;
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null; 
@@ -99,16 +96,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
 
 
-    public NewPage(string planId)
+    public NewPage(string _planId)
     {
         InitializeComponent();
         planContainer = new TransformViewModel();
         BindingContext = planContainer;
-
+        planId = _planId;
         drawingController = new DrawingController(planContainer);
-        PlanId = planId;
-        thisPlan = GlobalJson.Data.Plans[PlanId];
-        PageTitle = thisPlan.Name;
+        thisPlan = GlobalJson.Data.Plans[planId];
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
@@ -167,13 +162,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             await AddPlan();
         else
         {
-            if (PinZoom != null)
-                ZoomToPin(PinZoom);
+            if (pinZoom != null)
+                ZoomToPin(pinZoom);
         }
 
         // Setze den Titel der Seite und markiere den Plan im ShellManü
         var appShell = Application.Current.Windows[0].Page as AppShell;
-        appShell?.HighlightCurrentPlan(this.PlanId);
+        appShell?.HighlightCurrentPlan(planId);
     }
 
     protected override void OnDisappearing()
@@ -187,12 +182,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("pinZoom", out object value1))
-            PinZoom = value1 as string;
+            pinZoom = value1 as string;
 
         if (query.TryGetValue("pinMove", out object value2))
         {
             var pinId = value2 as string;
-            PinZoom = value2 as string;
+            pinZoom = value2 as string;
 
             if (!_pinLookup.ContainsKey(pinId) && !isFirstLoad)
                 AddPin(pinId, thisPlan.Pins[pinId].PinIcon);
@@ -320,7 +315,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             InputTransparent = false,
             BindingContext = new PinContext
             {
-                PlanId = PlanId,
+                PlanId = planId,
                 PinId = pinId
             }
         };
@@ -469,8 +464,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 ImageFit(null, null);
                 AddPins();
 
-                if (PinZoom != null)
-                    ZoomToPin(PinZoom);
+                if (pinZoom != null)
+                    ZoomToPin(pinZoom);
             }
         } 
     }
@@ -617,7 +612,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinLocation = "",
             PinIcon = _newPin,
             Fotos = [],
-            OnPlanId = PlanId,
+            OnPlanId = planId,
             SelfId = currentDateTime,
             DateTime = DateTime.Now,
             PinColor = (SKColor)pinColor,
@@ -630,7 +625,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (!overwrite)
         {
             // Sicherstellen, dass der Plan existiert
-            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out Plan plan))
+            if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
             {
                 plan.Pins ??= [];
                 plan.Pins[currentDateTime] = newPinData;
@@ -756,7 +751,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planContainer.TranslationY = (this.Height / 2) - (PlanContainer.Height * pin.Pos.Y);
         planContainer.Scale = zoom;
 
-        PinZoom = null;
+        pinZoom = null;
     }
 
     private void ImageFit(object sender, EventArgs e)
@@ -1287,7 +1282,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     break;
 
                 default:
-                    (Application.Current.Windows[0].Page as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId).Title = result.Result.NameEntry;
+                    (Application.Current.Windows[0].Page as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
                     Title = result.Result.NameEntry;
 
                     thisPlan.Name = result.Result.NameEntry;
@@ -1319,19 +1314,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Shell-Navigation entfernen
         var shellContent = shell
-            .FindByName<ShellContent>(PlanId);
+            .FindByName<ShellContent>(planId);
 
         if (shellContent?.Parent is ShellSection section)
             section.Items.Remove(shellContent);
 
         // Masterliste bereinigen
         var masterItem = shell.AllPlanItems
-            .FirstOrDefault(p => p.PlanId == PlanId);
+            .FirstOrDefault(p => p.PlanId == planId);
 
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan))
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan))
             return;
 
         // JSON + Files löschen
@@ -1341,7 +1336,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
-        GlobalJson.Data.Plans.Remove(PlanId);
+        GlobalJson.Data.Plans.Remove(planId);
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -1499,7 +1494,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Titel speichern
         (Application.Current.Windows[0].Page as AppShell)
-            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == PlanId)!.Title = Title;
+            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         thisPlan.Name = Title;
 
