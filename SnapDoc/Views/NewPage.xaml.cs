@@ -308,8 +308,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             HeightRequest = thisPlan.Pins[pinId].Size.Height,
             AnchorX = thisPlan.Pins[pinId].Anchor.X,
             AnchorY = thisPlan.Pins[pinId].Anchor.Y,
-            TranslationX = (thisPlan.ImageSize.Width * _originPos.X) - (_originAnchor.X * _pinSize.Width),
-            TranslationY = (thisPlan.ImageSize.Height * _originPos.Y) - (_originAnchor.Y * _pinSize.Height),
+            TranslationX = (PlanImage.WidthRequest * _originPos.X) - (_originAnchor.X * _pinSize.Width),
+            TranslationY = (PlanImage.HeightRequest * _originPos.Y) - (_originAnchor.Y * _pinSize.Height),
             Rotation = _rotation,
             Scale = PinScaling(pinId),
             InputTransparent = false,
@@ -360,11 +360,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         var plan = GlobalJson.Data.Plans[ctx.PlanId];
 
-        var x = img.TranslationX / plan.ImageSize.Width;
-        var y = img.TranslationY / plan.ImageSize.Height;
+        var x = img.TranslationX / PlanImage.WidthRequest;
+        var y = img.TranslationY / PlanImage.HeightRequest;
 
-        var dx = img.AnchorX * img.Width / plan.ImageSize.Width;
-        var dy = img.AnchorY * img.Height / plan.ImageSize.Height;
+        var dx = img.AnchorX * img.Width / PlanImage.WidthRequest;
+        var dy = img.AnchorY * img.Height / PlanImage.HeightRequest;
 
         plan.Pins[ctx.PinId].Pos = new Point(x + dx, y + dy);
 
@@ -442,8 +442,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         image.AnchorY = _originAnchor.Y;
         image.WidthRequest = _pinSize.Width;
         image.HeightRequest = _pinSize.Height;
-        image.TranslationX = (thisPlan.ImageSize.Width * _originPos.X) - (_originAnchor.X * image.Width);
-        image.TranslationY = (thisPlan.ImageSize.Height * _originPos.Y) - (_originAnchor.Y * image.Height);
+        image.TranslationX = (PlanImage.WidthRequest * _originPos.X) - (_originAnchor.X * image.Width);
+        image.TranslationY = (PlanImage.HeightRequest * _originPos.Y) - (_originAnchor.Y * image.Height);
     }
 
     private void PlanImage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
@@ -500,8 +500,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (isPinSet)
         {
-            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X;
-            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y;
+            var x = 1.0 / PlanImage.WidthRequest * e.Center.X;
+            var y = 1.0 / PlanImage.HeightRequest * e.Center.Y;
 
             SetPin(new Point(x, y));
 
@@ -515,8 +515,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
-            var x = 1.0 / thisPlan.ImageSize.Width * e.Center.X;
-            var y = 1.0 / thisPlan.ImageSize.Height * e.Center.Y;
+            var x = 1.0 / PlanImage.WidthRequest * e.Center.X;
+            var y = 1.0 / PlanImage.HeightRequest * e.Center.Y;
 
             SetPin(new Point(x, y));
         }
@@ -659,8 +659,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             doubleTappedPin.Source = ImageSource.FromFile(pinPath);
             doubleTappedPin.WidthRequest = pinData.Size.Width;
             doubleTappedPin.HeightRequest = pinData.Size.Height;
-            doubleTappedPin.TranslationX = (PlanImage.Width * pinData.Pos.X) - (pinData.Anchor.X * pinData.Size.Width);
-            doubleTappedPin.TranslationY = (PlanImage.Height * pinData.Pos.Y) - (pinData.Anchor.Y * pinData.Size.Height);
+            doubleTappedPin.TranslationX = (PlanImage.WidthRequest * pinData.Pos.X) - (pinData.Anchor.X * pinData.Size.Width);
+            doubleTappedPin.TranslationY = (PlanImage.HeightRequest * pinData.Pos.Y) - (pinData.Anchor.Y * pinData.Size.Height);
             doubleTappedPin.Rotation = _rotation;
             doubleTappedPin.Scale = _scale;
             doubleTappedPin.IsVisible = true;
@@ -946,8 +946,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         double fx = cx + rotatedOffset.X;
         double fy = cy + rotatedOffset.Y;
 
-        var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) / plan.ImageSize.Width;
-        var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) / plan.ImageSize.Height;
+        var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) / PlanImage.WidthRequest;
+        var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) / PlanImage.HeightRequest;
 
         SetPin(
             new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),

@@ -84,6 +84,7 @@
                 <VerticalStackLayout Spacing="8">
                     <material:TextField
                         x:Name="client_name"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -94,6 +95,7 @@
 
                     <material:TextField
                         x:Name="object_name"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -104,6 +106,7 @@
 
                     <material:EditorField
                         x:Name="object_address"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="500"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -113,6 +116,7 @@
 
                     <material:TextField
                         x:Name="working_title"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -123,6 +127,7 @@
 
                     <material:TextField
                         x:Name="project_nr"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -133,6 +138,7 @@
 
                     <material:TextField
                         x:Name="project_manager"
+                        FontSize="{StaticResource AppFontSizeNormal}"
                         MaxLength="200"
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"

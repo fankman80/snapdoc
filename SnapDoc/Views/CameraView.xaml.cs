@@ -43,10 +43,17 @@ public partial class CameraView : ContentPage
     {
         base.OnSizeAllocated(width, height);
 
-        if (width <= 0 || height <= 0 || _isInitialized) return;
+        if (width <= 0 || height <= 0) return;
 
-        _isInitialized = true;
-        Dispatcher.Dispatch(async () => await InitializeCameraSelection());
+        if (!_isInitialized)
+        {
+            _isInitialized = true;
+            Dispatcher.Dispatch(async () => await InitializeCameraSelection());
+        }
+        else
+        {
+            UpdateCameraLayout(width, height);
+        }
     }
 
     private async Task InitializeCameraSelection()
@@ -117,10 +124,10 @@ public partial class CameraView : ContentPage
         if (cameraView?.Camera == null || _optimalSize.Width <= 0) return;
 
         bool isPortrait = height > width;
-        double camW = isPortrait ? Math.Min(_optimalSize.Width, _optimalSize.Height) : Math.Max(_optimalSize.Width, _optimalSize.Height);
-        double camH = isPortrait ? Math.Max(_optimalSize.Width, _optimalSize.Height) : Math.Min(_optimalSize.Width, _optimalSize.Height);
-
-        double targetRatio = camW / camH;
+        double resW = Math.Max(_optimalSize.Width, _optimalSize.Height);
+        double resH = Math.Min(_optimalSize.Width, _optimalSize.Height);
+        double cameraRatio = resW / resH;
+        double targetRatio = isPortrait ? (1 / cameraRatio) : cameraRatio;
         double finalWidth, finalHeight;
 
         if ((width / height) > targetRatio)

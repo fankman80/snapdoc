@@ -12,8 +12,8 @@ public partial class Switch : ContentView
 
     #region BindableProperties
     public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnAnyPropertyChanged);
-    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Switch), Label.TextColorProperty.DefaultValue);    
-    public static readonly BindableProperty TextSizeProperty = BindableProperty.Create( nameof(TextSize), typeof(double), typeof(Switch), Label.FontSizeProperty.DefaultValue);   
+    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Switch), Label.TextColorProperty.DefaultValue);
+    public static readonly BindableProperty TextSizeProperty = BindableProperty.Create(nameof(TextSize), typeof(double),typeof(Switch), defaultValue: GetDefaultFontSize());
     public static readonly BindableProperty IsToggledProperty = BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
     public static readonly BindableProperty SwitchWidthProperty = BindableProperty.Create(nameof(SwitchWidth), typeof(double), typeof(Switch), 44.0, propertyChanged: OnAnyPropertyChanged);
     public static readonly BindableProperty SwitchHeightProperty = BindableProperty.Create(nameof(SwitchHeight), typeof(double), typeof(Switch), 24.0, propertyChanged: OnAnyPropertyChanged);
@@ -48,6 +48,13 @@ public partial class Switch : ContentView
 
     public double SwitchWidthMinus2 => SwitchWidth - 2;
     public double SwitchHeightMinus2 => SwitchHeight - 2;
+
+    private static double GetDefaultFontSize()
+    {
+        if (Application.Current?.Resources != null && Application.Current.Resources.TryGetValue("AppFontSizeNormal", out var value))
+            return (double)value;
+        return 14.0; // Absoluter Fallback, falls Ressourcen noch nicht geladen sind
+    }
 
     // ===== Event-Handler =====
 

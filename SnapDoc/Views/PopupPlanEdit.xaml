@@ -27,6 +27,7 @@
         <VerticalStackLayout>
             <material:TextField x:Name="name_entry"
                                 Title="{x:Static res:AppResources.planbezeichnung}"
+                                FontSize="{StaticResource AppFontSizeNormal}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"
@@ -35,12 +36,13 @@
                                 AllowClear="True"/>
 
             <material:EditorField x:Name="desc_entry"
-                                Title="{x:Static res:AppResources.beschreibung}"
-                                MaxLength="2000"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                                  Title="{x:Static res:AppResources.beschreibung}"
+                                  FontSize="{StaticResource AppFontSizeNormal}"
+                                  MaxLength="2000"
+                                  TitleColor="{DynamicResource SecondaryBackground}"
+                                  BorderColor="{DynamicResource SecondaryBackground}"
+                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                  AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
             <Grid>
                 <Border HeightRequest="44"

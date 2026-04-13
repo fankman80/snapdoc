@@ -24,6 +24,7 @@
         <VerticalStackLayout x:DataType="views:PopupTextEdit">
             <material:EditorField Text="{Binding InputTxt}"
                                   Title="{x:Static res:AppResources.text_eingeben}"
+                                  FontSize="{StaticResource AppFontSizeNormal}"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

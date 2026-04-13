@@ -49,7 +49,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         canvasView = view ?? throw new ArgumentNullException(nameof(view));
         canvasView.PaintSurface += OnPaintSurface;
         canvasView.Touch += OnTouch;
-        canvasView.InvalidateSurface();
     }
 
     public void Detach()
@@ -68,6 +67,13 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         bool scaleHandlesWithTransform = true,
         float rotationAngle = 0f)
     {
+        float currentScale = (float)transformVm.Scale;
+        if (currentScale <= 0.0001f)
+            currentScale = 1.0f;
+
+        float safeHandleRadius = scaleHandlesWithTransform ? handleRadius / currentScale : handleRadius;
+        float safePointRadius = scaleHandlesWithTransform ? pointRadius / currentScale : pointRadius;
+
         CombinedDrawable = new CombinedDrawable
         {
             FreeDrawable = new InteractiveFreehandDrawable
@@ -83,8 +89,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 PointColor = pointColor,
                 StartPointColor = startPointColor,
                 LineThickness = lineThickness,
-                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
-                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius,
+                HandleRadius = safeHandleRadius,
+                PointRadius = safePointRadius,
             },
             RectDrawable = new InteractiveRectangleDrawable
             {
@@ -94,8 +100,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 TextColor = textColor,
                 LineThickness = lineThickness,
                 StrokeStyle = strokeStyle,
-                HandleRadius = scaleHandlesWithTransform ? handleRadius / (float)transformVm.Scale : handleRadius,
-                PointRadius = scaleHandlesWithTransform ? pointRadius / (float)transformVm.Scale : pointRadius,
+                HandleRadius = safeHandleRadius,
+                PointRadius = safePointRadius,
                 AllowedAngleDeg = rotationAngle,
                 Text = "",
             }
@@ -106,6 +112,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
+        if (e.Info.Width <= 0 || e.Info.Height <= 0 || transformVm.Scale <= 0.0001)
+            return;
+
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
         CombinedDrawable?.Draw(canvas);
@@ -286,36 +295,29 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable == null)
             return;
 
-        // Polyline
-        var poly = CombinedDrawable.PolyDrawable;
-        if (poly != null && DrawMode == DrawMode.Poly)
+        float currentScale = (float)transformVm.Scale;
+        if (currentScale <= 0.0001f)
+            currentScale = 1.0f;
+
+        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius;
+        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius;
+
+        if (scaleHandlesWithTransform)
         {
-            if (scaleHandlesWithTransform)
-            {
-                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale);
-                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale);
-            }
-            else
-            {
-                poly.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius);
-                poly.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius);
-            }
+            handleRadius /= currentScale;
+            pointRadius /= currentScale;
         }
 
-        // Rectangle
-        var rect = CombinedDrawable.RectDrawable;
-        if (rect != null && DrawMode == DrawMode.Rect)
+        if (CombinedDrawable.PolyDrawable is { } poly && DrawMode == DrawMode.Poly)
         {
-            if (scaleHandlesWithTransform)
-            {
-                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius / transformVm.Scale);
-                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius / transformVm.Scale);
-            }
-            else
-            {
-                rect.HandleRadius = (float)(SettingsService.Instance.PolyLineHandleTouchRadius);
-                rect.PointRadius = (float)(SettingsService.Instance.PolyLineHandleRadius);
-            }
+            poly.HandleRadius = handleRadius;
+            poly.PointRadius = pointRadius;
+        }
+
+        if (CombinedDrawable.RectDrawable is { } rect && DrawMode == DrawMode.Rect)
+        {
+            rect.HandleRadius = handleRadius;
+            rect.PointRadius = pointRadius;
         }
 
         canvasView?.InvalidateSurface();

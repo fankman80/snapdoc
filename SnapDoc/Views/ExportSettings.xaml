@@ -136,6 +136,7 @@
                     
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="{x:Static res:AppResources.pinbeschriftung}"
+                            FontSize="{StaticResource AppFontSizeNormal}"
                             MaxLength="20"
                             Text="{Binding PinLabelPrefix}"
                             TitleColor="{DynamicResource SecondaryBackground}"

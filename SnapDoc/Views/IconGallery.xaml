@@ -143,10 +143,7 @@
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
             <Button x:Name="SortDirection"
-                    Text="{x:Static local:MaterialIcons.Sort}"
-                    FontSize="36"
-                    FontFamily="MaterialOutlined"
-                    TextColor="{DynamicResource Primary}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
                     CornerRadius="4"
                     Padding="0"            
                     HeightRequest="38"

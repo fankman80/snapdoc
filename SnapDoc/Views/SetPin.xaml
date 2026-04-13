@@ -124,6 +124,7 @@
 
         <VerticalStackLayout Grid.Row="1">
             <material:TextField Text="{Binding Pin.PinLocation}"
+                                FontSize="{StaticResource AppFontSizeNormal}"
                                 MaxLength="200"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -132,6 +133,7 @@
                                 AllowClear="True"
                                 Title="{x:Static res:AppResources.standort}"/>
             <material:EditorField Text="{Binding Pin.PinDesc}"
+                                  FontSize="{StaticResource AppFontSizeNormal}"
                                   MaxLength="2000"
                                   TitleColor="{DynamicResource SecondaryBackground}"
                                   BorderColor="{DynamicResource SecondaryBackground}"                        
@@ -241,8 +243,10 @@
                 <Button Grid.Column="3"
                         Padding="0"
                         MinimumWidthRequest="100"
+                        Text="{x:Static local:MaterialIcons.Photo_camera}"
+                        FontSize="30"
+                        FontFamily="MaterialOutlined"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Photo_camera}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
                         Clicked="TakeFoto"/>
                 <Button Grid.Column="4"

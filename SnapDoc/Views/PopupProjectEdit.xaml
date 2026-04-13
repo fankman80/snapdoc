@@ -16,6 +16,7 @@
         <VerticalStackLayout HorizontalOptions="Fill">
             <material:TextField x:Name="text_entry"
                                 Title="{x:Static res:AppResources.projekt_titel}"
+                                FontSize="{StaticResource AppFontSizeNormal}"
                                 TitleColor="{DynamicResource SecondaryBackground}"
                                 BorderColor="{DynamicResource SecondaryBackground}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

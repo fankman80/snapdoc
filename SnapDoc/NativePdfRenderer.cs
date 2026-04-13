@@ -58,22 +58,51 @@ namespace SnapDoc
 #elif IOS
             if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
                 return;
+            //using var page = doc.Document.GetPage(pageIndex);
+            //var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
+            //var size = new CGSize(pageRect.Width * scale, pageRect.Height * scale);
+            //var renderer = new UIGraphicsImageRenderer(size);
+            //var image = renderer.CreateImage((context) =>
+            //{
+            //    context.CGContext.SetFillColor(UIColor.White.CGColor);
+            //    context.CGContext.FillRect(new CGRect(CGPoint.Empty, size));
+            //    context.CGContext.TranslateCTM(0, size.Height);
+            //    context.CGContext.ScaleCTM(scale, -scale);
+            //    page.Draw(PdfDisplayBox.Media, context.CGContext);
+            //});
+            //using var jpegData = image.AsJPEG(0.8f);
+            //if (jpegData != null)
+            //    File.WriteAllBytes(imgPath, [.. jpegData]);
+
             using var page = doc.Document.GetPage(pageIndex);
             var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
-            var size = new CGSize(pageRect.Width * scale, pageRect.Height * scale);
-            var renderer = new UIGraphicsImageRenderer(size);
-            var image = renderer.CreateImage((context) =>
-            {
-                context.CGContext.SetFillColor(UIColor.White.CGColor);
-                context.CGContext.FillRect(new CGRect(CGPoint.Empty, size));
-                context.CGContext.TranslateCTM(0, size.Height);
-                context.CGContext.ScaleCTM(scale, -scale);
-                page.Draw(PdfDisplayBox.Media, context.CGContext);
-            });
-            using var jpegData = image.AsJPEG(0.8f);
-            if (jpegData != null)
-                File.WriteAllBytes(imgPath, [.. jpegData]);
+            int width = (int)(pageRect.Width * scale);
+            int height = (int)(pageRect.Height * scale);
+            using var colorSpace = CGColorSpace.CreateDeviceRGB();
+            using var context = new CGBitmapContext(
+                null,
+                width,
+                height,
+                8,
+                0,
+                colorSpace,
+                CGImageAlphaInfo.PremultipliedLast);
 
+            if (context != null)
+            {
+                context.SetFillColor(UIColor.White.CGColor);
+                context.FillRect(new CGRect(0, 0, width, height));
+                context.TranslateCTM(0, height);
+                context.ScaleCTM(scale, -scale);
+                page.Draw(PdfDisplayBox.Media, context);
+
+                using var cgImage = context.ToImage();
+                using var uiImage = UIImage.FromImage(cgImage);
+                using var jpegData = uiImage.AsJPEG(0.8f);
+
+                if (jpegData != null)
+                    File.WriteAllBytes(imgPath, jpegData.ToArray());
+            }
 #elif ANDROID
             if (doc.Renderer == null)
                 return;
