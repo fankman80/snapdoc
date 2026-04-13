@@ -28,17 +28,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public string PlanId;
     public string PinDelete;
     public string PinZoom = null;
-
     private readonly Plan thisPlan;
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null; 
     private MR.Gestures.Image doubleTappedPin = null;
     private bool isFirstLoad = true;
-    private Point mousePos;
     private bool isTappedHandled = false;
     private double minScale = 0.1;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
+
+#if WINDOWS
+    private Point mousePos;
+    private bool shiftKeyDown = false;
+    private double shiftKeyRotationStart;
+#endif
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -93,10 +97,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
 
-#if WINDOWS
-    private bool shiftKeyDown = false;
-    private double shiftKeyRotationStart;
-#endif
+
 
     public NewPage(string planId)
     {
@@ -674,9 +675,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnMouseMoved(object sender, MouseEventArgs e)
     {
+#if WINDOWS
         mousePos = e.Center;
 
-#if WINDOWS
         if (KeyboardHelper.IsShiftPressed() && !SettingsService.Instance.IsPlanRotateLocked)
         {
             double centerX = this.Width / 2;
