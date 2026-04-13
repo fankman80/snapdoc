@@ -800,6 +800,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void DrawingClicked(object sender, EventArgs e)
     {
+        bool shouldReset = (sender != null);
+
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
@@ -828,7 +830,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                 false,
-                (float)planContainer.Rotation
+                (float)planContainer.Rotation,
+                shouldReset
             );
 
             drawingController.InitialRotation = (float)planContainer.Rotation;

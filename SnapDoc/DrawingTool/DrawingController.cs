@@ -65,7 +65,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         float handleRadius, float pointRadius,
         SKColor pointColor, SKColor startPointColor,
         bool scaleHandlesWithTransform = true,
-        float rotationAngle = 0f)
+        float rotationAngle = 0f,
+        bool forceReset = false)
     {
         float currentScale = (float)transformVm.Scale;
         if (currentScale <= 0.0001f)
@@ -74,38 +75,43 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         float safeHandleRadius = scaleHandlesWithTransform ? handleRadius / currentScale : handleRadius;
         float safePointRadius = scaleHandlesWithTransform ? pointRadius / currentScale : pointRadius;
 
-        CombinedDrawable = new CombinedDrawable
+        if (forceReset || CombinedDrawable == null)
         {
-            FreeDrawable = new InteractiveFreehandDrawable
+            CombinedDrawable = new CombinedDrawable
             {
-                LineColor = lineColor,
-                LineThickness = lineThickness,
-            },
-            PolyDrawable = new InteractivePolylineDrawable
-            {
-                FillColor = fillColor,
-                LineColor = lineColor,
-                StrokeStyle = strokeStyle,
-                PointColor = pointColor,
-                StartPointColor = startPointColor,
-                LineThickness = lineThickness,
-                HandleRadius = safeHandleRadius,
-                PointRadius = safePointRadius,
-            },
-            RectDrawable = new InteractiveRectangleDrawable
-            {
-                FillColor = fillColor,
-                LineColor = lineColor,
-                PointColor = pointColor,
-                TextColor = textColor,
-                LineThickness = lineThickness,
-                StrokeStyle = strokeStyle,
-                HandleRadius = safeHandleRadius,
-                PointRadius = safePointRadius,
-                AllowedAngleDeg = rotationAngle,
-                Text = "",
-            }
-        };
+                FreeDrawable = new InteractiveFreehandDrawable(),
+                PolyDrawable = new InteractivePolylineDrawable(),
+                RectDrawable = new InteractiveRectangleDrawable()
+            };
+        }
+
+        // Freehand
+        CombinedDrawable.FreeDrawable.LineColor = lineColor;
+        CombinedDrawable.FreeDrawable.LineThickness = lineThickness;
+
+        // Polyline
+        var poly = CombinedDrawable.PolyDrawable;
+        poly.FillColor = fillColor;
+        poly.LineColor = lineColor;
+        poly.StrokeStyle = strokeStyle;
+        poly.PointColor = pointColor;
+        poly.StartPointColor = startPointColor;
+        poly.LineThickness = lineThickness;
+        poly.HandleRadius = safeHandleRadius;
+        poly.PointRadius = safePointRadius;
+
+        // Rectangle
+        var rect = CombinedDrawable.RectDrawable;
+        rect.FillColor = fillColor;
+        rect.LineColor = lineColor;
+        rect.PointColor = pointColor;
+        rect.TextColor = textColor;
+        rect.LineThickness = lineThickness;
+        rect.StrokeStyle = strokeStyle;
+        rect.HandleRadius = safeHandleRadius;
+        rect.PointRadius = safePointRadius;
+        rect.AllowedAngleDeg = rotationAngle;
+        // rect.Text = ""; // Vorsicht: Wenn du das hier setzt, überschreibst du geladenen Text!
 
         canvasView?.InvalidateSurface();
     }

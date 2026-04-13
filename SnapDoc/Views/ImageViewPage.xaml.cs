@@ -342,7 +342,8 @@ public partial class ImageViewPage : IQueryAttributable
             (float)SettingsService.Instance.PolyLineHandleTouchRadius,
             (float)SettingsService.Instance.PolyLineHandleRadius,
             SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha)
+            SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+            forceReset: true
         );
 
         // initialer Modus
