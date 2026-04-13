@@ -47,7 +47,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
     protected virtual void OnMouseExited(MouseEventArgs e) => AddText(MouseInfo("MouseExited", e));
     protected virtual void OnScrollWheelChanged(ScrollWheelEventArgs e) => AddText(ScrollWheelInfo("ScrollWheelChanged", e));
 
-    private string TapInfo(string eventName, TapEventArgs e)
+    private static string TapInfo(string eventName, TapEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -60,7 +60,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string LongPressInfo(string eventName, LongPressEventArgs e)
+    private static string LongPressInfo(string eventName, LongPressEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -72,7 +72,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string DownUpInfo(string eventName, DownUpEventArgs e)
+    private static string DownUpInfo(string eventName, DownUpEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -86,7 +86,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string PanInfo(string eventName, PanEventArgs e)
+    private static string PanInfo(string eventName, PanEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -101,7 +101,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string RotateInfo(string eventName, RotateEventArgs e)
+    private static string RotateInfo(string eventName, RotateEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -116,7 +116,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string PinchInfo(string eventName, PinchEventArgs e)
+    private static string PinchInfo(string eventName, PinchEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -135,7 +135,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string MouseInfo(string eventName, MouseEventArgs e)
+    private static string MouseInfo(string eventName, MouseEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -151,7 +151,7 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    private string ScrollWheelInfo(string eventName, ScrollWheelEventArgs e)
+    private static string ScrollWheelInfo(string eventName, ScrollWheelEventArgs e)
     {
         StringBuilder sb = new(eventName);
 
@@ -164,12 +164,12 @@ public class CustomEventArgsViewModel : TextOnlyViewModel
         return sb.ToString();
     }
 
-    protected string GetElementName(BaseGestureEventArgs e)
+    protected static string GetElementName(BaseGestureEventArgs e)
     {
         return e.Sender.GetType().Name + " " + ((Element)e.Sender).Id;
     }
 
-    private void AddTouches(StringBuilder sb, BaseGestureEventArgs e, string label = "Touches")
+    private static void AddTouches(StringBuilder sb, BaseGestureEventArgs e, string label = "Touches")
     {
         sb.Append($", {label}: ");
         if (e.Touches != null && e.Touches.Length > 0)
