@@ -53,7 +53,7 @@ public partial class Switch : ContentView
     {
         if (Application.Current?.Resources != null && Application.Current.Resources.TryGetValue("AppFontSizeNormal", out var value))
             return (double)value;
-        return 14.0; // Absoluter Fallback, falls Ressourcen noch nicht geladen sind
+        return 14.0;
     }
 
     // ===== Event-Handler =====
@@ -61,15 +61,12 @@ public partial class Switch : ContentView
     private static void OnAnyPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is Switch customSwitch)
-        {
             customSwitch.UpdateUI();
-        }
     }
 
     private void OnTapped(object sender, TappedEventArgs e)
     {
         IsToggled = !IsToggled;
-        // UpdateUI wird sowieso über PropertyChanged aufgerufen
     }
 
     protected override void OnBindingContextChanged()
@@ -114,16 +111,11 @@ public partial class Switch : ContentView
         double height = SwitchHeight - 1;
         double radius = height / 2;
 
-        // Sicherheitshalber Radius begrenzen
         radius = Math.Min(radius, width / 2);
 
         var segments = new PathSegmentCollection
-
     {
-        // Obere Linie
         new LineSegment { Point = new Point(width - radius, 0.5) },
-
-        // Obere rechte Ecke (Bogen)
         new ArcSegment
         {
             Point = new Point(width + 0.5, radius),
@@ -132,11 +124,7 @@ public partial class Switch : ContentView
             RotationAngle = 0,
             IsLargeArc = false
         },
-
-        // Rechte Seite
         new LineSegment { Point = new Point(width + 0.5, height - radius) },
-
-        // Untere rechte Ecke (Bogen)
         new ArcSegment
         {
             Point = new Point(width - radius, height + 0.5),
@@ -145,11 +133,7 @@ public partial class Switch : ContentView
             RotationAngle = 0,
             IsLargeArc = false
         },
-
-        // Untere Linie
         new LineSegment { Point = new Point(radius, height + 0.5) },
-
-        // Untere linke Ecke (Bogen)
         new ArcSegment
         {
             Point = new Point(0.5, height - radius),
@@ -158,11 +142,7 @@ public partial class Switch : ContentView
             RotationAngle = 0,
             IsLargeArc = false
         },
-
-        // Linke Seite
         new LineSegment { Point = new Point(0.5, radius) },
-
-        // Obere linke Ecke (Bogen)
         new ArcSegment
         {
             Point = new Point(radius, 0.5),
@@ -172,7 +152,6 @@ public partial class Switch : ContentView
             IsLargeArc = false
         }
     };
-
         var figure = new PathFigure
         {
             StartPoint = new Point(radius, 0.5),

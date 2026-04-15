@@ -120,19 +120,12 @@
                             Minimum="1"
                             Maximum="200"
                             Value="0"
+                            Margin="{OnPlatform Default='70,15,70,15', WinUI='70,15,70,15', iOS='50,15,50,15', Android='50,15,50,15'}"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
                             ValueChanged="OnResizeSliderValueChanged"
-                            DragCompleted="OnResizeSliderDragCompleted">
-                        <Slider.Margin>
-                            <OnPlatform x:TypeArguments="Thickness">
-                                <On Platform="Android" Value="50,15,50,15" />
-                                <On Platform="iOS" Value="50,15,50,15" />
-                                <On Platform="WinUI" Value="70,15,70,15" />
-                            </OnPlatform>
-                        </Slider.Margin>
-                    </Slider>
+                            DragCompleted="OnResizeSliderDragCompleted"/>
                 </Border>
 
                 <Button x:Name="loadCustomPinBtn"
@@ -193,19 +186,12 @@
                             Minimum="-180"
                             Maximum="180"
                             Value="0"
+                            Margin="{OnPlatform Default='70,15,70,15', WinUI='70,15,70,15', iOS='50,15,50,15', Android='50,15,50,15'}"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
                             ValueChanged="OnRotateSliderValueChanged"
-                            DragCompleted="OnRotateSliderDragCompleted">
-                        <Slider.Margin>
-                            <OnPlatform x:TypeArguments="Thickness">
-                                <On Platform="Android" Value="50,15,50,15" />
-                                <On Platform="iOS" Value="50,15,50,15" />
-                                <On Platform="WinUI" Value="70,15,70,15" />
-                            </OnPlatform>
-                        </Slider.Margin>
-                    </Slider>
+                            DragCompleted="OnRotateSliderDragCompleted"/>
                 </Border>
                 <Button x:Name="rotateModeBtn"
                         FontSize="38"

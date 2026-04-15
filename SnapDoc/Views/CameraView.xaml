@@ -95,7 +95,7 @@
                   ColumnDefinitions="*, *, *">
 
                 <Button Grid.Column="0"
-                        Padding="{OnPlatform 0, iOS=5, Android=0}"
+                        Padding="{OnPlatform Default=0, WinUI=0, iOS=5, Android=0}"
                         Text="{x:Static local:MaterialIcons.Flash_auto}"
                         HeightRequest="60" WidthRequest="60" CornerRadius="30"
                         FontSize="30" FontFamily="MaterialOutlined"
@@ -105,7 +105,7 @@
                         Clicked="OnFlashButtonClicked"/>
 
                 <Button Grid.Column="1"
-                        Padding="{OnPlatform 0, iOS=10, Android=0}"
+                        Padding="{OnPlatform Default=0, WinUI=0, iOS=10, Android=0}"
                         x:Name="controlButton"
                         HeightRequest="80" WidthRequest="80" CornerRadius="40"
                         Text="{x:Static local:MaterialIcons.Photo_camera}"
@@ -114,7 +114,7 @@
                         Clicked="OnCaptureClicked"/>
 
                 <Button Grid.Column="2"
-                        Padding="{OnPlatform 0, iOS=5, Android=0}"
+                        Padding="{OnPlatform Default=0, WinUI=0, iOS=5, Android=0}"
                         x:Name="switchCameraButton"
                         HeightRequest="60" WidthRequest="60" CornerRadius="30"
                         Text="{x:Static local:MaterialIcons.Flip_camera_ios}"

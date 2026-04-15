@@ -10,8 +10,10 @@
           ColumnSpacing="16"
           VerticalOptions="Center"
           HorizontalOptions="Start"
-          x:DataType="controls:Switch"
-          GestureRecognizers="{TapGestureRecognizer Tapped=OnTapped}">
+          x:DataType="controls:Switch">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnTapped" />
+        </Grid.GestureRecognizers>
 
         <Grid Grid.Column="0"
               HeightRequest="{Binding SwitchHeight, Source={x:Reference this}}"
@@ -35,6 +37,7 @@
                Text="{Binding LabelText, Source={x:Reference this}}"
                TextColor="{Binding TextColor, Source={x:Reference this}}"
                FontSize="{Binding TextSize, Source={x:Reference this}}"
+               FontFamily="{StaticResource AppFontFamily}"
                VerticalTextAlignment="Center" />
     </Grid>
 </ContentView>

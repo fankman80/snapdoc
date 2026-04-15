@@ -160,8 +160,8 @@
                                     </Image.GestureRecognizers>
                                 </Image>
 
-                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2" 
-                                        Padding="0"
+                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                        Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         ClassId="{Binding SelfId}"
                                         AutomationId = "{Binding OnPlanId}"
                                         Text="{x:Static local:MaterialIcons.Recenter}"
@@ -172,7 +172,7 @@
                                         Clicked="OnPinClicked"/>
 
                                 <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
-                                        Padding="0"
+                                        Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         Text="{Binding IsAllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                         FontSize="30"
                                         FontFamily="MaterialOutlined"

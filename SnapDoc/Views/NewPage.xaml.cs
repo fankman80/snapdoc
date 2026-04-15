@@ -41,7 +41,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double shiftKeyRotationStart;
 #endif
 
-    // --- DrawingController ---
+    // DrawingController
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
@@ -778,14 +778,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (!pin.IsCustomPin)
         {
-            // Sicherstellen, dass wir nicht durch 0 teilen
             double currentScale = planContainer.Scale > 0 ? planContainer.Scale : 1.0;
             double dynamicScale = 1.0 / currentScale;
-
             double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
             double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
 
-            // Begrenzung anwenden
             if (dynamicScale > maxLimit) dynamicScale = maxLimit;
             if (dynamicScale < minLimit) dynamicScale = minLimit;
 
@@ -793,7 +790,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         else
         {
-            // Auch Custom Pins profitieren vom baseScale auf iOS
             return baseScale * userPinScale;
         }
     }
@@ -808,7 +804,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
 
-        // 1) Canvas erzeugen und anhängen
+        // Canvas erzeugen und anhängen
         drawingView = drawingController.CreateCanvasView();
         absoluteLayout.Children.Add(drawingView);
         Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
@@ -816,7 +812,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         await Task.Delay(50);
 
-        // 2) DrawingController initialisieren
+        // DrawingController initialisieren
         MainThread.BeginInvokeOnMainThread(() =>
         {
             drawingController.InitializeDrawing(
@@ -1012,15 +1008,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         using var surface = SKSurface.Create(info);
         var canvas = surface.Canvas;
 
-        // --- Rotation ermitteln ---
+        // Rotation ermitteln
         float rotation = (float)-planContainer.Rotation;
 
-        // --- BoundingBox VOR dem Zeichnen berechnen ---
+        // BoundingBox VOR dem Zeichnen berechnen
         var boundingBox = drawingController.CalculateBoundingBox((float)-drawingController.InitialRotation);
         if (boundingBox == null)
             return new SKRectI(0, 0, 0, 0);
 
-        // --- Offset für Strichdicke hinzufügen ---
+        // Offset für Strichdicke hinzufügen
         var offset = (lineWidth * Settings.DisplayDensity) / 2;
         var cropRect = new SKRectI(
             (int)Math.Floor(boundingBox.Value.Left - offset),
@@ -1029,23 +1025,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (int)Math.Ceiling(boundingBox.Value.Bottom + offset)
         );
 
-        // --- Zeichne final auf Canvas ---
+        // Zeichne final auf Canvas
         canvas.Clear(SKColors.Transparent);
         drawingController.RenderFinal(canvas, (float)-drawingController.InitialRotation);
         canvas.Flush();
 
-        // --- Ganze Zeichnung als Bitmap holen ---
+        // Ganze Zeichnung als Bitmap holen
         using var fullImage = surface.Snapshot();
         using var fullBitmap = SKBitmap.FromImage(fullImage);
 
-        // --- Croppen ---
+        // Croppen
         var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
         fullBitmap.ExtractSubset(croppedBitmap, cropRect);
 
-        // --- PNG speichern ---
+        // PNG speichern
         using var image = SKImage.FromBitmap(croppedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Png, 100);
-        using var stream = File.OpenWrite(filePath);
+        using var data = image.Encode(SKEncodedImageFormat.Png, 90);
+        using var stream = File.Create(filePath);
         data.SaveTo(stream);
 
         return cropRect;
