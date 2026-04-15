@@ -119,9 +119,7 @@ public partial class GeolocationViewModel : BaseViewModel
             {
                 var url = new Foundation.NSUrl(UIKit.UIApplication.OpenSettingsUrlString);
                 if (UIKit.UIApplication.SharedApplication.CanOpenUrl(url))
-                {
-                    UIKit.UIApplication.SharedApplication.OpenUrl(url);
-                }
+                    UIKit.UIApplication.SharedApplication.OpenUrl(url, new Foundation.NSDictionary(), null);
             }
 #endif
             return;
