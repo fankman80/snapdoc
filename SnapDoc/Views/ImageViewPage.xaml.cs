@@ -319,36 +319,57 @@ public partial class ImageViewPage : IQueryAttributable
         drawingView?.InvalidateSurface();
     }
 
-    private void DrawingClicked(object sender, EventArgs e)
+    private async void DrawingClicked(object sender, EventArgs e)
     {
-        DrawBtn.IsVisible = false;
-        ToolBtns.IsVisible = true;
+        if (drawMode != DrawMode.None)
+            return;
 
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            try
+            {
+                DrawBtn.IsVisible = false;
+                ToolBtns.IsVisible = true;
 
-        // Canvas erzeugen und anhängen
-        drawingView = drawingController.CreateCanvasView();
-        absoluteLayout.Children.Add(drawingView);
-        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+                var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
-        // DrawingController initialisieren
-        drawingController.InitializeDrawing(
-            SelectedBorderColor.ToSKColor(),
-            lineWidth,
-            strokeStyle,
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-            (float)SettingsService.Instance.PolyLineHandleRadius,
-            SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-            forceReset: true
-        );
+                if (drawingView != null)
+                {
+                    drawingController.Detach();
+                    if (absoluteLayout.Children.Contains(drawingView))
+                        absoluteLayout.Children.Remove(drawingView);
+                    drawingView = null;
+                }
 
-        // initialer Modus
-        drawingController.DrawMode = DrawMode.None;
-        drawMode = DrawMode.None;
+                drawingView = drawingController.CreateCanvasView();
+                absoluteLayout.Children.Add(drawingView);
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+
+                await Task.Delay(50);
+
+                drawingController.InitializeDrawing(
+                    SelectedBorderColor.ToSKColor(),
+                    lineWidth,
+                    strokeStyle,
+                    SelectedFillColor.ToSKColor(),
+                    SelectedTextColor.ToSKColor(),
+                    (float)SettingsService.Instance.PolyLineHandleTouchRadius,
+                    (float)SettingsService.Instance.PolyLineHandleRadius,
+                    SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                    SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                    forceReset: true
+                );
+
+                drawingController.DrawMode = DrawMode.None;
+                drawMode = DrawMode.None;
+            }
+            catch
+            {
+                DrawBtn.IsVisible = true;
+                ToolBtns.IsVisible = false;
+            }
+        });
     }
 
     private void EraseClicked(object sender, EventArgs e)

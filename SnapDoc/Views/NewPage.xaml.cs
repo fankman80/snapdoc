@@ -796,43 +796,62 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void DrawingClicked(object sender, EventArgs e)
     {
+        if (drawMode != DrawMode.None && sender != null)
+            return;
+
         bool shouldReset = (sender != null);
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
         ToolBtns.IsVisible = true;
 
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
-
-        // Canvas erzeugen und anhängen
-        drawingView = drawingController.CreateCanvasView();
-        absoluteLayout.Children.Add(drawingView);
-        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-        Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
-
-        await Task.Delay(50);
-
-        // DrawingController initialisieren
-        MainThread.BeginInvokeOnMainThread(() =>
+        await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            drawingController.InitializeDrawing(
-                SelectedBorderColor.ToSKColor(),
-                lineWidth,
-                strokeStyle,
-                SelectedFillColor.ToSKColor(),
-                SelectedTextColor.ToSKColor(),
-                (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-                (float)SettingsService.Instance.PolyLineHandleRadius,
-                SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                false,
-                (float)planContainer.Rotation,
-                shouldReset
-            );
+            try
+            {
+                var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
 
-            drawingController.InitialRotation = (float)planContainer.Rotation;
-            drawingController.DrawMode = DrawMode.None;
-            drawMode = DrawMode.None;
+                if (drawingView != null)
+                {
+                    drawingController.Detach();
+                    if (absoluteLayout.Children.Contains(drawingView))
+                        absoluteLayout.Children.Remove(drawingView);
+                    drawingView = null;
+                }
+
+                // 2. Canvas erzeugen und anhängen
+                drawingView = drawingController.CreateCanvasView();
+                absoluteLayout.Children.Add(drawingView);
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+
+                await Task.Delay(50);
+
+                drawingController.InitializeDrawing(
+                    SelectedBorderColor.ToSKColor(),
+                    lineWidth,
+                    strokeStyle,
+                    SelectedFillColor.ToSKColor(),
+                    SelectedTextColor.ToSKColor(),
+                    (float)SettingsService.Instance.PolyLineHandleTouchRadius,
+                    (float)SettingsService.Instance.PolyLineHandleRadius,
+                    SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                    SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                    false,
+                    (float)planContainer.Rotation,
+                    shouldReset
+                );
+
+                drawingController.InitialRotation = (float)planContainer.Rotation;
+                drawingController.DrawMode = DrawMode.None;
+                drawMode = DrawMode.None;
+                drawingView.InvalidateSurface();
+            }
+            catch
+            {
+                DrawBtn.IsVisible = true;
+                ToolBtns.IsVisible = false;
+            }
         });
     }
 
