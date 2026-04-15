@@ -182,18 +182,26 @@
                                     WidthRequest="30"
                                     HeightRequest="30"
                                     Aspect="AspectFit" />
-                                <Image HorizontalOptions="Center"
-                                       WidthRequest="30"
-                                       Source="{Binding MapIcons[1], Converter={StaticResource RawAssetConverter}}"/>
-                                <Image HorizontalOptions="Center"
-                                       WidthRequest="30"
-                                       Source="{Binding MapIcons[2], Converter={StaticResource RawAssetConverter}}"/>
-                                <Image HorizontalOptions="Center"
-                                       WidthRequest="30"
-                                       Source="{Binding MapIcons[3], Converter={StaticResource RawAssetConverter}}"/>
-                                <Image HorizontalOptions="Center"
-                                       WidthRequest="30"
-                                       Source="{Binding MapIcons[4], Converter={StaticResource RawAssetConverter}}"/>
+                                <controls:SvgView 
+                                    Source="locationpin1a.svg"
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    Aspect="AspectFit" />
+                                <controls:SvgView 
+                                    Source="locationpin2a.svg"
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    Aspect="AspectFit" />
+                                <controls:SvgView 
+                                    Source="locationpin3a.svg"
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    Aspect="AspectFit" />
+                                <controls:SvgView 
+                                    Source="locationpin4a.svg"
+                                    WidthRequest="30"
+                                    HeightRequest="30"
+                                    Aspect="AspectFit" />
                             </HorizontalStackLayout>
 
                             <Label Text="{x:Static res:AppResources.pingroesse}" Margin="0,0,0,-10"/>

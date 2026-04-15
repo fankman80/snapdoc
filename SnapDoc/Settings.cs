@@ -68,10 +68,10 @@ public static class Settings
     public static readonly List<string> MapIcons =
     [
         "themeColorPin",
-        "mappin1a.png",
-        "mappin2a.png",
-        "mappin3a.png",
-        "mappin4a.png"
+        "locationpin1a.svg",
+        "locationpin2a.svg",
+        "locationpin3a.svg",
+        "locationpin4a.svg"
     ];
 
     public static readonly Dictionary<string, string> Languages =

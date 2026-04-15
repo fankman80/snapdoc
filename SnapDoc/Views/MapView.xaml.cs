@@ -1,11 +1,11 @@
 ﻿#nullable disable
 using BruTile.Predefined;
 using BruTile.Web;
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Maui;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -19,11 +19,11 @@ using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.ScaleBar;
 using SkiaSharp;
+using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using SnapDoc.Messages;
 using System.Diagnostics;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
@@ -178,13 +178,21 @@ public partial class MapView : IQueryAttributable
         };
     }
 
-    private void LoadPins()
+    private async void LoadPins()
     {
         _features.Clear();
         var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
         pinLayer?.Features = [];
 
-        string uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
+        string uri = SettingsService.Instance.MapIcons[SettingsService.Instance.MapIcon];
+        if (uri == "themeColorPin")
+            uri = new Uri(Helper.LoadSvgWithColor("customcolor.svg", "#999999", hexColor.ToRgbaHex())).AbsoluteUri;
+        else
+        {
+            await MauiResourceLoader.CopyAppPackageFileAsync(Settings.CacheDirectory, uri);
+            uri = new Uri(Path.Combine(Settings.CacheDirectory, uri)).AbsoluteUri;
+        }
+
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
         var plansToSearch = string.IsNullOrEmpty(planId)

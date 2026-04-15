@@ -917,50 +917,59 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         Directory.CreateDirectory(customPinPath);
 
-        bool overwrite =
-            doubleTappedPin != null &&
-            plan.Pins.TryGetValue(doubleTappedPin.AutomationId, out var pin) &&
-            File.Exists(Path.Combine(
-                customPinPath,
-                Path.GetFileName(pin.PinIcon)));
+        string newBaseName = $"custompin_{DateTime.Now.Ticks}";
+        string pngFileName = newBaseName + ".png";
+        string dataFileName = newBaseName + ".data";
+        string pngPath = Path.Combine(customPinPath, pngFileName);
+        string dataPath = Path.Combine(customPinPath, dataFileName);
+        bool isOverwrite = false;
+        string oldPngPath = null;
+        string oldDataPath = null;
 
-        var fileType = ".png";
-        var customPinName = overwrite
-            ? Path.GetFileNameWithoutExtension(plan.Pins[doubleTappedPin.AutomationId].PinIcon)
-            : $"custompin_{DateTime.Now:yyyyMMdd_HHmmss}";
+        if (doubleTappedPin != null && plan.Pins.TryGetValue(doubleTappedPin.AutomationId, out var oldPin))
+        {
+            isOverwrite = true;
+            var oldFileName = Path.GetFileName(oldPin.PinIcon);
+            oldPngPath = Path.Combine(customPinPath, oldFileName);
+            oldDataPath = Path.Combine(customPinPath, Path.ChangeExtension(oldFileName, ".data"));
+        }
 
-        var pngPath = Path.Combine(customPinPath, customPinName + fileType);
-
-        // PNG erzeugen
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
+        drawingController.SaveToFile(dataPath);
 
-        // Mittelpunkt (Canvas → Plan)
         var cx = imageRect.MidX / Settings.DisplayDensity;
         var cy = imageRect.MidY / Settings.DisplayDensity;
-
-        var rotatedOffset = RotateOffset(
-            SettingsService.Instance.CustomPinOffset,
-            -planContainer.Rotation);
-
+        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -planContainer.Rotation);
         double fx = cx + rotatedOffset.X;
         double fy = cy + rotatedOffset.Y;
-
         var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) / PlanImage.WidthRequest;
         var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) / PlanImage.HeightRequest;
 
         SetPin(
             new Point(PlanContainer.AnchorX + ox, PlanContainer.AnchorY + oy),
-            customPinName + fileType,
+            pngFileName,
             (int)imageRect.Width,
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
             1 / planContainer.Scale / Settings.DisplayDensity,
             drawingController.InitialRotation - planContainer.Rotation,
             drawingController.CombinedDrawable.RectDrawable.Text,
-            overwrite
+            isOverwrite
         );
 
-        drawingController.SaveToFile(Path.Combine(customPinPath, customPinName + ".data"));
+        // Die ALTEN Dateien löschen
+        if (isOverwrite)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(oldPngPath) && File.Exists(oldPngPath)) File.Delete(oldPngPath);
+                if (!string.IsNullOrEmpty(oldDataPath) && File.Exists(oldDataPath)) File.Delete(oldDataPath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
+            }
+        }
 
     Cleanup:
         drawingController.Detach();
@@ -970,10 +979,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         ToolBtns.IsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
-
         doubleTappedPin?.IsVisible = true;
         doubleTappedPin = null;
-
         drawingView?.InvalidateSurface();
     }
 
@@ -1123,6 +1130,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
                 SelectedTextColor = SKColor.Parse(style.TextColor).ToMauiColor();
                 lineWidth = (int)style.LineThickness;
+                strokeStyle = style.StrokeStyle;
             }
         }
     }
