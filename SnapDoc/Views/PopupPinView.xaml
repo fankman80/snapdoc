@@ -20,7 +20,7 @@
     </toolkit:Popup.Resources>
     
     <Grid Padding="0"
-          WidthRequest="220">
+          WidthRequest="200">
         <VerticalStackLayout Spacing="4">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0">
                 <Image Grid.Column="0"
@@ -44,7 +44,7 @@
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                      HeightRequest="1"
-                     Margin="0,4,0,4"/>
+                     Margin="0,2,0,2"/>
             
             <HorizontalStackLayout Spacing="0">
                 <Label Text="{x:Static res:AppResources.standort}" FontSize="12"
@@ -58,7 +58,7 @@
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
                      Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                      HeightRequest="1"
-                     Margin="0,6,0,6"/>
+                     Margin="0,2,0,2"/>
 
             <HorizontalStackLayout Spacing="0">
                 <Label Text="{x:Static res:AppResources.beschreibung}" FontSize="12"

@@ -201,7 +201,7 @@
     <Shell.FlyoutContent>
         <ContentView x:DataType="local:AppShell">
             <Grid RowDefinitions="Auto, *" VerticalOptions="Fill">
-                <VerticalStackLayout Grid.Row="0" BackgroundColor="White" Spacing="0" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
+                <VerticalStackLayout Grid.Row="0" Spacing="0" x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
                     <!-- Open Project -->
                     <Grid ColumnDefinitions="Auto,Auto" HeightRequest="44" Margin="14,0,0,0">
                         <Grid.GestureRecognizers>
