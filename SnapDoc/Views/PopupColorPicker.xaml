@@ -76,10 +76,10 @@
                                             WidthRequest="48"
                                             HeightRequest="48"
                                             BackgroundColor="Transparent"
-                                            Stroke="Black"
+                                            Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                             Padding="8"
                                             StrokeThickness="1">
-                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color=Black, Glyph={x:Static local:MaterialIcons.Add}}"/>
+                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Add}}"/>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnAddTapped" />
                                         </Border.GestureRecognizers>
