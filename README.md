@@ -3,12 +3,11 @@
 ![Alt-Text](./SnapDoc/Resources/Images/banner.png)
 ## Deutsch
 
-**SnapDoc** ist eine plattformübergreifende .NET MAUI-App (Windows & Android) für das Bauwesen, Architekten, Fachplaner und Immobilienverwalter.  
-Mit SnapDoc lassen sich **Bestandesaufnahmen von Gebäuden und Außenbereichen** effizient erstellen, Mängel oder Bausituationen **geolokalisiert dokumentieren** und mit **Text, Symbolen/Icons und Fotografien** ergänzen. Aus diesen Daten können automatisch **Berichte** generiert werden, basierend auf einfachen Word-Vorlagen.
+**SnapDoc** ist eine plattformübergreifende .NET MAUI-App (Windows, Android, iOS) für das Bauwesen, Architektur, Fachplaner und Immobilienverwalter.
+Mit SnapDoc lassen sich **Bestandesaufnahmen von Gebäuden und Aussenbereichen** effizient erstellen, Mängel oder Bausituationen **geolokalisiert dokumentieren** und mit **Text, Symbolen/Icons und Fotografien** ergänzen. Aus diesen Daten können automatisch **Berichte** generiert werden, basierend auf einfach zu erstellenden Word-Vorlagen.
 
 ### Technologien
-- .NET MAUI (.NET 10)
-- C#
+- .NET MAUI (C# / .NET 10)
 - MR.Gestures (für Pinch, Pan, Touch-Gesten)
 - CommunityToolkit.Maui.Views.DrawingView (für Zeichnungen)
 - UraniumUI (für moderne UI-Komponenten)
