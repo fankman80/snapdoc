@@ -16,66 +16,48 @@ public partial class OpenProject : ContentPage
     public OpenProject()
     {
         InitializeComponent();
-    }
-
-    protected override void OnAppearing()
-    {
-        base.OnAppearing();
 
         LoadJsonFiles();
     }
 
-    private void LoadJsonFiles()
+    private async void LoadJsonFiles()
     {
-        // Hauptverzeichnis, in dem die Suche beginnen soll (z.B. das App-Datenverzeichnis)
         string rootDirectory = Settings.DataDirectory;
-        List<FileItem> foundFiles = [];
-        string searchPattern = "*.json"; // Alle JSON-Dateien suchen
 
-        // Prüfen welche Datei schon geladen ist
-        string activeFilePath = GlobalJson.Data?.JsonFile != null
-                                ? Path.Combine(Settings.DataDirectory,
-                                               GlobalJson.Data.ProjectPath,
-                                               GlobalJson.Data.JsonFile)
-                                : null;
-
-        // Alle Unterverzeichnisse und das Hauptverzeichnis durchsuchen
-        try
+        var foundFiles = await Task.Run(() =>
         {
-            // Rekursive Suche in allen Unterverzeichnissen
-            string[] files = Directory.GetFiles(rootDirectory, searchPattern, SearchOption.AllDirectories);
-
-            // Gefundene Dateien zur Liste hinzufügen
-            foreach (var file in files)
+            List<FileItem> items = [];
+            try
             {
-                string[] _thumbImg = Directory.GetFiles(Path.GetDirectoryName(file), "title_*.jpg", SearchOption.AllDirectories);
-                string thumbImg = _thumbImg.FirstOrDefault();
+                var files = Directory.EnumerateFiles(rootDirectory, "*.json", SearchOption.AllDirectories);
 
-                thumbImg ??= "banner_thumbnail.png";
+                string activeFilePath = GlobalJson.Data?.JsonFile != null
+                    ? Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)
+                    : null;
 
-                foundFiles.Add(new FileItem
+                foreach (var file in files)
                 {
-                    FileName = Path.GetFileNameWithoutExtension(file),
-                    FilePath = file,
-                    FileDate = File.GetLastWriteTime(file),
-                    ImagePath = thumbImg,
-                    ThumbnailPath = thumbImg,
-                    IsActive = file == activeFilePath
-                });
+                    string projectDir = Path.GetDirectoryName(file);
+                    string thumbImg = Directory.EnumerateFiles(projectDir, "title_*.jpg").FirstOrDefault()
+                                     ?? "banner_thumbnail.png";
+
+                    items.Add(new FileItem
+                    {
+                        FileName = Path.GetFileNameWithoutExtension(file),
+                        FilePath = file,
+                        FileDate = File.GetLastWriteTime(file),
+                        ImagePath = thumbImg,
+                        ThumbnailPath = thumbImg,
+                        IsActive = file == activeFilePath
+                    });
+                }
             }
-        }
-        catch (Exception ex)
-        {
-            // Fehlerbehandlung, z.B. falls keine Zugriffsrechte auf bestimmte Verzeichnisse vorhanden sind
-            Console.WriteLine("Fehler beim Durchsuchen der Verzeichnisse: " + ex.Message);
-        }
+            catch { /* Fehlerbehandlung */ }
+            return items.OrderByDescending(f => f.FileDate).ToList();
+        });
 
-        // Liste der JSON-Dateien dem ListView zuweisen        
         FileListView.ItemsSource = foundFiles;
-        ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";    
-
-        // nach Datum sortieren
-        FileListView.ItemsSource = foundFiles.OrderByDescending(f => f.FileDate).ToList();
+        ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
     }
 
     private async void OnNewClicked(object sender, EventArgs e)
@@ -122,6 +104,8 @@ public partial class OpenProject : ContentPage
 
             // save data to file
             GlobalJson.SaveToFile();
+
+            LoadJsonFiles();
 
             await Shell.Current.GoToAsync("project_details");
 #if ANDROID || IOS
@@ -267,26 +251,36 @@ public partial class OpenProject : ContentPage
             case "Delete":
                 var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
                 var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
+
                 if (result1.Result == "Ok")
                 {
-                    List<FileItem> tmp_list = (List<FileItem>)FileListView.ItemsSource;
+                    string fullPath = item?.FilePath;
+                    if (string.IsNullOrEmpty(fullPath))
+                        return;
+
+                    string projectDirectoryPath = Path.GetDirectoryName(fullPath);
+                    string fileName = Path.GetFileName(fullPath);
+                    string currentActiveJson = GlobalJson.Data.JsonFile;
+                    bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
+                                             fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
+
+                    var tmp_list = (List<FileItem>)FileListView.ItemsSource;
                     tmp_list.Remove(item);
                     FileListView.ItemsSource = null;
                     FileListView.ItemsSource = tmp_list;
-                    FileListView.Footer = $"{tmp_list.Count} {AppResources.projekte}";
+                    ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
 
-                    // Rekursives Löschen von Dateien in allen Unterverzeichnissen
-                    string[] files = Directory.GetFiles(Path.GetDirectoryName(item.FilePath), "*", SearchOption.AllDirectories);
-                    foreach (var file in files)
-                        File.Delete(file);
+                    // Wenn das gelöschte Projekt das aktuell geladene Projekt ist, zurück zum Homescreen navigieren und Daten zurücksetzen
+                    if (isCurrentProject)
+                    {
+                        await Shell.Current.GoToAsync("//homescreen");
+                        SettingsService.Instance.IsProjectLoaded = false;
+                        LoadDataToView.ResetData();
+                        Helper.HeaderUpdate();
+                    }
 
-                    // Rekursives Löschen von Verzeichnissen
-                    string[] directories = Directory.GetDirectories(Path.GetDirectoryName(item.FilePath), "*", SearchOption.TopDirectoryOnly);
-                    foreach (var directory in directories)
-                        Directory.Delete(directory, true);
-
-                    // Root-Verzeichnis löschen
-                    Directory.Delete(Path.GetDirectoryName(item.FilePath));
+                    if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
+                        Directory.Delete(projectDirectoryPath, true);
 
                     LoadJsonFiles();
                 }
@@ -334,7 +328,6 @@ public partial class OpenProject : ContentPage
                 var directoryPath = Path.GetDirectoryName((Path.Combine(Settings.DataDirectory,item.FilePath)));
                 if (Directory.Exists(directoryPath))
                 {
-
 #if WINDOWS
                     Process.Start(new ProcessStartInfo
                     {

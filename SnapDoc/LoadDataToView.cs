@@ -84,25 +84,7 @@ public partial class LoadDataToView
 
     public static void ResetData()
     {
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
-
-        shell.PlanItems.Clear();
-        shell.AllPlanItems.Clear();
-
-        var itemsToRemove = shell.Items.Where(item =>
-            item.Items.Any(section =>
-                section.Items.Any(content =>
-                    content.Content is MapView ||
-                    content.Content is NewPage
-                )
-            )
-        ).ToList();
-
-        foreach (var item in itemsToRemove)
-        {
-            shell.Items.Remove(item);
-        }
+        AppShell.ClearAllPlansFromShell();
 
         // Reset Datenbank
         GlobalJson.Data.Client_name = null;

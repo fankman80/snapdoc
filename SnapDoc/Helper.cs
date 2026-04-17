@@ -23,31 +23,45 @@ public class Helper
 {
     public static void HeaderUpdate()
     {
-        // aktualisiere den Header Text
-        SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name;
-        SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name;
+        SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name ?? "";
+        SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name ?? "";
 
-        // aktualisiere das Thumbnail Bild
-        if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
+        if (string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) || string.IsNullOrEmpty(GlobalJson.Data.TitleImage))
         {
             SettingsService.Instance.FlyoutHeaderImage = "";
             SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
         }
         else
         {
-            SettingsService.Instance.FlyoutHeaderImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
-            SettingsService.Instance.FlyoutHeaderImageThumb = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
+            if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
+            {
+                SettingsService.Instance.FlyoutHeaderImage = "";
+                SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
+            }
+            else
+            {
+                SettingsService.Instance.FlyoutHeaderImage = Path.Combine(
+                    Settings.DataDirectory ?? "",
+                    GlobalJson.Data.ProjectPath ?? "",
+                    GlobalJson.Data.ImagePath ?? "",
+                    GlobalJson.Data.TitleImage ?? ""
+                );
+
+                SettingsService.Instance.FlyoutHeaderImageThumb = Path.Combine(
+                    Settings.DataDirectory ?? "",
+                    GlobalJson.Data.ProjectPath ?? "",
+                    GlobalJson.Data.TitleImage ?? ""
+                );
+            }
         }
 
 #if WINDOWS
-        // zwinge das UI zum Aktualisieren
-        var currentWindow = Application.Current.Windows[0];
+        // UI-Refresh-Hack für Windows
+        var currentWindow = Application.Current?.Windows.Count > 0 ? Application.Current.Windows[0] : null;
         if (currentWindow != null)
         {
-            var currentWidth = currentWindow.Width;
-            var currentHeight = currentWindow.Height;
-            currentWindow.Width = currentWidth + 1;  // Erhöht die Breite um 1 Pixel
-            currentWindow.Height = currentHeight + 1;  // Erhöht die Höhe um 1 Pixel
+            currentWindow.Width += 0.1; // Ein minimaler Wert reicht oft schon
+            currentWindow.Width -= 0.1;
         }
 #endif
     }

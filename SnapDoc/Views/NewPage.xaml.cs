@@ -1338,6 +1338,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (Application.Current.Windows[0].Page is not AppShell shell)
             return;
 
+        await Shell.Current.GoToAsync("//homescreen");
+
         // Shell-Navigation entfernen
         var shellContent = shell
             .FindByName<ShellContent>(planId);
@@ -1369,8 +1371,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Anzeige neu aufbauen
         shell.ApplyFilterAndSorting();
-
-        await Shell.Current.GoToAsync("//homescreen");
     }
 
     private static void DeleteIfExists(string path)

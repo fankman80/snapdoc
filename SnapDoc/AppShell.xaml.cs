@@ -258,4 +258,31 @@ public partial class AppShell : Shell
 
         ShowAddPdfButton = isProjectLoaded && isListEmpty;
     }
+
+    public static void ClearAllPlansFromShell()
+    {
+        if (Application.Current.Windows[0].Page is not AppShell shell)
+            return;
+
+        var plansToDelete = shell.AllPlanItems.ToList();
+
+        foreach (var plan in plansToDelete)
+        {
+            var shellContent = shell.FindByName<ShellContent>(plan.PlanId);
+
+            if (shellContent != null)
+            {
+                if (shellContent.Parent is ShellSection section)
+                {
+                    section.Items.Remove(shellContent);
+                    if (section.Items.Count == 0 && section.Parent is ShellItem group)
+                        group.Items.Remove(section);
+                }
+            }
+        }
+
+        shell.PlanItems.Clear();
+        shell.AllPlanItems.Clear();
+        shell.ApplyFilterAndSorting();
+    }
 }

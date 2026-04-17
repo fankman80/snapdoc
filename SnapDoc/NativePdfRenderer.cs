@@ -57,40 +57,6 @@ namespace SnapDoc
             await page.RenderToStreamAsync(outStream, options);
             await outStream.FlushAsync();
 #elif IOS
-            //if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
-            //    return;
-
-            //using var page = doc.Document.GetPage(pageIndex);
-            //var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
-            //int width = (int)(pageRect.Width * scale);
-            //int height = (int)(pageRect.Height * scale);
-            //using var colorSpace = CGColorSpace.CreateDeviceRGB();
-            //using var context = new CGBitmapContext(
-            //    null,
-            //    width,
-            //    height,
-            //    8,
-            //    0,
-            //    colorSpace,
-            //    CGImageAlphaInfo.PremultipliedLast);
-
-            //if (context != null)
-            //{
-            //    context.SetFillColor(UIColor.White.CGColor);
-            //    context.FillRect(new CGRect(0, 0, width, height));
-            //    context.TranslateCTM(0, height);
-            //    context.ScaleCTM(scale, -scale);
-
-            //    page.Draw(PdfDisplayBox.Media, context);
-
-            //    using var cgImage = context.ToImage();
-            //    using var uiImage = UIImage.FromImage(cgImage);
-            //    using var jpegData = uiImage.AsJPEG(0.8f);
-
-            //    if (jpegData != null)
-            //        File.WriteAllBytes(imgPath, [.. jpegData]);
-            //}
-
             if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
                 return;
 
@@ -113,22 +79,26 @@ namespace SnapDoc
             {
                 context.SetFillColor(UIColor.White.CGColor);
                 context.FillRect(new CGRect(0, 0, width, height));
+                context.TranslateCTM(0, height);
+                context.ScaleCTM(1.0f, -1.0f);
+                context.ScaleCTM(scale, scale);
 
-                if (rotation == 0)
+                switch (rotation)
                 {
-                    context.TranslateCTM(0, height);
-                    context.ScaleCTM(scale, -scale);
-                }
-                else if (rotation == 180)
-                {
-                    context.TranslateCTM(width, 0);
-                    context.ScaleCTM(-scale, scale);
-                }
-                else
-                {
-                    context.TranslateCTM(0, height);
-                    context.ScaleCTM(1, -1);
-                    context.ScaleCTM(scale, scale);
+                    case 90:
+                        context.RotateCTM((float)(Math.PI / -2.0));
+                        context.TranslateCTM(-pageRect.Width, 0);
+                        break;
+                    case 180:
+                        context.RotateCTM((float)Math.PI);
+                        context.TranslateCTM(-pageRect.Width, -pageRect.Height);
+                        break;
+                    case 270:
+                        context.RotateCTM((float)(Math.PI / 2.0));
+                        context.TranslateCTM(0, -pageRect.Height);
+                        break;
+                    default:
+                        break;
                 }
 
                 page.Draw(PdfDisplayBox.Media, context);
