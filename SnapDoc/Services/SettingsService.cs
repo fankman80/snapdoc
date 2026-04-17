@@ -182,7 +182,7 @@ public partial class SettingsService : ObservableObject
     ];
     [ObservableProperty] public partial List<PriorityItem> PriorityItems { get; set; } =
     [
-        new() { Key = "", Color = "#000000" },
+        new() { Key = "", Color = null },
         new() { Key = AppResources.empfehlung, Color = "#92D050" },
         new() { Key = AppResources.wichtig, Color = "#FFC000" },
         new() { Key = AppResources.kritisch, Color = "#FF0000" }

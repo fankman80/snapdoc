@@ -271,7 +271,7 @@ namespace SnapDoc
         {
             var items = SettingsService.Instance.PriorityItems;
 
-            if (PinPriority >= 0 && PinPriority < items.Count) // Check auf >= 0 korrigiert
+            if (PinPriority > 0 && PinPriority < items.Count)
             {
                 PriorityColor = Color.FromArgb(items[PinPriority].Color);
             }
