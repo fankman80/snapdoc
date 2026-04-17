@@ -44,6 +44,7 @@ namespace SnapDoc
 #if WINDOWS
             if (doc.Document == null)
                 return;
+
             using var page = doc.Document.GetPage((uint)pageIndex);
             var folder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(imgPath));
             var file = await folder.CreateFileAsync(Path.GetFileName(imgPath), Windows.Storage.CreationCollisionOption.ReplaceExisting);
@@ -56,44 +57,80 @@ namespace SnapDoc
             await page.RenderToStreamAsync(outStream, options);
             await outStream.FlushAsync();
 #elif IOS
-            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
-                return;
+            //if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
+            //    return;
+
             //using var page = doc.Document.GetPage(pageIndex);
             //var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
-            //var size = new CGSize(pageRect.Width * scale, pageRect.Height * scale);
-            //var renderer = new UIGraphicsImageRenderer(size);
-            //var image = renderer.CreateImage((context) =>
+            //int width = (int)(pageRect.Width * scale);
+            //int height = (int)(pageRect.Height * scale);
+            //using var colorSpace = CGColorSpace.CreateDeviceRGB();
+            //using var context = new CGBitmapContext(
+            //    null,
+            //    width,
+            //    height,
+            //    8,
+            //    0,
+            //    colorSpace,
+            //    CGImageAlphaInfo.PremultipliedLast);
+
+            //if (context != null)
             //{
-            //    context.CGContext.SetFillColor(UIColor.White.CGColor);
-            //    context.CGContext.FillRect(new CGRect(CGPoint.Empty, size));
-            //    context.CGContext.TranslateCTM(0, size.Height);
-            //    context.CGContext.ScaleCTM(scale, -scale);
-            //    page.Draw(PdfDisplayBox.Media, context.CGContext);
-            //});
-            //using var jpegData = image.AsJPEG(0.8f);
-            //if (jpegData != null)
-            //    File.WriteAllBytes(imgPath, [.. jpegData]);
+            //    context.SetFillColor(UIColor.White.CGColor);
+            //    context.FillRect(new CGRect(0, 0, width, height));
+            //    context.TranslateCTM(0, height);
+            //    context.ScaleCTM(scale, -scale);
+
+            //    page.Draw(PdfDisplayBox.Media, context);
+
+            //    using var cgImage = context.ToImage();
+            //    using var uiImage = UIImage.FromImage(cgImage);
+            //    using var jpegData = uiImage.AsJPEG(0.8f);
+
+            //    if (jpegData != null)
+            //        File.WriteAllBytes(imgPath, [.. jpegData]);
+            //}
+
+            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
+                return;
 
             using var page = doc.Document.GetPage(pageIndex);
             var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
+            int rotation = (int)page.Rotation;
             int width = (int)(pageRect.Width * scale);
             int height = (int)(pageRect.Height * scale);
+
+            if (rotation == 90 || rotation == 270)
+            {
+                width = (int)(pageRect.Height * scale);
+                height = (int)(pageRect.Width * scale);
+            }
+
             using var colorSpace = CGColorSpace.CreateDeviceRGB();
-            using var context = new CGBitmapContext(
-                null,
-                width,
-                height,
-                8,
-                0,
-                colorSpace,
-                CGImageAlphaInfo.PremultipliedLast);
+            using var context = new CGBitmapContext(null, width, height, 8, 0, colorSpace, CGImageAlphaInfo.PremultipliedLast);
 
             if (context != null)
             {
                 context.SetFillColor(UIColor.White.CGColor);
                 context.FillRect(new CGRect(0, 0, width, height));
-                context.TranslateCTM(0, height);
-                context.ScaleCTM(scale, -scale);
+
+                if (rotation == 0)
+                {
+                    context.TranslateCTM(0, height);
+                    context.ScaleCTM(scale, -scale);
+                }
+                else if (rotation == 180)
+                {
+                    context.TranslateCTM(width, 0);
+                    context.ScaleCTM(-scale, scale);
+                }
+                else
+                {
+                    context.TranslateCTM(0, height);
+                    context.ScaleCTM(1, -1);
+                    context.ScaleCTM(scale, scale);
+                }
+
                 page.Draw(PdfDisplayBox.Media, context);
 
                 using var cgImage = context.ToImage();
@@ -101,7 +138,7 @@ namespace SnapDoc
                 using var jpegData = uiImage.AsJPEG(0.8f);
 
                 if (jpegData != null)
-                    File.WriteAllBytes(imgPath, jpegData.ToArray());
+                    File.WriteAllBytes(imgPath, [.. jpegData]);
             }
 #elif ANDROID
             if (doc.Renderer == null)
@@ -113,20 +150,16 @@ namespace SnapDoc
                 page = doc.Renderer.OpenPage(pageIndex);
                 int width = (int)(page.Width * scale);
                 int height = (int)(page.Height * scale);
-                using (var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888))
+                using var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
+                using (var canvas = new Canvas(bitmap))
                 {
-                    using (var canvas = new Canvas(bitmap))
-                    {
-                        canvas.DrawColor(Android.Graphics.Color.White);
-                        page.Render(bitmap, null, null, PdfRenderMode.ForDisplay);
-                        using (var stream = new FileStream(imgPath, FileMode.Create, FileAccess.Write))
-                        {
-                            await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 80, stream);
-                            await stream.FlushAsync();
-                        }
-                    }
-                    bitmap.Recycle();
+                    canvas.DrawColor(Android.Graphics.Color.White);
+                    page.Render(bitmap, null, null, PdfRenderMode.ForDisplay);
+                    using var stream = new FileStream(imgPath, FileMode.Create, FileAccess.Write);
+                    await bitmap.CompressAsync(Bitmap.CompressFormat.Jpeg, 80, stream);
+                    await stream.FlushAsync();
                 }
+                bitmap.Recycle();
             }
             finally
             {

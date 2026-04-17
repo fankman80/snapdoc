@@ -77,9 +77,14 @@
                                             HeightRequest="48"
                                             BackgroundColor="Transparent"
                                             Stroke="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                            Padding="8"
+                                            Padding="0"
                                             StrokeThickness="1">
-                                        <Image Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Add}}"/>
+                                        <Label Text="{x:Static local:MaterialIcons.Add}"
+                                               FontFamily="MaterialOutlined"
+                                               FontSize="40"
+                                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center"/>
                                         <Border.GestureRecognizers>
                                             <TapGestureRecognizer Tapped="OnAddTapped" />
                                         </Border.GestureRecognizers>
