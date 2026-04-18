@@ -73,8 +73,6 @@ namespace SnapDoc
                 var context = rendererContext.CGContext;
                 context.SetFillColor(UIColor.White.CGColor);
                 context.FillRect(new CGRect(0, 0, width, height));
-                context.TranslateCTM(0, height);
-                context.ScaleCTM(1.0f, -1.0f);
                 context.ScaleCTM(scale, scale);
                 page.Draw(PdfDisplayBox.Media, context);
             });
