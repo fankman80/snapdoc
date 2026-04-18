@@ -63,53 +63,25 @@ namespace SnapDoc
             using var page = doc.Document.GetPage(pageIndex);
             var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
             int rotation = (int)page.Rotation;
-            int width = (int)(pageRect.Width * scale);
-            int height = (int)(pageRect.Height * scale);
+            bool isLandscape = (rotation == 90 || rotation == 270);
+            var width = isLandscape ? pageRect.Height * scale : pageRect.Width * scale;
+            var height = isLandscape ? pageRect.Width * scale : pageRect.Height * scale;
+            var format = new UIGraphicsImageRendererFormat { Opaque = true, Scale = 1.0f };
+            var renderer = new UIGraphicsImageRenderer(new CGSize(width, height), format);
 
-            if (rotation == 90 || rotation == 270)
-            {
-                width = (int)(pageRect.Height * scale);
-                height = (int)(pageRect.Width * scale);
-            }
-
-            using var colorSpace = CGColorSpace.CreateDeviceRGB();
-            using var context = new CGBitmapContext(null, width, height, 8, 0, colorSpace, CGImageAlphaInfo.PremultipliedLast);
-
-            if (context != null)
-            {
+            var img = renderer.CreateImage((rendererContext) => {
+                var context = rendererContext.CGContext;
                 context.SetFillColor(UIColor.White.CGColor);
                 context.FillRect(new CGRect(0, 0, width, height));
                 context.TranslateCTM(0, height);
                 context.ScaleCTM(1.0f, -1.0f);
                 context.ScaleCTM(scale, scale);
-
-                switch (rotation)
-                {
-                    case 90:
-                        context.RotateCTM((float)(Math.PI / -2.0));
-                        context.TranslateCTM(-pageRect.Width, 0);
-                        break;
-                    case 180:
-                        context.RotateCTM((float)Math.PI);
-                        context.TranslateCTM(-pageRect.Width, -pageRect.Height);
-                        break;
-                    case 270:
-                        context.RotateCTM((float)(Math.PI / 2.0));
-                        context.TranslateCTM(0, -pageRect.Height);
-                        break;
-                    default:
-                        break;
-                }
-
                 page.Draw(PdfDisplayBox.Media, context);
+            });
 
-                using var cgImage = context.ToImage();
-                using var uiImage = UIImage.FromImage(cgImage);
-                using var jpegData = uiImage.AsJPEG(0.8f);
-
-                if (jpegData != null)
-                    File.WriteAllBytes(imgPath, [.. jpegData]);
-            }
+            using var stream = File.OpenWrite(imgPath);
+            using var jpegData = img.AsJPEG(0.8f);
+            jpegData.AsStream().CopyTo(stream);
 #elif ANDROID
             if (doc.Renderer == null)
                 return;
