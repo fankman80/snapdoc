@@ -56,6 +56,9 @@ jobs:
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
           -p:RuntimeIdentifier=ios-arm64 \
           -p:SuppressXCodeVersionMismatch=true
+        env:
+          # Hier wird das GitHub Secret als Umgebungsvariable übergeben
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
