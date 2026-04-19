@@ -30,7 +30,7 @@ public static class MauiProgram
             .UseSkiaSharp()
             .UseSentry(options =>
             {
-                options.Dsn = "https://7280358f3695e3ae241277bf64f92a36@o4511245885308928.ingest.de.sentry.io/4511245889830992";
+                options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
                 options.TracesSampleRate = 1.0;
                 options.EnableLogs = true;
             })
