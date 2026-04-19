@@ -35,7 +35,9 @@ public static class MauiProgram
                 options.EnableLogs = true;
                 options.AttachScreenshot = true;
                 options.AttachStacktrace = true;
-                options.IncludePdbInDiagnosticContext = true;
+                options.IncludeBackgroundingStateInBreadcrumbs = true;
+                options.IncludeTextInBreadcrumbs = true;
+                options.IncludeTitleInBreadcrumbs = true;
             })
             .ConfigureFonts(fonts =>
             {
