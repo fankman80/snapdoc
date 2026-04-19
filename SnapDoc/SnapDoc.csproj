@@ -211,7 +211,7 @@
         <SentryUploadSymbols>true</SentryUploadSymbols>
         <SentryOrg>fankman_dev</SentryOrg>
         <SentryProject>snapdoc_maui</SentryProject>
-        <SentryAuthToken>https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536</SentryAuthToken>
+        <SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
 		<SentryUploadSymbols>true</SentryUploadSymbols>
 		<SentryUploadPdb>true</SentryUploadPdb>
     </PropertyGroup>
