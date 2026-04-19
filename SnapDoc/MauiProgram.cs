@@ -28,6 +28,12 @@ public static class MauiProgram
             .UseFFImageLoading()
             .ConfigureMRGestures()
             .UseSkiaSharp()
+            .UseSentry(options =>
+            {
+                options.Dsn = "https://7280358f3695e3ae241277bf64f92a36@o4511245885308928.ingest.de.sentry.io/4511245889830992";
+                options.TracesSampleRate = 1.0;
+                options.EnableLogs = true;
+            })
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
