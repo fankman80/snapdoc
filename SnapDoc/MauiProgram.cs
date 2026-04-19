@@ -33,6 +33,9 @@ public static class MauiProgram
                 options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
                 options.TracesSampleRate = 1.0;
                 options.EnableLogs = true;
+                options.AttachScreenshot = true;
+                options.AttachStacktrace = true;
+                options.IncludePdbInDiagnosticContext = true;
             })
             .ConfigureFonts(fonts =>
             {
