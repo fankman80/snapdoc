@@ -188,21 +188,6 @@
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
-                    <Label Text="{x:Static res:AppResources.foto_breite}" IsVisible="{Binding IsImageExport}" Margin="0,0,0,-10"/>
-                    <controls:RangeSlider
-                        IsVisible="{Binding IsImageExport}"
-                        IsRange="False"
-                        Minimum="10"
-                        Maximum="160"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0} mm"
-                        LowerValue="{Binding ImageExportSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                    </controls:RangeSlider>
-
                     <Label Text="{x:Static res:AppResources.positionsbilder_breite_hoehe}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
                     <controls:RangeSlider
                         IsVisible="{Binding IsPosImageExport}"
@@ -229,20 +214,6 @@
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         MinimumValueDisplayFormat="{}{0:0} Pixel"
                         LowerValue="{Binding PinPosCropExportSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                    </controls:RangeSlider>
-
-                    <Label Text="{x:Static res:AppResources.titelbild_hoehe}" Margin="0,0,0,-10"/>
-                    <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="10"
-                        Maximum="300"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0} mm"
-                        LowerValue="{Binding TitleExportSize}"
                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>

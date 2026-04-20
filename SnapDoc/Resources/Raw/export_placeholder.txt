@@ -25,10 +25,10 @@ ${plan_indexes}
 // Liste der Pläne
 
 ${plan_images/x/y}
-// Pläne x und y max. Breite und Höhe in Millimeter
+// Pläne, x/y = max. Breite und Höhe in Millimeter
 
-${title_image}
-// Titelbild
+${title_image/x/y}
+// Titelbild, x/y = max. Breite und Höhe in Millimeter
 
 ${pin_nr}
 // Fortlaufende Nummer des Pins
@@ -39,8 +39,8 @@ ${pin_planName}
 ${pin_posImage}
 // Positionsbild des Pins (Planausschnitt)
 
-${pin_fotoList}
-// Die dem Pin zugehörige Fotos
+${pin_fotoList/x/y}
+// Die dem Pin zugehörige Fotos, x/y = max. Breite und Höhe in Millimeter
 
 ${pin_name}
 // Titel oder Bezeichnung des Pins

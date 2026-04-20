@@ -4,7 +4,6 @@ using DocumentFormat.OpenXml.CustomXmlDataProperties;
 using DocumentFormat.OpenXml.Packaging;
 using DocumentFormat.OpenXml.Vml;
 using DocumentFormat.OpenXml.Wordprocessing;
-using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using System.Text;
@@ -18,13 +17,12 @@ namespace SnapDoc;
 
 public partial class ExportReport
 {
-    [GeneratedRegex(@"\$\{plan_images/(\d+)/(\d+)\}")]
-    private static partial Regex PlanImagesRegex();
-
+    [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList)/(?<w>\d+)/(?<h>\d+)\}")]
+    private static partial Regex UniversalImageRegex();
+    private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
+    private record ImageTagData(string Type, SizeF Size, string FullMatch);
     private static readonly Dictionary<string, string> imageRelationshipIds = [];
-
     private static string storeItemId;
-
     private record FotoWorkItem(string SourcePath, string TargetPath, float CompressValue);
 
     public static async Task DocX(string templateDoc, string savePath)
@@ -35,7 +33,7 @@ public partial class ExportReport
         if (!Directory.Exists(Settings.CacheDirectory))
             Directory.CreateDirectory(Settings.CacheDirectory);
 
-        // Alle Bilder parallel vorbereiten (BEVOR das Word-Dokument angefasst wird)
+        // Alle Bilder parallel vorbereiten
         await PreProcessAllImagesAsync(GlobalJson.Data, CancellationToken.None);
 
         Dictionary<string, string> placeholders_single = new()
@@ -52,14 +50,14 @@ public partial class ExportReport
         {
             {"${plan_indexes}", "${plan_indexes}"},         //bereinige splitted runs
             {"${plan_images/", "${plan_images/"},           //bereinige splitted runs
-            {"${title_image/}", "${title_image/}"},           //bereinige splitted runs
+            {"${title_image/", "${title_image/"},           //bereinige splitted runs
         };
         Dictionary<string, string> placeholders_table = new()
         {
             {"${pin_nr}", "${pin_nr}"},                     //bereinige splitted runs
             {"${pin_planName}", "${pin_planName}"},         //bereinige splitted runs
             {"${pin_posImage}", "${pin_posImage}"},         //bereinige splitted runs
-            {"${pin_fotoList}", "${pin_fotoList}"},         //bereinige splitted runs
+            {"${pin_fotoList/", "${pin_fotoList/"},         //bereinige splitted runs
             {"${pin_name}", "${pin_name}"},                 //bereinige splitted runs
             {"${pin_desc}", "${pin_desc}"},                 //bereinige splitted runs
             {"${pin_location}", "${pin_location}"},         //bereinige splitted runs
@@ -132,12 +130,9 @@ public partial class ExportReport
                            ?? customXmlPart.AddNewPart<CustomXmlPropertiesPart>();
 
             if (string.IsNullOrEmpty(storeItemId))
-            {
                 storeItemId = "{" + Guid.NewGuid().ToString().ToUpper() + "}";
-            }
 
             propPart.DataStoreItem ??= new DataStoreItem { ItemId = storeItemId };
-
 
             // suche Tabelle mit Namen "Pin_Table"
             string tableTitle = "Pin_Table";
@@ -160,8 +155,15 @@ public partial class ExportReport
             {
                 if (table != null)
                 {
-                    List<(int, int, string)> columnList = SearchTableColumns(table, placeholders_table); // Suche SpaltenNummern
-                    i = 1;
+                    // Die Template-Zeile finden (diejenige, die die Platzhalter enthält)
+                    List<(int, int, int, string)> columnList = SearchTableColumns(table, placeholders_table);
+                    int templateRowIndex = columnList[0].Item1;
+                    TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
+
+                    if (templateRow == null)
+                        return;
+
+                    i = 1; // erstelle einen globalen Pin-Counter
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
                         if (GlobalJson.Data.Plans[plan.Key].Pins != null && GlobalJson.Data.Plans[plan.Key].AllowExport)
@@ -175,17 +177,20 @@ public partial class ExportReport
 
                                     TableRow newRow = new();
 
+                                    // Formatierung der Template-Zeilekopieren
+                                    if (templateRow?.TableRowProperties != null)
+                                        newRow.AppendChild(templateRow.TableRowProperties.CloneNode(true));
+
                                     for (int column = 0; column < columnCount; column++)
                                     {
-                                        var _columnPlaceholders = columnList.FindAll(item => item.Item1 == column);
+                                        var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
                                         TableCell newTableCell = new();
                                         Paragraph newParagraph = new();
 
                                         if (_columnPlaceholders.Count > 0)
                                         {
-                                            foreach ((int, int, string) ph in _columnPlaceholders)
+                                            foreach ((int, int, int, string) ph in _columnPlaceholders)
                                             {
-                                                // Hilfsfunktion: Text + Break anhängen
                                                 void AddText(string text)
                                                 {
                                                     if (!string.IsNullOrEmpty(text))
@@ -195,7 +200,7 @@ public partial class ExportReport
                                                     }
                                                 }
 
-                                                switch (ph.Item3)
+                                                switch (ph.Item4)
                                                 {
                                                     case "${pin_nr}":
                                                         {
@@ -263,12 +268,16 @@ public partial class ExportReport
                                                         }
                                                         break;
 
-                                                    case "${pin_fotoList}":
-                                                        if (SettingsService.Instance.IsImageExport)
+                                                    case string s when s.StartsWith("${pin_fotoList"):
+                                                        var data = GetPlaceholderData(s);
+                                                        if (data != null && SettingsService.Instance.IsImageExport)
                                                         {
-                                                            foreach (var img in GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos.Values)
+                                                            SizeF maxTargetSize = data.Size;
+                                                            var pinFotos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos.Values;
+                                                            foreach (var img in pinFotos)
                                                             {
-                                                                if (!img.AllowExport) continue;
+                                                                if (!img.AllowExport)
+                                                                    continue;
 
                                                                 string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
                                                                 string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
@@ -280,17 +289,14 @@ public partial class ExportReport
 
                                                                 if (File.Exists(imgPath))
                                                                 {
-                                                                    double factor = (double)img.ImageSize.Width / img.ImageSize.Height;
-                                                                    var scaledSize = new Size
-                                                                    {
-                                                                        Width = SettingsService.Instance.ImageExportSize,
-                                                                        Height = SettingsService.Instance.ImageExportSize / factor
-                                                                    };
-
+                                                                    SizeF scaledSize = ScaleToFit(img.ImageSize, maxTargetSize);
                                                                     var imageElement = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline");
-
                                                                     if (imageElement != null)
-                                                                        newParagraph.Append(new Run(imageElement));
+                                                                    {
+                                                                        Run imgRun = new(imageElement);
+                                                                        imgRun.AppendChild(new Text(" ") { Space = SpaceProcessingModeValues.Preserve });
+                                                                        newParagraph.Append(imgRun);
+                                                                    }
                                                                 }
                                                             }
                                                         }
@@ -344,6 +350,9 @@ public partial class ExportReport
                                     i++;
                                 }
                             }
+                            // Die ursprüngliche Template-Zeile jetzt entfernen
+                            if (templateRow != null && templateRow.Parent != null)
+                                templateRow.Remove();
                         }
                     }
                 }
@@ -351,27 +360,22 @@ public partial class ExportReport
                 // Add Title Image
                 if (mainPart?.Document?.Body != null)
                 {
-                    foreach (Paragraph paragraph in mainPart.Document.Body.Elements<Paragraph>())
-                    {
-                        Run run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains("${title_image/"));
-                        if (run != null)
-                        {
-                            foreach (Text text in run.Elements<Text>())
-                            {
-                                if (text.Text.Contains("${title_image/"))
-                                {
-                                    text.Remove(); // Lösche den Platzhaltertext
-                                    SizeF fotoMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
-                                    SizeF scaledFotoSize = ScaleToFit(GlobalJson.Data.TitleImageSize, fotoMaxSize);
-                                    string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
-                                    if (File.Exists(imgPath))
-                                    {
-                                        Drawing _img = GetImageElement(mainPart, imgPath, scaledFotoSize, new Point(0, 0), 0, "inline");
+                    var titleParagraphs = mainPart.Document.Body.Descendants<Paragraph>()
+                        .Where(p => p.InnerText.Contains("${title_image/")).ToList();
 
-                                        run.Append(_img);
-                                    }
-                                }
-                            }
+                    foreach (var p in titleParagraphs)
+                    {
+                        var data = GetPlaceholderData(p.InnerText);
+                        if (data == null) continue;
+                        SizeF scaledSize = ScaleToFit(GlobalJson.Data.TitleImageSize, data.Size);
+                        string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+
+                        if (File.Exists(imgPath))
+                        {
+                            SimplifyAndReplacePlaceholder(p, data.FullMatch);
+
+                            var run = p.AppendChild(new Run());
+                            run.AppendChild(GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline"));
                         }
                     }
                 }
@@ -379,7 +383,6 @@ public partial class ExportReport
                 // Insert Plans
                 if (SettingsService.Instance.IsPlanExport)
                 {
-                    // create Plan Index
                     if (mainPart?.Document?.Body != null)
                     {
                         foreach (Paragraph paragraph in mainPart.Document.Body.Elements<Paragraph>())
@@ -413,104 +416,85 @@ public partial class ExportReport
 
                     if (mainPart?.Document?.Body != null)
                     {
-                        // add Plan Images
-                        foreach (Paragraph paragraph in mainPart.Document.Body.Elements<Paragraph>())
+                        var paragraphs = mainPart.Document.Body.Elements<Paragraph>().ToList();
+
+                        foreach (Paragraph placeholderPara in paragraphs)
                         {
-                            if (paragraph.InnerText.Contains("${plan_images/"))
+                            var data = GetPlaceholderData(placeholderPara.InnerText);
+
+                            if (data == null || data.Type != "plan_images")
+                                continue;
+
+                            SizeF planMaxSize = data.Size;
+                            string fontSizeVal = placeholderPara.Descendants<DW.FontSize>().FirstOrDefault()?.Val?.Value ?? "28";
+                            OpenXmlElement lastElement = placeholderPara;
+                            int planCounter = GlobalJson.Data.Plans.Values.Count(p => p.AllowExport);
+                            int currentPlanIdx = 1;
+                            int pinIndex = 1; // Pin-Counter
+
+                            foreach (var planEntry in GlobalJson.Data.Plans)
                             {
-                                SizeF planMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
+                                Plan plan = planEntry.Value;
+                                if (!plan.AllowExport)
+                                    continue;
 
-                                // lese Textformatierung des Platzhalters ein
-                                string fontSizeVal = "28";
-                                Run firstRun = paragraph.Elements<Run>().FirstOrDefault();
-                                var existingFontSize = firstRun?.RunProperties?.FontSize;
-                                if (existingFontSize != null)
-                                    fontSizeVal = existingFontSize.Val;
+                                Paragraph namePara = new(
+                                    new Run(
+                                        new RunProperties(new DW.FontSize { Val = fontSizeVal }),
+                                        new Text(plan.Name)
+                                    )
+                                );
+                                mainPart.Document.Body.InsertAfter(namePara, lastElement);
+                                lastElement = namePara;
 
-                                // lösche den Platzhalter
-                                paragraph.RemoveAllChildren();
-                                paragraph.Append(new Run());
+                                Paragraph imagePara = new();
+                                Run imgRun = new();
+                                string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File);
+                                Size originalSize = plan.ImageSize;
+                                SizeF scaledSize = ScaleToFit(originalSize, planMaxSize);
 
-                                int planCounter = GlobalJson.Data.Plans.Count;
-                                i = 1;
-                                foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
+                                imgRun.Append(GetImageElement(mainPart, planImagePath, scaledSize, new Point(0, 0), 0, "anchor"));
+
+                                if (plan.Pins != null)
                                 {
-                                    if (GlobalJson.Data.Plans[plan.Key].AllowExport)
+                                    foreach (Pin pin in plan.Pins.Values.Where(p => p.IsAllowExport))
                                     {
-                                        // Erster Paragraph für den Plan-Namen
-                                        Paragraph textParagraph = new();
-                                        Run run = new();
-                                        RunProperties runProperties = new(); // definiere Schriftgrösse
-                                        DW.FontSize fontSize = new() { Val = fontSizeVal }; // 16pt Schriftgröße
-                                        runProperties.Append(fontSize);
-                                        run.PrependChild(runProperties);
-                                        run.Append(new Text(GlobalJson.Data.Plans[plan.Key].Name));
-                                        textParagraph.Append(run);
-                                        paragraph.Append(textParagraph);
-
-                                        // Zweiter Paragraph für das Plan-Image und Pins
-                                        Paragraph imageAndPinsParagraph = new();
-                                        run = new Run();
-                                        string planImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, GlobalJson.Data.Plans[plan.Key].File);
-                                        Size planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
-                                        SizeF scaledPlanSize = ScaleToFit(planSize, planMaxSize);
-                                        SizeF scaleFactor = new(scaledPlanSize.Width / (float)planSize.Width, scaledPlanSize.Height / (float)planSize.Height);
-                                        run.Append(GetImageElement(mainPart, planImage, scaledPlanSize, new Point(0, 0), 0, "anchor"));
-
-                                        // Setze Pins
-                                        if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+                                        string pinImagePath = Path.Combine(Settings.CacheDirectory, pin.PinIcon);
+                                        var scaledPinSize = new SizeF
                                         {
-                                            foreach (KeyValuePair<string, Pin> pin in GlobalJson.Data.Plans[plan.Key].Pins)
-                                            {
-                                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
-                                                {
-                                                    string pinImage = Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
-                                                    PointF pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
-                                                    PointF pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
-                                                    SizeF pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
-                                                    SKColor pinColor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinColor;
-                                                    float pinRotation = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
-                                                    var scaledPinSize = new SizeF
-                                                    {
-                                                        Width = (float)(pinSize.Width * scaledPlanSize.Width / planSize.Width * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale),
-                                                        Height = (float)(pinSize.Height * scaledPlanSize.Height / planSize.Height * GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale)
-                                                    };
+                                            Width = (float)(pin.Size.Width * scaledSize.Width / originalSize.Width * pin.PinScale),
+                                            Height = (float)(pin.Size.Height * scaledSize.Height / originalSize.Height * pin.PinScale)
+                                        };
 
-                                                    PointF posOnPlan = PivotRecalc(pinPos, pinRotation, pinAnchor, scaledPinSize, scaledPlanSize);
+                                        PointF posOnPlan = PivotRecalc(pin.Pos, (float)pin.PinRotation, pin.Anchor, scaledPinSize, scaledSize);
+                                        imgRun.Append(GetImageElement(mainPart, pinImagePath, scaledPinSize, posOnPlan, (float)pin.PinRotation, "anchor"));
+                                        imgRun.Append(CreateTextBoxWithShape(
+                                            SettingsService.Instance.PinLabelPrefix,
+                                            pinIndex,
+                                            storeItemId,
+                                            $"/positions/pos[@id='{pinIndex}']",
+                                            new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - (SettingsService.Instance.PinLabelFontSize / 2)),
+                                            SettingsService.Instance.PinLabelFontSize,
+                                            pin.PinColor.ToString()[3..]));
 
-                                                    run.Append(GetImageElement(
-                                                        mainPart,
-                                                        pinImage,
-                                                        scaledPinSize,
-                                                        posOnPlan,
-                                                        pinRotation,
-                                                        "anchor"
-                                                    ));
-                                                    run.Append(CreateTextBoxWithShape(SettingsService.Instance.PinLabelPrefix,
-                                                                                      i,
-                                                                                      storeItemId,
-                                                                                      $"/positions/pos[@id='{i}']",
-                                                                                      new Point(posOnPlan.X + scaledPinSize.Width + 1, posOnPlan.Y - (SettingsService.Instance.PinLabelFontSize / 2)),
-                                                                                      SettingsService.Instance.PinLabelFontSize,
-                                                                                      pinColor.ToString()[3..]));
-                                                    i++;
-                                                }
-                                            }
-                                        }
-                                        // Füge das Plan-Image und die Pins zum Paragraph hinzu
-                                        imageAndPinsParagraph.Append(run);
-                                        paragraph.Append(imageAndPinsParagraph);
-
-                                        // Erstelle einen neuen Paragraph mit einem Seitenumbruch (ausser nach dem letzen Plan)
-                                        if (planCounter > 1)
-                                        {
-                                            Paragraph pageBreakParagraph = new(new Run(new Break() { Type = BreakValues.Page }));
-                                            paragraph.Append(pageBreakParagraph);
-                                        }
-                                        planCounter--;
+                                        pinIndex++;
                                     }
                                 }
+
+                                imagePara.Append(imgRun);
+                                mainPart.Document.Body.InsertAfter(imagePara, lastElement);
+                                lastElement = imagePara;
+
+                                if (currentPlanIdx < planCounter)
+                                {
+                                    Paragraph pbPara = new(new Run(new Break() { Type = BreakValues.Page }));
+                                    mainPart.Document.Body.InsertAfter(pbPara, lastElement);
+                                    lastElement = pbPara;
+                                }
+
+                                currentPlanIdx++;
                             }
+                            placeholderPara.Remove();
                         }
                     }
                 }
@@ -919,49 +903,76 @@ public partial class ExportReport
         return [.. uniquePinIcons];
     }
 
-    private static List<(int columnIndex, int positionInText, string placeholderKey)> SearchTableColumns(Table table, Dictionary<string, string> placeholders_table)
+    private static List<(int rowIndex, int columnIndex, int positionInText, string placeholderKey)> SearchTableColumns(Table table, Dictionary<string, string> placeholders_table)
     {
-        List<(int, int, string)> columnList = [];
+        List<(int, int, int, string)> columnList = [];
+        int rowIndex = 0; // Zeilenzähler initialisieren
+
         foreach (TableRow row in table.Elements<TableRow>())
         {
-            int columnIndex = 0; // Spaltenzähler
+            int columnIndex = 0;
             foreach (TableCell cell in row.Elements<TableCell>())
             {
                 foreach (Paragraph paragraph in cell.Elements<Paragraph>())
                 {
-                    string paragraphText = paragraph.InnerText; // Gesamter Text des Paragraphen
+                    string paragraphText = paragraph.InnerText;
+                    if (string.IsNullOrEmpty(paragraphText))
+                        continue;
+
                     foreach (KeyValuePair<string, string> placeholder in placeholders_table)
                     {
-                        int position = paragraphText.IndexOf(placeholder.Key);
-                        if (position != -1) // Platzhalter gefunden
+                        if (paragraphText.Contains(placeholder.Key))
                         {
-                            columnList.Add((columnIndex, position, placeholder.Key));
-                            Run run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains(placeholder.Key));
-                            if (run != null)
+                            var match = UniversalImageRegex().Match(paragraphText);
+
+                            string actualKey;
+                            if (match.Success && match.Value.Contains(placeholder.Key.Replace("${", "").Replace("}", "")))
+                                actualKey = match.Value;
+                            else
+                                actualKey = placeholder.Key;
+
+                            int position = paragraphText.IndexOf(actualKey);
+                            if (position != -1)
                             {
-                                foreach (Text text in run.Elements<Text>())
-                                {
-                                    if (text.Text.Contains(placeholder.Key))
-                                        text.Text = text.Text.Replace(placeholder.Key, ""); // Platzhalter entfernen
-                                }
+                                columnList.Add((rowIndex, columnIndex, position, actualKey));
+                                RemovePlaceholderText(paragraph, actualKey);
                             }
                         }
                     }
                 }
-                columnIndex++; // Spaltenzähler erhöhen
+                columnIndex++;
             }
+            rowIndex++; // Nächste Zeile
         }
 
-        // Sortiere die Liste nach Spalte und Position im Text
+        // Sortierung anpassen: Erst nach Zeile, dann nach Spalte, dann nach Position
         columnList.Sort((x, y) =>
         {
-            int result = x.Item1.CompareTo(y.Item1); // Zuerst nach Spalte (Item1) sortieren
-            if (result == 0)
-                result = x.Item2.CompareTo(y.Item2); // Wenn Spalte gleich, nach Position im Text (Item2) sortieren
-            return result;
+            int res = x.Item1.CompareTo(y.Item1); // rowIndex
+            if (res == 0) res = x.Item2.CompareTo(y.Item2); // columnIndex
+            if (res == 0) res = x.Item3.CompareTo(y.Item3); // positionInText
+            return res;
         });
 
         return columnList;
+    }
+
+    private static void RemovePlaceholderText(Paragraph p, string fullMatch)
+    {
+        foreach (var textElement in p.Descendants<Text>())
+        {
+            if (textElement.Text.Contains(fullMatch))
+            {
+                textElement.Text = textElement.Text.Replace(fullMatch, "");
+            }
+        }
+
+        if (p.InnerText.Contains(fullMatch))
+        {
+            string newText = p.InnerText.Replace(fullMatch, "");
+            p.RemoveAllChildren<Run>();
+            p.AppendChild(new Run(new Text(newText)));
+        }
     }
 
     private static Picture CreateTextBoxWithShape(
@@ -1090,7 +1101,7 @@ public partial class ExportReport
 
     private static SizeF ExtractDimensions(string input)
     {
-        Regex regex = PlanImagesRegex();
+        Regex regex = UniversalImageRegex();
         Match match = regex.Match(input);
 
         if (match.Success)
@@ -1100,6 +1111,33 @@ public partial class ExportReport
             return new SizeF(width, height);
         }
         return new SizeF(250, 140);
+    }
+
+    private static ImagePlaceholderData GetPlaceholderData(string text)
+    {
+        var match = UniversalImageRegex().Match(text);
+        if (!match.Success) return null;
+
+        return new ImagePlaceholderData(
+            match.Groups["type"].Value, // "title_image" oder "plan_images"
+            new SizeF(int.Parse(match.Groups["w"].Value), int.Parse(match.Groups["h"].Value)),
+            match.Value // Der exakte Text wie "${title_image/250/250}"
+        );
+    }
+
+    private static void SimplifyAndReplacePlaceholder(Paragraph p, string placeholder)
+    {
+        string fullText = p.InnerText;
+        string newText = fullText.Replace(placeholder, "");
+
+        // Alle alten Text-Elemente löschen
+        p.RemoveAllChildren<Run>();
+
+        // Falls noch restlicher Text vorhanden war (vor/nach dem Platzhalter), wieder einfügen
+        if (!string.IsNullOrWhiteSpace(newText))
+        {
+            p.AppendChild(new Run(new Text(newText) { Space = SpaceProcessingModeValues.Preserve }));
+        }
     }
 
     public static void CopyImageToDirectory(string destinationPath, string path, string icon)

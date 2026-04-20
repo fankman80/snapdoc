@@ -138,9 +138,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsPinIconExport { get; set; } = true;
     [ObservableProperty] public partial bool IsFotoOverlayExport { get; set; } = true;
     [ObservableProperty] public partial int FotoCompressValue { get; set; } = 20;
-    [ObservableProperty] public partial int ImageExportSize { get; set; } = 40;
     [ObservableProperty] public partial double PinExportSize { get; set; } = 3.2;
-    [ObservableProperty] public partial int TitleExportSize { get; set; } = 90;
     [ObservableProperty] public partial int PinPosExportSize { get; set; } = 25;
     [ObservableProperty] public partial int PinPosCropExportSize { get; set; } = 300;
     [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
@@ -329,10 +327,8 @@ public partial class SettingsService : ObservableObject
             PinLabelPrefix = PinLabelPrefix,
             PinLabelFontSize = Math.Round(PinLabelFontSize, 1),
             PinExportSize = Math.Round(PinExportSize, 1),
-            ImageExportSize = ImageExportSize,
             PinPosExportSize = PinPosExportSize,
             PinPosCropExportSize = PinPosCropExportSize,
-            TitleExportSize = TitleExportSize,
             IconGalleryGridView = IconGalleryGridView,
             PhotoGalleryGridView = PhotoGalleryGridView,
             MaxPdfImageSizeW = MaxPdfImageSizeW,
@@ -406,10 +402,8 @@ public partial class SettingsService : ObservableObject
             PinLabelPrefix = settings.PinLabelPrefix ?? string.Empty;
             PinLabelFontSize = settings.PinLabelFontSize;
             PinExportSize = settings.PinExportSize;
-            ImageExportSize = settings.ImageExportSize;
             PinPosExportSize = settings.PinPosExportSize;
             PinPosCropExportSize = settings.PinPosCropExportSize;
-            TitleExportSize = settings.TitleExportSize;
             IconGalleryGridView = settings.IconGalleryGridView;
             PhotoGalleryGridView = settings.PhotoGalleryGridView;
             MaxPdfImageSizeW = settings.MaxPdfImageSizeW;
@@ -479,10 +473,8 @@ public partial class SettingsService : ObservableObject
         PinLabelPrefix = defaultSettings.PinLabelPrefix;
         PinLabelFontSize = defaultSettings.PinLabelFontSize;
         PinExportSize = defaultSettings.PinExportSize;
-        ImageExportSize = defaultSettings.ImageExportSize;
         PinPosExportSize = defaultSettings.PinPosExportSize;
         PinPosCropExportSize = defaultSettings.PinPosCropExportSize;
-        TitleExportSize = defaultSettings.TitleExportSize;
         IconGalleryGridView = defaultSettings.IconGalleryGridView;
         PhotoGalleryGridView = defaultSettings.PhotoGalleryGridView;
         MaxPdfImageSizeW = defaultSettings.MaxPdfImageSizeW;
