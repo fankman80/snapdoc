@@ -9,7 +9,7 @@ namespace SnapDoc;
 
 public class CapturePicture
 {
-    public static async Task<(FileResult, System.Drawing.Size)> Capture(string filepath, string thumbnailPath = null, string customFilename = null)
+    public static async Task<(FileResult, Size)> Capture(string filepath, string thumbnailPath = null, string customFilename = null)
     {
         var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
 
@@ -22,7 +22,7 @@ public class CapturePicture
                 AppResources.berechtigung_fehlt,
                 AppResources.berechtigung_kamera_dateien_info,
                 AppResources.ok);
-            return (null, new System.Drawing.Size(0, 0));
+            return (null, new Size(0, 0));
         }
 
         try
@@ -43,7 +43,7 @@ public class CapturePicture
             }
 
             if (foto == null)
-                return (null, new System.Drawing.Size(0, 0));
+                return (null, new Size(0, 0));
 
             string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
             string resultPath = null;
@@ -96,14 +96,14 @@ public class CapturePicture
             if (resultPath != null)
             {
                 using var finalCodec = SKCodec.Create(resultPath);
-                return (new FileResult(resultPath), new System.Drawing.Size(finalCodec.Info.Width, finalCodec.Info.Height));
+                return (new FileResult(resultPath), new Size(finalCodec.Info.Width, finalCodec.Info.Height));
             }
 
-            return (null, new System.Drawing.Size(0, 0));
+            return (null, new Size(0, 0));
         }
         catch (Exception)
         {
-            return (null, new System.Drawing.Size(0, 0));
+            return (null, new Size(0, 0));
         }
     }
 

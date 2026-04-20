@@ -21,7 +21,7 @@ public class JsonDataModel
     public string ProjectPath { get; set; }
     public string JsonFile { get; set; }
     public string TitleImage { get; set; }
-    public System.Drawing.Size TitleImageSize { get; set; }
+    public Size TitleImageSize { get; set; }
 }
 
 public partial class Plan : ObservableObject
@@ -72,7 +72,7 @@ public partial class Foto : ObservableObject
     public string File { get; set; }
     public bool HasOverlay { get; set; }
     public DateTime DateTime { get; set; }
-    public System.Drawing.Size ImageSize { get; set; }
+    public Size ImageSize { get; set; }
 
     [ObservableProperty] public partial bool AllowExport { get; set; }
 }

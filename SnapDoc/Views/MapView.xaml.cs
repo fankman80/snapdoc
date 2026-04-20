@@ -29,6 +29,7 @@ using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
+using Size = Microsoft.Maui.Graphics.Size;
 
 namespace SnapDoc.Views;
 
@@ -429,7 +430,7 @@ public partial class MapView : IQueryAttributable
 
             if (result.Result == "export")
             {
-                var imageSize = new System.Drawing.Size(2000, 2000);
+                var imageSize = new Size(2000, 2000);
                 var imageBytes = await ExportMapAsImageAsync(imageSize, feature.Geometry.Centroid);
 
                 if (imageBytes == null || imageBytes.Length == 0)
@@ -718,7 +719,7 @@ public partial class MapView : IQueryAttributable
         };
     }
 
-    public async Task<byte[]> ExportMapAsImageAsync(System.Drawing.Size targetSize, NetTopologySuite.Geometries.Geometry targetCenter)
+    public async Task<byte[]> ExportMapAsImageAsync(Size targetSize, NetTopologySuite.Geometries.Geometry targetCenter)
     {
         double exportResolution = 0.2;
         var center = new MPoint(targetCenter.Centroid.X, targetCenter.Centroid.Y);

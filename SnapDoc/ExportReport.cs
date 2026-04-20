@@ -52,7 +52,7 @@ public partial class ExportReport
         {
             {"${plan_indexes}", "${plan_indexes}"},         //bereinige splitted runs
             {"${plan_images/", "${plan_images/"},           //bereinige splitted runs
-            {"${title_image}", "${title_image}"},           //bereinige splitted runs
+            {"${title_image/}", "${title_image/}"},           //bereinige splitted runs
         };
         Dictionary<string, string> placeholders_table = new()
         {
@@ -353,25 +353,20 @@ public partial class ExportReport
                 {
                     foreach (Paragraph paragraph in mainPart.Document.Body.Elements<Paragraph>())
                     {
-                        Run run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains("${title_image"));
+                        Run run = paragraph.Elements<Run>().FirstOrDefault(r => r.InnerText.Contains("${title_image/"));
                         if (run != null)
                         {
                             foreach (Text text in run.Elements<Text>())
                             {
-                                if (text.Text.Contains("${title_image"))
+                                if (text.Text.Contains("${title_image/"))
                                 {
-                                    text.Text = ""; // Lösche den Platzhaltertext
+                                    text.Remove(); // Lösche den Platzhaltertext
+                                    SizeF fotoMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
+                                    SizeF scaledFotoSize = ScaleToFit(GlobalJson.Data.TitleImageSize, fotoMaxSize);
                                     string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                                     if (File.Exists(imgPath))
                                     {
-                                        var factor = GlobalJson.Data.TitleImageSize.Width / GlobalJson.Data.TitleImageSize.Height;
-                                        var scaledSize = new Size
-                                        {
-                                            Width = SettingsService.Instance.TitleExportSize * factor,
-                                            Height = SettingsService.Instance.TitleExportSize
-                                        };
-
-                                        Drawing _img = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline");
+                                        Drawing _img = GetImageElement(mainPart, imgPath, scaledFotoSize, new Point(0, 0), 0, "inline");
 
                                         run.Append(_img);
                                     }
@@ -424,7 +419,6 @@ public partial class ExportReport
                             if (paragraph.InnerText.Contains("${plan_images/"))
                             {
                                 SizeF planMaxSize = ExtractDimensions(paragraph.InnerText.ToString());
-                                string replaceText = "${plan_images/" + planMaxSize.Width.ToString() + "/" + planMaxSize.Height.ToString() + "}";
 
                                 // lese Textformatierung des Platzhalters ein
                                 string fontSizeVal = "28";
