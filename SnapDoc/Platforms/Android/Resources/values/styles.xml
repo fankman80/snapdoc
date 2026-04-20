@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<resources>
+	<style name="Maui.SplashTheme" parent="Maui.MainTheme.NoActionBar">
+		<item name="android:windowBackground">@drawable/maui_splash</item>
+		<item name="android:windowIsTranslucent">true</item>
+	</style>
+
+	<style name="MainTheme" parent="Theme.Material3.DayNight">
+		<item name="colorControlActivated">@color/pickerAccent</item>
+		<item name="colorPrimary">@color/colorPrimary</item>
+	</style>
+</resources>
