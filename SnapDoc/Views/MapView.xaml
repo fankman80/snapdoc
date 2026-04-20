@@ -94,14 +94,13 @@
                 StrokeShape="RoundRectangle 4">
             <Grid VerticalOptions="Center" HorizontalOptions="Fill">
                 <Picker x:Name="LayerPicker"
-                        x:DataType="local:MapViewItem"
                         MinimumHeightRequest="32"  
                         FontSize="11"
                         BackgroundColor="White"
                         TextColor="Black"
                         VerticalOptions="Center"
                         HorizontalOptions="Fill"
-                        ItemDisplayBinding="{Binding Desc}"
+                        ItemDisplayBinding="{Binding Desc, x:DataType=local:MapViewItem}"
                         SelectedIndexChanged="OnLayerChanged">
                 </Picker>
             </Grid>

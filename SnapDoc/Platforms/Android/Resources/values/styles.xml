@@ -5,7 +5,7 @@
 		<item name="android:windowIsTranslucent">true</item>
 	</style>
 
-	<style name="MainTheme" parent="Theme.Material3.DayNight">
+	<style name="MainTheme" parent="Maui.MainTheme.NoActionBar">
 		<item name="colorControlActivated">@color/pickerAccent</item>
 		<item name="colorPrimary">@color/colorPrimary</item>
 	</style>
