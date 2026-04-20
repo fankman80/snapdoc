@@ -160,9 +160,6 @@
 	  <Compile Update="Views\MapView.xaml.cs">
 	    <DependentUpon>MapView.xaml</DependentUpon>
 	  </Compile>
-	  <Compile Update="Views\MapView.xaml.cs">
-	    <DependentUpon>MapView.xaml</DependentUpon>
-	  </Compile>
 	  <Compile Update="Views\PopupTextEdit.xaml.cs">
 	    <DependentUpon>PopupTextEdit.xaml</DependentUpon>
 	  </Compile>
