@@ -27,9 +27,11 @@ jobs:
 
       - name: Decode and save keystore
         shell: pwsh
+        env:
+          ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          [System.IO.File]::WriteAllBytes("SnapDoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
-
+          [System.IO.File]::WriteAllBytes("SnapDoc/SnapDoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
+      
       - name: Build Android App (Release)
         shell: pwsh
         run: |
