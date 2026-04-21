@@ -36,6 +36,7 @@ public partial class ExportReport
         // Alle Bilder parallel vorbereiten
         await PreProcessAllImagesAsync(GlobalJson.Data, CancellationToken.None);
 
+        // Platzhalter für einzelne Werte
         Dictionary<string, string> placeholders_single = new()
         {
             {"${client_name}", GlobalJson.Data.Client_name},
@@ -45,25 +46,29 @@ public partial class ExportReport
             {"${object_name}", GlobalJson.Data.Object_name},
             {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
             {"${project_manager}", GlobalJson.Data.Project_manager},
+            {"${title_image/", "${title_image/"}, 
         };
+
+        // Platzhalter für Listen
         Dictionary<string, string> placeholders_lists = new()
         {
-            {"${plan_indexes}", "${plan_indexes}"},         //bereinige splitted runs
-            {"${plan_images/", "${plan_images/"},           //bereinige splitted runs
-            {"${title_image/", "${title_image/"},           //bereinige splitted runs
+            {"${plan_indexes}", "${plan_indexes}"},
+            {"${plan_images/", "${plan_images/"},
         };
+
+        // Platzhalter für Tabellen
         Dictionary<string, string> placeholders_table = new()
         {
-            {"${pin_nr}", "${pin_nr}"},                     //bereinige splitted runs
-            {"${pin_planName}", "${pin_planName}"},         //bereinige splitted runs
-            {"${pin_posImage/", "${pin_posImage/"},         //bereinige splitted runs
-            {"${pin_fotoList/", "${pin_fotoList/"},         //bereinige splitted runs
-            {"${pin_name}", "${pin_name}"},                 //bereinige splitted runs
-            {"${pin_desc}", "${pin_desc}"},                 //bereinige splitted runs
-            {"${pin_location}", "${pin_location}"},         //bereinige splitted runs
-            {"${pin_priority}", "${pin_priority}"},         //bereinige splitted runs
-            {"${pin_geolocWGS84}", "${pin_geolocWGS84}"},   //bereinige splitted runs
-            {"${pin_geolocCH1903}", "${pin_geolocCH1903}"}, //bereinige splitted runs
+            {"${pin_nr}", "${pin_nr}"},
+            {"${pin_planName}", "${pin_planName}"},
+            {"${pin_posImage/", "${pin_posImage/"},
+            {"${pin_fotoList/", "${pin_fotoList/"},
+            {"${pin_name}", "${pin_name}"},
+            {"${pin_desc}", "${pin_desc}"},
+            {"${pin_location}", "${pin_location}"},
+            {"${pin_priority}", "${pin_priority}"},
+            {"${pin_geolocWGS84}", "${pin_geolocWGS84}"},
+            {"${pin_geolocCH1903}", "${pin_geolocCH1903}"},
         };
 
         // create a list with all icons, each icon only one times
@@ -85,7 +90,7 @@ public partial class ExportReport
 
         using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
         {
-            // Platzhalter durch die entsprechenden Werte ersetzen
+            // Platzhalter durch die entsprechenden Werte ersetzen und splitted runs bereinigen
             foreach (KeyValuePair<string, string> placeholder in placeholders_single)
                 if (!string.IsNullOrEmpty(placeholder.Value))
                     Codeuctivity.OpenXmlPowerTools.TextReplacer.SearchAndReplace(wordDoc, placeholder.Key, placeholder.Value, true);
@@ -99,9 +104,7 @@ public partial class ExportReport
             MainDocumentPart mainPart = wordDoc.MainDocumentPart;
 
             // CustomXmlPart erzeugen
-            var customXmlPart = mainPart.CustomXmlParts
-                                        .FirstOrDefault()
-                             ?? mainPart.AddCustomXmlPart(CustomXmlPartType.CustomXml);
+            var customXmlPart = mainPart.CustomXmlParts.FirstOrDefault() ?? mainPart.AddCustomXmlPart(CustomXmlPartType.CustomXml);
 
             // Positionsdaten für alle Pins schreiben
             var xml = "<positions>";
@@ -126,8 +129,7 @@ public partial class ExportReport
                 customXmlPart.FeedData(ms);
 
             // Properties mit StoreItemId erzeugen
-            var propPart = customXmlPart.CustomXmlPropertiesPart
-                           ?? customXmlPart.AddNewPart<CustomXmlPropertiesPart>();
+            var propPart = customXmlPart.CustomXmlPropertiesPart ?? customXmlPart.AddNewPart<CustomXmlPropertiesPart>();
 
             if (string.IsNullOrEmpty(storeItemId))
                 storeItemId = "{" + Guid.NewGuid().ToString().ToUpper() + "}";
@@ -136,8 +138,7 @@ public partial class ExportReport
 
             // suche Tabelle mit Namen "Pin_Table"
             string tableTitle = "Pin_Table";
-            Table table = mainPart?.Document?.Body?.Elements<Table>()
-            .FirstOrDefault(t =>
+            Table table = mainPart?.Document?.Body?.Elements<Table>().FirstOrDefault(t =>
             {
                 // Überprüfen, ob die Tabelle Eigenschaften hat
                 TableProperties tableProperties = t.GetFirstChild<TableProperties>();
@@ -160,7 +161,7 @@ public partial class ExportReport
                     int templateRowIndex = columnList[0].Item1;
                     TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
 
-                    i = 1; // erstelle einen globalen Pin-Counter
+                    var pinCounter = 1;
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
                         if (GlobalJson.Data.Plans[plan.Key].Pins != null && GlobalJson.Data.Plans[plan.Key].AllowExport)
@@ -183,7 +184,7 @@ public partial class ExportReport
                                         var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
                                         TableCell newTableCell = new();
 
-                                        // Zell-Eigenschaften (Breite, Rahmen) der Vorlage kopieren
+                                        // Zell-Eigenschaften von der Vorlage kopieren
                                         var templateCell = templateRow.Elements<TableCell>().ElementAtOrDefault(column);
                                         if (templateCell?.TableCellProperties != null)
                                             newTableCell.AppendChild(templateCell.TableCellProperties.CloneNode(true));
@@ -213,9 +214,9 @@ public partial class ExportReport
                                                 {
                                                     case "${pin_nr}":
                                                         {
-                                                            string tag = $"Pos_{i}";
-                                                            string xpath = $"/positions/pos[@id='{i}']";
-                                                            newParagraph.Append(new Run(CreateBoundSDTRun(tag, xpath, i.ToString())));
+                                                            string tag = $"Pos_{pinCounter}";
+                                                            string xpath = $"/positions/pos[@id='{pinCounter}']";
+                                                            newParagraph.Append(new Run(CreateBoundSDTRun(tag, xpath, pinCounter.ToString())));
                                                             newParagraph.Append(new Run(new Break()));
                                                             break;
                                                         }
@@ -236,7 +237,7 @@ public partial class ExportReport
 
                                                             if (File.Exists(planPath))
                                                             {
-                                                                SizeF exportSize = posData?.Size ?? new SizeF(25,25);
+                                                                SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
                                                                 var planSize = currentPlan.ImageSize;
                                                                 var cropFactor = new Point((1.0 / planSize.Width * 300) / 2.0, (1.0 / planSize.Height * 300) / 2.0);
 
@@ -349,7 +350,7 @@ public partial class ExportReport
                                     }
 
                                     table.Append(newRow);
-                                    i++;
+                                    pinCounter++;
                                 }
                             }
                             // Die ursprüngliche Template-Zeile jetzt entfernen
@@ -1216,7 +1217,8 @@ public partial class ExportReport
             CancellationToken = ct
         }, async (work, taskCt) =>
         {
-            await Task.Run(() => {
+            await Task.Run(() =>
+            {
                 if (File.Exists(work.SourcePath))
                 {
                     Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue);
