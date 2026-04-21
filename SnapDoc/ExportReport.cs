@@ -213,13 +213,11 @@ public partial class ExportReport
                                                 switch (ph.Item4)
                                                 {
                                                     case "${pin_nr}":
-                                                        {
-                                                            string tag = $"Pos_{pinCounter}";
-                                                            string xpath = $"/positions/pos[@id='{pinCounter}']";
-                                                            newParagraph.Append(new Run(CreateBoundSDTRun(tag, xpath, pinCounter.ToString())));
-                                                            newParagraph.Append(new Run(new Break()));
-                                                            break;
-                                                        }
+                                                        string tag = $"Pos_{pinCounter}";
+                                                        string xpath = $"/positions/pos[@id='{pinCounter}']";
+                                                        newParagraph.Append(new Run(CreateBoundSDTRun(tag, xpath, pinCounter.ToString())));
+                                                        newParagraph.Append(new Run(new Break()));
+                                                        break;
 
                                                     case "${pin_planName}":
                                                         AddText(GlobalJson.Data.Plans[plan.Key].Name);
@@ -348,7 +346,6 @@ public partial class ExportReport
                                         newTableCell.Append(newParagraph);
                                         newRow.Append(newTableCell);
                                     }
-
                                     table.Append(newRow);
                                     pinCounter++;
                                 }
