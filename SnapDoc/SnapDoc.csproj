@@ -208,7 +208,7 @@
 
     <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
         <SentryUploadSymbols>true</SentryUploadSymbols>
-        <SentryOrg>fankman_dev</SentryOrg>
+        <SentryOrg>fankman-dev</SentryOrg>
         <SentryProject>snapdoc_maui</SentryProject>
         <SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
 		<SentryUploadPdb>true</SentryUploadPdb>
