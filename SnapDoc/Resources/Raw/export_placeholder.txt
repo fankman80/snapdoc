@@ -37,7 +37,7 @@ ${pin_planName}
 // Name des Plans
 
 ${pin_posImage}
-// Positionsbild des Pins (Planausschnitt)
+// Positionsbild (Planausschnitt), x/y = max. Breite und Höhe in Millimeter
 
 ${pin_fotoList/x/y}
 // Die dem Pin zugehörige Fotos, x/y = max. Breite und Höhe in Millimeter

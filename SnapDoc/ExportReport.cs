@@ -17,7 +17,7 @@ namespace SnapDoc;
 
 public partial class ExportReport
 {
-    [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList)/(?<w>\d+)/(?<h>\d+)\}")]
+    [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList|pin_posImage)/(?<w>\d+)/(?<h>\d+)\}")]
     private static partial Regex UniversalImageRegex();
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
     private record ImageTagData(string Type, SizeF Size, string FullMatch);
@@ -56,7 +56,7 @@ public partial class ExportReport
         {
             {"${pin_nr}", "${pin_nr}"},                     //bereinige splitted runs
             {"${pin_planName}", "${pin_planName}"},         //bereinige splitted runs
-            {"${pin_posImage}", "${pin_posImage}"},         //bereinige splitted runs
+            {"${pin_posImage/", "${pin_posImage/"},         //bereinige splitted runs
             {"${pin_fotoList/", "${pin_fotoList/"},         //bereinige splitted runs
             {"${pin_name}", "${pin_name}"},                 //bereinige splitted runs
             {"${pin_desc}", "${pin_desc}"},                 //bereinige splitted runs
@@ -160,9 +160,6 @@ public partial class ExportReport
                     int templateRowIndex = columnList[0].Item1;
                     TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
 
-                    if (templateRow == null)
-                        return;
-
                     i = 1; // erstelle einen globalen Pin-Counter
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
@@ -185,7 +182,19 @@ public partial class ExportReport
                                     {
                                         var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
                                         TableCell newTableCell = new();
+
+                                        // Zell-Eigenschaften (Breite, Rahmen) der Vorlage kopieren
+                                        var templateCell = templateRow.Elements<TableCell>().ElementAtOrDefault(column);
+                                        if (templateCell?.TableCellProperties != null)
+                                            newTableCell.AppendChild(templateCell.TableCellProperties.CloneNode(true));
+                                        var templateRunProperties = templateCell?.Descendants<RunProperties>().FirstOrDefault();
+
                                         Paragraph newParagraph = new();
+
+                                        // Ausrichtungen kopieren
+                                        var templatePPr = templateCell?.Descendants<ParagraphProperties>().FirstOrDefault();
+                                        if (templatePPr != null)
+                                            newParagraph.AppendChild(templatePPr.CloneNode(true));
 
                                         if (_columnPlaceholders.Count > 0)
                                         {
@@ -215,56 +224,49 @@ public partial class ExportReport
                                                         AddText(GlobalJson.Data.Plans[plan.Key].Name);
                                                         break;
 
-                                                    case "${pin_posImage}":
-                                                        if (SettingsService.Instance.IsPosImageExport &&
-                                                            !GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsCustomPin)
+                                                    case string s when s.StartsWith("${pin_posImage"):
+                                                        var posData = GetPlaceholderData(s);
+                                                        var currentPlan = GlobalJson.Data.Plans[plan.Key];
+                                                        var currentPin = currentPlan.Pins[pin.Key];
+
+                                                        if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
                                                         {
-                                                            // Bild des Plans + Pin einfügen
-                                                            string planName = GlobalJson.Data.Plans[plan.Key].File;
-                                                            string planPath = Path.Combine(Settings.DataDirectory,
-                                                                                           GlobalJson.Data.ProjectPath,
-                                                                                           GlobalJson.Data.PlanPath,
-                                                                                           planName);
+                                                            string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                            string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
 
-                                                            Point pinPos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Pos;
-                                                            string pinImage = Path.Combine(Settings.CacheDirectory, GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinIcon);
-                                                            Point pinAnchor = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Anchor;
-                                                            float pinRotation = (float)GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinRotation;
-                                                            Size pinSize = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Size;
-                                                            var planSize = GlobalJson.Data.Plans[plan.Key].ImageSize;
-                                                            var cropFactor = new Point((1 / planSize.Width * 300) / 2,
-                                                                                       (1 / planSize.Height * 300) / 2);
-                                                            var crop = new OXML.Drawing.SourceRectangle
+                                                            if (File.Exists(planPath))
                                                             {
-                                                                Left = (int)((pinPos.X - cropFactor.X) * 100000),
-                                                                Top = (int)((pinPos.Y - cropFactor.Y) * 100000),
-                                                                Right = (int)((1 - pinPos.X - cropFactor.X) * 100000),
-                                                                Bottom = (int)((1 - pinPos.Y - cropFactor.Y) * 100000),
-                                                            };
+                                                                SizeF exportSize = posData?.Size ?? new SizeF(25,25);
+                                                                var planSize = currentPlan.ImageSize;
+                                                                var cropFactor = new Point((1.0 / planSize.Width * 300) / 2.0, (1.0 / planSize.Height * 300) / 2.0);
 
-                                                            var exportSize = new SizeF
-                                                            {
-                                                                Width = SettingsService.Instance.PinPosExportSize,
-                                                                Height = SettingsService.Instance.PinPosExportSize
-                                                            };
+                                                                var crop = new OXML.Drawing.SourceRectangle
+                                                                {
+                                                                    Left = (int)((currentPin.Pos.X - cropFactor.X) * 100000),
+                                                                    Top = (int)((currentPin.Pos.Y - cropFactor.Y) * 100000),
+                                                                    Right = (int)((1 - currentPin.Pos.X - cropFactor.X) * 100000),
+                                                                    Bottom = (int)((1 - currentPin.Pos.Y - cropFactor.Y) * 100000),
+                                                                };
 
-                                                            var scaledPinSize = new Size
-                                                            {
-                                                                Width = pinSize.Width * exportSize.Width /
-                                                                         SettingsService.Instance.PinPosCropExportSize *
-                                                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale,
-                                                                Height = pinSize.Height * exportSize.Height /
-                                                                         SettingsService.Instance.PinPosCropExportSize *
-                                                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinScale
-                                                            };
+                                                                var scaledPinSize = new Size
+                                                                {
+                                                                    Width = (int)(currentPin.Size.Width * exportSize.Width / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale),
+                                                                    Height = (int)(currentPin.Size.Height * exportSize.Height / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale)
+                                                                };
 
-                                                            PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), pinRotation, pinAnchor, scaledPinSize, exportSize);
+                                                                PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
+                                                                var planImgElement = GetImageElement(mainPart, planPath, exportSize, new Point(0, 0), 0, "anchor", crop);
+                                                                if (planImgElement != null)
+                                                                    newParagraph.Append(new Run(planImgElement));
 
-                                                            newParagraph.Append(new Run(GetImageElement(mainPart, planPath, exportSize,
-                                                                                                        new Point(0, 0), 0, "anchor", crop)));
-                                                            newParagraph.Append(new Run(GetImageElement(mainPart, pinImage, scaledPinSize,
-                                                                                                        posOnPlan, pinRotation, "anchor")));
-                                                            newParagraph.Append(new Run(new Break()));
+                                                                if (File.Exists(pinImage))
+                                                                {
+                                                                    var pinImgElement = GetImageElement(mainPart, pinImage, scaledPinSize, posOnPlan, (float)currentPin.PinRotation, "anchor");
+                                                                    if (pinImgElement != null)
+                                                                        newParagraph.Append(new Run(pinImgElement));
+                                                                }
+                                                                newParagraph.Append(new Run(new Break()));
+                                                            }
                                                         }
                                                         break;
 

@@ -188,21 +188,6 @@
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
-                    <Label Text="{x:Static res:AppResources.positionsbilder_breite_hoehe}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
-                    <controls:RangeSlider
-                        IsVisible="{Binding IsPosImageExport}"
-                        IsRange="False"
-                        Minimum="10"
-                        Maximum="160"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0} mm"
-                        LowerValue="{Binding PinPosExportSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                    </controls:RangeSlider>
-
                     <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
                     <controls:RangeSlider
                         IsVisible="{Binding IsPosImageExport}"

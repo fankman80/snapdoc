@@ -31,7 +31,6 @@ internal class SettingsModel
     public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
     public double PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
     public double PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter
-    public int PinPosExportSize { get; set; } // Größe der Pin-Position-Bilder im Bericht (maximale Kantenlänge in Pixel)
     public int PinPosCropExportSize { get; set; } // Größe der zugeschnittenen Pin-Position-Bilder im Bericht
     public bool IconGalleryGridView { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
     public bool PhotoGalleryGridView { get; set; } // Modus der Foto-Galerie (Raster oder Liste)
