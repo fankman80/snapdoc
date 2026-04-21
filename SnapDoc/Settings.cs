@@ -29,7 +29,7 @@ public static class Settings
     public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
     public static List<IconItem> IconData { get; set; } = [];
 
-    public static readonly string CacheDirectory = FileSystem.CacheDirectory;
+    public static readonly string CacheDirectory = Path.Combine(FileSystem.CacheDirectory, "AppCache");
 
     public static readonly string TemplateDirectory = Path.Combine(dataDirectory, "templates");
 

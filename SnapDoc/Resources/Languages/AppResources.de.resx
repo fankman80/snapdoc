@@ -858,4 +858,7 @@
   <data name="kartenausschnitt_speichern" xml:space="preserve">
     <value>Kartenausschnitt speichern</value>
   </data>
+  <data name="invalid_project_name" xml:space="preserve">
+    <value>Ungültiger Projektname. Bitte verwenden Sie keine Sonderzeichen.</value>
+  </data>
 </root>

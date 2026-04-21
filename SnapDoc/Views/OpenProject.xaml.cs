@@ -68,12 +68,20 @@ public partial class OpenProject : ContentPage
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
+            // Eingabe säubern
+            string sanitizedName = OpenProject.SanitizeFileName(result.Result);
+            if (string.IsNullOrWhiteSpace(sanitizedName))
+            {
+                await DisplayAlertAsync(AppResources.fehler, AppResources.invalid_project_name, AppResources.ok);
+                return;
+            }
+
             // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
             int counter = 1;
-            string _result = result.Result;
+            string _result = sanitizedName;
             while (Directory.Exists(Path.Combine(Settings.DataDirectory, _result)))
             {
-                _result = Path.Combine($"{result.Result} ({counter})");
+                _result = $"{sanitizedName} ({counter})";
                 counter++;
             }
 
@@ -112,6 +120,21 @@ public partial class OpenProject : ContentPage
             Shell.Current.FlyoutIsPresented = false;
 #endif
         }
+    }
+
+    private static string SanitizeFileName(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+            return string.Empty;
+
+        var invalidChars = Path.GetInvalidFileNameChars();
+        string cleanName = string.Concat(fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).Trim();
+        cleanName = cleanName.Replace("/", "_").Replace("\\", "_").Replace("$", "").Replace("{", "").Replace("}", "");
+
+        if (cleanName.Length > 100)
+            cleanName = cleanName.Substring(0, 100);
+
+        return cleanName;
     }
 
     private async void OnUploadClicked(object sender, EventArgs e)

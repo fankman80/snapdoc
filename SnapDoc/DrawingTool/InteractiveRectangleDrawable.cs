@@ -41,7 +41,7 @@ public class InteractiveRectangleDrawable
     }
     public InteractiveRectangleDrawable()
     {
-        InteractiveRectangleDrawable.EnsureRotationHandleLoaded();
+        InteractiveRectangleDrawable.EnsureRotationHandleLoaded().Wait();
     }
 
     public SKPoint[] Points
@@ -75,7 +75,7 @@ public class InteractiveRectangleDrawable
         }
     }
 
-    private static async void EnsureRotationHandleLoaded()
+    private static async Task EnsureRotationHandleLoaded()
     {
         if (_rotationHandleBitmap != null || _isLoading)
             return;

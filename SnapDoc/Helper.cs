@@ -16,7 +16,6 @@ using System.IO;
 using Android.Opengl;
 #endif
 
-
 namespace SnapDoc;
 
 public class Helper

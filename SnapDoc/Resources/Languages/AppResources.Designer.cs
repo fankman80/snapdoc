@@ -952,6 +952,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ungültiger Projektname. Bitte verwenden Sie keine Sonderzeichen. ähnelt.
+        /// </summary>
+        internal static string invalid_project_name {
+            get {
+                return ResourceManager.GetString("invalid_project_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
         /// </summary>
         internal static string kamera {
