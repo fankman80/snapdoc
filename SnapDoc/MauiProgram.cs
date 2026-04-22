@@ -28,14 +28,10 @@ public static class MauiProgram
             .UseFFImageLoading()
             .ConfigureMRGestures()
             .UseSkiaSharp()
+#if IOS && !DEBUG
             .UseSentry(options =>
             {
-                // DSN nur setzen, wenn wir NICHT im Debug sind
-#if DEBUG
-                options.Dsn = "";
-#else
                 options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
-#endif
                 options.TracesSampleRate = 1.0;
                 options.EnableLogs = true;
                 options.AttachScreenshot = true;
@@ -44,6 +40,7 @@ public static class MauiProgram
                 options.IncludeTextInBreadcrumbs = true;
                 options.IncludeTitleInBreadcrumbs = true;
             })
+#endif
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
