@@ -114,7 +114,6 @@
 
     <ItemGroup>
         <EmbeddedResource Include="Resources\Raw\editor.html" />
-        <EmbeddedResource Include="Resources\Raw\migration_tasks.json" />
     </ItemGroup>
 
 	<ItemGroup>
