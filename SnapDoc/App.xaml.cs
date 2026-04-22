@@ -3,6 +3,8 @@ using SnapDoc.Services;
 using UraniumUI;
 using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
+using System.Text.Json;
+
 
 #if ANDROID
 using Android.Hardware.Display;
@@ -35,6 +37,10 @@ public partial class App : Application
 
     private async static Task InitializeAsync()
     {
+        // Preferences.Clear();
+        // Führe eventuell anstehende Migrationen durch
+        await ExecutePendingMigrations();
+
         // Template-Dateien und Konfigurationsdatei kopieren
         if (!Directory.Exists(Settings.TemplateDirectory))
             Directory.CreateDirectory(Settings.TemplateDirectory);
@@ -49,9 +55,6 @@ public partial class App : Application
 
         if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "IconData.xml")))
             copyTasks.Add(Helper.CopyFileFromResourcesAsync("IconData.xml", Path.Combine(Settings.TemplateDirectory, "IconData.xml")));
-
-        if (!File.Exists(Path.Combine(Settings.DataDirectory, "appsettings.ini")))
-            SettingsService.Instance.SaveSettings();
 
         // Warte, bis alle Kopiervorgänge abgeschlossen sind
         await Task.WhenAll(copyTasks);
@@ -129,4 +132,82 @@ public partial class App : Application
 #endif
         return window;
     }
+
+    // Statische Instanz der Optionen (Thread-safe und ressourcenschonend)
+    private static readonly JsonSerializerOptions MigrationOptions = new()
+    {
+        PropertyNameCaseInsensitive = true
+    };
+
+    private async static Task ExecutePendingMigrations()
+    {
+        try
+        {
+            var assembly = typeof(App).Assembly;
+            using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.migration_tasks.json")!;
+            using var reader = new StreamReader(stream);
+            string jsonContent = reader.ReadToEnd();
+
+            var manifest = JsonSerializer.Deserialize<MigrationManifest>(jsonContent, MigrationOptions);
+
+            if (manifest == null)
+                return;
+
+            int appliedId = Preferences.Get("AppliedMigrationId", 0);
+
+            if (manifest.LastMigrationId != appliedId)
+            {
+                bool success = await PerformMigrationTask(manifest.TaskName, manifest.Parameters);
+                if (success)
+                    Preferences.Set("AppliedMigrationId", manifest.LastMigrationId);
+            }
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Migration Error: {ex.Message}");
+        }
+    }
+
+    private async static Task<bool> PerformMigrationTask(string taskName, MigrationParameters parameters)
+    {
+        switch (taskName)
+        {
+            case "DeleteTemplates":
+                if (parameters?.Files == null || parameters.Files.Count == 0)
+                    return true;
+
+                foreach (var fileName in parameters.Files)
+                {
+                    try
+                    {
+                        string filePath = Path.Combine(Settings.TemplateDirectory, fileName);
+
+                        if (File.Exists(filePath))
+                            File.Delete(filePath);
+                    }
+                    catch (Exception)
+                    {
+                        // Fehler bei einzelner Datei ignorieren, damit andere gelöscht werden können
+                    }
+                }
+                return true;
+
+            // bei Bedarf weitere Cases hinzufügen...
+
+            default:
+                return true;
+        }
+    }
+}
+
+public class MigrationManifest
+{
+    public int LastMigrationId { get; set; }
+    public string TaskName { get; set; }
+    public MigrationParameters Parameters { get; set; }
+}
+
+public class MigrationParameters
+{
+    public List<string> Files { get; set; }
 }

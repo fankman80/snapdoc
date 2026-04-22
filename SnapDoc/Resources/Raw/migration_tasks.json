@@ -1,0 +1,10 @@
+{
+  "LastMigrationId": 100001,
+  "TaskName": "DeleteTemplates",
+  "Parameters": {
+    "Files": [
+      "template_ebbe.docx",
+      "template_location_ebbe.docx"
+    ]
+  }
+}

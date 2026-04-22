@@ -136,7 +136,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
 
     private static string LoadHtmlFromFile(bool isReadOnly = true)
     {
-        var assembly = typeof(EditorView).Assembly;
+        var assembly = typeof(App).Assembly;
         using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.editor.html")!;
         using var reader = new StreamReader(stream);
         string htmlContent = reader.ReadToEnd();
