@@ -88,7 +88,6 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
-    [ObservableProperty] public partial int LastMigrationID { get; set; } = 0;
     [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
     [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
     [ObservableProperty] public partial int FlashMode { get; set; } = 0;
@@ -296,7 +295,6 @@ public partial class SettingsService : ObservableObject
     {
         var settings = new SettingsModel
         {
-            LastMigrationID = LastMigrationID,
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
@@ -371,9 +369,9 @@ public partial class SettingsService : ObservableObject
             if (string.IsNullOrWhiteSpace(json) || !json.TrimStart().StartsWith('{')) return;
 
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
-            if (settings == null) return;
+            if (settings == null)
+                return;
 
-            LastMigrationID = settings.LastMigrationID;
             PinMinScaleLimit = settings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
@@ -442,7 +440,6 @@ public partial class SettingsService : ObservableObject
     {
         // Einfach den Konstruktor einmal wieder aufrufen
         var defaultSettings = new SettingsService();
-        LastMigrationID = defaultSettings.LastMigrationID;
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;
