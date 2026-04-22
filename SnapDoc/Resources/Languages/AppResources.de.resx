@@ -861,4 +861,7 @@
   <data name="invalid_project_name" xml:space="preserve">
     <value>Ungültiger Projektname. Bitte verwenden Sie keine Sonderzeichen.</value>
   </data>
+  <data name="templates_reset_success" xml:space="preserve">
+    <value>Die Templates wurden auf die Standardwerte zurückgesetzt.</value>
+  </data>
 </root>

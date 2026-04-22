@@ -3,6 +3,7 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
+    public const int LATEST_MIGRATION_ID = 10019;
     public static double DisplayDensity { get; set; } = 1;
 
     // Icondefinitionen

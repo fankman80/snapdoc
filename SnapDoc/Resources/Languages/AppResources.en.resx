@@ -861,4 +861,7 @@
   <data name="invalid_project_name" xml:space="preserve">
     <value>Invalid project name. Please do not use special characters.</value>
   </data>
+  <data name="templates_reset_success" xml:space="preserve">
+    <value>The templates have been reset to their default values.</value>
+  </data>
 </root>

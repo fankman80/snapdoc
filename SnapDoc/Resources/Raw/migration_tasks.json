@@ -1,5 +1,4 @@
 {
-  "LastMigrationId": 100001,
   "TaskName": "DeleteTemplates",
   "Parameters": {
     "Files": [

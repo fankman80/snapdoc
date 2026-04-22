@@ -861,4 +861,7 @@
   <data name="invalid_project_name" xml:space="preserve">
     <value>Nom de projet non valide. Veuillez ne pas utiliser de caractères spéciaux.</value>
   </data>
+  <data name="templates_reset_success" xml:space="preserve">
+    <value>Les modèles ont été réinitialisés aux valeurs par défaut.</value>
+  </data>
 </root>

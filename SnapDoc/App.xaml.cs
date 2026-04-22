@@ -5,7 +5,6 @@ using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 using System.Text.Json;
 
-
 #if ANDROID
 using Android.Hardware.Display;
 using Android.Content;
@@ -23,22 +22,31 @@ namespace SnapDoc;
 
 public partial class App : Application
 {
+    private static int _newMigrationID = 0;
     public App()
     {
         InitializeComponent();
     }
 
-    protected override async void OnStart()
+    protected override void OnStart()
     {
         base.OnStart();
 
-        await InitializeAsync();
+        Task.Run(async () =>
+        {
+            try
+            {
+                await InitializeAsync();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Init Error: {ex.Message}");
+            }
+        });
     }
 
     private async static Task InitializeAsync()
     {
-        // Preferences.Clear();
-        // Führe eventuell anstehende Migrationen durch
         await ExecutePendingMigrations();
 
         // Template-Dateien und Konfigurationsdatei kopieren
@@ -68,47 +76,51 @@ public partial class App : Application
         SettingsService.Instance.LoadSettings();
 
         // prüfe GPS-Verfügbarkeit
-        var location = await GeolocationViewModel.Instance.TryGetLocationAsync();
-        if (location == null)
-            SettingsService.Instance.IsGpsActive = false;
-        else
-            SettingsService.Instance.IsGpsActive = true;
+        await MainThread.InvokeOnMainThreadAsync(async () =>
+        {
+            var location = await GeolocationViewModel.Instance.TryGetLocationAsync();
+            SettingsService.Instance.IsGpsActive = location != null;
+            Settings.DisplayDensity = DeviceDisplay.MainDisplayInfo.Density;
 
-        // ermittle die Höhe der Navigationsleiste (für CustomPinOffset)
-        double bottomInset = 0;
+            // ermittle die Höhe der Navigationsleiste (für CustomPinOffset)
+            double bottomInset = 0;
 #if ANDROID
-        var displayManager = Android.App.Application.Context.GetSystemService(Context.DisplayService) as DisplayManager;
-        var defaultdisplay = displayManager.GetDisplay(Android.Views.Display.DefaultDisplay);
-        var gotheight = Android.App.Application.Context.CreateDisplayContext(defaultdisplay).Resources.DisplayMetrics.HeightPixels;
+            var displayManager = Android.App.Application.Context.GetSystemService(Context.DisplayService) as DisplayManager;
+            var defaultdisplay = displayManager.GetDisplay(Android.Views.Display.DefaultDisplay);
+            var gotheight = Android.App.Application.Context.CreateDisplayContext(defaultdisplay).Resources.DisplayMetrics.HeightPixels;
 
-        // this is the status bar height
-        var statusid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("status_bar_height", "dimen", "android");
-        var statusbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(statusid);
+            // this is the status bar height
+            var statusid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("status_bar_height", "dimen", "android");
+            var statusbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(statusid);
 
-        // this is the navigation bar height
-        var navid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("navigation_bar_height", "dimen", "android");
-        var navbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(navid);
+            // this is the navigation bar height
+            var navid = Platform.CurrentActivity.ApplicationContext.Resources.GetIdentifier("navigation_bar_height", "dimen", "android");
+            var navbarheight = Platform.CurrentActivity.ApplicationContext.Resources.GetDimensionPixelSize(navid);
 
-        bottomInset = navbarheight / DeviceDisplay.MainDisplayInfo.Density;
+            bottomInset = navbarheight / DeviceDisplay.MainDisplayInfo.Density;
 #endif
 
 #if IOS
-        var window = UIApplication.SharedApplication
-            .ConnectedScenes
-            .OfType<UIWindowScene>()
-            .FirstOrDefault()?
-            .Windows
-            .FirstOrDefault(w => w.IsKeyWindow);
+            var window = UIApplication.SharedApplication
+                .ConnectedScenes
+                .OfType<UIWindowScene>()
+                .FirstOrDefault()?
+                .Windows
+                .FirstOrDefault(w => w.IsKeyWindow);
 
-        var safeAreaBottom = window?.SafeAreaInsets.Bottom ?? 0;
+            var safeAreaBottom = window?.SafeAreaInsets.Bottom ?? 0;
 
-        bottomInset = safeAreaBottom;
+            bottomInset = safeAreaBottom;
 #endif
+            // Display-Density speichern
+            Settings.DisplayDensity = DeviceDisplay.MainDisplayInfo.Density;
 
-        // Display-Density speichern
-        Settings.DisplayDensity = DeviceDisplay.MainDisplayInfo.Density;
+            // CustomPinOffset basierend auf der Höhe der Navigationsleiste setzen
+            SettingsService.Instance.CustomPinOffset = new Point(0, -bottomInset / 2);
+        });
 
-        SettingsService.Instance.CustomPinOffset = new Point(0, -bottomInset / 2);
+        // Datum der letzten Migration speichern (für Debugging oder zukünftige Migrationen)
+        SettingsService.Instance.LastMigrationID = _newMigrationID;
 
         // Einstellungen speichern
         SettingsService.Instance.SaveSettings();
@@ -141,31 +153,29 @@ public partial class App : Application
 
     private async static Task ExecutePendingMigrations()
     {
+        int appliedId = Preferences.Get("AppliedMigrationId", 0);
+
+        _newMigrationID = appliedId;
+        if (Settings.LATEST_MIGRATION_ID <= appliedId)
+            return;
+
         try
         {
             var assembly = typeof(App).Assembly;
             using var stream = assembly.GetManifestResourceStream("SnapDoc.Resources.Raw.migration_tasks.json")!;
             using var reader = new StreamReader(stream);
             string jsonContent = reader.ReadToEnd();
-
             var manifest = JsonSerializer.Deserialize<MigrationManifest>(jsonContent, MigrationOptions);
 
-            if (manifest == null)
-                return;
-
-            int appliedId = Preferences.Get("AppliedMigrationId", 0);
-
-            if (manifest.LastMigrationId != appliedId)
+            bool success = await PerformMigrationTask(manifest.TaskName, manifest.Parameters);
+            if (success)
             {
-                bool success = await PerformMigrationTask(manifest.TaskName, manifest.Parameters);
-                if (success)
-                    Preferences.Set("AppliedMigrationId", manifest.LastMigrationId);
+                Preferences.Set("AppliedMigrationId", Settings.LATEST_MIGRATION_ID);
+                _newMigrationID = Settings.LATEST_MIGRATION_ID;
             }
+
         }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Migration Error: {ex.Message}");
-        }
+        catch {}
     }
 
     private async static Task<bool> PerformMigrationTask(string taskName, MigrationParameters parameters)
@@ -185,10 +195,7 @@ public partial class App : Application
                         if (File.Exists(filePath))
                             File.Delete(filePath);
                     }
-                    catch (Exception)
-                    {
-                        // Fehler bei einzelner Datei ignorieren, damit andere gelöscht werden können
-                    }
+                    catch {}
                 }
                 return true;
 
@@ -202,7 +209,6 @@ public partial class App : Application
 
 public class MigrationManifest
 {
-    public int LastMigrationId { get; set; }
     public string TaskName { get; set; }
     public MigrationParameters Parameters { get; set; }
 }

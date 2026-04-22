@@ -1996,6 +1996,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Die Templates wurden auf die Standardwerte zurückgesetzt. ähnelt.
+        /// </summary>
+        internal static string templates_reset_success {
+            get {
+                return ResourceManager.GetString("templates_reset_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Text eingeben ähnelt.
         /// </summary>
         internal static string text_eingeben {
