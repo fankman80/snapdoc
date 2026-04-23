@@ -34,7 +34,7 @@ public static class MauiProgram
                 options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
                 options.Enabled = true;
 #else
-                ootions.Dsn = "";
+                options.Dsn = "";
                 options.Enabled = false; 
 #endif
                 options.TracesSampleRate = 1.0;
