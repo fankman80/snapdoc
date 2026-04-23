@@ -35,9 +35,9 @@ public static class MauiProgram
 #else
                 options.Dsn = "";
 #endif
-                options.TracesSampleRate = 1.0;
-                options.EnableLogs = true;
-                options.AttachScreenshot = true;
+                options.TracesSampleRate = 0; //1.0
+                options.EnableLogs = false;
+                options.AttachScreenshot = false;
                 options.AttachStacktrace = true;
                 options.IncludeBackgroundingStateInBreadcrumbs = true;
                 options.IncludeTextInBreadcrumbs = true;
