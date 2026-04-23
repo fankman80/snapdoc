@@ -37,7 +37,7 @@
 
             <ScrollView Grid.Row="0">
                 <VerticalStackLayout>
-                    <Grid ColumnSpacing="8">
+                    <Grid ColumnSpacing="4">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
                             <ColumnDefinition Width="Auto" />
