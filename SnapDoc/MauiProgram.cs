@@ -1,7 +1,6 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
-using Microsoft.Maui.Platform;
 using Camera.MAUI;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
@@ -10,6 +9,10 @@ using UraniumUI;
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
+#endif
+
+#if ANDROID
+using Microsoft.Maui.Platform;
 #endif
 
 namespace SnapDoc;
@@ -30,12 +33,9 @@ public static class MauiProgram
             .UseSkiaSharp()
             .UseSentry(options =>
             {
-#if IOS && !DEBUG
                 options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
-#else
-                options.Dsn = "";
-#endif
-                options.TracesSampleRate = 0; //1.0
+                options.InitializeSdk = false;
+                options.TracesSampleRate = 0.1;
                 options.EnableLogs = false;
                 options.AttachScreenshot = false;
                 options.AttachStacktrace = true;

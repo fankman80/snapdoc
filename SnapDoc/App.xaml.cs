@@ -104,6 +104,11 @@ public partial class App : Application
 
         // Einstellungen speichern
         SettingsService.Instance.SaveSettings();
+
+#if IOS
+        // Sentry initialisieren        
+        SentrySdk.Init();
+#endif
     }
 
     protected override Window CreateWindow(IActivationState activationState)
