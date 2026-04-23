@@ -31,18 +31,17 @@ public static class MauiProgram
             .UseFFImageLoading()
             .ConfigureMRGestures()
             .UseSkiaSharp()
-            //.UseSentry(options =>
-            //{
-            //    options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
-            //    options.InitializeSdk = false;
-            //    options.TracesSampleRate = 0.1;
-            //    options.EnableLogs = false;
-            //    options.AttachScreenshot = false;
-            //    options.AttachStacktrace = true;
-            //    options.IncludeBackgroundingStateInBreadcrumbs = true;
-            //    options.IncludeTextInBreadcrumbs = true;
-            //    options.IncludeTitleInBreadcrumbs = true;
-            //})
+            .UseSentry(options =>
+            {
+                options.Dsn = "https://b864c3fdd54cf3fe92c37b849cb6e9cd@o4511245885308928.ingest.de.sentry.io/4511245957267536";
+                options.TracesSampleRate = 0.1;
+                options.EnableLogs = false;
+                options.AttachScreenshot = true;
+                options.AttachStacktrace = true;
+                options.IncludeBackgroundingStateInBreadcrumbs = true;
+                options.IncludeTextInBreadcrumbs = true;
+                options.IncludeTitleInBreadcrumbs = true;
+            })
             .ConfigureFonts(fonts =>
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");

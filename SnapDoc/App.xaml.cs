@@ -104,11 +104,6 @@ public partial class App : Application
 
         // Einstellungen speichern
         SettingsService.Instance.SaveSettings();
-
-//#if IOS
-//        // Sentry initialisieren        
-//        SentrySdk.Init();
-//#endif
     }
 
     protected override Window CreateWindow(IActivationState activationState)
@@ -124,7 +119,7 @@ public partial class App : Application
             if (window.Handler?.PlatformView is MauiWinUIWindow w)
             {
                 var presenter = (w.AppWindow.Presenter as OverlappedPresenter);
-           }
+            }
         };
 #endif
         return window;
