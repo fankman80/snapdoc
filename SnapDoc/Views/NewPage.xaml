@@ -116,11 +116,15 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
-                    <Slider x:Name="PinSizeSlider"
+                    <controls:RangeSlider
+                            x:Name="PinSizeSlider"
+                            ShowLabels="False"
+                            IsRealtime="True"
+                            IsRange="False"
                             Minimum="1"
                             Maximum="200"
-                            Value="0"
-                            Margin="{OnPlatform Default='70,15,70,15', WinUI='70,15,70,15', iOS='50,15,50,15', Android='50,15,50,15'}"
+                            Step="1"
+                            Margin="65,0,65,0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
@@ -171,7 +175,7 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="85,0,0,104"
+                       Margin="95,0,0,104"
                        ZIndex="10001"/>                
                 <Border BackgroundColor="{DynamicResource Primary}"
                         StrokeThickness="0"
@@ -182,11 +186,15 @@
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
                     </Border.StrokeShape>
-                    <Slider x:Name="PinRotateSlider"
+                    <controls:RangeSlider
+                            x:Name="PinRotateSlider"
+                            ShowLabels="False"
+                            IsRealtime="True"
+                            IsRange="False"
                             Minimum="-180"
                             Maximum="180"
-                            Value="0"
-                            Margin="{OnPlatform Default='70,15,70,15', WinUI='70,15,70,15', iOS='50,15,50,15', Android='50,15,50,15'}"
+                            Step="1"
+                            Margin="65,0,65,0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
@@ -228,7 +236,7 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="85,0,0,24"
+                       Margin="95,0,0,24"
                        ZIndex="10001"/>
             </Grid>
 

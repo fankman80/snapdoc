@@ -196,7 +196,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Automatische Drehung ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Automatische Drehung ähnelt.
         /// </summary>
         internal static string automatische_drehung {
             get {
@@ -205,7 +205,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Automatische Grössenanpassung ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Automatische Grössenanpassung ähnelt.
         /// </summary>
         internal static string automatische_groessenanpassung {
             get {
@@ -439,7 +439,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Drehung fixiert ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Drehung fixiert ähnelt.
         /// </summary>
         internal static string drehung_fixiert {
             get {
@@ -844,7 +844,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die ◀ Grösse fixiert ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Grösse fixiert ähnelt.
         /// </summary>
         internal static string groesse_fixiert {
             get {

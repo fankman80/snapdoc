@@ -118,8 +118,8 @@
                             </uranium:ExpanderView.Header>
                             <VerticalStackLayout Margin="10,0,10,10" Spacing="10">
                                 <!-- Slider for Red -->
-                                <Label Text="{x:Static res:AppResources.rot_r}" TextColor="Red" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.rot_r}" TextColor="Red" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -135,8 +135,8 @@
                                 </controls:RangeSlider>
 
                                 <!-- Slider for Green -->
-                                <Label Text="{x:Static res:AppResources.gruen_g}" TextColor="Green" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.gruen_g}" TextColor="Green" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -152,8 +152,8 @@
                                 </controls:RangeSlider>
                                 
                                 <!-- Slider for Blue -->
-                                <Label Text="{x:Static res:AppResources.blau_b}" TextColor="Blue" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.blau_b}" TextColor="Blue" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -169,8 +169,8 @@
                                 </controls:RangeSlider>  
                                 
                                 <!-- Slider for Hue -->
-                                <Label Text="{x:Static res:AppResources.farbwert_h}" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.farbwert_h}" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -185,8 +185,8 @@
                                 </controls:RangeSlider>
                                 
                                 <!-- Slider for Saturation -->
-                                <Label Text="{x:Static res:AppResources.saettigung_s}" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.saettigung_s}" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -201,8 +201,8 @@
                                 </controls:RangeSlider>                                
                                 
                                 <!-- Slider for Brightness -->
-                                <Label Text="{x:Static res:AppResources.helligkeit_l}" FontSize="12" Margin="0,0,0,-10"/>
-                                <controls:RangeSlider
+                                <Label Text="{x:Static res:AppResources.helligkeit_l}" FontSize="12"/>
+                                <controls:RangeSlider Margin="0,0,0,10"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
@@ -219,7 +219,7 @@
                         </uranium:ExpanderView>
                     </Border>
 
-                    <Label Text="{x:Static res:AppResources.deckkraft}" Margin="0,0,0,-10"/>
+                    <Label Text="{x:Static res:AppResources.deckkraft}"/>
                     <controls:RangeSlider
                         IsRange="False"
                         IsRealtime="True"

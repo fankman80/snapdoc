@@ -27,7 +27,7 @@
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
-                <Label Text="{x:Static res:AppResources.pingroesse_limitieren}" Margin="0,0,0,-10"/>
+                <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
                 <controls:RangeSlider IsRange="True"
                                     Minimum="1"
                                     Maximum="100"
@@ -204,7 +204,7 @@
                                     Aspect="AspectFit" />
                             </HorizontalStackLayout>
 
-                            <Label Text="{x:Static res:AppResources.pingroesse}" Margin="0,0,0,-10"/>
+                            <Label Text="{x:Static res:AppResources.pingroesse}"/>
                             <controls:RangeSlider
                                     IsRange="False"
                                     Minimum="1"
@@ -310,7 +310,7 @@
                                         Clicked="ResetIcon"/>
                             </Grid>
                             <VerticalStackLayout>
-                                <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}" Margin="0,0,0,-10"/>
+                                <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"/>
                                 <controls:RangeSlider
                                     IsRange="False"
                                     Minimum="1"

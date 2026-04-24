@@ -168,7 +168,7 @@ public partial class ExportReport
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
                         var currentPlan = GlobalJson.Data.Plans[plan.Key];
-                        if (currentPlan.Pins != null && currentPlan.AllowExport)
+                        if (currentPlan.Pins != null && currentPlan.AllowExport && !plan.Key.Contains("webmap"))
                         {
                             foreach (KeyValuePair<string, Pin> pin in currentPlan.Pins)
                             {
@@ -425,12 +425,13 @@ public partial class ExportReport
                                         text.Remove(); // Lösche den Platzhaltertext
                                         foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                                         {
-                                            if (GlobalJson.Data.Plans[plan.Key].AllowExport)
+                                            var currentPlan = GlobalJson.Data.Plans[plan.Key];
+                                            if (currentPlan.AllowExport && !plan.Key.Contains("webmap"))
                                             {
-                                                run.Append(new Text("- " + GlobalJson.Data.Plans[plan.Key].Name));
-                                                if (!string.IsNullOrWhiteSpace(GlobalJson.Data.Plans[plan.Key].Description))
+                                                run.Append(new Text("- " + currentPlan.Name));
+                                                if (!string.IsNullOrWhiteSpace(currentPlan.Description))
                                                 {
-                                                    run.Append(new Text(" (" + GlobalJson.Data.Plans[plan.Key].Description + ")")
+                                                    run.Append(new Text(" (" + currentPlan.Description + ")")
                                                     { Space = SpaceProcessingModeValues.Preserve });
                                                 }
                                                 run.Append(new Break() { Type = BreakValues.TextWrapping });
@@ -445,7 +446,6 @@ public partial class ExportReport
                     if (mainPart?.Document?.Body != null)
                     {
                         var paragraphs = mainPart.Document.Body.Elements<Paragraph>().ToList();
-
                         foreach (Paragraph placeholderPara in paragraphs)
                         {
                             var data = GetPlaceholderData(placeholderPara.InnerText);
@@ -460,16 +460,16 @@ public partial class ExportReport
                             int currentPlanIdx = 1;
                             int pinIndex = 1; // Pin-Counter
 
-                            foreach (var planEntry in GlobalJson.Data.Plans)
+                            foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                             {
-                                Plan plan = planEntry.Value;
-                                if (!plan.AllowExport)
+                                var currentPlan = GlobalJson.Data.Plans[plan.Key];
+                                if (!currentPlan.AllowExport || plan.Key.Contains("webmap"))
                                     continue;
 
                                 Paragraph namePara = new(
                                     new Run(
                                         new RunProperties(new DW.FontSize { Val = fontSizeVal }),
-                                        new Text(plan.Name)
+                                        new Text(currentPlan.Name)
                                     )
                                 );
                                 mainPart.Document.Body.InsertAfter(namePara, lastElement);
@@ -477,15 +477,15 @@ public partial class ExportReport
 
                                 Paragraph imagePara = new();
                                 Run imgRun = new();
-                                string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File);
-                                Size originalSize = plan.ImageSize;
+                                string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                Size originalSize = currentPlan.ImageSize;
                                 SizeF scaledSize = ScaleToFit(originalSize, planMaxSize);
 
                                 imgRun.Append(GetImageElement(mainPart, planImagePath, scaledSize, new Point(0, 0), 0, "anchor"));
 
-                                if (plan.Pins != null)
+                                if (currentPlan.Pins != null)
                                 {
-                                    foreach (Pin pin in plan.Pins.Values.Where(p => p.IsAllowExport))
+                                    foreach (Pin pin in currentPlan.Pins.Values.Where(p => p.IsAllowExport))
                                     {
                                         string pinImagePath = Path.Combine(Settings.CacheDirectory, pin.PinIcon);
                                         var scaledPinSize = new SizeF

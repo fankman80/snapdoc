@@ -410,8 +410,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         var pin = GlobalJson.Data.Plans[ctx.PlanId].Pins[ctx.PinId];
 
-        PinSizeSlider.Value = pin.PinScale * 100;
-        PinRotateSlider.Value = Helper.ToSliderValue(pin.PinRotation);
+        PinSizeSlider.LowerValue = pin.PinScale * 100;
+        PinRotateSlider.LowerValue = Helper.ToSliderValue(pin.PinRotation);
 
         planContainer.IsPanningEnabled = false;
         DrawBtn.IsVisible = false;
@@ -1188,7 +1188,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = 0;
             rotateModeLabel.Text = AppResources.automatische_drehung;
             rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
-            PinRotateSlider.Value = 0;
+            PinRotateSlider.LowerValue = 0;
 
             doubleTappedPin.Rotation = planContainer.Rotation * -1;
         }
@@ -1198,7 +1198,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
             rotateModeLabel.Text = AppResources.drehung_fixiert;
             rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
-            PinRotateSlider.Value = Helper.ToSliderValue(-planContainer.Rotation);
+            PinRotateSlider.LowerValue = Helper.ToSliderValue(-planContainer.Rotation);
         }
 
         // save data to file
@@ -1207,7 +1207,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
+        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
 
         degreesLabel.Text = $"{sliderValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(sliderValue);
@@ -1215,7 +1215,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = Helper.SliderToRotation(Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0));
+        var sliderValue = Helper.SliderToRotation(Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0));
 
         if (sliderValue != 0)
             thisPlan.Pins[doubleTappedPin.AutomationId].IsLockRotate = true;
@@ -1237,7 +1237,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnResizeSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
+        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
 
         double scale = 1.0 / PlanContainer.Scale;
         double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
@@ -1251,7 +1251,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((Microsoft.Maui.Controls.Slider)sender).Value, 0);
+        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
 
         thisPlan.Pins[doubleTappedPin.AutomationId].PinScale = sliderValue / 100.0;
 
@@ -1268,23 +1268,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void OnRotateSnapCklicked(object sender, EventArgs e)
     {
         var snapValue = 0;
-        if ((PinRotateSlider.Value * 4 / 360) % 1 == 0)
+        if ((PinRotateSlider.LowerValue * 4 / 360) % 1 == 0)
         {
-            if (PinRotateSlider.Value == 0)
+            if (PinRotateSlider.LowerValue == 0)
                 snapValue = 90;
-            else if (PinRotateSlider.Value == 90)
+            else if (PinRotateSlider.LowerValue == 90)
                 snapValue = 180;
-            else if (PinRotateSlider.Value == 180)
+            else if (PinRotateSlider.LowerValue == 180)
                 snapValue = -90;
-            else if (PinRotateSlider.Value == -90)
+            else if (PinRotateSlider.LowerValue == -90)
                 snapValue = 0;
         }
         else
         {
-            snapValue = (int)Math.Round(PinRotateSlider.Value * 4 / 360, 0) * 90;
+            snapValue = (int)Math.Round(PinRotateSlider.LowerValue * 4 / 360, 0) * 90;
         }
         
-        PinRotateSlider.Value = snapValue;
+        PinRotateSlider.LowerValue = snapValue;
         degreesLabel.Text = $"{snapValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(snapValue);
         thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = snapValue;

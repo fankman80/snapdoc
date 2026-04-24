@@ -5,8 +5,6 @@ public partial class RangeSlider : ContentView
     #region BindableProperties
     public static readonly BindableProperty MinimumProperty = BindableProperty.Create(nameof(Minimum), typeof(double), typeof(RangeSlider), 0.0, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty MaximumProperty = BindableProperty.Create(nameof(Maximum), typeof(double), typeof(RangeSlider), 100.0, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
-    public static readonly BindableProperty LowerValueProperty = BindableProperty.Create(nameof(LowerValue), typeof(double), typeof(RangeSlider), 0.0, BindingMode.TwoWay, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
-    public static readonly BindableProperty UpperValueProperty = BindableProperty.Create(nameof(UpperValue), typeof(double), typeof(RangeSlider), 100.0, BindingMode.TwoWay, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty IsRangeProperty = BindableProperty.Create(nameof(IsRange), typeof(bool), typeof(RangeSlider), false, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty MaximumTrackColorProperty = BindableProperty.Create(nameof(MaximumTrackColor), typeof(Color), typeof(RangeSlider), Colors.Gray, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty MinimumTrackColorProperty = BindableProperty.Create(nameof(MinimumTrackColor), typeof(Color), typeof(RangeSlider), Colors.Green, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
@@ -21,6 +19,27 @@ public partial class RangeSlider : ContentView
     public static readonly BindableProperty LabelCalculationProperty = BindableProperty.Create(nameof(LabelCalculation), typeof(string), typeof(RangeSlider), string.Empty);
     public static readonly BindableProperty IsRealtimeProperty = BindableProperty.Create(nameof(IsRealtime), typeof(bool), typeof(RangeSlider), false);
 
+    public static readonly BindableProperty LowerValueProperty = BindableProperty.Create(
+        nameof(LowerValue), typeof(double), typeof(RangeSlider), 0.0, BindingMode.TwoWay,
+        propertyChanged: (b, o, n) =>
+        {
+            var control = (RangeSlider)b;
+            if (!control._isDragging)
+                control.UpdateUI();
+        });
+
+    public static readonly BindableProperty UpperValueProperty = BindableProperty.Create(
+        nameof(UpperValue), typeof(double), typeof(RangeSlider), 100.0, BindingMode.TwoWay,
+        propertyChanged: (b, o, n) =>
+        {
+            var control = (RangeSlider)b;
+            if (!control._isDragging)
+                control.UpdateUI();
+        });
+
+    public event EventHandler<ValueChangedEventArgs>? ValueChanged;
+
+    public event EventHandler? DragCompleted;
     public double Step { get => (double)GetValue(StepProperty); set => SetValue(StepProperty, value); }
     public string MinimumValueDisplayFormat { get => (string)GetValue(MinimumValueDisplayFormatProperty); set => SetValue(MinimumValueDisplayFormatProperty, value); }
     public string MaximumValueDisplayFormat { get => (string)GetValue(MaximumValueDisplayFormatProperty); set => SetValue(MaximumValueDisplayFormatProperty, value); }
@@ -70,7 +89,6 @@ public partial class RangeSlider : ContentView
 
         TrackCanvas.Drawable = _painter;
         TrackCanvas.HeightRequest = KnobSize + 20;
-        TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
 
         MainContainer.SizeChanged += (s, e) =>
         {
@@ -185,6 +203,8 @@ public partial class RangeSlider : ContentView
             FinalizeValue(_currentXUpper, false);
 
         UpdateUI();
+
+        DragCompleted?.Invoke(this, EventArgs.Empty);
     }
 
     private void UpdateThumbPosition(double absoluteX)
@@ -220,9 +240,10 @@ public partial class RangeSlider : ContentView
         {
             if (Math.Abs(steppedVal - _lastReportedLowerValue) > 0.00001)
             {
-                double displayVal = ApplyLabelCalculation(steppedVal);
-                LowerLabel.Text = string.Format(MinimumValueDisplayFormat, displayVal);
+                double oldVal = _lastReportedLowerValue;
                 _lastReportedLowerValue = steppedVal;
+                LowerLabel.Text = string.Format(MinimumValueDisplayFormat, ApplyLabelCalculation(steppedVal));
+                ValueChanged?.Invoke(this, new ValueChangedEventArgs(oldVal, steppedVal));
 
                 if (IsRealtime)
                     LowerValue = steppedVal;
@@ -232,9 +253,10 @@ public partial class RangeSlider : ContentView
         {
             if (Math.Abs(steppedVal - _lastReportedUpperValue) > 0.00001)
             {
-                double displayVal = ApplyLabelCalculation(steppedVal);
-                UpperLabel.Text = string.Format(MaximumValueDisplayFormat, displayVal);
+                double oldVal = _lastReportedUpperValue;
                 _lastReportedUpperValue = steppedVal;
+                UpperLabel.Text = string.Format(MaximumValueDisplayFormat, ApplyLabelCalculation(steppedVal));
+                ValueChanged?.Invoke(this, new ValueChangedEventArgs(oldVal, steppedVal));
 
                 if (IsRealtime)
                     UpperValue = steppedVal;
@@ -259,7 +281,7 @@ public partial class RangeSlider : ContentView
         }
         else
         {
-            TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
+            TouchLayer.Margin = new Thickness(0);
             TouchLayer.ZIndex = 100;
 #if ANDROID
             var androidView = this.Handler?.PlatformView as Android.Views.View;
@@ -375,6 +397,23 @@ public partial class RangeSlider : ContentView
             _painter.ThumbColor = ThumbColor;
             _painter.KnobSize = KnobSize;
             _painter.IsRange = IsRange;
+
+            // Labels Sichtbarkeit steuern
+            LowerLabel.IsVisible = ShowLabels;
+            UpperLabel.IsVisible = ShowLabels && IsRange;
+
+            // Zentrierung korrigieren
+            if (!ShowLabels)
+            {
+                TouchLayer.Margin = new Thickness(0);
+                TrackCanvas.VerticalOptions = LayoutOptions.Center;
+                MainContainer.VerticalOptions = LayoutOptions.Center;
+            }
+            else
+            {
+                TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
+                TrackCanvas.VerticalOptions = LayoutOptions.Start; // Oder dein Standard
+            }
 
             if (TextColor != null)
             {

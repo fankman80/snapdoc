@@ -469,16 +469,16 @@
     <value>Standard-Icon</value>
   </data>
   <data name="automatische_drehung" xml:space="preserve">
-    <value>◀ Automatische Drehung</value>
+    <value>Automatische Drehung</value>
   </data>
   <data name="drehung_fixiert" xml:space="preserve">
-    <value>◀ Drehung fixiert</value>
+    <value>Drehung fixiert</value>
   </data>
   <data name="automatische_groessenanpassung" xml:space="preserve">
-    <value>◀ Automatische Grössenanpassung</value>
+    <value>Automatische Grössenanpassung</value>
   </data>
   <data name="groesse_fixiert" xml:space="preserve">
-    <value>◀ Grösse fixiert</value>
+    <value>Grösse fixiert</value>
   </data>
   <data name="adresse" xml:space="preserve">
     <value>Adresse</value>

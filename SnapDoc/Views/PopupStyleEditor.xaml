@@ -128,7 +128,7 @@
                             Clicked="OnTemplateAddClicked"/>
                 </Grid>
 
-                <Label Text="{x:Static res:AppResources.linienbreite}" Margin="0,0,0,-10"/>
+                <Label Text="{x:Static res:AppResources.linienbreite}"/>
                 <controls:RangeSlider
                         IsRange="False"
                         Minimum="0"

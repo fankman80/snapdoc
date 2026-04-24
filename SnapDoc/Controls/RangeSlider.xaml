@@ -7,41 +7,9 @@
 
     <Grid x:Name="MainContainer" 
           VerticalOptions="Center" 
-          RowDefinitions="Auto, Auto"
-          ColumnDefinitions="*"
           IsClippedToBounds="False">
 
-        <Grid Grid.Row="0"
-              VerticalOptions="End"
-              IsClippedToBounds="False"
-              Margin="0,0,0,-6"
-              ZIndex="1">
-
-            <Label x:Name="LowerLabel"
-                   IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
-                   TextColor="{Binding TextColor, Source={x:Reference this}}"
-                   FontSize="{Binding FontSize, Source={x:Reference this}}"
-                   FontFamily="{StaticResource AppFontFamily}"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   HorizontalTextAlignment="Center"
-                   LineBreakMode="NoWrap"
-                   InputTransparent="True" />
-
-            <Label x:Name="UpperLabel" 
-                   IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
-                   TextColor="{Binding TextColor, Source={x:Reference this}}"
-                   FontSize="{Binding FontSize, Source={x:Reference this}}"
-                   FontFamily="{StaticResource AppFontFamily}"
-                   HorizontalOptions="Start"
-                   VerticalOptions="End"
-                   HorizontalTextAlignment="Center"
-                   LineBreakMode="NoWrap"
-                   InputTransparent="True" />
-        </Grid>
-
-        <Grid Grid.Row="1" 
-              HeightRequest="{Binding KnobSize, Source={x:Reference this}}" 
+        <Grid HeightRequest="{Binding KnobSize, Source={x:Reference this}}" 
               VerticalOptions="Center"
               IsClippedToBounds="False">
 
@@ -60,10 +28,36 @@
                   IsClippedToBounds="False">
                 <Grid.GestureRecognizers>
                     <PointerGestureRecognizer PointerPressed="OnPointerPressed" 
-                                              PointerReleased="OnPointerReleased"/>
+                                          PointerReleased="OnPointerReleased"/>
                     <PanGestureRecognizer PanUpdated="OnPanUpdated" />
                 </Grid.GestureRecognizers>
             </Grid>
+        </Grid>
+
+        <Grid x:Name="LabelContainer"
+              VerticalOptions="Center"
+              TranslationY="-12" 
+              IsClippedToBounds="False"
+              IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
+              InputTransparent="True"
+              ZIndex="1">
+
+            <Label x:Name="LowerLabel"
+                   TextColor="{Binding TextColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="NoWrap" />
+
+            <Label x:Name="UpperLabel" 
+                   IsVisible="{Binding IsRange, Source={x:Reference this}}"
+                   TextColor="{Binding TextColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   HorizontalOptions="Start"
+                   VerticalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   LineBreakMode="NoWrap" />
         </Grid>
     </Grid>
 </ContentView>

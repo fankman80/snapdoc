@@ -145,7 +145,7 @@
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
                     
-                    <Label Text="{x:Static res:AppResources.fotoqualitaet}" Margin="0,0,0,-10"/>
+                    <Label Text="{x:Static res:AppResources.fotoqualitaet}"/>
                     <controls:RangeSlider
                         IsRange="False"
                         Minimum="1"
@@ -159,7 +159,7 @@
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
-                    <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}" Margin="0,0,0,-10"/>
+                    <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}"/>
                     <controls:RangeSlider
                         IsRange="False"
                         Minimum="1"
@@ -173,7 +173,7 @@
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
-                    <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}" IsVisible="{Binding IsPinIconExport}" Margin="0,0,0,-10"/>
+                    <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}" IsVisible="{Binding IsPinIconExport}"/>
                     <controls:RangeSlider
                         IsVisible="{Binding IsPinIconExport}"
                         IsRange="False"
@@ -188,7 +188,7 @@
                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
-                    <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}" Margin="0,0,0,-10"/>
+                    <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}"/>
                     <controls:RangeSlider
                         IsVisible="{Binding IsPosImageExport}"
                         IsRange="False"
