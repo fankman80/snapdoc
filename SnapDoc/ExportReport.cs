@@ -17,7 +17,7 @@ namespace SnapDoc;
 
 public partial class ExportReport
 {
-    [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList|pin_posImage)/(?<w>\d+)/(?<h>\d+)\}")]
+    [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList|pin_posImage|pin_posIcon)/(?<w>\d+)/(?<h>\d+)\}")]
     private static partial Regex UniversalImageRegex();
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
     private record ImageTagData(string Type, SizeF Size, string FullMatch);
@@ -62,6 +62,7 @@ public partial class ExportReport
             {"${pin_nr}", "${pin_nr}"},
             {"${pin_planName}", "${pin_planName}"},
             {"${pin_posImage/", "${pin_posImage/"},
+            {"${pin_posIcon/", "${pin_posIcon/"},
             {"${pin_fotoList/", "${pin_fotoList/"},
             {"${pin_name}", "${pin_name}"},
             {"${pin_desc}", "${pin_desc}"},
@@ -69,6 +70,8 @@ public partial class ExportReport
             {"${pin_priority}", "${pin_priority}"},
             {"${pin_geolocWGS84}", "${pin_geolocWGS84}"},
             {"${pin_geolocCH1903}", "${pin_geolocCH1903}"},
+            {"${pin_captureTime}", "${pin_captureTime}"},
+            {"${pin_captureDate}", "${pin_captureDate}"},
         };
 
         // create a list with all icons, each icon only one times
@@ -164,11 +167,13 @@ public partial class ExportReport
                     var pinCounter = 1;
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
-                        if (GlobalJson.Data.Plans[plan.Key].Pins != null && GlobalJson.Data.Plans[plan.Key].AllowExport)
+                        var currentPlan = GlobalJson.Data.Plans[plan.Key];
+                        if (currentPlan.Pins != null && currentPlan.AllowExport)
                         {
-                            foreach (KeyValuePair<string, Pin> pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                            foreach (KeyValuePair<string, Pin> pin in currentPlan.Pins)
                             {
-                                if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].IsAllowExport)
+                                var currentPin = currentPlan.Pins[pin.Key];
+                                if (currentPin.IsAllowExport)
                                 {
                                     // Anzahl Spalten ermitteln
                                     int columnCount = table.Elements<TableRow>().FirstOrDefault()?.Elements<TableCell>().Count() ?? 0;
@@ -201,12 +206,13 @@ public partial class ExportReport
                                         {
                                             foreach ((int, int, int, string) ph in _columnPlaceholders)
                                             {
-                                                void AddText(string text)
+                                                void AddText(string text, bool lineBreak = true)
                                                 {
                                                     if (!string.IsNullOrEmpty(text))
                                                     {
                                                         newParagraph.Append(new Run(new Text(text)));
-                                                        newParagraph.Append(new Run(new Break()));   // Zeilenumbruch nur nach Text
+                                                        if (lineBreak)
+                                                            newParagraph.Append(new Run(new Break()));   // Zeilenumbruch nur nach Text
                                                     }
                                                 }
 
@@ -220,16 +226,31 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_planName}":
-                                                        AddText(GlobalJson.Data.Plans[plan.Key].Name);
+                                                        AddText(currentPlan.Name);
+                                                        break;
+
+                                                    case string s when s.StartsWith("${pin_posIcon"):
+                                                        if (!currentPin.IsCustomPin)
+                                                        {
+                                                            var posData = GetPlaceholderData(s);
+                                                            string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                            string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
+
+                                                            if (File.Exists(pinImage))
+                                                            {
+                                                                SizeF exportSize = posData?.Size ?? new SizeF(14, 14);
+                                                                var pinImgElement = GetImageElement(mainPart, pinImage, exportSize, new Point(0, 0), 0, "inline");
+                                                                if (pinImgElement != null)
+                                                                    newParagraph.Append(new Run(pinImgElement));
+                                                            }
+                                                            newParagraph.Append(new Run(new Break()));
+                                                        }
                                                         break;
 
                                                     case string s when s.StartsWith("${pin_posImage"):
-                                                        var posData = GetPlaceholderData(s);
-                                                        var currentPlan = GlobalJson.Data.Plans[plan.Key];
-                                                        var currentPin = currentPlan.Pins[pin.Key];
-
                                                         if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
                                                         {
+                                                            var posData = GetPlaceholderData(s);
                                                             string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
                                                             string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
 
@@ -274,7 +295,7 @@ public partial class ExportReport
                                                         if (data != null && SettingsService.Instance.IsImageExport)
                                                         {
                                                             SizeF maxTargetSize = data.Size;
-                                                            var pinFotos = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].Fotos.Values;
+                                                            var pinFotos = currentPin.Fotos.Values;
                                                             foreach (var img in pinFotos)
                                                             {
                                                                 if (!img.AllowExport)
@@ -304,45 +325,52 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_name}":
-                                                        AddText(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName);
+                                                        AddText(currentPin.PinName);
                                                         break;
 
                                                     case "${pin_desc}":
-                                                        AddText(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key]
-                                                                .PinDesc.Replace("\r\n", "\n")
-                                                                .Replace("\r", "\n"));
+                                                        AddText(currentPin.PinDesc.Replace("\r\n", "\n").Replace("\r", "\n"));
                                                         break;
 
                                                     case "${pin_location}":
-                                                        AddText(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinLocation);
+                                                        AddText(currentPin.PinLocation);
                                                         break;
 
                                                     case "${pin_priority}":
-                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority != 0)
+                                                        if (currentPin.PinPriority != 0)
                                                         {
                                                             string fillColor = SettingsService.Instance.PriorityItems[
-                                                                GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority].Color;
+                                                                currentPin.PinPriority].Color;
                                                             newTableCell.TableCellProperties =
                                                                 new TableCellProperties(new Shading { Fill = fillColor.Replace("#", "") });
                                                         }
-                                                        var priorityIndex = GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinPriority;
+                                                        var priorityIndex = currentPin.PinPriority;
                                                         var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
                                                         AddText(prio_item?.Key ?? "");
                                                         break;
 
                                                     case "${pin_geolocWGS84}":
-                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
-                                                            AddText(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.ToString());
+                                                        if (currentPin.GeoLocation != null)
+                                                            AddText(currentPin.GeoLocation.WGS84.ToString());
                                                         break;
 
                                                     case "${pin_geolocCH1903}":
-                                                        if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
-                                                            AddText(GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.CH1903.ToString());
+                                                        if (currentPin.GeoLocation != null)
+                                                            AddText(currentPin.GeoLocation.CH1903.ToString());
+                                                        break;
+
+                                                    case "${pin_captureDate}":
+                                                        if (currentPin.DateTime != DateTime.MinValue)
+                                                            AddText(currentPin.DateTime.ToShortDateString());
+                                                        break;
+
+                                                    case "${pin_captureTime}":
+                                                        if (currentPin.DateTime != DateTime.MinValue)
+                                                            AddText(currentPin.DateTime.ToShortTimeString());
                                                         break;
                                                 }
                                             }
                                         }
-
                                         newTableCell.Append(newParagraph);
                                         newRow.Append(newTableCell);
                                     }
@@ -1119,9 +1147,9 @@ public partial class ExportReport
         if (!match.Success) return null;
 
         return new ImagePlaceholderData(
-            match.Groups["type"].Value, // "title_image" oder "plan_images"
+            match.Groups["type"].Value,
             new SizeF(int.Parse(match.Groups["w"].Value), int.Parse(match.Groups["h"].Value)),
-            match.Value // Der exakte Text wie "${title_image/250/250}"
+            match.Value
         );
     }
 
