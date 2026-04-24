@@ -19,6 +19,12 @@ using System.ComponentModel;
 using SnapDoc.Platforms.Windows;
 #endif
 
+#if IOS
+using UIKit;
+using CoreAnimation;
+using CommunityToolkit.Maui.Core.Extensions;
+#endif
+
 namespace SnapDoc.Views;
 
 public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
@@ -319,6 +325,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 PinId = pinId
             }
         };
+
+#if IOS
+        // Auf iOS kann es vorkommen, dass die Pins unscharf dargestellt werden, wenn sie skaliert werden.
+        // FixIosPinQuality(smallImage);
+#endif
 
         smallImage.Down += OnPinDown;
         smallImage.Up += OnPinUp;
@@ -768,13 +779,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private double PinScaling(string pinId)
     {
-        double baseScale = 1.0;
-#if IOS
-        baseScale = 2.0; 
-#endif
-
+        double baseScale = SettingsService.Instance.OsBaseScale;
         var pin = thisPlan.Pins[pinId];
-        double userPinScale = pin.PinScale; // Der individuelle Scale-Wert des Pins
+        double userPinScale = pin.PinScale;
 
         if (!pin.IsCustomPin)
         {
@@ -790,7 +797,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         else
         {
-            return baseScale * userPinScale;
+            return userPinScale;
         }
     }
 
@@ -1557,6 +1564,38 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
+        }
+#endif
+    }
+
+    private static void FixIosPinQuality(Microsoft.Maui.Controls.Image img)
+    {
+#if IOS
+        static void Apply(UIImageView imageView)
+        {
+            if (imageView.Layer == null)
+                return;
+
+            imageView.Layer.MinificationFilter = CALayer.FilterTrilinear;
+            imageView.Layer.MagnificationFilter = CALayer.FilterTrilinear;
+            imageView.Layer.ContentsScale = (System.Runtime.InteropServices.NFloat)UIScreen.MainScreen.Scale;
+            imageView.Layer.ShouldRasterize = true;
+            imageView.Layer.RasterizationScale = (System.Runtime.InteropServices.NFloat)(UIScreen.MainScreen.Scale * 2.0);
+            imageView.Layer.EdgeAntialiasingMask = CAEdgeAntialiasingMask.All;
+            imageView.Layer.AllowsEdgeAntialiasing = true;
+        }
+
+        if (img.Handler?.PlatformView is UIImageView directView)
+        {
+            Apply(directView);
+        }
+        else
+        {
+            img.HandlerChanged += (s, e) =>
+            {
+                if (img.Handler?.PlatformView is UIImageView imageView)
+                    Apply(imageView);
+            };
         }
 #endif
     }

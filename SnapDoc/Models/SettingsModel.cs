@@ -2,6 +2,7 @@
 
 internal class SettingsModel
 {
+    public double OsBaseScale { get; set; } // Basis-Skalierung für das Betriebssystem
     public int PinMinScaleLimit { get; set; } // Skalierungsgrenze für Pins (Minimum)
     public int PinMaxScaleLimit { get; set; } // Skalierungsgrenze für Pins (Maximum)
     public int MapIconSize { get; set; } // Größe der Karten-Icons auf swisstopo

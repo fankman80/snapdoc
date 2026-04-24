@@ -18,14 +18,18 @@ public static class Settings
 
 #if WINDOWS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.UserProfile), "SnapDoc");
+    private static double osBaseScale = 1.0;
 #endif
 #if ANDROID
     private static string dataDirectory = Path.Combine(FileSystem.AppDataDirectory, "SnapDoc");
+    private static double osBaseScale = 1.0;
 #endif
 #if IOS
     private static string dataDirectory = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SnapDoc");
+    private static double osBaseScale = 2.0;
 #endif
 
+    public static double OsBaseScale { get => osBaseScale; set => osBaseScale = value; }
     public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
     public static List<IconItem> IconData { get; set; } = [];
 

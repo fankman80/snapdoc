@@ -88,6 +88,7 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
+    [ObservableProperty] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
     [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
     [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
     [ObservableProperty] public partial int FlashMode { get; set; } = 0;
@@ -295,6 +296,7 @@ public partial class SettingsService : ObservableObject
     {
         var settings = new SettingsModel
         {
+            OsBaseScale = OsBaseScale,
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
@@ -372,6 +374,7 @@ public partial class SettingsService : ObservableObject
             if (settings == null)
                 return;
 
+            OsBaseScale = settings.OsBaseScale != 0 ? settings.OsBaseScale : Settings.OsBaseScale;
             PinMinScaleLimit = settings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
@@ -440,6 +443,7 @@ public partial class SettingsService : ObservableObject
     {
         // Einfach den Konstruktor einmal wieder aufrufen
         var defaultSettings = new SettingsService();
+        OsBaseScale = defaultSettings.OsBaseScale;
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;
