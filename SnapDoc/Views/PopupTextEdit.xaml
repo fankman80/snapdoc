@@ -33,16 +33,17 @@
             <VerticalStackLayout IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
                 <Label Text="{x:Static res:AppResources.schriftgroesse}"/>
                 <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="6"
-                        Maximum="180"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0} pt"
-                        LowerValue="{Binding FontSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    Margin="0,0,0,10"
+                    IsRange="False"
+                    Minimum="6"
+                    Maximum="180"
+                    Step="1"
+                    FontSize="12"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    MinimumValueDisplayFormat="{}{0} pt"
+                    LowerValue="{Binding FontSize}"
+                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                 </controls:RangeSlider>
             </VerticalStackLayout>
 
@@ -150,16 +151,17 @@
             <VerticalStackLayout>
                 <Label Text="{x:Static res:AppResources.randabstand}"/>
                 <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="0"
-                        Maximum="50"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0} px"
-                        LowerValue="{Binding TextPadding}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                     Margin="0,0,0,10"
+                     IsRange="False"
+                     Minimum="0"
+                     Maximum="50"
+                     Step="1"
+                     FontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0} px"
+                     LowerValue="{Binding TextPadding}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                 </controls:RangeSlider>
             </VerticalStackLayout>
 

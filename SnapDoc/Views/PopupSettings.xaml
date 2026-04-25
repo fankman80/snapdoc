@@ -28,18 +28,20 @@
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
                 <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
-                <controls:RangeSlider IsRange="True"
-                                    Minimum="1"
-                                    Maximum="100"
-                                    Step="1"
-                                    FontSize="12"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    MinimumValueDisplayFormat="{}min. {0:0} %"
-                                    MaximumValueDisplayFormat="{}max. {0:0} %"
-                                    LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
-                                    UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
-                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                <controls:RangeSlider
+                            Margin="0,0,0,10"
+                            IsRange="True"
+                            Minimum="1"
+                            Maximum="100"
+                            Step="1"
+                            FontSize="12"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                            MinimumValueDisplayFormat="{}min. {0:0} %"
+                            MaximumValueDisplayFormat="{}max. {0:0} %"
+                            LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
+                            UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
+                            MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                            MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                 </controls:RangeSlider>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
@@ -206,6 +208,7 @@
 
                             <Label Text="{x:Static res:AppResources.pingroesse}"/>
                             <controls:RangeSlider
+                                    Margin="0,0,0,10"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="100"
@@ -312,6 +315,7 @@
                             <VerticalStackLayout>
                                 <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"/>
                                 <controls:RangeSlider
+                                    Margin="0,0,0,10"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="50"

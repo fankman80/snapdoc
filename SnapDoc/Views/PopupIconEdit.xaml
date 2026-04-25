@@ -107,17 +107,18 @@
                 <VerticalStackLayout>
                     <Label Text="{x:Static res:AppResources.voreinstellung_skalierung}"/>
                     <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="0"
-                        Maximum="1"
-                        Step="0.01"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0} %"
-                        LabelCalculation="*100"
-                        LowerValue="{Binding IconScale}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                         Margin="0,0,0,10"
+                         IsRange="False"
+                         Minimum="0"
+                         Maximum="1"
+                         Step="0.01"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0:0} %"
+                         LabelCalculation="*100"
+                         LowerValue="{Binding IconScale}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
                     <controls:Switch x:Name="allowRotate"
                                     LabelText="{x:Static res:AppResources.rotation_sperren}"

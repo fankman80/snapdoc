@@ -147,60 +147,64 @@
                     
                     <Label Text="{x:Static res:AppResources.fotoqualitaet}"/>
                     <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="1"
-                        Maximum="100"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0} %"
-                        LowerValue="{Binding FotoCompressValue}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                         Margin="0,0,0,10"
+                         IsRange="False"
+                         Minimum="1"
+                         Maximum="100"
+                         Step="1"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0} %"
+                         LowerValue="{Binding FotoCompressValue}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
                     <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}"/>
                     <controls:RangeSlider
-                        IsRange="False"
-                        Minimum="1"
-                        Maximum="20"
-                        Step="0.1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0.#} pt"
-                        LowerValue="{Binding PinLabelFontSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                         Margin="0,0,0,10"
+                         IsRange="False"
+                         Minimum="1"
+                         Maximum="20"
+                         Step="0.1"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0:0.#} pt"
+                         LowerValue="{Binding PinLabelFontSize}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
                     <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}" IsVisible="{Binding IsPinIconExport}"/>
                     <controls:RangeSlider
-                        IsVisible="{Binding IsPinIconExport}"
-                        IsRange="False"
-                        Minimum="1"
-                        Maximum="20"
-                        Step="0.1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0.#} mm"
-                        LowerValue="{Binding PinExportSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                         Margin="0,0,0,10"
+                         IsVisible="{Binding IsPinIconExport}"
+                         IsRange="False"
+                         Minimum="1"
+                         Maximum="20"
+                         Step="0.1"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0:0.#} mm"
+                         LowerValue="{Binding PinExportSize}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
 
                     <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}"/>
                     <controls:RangeSlider
-                        IsVisible="{Binding IsPosImageExport}"
-                        IsRange="False"
-                        Minimum="100"
-                        Maximum="1000"
-                        Step="1"
-                        FontSize="12"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        MinimumValueDisplayFormat="{}{0:0} Pixel"
-                        LowerValue="{Binding PinPosCropExportSize}"
-                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                         Margin="0,0,0,10"
+                         IsVisible="{Binding IsPosImageExport}"
+                         IsRange="False"
+                         Minimum="100"
+                         Maximum="1000"
+                         Step="1"
+                         FontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0:0} Pixel"
+                         LowerValue="{Binding PinPosCropExportSize}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>
                 </VerticalStackLayout>
             </ScrollView>
