@@ -402,19 +402,6 @@ public partial class RangeSlider : ContentView
             LowerLabel.IsVisible = ShowLabels;
             UpperLabel.IsVisible = ShowLabels && IsRange;
 
-            // Zentrierung korrigieren
-            if (!ShowLabels)
-            {
-                TouchLayer.Margin = new Thickness(0);
-                TrackCanvas.VerticalOptions = LayoutOptions.Center;
-                MainContainer.VerticalOptions = LayoutOptions.Center;
-            }
-            else
-            {
-                TouchLayer.Margin = new Thickness(0, -(KnobSize / 2));
-                TrackCanvas.VerticalOptions = LayoutOptions.Start; // Oder dein Standard
-            }
-
             if (TextColor != null)
             {
                 LowerLabel.TextColor = TextColor;

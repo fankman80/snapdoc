@@ -107,7 +107,6 @@
                 <VerticalStackLayout>
                     <Label Text="{x:Static res:AppResources.voreinstellung_skalierung}"/>
                     <controls:RangeSlider
-                         Margin="0,0,0,10"
                          IsRange="False"
                          Minimum="0"
                          Maximum="1"

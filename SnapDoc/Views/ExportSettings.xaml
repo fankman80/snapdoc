@@ -147,7 +147,6 @@
                     
                     <Label Text="{x:Static res:AppResources.fotoqualitaet}"/>
                     <controls:RangeSlider
-                         Margin="0,0,0,10"
                          IsRange="False"
                          Minimum="1"
                          Maximum="100"
@@ -162,7 +161,6 @@
 
                     <Label Text="{x:Static res:AppResources.groesse_pinbeschriftung}"/>
                     <controls:RangeSlider
-                         Margin="0,0,0,10"
                          IsRange="False"
                          Minimum="1"
                          Maximum="20"
@@ -177,7 +175,6 @@
 
                     <Label Text="{x:Static res:AppResources.pin_icon_breite_hoehe}" IsVisible="{Binding IsPinIconExport}"/>
                     <controls:RangeSlider
-                         Margin="0,0,0,10"
                          IsVisible="{Binding IsPinIconExport}"
                          IsRange="False"
                          Minimum="1"
@@ -193,7 +190,6 @@
 
                     <Label Text="{x:Static res:AppResources.positionsbilder_zuschnitt}" IsVisible="{Binding IsPosImageExport}"/>
                     <controls:RangeSlider
-                         Margin="0,0,0,10"
                          IsVisible="{Binding IsPosImageExport}"
                          IsRange="False"
                          Minimum="100"

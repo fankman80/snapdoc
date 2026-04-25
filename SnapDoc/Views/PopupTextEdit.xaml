@@ -33,7 +33,6 @@
             <VerticalStackLayout IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
                 <Label Text="{x:Static res:AppResources.schriftgroesse}"/>
                 <controls:RangeSlider
-                    Margin="0,0,0,10"
                     IsRange="False"
                     Minimum="6"
                     Maximum="180"
@@ -151,7 +150,6 @@
             <VerticalStackLayout>
                 <Label Text="{x:Static res:AppResources.randabstand}"/>
                 <controls:RangeSlider
-                     Margin="0,0,0,10"
                      IsRange="False"
                      Minimum="0"
                      Maximum="50"

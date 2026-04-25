@@ -130,7 +130,6 @@
 
                 <Label Text="{x:Static res:AppResources.linienbreite}"/>
                 <controls:RangeSlider
-                     Margin="0,0,0,10"
                      IsRange="False"
                      Minimum="0"
                      Maximum="20"

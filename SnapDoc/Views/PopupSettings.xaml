@@ -29,7 +29,6 @@
             <VerticalStackLayout>
                 <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
                 <controls:RangeSlider
-                            Margin="0,0,0,10"
                             IsRange="True"
                             Minimum="1"
                             Maximum="100"
@@ -93,7 +92,7 @@
                         StrokeShape="RoundRectangle 8"
                         Padding="8"
                         Margin="0,0,0,10">
-                <uranium:ExpanderView Margin="6,6,6,6">
+                <uranium:ExpanderView Margin="6">
                     <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.modus_fuer_pinplatzierung}"/>
                     </uranium:ExpanderView.Header>
@@ -134,7 +133,7 @@
                         StrokeShape="RoundRectangle 8"
                         Padding="8"
                         Margin="0,0,0,10">
-                    <uranium:ExpanderView Margin="6,6,6,6">
+                    <uranium:ExpanderView Margin="6">
                         <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.kartenservice}"/>
                         </uranium:ExpanderView.Header>
@@ -146,31 +145,26 @@
                                                            Orientation="Horizontal">
                                 <material:RadioButton Value="0"
                                                       WidthRequest="30"
-                                                      Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
                                 <material:RadioButton Value="1"
                                                       WidthRequest="30"
-                                                      Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
                                 <material:RadioButton Value="2"
                                                       WidthRequest="30"
-                                                      Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
                                 <material:RadioButton Value="3"
                                                       WidthRequest="30"
-                                                      Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
                                 <material:RadioButton Value="4"
                                                       WidthRequest="30"
-                                                      Margin="0,0,0,10"
                                                       CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                                       HorizontalOptions="Center" />
@@ -208,7 +202,6 @@
 
                             <Label Text="{x:Static res:AppResources.pingroesse}"/>
                             <controls:RangeSlider
-                                    Margin="0,0,0,10"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="100"
@@ -225,11 +218,11 @@
                 </Border>
 
                 <Border Stroke="{DynamicResource SecondaryBackground}"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="8"
-                    Margin="0,0,0,10">
-                    <uranium:ExpanderView Margin="6,6,6,6">
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
+                    <uranium:ExpanderView Margin="6">
                         <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.farbschema}"/>
                         </uranium:ExpanderView.Header>
@@ -261,11 +254,11 @@
                 </Border>
 
                 <Border Stroke="{DynamicResource SecondaryBackground}"
-                    StrokeThickness="1"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="8"
-                    Margin="0,0,0,10">
-                    <uranium:ExpanderView Margin="6,6,6,6">
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        Padding="8"
+                        Margin="0,0,0,10">
+                    <uranium:ExpanderView Margin="6">
                         <uranium:ExpanderView.Header>
                             <Label Text="{x:Static res:AppResources.erweiterte_einstellungen}"/>
                         </uranium:ExpanderView.Header>
@@ -315,7 +308,6 @@
                             <VerticalStackLayout>
                                 <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"/>
                                 <controls:RangeSlider
-                                    Margin="0,0,0,10"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="50"
