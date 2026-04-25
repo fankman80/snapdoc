@@ -147,7 +147,7 @@
                         VerticalOptions="End"
                         Clicked="LoadCustomPinClicked"/>
                 <Button x:Name="sizeModeBtn"
-                        FontSize="36"
+                        FontSize="{OnPlatform 38, iOS=34}"
                         FontFamily="MaterialOutlined"
                         TextColor="{DynamicResource Primary}"
                         BackgroundColor="{DynamicResource PrimaryDarkText}"
@@ -202,7 +202,7 @@
                             DragCompleted="OnRotateSliderDragCompleted"/>
                 </Border>
                 <Button x:Name="rotateModeBtn"
-                        FontSize="36"
+                        FontSize="{OnPlatform 38, iOS=34}"
                         FontFamily="MaterialOutlined"
                         TextColor="{DynamicResource Primary}"
                         BackgroundColor="{DynamicResource PrimaryDarkText}"
