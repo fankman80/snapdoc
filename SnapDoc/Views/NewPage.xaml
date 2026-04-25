@@ -170,8 +170,8 @@
                        Margin="0,0,30,118"
                        ZIndex="10001"/>                
                 <Label x:Name="sizeModeLabel"
-                       FontSize="12"
-                       VerticalTextAlignment="Start"
+                       FontSize="11"
+                       VerticalTextAlignment="Center"
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
@@ -231,8 +231,8 @@
                         VerticalOptions="End"
                         Clicked="OnRotateSnapCklicked"/>
                 <Label x:Name="rotateModeLabel"
-                       FontSize="12"
-                       VerticalTextAlignment="Start"
+                       FontSize="11"
+                       VerticalTextAlignment="Center"
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
