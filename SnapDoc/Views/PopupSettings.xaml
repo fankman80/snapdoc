@@ -27,13 +27,13 @@
         </Grid.RowDefinitions>
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
-                <Label Text="{x:Static res:AppResources.pingroesse_limitieren}"/>
                 <controls:RangeSlider
+                            LabelText="{x:Static res:AppResources.pingroesse_limitieren}"
                             IsRange="True"
                             Minimum="1"
                             Maximum="100"
                             Step="1"
-                            FontSize="12"
+                            ValueFontSize="12"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             MinimumValueDisplayFormat="{}min. {0:0} %"
                             MaximumValueDisplayFormat="{}max. {0:0} %"
@@ -200,13 +200,13 @@
                                     Aspect="AspectFit" />
                             </HorizontalStackLayout>
 
-                            <Label Text="{x:Static res:AppResources.pingroesse}"/>
                             <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.pingroesse}"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="100"
                                     Step="1"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                     MinimumValueDisplayFormat="{}{0:0} %"
                                     LowerValue="{Binding MapIconSize}"
@@ -306,13 +306,13 @@
                                         Clicked="ResetIcon"/>
                             </Grid>
                             <VerticalStackLayout>
-                                <Label Text="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="50"
                                     Step="1"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                     MinimumValueDisplayFormat="{}{0:0} MP"
                                     LowerValue="{Binding MaxPdfPixelCount}"

@@ -1,3 +1,4 @@
+
 namespace SnapDoc.Controls;
 
 public partial class RangeSlider : ContentView
@@ -10,7 +11,7 @@ public partial class RangeSlider : ContentView
     public static readonly BindableProperty MinimumTrackColorProperty = BindableProperty.Create(nameof(MinimumTrackColor), typeof(Color), typeof(RangeSlider), Colors.Green, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty ThumbColorProperty = BindableProperty.Create(nameof(ThumbColor), typeof(Color), typeof(RangeSlider), Colors.White, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(RangeSlider), Label.TextColorProperty.DefaultValue, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
-    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(RangeSlider), Label.FontSizeProperty.DefaultValue, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
+    public static readonly BindableProperty ValueFontSizeProperty = BindableProperty.Create(nameof(ValueFontSize), typeof(double), typeof(RangeSlider), Label.FontSizeProperty.DefaultValue, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty StepProperty = BindableProperty.Create(nameof(Step), typeof(double), typeof(RangeSlider), 1.0, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty KnobSizeProperty = BindableProperty.Create(nameof(KnobSize), typeof(double), typeof(RangeSlider), 24.0, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty MinimumValueDisplayFormatProperty = BindableProperty.Create(nameof(MinimumValueDisplayFormat), typeof(string), typeof(RangeSlider), "{0:0}");
@@ -18,6 +19,8 @@ public partial class RangeSlider : ContentView
     public static readonly BindableProperty ShowLabelsProperty = BindableProperty.Create(nameof(ShowLabels), typeof(bool), typeof(RangeSlider), true, propertyChanged: (b, o, n) => ((RangeSlider)b).UpdateUI());
     public static readonly BindableProperty LabelCalculationProperty = BindableProperty.Create(nameof(LabelCalculation), typeof(string), typeof(RangeSlider), string.Empty);
     public static readonly BindableProperty IsRealtimeProperty = BindableProperty.Create(nameof(IsRealtime), typeof(bool), typeof(RangeSlider), false);
+    public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(RangeSlider), string.Empty, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty TextSizeProperty = BindableProperty.Create(nameof(TextSize), typeof(double), typeof(RangeSlider), defaultValue: GetDefaultFontSize());
 
     public static readonly BindableProperty LowerValueProperty = BindableProperty.Create(
         nameof(LowerValue), typeof(double), typeof(RangeSlider), 0.0, BindingMode.TwoWay,
@@ -37,6 +40,9 @@ public partial class RangeSlider : ContentView
                 control.UpdateUI();
         });
 
+    public string LabelText { get => (string)GetValue(LabelTextProperty); set => SetValue(LabelTextProperty, value); }
+    public double TextSize { get => (double)GetValue(TextSizeProperty); set => SetValue(TextSizeProperty, value); }
+
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
 
     public event EventHandler? DragCompleted;
@@ -53,7 +59,7 @@ public partial class RangeSlider : ContentView
     public Color ThumbColor { get => (Color)GetValue(ThumbColorProperty); set => SetValue(ThumbColorProperty, value); }
     public double KnobSize { get => (double)GetValue(KnobSizeProperty); set => SetValue(KnobSizeProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
-    public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
+    public double ValueFontSize { get => (double)GetValue(ValueFontSizeProperty); set => SetValue(ValueFontSizeProperty, value); }
     public bool ShowLabels { get => (bool)GetValue(ShowLabelsProperty); set => SetValue(ShowLabelsProperty, value); }
     public string LabelCalculation { get => (string)GetValue(LabelCalculationProperty); set => SetValue(LabelCalculationProperty, value); }
     public bool IsRealtime { get => (bool)GetValue(IsRealtimeProperty); set => SetValue(IsRealtimeProperty, value); }
@@ -76,6 +82,19 @@ public partial class RangeSlider : ContentView
     private bool _isScrollingTriggered;
     private const double GestureThreshold = 10.0;
     private bool _wasPressedOnThisControl;
+
+    private static double GetDefaultFontSize()
+    {
+        if (Application.Current?.Resources != null && Application.Current.Resources.TryGetValue("AppFontSizeNormal", out var value))
+            return (double)value;
+        return 14.0;
+    }
+
+    private static void OnAnyPropertyChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is RangeSlider customSlider)
+            customSlider.UpdateUI();
+    }
 
     public RangeSlider()
     {
@@ -407,8 +426,8 @@ public partial class RangeSlider : ContentView
                 LowerLabel.TextColor = TextColor;
                 UpperLabel.TextColor = TextColor;
             }
-            LowerLabel.FontSize = FontSize;
-            UpperLabel.FontSize = FontSize;
+            LowerLabel.FontSize = ValueFontSize;
+            UpperLabel.FontSize = ValueFontSize;
             _cachedLowerWidth = 0;
             _cachedUpperWidth = 0;
 

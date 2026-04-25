@@ -128,13 +128,13 @@
                             Clicked="OnTemplateAddClicked"/>
                 </Grid>
 
-                <Label Text="{x:Static res:AppResources.linienbreite}"/>
                 <controls:RangeSlider
+                     LabelText="{x:Static res:AppResources.linienbreite}"
                      IsRange="False"
                      Minimum="0"
                      Maximum="20"
                      Step="1"
-                     FontSize="12"
+                     ValueFontSize="12"
                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                      MinimumValueDisplayFormat="{}{0} px"
                      LowerValue="{Binding LineWidth}"

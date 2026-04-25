@@ -31,13 +31,13 @@
                                   AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
             <VerticalStackLayout IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}">
-                <Label Text="{x:Static res:AppResources.schriftgroesse}"/>
                 <controls:RangeSlider
+                    LabelText="{x:Static res:AppResources.schriftgroesse}"
                     IsRange="False"
                     Minimum="6"
                     Maximum="180"
                     Step="1"
-                    FontSize="12"
+                    ValueFontSize="12"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     MinimumValueDisplayFormat="{}{0} pt"
                     LowerValue="{Binding FontSize}"
@@ -148,13 +148,13 @@
             </HorizontalStackLayout>
 
             <VerticalStackLayout>
-                <Label Text="{x:Static res:AppResources.randabstand}"/>
                 <controls:RangeSlider
+                     LabelText="{x:Static res:AppResources.randabstand}"
                      IsRange="False"
                      Minimum="0"
                      Maximum="50"
                      Step="1"
-                     FontSize="12"
+                     ValueFontSize="12"
                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                      MinimumValueDisplayFormat="{}{0} px"
                      LowerValue="{Binding TextPadding}"

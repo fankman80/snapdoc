@@ -105,13 +105,13 @@
                         Clicked="OnColorPickerClicked"/>
 
                 <VerticalStackLayout>
-                    <Label Text="{x:Static res:AppResources.voreinstellung_skalierung}"/>
                     <controls:RangeSlider
+                         LabelText="{x:Static res:AppResources.voreinstellung_skalierung}"
                          IsRange="False"
                          Minimum="0"
                          Maximum="1"
                          Step="0.01"
-                         FontSize="12"
+                         ValueFontSize="12"
                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                          MinimumValueDisplayFormat="{}{0:0} %"
                          LabelCalculation="*100"

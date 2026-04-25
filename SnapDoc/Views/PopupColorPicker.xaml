@@ -118,14 +118,15 @@
                             </uranium:ExpanderView.Header>
                             <VerticalStackLayout Margin="10,0,10,10" Spacing="4">
                                 <!-- Slider for Red -->
-                                <Label Text="{x:Static res:AppResources.rot_r}" TextColor="Red" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.rot_r}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     TextColor="Red"
                                     MinimumValueDisplayFormat="{}{0:0}"
                                     LabelCalculation="*255"
@@ -135,14 +136,15 @@
                                 </controls:RangeSlider>
 
                                 <!-- Slider for Green -->
-                                <Label Text="{x:Static res:AppResources.gruen_g}" TextColor="Green" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.gruen_g}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     TextColor="Green"
                                     MinimumValueDisplayFormat="{}{0:0}"
                                     LabelCalculation="*255"
@@ -152,14 +154,15 @@
                                 </controls:RangeSlider>
                                 
                                 <!-- Slider for Blue -->
-                                <Label Text="{x:Static res:AppResources.blau_b}" TextColor="Blue" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.blau_b}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     TextColor="Blue"
                                     MinimumValueDisplayFormat="{}{0:0}"
                                     LabelCalculation="*255"
@@ -169,14 +172,15 @@
                                 </controls:RangeSlider>  
                                 
                                 <!-- Slider for Hue -->
-                                <Label Text="{x:Static res:AppResources.farbwert_h}" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.farbwert_h}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     MinimumValueDisplayFormat="{}{0:0}°"
                                     LabelCalculation="*360"
                                     LowerValue="{Binding HueValue, Mode=TwoWay}"
@@ -185,14 +189,15 @@
                                 </controls:RangeSlider>
                                 
                                 <!-- Slider for Saturation -->
-                                <Label Text="{x:Static res:AppResources.saettigung_s}" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.saettigung_s}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     MinimumValueDisplayFormat="{}{0:0}%"
                                     LabelCalculation="*100"
                                     LowerValue="{Binding SaturationValue, Mode=TwoWay}"
@@ -201,14 +206,15 @@
                                 </controls:RangeSlider>                                
                                 
                                 <!-- Slider for Brightness -->
-                                <Label Text="{x:Static res:AppResources.helligkeit_l}" FontSize="12"/>
                                 <controls:RangeSlider
+                                    LabelText="{x:Static res:AppResources.helligkeit_l}"
+                                    TextSize="12"
                                     IsRange="False"
                                     IsRealtime="True"
                                     Minimum="0"
                                     Maximum="1"
                                     Step="0.001"
-                                    FontSize="12"
+                                    ValueFontSize="12"
                                     MinimumValueDisplayFormat="{}{0:0}%"
                                     LabelCalculation="*100"
                                     LowerValue="{Binding BrightnessValue, Mode=TwoWay}"
@@ -219,14 +225,14 @@
                         </uranium:ExpanderView>
                     </Border>
 
-                    <Label Text="{x:Static res:AppResources.deckkraft}"/>
                     <controls:RangeSlider
+                         LabelText="{x:Static res:AppResources.deckkraft}"
                          IsRange="False"
                          IsRealtime="True"
                          Minimum="0"
                          Maximum="255"
                          Step="1"
-                         FontSize="12"
+                         ValueFontSize="12"
                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                          MinimumValueDisplayFormat="{}{0:0} %"
                          LabelCalculation="*0.3921"

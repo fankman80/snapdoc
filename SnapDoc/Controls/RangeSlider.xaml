@@ -12,17 +12,37 @@
           RowSpacing="0">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
             <RowDefinition Height="{Binding KnobSize, Source={x:Reference this}}" />
         </Grid.RowDefinitions>
 
+        <Label Grid.Column="0"
+               Text="{Binding LabelText, Source={x:Reference this}}"
+               TextColor="{Binding TextColor, Source={x:Reference this}}"
+               FontSize="{Binding TextSize, Source={x:Reference this}}"
+               FontFamily="{StaticResource AppFontFamily}"
+               VerticalTextAlignment="Start">
+            <Label.Triggers>
+                <DataTrigger TargetType="Label" 
+                         Binding="{Binding LabelText, Source={x:Reference this}}" 
+                         Value="{x:Null}">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+                <DataTrigger TargetType="Label" 
+                         Binding="{Binding LabelText, Source={x:Reference this}}" 
+                         Value="">
+                    <Setter Property="IsVisible" Value="False" />
+                </DataTrigger>
+            </Label.Triggers>
+        </Label>
         <Grid x:Name="LabelContainer"
-              Grid.Row="0"
+              Grid.Row="1"
               IsVisible="{Binding ShowLabels, Source={x:Reference this}}"
               InputTransparent="True"
               ZIndex="1">
             <Label x:Name="LowerLabel"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
-                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   FontSize="{Binding ValueFontSize, Source={x:Reference this}}"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    HorizontalTextAlignment="Center"
@@ -31,14 +51,14 @@
             <Label x:Name="UpperLabel"
                    IsVisible="{Binding IsRange, Source={x:Reference this}}"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
-                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   FontSize="{Binding ValueFontSize, Source={x:Reference this}}"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    HorizontalTextAlignment="Center"
                    LineBreakMode="NoWrap" />
         </Grid>
 
-        <Grid Grid.Row="1" IsClippedToBounds="False">
+        <Grid Grid.Row="2" IsClippedToBounds="False">
             <GraphicsView x:Name="TrackCanvas"
                           ZIndex="0"
                           HeightRequest="{Binding KnobSize, Source={x:Reference this}}"
