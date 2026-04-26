@@ -28,6 +28,9 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
         okButtonText.Text = okText;
         FillOpacityVisibility = fillOpacityVisibility;
         FillOpacity = fillOpacity;
+
+        this.SelectedColor = selectedColor;
+
         ColorsList = new ObservableCollection<ColorBoxItem>(
                     SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
                     { BackgroundColor = Color.FromRgba(c) }))
@@ -53,6 +56,8 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
             GreenValue = selectedColor.Green;
             BlueValue = selectedColor.Blue;
         }
+
+        UpdateHSVFromRGB_Work();
 
         BindingContext = this;
     }
@@ -86,7 +91,8 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new ColorPickerReturn(selectedColor.ToHex(), FillOpacity));
+        var hex = SelectedColor?.ToHex() ?? "#000000";
+        await CloseAsync(new ColorPickerReturn(hex, FillOpacity));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

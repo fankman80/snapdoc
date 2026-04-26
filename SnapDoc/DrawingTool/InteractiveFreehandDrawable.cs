@@ -38,13 +38,30 @@ public class InteractiveFreehandDrawable
             IsAntialias = true
         };
 
-        foreach (var point in Points)
+        foreach (var stroke in Points)
         {
-            if (point.Count < 2) continue;
-            for (int i = 0; i < point.Count - 1; i++)
+            if (stroke.Count < 2) continue;
+
+            using var path = new SKPath();
+
+            path.MoveTo(stroke[0]);
+
+            if (stroke.Count == 2)
             {
-                canvas.DrawLine(point[i], point[i + 1], paint);
+                path.LineTo(stroke[1]);
             }
+            else
+            {
+                for (int i = 1; i < stroke.Count - 1; i++)
+                {
+                    var current = stroke[i];
+                    var next = stroke[i + 1];
+                    var midPoint = new SKPoint((current.X + next.X) / 2, (current.Y + next.Y) / 2);
+                    path.QuadTo(current, midPoint);
+                }
+                path.LineTo(stroke.Last());
+            }
+            canvas.DrawPath(path, paint);
         }
     }
 

@@ -215,21 +215,30 @@
                         HorizontalOptions="Start"
                         VerticalOptions="End"
                         Clicked="OnRotateModeClicked"/>
-                <Button x:Name="degreesLabel"
-                        IsVisible="True"
-                        Text="0°"
-                        FontSize="16"
-                        TextColor="{DynamicResource Primary}"
-                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                <Border x:Name="degreesLabelBorder"
                         HeightRequest="50"
                         WidthRequest="50"
-                        CornerRadius="25"
-                        Padding="0"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
                         Margin="0,0,25,25"
                         ZIndex="10001"
+                        StrokeThickness="0"
                         HorizontalOptions="End"
-                        VerticalOptions="End"
-                        Clicked="OnRotateSnapCklicked"/>
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="25"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnRotateSnapCklicked" />
+                    </Border.GestureRecognizers>
+                    <Label x:Name="degreesLabel"
+                           Text="0°"
+                           FontSize="16"
+                           TextColor="{DynamicResource Primary}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Center"/>
+                </Border>
                 <Label x:Name="rotateModeLabel"
                        FontSize="11"
                        VerticalTextAlignment="Center"

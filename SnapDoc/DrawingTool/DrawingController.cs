@@ -21,7 +21,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private bool isRotatingRectangle = false;
     private SKPoint? rectResizeAnchor;
 
-
     // BoundingBox
     public float MinX { get; private set; }
     public float MinY { get; private set; }
@@ -238,17 +237,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             if (rect == null) return;
 
             if (isRotatingRectangle)
-            {
                 rect.SetRotationFromPoint(p);
-            }
             else if (activeIndex != null && rectResizeAnchor.HasValue)
-            {
                 rect.SetFromDrag(rectResizeAnchor.Value, p);
-            }
             else if (rectDragStart.HasValue)
-            {
                 rect.SetFromDrag(rectDragStart.Value, p);
-            }
         }
 
         canvasView?.InvalidateSurface();

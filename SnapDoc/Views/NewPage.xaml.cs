@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
@@ -51,7 +52,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = 3;
+    private int lineWidth = (int)(3 * SettingsService.Instance.OsBaseScale);
     private string strokeStyle = "";
 
     private string planImageSource = "";
@@ -99,8 +100,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     }
 
     private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
-
-
 
     public NewPage(string _planId)
     {
@@ -348,11 +347,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnPinDown(object sender, EventArgs e)
     {
-        var img = (MR.Gestures.Image)sender;
-        var ctx = (PinContext)img.BindingContext;
-
-        if (GlobalJson.Data.Plans[ctx.PlanId].Pins[ctx.PinId].IsLockPosition)
-            return;
+        if (sender is not MR.Gestures.Image img) return;
+        if (img.BindingContext is not PinContext ctx) return;
+        if (!GlobalJson.Data.Plans.TryGetValue(ctx.PlanId, out var plan) || !plan.Pins.TryGetValue(ctx.PinId, out var pin)) return;
+        if (pin.IsLockPosition) return;
 
         planContainer.IsPanningEnabled = false;
         activePin = img;
@@ -360,16 +358,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnPinUp(object sender, EventArgs e)
     {
-        var img = (MR.Gestures.Image)sender;
-        var ctx = (PinContext)img.BindingContext;
-
-        if (GlobalJson.Data.Plans[ctx.PlanId].Pins[ctx.PinId].IsLockPosition)
-            return;
-
         planContainer.IsPanningEnabled = true;
         activePin = null;
 
-        var plan = GlobalJson.Data.Plans[ctx.PlanId];
+        if (sender is not MR.Gestures.Image img) return;
+        if (img.BindingContext is not PinContext ctx) return;
+        if (!GlobalJson.Data.Plans.TryGetValue(ctx.PlanId, out var plan) || !plan.Pins.TryGetValue(ctx.PinId, out var pin)) return;
+        if (pin.IsLockPosition) return;
 
         var x = img.TranslationX / PlanImage.WidthRequest;
         var y = img.TranslationY / PlanImage.HeightRequest;
@@ -377,38 +372,43 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var dx = img.AnchorX * img.Width / PlanImage.WidthRequest;
         var dy = img.AnchorY * img.Height / PlanImage.HeightRequest;
 
-        plan.Pins[ctx.PinId].Pos = new Point(x + dx, y + dy);
+        pin.Pos = new Point(x + dx, y + dy);
 
-        // Wenn die Position automatisch gesperrt werden soll, setze die Sperre nach Bewegung
         if (SettingsService.Instance.IsPinAutoLock)
-            plan.Pins[ctx.PinId].IsLockPosition = true;
+            pin.IsLockPosition = true;
 
         GlobalJson.SaveToFile();
     }
 
     private async void OnPinTapped(object sender, EventArgs e)
     {
-        if (isTappedHandled || isPinSet)
-            return;
+        if (sender is not MR.Gestures.Image img) return;
+        if (img.BindingContext is not PinContext ctx) return;
+        if (!GlobalJson.Data.Plans.TryGetValue(ctx.PlanId, out var plan) || !plan.Pins.ContainsKey(ctx.PinId)) return;
+        if (isTappedHandled || isPinSet) return;
 
-        isTappedHandled = true;
-
-        var img = (MR.Gestures.Image)sender;
-        var ctx = (PinContext)img.BindingContext;
-
-        await Shell.Current.GoToAsync($"setpin?planId={ctx.PlanId}&pinId={ctx.PinId}");
-
-        isTappedHandled = false;
+        try
+        {
+            isTappedHandled = true;
+            await Shell.Current.GoToAsync($"setpin?planId={ctx.PlanId}&pinId={ctx.PinId}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Navigation error: {ex.Message}");
+        }
+        finally
+        {
+            isTappedHandled = false;
+        }
     }
 
     private void OnPinDoubleTapped(object sender, EventArgs e)
     {
-        var img = (MR.Gestures.Image)sender;
-        var ctx = (PinContext)img.BindingContext;
+        if (sender is not MR.Gestures.Image img) return;
+        if (img.BindingContext is not PinContext ctx) return;
+        if (!GlobalJson.Data.Plans.TryGetValue(ctx.PlanId, out var plan) || !plan.Pins.TryGetValue(ctx.PinId, out var pin)) return;
 
         doubleTappedPin = img;
-
-        var pin = GlobalJson.Data.Plans[ctx.PlanId].Pins[ctx.PinId];
 
         PinSizeSlider.LowerValue = pin.PinScale * 100;
         PinRotateSlider.LowerValue = Helper.ToSliderValue(pin.PinRotation);
