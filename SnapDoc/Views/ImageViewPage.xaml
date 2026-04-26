@@ -83,7 +83,8 @@
 				            TranslationY="{Binding TranslationY}"
                             AnchorX="{Binding AnchorX}"
 				            AnchorY="{Binding AnchorY}">
-                <Image x:Name="FotoImage"/>
+                <Image x:Name="FotoImageBack" Opacity="0" Aspect="AspectFit" />
+                <Image x:Name="FotoImageFront" Opacity="1" Aspect="AspectFit" />
             </AbsoluteLayout>
         </mr:ContentView>
 
