@@ -286,7 +286,9 @@
                                 SelectionMode="None"
                                 ReorderCompleted="OnReorderCompleted"
                                 SelectionChanged="OnPlanSelectionChanged">
-
+                    <CollectionView.Footer>
+                        <BoxView HeightRequest="{OnPlatform iOS=50, Default=0}" Color="Transparent" />
+                    </CollectionView.Footer>
                 </CollectionView>
             </Grid>
         </ContentView>
