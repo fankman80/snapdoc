@@ -121,8 +121,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int PdfThumbDpi { get; set; } = 72;
     [ObservableProperty] public partial int MapIconSize { get; set; } = 85;
     [ObservableProperty] public partial int MapIcon { get; set; } = 0;
-    [ObservableProperty] public partial int MapOverlay1 { get; set; } = 1;
-    [ObservableProperty] public partial int MapOverlay2 { get; set; } = 5;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial bool IsPinPlaceBtnManualHide { get; set; } = false;
     [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial int PinPlaceMode { get; set; } = 0;
     public bool IsButtonActuallyVisible => PinPlaceMode != 2 && !IsPinPlaceBtnManualHide;
@@ -301,8 +299,6 @@ public partial class SettingsService : ObservableObject
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
             MapIcon = MapIcon,
-            MapOverlay1 = MapOverlay1,
-            MapOverlay2 = MapOverlay2,
             PinPlaceMode = PinPlaceMode,
             PinDuplicateOffset = PinDuplicateOffset,
             IsPlanRotateLocked = IsPlanRotateLocked,
@@ -379,8 +375,6 @@ public partial class SettingsService : ObservableObject
             PinMaxScaleLimit = settings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize;
             MapIcon = settings.MapIcon;
-            MapOverlay1 = settings.MapOverlay1;
-            MapOverlay2 = settings.MapOverlay2;
             PinPlaceMode = settings.PinPlaceMode;
             PinDuplicateOffset = settings.PinDuplicateOffset;
             IsPlanRotateLocked = settings.IsPlanRotateLocked;
@@ -448,8 +442,6 @@ public partial class SettingsService : ObservableObject
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;
         MapIcon = defaultSettings.MapIcon;
-        MapOverlay1 = defaultSettings.MapOverlay1;
-        MapOverlay2 = defaultSettings.MapOverlay2;
         PinPlaceMode = defaultSettings.PinPlaceMode;
         PinDuplicateOffset = defaultSettings.PinDuplicateOffset;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;

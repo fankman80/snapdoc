@@ -103,7 +103,7 @@ public partial class ImageViewPage : IQueryAttributable
         Dispatcher.Dispatch(() => ImageFit(null, null));
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("planId", out object value1)) PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2)) PinId = value2 as string;
@@ -126,8 +126,9 @@ public partial class ImageViewPage : IQueryAttributable
                 this.Title = formattedDate;
             }
 
-            var bytes = File.ReadAllBytes(imgPath);
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+            byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            await Task.Delay(150);
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -372,7 +373,7 @@ public partial class ImageViewPage : IQueryAttributable
         });
     }
 
-    private void EraseClicked(object sender, EventArgs e)
+    private async void EraseClicked(object sender, EventArgs e)
     {
         SetDrawMode(DrawMode.None);
         drawingController.Reset();
@@ -381,30 +382,12 @@ public partial class ImageViewPage : IQueryAttributable
         {
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            
-            FotoImage.Source = ImageSource.FromStream(() =>
-            {
-                return File.OpenRead(imgPath);
-            });
+
+            byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            await Task.Delay(150);
 
             GlobalJson.SaveToFile();
-        }
-    }
-
-    private async void TextClicked(object sender, EventArgs e)
-    {
-        var combined = drawingController.CombinedDrawable;
-
-        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, okText: AppResources.ok);
-        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
-        if (result.Result != null)
-        {
-            combined.RectDrawable?.Text = result.Result.InputTxt;
-            combined.RectDrawable?.TextSize = result.Result.FontSize;
-            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
-            combined.RectDrawable?.TextStyle = result.Result.Style;
-            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
-            drawingView?.InvalidateSurface();
         }
     }
 
@@ -420,14 +403,9 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 if (File.Exists(imgPath))
                     File.Delete(imgPath);
+
                 File.Move(origPath, imgPath);
 
-                FotoImage.Source = ImageSource.FromStream(() =>
-                {
-                    return File.OpenRead(imgPath);
-                });
-
-                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
             else
@@ -441,14 +419,14 @@ public partial class ImageViewPage : IQueryAttributable
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
 
-                FotoImage.Source = ImageSource.FromStream(() =>
-                {
-                    return File.OpenRead(imgPath);
-                });
-
-                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
+
+            byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            await Task.Delay(150);
+
+            Thumbnail.Generate(imgPath, thumbPath);
 
             // ändere Json-Key
             var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
@@ -465,7 +443,6 @@ public partial class ImageViewPage : IQueryAttributable
         // Cleanup drawing canvas
         drawingController.Detach();
         RemoveDrawingView();
-
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
@@ -544,5 +521,23 @@ public partial class ImageViewPage : IQueryAttributable
             lineWidth,
             strokeStyle
         );
+    }
+    private async void TextClicked(object sender, EventArgs e)
+    {
+        var combined = drawingController.CombinedDrawable;
+
+        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, combined.RectDrawable.TextPadding, okText: AppResources.ok);
+        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
+        if (result.Result != null)
+        {
+            combined.RectDrawable?.Text = result.Result.InputTxt;
+            combined.RectDrawable?.TextSize = result.Result.FontSize;
+            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
+            combined.RectDrawable?.TextStyle = result.Result.Style;
+            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
+            combined.RectDrawable?.TextPadding = result.Result.TextPadding;
+        }
+
+        drawingView?.InvalidateSurface();
     }
 }
