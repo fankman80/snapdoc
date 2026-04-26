@@ -128,7 +128,6 @@ public partial class ImageViewPage : IQueryAttributable
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-            await Task.Delay(150);
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -385,8 +384,7 @@ public partial class ImageViewPage : IQueryAttributable
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-            await Task.Delay(150);
-
+            
             GlobalJson.SaveToFile();
         }
     }
@@ -424,8 +422,7 @@ public partial class ImageViewPage : IQueryAttributable
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-            await Task.Delay(150);
-
+            
             Thumbnail.Generate(imgPath, thumbPath);
 
             // ändere Json-Key
