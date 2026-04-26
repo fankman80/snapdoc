@@ -9,6 +9,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using SnapDoc.DrawingTool;
+private bool _isFrontVisible = true;
 
 namespace SnapDoc.Views;
 
@@ -127,7 +128,7 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            await UpdateImageAsync(imageBytes);
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -383,8 +384,8 @@ public partial class ImageViewPage : IQueryAttributable
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
-            
+            await UpdateImageAsync(imageBytes);
+
             GlobalJson.SaveToFile();
         }
     }
@@ -421,7 +422,7 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             byte[] imageBytes = await File.ReadAllBytesAsync(imgPath);
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+            await UpdateImageAsync(imageBytes);
             
             Thumbnail.Generate(imgPath, thumbPath);
 
@@ -536,5 +537,20 @@ public partial class ImageViewPage : IQueryAttributable
         }
 
         drawingView?.InvalidateSurface();
+    }
+
+    private async Task UpdateImageAsync(byte[] imageBytes)
+    {
+        var activeImage = _isFrontVisible ? FotoImageFront : FotoImageBack;
+        var backbufferImage = _isFrontVisible ? FotoImageBack : FotoImageFront;
+
+        backbufferImage.Source = ImageSource.FromStream(() => new MemoryStream(imageBytes));
+
+        await Task.Delay(150); 
+
+        backbufferImage.Opacity = 1;
+        activeImage.Opacity = 0;
+        _isFrontVisible = !_isFrontVisible;
+        activeImage.Source = null;
     }
 }
