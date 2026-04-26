@@ -9,7 +9,6 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using SnapDoc.DrawingTool;
-private bool _isFrontVisible = true;
 
 namespace SnapDoc.Views;
 
@@ -23,6 +22,7 @@ public partial class ImageViewPage : IQueryAttributable
     private bool hasFittedImage = false;
     private double minScale = 0.1;
     private readonly TransformViewModel fotoContainer;
+    private bool _isFrontVisible = true;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
