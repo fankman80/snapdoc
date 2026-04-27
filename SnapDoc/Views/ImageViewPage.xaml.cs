@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using CommunityToolkit.Maui.Extensions;
 using Microsoft.Maui.Layouts;
 using MR.Gestures;
@@ -334,18 +333,16 @@ public partial class ImageViewPage : IQueryAttributable
 
                 var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
-                if (drawingView != null)
+                if (drawingView == null)
                 {
-                    drawingController.Detach();
-                    if (absoluteLayout.Children.Contains(drawingView))
-                        absoluteLayout.Children.Remove(drawingView);
-                    drawingView = null;
+                    drawingView = drawingController.CreateCanvasView();
+                    drawingView.IsVisible = false;
+                    absoluteLayout.Children.Add(drawingView);
+                    Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+                    Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
                 }
 
-                drawingView = drawingController.CreateCanvasView();
-                absoluteLayout.Children.Add(drawingView);
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+                drawingView.IsVisible = true;
 
                 await Task.Delay(50);
 
@@ -382,19 +379,33 @@ public partial class ImageViewPage : IQueryAttributable
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
             var bytes = await File.ReadAllBytesAsync(imgPath);
+
+            drawingView?.Opacity = 0;
+
             OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
             // Warten bis das Bild geladen ist
             await Task.Yield();
-            while (FotoImage.IsLoading)
+            int timeout = 0;
+            while (FotoImage.IsLoading && timeout < 50)
+            {
                 await Task.Delay(20);
-            await Task.Delay(50);
+                timeout++;
+            }
+
+            await Task.Delay(150);
 
             GlobalJson.SaveToFile();
         }
+
         drawingController.Reset();
-        drawingView?.InvalidateSurface();
+
+        if (drawingView != null)
+        {
+            drawingView.InvalidateSurface();
+            drawingView.Opacity = 1;
+        }
     }
 
     private async void TextClicked(object sender, EventArgs e)
@@ -445,9 +456,12 @@ public partial class ImageViewPage : IQueryAttributable
 
             // Warten bis das Bild geladen ist
             await Task.Yield();
-            while (FotoImage.IsLoading)
+            int timeout = 0;
+            while (FotoImage.IsLoading && timeout < 50)
+            {
                 await Task.Delay(20);
-            await Task.Delay(50);
+                timeout++;
+            }
 
             Thumbnail.Generate(imgPath, thumbPath);
 
@@ -462,8 +476,11 @@ public partial class ImageViewPage : IQueryAttributable
             GlobalJson.SaveToFile();
         }
 
-        drawingController.Detach();
-        RemoveDrawingView();
+        if (drawingView != null)
+        {
+            drawingView.IsVisible = false;
+            drawingController.Detach();
+        }
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
@@ -471,24 +488,12 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
-    private void RemoveDrawingView()
-    {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
-        if (drawingView != null && absoluteLayout != null)
-        {
-            absoluteLayout.Children.Remove(drawingView);
-            drawingView = null;
-        }
-    }
-
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
         using var fotoStream = File.OpenRead(fotoPath);
         using var fotoBitmap = SKBitmap.Decode(fotoStream);
-
         int width = fotoBitmap.Width;
         int height = fotoBitmap.Height;
-
         var info = new SKImageInfo(width, height);
         using var surface = SKSurface.Create(info);
         var canvas = surface.Canvas;
