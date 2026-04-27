@@ -127,6 +127,7 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             var bytes = File.ReadAllBytes(imgPath);
+            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
         }
         if (query.TryGetValue("gotoBtn", out var value5))
@@ -372,23 +373,23 @@ public partial class ImageViewPage : IQueryAttributable
         });
     }
 
-    private void EraseClicked(object sender, EventArgs e)
+    private async void EraseClicked(object sender, EventArgs e)
     {
         SetDrawMode(DrawMode.None);
-        drawingController.Reset();
 
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            var bytes = await File.ReadAllBytesAsync(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-            FotoImage.Source = ImageSource.FromStream(() =>
-            {
-                return File.OpenRead(imgPath);
-            });
+            await Task.Delay(100);
 
             GlobalJson.SaveToFile();
         }
+        drawingController.Reset();
+        drawingView?.InvalidateSurface();
     }
 
     private async void TextClicked(object sender, EventArgs e)
@@ -418,16 +419,8 @@ public partial class ImageViewPage : IQueryAttributable
 
             if (isCleared)
             {
-                if (File.Exists(imgPath))
-                    File.Delete(imgPath);
+                if (File.Exists(imgPath)) File.Delete(imgPath);
                 File.Move(origPath, imgPath);
-
-                FotoImage.Source = ImageSource.FromStream(() =>
-                {
-                    return File.OpenRead(imgPath);
-                });
-
-                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
             else
@@ -438,19 +431,17 @@ public partial class ImageViewPage : IQueryAttributable
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
 
-                // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
-
-                FotoImage.Source = ImageSource.FromStream(() =>
-                {
-                    return File.OpenRead(imgPath);
-                });
-
-                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
 
-            // ändere Json-Key
+            var bytes = await File.ReadAllBytesAsync(imgPath);
+            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+            await Task.Delay(100);
+
+            Thumbnail.Generate(imgPath, thumbPath);
+
             var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
             if (fotos.TryGetValue(ImgSource, out var value))
             {
@@ -462,10 +453,8 @@ public partial class ImageViewPage : IQueryAttributable
             GlobalJson.SaveToFile();
         }
 
-        // Cleanup drawing canvas
         drawingController.Detach();
         RemoveDrawingView();
-
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;

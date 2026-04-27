@@ -189,18 +189,15 @@ public partial class ExportReport
                                         var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
                                         TableCell newTableCell = new();
 
-                                        // Zell-Eigenschaften von der Vorlage kopieren
                                         var templateCell = templateRow.Elements<TableCell>().ElementAtOrDefault(column);
                                         if (templateCell?.TableCellProperties != null)
                                             newTableCell.AppendChild(templateCell.TableCellProperties.CloneNode(true));
-                                        var templateRunProperties = templateCell?.Descendants<RunProperties>().FirstOrDefault();
 
                                         Paragraph newParagraph = new();
 
-                                        // Ausrichtungen kopieren
                                         var templatePPr = templateCell?.Descendants<ParagraphProperties>().FirstOrDefault();
                                         if (templatePPr != null)
-                                            newParagraph.AppendChild(templatePPr.CloneNode(true));
+                                            newParagraph.ParagraphProperties = (ParagraphProperties)templatePPr.CloneNode(true);
 
                                         if (_columnPlaceholders.Count > 0)
                                         {
@@ -339,11 +336,20 @@ public partial class ExportReport
                                                     case "${pin_priority}":
                                                         if (currentPin.PinPriority != 0)
                                                         {
-                                                            string fillColor = SettingsService.Instance.PriorityItems[
-                                                                currentPin.PinPriority].Color;
-                                                            newTableCell.TableCellProperties =
-                                                                new TableCellProperties(new Shading { Fill = fillColor.Replace("#", "") });
+                                                            string fillColor = SettingsService.Instance.PriorityItems[currentPin.PinPriority].Color;
+                                                            newTableCell.TableCellProperties ??= new TableCellProperties();
+
+                                                            Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
+                                                            if (shading == null)
+                                                            {
+                                                                shading = new Shading();
+                                                                newTableCell.TableCellProperties.AppendChild(shading);
+                                                            }
+
+                                                            shading.Fill = fillColor.Replace("#", "");
+                                                            shading.Val = ShadingPatternValues.Clear;
                                                         }
+
                                                         var priorityIndex = currentPin.PinPriority;
                                                         var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
                                                         AddText(prio_item?.Key ?? "");
