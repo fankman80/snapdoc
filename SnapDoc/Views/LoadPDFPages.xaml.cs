@@ -59,10 +59,9 @@ public partial class LoadPDFPages : ContentPage
         string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
         List<PdfItem> pdfImages = [];
 
-        busyOverlay.BusyMessage = AppResources.lade_pdf_seiten;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
+        // Zeige Busy-Overlay
+        var busyPopup = new MyBusyPage(AppResources.lade_pdf_seiten);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
         try
         {
@@ -126,9 +125,8 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            busyOverlay.IsActivityRunning = false;
-            busyOverlay.IsOverlayVisible = false;
-            busyOverlay.InputTransparent = true;
+            // Busy-Overlay entfernen
+            await Mopups.Services.MopupService.Instance.PopAsync();
         }
     }
 
@@ -178,17 +176,13 @@ public partial class LoadPDFPages : ContentPage
 
     private async void AddPdfImages()
     {
-        busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
-
         try
         {
-            await LoadPDFImages();
+            // Zeige Busy-Overlay
+            var busyPopup = new MyBusyPage(AppResources.pdf_wird_konvertiert);
+            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
-            MainThread.BeginInvokeOnMainThread(() =>
-                busyOverlay.BusyMessage = AppResources.pdf_wird_konvertiert);
+            await LoadPDFImages();
 
             await ProcessFileOrganizationLogic();
 
@@ -205,9 +199,8 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            busyOverlay.IsActivityRunning = false;
-            busyOverlay.IsOverlayVisible = false;
-            busyOverlay.InputTransparent = true;
+            // Busy-Overlay entfernen
+            await Mopups.Services.MopupService.Instance.PopAsync();
         }
     }
 

@@ -120,12 +120,5 @@
                    x:Name="ProjectCounterLabel"
                    FontSize="12"/>
         </Grid>
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               IsOverlayVisible="False"
-                               InputTransparent="True"
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
 </ContentPage>

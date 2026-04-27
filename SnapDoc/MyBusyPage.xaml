@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+                  xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+                  xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
+                  x:Class="SnapDoc.MyBusyPage"
+                  BackgroundColor="#CC000000">
+    <Grid>
+        <VerticalStackLayout VerticalOptions="Center" 
+                             HorizontalOptions="Center" 
+                             Spacing="20">
+            <ActivityIndicator IsRunning="True" 
+                               Color="White" 
+                               Scale="1" />
+            <Label x:Name="BusyTextLabel"
+                   Text="Daten werden geladen..." 
+                   TextColor="White" 
+                   FontSize="20" />
+        </VerticalStackLayout>
+    </Grid>
+</mopups:PopupPage>

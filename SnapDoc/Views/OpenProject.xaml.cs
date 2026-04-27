@@ -139,11 +139,6 @@ public partial class OpenProject : ContentPage
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
-        busyOverlay.BusyMessage = AppResources.warte_auf_datei;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
-
         try
         {
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
@@ -153,8 +148,9 @@ public partial class OpenProject : ContentPage
 
             if (fileResult != null)
             {
-                // Optional: Nachricht aktualisieren, dass der Download fertig ist und nun verarbeitet wird
-                busyOverlay.BusyMessage = AppResources.projekt_wird_importiert;
+                // Zeige Busy-Overlay
+                var busyPopup = new MyBusyPage(AppResources.projekt_wird_importiert);
+                await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
                 var targetDirectory = Settings.DataDirectory;
 
@@ -177,9 +173,9 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            busyOverlay.IsActivityRunning = false;
-            busyOverlay.IsOverlayVisible = false;
-            busyOverlay.InputTransparent = true;
+            // Busy-Overlay entfernen
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAsync();
         }
     }
 
@@ -192,10 +188,9 @@ public partial class OpenProject : ContentPage
         if (item == null)
             return;
 
-        busyOverlay.BusyMessage = AppResources.projekt_wird_geladen;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
+        // Zeige Busy-Overlay
+        var busyPopup = new MyBusyPage(AppResources.projekt_wird_geladen);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
         await Task.Delay(100);
 
@@ -203,9 +198,8 @@ public partial class OpenProject : ContentPage
         {
             if (item.IsActive)
             {
-                busyOverlay.IsActivityRunning = false;
-                busyOverlay.IsOverlayVisible = false;
-                busyOverlay.InputTransparent = true;
+                // Busy-Overlay entfernen
+                await Mopups.Services.MopupService.Instance.PopAsync();
                 return;
             }
 
@@ -255,9 +249,9 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            busyOverlay.IsActivityRunning = false;
-            busyOverlay.IsOverlayVisible = false;
-            busyOverlay.InputTransparent = true;
+            // Busy-Overlay entfernen
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAsync();
         }
     }
 
@@ -316,17 +310,16 @@ public partial class OpenProject : ContentPage
                 {
                     string sourceDirectory = Path.GetDirectoryName(item.FilePath);
                     string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
-                    busyOverlay.BusyMessage = AppResources.daten_werden_komprimiert;
-                    busyOverlay.IsOverlayVisible = true;
-                    busyOverlay.IsActivityRunning = true;
-                    busyOverlay.InputTransparent = false;
+
+                    // Zeige Busy-Overlay
+                    var busyPopup = new MyBusyPage(AppResources.daten_werden_komprimiert);
+                    await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
                     // Hintergrundoperation (nicht UI-Operationen)
                     await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
 
-                    busyOverlay.IsActivityRunning = false;
-                    busyOverlay.IsOverlayVisible = false;
-                    busyOverlay.InputTransparent = true;
+                    // Busy-Overlay entfernen
+                    await Mopups.Services.MopupService.Instance.PopAsync();
 
                     var saveStream = File.Open(outputPath, FileMode.Open);
                     try

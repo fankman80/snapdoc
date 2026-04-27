@@ -133,7 +133,7 @@
                                         SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </VerticalStackLayout>
-                    
+
                     <material:TextField Grid.Column="0" Grid.Row="1"
                             Title="{x:Static res:AppResources.pinbeschriftung}"
                             FontSize="{StaticResource AppFontSizeNormal}"
@@ -144,7 +144,7 @@
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                             AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             AllowClear="True"/>
-                    
+
                     <controls:RangeSlider
                          LabelText="{x:Static res:AppResources.fotoqualitaet}"
                          IsRange="False"
@@ -227,12 +227,5 @@
                         Clicked="OnSaveClicked" />
             </Grid>
         </Grid>
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               IsOverlayVisible="False"
-                               InputTransparent="True"
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
 </ContentPage>

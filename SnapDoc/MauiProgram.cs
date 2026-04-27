@@ -6,6 +6,8 @@ using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
 using UraniumUI;
+using Mopups.Hosting;
+
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
@@ -30,6 +32,7 @@ public static class MauiProgram
             .UseUraniumUI()
             .UseFFImageLoading()
             .ConfigureMRGestures()
+            .ConfigureMopups()
             .UseSkiaSharp()
             .UseSentry(options =>
             {
@@ -50,7 +53,8 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-BoldItalic.ttf", "OpenSansBoldItalic");
                 fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
             });
-        
+
+        builder.Services.AddMopupsDialogs();
         builder.UseMauiCameraView();
         
 #if IOS || MACCATALYST

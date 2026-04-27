@@ -49,19 +49,18 @@ public partial class ExportSettings : ContentPage
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        busyOverlay.BusyMessage = AppResources.bericht_wird_geteilt;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
+        // Zeige Busy-Overlay
+        var busyPopup = new MyBusyPage(AppResources.bericht_wird_geteilt);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
             await ExportReport.DocX(templatePath, outputPath);
         });
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
-        busyOverlay.InputTransparent = true;
+
+        // Busy-Overlay entfernen
+        await Mopups.Services.MopupService.Instance.PopAsync();
 
         try
         {
@@ -97,18 +96,18 @@ public partial class ExportSettings : ContentPage
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        busyOverlay.BusyMessage = AppResources.bericht_wird_gespeichert;
-        busyOverlay.IsActivityRunning = true;
-        busyOverlay.IsOverlayVisible = true;
-        busyOverlay.InputTransparent = false;
+        // Zeige Busy-Overlay
+        var busyPopup = new MyBusyPage(AppResources.bericht_wird_gespeichert);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+
         // Hintergrundoperation (nicht UI-Operationen)
         await Task.Run(async () =>
         {
             await ExportReport.DocX(templatePath, outputPath);
         });
-        busyOverlay.IsActivityRunning = false;
-        busyOverlay.IsOverlayVisible = false;
-        busyOverlay.InputTransparent = true;
+
+        // Busy-Overlay entfernen
+        await Mopups.Services.MopupService.Instance.PopAsync();
 
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);

@@ -135,6 +135,7 @@
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.119.4-preview.1.1" />
 		<PackageReference Include="UraniumUI" Version="2.15.0" />
+		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="2.15.0" />
 		<PackageReference Include="UraniumUI.Material" Version="2.15.0" />
 	</ItemGroup>
 
@@ -183,6 +184,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Controls\TooltipPopup.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="MyBusyPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CameraView.xaml">

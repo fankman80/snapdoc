@@ -410,12 +410,5 @@
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>
         </AbsoluteLayout>
-
-        <!-- Overlay für Busy-Indikator -->
-        <local:BusyOverlayView x:Name="busyOverlay"
-                               IsOverlayVisible="False"
-                               InputTransparent="True"                              
-                               AbsoluteLayout.LayoutBounds="0,0,1,1"
-                               AbsoluteLayout.LayoutFlags="All"/>
     </Grid>
 </ContentPage>
