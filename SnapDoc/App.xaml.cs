@@ -36,21 +36,31 @@ public partial class App : Application
     private async static Task InitializeAsync()
     {
         // Template-Dateien und Konfigurationsdatei kopieren
-        if (!Directory.Exists(Settings.TemplateDirectory))
-            Directory.CreateDirectory(Settings.TemplateDirectory);
+        Directory.CreateDirectory(Settings.TemplateDirectory);
 
         var copyTasks = new List<Task>();
 
-        if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx")))
-            copyTasks.Add(Helper.CopyFileFromResourcesAsync("template_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx")));
+        // Hilfsfunktion zum sicheren Kopieren
+        static async Task SafeCopy(string fileName, string targetPath)
+        {
+            try
+            {
+                await Helper.CopyFileFromResourcesAsync(fileName, targetPath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Kopieren von {fileName}: {ex.Message}");
+            }
+        }
 
-        if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx")))
-            copyTasks.Add(Helper.CopyFileFromResourcesAsync("template_location_ebbe.docx", Path.Combine(Settings.TemplateDirectory, "template_location_ebbe.docx")));
+        string ebbePath = Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx");
+        if (!File.Exists(ebbePath))
+            copyTasks.Add(SafeCopy("template_ebbe.docx", ebbePath));
 
-        if (!File.Exists(Path.Combine(Settings.TemplateDirectory, "IconData.xml")))
-            copyTasks.Add(Helper.CopyFileFromResourcesAsync("IconData.xml", Path.Combine(Settings.TemplateDirectory, "IconData.xml")));
-            
-        // Warte, bis alle Kopiervorgänge abgeschlossen sind
+        string iconPath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
+        if (!File.Exists(iconPath))
+            copyTasks.Add(SafeCopy("IconData.xml", iconPath));
+
         await Task.WhenAll(copyTasks);
 
         // Icon-Daten einlesen

@@ -30,8 +30,7 @@ public partial class ExportReport
         imageRelationshipIds.Clear();
 
         // Cache-Verzeichnis sicherstellen
-        if (!Directory.Exists(Settings.CacheDirectory))
-            Directory.CreateDirectory(Settings.CacheDirectory);
+        Directory.CreateDirectory(Settings.CacheDirectory);
 
         // Alle Bilder parallel vorbereiten
         await PreProcessAllImagesAsync(GlobalJson.Data, CancellationToken.None);

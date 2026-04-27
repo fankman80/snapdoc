@@ -74,8 +74,7 @@ public partial class LoadPDFPages : ContentPage
                 {
                     await Task.Run(async () =>
                     {
-                        if (!Directory.Exists(Settings.CacheDirectory))
-                            Directory.CreateDirectory(Settings.CacheDirectory);
+                        Directory.CreateDirectory(Settings.CacheDirectory);
 
                         using (var destStream = File.Create(localPdfPath))
                         {
@@ -242,8 +241,7 @@ public partial class LoadPDFPages : ContentPage
         await Task.Run(() =>
         {
             string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
-            if (!Directory.Exists(Path.Combine(imageDirectory, "thumbnails")))
-                Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
+            Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
             int i = 0;
             var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();

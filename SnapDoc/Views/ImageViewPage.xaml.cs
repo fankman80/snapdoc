@@ -382,9 +382,14 @@ public partial class ImageViewPage : IQueryAttributable
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
             var bytes = await File.ReadAllBytesAsync(imgPath);
+            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-            await Task.Delay(100);
+            // Warten bis das Bild geladen ist
+            await Task.Yield();
+            while (FotoImage.IsLoading)
+                await Task.Delay(20);
+            await Task.Delay(50);
 
             GlobalJson.SaveToFile();
         }
@@ -425,8 +430,7 @@ public partial class ImageViewPage : IQueryAttributable
             }
             else
             {
-                if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
-                    Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
+                Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
 
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
@@ -436,9 +440,14 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             var bytes = await File.ReadAllBytesAsync(imgPath);
+            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-            await Task.Delay(100);
+            // Warten bis das Bild geladen ist
+            await Task.Yield();
+            while (FotoImage.IsLoading)
+                await Task.Delay(20);
+            await Task.Delay(50);
 
             Thumbnail.Generate(imgPath, thumbPath);
 

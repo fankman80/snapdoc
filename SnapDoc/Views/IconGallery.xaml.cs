@@ -121,8 +121,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             using var stream = await result.OpenReadAsync();
             var localPath = Path.Combine(Settings.DataDirectory, "customicons", fileName);
 
-            if (!Directory.Exists(Path.Combine(Settings.DataDirectory, "customicons")))
-                Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, "customicons"));
+            Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, "customicons"));
 
             using (var fileStream = File.Create(localPath))
             {
