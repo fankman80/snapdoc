@@ -83,7 +83,6 @@
 				            TranslationY="{Binding TranslationY}"
                             AnchorX="{Binding AnchorX}"
 				            AnchorY="{Binding AnchorY}">
-                <Image x:Name="OriginalImage" InputTransparent="True" />
                 <Image x:Name="FotoImage"/>
             </AbsoluteLayout>
         </mr:ContentView>
