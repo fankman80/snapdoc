@@ -1,4 +1,4 @@
-﻿#nullable disable
+#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using Microsoft.Maui.Layouts;
 using MR.Gestures;
@@ -126,7 +126,6 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             var bytes = File.ReadAllBytes(imgPath);
-            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
         }
         if (query.TryGetValue("gotoBtn", out var value5))
@@ -144,10 +143,10 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPinched(object sender, PinchEventArgs e)
     {
         fotoContainer.IsPanningEnabled = true;
-
+        
         if (fotoContainer.Scale < minScale)
             ImageFit(null, null);
-
+        
         fotoContainer.IsPanningEnabled = true;
     }
 
@@ -252,7 +251,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
 
         // save data to file
-        GlobalJson.SaveToFile();
+        GlobalJson.SaveToFile();  
 
         await Shell.Current.GoToAsync($"..");
     }
@@ -333,16 +332,18 @@ public partial class ImageViewPage : IQueryAttributable
 
                 var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
-                if (drawingView == null)
+                if (drawingView != null)
                 {
-                    drawingView = drawingController.CreateCanvasView();
-                    drawingView.IsVisible = false;
-                    absoluteLayout.Children.Add(drawingView);
-                    Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-                    Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+                    drawingController.Detach();
+                    if (absoluteLayout.Children.Contains(drawingView))
+                        absoluteLayout.Children.Remove(drawingView);
+                    drawingView = null;
                 }
 
-                drawingView.IsVisible = true;
+                drawingView = drawingController.CreateCanvasView();
+                absoluteLayout.Children.Add(drawingView);
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
                 await Task.Delay(50);
 
@@ -370,41 +371,22 @@ public partial class ImageViewPage : IQueryAttributable
         });
     }
 
-    private async void EraseClicked(object sender, EventArgs e)
+    private void EraseClicked(object sender, EventArgs e)
     {
         SetDrawMode(DrawMode.None);
+        drawingController.Reset();
 
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            var bytes = await File.ReadAllBytesAsync(imgPath);
-
-            drawingView?.Opacity = 0;
-
-            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-
-            // Warten bis das Bild geladen ist
-            await Task.Yield();
-            int timeout = 0;
-            while (FotoImage.IsLoading && timeout < 50)
+            
+            FotoImage.Source = ImageSource.FromStream(() =>
             {
-                await Task.Delay(20);
-                timeout++;
-            }
-
-            await Task.Delay(150);
+                return File.OpenRead(imgPath);
+            });
 
             GlobalJson.SaveToFile();
-        }
-
-        drawingController.Reset();
-
-        if (drawingView != null)
-        {
-            drawingView.InvalidateSurface();
-            drawingView.Opacity = 1;
         }
     }
 
@@ -435,36 +417,35 @@ public partial class ImageViewPage : IQueryAttributable
 
             if (isCleared)
             {
-                if (File.Exists(imgPath)) File.Delete(imgPath);
+                if (File.Exists(imgPath))
+                    File.Delete(imgPath);
                 File.Move(origPath, imgPath);
+
+                var bytes = File.ReadAllBytes(imgPath);
+                FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
             else
             {
-                Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
+                if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
+                    Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
 
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
 
+                // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
+
+                var bytes = File.ReadAllBytes(imgPath);
+                FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+                Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
 
-            var bytes = await File.ReadAllBytesAsync(imgPath);
-            OriginalImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-
-            // Warten bis das Bild geladen ist
-            await Task.Yield();
-            int timeout = 0;
-            while (FotoImage.IsLoading && timeout < 50)
-            {
-                await Task.Delay(20);
-                timeout++;
-            }
-
-            Thumbnail.Generate(imgPath, thumbPath);
-
+            // ändere Json-Key
             var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
             if (fotos.TryGetValue(ImgSource, out var value))
             {
@@ -476,11 +457,10 @@ public partial class ImageViewPage : IQueryAttributable
             GlobalJson.SaveToFile();
         }
 
-        if (drawingView != null)
-        {
-            drawingView.IsVisible = false;
-            drawingController.Detach();
-        }
+        // Cleanup drawing canvas
+        drawingController.Detach();
+        RemoveDrawingView();
+
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         ToolBtns.IsVisible = false;
@@ -488,12 +468,24 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
+    private void RemoveDrawingView()
+    {
+        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
+        if (drawingView != null && absoluteLayout != null)
+        {
+            absoluteLayout.Children.Remove(drawingView);
+            drawingView = null;
+        }
+    }
+
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
         using var fotoStream = File.OpenRead(fotoPath);
         using var fotoBitmap = SKBitmap.Decode(fotoStream);
+
         int width = fotoBitmap.Width;
         int height = fotoBitmap.Height;
+
         var info = new SKImageInfo(width, height);
         using var surface = SKSurface.Create(info);
         var canvas = surface.Canvas;
