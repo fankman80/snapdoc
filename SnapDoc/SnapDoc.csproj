@@ -186,7 +186,7 @@
 	  <MauiXaml Update="Controls\TooltipPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
-	  <MauiXaml Update="MyBusyPage.xaml">
+	  <MauiXaml Update="Controls\MyBusyPage.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\CameraView.xaml">

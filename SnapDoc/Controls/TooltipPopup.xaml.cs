@@ -1,8 +1,8 @@
-using CommunityToolkit.Maui.Views;
+using Mopups.Pages;
 
 namespace SnapDoc.Controls;
 
-public partial class TooltipPopup : Popup
+public partial class TooltipPopup : PopupPage
 {
     public TooltipPopup()
     {

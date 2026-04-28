@@ -13,6 +13,15 @@ namespace SnapDoc.Platforms.Android
         protected override void OnCreate(Bundle? savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            if (Window != null)
+            {
+                AndroidX.Core.View.WindowCompat.SetDecorFitsSystemWindows(Window, false);
+                Window.SetStatusBarColor(global::Android.Graphics.Color.Transparent);
+                var controller = AndroidX.Core.View.WindowCompat.GetInsetsController(Window, Window.DecorView);
+                controller?.AppearanceLightStatusBars = false;
+                controller.AppearanceLightNavigationBars = false;
+            }
         }
     }
 }

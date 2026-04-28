@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Services;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Controls;
 
 namespace SnapDoc.Views;
 
@@ -60,7 +61,8 @@ public partial class ExportSettings : ContentPage
         });
 
         // Busy-Overlay entfernen
-        await Mopups.Services.MopupService.Instance.PopAsync();
+        if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+            await Mopups.Services.MopupService.Instance.PopAllAsync();
 
         try
         {
@@ -107,7 +109,8 @@ public partial class ExportSettings : ContentPage
         });
 
         // Busy-Overlay entfernen
-        await Mopups.Services.MopupService.Instance.PopAsync();
+        if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+            await Mopups.Services.MopupService.Instance.PopAllAsync();
 
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);

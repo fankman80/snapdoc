@@ -4,15 +4,24 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              x:Class="SnapDoc.Views.HomeScreen"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
-             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-             BackgroundColor="DimGrey">
+             Shell.BackgroundColor="#5c5c5c"
+             BackgroundColor="#5c5c5c">
 
     <ContentPage.Content>
-        <controls:SvgView
-            Margin="40"
-            Source="logo.svg"
-            TintColor="{DynamicResource Primary}"
-            TargetHexColor="#00b1ca"
-            Aspect="AspectFit" />
+        <Grid>
+            <controls:SvgView
+                Margin="50"
+                HeightRequest="{OnPlatform WinUI=300, Default=-1}"
+                WidthRequest="{OnPlatform WinUI=300, Default=-1}"
+                Source="logo.svg"
+                TintColor="{DynamicResource Primary}"
+                TargetHexColor="#00b1ca"
+                Aspect="AspectFit" />
+            <Label Text="Emch+Berger AG Bern / 2026"
+                   Margin="0,0,0,20"
+                   TextColor="White"
+                   HorizontalOptions="Center"
+                   VerticalOptions="End"/>
+        </Grid>
     </ContentPage.Content>
 </ContentPage>

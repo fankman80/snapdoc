@@ -1,5 +1,6 @@
 ﻿#nullable disable
 using SkiaSharp;
+using SnapDoc.Controls;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -126,7 +127,8 @@ public partial class LoadPDFPages : ContentPage
         finally
         {
             // Busy-Overlay entfernen
-            await Mopups.Services.MopupService.Instance.PopAsync();
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
         }
     }
 
@@ -200,7 +202,8 @@ public partial class LoadPDFPages : ContentPage
         finally
         {
             // Busy-Overlay entfernen
-            await Mopups.Services.MopupService.Instance.PopAsync();
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
         }
     }
 

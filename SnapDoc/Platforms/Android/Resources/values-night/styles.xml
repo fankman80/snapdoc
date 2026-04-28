@@ -2,7 +2,9 @@
 <resources>
 	<style name="Maui.MainTheme.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
 		<item name="colorControlActivated">#ffffff</item>
-		<item name="colorPrimary">#212121</item>
+		<item name="colorPrimary">#333333</item>
 		<item name="android:statusBarColor">@android:color/transparent</item>
+		<item name="android:windowLightStatusBar">false</item>
+		<item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
 	</style>
 </resources>

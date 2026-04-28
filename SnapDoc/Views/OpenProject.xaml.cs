@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Services;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Controls;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -132,50 +133,49 @@ public partial class OpenProject : ContentPage
         cleanName = cleanName.Replace("/", "_").Replace("\\", "_").Replace("$", "").Replace("{", "").Replace("}", "");
 
         if (cleanName.Length > 100)
-            cleanName = cleanName.Substring(0, 100);
+            cleanName = cleanName[..100];
 
         return cleanName;
     }
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
+        var fileResult = await FilePicker.Default.PickAsync(new PickOptions
+        {
+            PickerTitle = AppResources.bitte_waehle_zip
+        });
+
+        if (fileResult == null) return;
+
         try
         {
-            var fileResult = await FilePicker.Default.PickAsync(new PickOptions
-            {
-                PickerTitle = AppResources.bitte_waehle_zip
-            });
+            var targetDirectory = Settings.DataDirectory;
+            var sourcePath = fileResult.FullPath;
 
-            if (fileResult != null)
-            {
-                // Zeige Busy-Overlay
-                var busyPopup = new MyBusyPage(AppResources.projekt_wird_importiert);
-                await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+            await Task.Delay(250);
 
-                var targetDirectory = Settings.DataDirectory;
+            // Zeige Busy-Overlay
+            var busyPopup = new MyBusyPage(AppResources.projekt_wird_importiert);
+            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
-                // Hintergrundoperation
-                await Task.Run(() =>
-                {
-                    Helper.UnpackDirectory(fileResult.FullPath, targetDirectory);
-                });
-
-                LoadJsonFiles();
-            }
+            // Hintergrundoperation (nicht UI-Operationen)
+            await Task.Run(() => Helper.UnpackDirectory(sourcePath, targetDirectory));
+            await MainThread.InvokeOnMainThreadAsync(() => LoadJsonFiles());
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.fehler, AppResources.datei_konnte_nicht_importiert_werden, AppResources.ok);
-            else
-                await Toast.Make(AppResources.datei_konnte_nicht_importiert_werden).Show();
+            await MainThread.InvokeOnMainThreadAsync(async () => {
+                if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                    await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.fehler, AppResources.datei_konnte_nicht_importiert_werden, AppResources.ok);
+                else
+                    await Toast.Make(AppResources.datei_konnte_nicht_importiert_werden).Show();
+            });
         }
         finally
         {
             // Busy-Overlay entfernen
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAsync();
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
         }
     }
 
@@ -199,7 +199,8 @@ public partial class OpenProject : ContentPage
             if (item.IsActive)
             {
                 // Busy-Overlay entfernen
-                await Mopups.Services.MopupService.Instance.PopAsync();
+                if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                    await Mopups.Services.MopupService.Instance.PopAllAsync();
                 return;
             }
 
@@ -251,7 +252,7 @@ public partial class OpenProject : ContentPage
         {
             // Busy-Overlay entfernen
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAsync();
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
         }
     }
 
@@ -319,7 +320,8 @@ public partial class OpenProject : ContentPage
                     await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
 
                     // Busy-Overlay entfernen
-                    await Mopups.Services.MopupService.Instance.PopAsync();
+                    if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                        await Mopups.Services.MopupService.Instance.PopAllAsync();
 
                     var saveStream = File.Open(outputPath, FileMode.Open);
                     try

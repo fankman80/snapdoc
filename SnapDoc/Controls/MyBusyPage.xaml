@@ -2,7 +2,7 @@
 <mopups:PopupPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                   xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                   xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
-                  x:Class="SnapDoc.MyBusyPage"
+                  x:Class="SnapDoc.Controls.MyBusyPage"
                   BackgroundColor="#CC000000">
     <Grid>
         <VerticalStackLayout VerticalOptions="Center" 

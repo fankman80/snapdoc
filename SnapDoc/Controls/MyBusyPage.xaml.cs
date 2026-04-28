@@ -1,6 +1,6 @@
 using Mopups.Pages;
 
-namespace SnapDoc;
+namespace SnapDoc.Controls;
 
 public partial class MyBusyPage : PopupPage
 {
