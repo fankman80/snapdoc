@@ -12,6 +12,7 @@
        xmlns:local="clr-namespace:SnapDoc"
        x:Class="SnapDoc.AppShell"
        x:Name="AppShellRoot"
+       Shell.BackgroundColor="{DynamicResource Primary}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"       
        FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}">

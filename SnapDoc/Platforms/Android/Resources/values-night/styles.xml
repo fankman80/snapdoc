@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
 <resources>
 	<style name="Maui.MainTheme.NoActionBar" parent="Theme.MaterialComponents.DayNight.NoActionBar">
-		<item name="colorControlActivated">#000000</item>
+		<item name="colorControlActivated">#ffffff</item>
 		<item name="colorPrimary">#212121</item>
 		<item name="android:statusBarColor">@android:color/transparent</item>
 	</style>

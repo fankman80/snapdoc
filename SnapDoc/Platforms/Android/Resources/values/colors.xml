@@ -3,5 +3,4 @@
 	<color name="colorPrimary">#000000</color>
 	<color name="colorPrimaryDark">#ffffff</color>
 	<color name="colorAccent">#888888</color>
-	<color name="pickerAccent">#888888</color>
 </resources>
