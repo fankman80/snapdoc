@@ -4,10 +4,6 @@ using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.Text.Json;
 
-#if ANDROID
-using SnapDoc.Platforms.Android;
-#endif
-
 namespace SnapDoc.Services;
 
 public partial class SettingsService : ObservableObject
@@ -258,11 +254,6 @@ public partial class SettingsService : ObservableObject
 
         foreach (var kvp in colors)
             Application.Current?.Resources?[kvp.Key] = Color.FromArgb(kvp.Value);
-
-#if ANDROID
-        bool useDarkIcons = (theme == "Minimalist"); // Bei "Minimalist" mit hellem Hintergrund sollen dunkle Statusleisten-Icons verwendet werden, bei den anderen Designs mit dunkleren Hintergründen helle Icons
-        MainActivity.Instance?.UpdatePlatformColors(useDarkIcons);
-#endif
     }
 
     public void ApplyThemeAfterAppStart()
