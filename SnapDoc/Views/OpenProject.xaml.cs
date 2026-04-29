@@ -14,6 +14,8 @@ using System.Diagnostics;
 namespace SnapDoc.Views;
 public partial class OpenProject : ContentPage
 {
+    private bool _isProcessing = false;
+
     public OpenProject()
     {
         InitializeComponent();
@@ -258,143 +260,179 @@ public partial class OpenProject : ContentPage
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-        FileItem item = (FileItem)button.BindingContext;
+        if (_isProcessing) return;
+        _isProcessing = true;
 
-        var _popup = new PopupProjectEdit(entry: item.FileName);
-        var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
-
-        switch (_result.Result)
+        try
         {
-            case "Delete":
-                var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-                var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
+            var button = sender as Button;
+            FileItem item = (FileItem)button.BindingContext;
 
-                if (result1.Result == "Ok")
-                {
-                    string fullPath = item?.FilePath;
-                    if (string.IsNullOrEmpty(fullPath))
-                        return;
+            var _popup = new PopupProjectEdit(entry: item.FileName);
+            var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
 
-                    string projectDirectoryPath = Path.GetDirectoryName(fullPath);
-                    string fileName = Path.GetFileName(fullPath);
-                    string currentActiveJson = GlobalJson.Data.JsonFile;
-                    bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
-                                             fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
+            // Falls das Popup einfach weggeklickt wurde (Result null oder leer)
+            if (_result == null || string.IsNullOrEmpty(_result.Result))
+                return;
 
-                    var tmp_list = (List<FileItem>)FileListView.ItemsSource;
-                    tmp_list.Remove(item);
-                    FileListView.ItemsSource = null;
-                    FileListView.ItemsSource = tmp_list;
-                    ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
+            switch (_result.Result)
+            {
+                case "Delete":
+                    await Task.Delay(200);
 
-                    // Wenn das gelöschte Projekt das aktuell geladene Projekt ist, zurück zum Homescreen navigieren und Daten zurücksetzen
-                    if (isCurrentProject)
+                    var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+                    var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
+
+                    if (result1.Result == "Ok")
                     {
-                        await Shell.Current.GoToAsync("//homescreen");
-                        SettingsService.Instance.IsProjectLoaded = false;
-                        LoadDataToView.ResetData();
-                        Helper.HeaderUpdate();
+                        string fullPath = item?.FilePath;
+                        if (string.IsNullOrEmpty(fullPath))
+                            return;
+
+                        string projectDirectoryPath = Path.GetDirectoryName(fullPath);
+                        string fileName = Path.GetFileName(fullPath);
+                        string currentActiveJson = GlobalJson.Data.JsonFile;
+                        bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
+                                                 fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
+
+                        var tmp_list = (List<FileItem>)FileListView.ItemsSource;
+                        tmp_list.Remove(item);
+                        FileListView.ItemsSource = null;
+                        FileListView.ItemsSource = tmp_list;
+                        ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
+
+                        // Wenn das gelöschte Projekt das aktuell geladene Projekt ist, zurück zum Homescreen navigieren und Daten zurücksetzen
+                        if (isCurrentProject)
+                        {
+                            await Shell.Current.GoToAsync("//homescreen");
+                            SettingsService.Instance.IsProjectLoaded = false;
+                            LoadDataToView.ResetData();
+                            Helper.HeaderUpdate();
+                        }
+
+                        if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
+                            Directory.Delete(projectDirectoryPath, true);
+
+                        LoadJsonFiles();
                     }
+                    break;
 
-                    if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
-                        Directory.Delete(projectDirectoryPath, true);
+                case "Zip":
+                    await Task.Delay(200);
 
-                    LoadJsonFiles();
-                }
-                break;
+                    var popup2 = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
+                    var result2 = await this.ShowPopupAsync<string>(popup2, Settings.PopupOptions);
 
-            case "Zip":
-                var popup2 = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
-                var result2 = await this.ShowPopupAsync<string>(popup2, Settings.PopupOptions);
-                if (result2.Result == "Ok")
-                {
-                    string sourceDirectory = Path.GetDirectoryName(item.FilePath);
-                    string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
-
-                    // Zeige Busy-Overlay
-                    var busyPopup = new MyBusyPage(AppResources.daten_werden_komprimiert);
-                    await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
-                    // Hintergrundoperation (nicht UI-Operationen)
-                    await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
-
-                    // Busy-Overlay entfernen
-                    if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                        await Mopups.Services.MopupService.Instance.PopAllAsync();
-
-                    var saveStream = File.Open(outputPath, FileMode.Open);
-                    try
+                    if (result2.Result == "Ok")
                     {
-                        var fileSaveResult = await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(item.FileName) + ".zip", saveStream);
-                        if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                            await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.zip_wurde_exportiert, AppResources.ok);
-                        else
-                            await Toast.Make(AppResources.zip_wurde_exportiert).Show();
+                        string sourceDirectory = Path.GetDirectoryName(item.FilePath);
+                        string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
+
+                        await Task.Delay(250);
+
+                        // Zeige Busy-Overlay
+                        var busyPopup = new MyBusyPage(AppResources.daten_werden_komprimiert);
+                        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+
+                        try
+                        {
+                            // Hintergrundoperation
+                            await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
+                        }
+                        finally
+                        {
+                            // Busy-Overlay entfernen bevor der FileSaver Dialog kommt
+                            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                                await Mopups.Services.MopupService.Instance.PopAllAsync();
+
+                            await Task.Delay(200); // Dem System Zeit geben das Overlay zu schließen
+                        }
+
+                        if (File.Exists(outputPath))
+                        {
+                            using (var saveStream = File.Open(outputPath, FileMode.Open))
+                            {
+                                var fileSaveResult = await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(item.FileName) + ".zip", saveStream);
+
+                                if (fileSaveResult.IsSuccessful)
+                                {
+                                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
+                                        await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.zip_wurde_exportiert, AppResources.ok);
+                                    else
+                                        await Toast.Make(AppResources.zip_wurde_exportiert).Show();
+                                }
+                            }
+                            File.Delete(outputPath);
+                        }
                     }
-                    finally
+                    break;
+
+                case "Folder":
+                    var directoryPath = Path.GetDirectoryName((Path.Combine(Settings.DataDirectory,item.FilePath)));
+                    if (Directory.Exists(directoryPath))
                     {
-                        saveStream.Close();  // Schließt den Stream sicher
+    #if WINDOWS
+                        Process.Start(new ProcessStartInfo
+                        {
+                            FileName = directoryPath,
+                            UseShellExecute = true,
+                            Verb = "open"
+                        });
+    #endif
                     }
+                    break;
 
-                    if (File.Exists(outputPath))
-                        File.Delete(outputPath);
-                }
-                break;
+                case null:
+                    break;
 
-            case "Folder":
-                var directoryPath = Path.GetDirectoryName((Path.Combine(Settings.DataDirectory,item.FilePath)));
-                if (Directory.Exists(directoryPath))
-                {
-#if WINDOWS
-                    Process.Start(new ProcessStartInfo
+                default:
+                    if (Directory.Exists(Path.GetDirectoryName(item.FilePath)))
                     {
-                        FileName = directoryPath,
-                        UseShellExecute = true,
-                        Verb = "open"
-                    });
-#endif
-                }
-                break;
+                        var newFilePath = Path.Combine(Settings.DataDirectory, _result.Result, _result.Result + ".json");
+                        var oldFilePath = item.FilePath;
 
-            case null:
-                break;
+                        GlobalJson.LoadFromFile(oldFilePath);
+                        GlobalJson.Data.ProjectPath = _result.Result;
+                        GlobalJson.Data.JsonFile = _result.Result + ".json";
+                        GlobalJson.Data.PlanPath = "plans";
+                        GlobalJson.Data.ImagePath = "images";
+                        GlobalJson.Data.ThumbnailPath = "thumbnails";
+                        GlobalJson.Data.CustomPinsPath = "custompins";
+                        GlobalJson.SaveToFile();
 
-            default:
-                if (Directory.Exists(Path.GetDirectoryName(item.FilePath)))
-                {
-                    var newFilePath = Path.Combine(Settings.DataDirectory, _result.Result, _result.Result + ".json");
-                    var oldFilePath = item.FilePath;
+                        // Verzeichnis an die neue Stelle verschieben (umbenennen)
+                        Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));
 
-                    GlobalJson.LoadFromFile(oldFilePath);
-                    GlobalJson.Data.ProjectPath = _result.Result;
-                    GlobalJson.Data.JsonFile = _result.Result + ".json";
-                    GlobalJson.Data.PlanPath = "plans";
-                    GlobalJson.Data.ImagePath = "images";
-                    GlobalJson.Data.ThumbnailPath = "thumbnails";
-                    GlobalJson.Data.CustomPinsPath = "custompins";
-                    GlobalJson.SaveToFile();
+                        // Json verschieben (umbenennen)
+                        Directory.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
+                                        Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
 
-                    // Verzeichnis an die neue Stelle verschieben (umbenennen)
-                    Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));
+                        GlobalJson.UpdateFilePath(newFilePath);
 
-                    // Json verschieben (umbenennen)
-                    Directory.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
-                                    Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
-
-                    GlobalJson.UpdateFilePath(newFilePath);
-
-                    if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath,GlobalJson.Data.JsonFile)))
-                    {
-                        // Daten laden und verarbeiten (nicht UI-bezogen)
-                        LoadDataToView.ResetData();
-                        GlobalJson.LoadFromFile(newFilePath);
-                        LoadDataToView.LoadData(new FileResult(newFilePath));
-                        Helper.HeaderUpdate();  // UI-Aktualisierung
+                        if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath,GlobalJson.Data.JsonFile)))
+                        {
+                            // Daten laden und verarbeiten (nicht UI-bezogen)
+                            LoadDataToView.ResetData();
+                            GlobalJson.LoadFromFile(newFilePath);
+                            LoadDataToView.LoadData(new FileResult(newFilePath));
+                            Helper.HeaderUpdate();  // UI-Aktualisierung
+                        }
+                        LoadJsonFiles();
                     }
-                    LoadJsonFiles();
-                }
-                break;
+                    break;
+            }
+        }
+        catch (Exception ex)
+        {
+            // Sicherstellen, dass Busy-Popups bei Fehlern verschwinden
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
+
+            await DisplayAlertAsync("Error", ex.Message, "OK");
+        }
+        finally
+        {
+            _isProcessing = false;
         }
     }
 }

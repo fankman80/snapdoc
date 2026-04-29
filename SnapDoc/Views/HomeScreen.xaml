@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Views.HomeScreen"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="#5c5c5c"
@@ -17,9 +18,9 @@
                 TintColor="{DynamicResource Primary}"
                 TargetHexColor="#00b1ca"
                 Aspect="AspectFit" />
-            <Label Text="Emch+Berger AG Bern / 2026"
+            <Label Text="{x:Static local:Settings.AppCopyright}"
                    Margin="0,0,0,20"
-                   TextColor="White"
+                   TextColor="LightGray"
                    HorizontalOptions="Center"
                    VerticalOptions="End"/>
         </Grid>

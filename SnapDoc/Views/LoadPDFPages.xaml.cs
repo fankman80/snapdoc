@@ -9,6 +9,7 @@ namespace SnapDoc.Views;
 public partial class LoadPDFPages : ContentPage
 {
     IEnumerable<FileResult> resultList;
+    private bool _isProcessing = false;
     public int DynamicSpan { get; set; } = 0;
 
     public LoadPDFPages()
@@ -42,30 +43,38 @@ public partial class LoadPDFPages : ContentPage
 
     private async void LoadPreviewPDFImages()
     {
-        if (Directory.Exists(Settings.CacheDirectory))
-        {
-            foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
-            {
-                try { File.Delete(file); } catch { }
-            }
-        }
-
-        resultList = await PickPdfFileAsync();
-        if (resultList == null || !resultList.Any())
-        {
-            await Shell.Current.GoToAsync("..");
-            return;
-        }
-
-        string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
-        List<PdfItem> pdfImages = [];
-
-        // Zeige Busy-Overlay
-        var busyPopup = new MyBusyPage(AppResources.lade_pdf_seiten);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+        if (_isProcessing) return;
+        _isProcessing = true;
 
         try
         {
+            if (Directory.Exists(Settings.CacheDirectory))
+            {
+                foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
+                {
+                    try { File.Delete(file); } catch { }
+                }
+            }
+
+            resultList = await PickPdfFileAsync();
+
+            if (resultList == null || !resultList.Any())
+            {
+                _isProcessing = false; // Wichtig: Hier wieder freigeben
+                await Shell.Current.GoToAsync("..");
+                return;
+            }
+
+            // Warten, bis der FilePicker Dialog vollständig geschlossen ist
+            await Task.Delay(250);
+
+            // Zeige Busy-Overlay
+            var busyPopup = new MyBusyPage(AppResources.lade_pdf_seiten);
+            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+
+            string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
+            List<PdfItem> pdfImages = [];
+
             int pdfIndex = 0;
             foreach (var file in resultList)
             {
@@ -122,10 +131,16 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
+            // Popup schließen vor Fehlermeldung
+            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
+                await Mopups.Services.MopupService.Instance.PopAllAsync();
+
             await DisplayAlertAsync("Fehler", ex.Message, "OK");
         }
         finally
         {
+            _isProcessing = false;
+
             // Busy-Overlay entfernen
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
                 await Mopups.Services.MopupService.Instance.PopAllAsync();
@@ -178,14 +193,18 @@ public partial class LoadPDFPages : ContentPage
 
     private async void AddPdfImages()
     {
+        if (_isProcessing) return;
+        _isProcessing = true;
+
         try
         {
+            await Task.Delay(250);
+
             // Zeige Busy-Overlay
             var busyPopup = new MyBusyPage(AppResources.pdf_wird_konvertiert);
             await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
             await LoadPDFImages();
-
             await ProcessFileOrganizationLogic();
 
             GlobalJson.SaveToFile();
@@ -201,6 +220,8 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
+            _isProcessing = false;
+
             // Busy-Overlay entfernen
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
                 await Mopups.Services.MopupService.Instance.PopAllAsync();
