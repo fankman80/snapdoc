@@ -252,7 +252,6 @@ public partial class ExportReport
                                                             string backgroundImagePath = null;
                                                             OXML.Drawing.SourceRectangle crop = null;
 
-                                                            // Hintergrund-Quelle bestimmen (WebMap oder normaler Plan)
                                                             if (currentPin.IsWebMapPin)
                                                             {
                                                                 // Suche in den Fotos nach dem MAP_IMG
@@ -262,10 +261,8 @@ public partial class ExportReport
                                                             }
                                                             else
                                                             {
-                                                                // Normaler Plan
                                                                 backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
 
-                                                                // Crop-Berechnung (nur für normale Pläne notwendig)
                                                                 var planSize = currentPlan.ImageSize;
                                                                 double factorX = (1.0 / planSize.Width * 300) / 2.0;
                                                                 double factorY = (1.0 / planSize.Height * 300) / 2.0;
@@ -282,7 +279,6 @@ public partial class ExportReport
                                                             // Zeichnen, falls ein gültiges Hintergrundbild gefunden wurde
                                                             if (!string.IsNullOrEmpty(backgroundImagePath) && File.Exists(backgroundImagePath))
                                                             {
-                                                                // Pin-Größe berechnen (identisch für beide Fälle)
                                                                 var scaledPinSize = new Size
                                                                 {
                                                                     Width = (int)(currentPin.Size.Width * exportSize.Width / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale),

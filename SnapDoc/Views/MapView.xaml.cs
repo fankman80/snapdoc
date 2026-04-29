@@ -6,6 +6,7 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
+using DocumentFormat.OpenXml.InkML;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -448,7 +449,12 @@ public partial class MapView : IQueryAttributable
                     var files = Directory.GetFiles(folderPath, "MAP_IMG_*.jpg");
                     foreach (var file in files) // Sicherer: Alle alten MAP_IMG löschen
                     {
-                        try { File.Delete(file); } catch { /* Optional: Logging */ }
+                        try
+                        {
+                            File.Delete(file);
+                            GlobalJson.Data.Plans[planId].Pins[pinId].Fotos.Remove(Path.GetFileName(file));
+                        }
+                        catch { /* Optional: Logging */ }
                     }
                 }
 
@@ -458,9 +464,15 @@ public partial class MapView : IQueryAttributable
                     var thumbFiles = Directory.GetFiles(thumbFolderPath, "MAP_IMG_*.jpg");
                     foreach (var file in thumbFiles)
                     {
-                        try { File.Delete(file); } catch { /* Optional: Logging */ }
+                        try
+                        {
+                            File.Delete(file);
+                        }
+                        catch { /* Optional: Logging */ }
                     }
                 }
+
+
 
                 await File.WriteAllBytesAsync(filepath, imageBytes);
 
@@ -473,6 +485,7 @@ public partial class MapView : IQueryAttributable
                     DateTime = DateTime.Now,
                     ImageSize = imageSize
                 };
+              
                 GlobalJson.Data.Plans[planId].Pins[pinId].Fotos[filename] = newImageData;
                 GlobalJson.SaveToFile();
             }
