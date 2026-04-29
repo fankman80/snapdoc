@@ -149,10 +149,9 @@
                                        x:DataType="local:PinItem"
                                        WidthRequest="52"
                                        HeightRequest="52"
-                                       IsEnabled="{Binding CanEditIcon}"
                                        Margin="6"
                                        ClassId="{Binding SelfId}"
-                                       AutomationId = "{Binding OnPlanId}"
+                                       AutomationId="{Binding OnPlanId}"
                                        Source="{Binding DisplayIconPath}"
                                        Aspect="AspectFit">
                                     <Image.GestureRecognizers>
@@ -161,9 +160,22 @@
                                 </Image>
 
                                 <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                        IsVisible="{Binding IsWebMapPin}"
                                         Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         ClassId="{Binding SelfId}"
-                                        AutomationId = "{Binding OnPlanId}"
+                                        AutomationId="{Binding OnPlanId}"
+                                        Text="{x:Static local:MaterialIcons.Globe_location_pin}"
+                                        FontSize="30"
+                                        FontFamily="MaterialOutlined"
+                                        BackgroundColor="Transparent"
+                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"                                            
+                                        Clicked="OnPinClicked"/>
+
+                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                        IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
+                                        Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
+                                        ClassId="{Binding SelfId}"
+                                        AutomationId="{Binding OnPlanId}"
                                         Text="{x:Static local:MaterialIcons.Recenter}"
                                         FontSize="30"
                                         FontFamily="MaterialOutlined"

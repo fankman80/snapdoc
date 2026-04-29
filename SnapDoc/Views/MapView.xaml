@@ -132,7 +132,6 @@
                       VerticalOptions="Center"
                       HorizontalOptions="Center">
                     <Image Grid.Column="0"
-                           IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                            Source="{Binding Pin.DisplayIconPath}" />
                     <Label Grid.Column="1"
                            Text="{x:Static res:AppResources.neu_setzen}"

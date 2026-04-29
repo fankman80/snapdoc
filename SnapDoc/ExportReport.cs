@@ -167,7 +167,7 @@ public partial class ExportReport
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
                         var currentPlan = GlobalJson.Data.Plans[plan.Key];
-                        if (currentPlan.Pins != null && currentPlan.AllowExport && !plan.Key.Contains("webmap"))
+                        if (currentPlan.Pins != null && currentPlan.AllowExport)
                         {
                             foreach (KeyValuePair<string, Pin> pin in currentPlan.Pins)
                             {
@@ -247,23 +247,42 @@ public partial class ExportReport
                                                         if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
                                                         {
                                                             var posData = GetPlaceholderData(s);
-                                                            string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                            SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
                                                             string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
+                                                            string backgroundImagePath = null;
+                                                            OXML.Drawing.SourceRectangle crop = null;
 
-                                                            if (File.Exists(planPath))
+                                                            // Hintergrund-Quelle bestimmen (WebMap oder normaler Plan)
+                                                            if (currentPin.IsWebMapPin)
                                                             {
-                                                                SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
+                                                                // Suche in den Fotos nach dem MAP_IMG
+                                                                var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+                                                                if (mapImage != null)
+                                                                    backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, mapImage.File);
+                                                            }
+                                                            else
+                                                            {
+                                                                // Normaler Plan
+                                                                backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+
+                                                                // Crop-Berechnung (nur für normale Pläne notwendig)
                                                                 var planSize = currentPlan.ImageSize;
-                                                                var cropFactor = new Point((1.0 / planSize.Width * 300) / 2.0, (1.0 / planSize.Height * 300) / 2.0);
+                                                                double factorX = (1.0 / planSize.Width * 300) / 2.0;
+                                                                double factorY = (1.0 / planSize.Height * 300) / 2.0;
 
-                                                                var crop = new OXML.Drawing.SourceRectangle
+                                                                crop = new OXML.Drawing.SourceRectangle
                                                                 {
-                                                                    Left = (int)((currentPin.Pos.X - cropFactor.X) * 100000),
-                                                                    Top = (int)((currentPin.Pos.Y - cropFactor.Y) * 100000),
-                                                                    Right = (int)((1 - currentPin.Pos.X - cropFactor.X) * 100000),
-                                                                    Bottom = (int)((1 - currentPin.Pos.Y - cropFactor.Y) * 100000),
+                                                                    Left = (int)((currentPin.Pos.X - factorX) * 100000),
+                                                                    Top = (int)((currentPin.Pos.Y - factorY) * 100000),
+                                                                    Right = (int)((1 - currentPin.Pos.X - factorX) * 100000),
+                                                                    Bottom = (int)((1 - currentPin.Pos.Y - factorY) * 100000),
                                                                 };
+                                                            }
 
+                                                            // Zeichnen, falls ein gültiges Hintergrundbild gefunden wurde
+                                                            if (!string.IsNullOrEmpty(backgroundImagePath) && File.Exists(backgroundImagePath))
+                                                            {
+                                                                // Pin-Größe berechnen (identisch für beide Fälle)
                                                                 var scaledPinSize = new Size
                                                                 {
                                                                     Width = (int)(currentPin.Size.Width * exportSize.Width / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale),
@@ -271,16 +290,20 @@ public partial class ExportReport
                                                                 };
 
                                                                 PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
-                                                                var planImgElement = GetImageElement(mainPart, planPath, exportSize, new Point(0, 0), 0, "anchor", crop);
+
+                                                                // Hintergrundbild einfügen
+                                                                var planImgElement = GetImageElement(mainPart, backgroundImagePath, exportSize, new Point(0, 0), 0, "anchor", crop);
                                                                 if (planImgElement != null)
                                                                     newParagraph.Append(new Run(planImgElement));
 
+                                                                // Pin-Icon oben drauf setzen
                                                                 if (File.Exists(pinImage))
                                                                 {
                                                                     var pinImgElement = GetImageElement(mainPart, pinImage, scaledPinSize, posOnPlan, (float)currentPin.PinRotation, "anchor");
                                                                     if (pinImgElement != null)
                                                                         newParagraph.Append(new Run(pinImgElement));
                                                                 }
+
                                                                 newParagraph.Append(new Run(new Break()));
                                                             }
                                                         }
@@ -295,6 +318,9 @@ public partial class ExportReport
                                                             foreach (var img in pinFotos)
                                                             {
                                                                 if (!img.AllowExport)
+                                                                    continue;
+
+                                                                if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
                                                                     continue;
 
                                                                 string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);

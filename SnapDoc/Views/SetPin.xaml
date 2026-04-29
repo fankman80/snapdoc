@@ -176,7 +176,6 @@
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <Border Grid.Column="2" Grid.Row="0" Grid.RowSpan="3"
-                        IsEnabled="{Binding Pin.CanEditIcon}"
                         WidthRequest="100"
                         Stroke="Grey"
                         StrokeThickness="1"
@@ -214,7 +213,6 @@
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
@@ -230,7 +228,7 @@
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"                        
                         Clicked="ZoomToPinClicked"/>
-                <Button Grid.Column="1"
+                <Button Grid.Column="0"
                         IsVisible="{Binding Pin.IsWebMapPin}"
                         Padding="0"
                         MinimumWidthRequest="50"                        
@@ -240,7 +238,7 @@
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"                  
                         Clicked="ZoomToPinClicked"/>
-                <Button Grid.Column="3"
+                <Button Grid.Column="2"
                         Padding="0"
                         MinimumWidthRequest="100"
                         Text="{x:Static local:MaterialIcons.Photo_camera}"
@@ -249,7 +247,7 @@
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.foto_aufnehmen}"                        
                         Clicked="TakeFoto"/>
-                <Button Grid.Column="4"
+                <Button Grid.Column="3"
                         Padding="0"
                         Text="{x:Static res:AppResources.ok}"
                         MinimumWidthRequest="100"

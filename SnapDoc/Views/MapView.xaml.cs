@@ -437,8 +437,30 @@ public partial class MapView : IQueryAttributable
                     return;
 
                 string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
-                string filepath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, filename);
-                string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, filename);
+                string folderPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath);
+                string thumbFolderPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath);
+                string filepath = Path.Combine(folderPath, filename);
+                string thumbPath = Path.Combine(thumbFolderPath, filename);
+
+                // 1. Hauptbild-Ordner aufräumen
+                if (Directory.Exists(folderPath))
+                {
+                    var files = Directory.GetFiles(folderPath, "MAP_IMG_*.jpg");
+                    foreach (var file in files) // Sicherer: Alle alten MAP_IMG löschen
+                    {
+                        try { File.Delete(file); } catch { /* Optional: Logging */ }
+                    }
+                }
+
+                // 2. Thumbnail-Ordner aufräumen
+                if (Directory.Exists(thumbFolderPath)) // Wichtig: Eigene Prüfung für den Thumb-Ordner
+                {
+                    var thumbFiles = Directory.GetFiles(thumbFolderPath, "MAP_IMG_*.jpg");
+                    foreach (var file in thumbFiles)
+                    {
+                        try { File.Delete(file); } catch { /* Optional: Logging */ }
+                    }
+                }
 
                 await File.WriteAllBytesAsync(filepath, imageBytes);
 
