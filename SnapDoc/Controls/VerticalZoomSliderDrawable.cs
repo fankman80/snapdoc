@@ -1,5 +1,4 @@
-﻿using Microsoft.Maui.Graphics;
-using Font = Microsoft.Maui.Graphics.Font;
+﻿using Font = Microsoft.Maui.Graphics.Font;
 
 namespace SnapDoc.Controls
 {

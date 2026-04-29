@@ -443,36 +443,17 @@ public partial class MapView : IQueryAttributable
                 string filepath = Path.Combine(folderPath, filename);
                 string thumbPath = Path.Combine(thumbFolderPath, filename);
 
-                // 1. Hauptbild-Ordner aufräumen
-                if (Directory.Exists(folderPath))
+                // Suche in den Fotos nach dem MAP_IMG
+                var currentPin = GlobalJson.Data.Plans[planId].Pins[pinId];
+                var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+                if (mapImage != null)
                 {
-                    var files = Directory.GetFiles(folderPath, "MAP_IMG_*.jpg");
-                    foreach (var file in files) // Sicherer: Alle alten MAP_IMG löschen
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                            GlobalJson.Data.Plans[planId].Pins[pinId].Fotos.Remove(Path.GetFileName(file));
-                        }
-                        catch { /* Optional: Logging */ }
-                    }
+                    try { File.Delete(Path.Combine(folderPath, mapImage.File)); }
+                    catch { /* Optional: Logging */ }
+                    try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); }
+                    catch { /* Optional: Logging */ }
+                    currentPin.Fotos.Remove(Path.GetFileName(mapImage.File));
                 }
-
-                // 2. Thumbnail-Ordner aufräumen
-                if (Directory.Exists(thumbFolderPath)) // Wichtig: Eigene Prüfung für den Thumb-Ordner
-                {
-                    var thumbFiles = Directory.GetFiles(thumbFolderPath, "MAP_IMG_*.jpg");
-                    foreach (var file in thumbFiles)
-                    {
-                        try
-                        {
-                            File.Delete(file);
-                        }
-                        catch { /* Optional: Logging */ }
-                    }
-                }
-
-
 
                 await File.WriteAllBytesAsync(filepath, imageBytes);
 
@@ -485,8 +466,8 @@ public partial class MapView : IQueryAttributable
                     DateTime = DateTime.Now,
                     ImageSize = imageSize
                 };
-              
-                GlobalJson.Data.Plans[planId].Pins[pinId].Fotos[filename] = newImageData;
+
+                currentPin.Fotos[filename] = newImageData;
                 GlobalJson.SaveToFile();
             }
         }

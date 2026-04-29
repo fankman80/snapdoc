@@ -1,6 +1,5 @@
 ﻿using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
 
 namespace SnapDoc.Controls;
 
@@ -120,28 +119,20 @@ public partial class TooltipOverlay : SKCanvasView
         float tailSize = 30 * density;
         float cornerRadius = 24 * density;
 
-        // 1. Schriftart und Text-Metriken (Modern SkiaSharp)
         using var typeface = SKTypeface.FromFamilyName("Arial");
         using var font = new SKFont(typeface, 16 * density);
 
-        // Textgröße messen
         var textWidth = font.MeasureText(Text, out var textBounds);
-
         float bubbleWidth = textWidth + (padding * 2);
-        float bubbleHeight = font.Size + (padding * 2); // Oder font.Metrics.CapHeight nutzen
+        float bubbleHeight = font.Size + (padding * 2);
 
-        // --- NEU: Hier definierst du den Abstand in MAUI-Einheiten ---
-        float bubbleGap = 10 * density; // 10 Pixel Abstand zwischen Spitze und Blase
         float hManual = (float)HorizontalOffset * density;
         float vManual = (float)VerticalOffset * density;
 
-        // 2. Ausrichtung berechnen
-        // Wenn targetX links ist, addieren wir hManual, wenn rechts, subtrahieren wir es.
         float offsetX = targetX < info.Width / 2
                         ? (tailSize + hManual)
                         : -(bubbleWidth + tailSize + hManual);
 
-        // Das Gleiche für die vertikale Verschiebung
         float offsetY = targetY < info.Height / 2
                         ? (tailSize + vManual)
                         : -(bubbleHeight + tailSize + vManual);
@@ -152,44 +143,36 @@ public partial class TooltipOverlay : SKCanvasView
             targetX + offsetX + bubbleWidth,
             targetY + offsetY + bubbleHeight);
 
-        // 3. Pfad für Sprechblase erstellen
-        using var rectPath = new SKPath();
-        rectPath.AddRoundRect(bubbleRect, cornerRadius, cornerRadius);
+        // --- MODERN: Pfad für die Blase mit SKPathBuilder ---
+        var rectBuilder = new SKPathBuilder();
+        rectBuilder.AddRoundRect(bubbleRect, cornerRadius, cornerRadius);
+        using var rectPath = rectBuilder.Detach();
 
-        using var tailPath = new SKPath();
-        tailPath.MoveTo(skTargetPoint);
+        // --- MODERN: Pfad für die Spitze mit SKPathBuilder ---
+        var tailBuilder = new SKPathBuilder();
+        tailBuilder.MoveTo(skTargetPoint);
 
         float inset = 30 * density;
         float tailWidthAtBase = 30 * density;
         float overlap = 1.0f * density;
 
-        float tipBaseStart;
-        if (offsetX > 0)
-        {
-            tipBaseStart = bubbleRect.Left + inset;
-        }
-        else
-        {
-            tipBaseStart = bubbleRect.Right - inset - tailWidthAtBase;
-        }
+        float tipBaseStart = (offsetX > 0)
+            ? bubbleRect.Left + inset
+            : bubbleRect.Right - inset - tailWidthAtBase;
 
-        // Hier korrigieren wir den Ankerpunkt: 
-        // Wir ziehen das 'overlap' ab oder addieren es, je nach Lage.
         float verticalAttachPoint = targetY + offsetY + (offsetY > 0 ? 0 : bubbleHeight);
         float deepAttachPoint = offsetY > 0 ? verticalAttachPoint + overlap : verticalAttachPoint - overlap;
 
-        tailPath.LineTo(tipBaseStart, deepAttachPoint);
-        tailPath.LineTo(tipBaseStart + tailWidthAtBase, deepAttachPoint);
-        tailPath.Close();
+        tailBuilder.LineTo(tipBaseStart, deepAttachPoint);
+        tailBuilder.LineTo(tipBaseStart + tailWidthAtBase, deepAttachPoint);
+        tailBuilder.Close();
+        using var tailPath = tailBuilder.Detach();
 
-        // JETZT VERSCHMELZEN:
-        // Wir nutzen SKPath.Op um aus zwei Pfaden einen neuen, kombinierten Pfad zu machen.
+        // Pfade verschmelzen
         var combinedPath = rectPath.Op(tailPath, SKPathOp.Union);
-
-        // Falls Op fehlschlägt (null zurückgibt), nehmen wir zur Sicherheit den rectPath
         var finalPath = combinedPath ?? rectPath;
 
-        // 4. Zeichnen (jetzt mit finalPath)
+        // Zeichnen
         using var fillPaint = new SKPaint { Color = SKColors.White, Style = SKPaintStyle.Fill, IsAntialias = true };
         canvas.DrawPath(finalPath, fillPaint);
 
@@ -203,12 +186,10 @@ public partial class TooltipOverlay : SKCanvasView
         };
         canvas.DrawPath(finalPath, strokePaint);
 
-        // Wichtig: combinedPath muss entsorgt werden, da Op ein neues Objekt erstellt
-        combinedPath?.Dispose();
-
         using var textPaint = new SKPaint { Color = SKColors.Black, IsAntialias = true };
-
-        // Text zeichnen (wie bisher):
+        // Text zeichnen (Nutze die Font-Instanz direkt)
         canvas.DrawText(Text, bubbleRect.Left + padding, bubbleRect.Bottom - padding, font, textPaint);
+
+        combinedPath?.Dispose();
     }
 }

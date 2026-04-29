@@ -1,6 +1,4 @@
-﻿using SnapDoc.Controls;
-
-namespace SnapDoc.Views;
+﻿namespace SnapDoc.Views;
 
 public partial class HomeScreen : ContentPage
 {

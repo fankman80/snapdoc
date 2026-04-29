@@ -4,7 +4,7 @@
                   xmlns:mopups="clr-namespace:Mopups.Pages;assembly=Mopups"
                   xmlns:controls="clr-namespace:SnapDoc.Controls"
                   x:Class="SnapDoc.Controls.TooltipPopup"
-                  BackgroundColor="#CC000000">
+                  BackgroundColor="#80000000">
 
     <Grid>
         <controls:TooltipOverlay    

@@ -116,19 +116,21 @@ public class InteractiveRectangleDrawable
 
         var pts = Points;
 
-        using var path = new SKPath();
-        path.MoveTo(pts[0]);
-        path.LineTo(pts[1]);
-        path.LineTo(pts[2]);
-        path.LineTo(pts[3]);
-        path.Close();
+        var builder = new SKPathBuilder();
+        builder.MoveTo(pts[0]);
+        builder.LineTo(pts[1]);
+        builder.LineTo(pts[2]);
+        builder.LineTo(pts[3]);
+        builder.Close();
 
+        using var path = builder.Detach();
         using var fillPaint = new SKPaint
         {
             Color = FillColor,
-            IsStroke = false,
+            Style = SKPaintStyle.Fill, // "IsStroke = false" ist veraltet, nutze Style
             IsAntialias = true
         };
+
         canvas.DrawPath(path, fillPaint);
 
         if (LineThickness > 0)
@@ -148,7 +150,6 @@ public class InteractiveRectangleDrawable
             canvas.DrawPath(path, linePaint);
         }
 
-        // Draw text if available
         if (!string.IsNullOrEmpty(Text))
             DrawMultilineText(canvas);
 
@@ -189,11 +190,9 @@ public class InteractiveRectangleDrawable
         canvas.Translate(Center.X, Center.Y);
         canvas.RotateDegrees(AllowedAngleDeg);
 
-        // Calculate max text area
         float maxTextWidth = Width - 2 * TextPadding * (float)Settings.DisplayDensity;
         float maxTextHeight = Height - 2 * TextPadding * (float)Settings.DisplayDensity;
 
-        // Determine font size
         TextSize = AutoSizeText
             ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
             : TextSize;

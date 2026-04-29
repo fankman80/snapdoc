@@ -1,8 +1,4 @@
-﻿using Microsoft.Maui.Controls;
-using Microsoft.Maui.Graphics;
-using System.Diagnostics;
-
-namespace SnapDoc.Controls
+﻿namespace SnapDoc.Controls
 {
     public partial class VerticalZoomSlider : GraphicsView
     {

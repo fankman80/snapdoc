@@ -42,14 +42,12 @@ public class InteractiveFreehandDrawable
         {
             if (stroke.Count < 2) continue;
 
-            using var path = new SKPath();
+            var builder = new SKPathBuilder();
 
-            path.MoveTo(stroke[0]);
+            builder.MoveTo(stroke[0]);
 
             if (stroke.Count == 2)
-            {
-                path.LineTo(stroke[1]);
-            }
+                builder.LineTo(stroke[1]);
             else
             {
                 for (int i = 1; i < stroke.Count - 1; i++)
@@ -57,10 +55,13 @@ public class InteractiveFreehandDrawable
                     var current = stroke[i];
                     var next = stroke[i + 1];
                     var midPoint = new SKPoint((current.X + next.X) / 2, (current.Y + next.Y) / 2);
-                    path.QuadTo(current, midPoint);
+
+                    builder.QuadTo(current, midPoint);
                 }
-                path.LineTo(stroke.Last());
+                builder.LineTo(stroke.Last());
             }
+
+            using var path = builder.Detach();
             canvas.DrawPath(path, paint);
         }
     }

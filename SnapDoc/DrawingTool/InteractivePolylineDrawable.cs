@@ -22,22 +22,28 @@ public class InteractivePolylineDrawable
         if (Points.Count < 2)
             return;
 
-        using var path = new SKPath();
-        path.MoveTo(Points[0]);
-        for (int i = 1; i < Points.Count; i++)
+        // 1. Erstelle den Builder
+        var builder = new SKPathBuilder();
+
+        if (Points.Count > 0)
         {
-            path.LineTo(Points[i]);
+            builder.MoveTo(Points[0]);
+            for (int i = 1; i < Points.Count; i++)
+            {
+                builder.LineTo(Points[i]);
+            }
+
+            if (IsClosed)
+                builder.Close();
         }
 
-        if (IsClosed)
-            path.Close();
-
+        using var path = builder.Detach();
         if (IsClosed)
         {
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
-                IsStroke = false,
+                Style = SKPaintStyle.Fill,
                 IsAntialias = true
             };
             canvas.DrawPath(path, fillPaint);
