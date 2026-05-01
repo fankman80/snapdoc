@@ -3,7 +3,7 @@ using CommunityToolkit.Maui;
 
 public static class Settings
 {
-    public static string AppCopyright { get; set; } = "Emch+Berger AG Bern / 2026";
+    public static string AppCopyright { get; set; } = "Emch+Berger AG Bern | 2026";
 
     public static double DisplayDensity { get; set; } = 1;
 
