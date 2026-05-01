@@ -217,7 +217,7 @@ public partial class ExportReport
                                                     case "${pin_nr}":
                                                         string tag = $"Pos_{pinCounter}";
                                                         string xpath = $"/positions/pos[@id='{pinCounter}']";
-                                                        newParagraph.Append(new Run(CreateBoundSDTRun(tag, xpath, pinCounter.ToString())));
+                                                        newParagraph.Append(CreateBoundSDTRun(tag, xpath, pinCounter.ToString()));
                                                         newParagraph.Append(new Run(new Break()));
                                                         break;
 

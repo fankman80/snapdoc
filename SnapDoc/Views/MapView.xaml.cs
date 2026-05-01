@@ -737,13 +737,12 @@ public partial class MapView : IQueryAttributable
 
     public async Task<byte[]> ExportMapAsImageAsync(Size targetSize, NetTopologySuite.Geometries.Geometry targetCenter)
     {
-        double exportResolution = 0.2;
         var center = new MPoint(targetCenter.Centroid.X, targetCenter.Centroid.Y);
         var exportViewport = new Viewport(
             center.X,
             center.Y,
-            exportResolution,
-            0,
+            0.2, // Zoomstufe für den Export (je kleiner, desto näher dran)
+            0, // Rotation 0 für Nord oben
             targetSize.Width,
             targetSize.Height
         );
