@@ -408,6 +408,11 @@ public partial class ExportReport
                     foreach (var para in paragraphs)
                     {
                         string fullText = para.InnerText;
+
+                        // Umbrüche umwandeln
+                        if (para.InnerText.Contains("{linebreak}"))
+                            ProcessLineBreaksInParagraph(para, "{linebreak}");
+                        
                         var imageMatch = UniversalImageRegex().Match(fullText);
 
                         // Title Image
@@ -604,6 +609,30 @@ public partial class ExportReport
             anchorPara.Remove();
     }
 
+    private static void ProcessLineBreaksInParagraph(Paragraph para, string placeholder = "{linebreak}")
+    {
+        var runs = para.Elements<Run>().ToList();
+        foreach (var run in runs)
+        {
+            var textElements = run.Elements<Text>().ToList();
+            foreach (var text in textElements)
+            {
+                if (text.Text.Contains(placeholder))
+                {
+                    string[] parts = text.Text.Split(new[] { placeholder }, StringSplitOptions.None);
+                    text.Text = parts[0];
+                    text.Space = SpaceProcessingModeValues.Preserve;
+                    OpenXmlElement lastElement = text;
+                    for (int i = 1; i < parts.Length; i++)
+                    {
+                        lastElement = run.InsertAfter(new Break(), lastElement);
+                        lastElement = run.InsertAfter(new Text(parts[i]) { Space = SpaceProcessingModeValues.Preserve }, lastElement);
+                    }
+                }
+            }
+        }
+    }
+    
     private static SdtRun CreateBoundSDTRun(string tag, string xpath, string initialValue)
     {
         return new SdtRun(
