@@ -19,6 +19,7 @@ using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.ScaleBar;
+using Mapsui.Widgets.Compass;
 using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -91,6 +92,8 @@ public partial class MapView : IQueryAttributable
         map.Layers.Add(_measureLayer);
 
         map.Widgets.Clear();
+
+        map.Widgets.Add(new CompassWidget { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, MarginX = 20, MarginY = 40, Size = 50, Enabled = true });
         map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
         map.Widgets.Add(_instructionWidget);
 
