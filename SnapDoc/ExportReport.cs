@@ -39,7 +39,7 @@ public partial class ExportReport
         Dictionary<string, string> placeholders = new()
         {
             {"${client_name}", GlobalJson.Data.Client_name},
-            {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "{linebreak}")},
+            {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
             {"${working_title}", GlobalJson.Data.Working_title},
             {"${project_nr}", GlobalJson.Data.Project_nr},
             {"${object_name}", GlobalJson.Data.Object_name},
@@ -402,18 +402,21 @@ public partial class ExportReport
                     var paragraphs = mainPart.Document.Body.Descendants<Paragraph>()
                         .Where(p => p.InnerText.Contains("${plan_indexes}") ||
                                     p.InnerText.Contains("${plan_images") ||
-                                    p.InnerText.Contains("${title_image"))
+                                    p.InnerText.Contains("${title_image") ||
+                                    p.InnerText.Contains("${linebreak}"))
                         .ToList();
 
                     foreach (var para in paragraphs)
                     {
                         string fullText = para.InnerText;
-
-                        // Umbrüche umwandeln
-                        if (para.InnerText.Contains("{linebreak}"))
-                            ProcessLineBreaksInParagraph(para, "{linebreak}");
-                        
                         var imageMatch = UniversalImageRegex().Match(fullText);
+
+                        // Add Linebreak
+                        if (fullText.Contains("${linebreak}"))
+                        {
+                            if (para.InnerText.Contains("${linebreak}"))
+                                ProcessLineBreaksInParagraph(para, "${linebreak}");
+                        }
 
                         // Title Image
                         if (imageMatch.Success && imageMatch.Value.Contains("title_image"))
