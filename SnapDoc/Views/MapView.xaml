@@ -109,11 +109,22 @@
             </Border.Shadow>            
         </Border>
 
-        <HorizontalStackLayout x:DataType="views:MapView"
+        <VerticalStackLayout x:DataType="views:MapView"
                                HorizontalOptions="End"
                                VerticalOptions="End"
                                Spacing="14"
                                Padding="14">
+            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    WidthRequest="60"
+                    HeightRequest="60"
+                    CornerRadius="30"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="SetPinClicked">
+                <Button.Shadow>
+                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                </Button.Shadow>
+            </Button>
             <Border x:Name="SetPosBtn"
                     IsVisible="False"
                     Padding="10,10,14,10"
@@ -140,17 +151,6 @@
                            TextColor="{DynamicResource PrimaryDarkText}" />
                 </Grid>
             </Border>
-            <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
-                    WidthRequest="60"
-                    HeightRequest="60"
-                    CornerRadius="30"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    Clicked="SetPinClicked">
-                <Button.Shadow>
-                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
-                </Button.Shadow>
-            </Button>
-        </HorizontalStackLayout>
+        </VerticalStackLayout>
     </Grid>
 </ContentPage>
