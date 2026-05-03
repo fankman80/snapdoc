@@ -64,7 +64,24 @@
     </ContentPage.Resources>
 
     <Grid>
-        <mapsui:MapControl x:Name="MapControl"/>
+        <mapsui:MapControl x:Name="MapControl"
+                           MapPointerMoved="OnPointerMoved"
+                           MapPointerPressed="OnPointerPressed"
+                           MapPointerReleased="OnPointerReleased"/>
+        <controls:SvgView x:Name="NorthArrow"
+                          Source="north_arrow.svg"
+                          TintColor="{DynamicResource Primary}"
+                          TargetHexColor="#ff0000"
+                          WidthRequest="60"
+                          HeightRequest="60"
+                          VerticalOptions="Start"
+                          HorizontalOptions="End"
+                          Margin="0,60,14,0"
+                          Aspect="AspectFit">
+            <controls:SvgView.GestureRecognizers>
+                <TapGestureRecognizer Tapped="OnResetRotationClicked" />
+            </controls:SvgView.GestureRecognizers>
+        </controls:SvgView>
         <Button x:Name="RulerButton"
                 Text="{x:Static res:AppResources.vermessung}"
                 MinimumHeightRequest="32"                
@@ -115,6 +132,7 @@
                                Spacing="14"
                                Padding="14">
             <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    HorizontalOptions="End"
                     WidthRequest="60"
                     HeightRequest="60"
                     CornerRadius="30"

@@ -6,7 +6,6 @@ using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
-using DocumentFormat.OpenXml.InkML;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -19,7 +18,7 @@ using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.ScaleBar;
-using Mapsui.Widgets.Compass;
+using Microsoft.Maui.Layouts;
 using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -54,6 +53,8 @@ public partial class MapView : IQueryAttributable
     private int _draggedMeasurePointIndex = -1;
     private bool _isPolygonClosed = false;
     private readonly Color _widgetColor;
+    private double? _previousAngle = null;
+    private bool _isAnimating = false;
 
     private PinItem pin;
     public PinItem Pin
@@ -93,7 +94,6 @@ public partial class MapView : IQueryAttributable
 
         map.Widgets.Clear();
 
-        map.Widgets.Add(new CompassWidget { HorizontalAlignment = HorizontalAlignment.Right, VerticalAlignment = VerticalAlignment.Top, MarginX = 20, MarginY = 40, Size = 50, Enabled = true });
         map.Widgets.Add(new ScaleBarWidget(map) { MaxWidth = 180, Margin = new MRect(8), TextAlignment = Mapsui.Widgets.Alignment.Center, Font = new Font { FontFamily = "sans serif", Size = 14 }, HorizontalAlignment = Mapsui.Widgets.HorizontalAlignment.Left, VerticalAlignment = Mapsui.Widgets.VerticalAlignment.Bottom });
         map.Widgets.Add(_instructionWidget);
 
@@ -102,6 +102,7 @@ public partial class MapView : IQueryAttributable
         map.PointerPressed += OnPressed;
         map.PointerMoved += OnMoved;
         map.PointerReleased += OnReleased;
+        map.Navigator.ViewportChanged += Navigator_ViewportChanged;
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
@@ -965,6 +966,96 @@ public partial class MapView : IQueryAttributable
         {
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
+#endif
+    }
+
+    private void Navigator_ViewportChanged(object sender, Mapsui.ViewportChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(Navigator.Viewport))
+        {
+            var rotation = map.Navigator.Viewport.Rotation;
+            NorthArrow.Rotation = rotation;
+
+            UpdateArrowFading(rotation);
+        }
+    }
+
+    private void OnResetRotationClicked(object sender, EventArgs e)
+    {
+        map.Navigator.RotateTo(0);
+    }
+
+    private async void UpdateArrowFading(double rotation)
+    {
+        bool shouldBeVisible = Math.Abs(rotation) > 0.1;
+
+        if (_isAnimating) return;
+        if (shouldBeVisible && NorthArrow.Opacity >= 1) return;
+        if (!shouldBeVisible && !NorthArrow.IsVisible) return;
+
+        _isAnimating = true;
+
+        if (shouldBeVisible)
+        {
+            NorthArrow.IsVisible = true;
+            await NorthArrow.FadeToAsync(1, 250, Easing.CubicIn);
+        }
+        else
+        {
+            await NorthArrow.FadeToAsync(0, 250, Easing.CubicOut);
+            NorthArrow.IsVisible = false;
+        }
+
+        _isAnimating = false;
+    }
+
+    private void OnPointerPressed(object sender, MapEventArgs e)
+    {
+        if (IsShiftPressed())
+        {
+            _previousAngle = CalculateAngle(e);
+            e.Handled = true; // Verhindert, dass die Karte gleichzeitig verschoben wird
+        }
+    }
+
+    private void OnPointerMoved(object sender, MapEventArgs e)
+    {
+        if (_previousAngle != null && IsShiftPressed())
+        {
+            var currentAngle = CalculateAngle(e);
+            var deltaAngle = currentAngle - _previousAngle.Value;
+            var currentRotation = MapControl.Map.Navigator.Viewport.Rotation;
+            MapControl.Map.Navigator.RotateTo(currentRotation + deltaAngle, 0);
+
+            _previousAngle = currentAngle;
+            e.Handled = true;
+        }
+    }
+
+    private void OnPointerReleased(object sender, MapEventArgs e)
+    {
+        _previousAngle = null;
+    }
+
+    private double CalculateAngle(Mapsui.MapEventArgs e)
+    {
+        var position = e.ScreenPosition;
+        double centerX = MapControl.Width / 2;
+        double centerY = MapControl.Height / 2;
+        double dx = position.X - centerX;
+        double dy = position.Y - centerY;
+
+        return Math.Atan2(dy, dx) * (180 / Math.PI);
+    }
+
+    private static bool IsShiftPressed()
+    {
+#if WINDOWS
+    var state = Microsoft.UI.Input.InputKeyboardSource.GetKeyStateForCurrentThread(
+        Windows.System.VirtualKey.Shift);
+    return state.HasFlag(Windows.UI.Core.CoreVirtualKeyStates.Down);
+#else
+        return false;
 #endif
     }
 }

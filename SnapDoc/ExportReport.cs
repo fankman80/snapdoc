@@ -622,7 +622,7 @@ public partial class ExportReport
             {
                 if (text.Text.Contains(placeholder))
                 {
-                    string[] parts = text.Text.Split(new[] { placeholder }, StringSplitOptions.None);
+                    string[] parts = text.Text.Split([placeholder], StringSplitOptions.None);
                     text.Text = parts[0];
                     text.Space = SpaceProcessingModeValues.Preserve;
                     OpenXmlElement lastElement = text;

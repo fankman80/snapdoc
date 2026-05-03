@@ -116,6 +116,10 @@
         <EmbeddedResource Include="Resources\Raw\editor.html" />
     </ItemGroup>
 
+    <ItemGroup>
+      <MauiImage Include="Resources\raw\north_arrow.svg" />
+    </ItemGroup>
+
 	<ItemGroup>
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="9.0.493" />

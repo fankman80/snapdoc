@@ -1,0 +1,11 @@
+<svg width="1000" height="1000" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+    <g transform="translate(-51.471 -91.49)">
+        <circle style="fill:#000;fill-opacity:1;stroke:#fff;stroke-width:0;stroke-dasharray:none;stroke-opacity:1" cx="551.471" cy="591.49" r="500"/>
+        <g style="fill-rule:evenodd">
+            <path d="M145.05 321.47h-10.375L90.55 247.095l.125 5.625c.125 2.125.187 3.917.188 5.375v63.375h-8.625v-85.312h13.375l41.25 69.562-.125-5.938a175.337 175.337 0 0 1-.125-6.187v-57.438h8.437z" style="fill:#fff;fill-opacity:1;fill-rule:evenodd" transform="matrix(3.1914 0 0 2.74194 190.278 147.582)"/>
+            <path d="M113.91 9.216v117.41l106.36 111.33z" style="fill:#ff0000;fill-opacity:1;fill-rule:evenodd" transform="matrix(3.1914 0 0 2.74194 190.278 147.582)"/>
+            <path d="M113.911 9.217v117.41L7.551 237.957z" style="fill:#fff;fill-opacity:1;fill-rule:evenodd" transform="matrix(3.1914 0 0 2.74194 190.278 147.582)"/>
+            <path d="m5.53 240.17 108.38-113.54L220.82 238.7 113.91 9.4Z" stroke="#000" stroke-width="6" fill="none" style="fill-rule:evenodd;stroke:#fff;stroke-opacity:1" transform="matrix(3.1914 0 0 2.74194 190.278 147.582)"/>
+        </g>
+    </g>
+</svg>
