@@ -864,4 +864,7 @@
   <data name="templates_reset_success" xml:space="preserve">
     <value>The templates have been reset to their default values.</value>
   </data>
+  <data name="karte_loeschen" xml:space="preserve">
+    <value>Delete map</value>
+  </data>
 </root>

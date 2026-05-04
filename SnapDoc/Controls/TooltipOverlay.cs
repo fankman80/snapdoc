@@ -5,12 +5,8 @@ namespace SnapDoc.Controls;
 
 using SkiaSharp.Views.Maui.Controls;
 
-// WICHTIG: Nutze Microsoft.Maui.Graphics für die Property
-using Point = Microsoft.Maui.Graphics.Point;
-
 public partial class TooltipOverlay : SKCanvasView
 {
-    // Neue Property für das Ziel-Element
     public static readonly BindableProperty AnchorElementProperty =
         BindableProperty.Create(nameof(AnchorElement), typeof(VisualElement), typeof(TooltipOverlay), null,
             propertyChanged: OnAnchorElementChanged);
@@ -26,25 +22,21 @@ public partial class TooltipOverlay : SKCanvasView
         var control = (TooltipOverlay)bindable;
         if (newValue is VisualElement element)
         {
-            // Sobald das Element fertig gelayoutet ist, Position berechnen
             element.SizeChanged += (s, e) => control.UpdatePositionFromAnchor();
             control.UpdatePositionFromAnchor();
         }
     }
 
-    private Point GetAbsolutePosition(VisualElement element)
+    private static Point GetAbsolutePosition(VisualElement element)
     {
         if (element == null) return new Point(0, 0);
 
-        // Diese Methode gibt die Position relativ zum Fenster zurück
-        // Funktioniert in MAUI meist am besten über diese Hilfskonstruktion:
         var result = new Point(0, 0);
         var parent = element;
 
         while (parent != null)
         {
             result = result.Offset(parent.X, parent.Y);
-            // Shell-Besonderheit: Toolbar-Elemente haben oft keinen Parent mehr nach dem TitleView
             parent = parent.Parent as VisualElement;
         }
         return result;
@@ -56,14 +48,9 @@ public partial class TooltipOverlay : SKCanvasView
 
         Dispatcher.Dispatch(() =>
         {
-            // 1. Position des Buttons auf dem gesamten Fenster
             var anchorPos = GetAbsolutePosition(AnchorElement);
-
-            // 2. Position des Skia-Canvas auf dem Fenster
             var canvasPos = GetAbsolutePosition(this);
 
-            // 3. Die Differenz ist der Punkt im Canvas
-            // Wir ziehen canvasPos ab, um den Versatz durch Toolbar/StatusBar zu eliminieren
             float localX = (float)(anchorPos.X - canvasPos.X);
             float localY = (float)(anchorPos.Y - canvasPos.Y);
 
@@ -143,12 +130,10 @@ public partial class TooltipOverlay : SKCanvasView
             targetX + offsetX + bubbleWidth,
             targetY + offsetY + bubbleHeight);
 
-        // --- MODERN: Pfad für die Blase mit SKPathBuilder ---
         var rectBuilder = new SKPathBuilder();
         rectBuilder.AddRoundRect(bubbleRect, cornerRadius, cornerRadius);
         using var rectPath = rectBuilder.Detach();
 
-        // --- MODERN: Pfad für die Spitze mit SKPathBuilder ---
         var tailBuilder = new SKPathBuilder();
         tailBuilder.MoveTo(skTargetPoint);
 
@@ -168,11 +153,9 @@ public partial class TooltipOverlay : SKCanvasView
         tailBuilder.Close();
         using var tailPath = tailBuilder.Detach();
 
-        // Pfade verschmelzen
         var combinedPath = rectPath.Op(tailPath, SKPathOp.Union);
         var finalPath = combinedPath ?? rectPath;
 
-        // Zeichnen
         using var fillPaint = new SKPaint { Color = SKColors.White, Style = SKPaintStyle.Fill, IsAntialias = true };
         canvas.DrawPath(finalPath, fillPaint);
 
@@ -187,7 +170,6 @@ public partial class TooltipOverlay : SKCanvasView
         canvas.DrawPath(finalPath, strokePaint);
 
         using var textPaint = new SKPaint { Color = SKColors.Black, IsAntialias = true };
-        // Text zeichnen (Nutze die Font-Instanz direkt)
         canvas.DrawText(Text, bubbleRect.Left + padding, bubbleRect.Bottom - padding, font, textPaint);
 
         combinedPath?.Dispose();

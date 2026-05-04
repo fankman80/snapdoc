@@ -979,6 +979,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Karte löschen ähnelt.
+        /// </summary>
+        internal static string karte_loeschen {
+            get {
+                return ResourceManager.GetString("karte_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt speichern ähnelt.
         /// </summary>
         internal static string kartenausschnitt_speichern {

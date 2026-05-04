@@ -12,6 +12,8 @@
                                Color="White" 
                                Scale="1" />
             <Label x:Name="BusyTextLabel"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
                    Text="Daten werden geladen..." 
                    TextColor="White" 
                    FontSize="20" />

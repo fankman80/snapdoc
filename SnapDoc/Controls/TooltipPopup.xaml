@@ -8,7 +8,7 @@
 
     <Grid>
         <controls:TooltipOverlay    
-            x:Name="SkiaOverlay"
+            x:Name="SkiaOverlay"            
             InputTransparent="True" 
             HorizontalOptions="Fill" 
             VerticalOptions="Fill" />

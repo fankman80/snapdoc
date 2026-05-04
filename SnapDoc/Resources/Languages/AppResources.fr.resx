@@ -523,7 +523,7 @@
     <value>Aucun projet chargé</value>
   </data>
   <data name="projekt_wird_geladen" xml:space="preserve">
-    <value>Le projet est en cours de chargement...</value>
+    <value>Chargement du projet...</value>
   </data>
   <data name="titel_eingeben" xml:space="preserve">
     <value>(Saisissez le titre...)</value>
@@ -863,5 +863,8 @@
   </data>
   <data name="templates_reset_success" xml:space="preserve">
     <value>Les modèles ont été réinitialisés aux valeurs par défaut.</value>
+  </data>
+  <data name="karte_loeschen" xml:space="preserve">
+    <value>Supprimer la carte</value>
   </data>
 </root>

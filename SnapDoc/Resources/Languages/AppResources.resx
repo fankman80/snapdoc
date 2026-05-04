@@ -864,4 +864,7 @@
   <data name="templates_reset_success" xml:space="preserve">
     <value>Die Templates wurden auf die Standardwerte zurückgesetzt.</value>
   </data>
+  <data name="karte_loeschen" xml:space="preserve">
+    <value>Karte löschen</value>
+  </data>
 </root>
