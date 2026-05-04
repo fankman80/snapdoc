@@ -73,11 +73,11 @@
                           Source="north_arrow.svg"
                           TintColor="{DynamicResource Primary}"
                           TargetHexColor="#ff0000"
-                          WidthRequest="60"
-                          HeightRequest="60"
+                          WidthRequest="44"
+                          HeightRequest="44"
                           VerticalOptions="Start"
                           HorizontalOptions="End"
-                          Margin="0,60,14,0"
+                          Margin="0,60,22,0"
                           Aspect="AspectFit">
             <controls:SvgView.GestureRecognizers>
                 <TapGestureRecognizer Tapped="OnResetRotationClicked" />

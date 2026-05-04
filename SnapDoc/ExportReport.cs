@@ -20,7 +20,6 @@ public partial class ExportReport
     [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList|pin_posImage|pin_posIcon)(?:/(?<w>\d+))?(?:/(?<h>\d+))?\}")]
     private static partial Regex UniversalImageRegex();
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
-    private record ImageTagData(string Type, SizeF Size, string FullMatch);
     private static readonly Dictionary<string, string> imageRelationshipIds = [];
     private static string storeItemId;
     private record FotoWorkItem(string SourcePath, string TargetPath, float CompressValue);
@@ -38,13 +37,13 @@ public partial class ExportReport
         // Platzhalter
         Dictionary<string, string> placeholders = new()
         {
-            {"${client_name}", GlobalJson.Data.Client_name},
+            {"${client_name}", GlobalJson.Data.Client_name.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
             {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${working_title}", GlobalJson.Data.Working_title},
-            {"${project_nr}", GlobalJson.Data.Project_nr},
-            {"${object_name}", GlobalJson.Data.Object_name},
+            {"${working_title}", GlobalJson.Data.Working_title.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
+            {"${project_nr}", GlobalJson.Data.Project_nr.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
+            {"${object_name}", GlobalJson.Data.Object_name.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
             {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
-            {"${project_manager}", GlobalJson.Data.Project_manager},
+            {"${project_manager}", GlobalJson.Data.Project_manager.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
             {"${title_image/", "${title_image/"}, 
             {"${plan_indexes}", "${plan_indexes}"},
             {"${plan_images/", "${plan_images/"},
@@ -283,7 +282,6 @@ public partial class ExportReport
                                                                     if (pinImgElement != null)
                                                                         newParagraph.Append(new Run(pinImgElement));
                                                                 }
-
                                                                 newParagraph.Append(new Run(new Break()));
                                                             }
                                                         }
@@ -459,7 +457,7 @@ public partial class ExportReport
                         // Plan Images
                         if (imageMatch.Success && imageMatch.Value.Contains("plan_images") && SettingsService.Instance.IsPlanExport)
                         {
-                            string fullPlaceholder = imageMatch.Value; // Das ist z.B. "${plan_images/380/230}"
+                            string fullPlaceholder = imageMatch.Value;
                             var textNode = para.Descendants<Text>().FirstOrDefault(t => t.Text.Contains("${plan_images"));
                             RunProperties originalProperties = null;
                             if (textNode?.Parent is Run parentRun)
@@ -1211,20 +1209,6 @@ public partial class ExportReport
         int newHeight = (int)(originalSize.Height * scale);
 
         return new SizeF(newWidth, newHeight);
-    }
-
-    private static SizeF ExtractDimensions(string input)
-    {
-        Regex regex = UniversalImageRegex();
-        Match match = regex.Match(input);
-
-        if (match.Success)
-        {
-            int width = int.Parse(match.Groups[1].Value);
-            int height = int.Parse(match.Groups[2].Value);
-            return new SizeF(width, height);
-        }
-        return new SizeF(250, 140);
     }
 
     private static ImagePlaceholderData GetPlaceholderData(string text)
