@@ -260,6 +260,9 @@ public partial class ImageViewPage : IQueryAttributable
         await Shell.Current.GoToAsync($"..");
     }
 
+    private async void DrawingClicked(object sender, EventArgs e)
+    => await StartDrawing();
+
     private void DrawFreeClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Free);
 
@@ -383,7 +386,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawingView?.InvalidateSurface();
     }
 
-    private async void DrawingClicked(object sender, EventArgs e)
+    private async Task StartDrawing()
     {
         if (drawMode != DrawMode.None)
             return;

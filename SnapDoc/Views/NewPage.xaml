@@ -286,36 +286,6 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="TextClicked"/>
-                <HorizontalStackLayout x:Name="ButtonContainer">
-                    <Button x:Name="DrawRectBtn"
-                            IsVisible="true" 
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"                       
-                            Clicked="MenuButtonClicked"
-                            Style="{StaticResource ToolButtonStyle}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"/>
-
-                    <Button x:Name="DrawPolyBtn"
-                            IsVisible="false"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Polyline}}"                            
-                            Clicked="MenuButtonClicked"
-                            Style="{StaticResource ToolButtonStyle}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"/>
-
-                    <Button x:Name="DrawArrowBtn"
-                            IsVisible="false"
-                            Rotation="90"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Arrow_shape_up}}"                         
-                            Clicked="MenuButtonClicked"
-                            Style="{StaticResource ToolButtonStyle}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.pfeil_zeichnen}"/>
-
-                    <Button x:Name="DrawFreeBtn"
-                            IsVisible="false"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
-                            Clicked="MenuButtonClicked"
-                            Style="{StaticResource ToolButtonStyle}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"/>
-                </HorizontalStackLayout>
                 <AbsoluteLayout x:DataType="views:NewPage">
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                             Style="{StaticResource ToolButtonStyle}"
@@ -354,6 +324,36 @@
                         </Border.Shadow>
                     </Border>
                 </AbsoluteLayout>
+                <HorizontalStackLayout x:Name="ButtonContainer">
+                    <Button x:Name="DrawRectBtn"
+                            IsVisible="true" 
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"                       
+                            Clicked="MenuButtonClicked"
+                            Style="{StaticResource ToolButtonStyle}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"/>
+
+                    <Button x:Name="DrawPolyBtn"
+                            IsVisible="false"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Polyline}}"                            
+                            Clicked="MenuButtonClicked"
+                            Style="{StaticResource ToolButtonStyle}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"/>
+
+                    <Button x:Name="DrawArrowBtn"
+                            IsVisible="false"
+                            Rotation="90"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Arrow_shape_up}}"                         
+                            Clicked="MenuButtonClicked"
+                            Style="{StaticResource ToolButtonStyle}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.pfeil_zeichnen}"/>
+
+                    <Button x:Name="DrawFreeBtn"
+                            IsVisible="false"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
+                            Clicked="MenuButtonClicked"
+                            Style="{StaticResource ToolButtonStyle}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"/>
+                </HorizontalStackLayout>
                 <Button HorizontalOptions="Start"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                         BackgroundColor="LimeGreen"

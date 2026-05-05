@@ -803,12 +803,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private async void DrawingClicked(object sender, EventArgs e)
+    private async Task StartDrawing(bool setDefaultMode = true)
     {
-        if (drawMode != DrawMode.None && sender != null)
-            return;
-
-        bool shouldReset = (sender != null);
+        bool shouldReset = setDefaultMode;
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
@@ -852,8 +849,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 );
 
                 drawingController.InitialRotation = (float)planContainer.Rotation;
-                _activeButton = DrawRectBtn;
-                SetDrawMode(DrawMode.Rect);
                 drawingView.InvalidateSurface();
             }
             catch
@@ -862,7 +857,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 ToolBtns.IsVisible = false;
             }
         });
+
+        if (setDefaultMode)
+        {
+            _activeButton = DrawRectBtn;
+            SetDrawMode(DrawMode.Rect);
+        }
     }
+
+    private async void DrawingClicked(object sender, EventArgs e)
+        => await StartDrawing();
 
     private void DrawFreeClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Free);
@@ -946,43 +950,32 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void SetDrawMode(DrawMode mode)
     {
-        bool activate = drawMode != mode;
+        if (mode == DrawMode.None) return;
 
-        // DrawMode setzen
-        drawMode = activate ? mode : DrawMode.None;
-        drawingController.DrawMode = drawMode;
+        drawMode = mode;
+        drawingController.DrawMode = mode;
 
-        // Aktiver Button
-        if (activate)
+        _activeButton = mode switch
         {
-            switch (mode)
-            {
-                case DrawMode.Free:
-                    AddTextBtn.IsVisible = false;
-                    break;
+            DrawMode.Rect => DrawRectBtn,
+            DrawMode.Poly => DrawPolyBtn,
+            DrawMode.Arrow => DrawArrowBtn,
+            DrawMode.Free => DrawFreeBtn,
+            _ => _activeButton
+        };
 
-                case DrawMode.Poly:
-                    AddTextBtn.IsVisible = false;
-                    break;
+        AddTextBtn.IsVisible = (mode == DrawMode.Rect);
 
-                case DrawMode.Rect:
-                    AddTextBtn.IsVisible= true;
-                    break;
-                        
-                case DrawMode.Arrow:
-                    AddTextBtn.IsVisible = false;
-                    break;
-            }
-        }
-
-        // Handles
         var combined = drawingController.CombinedDrawable;
         if (combined != null)
         {
-            combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
-            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rect;
-            combined.ArrowDrawable?.DisplayHandles = activate && mode == DrawMode.Arrow;
+            combined.PolyDrawable.DisplayHandles = (mode == DrawMode.Poly);
+            combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
+            combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
+
+        if (!_isMenuExpanded)
+            _ = CollapseMenu();
 
         drawingView?.InvalidateSurface();
     }
@@ -1192,7 +1185,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         doubleTappedPin = null;
     }
 
-    private void LoadCustomPinClicked(object sender, EventArgs e)
+    private async void LoadCustomPinClicked(object sender, EventArgs e)
     {
         if (!thisPlan.Pins[doubleTappedPin.AutomationId].IsCustomPin)
             return;
@@ -1206,7 +1199,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             planContainer.IsPanningEnabled = true;
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
-            DrawingClicked(null, null);
+            await StartDrawing(false);
             ZoomToPin(doubleTappedPin.AutomationId, 1 / thisPlan.Pins[doubleTappedPin.AutomationId].PinScale / Settings.DisplayDensity);
             drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
             planContainer.Rotation = -thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation + drawingController.InitialRotation;  
@@ -1220,6 +1213,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 lineWidth = (int)style.LineThickness;
                 strokeStyle = style.StrokeStyle;
             }
+
+            if (drawingController.DrawMode == DrawMode.Rect)
+                _activeButton = DrawRectBtn;
+            else if (drawingController.DrawMode == DrawMode.Poly)
+                _activeButton = DrawPolyBtn;
+            else if (drawingController.DrawMode == DrawMode.Arrow)
+                _activeButton = DrawArrowBtn;
+            else if (drawingController.DrawMode == DrawMode.Free)
+                _activeButton = DrawFreeBtn;
+
+            if (drawingController.DrawMode != DrawMode.None)
+                SetDrawMode(drawingController.DrawMode);
         }
     }
 

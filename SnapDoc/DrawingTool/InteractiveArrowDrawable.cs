@@ -20,7 +20,7 @@ public class InteractiveArrowDrawable
     public float Height { get; set; }
     public float ShaftFactor { get; set; } = 0.5f; // Dicke des Hinterteils (0 bis 1)
     public float TipFactor { get; set; } = 0.3f;   // Länge der Spitze (0 bis 1)
-    private static SKBitmap? _rotationHandleBitmap;
+    private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private float _allowedAngleRad;
     public float AllowedAngleRad
@@ -116,7 +116,7 @@ public class InteractiveArrowDrawable
 
     private static async Task EnsureRotationHandleLoaded()
     {
-        if (_rotationHandleBitmap != null || _isLoading)
+        if (_rotationHandleImage != null || _isLoading)
             return;
 
         _isLoading = true;
@@ -124,7 +124,12 @@ public class InteractiveArrowDrawable
         try
         {
             using var stream = await FileSystem.OpenAppPackageFileAsync("rotate_option.png");
-            _rotationHandleBitmap = SKBitmap.Decode(stream);
+            using var tempBitmap = SKBitmap.Decode(stream);
+            _rotationHandleImage = SKImage.FromBitmap(tempBitmap);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Handles: {ex.Message}");
         }
         finally
         {
@@ -224,19 +229,21 @@ public class InteractiveArrowDrawable
         // Form-Handle (Schaft/Spitze)
         canvas.DrawCircle(ShapeHandle, PointRadius * density, handlePaint);
 
-        if (_rotationHandleBitmap != null)
+        if (_rotationHandleImage != null) // Prüfung auf das geladene Image
         {
-#pragma warning disable CS0618 // FilterQuality ist veraltet, aber nötig
-            var paint = new SKPaint { IsAntialias = true, FilterQuality = SKFilterQuality.High };
-#pragma warning restore CS0618
+            using var paint = new SKPaint { IsAntialias = true };
+
             float size = PointRadius * (float)Settings.DisplayDensity * 4;
-            var destArrow = new SKRect(
+            var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
                 RotationHandle.X + size / 2f,
                 RotationHandle.Y + size / 2f
             );
-            canvas.DrawBitmap(_rotationHandleBitmap, destArrow, paint);
+
+            var sampling = new SKSamplingOptions(SKCubicResampler.Mitchell);
+
+            canvas.DrawImage(_rotationHandleImage, destRect, sampling, paint);
         }
     }
 

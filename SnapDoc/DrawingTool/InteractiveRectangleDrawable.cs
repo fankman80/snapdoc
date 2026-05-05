@@ -26,7 +26,7 @@ public class InteractiveRectangleDrawable
     public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
     public bool AutoSizeText { get; set; } = true;
     public int TextPadding { get; set; } = 10;
-    private static SKBitmap? _rotationHandleBitmap;
+    private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private float _allowedAngleRad;
     public float AllowedAngleRad
@@ -77,7 +77,7 @@ public class InteractiveRectangleDrawable
 
     private static async Task EnsureRotationHandleLoaded()
     {
-        if (_rotationHandleBitmap != null || _isLoading)
+        if (_rotationHandleImage != null || _isLoading)
             return;
 
         _isLoading = true;
@@ -85,7 +85,12 @@ public class InteractiveRectangleDrawable
         try
         {
             using var stream = await FileSystem.OpenAppPackageFileAsync("rotate_option.png");
-            _rotationHandleBitmap = SKBitmap.Decode(stream);
+            using var tempBitmap = SKBitmap.Decode(stream);
+            _rotationHandleImage = SKImage.FromBitmap(tempBitmap);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Handles: {ex.Message}");
         }
         finally
         {
@@ -165,11 +170,10 @@ public class InteractiveRectangleDrawable
         foreach (var p in pts)
             canvas.DrawCircle(p, PointRadius * (float)Settings.DisplayDensity, handlePaint);
 
-        if (_rotationHandleBitmap != null)
+        if (_rotationHandleImage != null) // Prüfung auf das geladene Image
         {
-#pragma warning disable CS0618 // FilterQuality ist veraltet, aber nötig
-            var paint = new SKPaint { IsAntialias = true, FilterQuality = SKFilterQuality.High };
-#pragma warning restore CS0618
+            using var paint = new SKPaint { IsAntialias = true };
+
             float size = PointRadius * (float)Settings.DisplayDensity * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
@@ -177,7 +181,10 @@ public class InteractiveRectangleDrawable
                 RotationHandle.X + size / 2f,
                 RotationHandle.Y + size / 2f
             );
-            canvas.DrawBitmap(_rotationHandleBitmap, destRect, paint);
+
+            var sampling = new SKSamplingOptions(SKCubicResampler.Mitchell);
+
+            canvas.DrawImage(_rotationHandleImage, destRect, sampling, paint);
         }
     }
 

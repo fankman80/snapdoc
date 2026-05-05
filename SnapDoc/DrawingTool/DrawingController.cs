@@ -618,20 +618,37 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public void LoadFromFile(string path, SKPoint position)
     {
         CombinedDrawable ??= new CombinedDrawable
-            {
-                FreeDrawable = new InteractiveFreehandDrawable(),
-                PolyDrawable = new InteractivePolylineDrawable(),
-                RectDrawable = new InteractiveRectangleDrawable(),
-                ArrowDrawable = new InteractiveArrowDrawable()
-            };
+        {
+            FreeDrawable = new InteractiveFreehandDrawable(),
+            PolyDrawable = new InteractivePolylineDrawable(),
+            RectDrawable = new InteractiveRectangleDrawable(),
+            ArrowDrawable = new InteractiveArrowDrawable()
+        };
 
+        // Wir laden das DTO und befüllen das CombinedDrawable
         var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position, this);
-        InitialRotation = dto.InitialRotation;
-        LoadedStyle = dto.Style;
 
-        DrawMode = DrawMode.None;
+        if (dto != null)
+        {
+            InitialRotation = dto.InitialRotation;
+            LoadedStyle = dto.Style;
+
+            if (dto.Rect != null)
+                DrawMode = DrawMode.Rect;
+            else if (dto.Poly != null)
+                DrawMode = DrawMode.Poly;
+            else if (dto.Arrow != null)
+                DrawMode = DrawMode.Arrow;
+            else if (dto.Free != null)
+                DrawMode = DrawMode.Free;
+            else
+                DrawMode = DrawMode.None;
+        }
+        else
+            DrawMode = DrawMode.None;
+
         HideAllHandles();
-
+        UpdateHandleVisibility();
         canvasView?.InvalidateSurface();
     }
 
@@ -643,6 +660,16 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         CombinedDrawable.PolyDrawable?.DisplayHandles = false;
         CombinedDrawable.RectDrawable?.DisplayHandles = false;
         CombinedDrawable.ArrowDrawable?.DisplayHandles = false;
+    }
+
+    private void UpdateHandleVisibility()
+    {
+        if (CombinedDrawable == null) return;
+
+        // Nur die Handles des aktiven Modus einblenden
+        CombinedDrawable.RectDrawable.DisplayHandles = (DrawMode == DrawMode.Rect);
+        CombinedDrawable.PolyDrawable.DisplayHandles = (DrawMode == DrawMode.Poly);
+        CombinedDrawable.ArrowDrawable.DisplayHandles = (DrawMode == DrawMode.Arrow);
     }
 
 
