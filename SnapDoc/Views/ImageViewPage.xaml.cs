@@ -21,6 +21,8 @@ public partial class ImageViewPage : IQueryAttributable
     private bool hasFittedImage = false;
     private double minScale = 0.1;
     private readonly TransformViewModel fotoContainer;
+    private bool _isMenuExpanded = false;
+    private Microsoft.Maui.Controls.Button _activeButton;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -86,6 +88,8 @@ public partial class ImageViewPage : IQueryAttributable
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
 
         drawingController = new DrawingController(fotoContainer);
+
+        _activeButton = DrawRectBtn;
     }
 
     protected override void OnAppearing()
@@ -268,6 +272,74 @@ public partial class ImageViewPage : IQueryAttributable
     private void DrawArrowClicked(object sender, EventArgs e)
     => SetDrawMode(DrawMode.Arrow);
 
+    private async void MenuButtonClicked(object sender, EventArgs e)
+    {
+        if (sender is not Microsoft.Maui.Controls.Button clickedButton) return;
+
+        if (!_isMenuExpanded)
+        {
+            await ExpandMenu();
+        }
+        else
+        {
+            _activeButton = clickedButton;
+            await CollapseMenu();
+
+            ExecuteDrawingLogic(clickedButton);
+        }
+    }
+
+    private async Task ExpandMenu()
+    {
+        _isMenuExpanded = true;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                btn.IsVisible = true;
+                btn.Opacity = 0;
+                // Kleiner Fade-In Effekt
+                _ = btn.FadeToAsync(1, 200, Easing.CubicOut);
+            }
+        }
+    }
+
+    private async Task CollapseMenu()
+    {
+        _isMenuExpanded = false;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                if (btn == _activeButton)
+                {
+                    btn.IsVisible = true;
+                    btn.Opacity = 1;
+                }
+                else
+                {
+                    _ = btn.FadeToAsync(0, 200, Easing.CubicIn);
+                    btn.Dispatcher.Dispatch(async () =>
+                    {
+                        await Task.Delay(200);
+                        if (!_isMenuExpanded)
+                            btn.IsVisible = false;
+                    });
+                }
+            }
+        }
+    }
+
+    private void ExecuteDrawingLogic(Microsoft.Maui.Controls.Button btn)
+    {
+        if (btn == DrawRectBtn) DrawRectClicked(btn, EventArgs.Empty);
+        else if (btn == DrawPolyBtn) DrawPolyClicked(btn, EventArgs.Empty);
+        else if (btn == DrawArrowBtn) DrawArrowClicked(btn, EventArgs.Empty);
+        else if (btn == DrawFreeBtn) DrawFreeClicked(btn, EventArgs.Empty);
+    }
+
     private void SetDrawMode(DrawMode mode)
     {
         bool activate = drawMode != mode;
@@ -276,12 +348,6 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = activate ? mode : DrawMode.None;
         drawingController.DrawMode = drawMode;
 
-        // Buttons reset
-        DrawFreeBtn.CornerRadius = 30;
-        DrawPolyBtn.CornerRadius = 30;
-        DrawRectBtn.CornerRadius = 30;
-        DrawArrowBtn.CornerRadius = 30;
-
         // Aktiver Button
         if (activate)
         {
@@ -289,30 +355,18 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 case DrawMode.Free:
                     AddTextBtn.IsVisible = false;
-                    DrawFreeBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Poly:
                     AddTextBtn.IsVisible = false;
-                    DrawPolyBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Rect:
                     AddTextBtn.IsVisible = true;
-                    DrawRectBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Arrow:
-                    AddTextBtn.IsVisible = true;
-                    DrawArrowBtn.CornerRadius = 10;
-                    break;
-
-                case DrawMode.None:
                     AddTextBtn.IsVisible = false;
-                    DrawPolyBtn.CornerRadius = 30;
-                    DrawFreeBtn.CornerRadius = 30;
-                    DrawRectBtn.CornerRadius = 30;
-                    DrawArrowBtn.CornerRadius = 30;
                     break;
             }
         }
@@ -371,8 +425,8 @@ public partial class ImageViewPage : IQueryAttributable
                     forceReset: true
                 );
 
-                drawingController.DrawMode = DrawMode.None;
-                drawMode = DrawMode.None;
+                _activeButton = DrawRectBtn;
+                SetDrawMode(DrawMode.Rect);
             }
             catch
             {
@@ -384,7 +438,6 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        SetDrawMode(DrawMode.None);
         drawingController.Reset();
 
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)

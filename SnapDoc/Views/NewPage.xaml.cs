@@ -1,6 +1,5 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
 using Microsoft.Maui.Platform;
@@ -41,6 +40,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double minScale = 0.1;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
+    private bool _isMenuExpanded = false;
+    private Microsoft.Maui.Controls.Button _activeButton;
 
 #if WINDOWS
     private Point mousePos;
@@ -109,6 +110,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         drawingController = new DrawingController(planContainer);
         thisPlan = GlobalJson.Data.Plans[planId];
+        _activeButton = DrawRectBtn;
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
@@ -850,8 +852,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 );
 
                 drawingController.InitialRotation = (float)planContainer.Rotation;
-                drawingController.DrawMode = DrawMode.None;
-                drawMode = DrawMode.None;
+                _activeButton = DrawRectBtn;
+                SetDrawMode(DrawMode.Rect);
                 drawingView.InvalidateSurface();
             }
             catch
@@ -874,6 +876,74 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawArrowClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Arrow);
 
+    private async void MenuButtonClicked(object sender, EventArgs e)
+    {
+        if (sender is not Microsoft.Maui.Controls.Button clickedButton) return;
+
+        if (!_isMenuExpanded)
+        {
+            await ExpandMenu();
+        }
+        else
+        {
+            _activeButton = clickedButton;
+            await CollapseMenu();
+
+            ExecuteDrawingLogic(clickedButton);
+        }
+    }
+
+    private async Task ExpandMenu()
+    {
+        _isMenuExpanded = true;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                btn.IsVisible = true;
+                btn.Opacity = 0;
+                // Kleiner Fade-In Effekt
+                _ = btn.FadeToAsync(1, 200, Easing.CubicOut);
+            }
+        }
+    }
+
+    private async Task CollapseMenu()
+    {
+        _isMenuExpanded = false;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                if (btn == _activeButton)
+                {
+                    btn.IsVisible = true;
+                    btn.Opacity = 1;
+                }
+                else
+                {
+                    _ = btn.FadeToAsync(0, 200, Easing.CubicIn);
+                    btn.Dispatcher.Dispatch(async () =>
+                    {
+                        await Task.Delay(200);
+                        if (!_isMenuExpanded)
+                            btn.IsVisible = false;
+                    });
+                }
+            }
+        }
+    }
+
+    private void ExecuteDrawingLogic(Microsoft.Maui.Controls.Button btn)
+    {
+        if (btn == DrawRectBtn) DrawRectClicked(btn, EventArgs.Empty);
+        else if (btn == DrawPolyBtn) DrawPolyClicked(btn, EventArgs.Empty);
+        else if (btn == DrawArrowBtn) DrawArrowClicked(btn, EventArgs.Empty);
+        else if (btn == DrawFreeBtn) DrawFreeClicked(btn, EventArgs.Empty);
+    }
+
     private void SetDrawMode(DrawMode mode)
     {
         bool activate = drawMode != mode;
@@ -882,12 +952,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = activate ? mode : DrawMode.None;
         drawingController.DrawMode = drawMode;
 
-        // Buttons reset
-        DrawFreeBtn.CornerRadius = 30;
-        DrawPolyBtn.CornerRadius = 30;
-        DrawRectBtn.CornerRadius = 30;
-        DrawArrowBtn.CornerRadius = 30;
-
         // Aktiver Button
         if (activate)
         {
@@ -895,30 +959,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 case DrawMode.Free:
                     AddTextBtn.IsVisible = false;
-                    DrawFreeBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Poly:
                     AddTextBtn.IsVisible = false;
-                    DrawPolyBtn.CornerRadius = 10;
                     break;
 
                 case DrawMode.Rect:
                     AddTextBtn.IsVisible= true;
-                    DrawRectBtn.CornerRadius = 10;
                     break;
                         
                 case DrawMode.Arrow:
-                    AddTextBtn.IsVisible = true;
-                    DrawArrowBtn.CornerRadius = 10;
-                    break;
-
-                case DrawMode.None:
                     AddTextBtn.IsVisible = false;
-                    DrawPolyBtn.CornerRadius = 30;
-                    DrawFreeBtn.CornerRadius = 30;
-                    DrawRectBtn.CornerRadius = 30;
-                    DrawArrowBtn.CornerRadius = 30;
                     break;
             }
         }
@@ -937,7 +989,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void EraseClicked(object sender, EventArgs e)
     {
-        SetDrawMode(DrawMode.None);
         drawingController.Reset();
     }
 

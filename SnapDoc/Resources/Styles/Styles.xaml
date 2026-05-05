@@ -8,6 +8,15 @@
     <x:String x:Key="AppFontFamily">OpenSansRegular</x:String>
     <x:Double x:Key="AppFontSizeNormal">14</x:Double>
 
+    <Style x:Key="ToolButtonStyle" TargetType="Button">
+        <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
+        <Setter Property="TextColor" Value="{DynamicResource PrimaryDarkText}" />
+        <Setter Property="WidthRequest" Value="60" />
+        <Setter Property="HeightRequest" Value="60" />
+        <Setter Property="CornerRadius" Value="30" />
+        <Setter Property="Padding" Value="0" />
+    </Style>
+    
     <Style TargetType="ActivityIndicator">
         <Setter Property="Color" Value="{AppThemeBinding Light={StaticResource Primary}, Dark={StaticResource White}}" />
     </Style>

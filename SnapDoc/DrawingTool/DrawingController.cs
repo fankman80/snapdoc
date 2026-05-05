@@ -3,7 +3,6 @@ using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using Svg.Model.Drawables.Elements;
 
 namespace SnapDoc.DrawingTool;
 

@@ -867,4 +867,7 @@
   <data name="karte_loeschen" xml:space="preserve">
     <value>Karte löschen</value>
   </data>
+  <data name="pfeil_zeichnen" xml:space="preserve">
+    <value>Pfeil zeichnen</value>
+  </data>
 </root>

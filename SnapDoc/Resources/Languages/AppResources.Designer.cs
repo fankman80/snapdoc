@@ -1375,6 +1375,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pfeil zeichnen ähnelt.
+        /// </summary>
+        internal static string pfeil_zeichnen {
+            get {
+                return ResourceManager.GetString("pfeil_zeichnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf folgenden Plan kopieren ähnelt.
         /// </summary>
         internal static string pin_auf_plan_kopieren {
