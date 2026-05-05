@@ -841,7 +841,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     SelectedFillColor.ToSKColor(),
                     SelectedTextColor.ToSKColor(),
                     (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-                    (float)SettingsService.Instance.PolyLineHandleRadius,
+                    (float)SettingsService.Instance.PolyLineHandleRadius,                    
                     SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                     SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                     false,
@@ -871,6 +871,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawRectClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Rect);
 
+    private void DrawArrowClicked(object sender, EventArgs e)
+        => SetDrawMode(DrawMode.Arrow);
+
     private void SetDrawMode(DrawMode mode)
     {
         bool activate = drawMode != mode;
@@ -883,6 +886,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         DrawFreeBtn.CornerRadius = 30;
         DrawPolyBtn.CornerRadius = 30;
         DrawRectBtn.CornerRadius = 30;
+        DrawArrowBtn.CornerRadius = 30;
 
         // Aktiver Button
         if (activate)
@@ -903,12 +907,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     AddTextBtn.IsVisible= true;
                     DrawRectBtn.CornerRadius = 10;
                     break;
+                        
+                case DrawMode.Arrow:
+                    AddTextBtn.IsVisible = true;
+                    DrawArrowBtn.CornerRadius = 10;
+                    break;
 
                 case DrawMode.None:
                     AddTextBtn.IsVisible = false;
                     DrawPolyBtn.CornerRadius = 30;
                     DrawFreeBtn.CornerRadius = 30;
                     DrawRectBtn.CornerRadius = 30;
+                    DrawArrowBtn.CornerRadius = 30;
                     break;
             }
         }
@@ -919,6 +929,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
             combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rect;
+            combined.ArrowDrawable?.DisplayHandles = activate && mode == DrawMode.Arrow;
         }
 
         drawingView?.InvalidateSurface();

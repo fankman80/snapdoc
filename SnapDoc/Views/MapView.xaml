@@ -133,6 +133,7 @@
                                Spacing="14"
                                Padding="14">
             <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    Padding="0"
                     HorizontalOptions="End"
                     WidthRequest="60"
                     HeightRequest="60"

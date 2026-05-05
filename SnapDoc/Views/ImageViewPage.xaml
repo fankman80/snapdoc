@@ -88,6 +88,7 @@
         </mr:ContentView>
 
         <Button x:Name="DrawBtn" ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
+                Padding="0"
                 BackgroundColor="{DynamicResource Primary}"
                 TextColor="{DynamicResource PrimaryDarkText}"
                 Margin="0,0,20,20"
@@ -110,6 +111,7 @@
                                  AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                  AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
+                        Padding="0"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -118,6 +120,7 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
                 <Button x:Name="AddTextBtn"
+                        Padding="0"
                         IsVisible="False"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
                         BackgroundColor="{DynamicResource Primary}"
@@ -129,6 +132,7 @@
                         Clicked="TextClicked"/>
                 <AbsoluteLayout x:DataType="views:ImageViewPage">
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
+                            Padding="0"
                             BackgroundColor="{DynamicResource Primary}"
                             TextColor="{DynamicResource PrimaryDarkText}"
                             WidthRequest="60"
@@ -170,6 +174,7 @@
                     </Border>
                 </AbsoluteLayout>
                 <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
+                        Padding="0"
                         BackgroundColor="LimeGreen"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         WidthRequest="60"
@@ -183,6 +188,7 @@
                                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                    AbsoluteLayout.LayoutFlags="PositionProportional">
                 <Button x:Name="DrawRectBtn"
+                        Padding="0"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Activity_zone}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
@@ -192,6 +198,7 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"
                         Clicked="DrawRectClicked"/>
                 <Button x:Name="DrawPolyBtn"
+                        Padding="0"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined,Glyph={x:Static local:MaterialIcons.Polyline}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"
@@ -200,7 +207,18 @@
                         CornerRadius="30"
                         ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"
                         Clicked="DrawPolyClicked"/>
+                <Button x:Name="DrawArrowBtn"
+                        Rotation="90"
+                        Padding="0"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=44, Glyph={x:Static local:MaterialIcons.Arrow_shape_up}}"
+                        BackgroundColor="{DynamicResource Primary}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        WidthRequest="60"
+                        HeightRequest="60"
+                        CornerRadius="30"
+                        Clicked="DrawArrowClicked"/>
                 <Button x:Name="DrawFreeBtn"
+                        Padding="0"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Gesture}}"
                         BackgroundColor="{DynamicResource Primary}"
                         TextColor="{DynamicResource PrimaryDarkText}"

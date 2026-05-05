@@ -70,6 +70,18 @@ public static class DrawingMapper
                             p.X - bounds.Left,
                             p.Y - bounds.Top))]
                 }
+                : null,
+
+            // ---------------- ARROW ----------------
+            Arrow = d.ArrowDrawable?.IsDrawn == true
+                ? new ArrowDto
+                {
+                    RotationDeg = NormalizeAngleDeg(d.ArrowDrawable.AllowedAngleDeg - initialRotation),
+                    Points = [.. d.ArrowDrawable.Points
+                        .Select(p => new PointDto(
+                            p.X - bounds.Left,
+                            p.Y - bounds.Top))]
+                }
                 : null
         };
     }
@@ -132,6 +144,26 @@ public static class DrawingMapper
             r.SetFromDrag(p0, p2);
             r.IsDrawn = true;
         }
+
+        // ---------------- ARROW ----------------
+        if (dto.Arrow != null)
+        {
+            var r = d.ArrowDrawable;
+            r.Reset();
+
+            r.AllowedAngleDeg = dto.InitialRotation + dto.Arrow.RotationDeg;
+
+            var p0 = new SKPoint(
+                dto.Arrow.Points[0].X + offset.X,
+                dto.Arrow.Points[0].Y + offset.Y);
+
+            var p2 = new SKPoint(
+                dto.Arrow.Points[2].X + offset.X,
+                dto.Arrow.Points[2].Y + offset.Y);
+
+            r.SetFromDrag(p0, p2);
+            r.IsDrawn = true;
+        }
     }
 
     static SKRect CalculateBounds(CombinedDrawable d)
@@ -141,6 +173,7 @@ public static class DrawingMapper
         points.AddRange(d.PolyDrawable.Points);
         points.AddRange(d.FreeDrawable.Points.SelectMany(s => s));
         points.AddRange(d.RectDrawable.Points);
+        points.AddRange(d.ArrowDrawable.Points);
 
         if (points.Count == 0)
             return SKRect.Empty;
@@ -180,6 +213,11 @@ public static class DrawingMapper
         d.RectDrawable.TextStyle = (RectangleTextStyle)s.TextStyle;
         d.RectDrawable.AutoSizeText = s.AutoSizeText;
         d.RectDrawable.TextPadding = s.TextPadding;
+
+        d.ArrowDrawable.LineColor = lineColor;
+        d.ArrowDrawable.FillColor = fillColor;
+        d.ArrowDrawable.LineThickness = s.LineThickness;
+        d.ArrowDrawable.StrokeStyle = s.StrokeStyle;
     }
 
     private static float NormalizeAngleDeg(float deg)
