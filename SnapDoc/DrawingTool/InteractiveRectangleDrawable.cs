@@ -127,7 +127,7 @@ public class InteractiveRectangleDrawable
         using var fillPaint = new SKPaint
         {
             Color = FillColor,
-            Style = SKPaintStyle.Fill, // "IsStroke = false" ist veraltet, nutze Style
+            Style = SKPaintStyle.Fill,
             IsAntialias = true
         };
 
