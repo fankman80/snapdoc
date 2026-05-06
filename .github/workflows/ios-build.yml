@@ -22,10 +22,8 @@ jobs:
           dotnet workload install maui-ios
           dotnet workload restore
 
-      - name: Set up Xcode 26.4
-        uses: apple-actions/setup-xcode@v1
-        with:
-          xcode-version: '26.4' 
+      - name: List available Xcode versions
+        run: ls -d /Applications/Xcode* 
 
       - name: Import Certificate (.p12)
         run: |
