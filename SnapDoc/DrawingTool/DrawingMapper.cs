@@ -125,7 +125,7 @@ public static class DrawingMapper
         }
 
         // ---------------- RECT ----------------
-        if (dto.Rect != null && dto.Rect.Points.Count == 4)
+        if (dto.Rect != null)
         {
             var r = d.RectDrawable;
             r.Reset();
@@ -170,10 +170,17 @@ public static class DrawingMapper
     {
         var points = new List<SKPoint>();
 
-        points.AddRange(d.PolyDrawable.Points);
-        points.AddRange(d.FreeDrawable.Points.SelectMany(s => s));
-        points.AddRange(d.RectDrawable.Points);
-        points.AddRange(d.ArrowDrawable.Points);
+        if (d.PolyDrawable.HasContent)
+            points.AddRange(d.PolyDrawable.Points);
+
+        if (d.FreeDrawable.HasContent)
+            points.AddRange(d.FreeDrawable.Points.SelectMany(s => s));
+
+        if (d.RectDrawable.HasContent)
+            points.AddRange(d.RectDrawable.Points);
+
+        if (d.ArrowDrawable.HasContent)
+            points.AddRange(d.ArrowDrawable.Points);
 
         if (points.Count == 0)
             return SKRect.Empty;
@@ -183,6 +190,7 @@ public static class DrawingMapper
         var maxX = points.Max(p => p.X);
         var maxY = points.Max(p => p.Y);
 
+        // Erzeugt ein Rechteck von minX/minY bis maxX/maxY
         return SKRect.Create(minX, minY, maxX - minX, maxY - minY);
     }
 

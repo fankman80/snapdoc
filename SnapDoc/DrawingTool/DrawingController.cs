@@ -515,17 +515,17 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         var allPoints = new List<SKPoint>();
 
-        if (CombinedDrawable.PolyDrawable != null)
+        if (CombinedDrawable.PolyDrawable.HasContent)
             allPoints.AddRange(CombinedDrawable.PolyDrawable.Points);
 
-        if (CombinedDrawable.FreeDrawable != null)
+        if (CombinedDrawable.FreeDrawable.HasContent)
             foreach (var stroke in CombinedDrawable.FreeDrawable.Points)
                 allPoints.AddRange(stroke);
 
-        if (CombinedDrawable.RectDrawable is { IsDrawn: true, Points.Length: 4 })
+        if (CombinedDrawable.RectDrawable.HasContent)
             allPoints.AddRange(CombinedDrawable.RectDrawable.Points);
 
-        if (CombinedDrawable.ArrowDrawable is { IsDrawn: true })
+        if (CombinedDrawable.ArrowDrawable.HasContent)
             allPoints.AddRange(CombinedDrawable.ArrowDrawable.Points);
 
         if (allPoints.Count == 0)

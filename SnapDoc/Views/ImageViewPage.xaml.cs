@@ -277,7 +277,8 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async void MenuButtonClicked(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Button clickedButton) return;
+        if (sender is not Microsoft.Maui.Controls.Button clickedButton)
+            return;
 
         if (!_isMenuExpanded)
         {
@@ -287,7 +288,6 @@ public partial class ImageViewPage : IQueryAttributable
         {
             _activeButton = clickedButton;
             await CollapseMenu();
-
             ExecuteDrawingLogic(clickedButton);
         }
     }
@@ -295,6 +295,9 @@ public partial class ImageViewPage : IQueryAttributable
     private async Task ExpandMenu()
     {
         _isMenuExpanded = true;
+
+        // Zeichnen deaktivieren, solange das Menü offen ist
+        drawingView?.InputTransparent = true;
 
         foreach (var view in ButtonContainer.Children)
         {
@@ -308,9 +311,34 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private void SyncMenuStateInstant()
+    {
+        _isMenuExpanded = false;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                if (btn == _activeButton)
+                {
+                    btn.IsVisible = true;
+                    btn.Opacity = 1;
+                }
+                else
+                {
+                    btn.IsVisible = false;
+                    btn.Opacity = 0;
+                }
+            }
+        }
+    }
+
     private async Task CollapseMenu()
     {
         _isMenuExpanded = false;
+
+        // Zeichnen erst wieder erlauben, wenn das Menü schließt
+        drawingView?.InputTransparent = false;
 
         foreach (var view in ButtonContainer.Children)
         {
@@ -345,59 +373,52 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void SetDrawMode(DrawMode mode)
     {
-        bool activate = drawMode != mode;
+        if (mode == DrawMode.None) return;
 
-        // DrawMode setzen
-        drawMode = activate ? mode : DrawMode.None;
-        drawingController.DrawMode = drawMode;
+        drawMode = mode;
+        drawingController.DrawMode = mode;
 
-        // Aktiver Button
-        if (activate)
+        _activeButton = mode switch
         {
-            switch (mode)
-            {
-                case DrawMode.Free:
-                    AddTextBtn.IsVisible = false;
-                    break;
+            DrawMode.Rect => DrawRectBtn,
+            DrawMode.Poly => DrawPolyBtn,
+            DrawMode.Arrow => DrawArrowBtn,
+            DrawMode.Free => DrawFreeBtn,
+            _ => _activeButton
+        };
 
-                case DrawMode.Poly:
-                    AddTextBtn.IsVisible = false;
-                    break;
+        AddTextBtn.IsVisible = (mode == DrawMode.Rect);
 
-                case DrawMode.Rect:
-                    AddTextBtn.IsVisible = true;
-                    break;
-
-                case DrawMode.Arrow:
-                    AddTextBtn.IsVisible = false;
-                    break;
-            }
-        }
-
-        // Handles
         var combined = drawingController.CombinedDrawable;
         if (combined != null)
         {
-            combined.PolyDrawable?.DisplayHandles = activate && mode == DrawMode.Poly;
-            combined.RectDrawable?.DisplayHandles = activate && mode == DrawMode.Rect;
-            combined.ArrowDrawable?.DisplayHandles = activate && mode == DrawMode.Arrow;
+            combined.PolyDrawable.DisplayHandles = (mode == DrawMode.Poly);
+            combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
+            combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
+
+        if (!_isMenuExpanded)
+            _ = CollapseMenu();
 
         drawingView?.InvalidateSurface();
     }
 
-    private async Task StartDrawing()
+    private async Task StartDrawing(bool setDefaultMode = true)
     {
-        if (drawMode != DrawMode.None)
-            return;
+        if (setDefaultMode)
+        {
+            _activeButton = DrawRectBtn;
+            SetDrawMode(DrawMode.Rect);
+            SyncMenuStateInstant();
+        }
+
+        SettingsService.Instance.IsPinPlaceBtnManualHide = true;
+        DrawBtn.IsVisible = false;
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
             try
             {
-                DrawBtn.IsVisible = false;
-                ToolBtns.IsVisible = true;
-
                 var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
 
                 if (drawingView != null)
@@ -408,12 +429,21 @@ public partial class ImageViewPage : IQueryAttributable
                     drawingView = null;
                 }
 
+                if (setDefaultMode)
+                    drawingController.Reset();
+
                 drawingView = drawingController.CreateCanvasView();
+
+                // Wenn das Menü beim Start zu ist, Input erlauben
+                drawingView.InputTransparent = _isMenuExpanded;
+
+                drawingView.Opacity = 0;
                 absoluteLayout.Children.Add(drawingView);
+
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-                await Task.Delay(50);
+                ToolBtns.IsVisible = true;
 
                 drawingController.InitializeDrawing(
                     SelectedBorderColor.ToSKColor(),
@@ -428,11 +458,13 @@ public partial class ImageViewPage : IQueryAttributable
                     forceReset: true
                 );
 
-                _activeButton = DrawRectBtn;
-                SetDrawMode(DrawMode.Rect);
+                drawingView.InvalidateSurface();
+                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
+                drawingView.Opacity = 1;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Starten des Drawings: {ex.Message}");
                 DrawBtn.IsVisible = true;
                 ToolBtns.IsVisible = false;
             }

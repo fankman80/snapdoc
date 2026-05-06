@@ -1,9 +1,11 @@
-﻿using SkiaSharp;
+﻿using DocumentFormat.OpenXml.Drawing.Charts;
+using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
 public class InteractivePolylineDrawable
 {
+    public bool HasContent => Points != null && Points.Count > 1;
     public List<SKPoint> Points { get; set; } = [];
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
@@ -15,7 +17,6 @@ public class InteractivePolylineDrawable
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
-    public bool HasContent => Points.Count > 0;
 
     public void Draw(SKCanvas canvas)
     {

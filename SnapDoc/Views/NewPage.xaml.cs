@@ -805,11 +805,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task StartDrawing(bool setDefaultMode = true)
     {
-        bool shouldReset = setDefaultMode;
+        if (setDefaultMode)
+        {
+            _activeButton = DrawRectBtn;
+            SetDrawMode(DrawMode.Rect);
+            SyncMenuStateInstant();
+        }
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
-        ToolBtns.IsVisible = true;
 
         await MainThread.InvokeOnMainThreadAsync(async () =>
         {
@@ -825,13 +829,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     drawingView = null;
                 }
 
-                // 2. Canvas erzeugen und anhängen
+                if (setDefaultMode)
+                    drawingController.Reset();
+
                 drawingView = drawingController.CreateCanvasView();
+
+                // Wenn das Menü beim Start zu ist, Input erlauben
+                drawingView.InputTransparent = _isMenuExpanded;
+
+                drawingView.Opacity = 0;
                 absoluteLayout.Children.Add(drawingView);
+
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-                await Task.Delay(50);
+                ToolBtns.IsVisible = true;
 
                 drawingController.InitializeDrawing(
                     SelectedBorderColor.ToSKColor(),
@@ -840,29 +852,27 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     SelectedFillColor.ToSKColor(),
                     SelectedTextColor.ToSKColor(),
                     (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-                    (float)SettingsService.Instance.PolyLineHandleRadius,                    
+                    (float)SettingsService.Instance.PolyLineHandleRadius,
                     SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                     SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
                     false,
                     (float)planContainer.Rotation,
-                    shouldReset
+                    setDefaultMode
                 );
 
                 drawingController.InitialRotation = (float)planContainer.Rotation;
+
                 drawingView.InvalidateSurface();
+                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
+                drawingView.Opacity = 1;
             }
-            catch
+            catch (Exception ex)
             {
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Starten des Drawings: {ex.Message}");
                 DrawBtn.IsVisible = true;
                 ToolBtns.IsVisible = false;
             }
         });
-
-        if (setDefaultMode)
-        {
-            _activeButton = DrawRectBtn;
-            SetDrawMode(DrawMode.Rect);
-        }
     }
 
     private async void DrawingClicked(object sender, EventArgs e)
@@ -882,7 +892,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void MenuButtonClicked(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Button clickedButton) return;
+        if (sender is not Microsoft.Maui.Controls.Button clickedButton)
+            return;
 
         if (!_isMenuExpanded)
         {
@@ -892,7 +903,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             _activeButton = clickedButton;
             await CollapseMenu();
-
             ExecuteDrawingLogic(clickedButton);
         }
     }
@@ -900,6 +910,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async Task ExpandMenu()
     {
         _isMenuExpanded = true;
+
+        // Zeichnen deaktivieren, solange das Menü offen ist
+        drawingView?.InputTransparent = true;
 
         foreach (var view in ButtonContainer.Children)
         {
@@ -913,9 +926,34 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
+    private void SyncMenuStateInstant()
+    {
+        _isMenuExpanded = false;
+
+        foreach (var view in ButtonContainer.Children)
+        {
+            if (view is Microsoft.Maui.Controls.Button btn)
+            {
+                if (btn == _activeButton)
+                {
+                    btn.IsVisible = true;
+                    btn.Opacity = 1;
+                }
+                else
+                {
+                    btn.IsVisible = false;
+                    btn.Opacity = 0;
+                }
+            }
+        }
+    }
+
     private async Task CollapseMenu()
     {
         _isMenuExpanded = false;
+
+        // Zeichnen erst wieder erlauben, wenn das Menü schließt
+        drawingView?.InputTransparent = false;
 
         foreach (var view in ButtonContainer.Children)
         {
