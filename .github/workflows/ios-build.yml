@@ -22,8 +22,10 @@ jobs:
           dotnet workload install maui-ios
           dotnet workload restore
 
-      - name: List available Xcode versions
-        run: ls -d /Applications/Xcode* 
+      - name: Select Xcode
+        run: |
+          sudo xcode-select -s /Applications/Xcode_26.3.app
+          xcodebuild -version
 
       - name: Import Certificate (.p12)
         run: |
