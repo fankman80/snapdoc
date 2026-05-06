@@ -19,7 +19,7 @@ jobs:
 
       - name: Select Xcode
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          sudo xcode-select -s /Applications/Xcode_26.4.app
           xcodebuild -version
 
       - name: Install MAUI Workloads
