@@ -134,7 +134,7 @@
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.51" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
-		<PackageReference Include="Sentry.Maui" Version="6.4.1" />
+		<PackageReference Include="Sentry.Maui" Version="6.5.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.147.0-preview.1.1" />
 		<PackageReference Include="UraniumUI" Version="2.15.0" />

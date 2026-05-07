@@ -847,14 +847,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                 drawingController.InitializeDrawing(
                     SelectedBorderColor.ToSKColor(),
-                    lineWidth,
-                    strokeStyle,
                     SelectedFillColor.ToSKColor(),
                     SelectedTextColor.ToSKColor(),
-                    (float)SettingsService.Instance.PolyLineHandleTouchRadius,
-                    (float)SettingsService.Instance.PolyLineHandleRadius,
-                    SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
-                    SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha),
+                    lineWidth,
+                    strokeStyle,
                     false,
                     (float)planContainer.Rotation,
                     setDefaultMode

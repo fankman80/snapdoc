@@ -1,4 +1,5 @@
-﻿using DocumentFormat.OpenXml.Drawing.Charts;
+﻿using Codeuctivity.OpenXmlPowerTools;
+using DocumentFormat.OpenXml.Drawing.Charts;
 using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
@@ -15,8 +16,9 @@ public class InteractivePolylineDrawable
     public bool IsClosed { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
-    public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(128);
+    public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
+    private readonly float density = (float)Settings.DisplayDensity;
 
     public void Draw(SKCanvas canvas)
     {
@@ -55,14 +57,14 @@ public class InteractivePolylineDrawable
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+                StrokeWidth = LineThickness * density,
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round, // Schöne Ecken!
                 PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
                     ? null
                     : SKPathEffect.CreateDash(
-                        Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
+                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
                         0f)
             };
             canvas.DrawPath(path, linePaint);
@@ -70,6 +72,14 @@ public class InteractivePolylineDrawable
 
         if (DisplayHandles)
         {
+            using var handleStroke = new SKPaint
+            {
+                Color = SKColors.DarkGray,
+                Style = SKPaintStyle.Stroke,
+                StrokeWidth = 2,
+                IsAntialias = true
+            };
+
             for (int i = 0; i < Points.Count; i++)
             {
                 // Wenn das Polygon geschlossen ist, alle Punkte grau, sonst erster Punkt grün
@@ -78,12 +88,13 @@ public class InteractivePolylineDrawable
                 using var pointPaint = new SKPaint
                 {
                     Color = color,
+                    Style = SKPaintStyle.Fill,
                     IsStroke = false,
-                    IsAntialias = true,
-                    Style = SKPaintStyle.StrokeAndFill,
-                    StrokeWidth = 2
+                    IsAntialias = true
                 };
-                canvas.DrawCircle(Points[i], PointRadius * (float)Settings.DisplayDensity, pointPaint);
+
+                canvas.DrawCircle(Points[i], PointRadius * density, pointPaint);
+                canvas.DrawCircle(Points[i], PointRadius * density, handleStroke);
             }
         }
     }
@@ -94,7 +105,7 @@ public class InteractivePolylineDrawable
         {
             var dx = Points[i].X - x;
             var dy = Points[i].Y - y;
-            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * (float)Settings.DisplayDensity)
+            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * density)
                 return i;
         }
         return null;
@@ -109,7 +120,7 @@ public class InteractivePolylineDrawable
         var dx = start.X - x;
         var dy = start.Y - y;
 
-        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * (float)Settings.DisplayDensity)
+        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * density)
         {
             IsClosed = true;
             return true;

@@ -13,8 +13,7 @@ public class InteractiveArrowDrawable
     public bool IsDrawn { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
-    public SKColor TextColor { get; set; } = SKColors.Black;
-    public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
+    public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
     public float Height { get; set; }
@@ -22,6 +21,7 @@ public class InteractiveArrowDrawable
     public float TipFactor { get; set; } = 0.3f;   // Länge der Spitze (0 bis 1)
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
+    private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
     public float AllowedAngleRad
     {
@@ -141,7 +141,7 @@ public class InteractiveArrowDrawable
     {
         get
         {
-            float handleDistance = PointRadius * (float)Settings.DisplayDensity * 3;
+            float handleDistance = PointRadius * density * 3;
             float yLocal = -Height / 2f - handleDistance;
 
             float cos = MathF.Cos(AllowedAngleRad);
@@ -201,14 +201,14 @@ public class InteractiveArrowDrawable
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+                StrokeWidth = LineThickness * density,
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Miter,
                 PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
                     ? null
                     : SKPathEffect.CreateDash(
-                        Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
+                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
                         0f)
             };
             canvas.DrawPath(path, linePaint);
@@ -219,21 +219,38 @@ public class InteractiveArrowDrawable
 
     private void DrawHandles(SKCanvas canvas)
     {
-        float density = (float)Settings.DisplayDensity;
-        using var handlePaint = new SKPaint { Color = PointColor, Style = SKPaintStyle.Fill, IsAntialias = true };
+        using var handlePaint = new SKPaint
+        {
+            Color = PointColor,
+            Style = SKPaintStyle.Fill,
+            IsStroke = false,
+            IsAntialias = true
+        };
+
+        using var handleStroke = new SKPaint
+        {
+            Color = SKColors.DarkGray,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 2,
+            IsAntialias = true
+        };
 
         // Eck-Handles
         foreach (var p in BoundingPoints)
+        {
             canvas.DrawCircle(p, PointRadius * density, handlePaint);
+            canvas.DrawCircle(p, PointRadius * density, handleStroke);
+        }
 
         // Form-Handle (Schaft/Spitze)
         canvas.DrawCircle(ShapeHandle, PointRadius * density, handlePaint);
+        canvas.DrawCircle(ShapeHandle, PointRadius * density, handleStroke);
 
         if (_rotationHandleImage != null) // Prüfung auf das geladene Image
         {
             using var paint = new SKPaint { IsAntialias = true };
 
-            float size = PointRadius * (float)Settings.DisplayDensity * 4;
+            float size = PointRadius * density * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
@@ -249,7 +266,6 @@ public class InteractiveArrowDrawable
 
     public int? FindPointIndex(float x, float y)
     {
-        float density = (float)Settings.DisplayDensity;
         var p = new SKPoint(x, y);
 
         // Check Bounding Points (0-3)
@@ -285,7 +301,7 @@ public class InteractiveArrowDrawable
         ShaftFactor = Math.Clamp(Math.Abs(localY) / (Height / 2f), 0.05f, 1f);
     }
 
-    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * (float)Settings.DisplayDensity;
+    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;
 
     public void SetRotationFromPoint(SKPoint p)
     {

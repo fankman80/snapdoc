@@ -14,7 +14,7 @@ public class InteractiveRectangleDrawable
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor TextColor { get; set; } = SKColors.Black;
-    public SKColor PointColor { get; set; } = SKColors.Gray.WithAlpha(160);
+    public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
     public float Height { get; set; }
@@ -28,6 +28,7 @@ public class InteractiveRectangleDrawable
     public int TextPadding { get; set; } = 10;
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
+    private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
     public float AllowedAngleRad
     {
@@ -102,7 +103,7 @@ public class InteractiveRectangleDrawable
     {
         get
         {
-            float handleDistance = PointRadius * (float)Settings.DisplayDensity * 3;
+            float handleDistance = PointRadius * density * 3;
             float yLocal = -Height / 2f - handleDistance;
 
             float cos = MathF.Cos(AllowedAngleRad);
@@ -143,13 +144,13 @@ public class InteractiveRectangleDrawable
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+                StrokeWidth = LineThickness * density,
                 IsStroke = true,
                 IsAntialias = true,
                 PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
                 ? null
                 : SKPathEffect.CreateDash(
-                    Helper.ParseDashArray(StrokeStyle, (float)Settings.DisplayDensity, LineThickness),
+                    Helper.ParseDashArray(StrokeStyle, density, LineThickness),
                     0f)
             };
             canvas.DrawPath(path, linePaint);
@@ -164,17 +165,29 @@ public class InteractiveRectangleDrawable
         {
             Color = PointColor,
             Style = SKPaintStyle.Fill,
+            IsStroke = false,
+            IsAntialias = true
+        };
+
+        using var handleStroke = new SKPaint
+        {
+            Color = SKColors.DarkGray,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 2,
             IsAntialias = true
         };
 
         foreach (var p in pts)
-            canvas.DrawCircle(p, PointRadius * (float)Settings.DisplayDensity, handlePaint);
+        {
+            canvas.DrawCircle(p, PointRadius * density, handlePaint);
+            canvas.DrawCircle(p, PointRadius * density, handleStroke);
+        }          
 
         if (_rotationHandleImage != null) // Prüfung auf das geladene Image
         {
             using var paint = new SKPaint { IsAntialias = true };
 
-            float size = PointRadius * (float)Settings.DisplayDensity * 4;
+            float size = PointRadius * density * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
@@ -197,8 +210,8 @@ public class InteractiveRectangleDrawable
         canvas.Translate(Center.X, Center.Y);
         canvas.RotateDegrees(AllowedAngleDeg);
 
-        float maxTextWidth = Width - 2 * TextPadding * (float)Settings.DisplayDensity;
-        float maxTextHeight = Height - 2 * TextPadding * (float)Settings.DisplayDensity;
+        float maxTextWidth = Width - 2 * TextPadding * density;
+        float maxTextHeight = Height - 2 * TextPadding * density;
 
         TextSize = AutoSizeText
             ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
@@ -216,7 +229,7 @@ public class InteractiveRectangleDrawable
             IsStroke = false
         };
 
-        float maxWidth = Width - 2 * TextPadding * (float)Settings.DisplayDensity;
+        float maxWidth = Width - 2 * TextPadding * density;
         var lines = BreakTextIntoLines(Text, font, maxWidth);
 
         var metrics = font.Metrics;
@@ -287,10 +300,10 @@ public class InteractiveRectangleDrawable
         return TextAlignment switch
         {
             RectangleTextAlignment.Left =>
-                -Width / 2f + TextPadding * (float)Settings.DisplayDensity,
+                -Width / 2f + TextPadding * density,
 
             RectangleTextAlignment.Right =>
-                Width / 2f - TextPadding * (float)Settings.DisplayDensity - lineWidth,
+                Width / 2f - TextPadding * density - lineWidth,
 
             _ => // Center
                 -lineWidth / 2f
@@ -346,7 +359,7 @@ public class InteractiveRectangleDrawable
         return true;
     }
 
-    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * (float)Settings.DisplayDensity;
+    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;
 
     public void SetRotationFromPoint(SKPoint p)
     {
@@ -362,7 +375,7 @@ public class InteractiveRectangleDrawable
 
         for (int i = 0; i < pts.Length; i++)
         {
-            if (SKPoint.Distance(p, pts[i]) <= HandleRadius * (float)Settings.DisplayDensity)
+            if (SKPoint.Distance(p, pts[i]) <= HandleRadius * density)
                 return i;
         }
 

@@ -63,19 +63,20 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     }
 
     public void InitializeDrawing(SKColor lineColor,
-        float lineThickness, string strokeStyle, SKColor fillColor, SKColor textColor,
-        float handleRadius, float pointRadius,
-        SKColor pointColor, SKColor startPointColor,
-        bool scaleHandlesWithTransform = true,
-        float rotationAngle = 0f,
-        bool forceReset = false)
+                                SKColor fillColor,
+                                SKColor textColor,
+                                float lineThickness,
+                                string strokeStyle,
+                                bool scaleHandlesWithTransform = true,
+                                float rotationAngle = 0f,
+                                bool forceReset = false)
     {
         float currentScale = (float)transformVm.Scale;
         if (currentScale <= 0.0001f)
             currentScale = 1.0f;
 
-        float safeHandleRadius = scaleHandlesWithTransform ? handleRadius / currentScale : handleRadius;
-        float safePointRadius = scaleHandlesWithTransform ? pointRadius / currentScale : pointRadius;
+        float safeHandleRadius = scaleHandlesWithTransform ? (float)SettingsService.Instance.PolyLineHandleTouchRadius / currentScale : (float)SettingsService.Instance.PolyLineHandleTouchRadius;
+        float safePointRadius = scaleHandlesWithTransform ? (float)SettingsService.Instance.PolyLineHandleRadius / currentScale : (float)SettingsService.Instance.PolyLineHandleRadius;
 
         if (forceReset || CombinedDrawable == null)
         {
@@ -97,8 +98,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         poly.FillColor = fillColor;
         poly.LineColor = lineColor;
         poly.StrokeStyle = strokeStyle;
-        poly.PointColor = pointColor;
-        poly.StartPointColor = startPointColor;
+        poly.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
+        poly.StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         poly.LineThickness = lineThickness;
         poly.HandleRadius = safeHandleRadius;
         poly.PointRadius = safePointRadius;
@@ -107,7 +108,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         var rect = CombinedDrawable.RectDrawable;
         rect.FillColor = fillColor;
         rect.LineColor = lineColor;
-        rect.PointColor = pointColor;
+        rect.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         rect.TextColor = textColor;
         rect.LineThickness = lineThickness;
         rect.StrokeStyle = strokeStyle;
@@ -120,8 +121,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         var arrow = CombinedDrawable.ArrowDrawable;
         arrow.FillColor = fillColor;
         arrow.LineColor = lineColor;
-        arrow.PointColor = pointColor;
-        arrow.TextColor = textColor;
+        arrow.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         arrow.LineThickness = lineThickness;
         arrow.StrokeStyle = strokeStyle;
         arrow.HandleRadius = safeHandleRadius;
@@ -456,7 +456,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         {
             arrow.LineColor = lineColor;
             arrow.FillColor = fillColor;
-            arrow.TextColor = textColor;
             arrow.LineThickness = lineWidth;
             arrow.StrokeStyle = strokeStyle;
         }

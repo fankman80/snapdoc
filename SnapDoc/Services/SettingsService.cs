@@ -146,9 +146,9 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial float PolyLineHandleRadius { get; set; } = 10f;
     [ObservableProperty] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
     [ObservableProperty] public partial int DoubleClickThresholdMs { get; set; } = 300;
-    [ObservableProperty] public partial string PolyLineHandleColor { get; set; } = "#808080";
+    [ObservableProperty] public partial string PolyLineHandleColor { get; set; } = "#ffffff";
     [ObservableProperty] public partial string PolyLineStartHandleColor { get; set; } = "#00FF00";
-    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 127;
+    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 160;
     [ObservableProperty] public partial Point CustomPinOffset { get; set; } = new(0,0);
     [ObservableProperty] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
     [ObservableProperty] public partial string? SelectedTemplate { get; set; }
