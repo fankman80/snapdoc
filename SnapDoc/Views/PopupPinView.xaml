@@ -24,16 +24,16 @@
         <VerticalStackLayout Spacing="4">
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0">
                 <Image Grid.Column="0"
-                       Margin="0,0,8,0"
+                       Margin="0,0,10,0"
                        Source="{Binding Pin.DisplayIconPath}"
-                       WidthRequest="50"
-                       HeightRequest="50"/>
+                       WidthRequest="46"
+                       HeightRequest="46"/>
                 <VerticalStackLayout Grid.Column="1" Spacing="4">
                     <HorizontalStackLayout Spacing="0">
                         <Label Text="{x:Static res:AppResources.bezeichnung}" FontSize="12"
-                           TextColor="{DynamicResource Primary}"/>
+                               TextColor="{DynamicResource Primary}"/>
                         <Label Text=":" FontSize="12"
-                           TextColor="{DynamicResource Primary}"/>
+                               TextColor="{DynamicResource Primary}"/>
                     </HorizontalStackLayout>
                     <local:BorderlessEntry Text="{Binding Pin.PinName}" FontSize="12"/>
                 </VerticalStackLayout>
