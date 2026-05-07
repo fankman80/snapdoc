@@ -414,34 +414,35 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         PinSizeSlider.LowerValue = pin.PinScale * 100;
         PinRotateSlider.LowerValue = Helper.ToSliderValue(pin.PinRotation);
+        DegreesLabel.Text = $"{Helper.ToSliderValue(pin.PinRotation):0}°";
 
         planContainer.IsPanningEnabled = false;
         DrawBtn.IsVisible = false;
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         PinEditBorder.IsVisible = true;
 
-        loadCustomPinBtn.IsVisible = pin.IsCustomPin;
+        LoadCustomPinBtn.IsVisible = pin.IsCustomPin;
 
         if (pin.IsLockRotate)
         {
-            rotateModeLabel.Text = AppResources.drehung_fixiert;
-            rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
+            RotateModeLabel.Text = AppResources.drehung_fixiert;
+            RotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
         }
         else
         {
-            rotateModeLabel.Text = AppResources.automatische_drehung;
-            rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
+            RotateModeLabel.Text = AppResources.automatische_drehung;
+            RotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
         }
 
         if (pin.IsLockAutoScale)
         {
-            sizeModeLabel.Text = AppResources.groesse_fixiert;
-            sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
+            SizeModeLabel.Text = AppResources.groesse_fixiert;
+            SizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
         else
         {
-            sizeModeLabel.Text = AppResources.automatische_groessenanpassung;
-            sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
+            SizeModeLabel.Text = AppResources.automatische_groessenanpassung;
+            SizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
     }
 
@@ -1067,7 +1068,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
             1 / planContainer.Scale / Settings.DisplayDensity,
-            drawingController.InitialRotation - planContainer.Rotation,
+            0,
             drawingController.CombinedDrawable.RectDrawable.Text,
             isOverwrite
         );
@@ -1267,14 +1268,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (thisPlan.Pins[doubleTappedPin.AutomationId].IsLockAutoScale)
         {
             thisPlan.Pins[doubleTappedPin.AutomationId].IsLockAutoScale = false;
-            sizeModeLabel.Text = AppResources.automatische_groessenanpassung;
-            sizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
+            SizeModeLabel.Text = AppResources.automatische_groessenanpassung;
+            SizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
         else
         {
             thisPlan.Pins[doubleTappedPin.AutomationId].IsLockAutoScale = true;
-            sizeModeLabel.Text = AppResources.groesse_fixiert;
-            sizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
+            SizeModeLabel.Text = AppResources.groesse_fixiert;
+            SizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
 
         // save data to file
@@ -1287,8 +1288,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             thisPlan.Pins[doubleTappedPin.AutomationId].IsLockRotate = false;
             thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = 0;
-            rotateModeLabel.Text = AppResources.automatische_drehung;
-            rotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
+            RotateModeLabel.Text = AppResources.automatische_drehung;
+            RotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.LowerValue = 0;
 
             doubleTappedPin.Rotation = planContainer.Rotation * -1;
@@ -1297,8 +1298,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             thisPlan.Pins[doubleTappedPin.AutomationId].IsLockRotate = true;
             thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
-            rotateModeLabel.Text = AppResources.drehung_fixiert;
-            rotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
+            RotateModeLabel.Text = AppResources.drehung_fixiert;
+            RotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             PinRotateSlider.LowerValue = Helper.ToSliderValue(-planContainer.Rotation);
         }
 
@@ -1310,7 +1311,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
 
-        degreesLabel.Text = $"{sliderValue}°";
+        DegreesLabel.Text = $"{sliderValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(sliderValue);
     }
 
@@ -1347,7 +1348,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else
             doubleTappedPin.Scale = sliderValue / 100.0;
 
-        percentLabel.Text = $"{sliderValue}%";
+        PercentLabel.Text = $"{sliderValue}%";
     }
 
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
@@ -1386,7 +1387,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
         
         PinRotateSlider.LowerValue = snapValue;
-        degreesLabel.Text = $"{snapValue}°";
+        DegreesLabel.Text = $"{snapValue}°";
         doubleTappedPin.Rotation = Helper.SliderToRotation(snapValue);
         thisPlan.Pins[doubleTappedPin.AutomationId].PinRotation = snapValue;
 

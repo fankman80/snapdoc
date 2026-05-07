@@ -132,7 +132,7 @@
                             DragCompleted="OnResizeSliderDragCompleted"/>
                 </Border>
 
-                <Button x:Name="loadCustomPinBtn"                        
+                <Button x:Name="LoadCustomPinBtn"                        
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
                         IsVisible="False"
                         Style="{StaticResource ToolButtonStyle}"
@@ -141,7 +141,7 @@
                         HorizontalOptions="Start"
                         VerticalOptions="End"
                         Clicked="LoadCustomPinClicked"/>
-                <Button x:Name="sizeModeBtn"
+                <Button x:Name="SizeModeBtn"
                         FontSize="{OnPlatform 38, iOS=34}"
                         FontFamily="MaterialOutlined"
                         TextColor="{DynamicResource Primary}"
@@ -155,7 +155,7 @@
                         HorizontalOptions="Start"
                         VerticalOptions="End"
                         Clicked="OnSizeModeClicked"/>                
-                <Label x:Name="percentLabel"
+                <Label x:Name="PercentLabel"
                        Text="100%"
                        FontSize="16"
                        VerticalTextAlignment="Center"
@@ -164,7 +164,7 @@
                        TextColor="{DynamicResource PrimaryDarkText}"
                        Margin="0,0,30,118"
                        ZIndex="10001"/>                
-                <Label x:Name="sizeModeLabel"
+                <Label x:Name="SizeModeLabel"
                        FontSize="11"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="Start"
@@ -196,7 +196,7 @@
                             ValueChanged="OnRotateSliderValueChanged"
                             DragCompleted="OnRotateSliderDragCompleted"/>
                 </Border>
-                <Button x:Name="rotateModeBtn"
+                <Button x:Name="RotateModeBtn"
                         FontSize="{OnPlatform 38, iOS=34}"
                         FontFamily="MaterialOutlined"
                         TextColor="{DynamicResource Primary}"
@@ -210,7 +210,7 @@
                         HorizontalOptions="Start"
                         VerticalOptions="End"
                         Clicked="OnRotateModeClicked"/>
-                <Border x:Name="degreesLabelBorder"
+                <Border x:Name="DegreesLabelBorder"
                         HeightRequest="50"
                         WidthRequest="50"
                         BackgroundColor="{DynamicResource PrimaryDarkText}"
@@ -225,7 +225,7 @@
                     <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnRotateSnapCklicked" />
                     </Border.GestureRecognizers>
-                    <Label x:Name="degreesLabel"
+                    <Label x:Name="DegreesLabel"
                            Text="0°"
                            FontSize="16"
                            TextColor="{DynamicResource Primary}"
@@ -234,7 +234,7 @@
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Center"/>
                 </Border>
-                <Label x:Name="rotateModeLabel"
+                <Label x:Name="RotateModeLabel"
                        FontSize="11"
                        VerticalTextAlignment="Center"
                        HorizontalOptions="Start"

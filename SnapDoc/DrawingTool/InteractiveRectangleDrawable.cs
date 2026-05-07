@@ -388,7 +388,6 @@ public class InteractiveRectangleDrawable
         return Points[opposite];
     }
 
-
     public void SetFromDrag(SKPoint start, SKPoint end)
     {
         var dx = end.X - start.X;
