@@ -21,7 +21,7 @@
         <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
-            <Entry Grid.Column="0"
+            <local:BorderlessEntry Grid.Column="0"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Placeholder="{x:Static res:AppResources.titel_eingeben}"

@@ -25,7 +25,6 @@
             <Grid ColumnDefinitions="Auto,*" ColumnSpacing="0">
                 <Image Grid.Column="0"
                        Margin="0,0,8,0"
-                       IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                        Source="{Binding Pin.DisplayIconPath}"
                        WidthRequest="50"
                        HeightRequest="50"/>
@@ -36,7 +35,7 @@
                         <Label Text=":" FontSize="12"
                            TextColor="{DynamicResource Primary}"/>
                     </HorizontalStackLayout>
-                    <Label Text="{Binding Pin.PinName}" FontSize="12" LineBreakMode="TailTruncation" />
+                    <local:BorderlessEntry Text="{Binding Pin.PinName}" FontSize="12"/>
                 </VerticalStackLayout>
             </Grid>
             
@@ -52,7 +51,7 @@
                 <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <Label Text="{Binding Pin.PinLocation}" FontSize="12" LineBreakMode="TailTruncation"/>
+            <local:BorderlessEntry Text="{Binding Pin.PinLocation}" FontSize="12"/>
 
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
@@ -66,7 +65,7 @@
                 <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <Label Text="{Binding Pin.PinDesc}" FontSize="12" Margin="0,0,0,16"/>
+            <local:BorderlessEditor Text="{Binding Pin.PinDesc}" FontSize="12" Margin="0,0,0,16"/>
 
             <Grid>
                 <Grid.ColumnDefinitions>

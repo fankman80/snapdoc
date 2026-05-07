@@ -64,40 +64,54 @@ public static class MauiProgram
         });
 #endif
 
+        // Entfernt Entry Rahmen, Padding und blauer Strich
+        Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("MyBorderlessCustomization", (handler, view) =>
+        {
+            if (view is BorderlessEntry)
+            {
+#if ANDROID
+                handler.PlatformView.Background = null;
+                handler.PlatformView.SetPadding(0, 0, 0, 0);
+#elif IOS || MACCATALYST
+                handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
+#elif WINDOWS
+                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.Padding = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.MinWidth = 0;
+                handler.PlatformView.MinHeight = 0;
+#endif
+            }
+        });
+
+        // Entfernt Editor Rahmen, Padding und blauer Strich
+        Microsoft.Maui.Handlers.EditorHandler.Mapper.AppendToMapping("MyBorderlessEditorCustomization", (handler, view) =>
+        {
+            if (view is BorderlessEditor)
+            {
+#if ANDROID
+                handler.PlatformView.Background = null;
+                handler.PlatformView.SetPadding(0, 0, 0, 0);
+#elif IOS || MACCATALYST
+                handler.PlatformView.BackgroundColor = UIKit.UIColor.Clear;
+                handler.PlatformView.Layer.BorderWidth = 0;
+                handler.PlatformView.TextContainerInset = UIKit.UIEdgeInsets.Zero; // Entfernt inneres Padding
+                handler.PlatformView.TextContainer.LineFragmentPadding = 0;
+#elif WINDOWS
+                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.Padding = new Microsoft.UI.Xaml.Thickness(0);
+                handler.PlatformView.MinWidth = 0;
+                handler.PlatformView.MinHeight = 0;
+#endif
+            }
+        });
+
         // Registriere die AppShell
         builder.Services.AddSingleton<AppShell>();
 
         // Registriere den FileSaver
         builder.Services.AddSingleton<IFileSaver>(FileSaver.Default);
-
-#if WINDOWS
-        // Place Windows Screen-Center
-        builder.ConfigureLifecycleEvents(events =>
-        {
-            events.AddWindows(windowsLifecycleBuilder =>
-            {
-                windowsLifecycleBuilder.OnWindowCreated(window =>
-                {
-                    window.ExtendsContentIntoTitleBar = false;
-                    var handle = WinRT.Interop.WindowNative.GetWindowHandle(window);
-                    var id = Microsoft.UI.Win32Interop.GetWindowIdFromWindow(handle);
-                    var appWindow = Microsoft.UI.Windowing.AppWindow.GetFromWindowId(id);
-
-                    if (appWindow is not null)
-                    {
-                        Microsoft.UI.Windowing.DisplayArea displayArea = Microsoft.UI.Windowing.DisplayArea.GetFromWindowId(id, Microsoft.UI.Windowing.DisplayAreaFallback.Nearest);
-                        if (displayArea is not null)
-                        {
-                            var CenteredPosition = appWindow.Position;
-                            CenteredPosition.X = ((displayArea.WorkArea.Width - appWindow.Size.Width) / 2);
-                            CenteredPosition.Y = ((displayArea.WorkArea.Height - appWindow.Size.Height) / 2);
-                            appWindow.Move(CenteredPosition);
-                        }
-                    }
-                });
-            });
-        });
-#endif
 
 #if ANDROID
         // Android Picker: Entfernt die Unterstreichung, fügt Pfeil hinzu und setzt Padding
@@ -186,4 +200,12 @@ public static class MauiProgram
             }
         }
     }
+}
+
+public partial class BorderlessEntry : Microsoft.Maui.Controls.Entry
+{
+}
+
+public partial class BorderlessEditor : Microsoft.Maui.Controls.Editor
+{
 }
