@@ -210,8 +210,8 @@ public class InteractiveRectangleDrawable
         canvas.Translate(Center.X, Center.Y);
         canvas.RotateDegrees(AllowedAngleDeg);
 
-        float maxTextWidth = Width - 2 * TextPadding * density;
-        float maxTextHeight = Height - 2 * TextPadding * density;
+        float maxTextWidth = Width / 100 * (100 - TextPadding);
+        float maxTextHeight = Height / 100 * (100 - TextPadding);
 
         TextSize = AutoSizeText
             ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
@@ -229,8 +229,7 @@ public class InteractiveRectangleDrawable
             IsStroke = false
         };
 
-        float maxWidth = Width - 2 * TextPadding * density;
-        var lines = BreakTextIntoLines(Text, font, maxWidth);
+        var lines = BreakTextIntoLines(Text, font, maxTextWidth);
 
         var metrics = font.Metrics;
         float lineHeight = metrics.Descent - metrics.Ascent;
