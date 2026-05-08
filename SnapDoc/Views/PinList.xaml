@@ -50,13 +50,14 @@
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
                 StrokeShape="RoundRectangle 4">
-            <Entry x:Name="SearchEntry"
-                    FontSize="12"
-                    VerticalTextAlignment="Center"
-                    VerticalOptions="Center"
-                    Placeholder="{x:Static res:AppResources.suche}"
-                    TextChanged="SearchEntry_TextChanged"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
+            <local:BorderlessEntry x:Name="SearchEntry"
+                                   Margin="6,0,0,0"
+                                   FontSize="12"
+                                   VerticalTextAlignment="Center"
+                                   VerticalOptions="Center"
+                                   Placeholder="{x:Static res:AppResources.suche}"
+                                   TextChanged="SearchEntry_TextChanged"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">

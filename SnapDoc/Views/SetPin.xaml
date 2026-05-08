@@ -185,8 +185,8 @@
                     <ImageButton Source="{Binding Pin.DisplayIconPath}"
                                  BackgroundColor="Transparent"
                                  Aspect="AspectFit"
-                                 Clicked="OnPinSelectClick"
-                                 Padding="12"/>
+                                 Padding="12"
+                                 Clicked="OnPinSelectClick"/>
                 </Border>
             </Grid>
 

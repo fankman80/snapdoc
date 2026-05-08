@@ -128,6 +128,9 @@ public partial class PinList : ContentPage
         string planId = button.AutomationId;
         string pinId = button.ClassId;
 
+        if (GlobalJson.Data.Plans[planId].Pins[pinId].IsCustomPin)
+            return;
+
         await Shell.Current.GoToAsync($"icongallery?planId={planId}&pinId={pinId}");
     }
 

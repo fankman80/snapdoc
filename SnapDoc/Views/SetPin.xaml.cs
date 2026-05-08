@@ -185,6 +185,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
+        if (Pin.IsCustomPin)
+            return;
+
         // save data to file
         GlobalJson.SaveToFile();
 
