@@ -97,15 +97,26 @@
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                 Clicked="DrawingClicked"/>
 
-        <VerticalStackLayout x:Name="ToolBtns"
-                            IsVisible="False"
-                            Spacing="16"
-                            Margin="20"
-                            HorizontalOptions="Start"
-                            VerticalOptions="End"
-                            ZIndex="10000"
-                            AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                            AbsoluteLayout.LayoutFlags="PositionProportional">
+        <Button IsVisible="{Binding Source={x:Reference Name=ThisPage}, Path=IsToolButtonsVisible}"
+                Margin="0,0,20,20"
+                ZIndex="10000"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
+                BackgroundColor="LimeGreen"
+                Style="{StaticResource ToolButtonStyle}"
+                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                AbsoluteLayout.LayoutFlags="PositionProportional"
+                ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
+                Clicked="CheckClicked"/>
+
+        <VerticalStackLayout IsVisible="{Binding Source={x:Reference Name=ThisPage}, Path=IsToolButtonsVisible}"
+                             Spacing="16"
+                             Margin="20"
+                             HorizontalOptions="Start"
+                             VerticalOptions="End"
+                             ZIndex="10000"
+                             AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                             AbsoluteLayout.LayoutFlags="PositionProportional">
+            
             <Button HorizontalOptions="Start"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
                     Style="{StaticResource ToolButtonStyle}"
@@ -186,12 +197,6 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"/>
             </HorizontalStackLayout>
-            <Button HorizontalOptions="Start"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
-                    BackgroundColor="LimeGreen"
-                    Style="{StaticResource ToolButtonStyle}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
-                    Clicked="CheckClicked"/>
         </VerticalStackLayout>
     </AbsoluteLayout>
 </ContentPage>

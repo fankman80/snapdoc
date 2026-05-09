@@ -100,6 +100,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
+    private bool isToolButtonsVisible = false;
+    public bool IsToolButtonsVisible
+    {
+        get => isToolButtonsVisible;
+        set
+        {
+            isToolButtonsVisible = value;
+            OnPropertyChanged();
+        }
+    }
+
     private readonly Dictionary<string, MR.Gestures.Image> _pinLookup = [];
 
     public NewPage(string _planId)
@@ -844,7 +855,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-                ToolBtns.IsVisible = true;
+                IsToolButtonsVisible = true;
 
                 drawingController.InitializeDrawing(
                     SelectedBorderColor.ToSKColor(),
@@ -867,7 +878,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 System.Diagnostics.Debug.WriteLine($"Fehler beim Starten des Drawings: {ex.Message}");
                 DrawBtn.IsVisible = true;
-                ToolBtns.IsVisible = false;
+                IsToolButtonsVisible = false;
             }
         });
     }
@@ -1092,7 +1103,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         RemoveDrawingView();
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
-        ToolBtns.IsVisible = false;
+        IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
         doubleTappedPin?.IsVisible = true;

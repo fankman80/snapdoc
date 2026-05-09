@@ -75,6 +75,17 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private bool isToolButtonsVisible = false;
+    public bool IsToolButtonsVisible
+    {
+        get => isToolButtonsVisible;
+        set
+        {
+            isToolButtonsVisible = value;
+            OnPropertyChanged();
+        }
+    }
+
     public ImageViewPage()
     {
         InitializeComponent();
@@ -443,7 +454,7 @@ public partial class ImageViewPage : IQueryAttributable
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
                 Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
-                ToolBtns.IsVisible = true;
+                IsToolButtonsVisible = true;
 
                 drawingController.InitializeDrawing(
                     SelectedBorderColor.ToSKColor(),
@@ -462,7 +473,7 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 System.Diagnostics.Debug.WriteLine($"Fehler beim Starten des Drawings: {ex.Message}");
                 DrawBtn.IsVisible = true;
-                ToolBtns.IsVisible = false;
+                IsToolButtonsVisible = false;
             }
         });
     }
@@ -558,7 +569,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
-        ToolBtns.IsVisible = false;
+        IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         isCleared = false;
     }
