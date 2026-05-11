@@ -870,4 +870,7 @@
   <data name="pfeil_zeichnen" xml:space="preserve">
     <value>Draw arrow</value>
   </data>
+  <data name="suche_standort" xml:space="preserve">
+    <value>Searching for location...</value>
+  </data>
 </root>

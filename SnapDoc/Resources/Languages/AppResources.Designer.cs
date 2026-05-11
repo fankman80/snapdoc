@@ -1996,6 +1996,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Suche Standort... ähnelt.
+        /// </summary>
+        internal static string suche_standort {
+            get {
+                return ResourceManager.GetString("suche_standort", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die swisstopo Karte ähnelt.
         /// </summary>
         internal static string swisstopo_karte {

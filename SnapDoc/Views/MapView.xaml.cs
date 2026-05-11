@@ -18,7 +18,6 @@ using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
 using Mapsui.Widgets.ScaleBar;
-using Microsoft.Maui.Layouts;
 using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -26,6 +25,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Diagnostics;
+using SnapDoc.Controls;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
@@ -237,54 +237,84 @@ public partial class MapView : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
-        SetPosBtn.IsVisible = false;
+        MyBusyPage busyPopup = null;
 
-        double targetLon = 8.226692;
-        double targetLat = 46.80121;
-        int targetZoom = 8; // Default Zoom für die Übersicht
-
-        if (!string.IsNullOrEmpty(planId) && !string.IsNullOrEmpty(pinId))
+        async Task ShowBusyIfNeeded()
         {
-            if (GlobalJson.Data.Plans.TryGetValue(planId, out var plan) &&
-                plan.Pins.TryGetValue(pinId, out var pinData))
+            if (busyPopup == null)
             {
-                Pin = new PinItem(pinData);
-                SetPosBtn.IsVisible = true;
+                busyPopup = new MyBusyPage(AppResources.suche_standort);
+                await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+            }
+        }
 
-                if (pinData.GeoLocation?.WGS84 != null)
+        try
+        {
+            SetPosBtn.IsVisible = false;
+
+            double targetLon = 8.226692;
+            double targetLat = 46.80121;
+            int targetZoom = 8;
+
+            if (!string.IsNullOrEmpty(planId) && !string.IsNullOrEmpty(pinId))
+            {
+                if (GlobalJson.Data.Plans.TryGetValue(planId, out var plan) &&
+                    plan.Pins.TryGetValue(pinId, out var pinData))
                 {
-                    targetLon = pinData.GeoLocation.WGS84.Longitude;
-                    targetLat = pinData.GeoLocation.WGS84.Latitude;
-                    targetZoom = 18; // Nah ran
-                }
-                else if (SettingsService.Instance.IsGpsActive)
-                {
-                    var location = await geoViewModel.TryGetLocationAsync();
-                    if (location != null)
+                    Pin = new PinItem(pinData);
+                    SetPosBtn.IsVisible = true;
+
+                    if (pinData.GeoLocation?.WGS84 != null)
                     {
-                        targetLon = location.Longitude;
-                        targetLat = location.Latitude;
-                        targetZoom = 18; // Auch hier nah ran
+                        targetLon = pinData.GeoLocation.WGS84.Longitude;
+                        targetLat = pinData.GeoLocation.WGS84.Latitude;
+                        targetZoom = 18;
+                    }
+                    else if (SettingsService.Instance.IsGpsActive)
+                    {
+                        // GPS benötigt -> Popup zeigen
+                        await ShowBusyIfNeeded();
+
+                        var location = await geoViewModel.TryGetLocationAsync();
+                        if (location != null)
+                        {
+                            targetLon = location.Longitude;
+                            targetLat = location.Latitude;
+                            targetZoom = 18;
+                        }
                     }
                 }
             }
-        }
-        else if (SettingsService.Instance.IsGpsActive)
-        {
-            var location = await geoViewModel.TryGetLocationAsync();
-            if (location != null)
+            else if (SettingsService.Instance.IsGpsActive)
             {
-                targetLon = location.Longitude;
-                targetLat = location.Latitude;
-                targetZoom = 18;
+                // GPS benötigt -> Popup zeigen
+                await ShowBusyIfNeeded();
+
+                var location = await geoViewModel.TryGetLocationAsync();
+                if (location != null)
+                {
+                    targetLon = location.Longitude;
+                    targetLat = location.Latitude;
+                    targetZoom = 18;
+                }
+            }
+
+            if (map?.Navigator != null)
+            {
+                var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(targetLon, targetLat).ToMPoint();
+                map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[targetZoom]);
+                MapControl.RefreshGraphics();
             }
         }
-
-        if (map?.Navigator != null)
+        catch (Exception ex)
         {
-            var sphericalMercatorCoordinate = SphericalMercator.FromLonLat(targetLon, targetLat).ToMPoint();
-            map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[targetZoom]);
-            MapControl.RefreshGraphics();
+            Debug.WriteLine($"Fehler bei SetPos: {ex.Message}");
+        }
+        finally
+        {
+            // Popup schließen
+            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
+                await Mopups.Services.MopupService.Instance.PopAsync();
         }
     }
 
@@ -296,36 +326,54 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        var location = await geoViewModel.TryGetLocationAsync();
-        if (location == null)
-            return;
+        // Popup erstellen und anzeigen
+        var busyPopup = new MyBusyPage(AppResources.suche_standort);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
-        await UpdateAndSavePinLocationAsync(planId, pinId, location.Longitude, location.Latitude);
-
-        var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
-        if (pinLayer != null)
+        try
         {
-            var feature = pinLayer.Features
-                                  .OfType<GeometryFeature>()
-                                  .FirstOrDefault(f => f["PinId"]?.ToString() == pinId &&
-                                                       f["PlanId"]?.ToString() == planId);
+            // Suche starten (hier wartet der Code)
+            var location = await geoViewModel.TryGetLocationAsync();
 
-            if (feature != null)
-            {
-                var (x, y) = SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
-                feature.Geometry = new Point(x, y);
+            if (location == null)
+                return;
 
-                pinLayer.FeaturesWereModified();
-                pinLayer.DataHasChanged();
-            }
-            else
+            // Karten-Logik ausführen
+            await UpdateAndSavePinLocationAsync(planId, pinId, location.Longitude, location.Latitude);
+
+            var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
+            if (pinLayer != null)
             {
-                AddPin(map, new Point(location.Longitude, location.Latitude), planId, pinId);
+                var feature = pinLayer.Features
+                                      .OfType<GeometryFeature>()
+                                      .FirstOrDefault(f => f["PinId"]?.ToString() == pinId &&
+                                                           f["PlanId"]?.ToString() == planId);
+
+                if (feature != null)
+                {
+                    var (x, y) = SphericalMercator.FromLonLat(location.Longitude, location.Latitude);
+                    feature.Geometry = new Point(x, y);
+
+                    pinLayer.FeaturesWereModified();
+                    pinLayer.DataHasChanged();
+                }
+                else
+                    AddPin(map, new Point(location.Longitude, location.Latitude), planId, pinId);
             }
+
+            var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
+            map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
         }
-
-        var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler bei SetPos: {ex.Message}");
+        }
+        finally
+        {
+            // Popup schließen
+            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
+                await Mopups.Services.MopupService.Instance.PopAsync();
+        }
     }
 
     private void OnRulerClicked(object sender, EventArgs e)
@@ -654,53 +702,70 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        var location = await geoViewModel.TryGetLocationAsync();
-        if (location == null)
-            return;
+        // Popup erstellen und anzeigen
+        var busyPopup = new MyBusyPage(AppResources.suche_standort);
+        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
 
-        var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
-        map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
-
-        var currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-
-        Models.Pin newPinData = new()
+        try
         {
-            Pos = new Microsoft.Maui.Graphics.Point(0, 0),
-            Anchor = new Microsoft.Maui.Graphics.Point(0, 0),
-            Size = new Microsoft.Maui.Graphics.Size(0, 0),
-            IsLockPosition = false,
-            IsLockRotate = true,
-            IsLockAutoScale = true,
-            IsCustomPin = false,
-            IsCustomIcon = false,
-            IsWebMapPin = true,
-            PinName = "",
-            PinDesc = "",
-            PinPriority = 0,
-            PinLocation = "",
-            PinIcon = SettingsService.Instance.DefaultPinIcon,
-            Fotos = [],
-            OnPlanId = planId,
-            SelfId = currentDateTime,
-            DateTime = DateTime.Now,
-            PinColor = SKColors.Red,
-            PinScale = 1,
-            PinRotation = 0,
-            GeoLocation = new GeoLocData(location),
-            IsAllowExport = true,
-        };
+            var location = await geoViewModel.TryGetLocationAsync();
 
-        // Sicherstellen, dass der Plan existiert
-        if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
-        {
-            plan.Pins ??= [];
-            plan.Pins[currentDateTime] = newPinData;
+            if (location == null)
+                return;
 
-            GlobalJson.Data.Plans[planId].PinCount += 1;
-            GlobalJson.SaveToFile();
+            var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
+            map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
+
+            var currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            Models.Pin newPinData = new()
+            {
+                // ... (deine bestehende Initialisierung)
+                Pos = new Microsoft.Maui.Graphics.Point(0, 0),
+                Anchor = new Microsoft.Maui.Graphics.Point(0, 0),
+                Size = new Microsoft.Maui.Graphics.Size(0, 0),
+                IsLockPosition = false,
+                IsLockRotate = true,
+                IsLockAutoScale = true,
+                IsCustomPin = false,
+                IsCustomIcon = false,
+                IsWebMapPin = true,
+                PinName = "",
+                PinDesc = "",
+                PinPriority = 0,
+                PinLocation = "",
+                PinIcon = SettingsService.Instance.DefaultPinIcon,
+                Fotos = [],
+                OnPlanId = planId,
+                SelfId = currentDateTime,
+                DateTime = DateTime.Now,
+                PinColor = SKColors.Red,
+                PinScale = 1,
+                PinRotation = 0,
+                GeoLocation = new GeoLocData(location),
+                IsAllowExport = true,
+            };
+
+            if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
+            {
+                plan.Pins ??= [];
+                plan.Pins[currentDateTime] = newPinData;
+                GlobalJson.Data.Plans[planId].PinCount += 1;
+                GlobalJson.SaveToFile();
+
+                AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
+            }
         }
-
-        AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler bei SetPos: {ex.Message}");
+        }
+        finally
+        {
+            // Popup schließen
+            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
+                await Mopups.Services.MopupService.Instance.PopAsync();
+        }
     }
 
     private static TextBoxWidget CreateInstructionTextBox(string text) => new()

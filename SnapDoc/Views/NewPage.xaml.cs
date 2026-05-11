@@ -721,6 +721,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task UpdatePinLocationAsync(Pin pin)
     {
+        if (!SettingsService.Instance.IsGpsActive)
+            return;
+
         var location = await geoViewModel.TryGetLocationAsync();
         if (location == null)
             return;

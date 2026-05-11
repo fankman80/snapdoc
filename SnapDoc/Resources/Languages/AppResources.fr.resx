@@ -870,4 +870,7 @@
   <data name="pfeil_zeichnen" xml:space="preserve">
     <value>Dessiner une flèche</value>
   </data>
+  <data name="suche_standort" xml:space="preserve">
+    <value>Recherche de l'emplacement...</value>
+  </data>
 </root>
