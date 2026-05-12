@@ -28,7 +28,7 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = (int)(6 * SettingsService.Instance.OsBaseScale);
+    private int lineWidth = (int)(12 * SettingsService.Instance.OsBaseScale);
     private string strokeStyle = "";
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
@@ -416,6 +416,8 @@ public partial class ImageViewPage : IQueryAttributable
 
     private async Task StartDrawing(bool setDefaultMode = true)
     {
+        fotoContainer.IsPanningEnabled = false;
+
         if (setDefaultMode)
         {
             _activeButton = DrawRectBtn;
@@ -564,6 +566,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
 
         // Cleanup drawing canvas
+        fotoContainer.IsPanningEnabled = true;
         drawingController.Detach();
         RemoveDrawingView();
 

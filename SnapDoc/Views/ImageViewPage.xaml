@@ -78,7 +78,7 @@
                         DoubleTapped="OnDoubleTapped"
                         ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="FotoContainer"
-                            InputTransparent="True" 
+                            InputTransparent="False" 
 				            Scale="{Binding Scale}"
 				            TranslationX="{Binding TranslationX}"
 				            TranslationY="{Binding TranslationY}"
