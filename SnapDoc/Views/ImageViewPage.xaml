@@ -78,12 +78,14 @@
                         DoubleTapped="OnDoubleTapped"
                         ScrollWheelChanged="OnMouseScroll">
             <AbsoluteLayout x:Name="FotoContainer"
+                            InputTransparent="True" 
 				            Scale="{Binding Scale}"
 				            TranslationX="{Binding TranslationX}"
 				            TranslationY="{Binding TranslationY}"
                             AnchorX="{Binding AnchorX}"
 				            AnchorY="{Binding AnchorY}">
-                <Image x:Name="FotoImage"/>
+                <Image x:Name="FotoImage"
+                       InputTransparent="True" />
             </AbsoluteLayout>
         </mr:ContentView>
 
