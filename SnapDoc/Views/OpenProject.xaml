@@ -13,12 +13,6 @@
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektliste}">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-    
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"

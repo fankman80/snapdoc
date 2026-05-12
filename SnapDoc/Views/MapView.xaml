@@ -58,12 +58,6 @@
         </Grid>
     </Shell.TitleView>
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <Grid>
         <mapsui:MapControl x:Name="MapControl"
                            MapPointerMoved="OnPointerMoved"

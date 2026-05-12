@@ -1,6 +1,8 @@
 ﻿<?xml version = "1.0" encoding = "UTF-8" ?>
 <Application xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.App">
@@ -11,6 +13,18 @@
                 <ResourceDictionary Source="Resources/Styles/Colors.xaml" />
                 <ResourceDictionary Source="Resources/Styles/Styles.xaml" />
             </ResourceDictionary.MergedDictionaries>
+            
+            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>
+            <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" /> 
+            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
+            <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
+            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
+            <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
+            <services:HexToColorConverter x:Key="HexToColorConverter" />
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
+            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+
             <Style TargetType="StackLayout">
                 <Setter Property="Spacing"
                         Value="12" />

@@ -23,9 +23,6 @@
             <toolkit:BoolToObjectConverter x:Key="IsValidConverter"
                 TrueObject="{StaticResource TrueColorBrush}"
                 FalseObject="{StaticResource FalseColorBrush}"/>
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
         </ResourceDictionary>
     </toolkit:Popup.Resources>
 

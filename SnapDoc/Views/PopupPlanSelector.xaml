@@ -14,14 +14,6 @@
                xmlns:local="clr-namespace:SnapDoc"
                x:Class="SnapDoc.Views.PopupPlanSelector">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-            <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-
     <Grid Padding="12"
           WidthRequest="320">
         <Grid.RowDefinitions>

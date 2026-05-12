@@ -17,13 +17,6 @@
              x:DataType="views:NewPage"
              x:Name="ThisPage"
              Title="{Binding Title}">
-    
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"

@@ -28,7 +28,7 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = (int)(12 * SettingsService.Instance.OsBaseScale);
+    private int lineWidth = (int)(4 * SettingsService.Instance.OsBaseScale);
     private string strokeStyle = "";
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
@@ -89,17 +89,14 @@ public partial class ImageViewPage : IQueryAttributable
     public ImageViewPage()
     {
         InitializeComponent();
-
         BindingContext = this;
         fotoContainer = new TransformViewModel();
 
-        FotoContainer.BindingContext = fotoContainer;
+        ImageDrawingCanvas.BindingContext = fotoContainer;
         GestureContainer.BindingContext = fotoContainer;
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
-
         drawingController = new DrawingController(fotoContainer);
-
         _activeButton = DrawRectBtn;
     }
 
@@ -141,7 +138,7 @@ public partial class ImageViewPage : IQueryAttributable
             }
 
             var bytes = File.ReadAllBytes(imgPath);
-            FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+            FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -169,12 +166,13 @@ public partial class ImageViewPage : IQueryAttributable
     {
         if (!fotoContainer.IsPanningEnabled) return;
 
-        var scaleSpeed = 1 / FotoContainer.Scale;
+        var dragScale = 1.0 / fotoContainer.Scale;
         double angle = FotoContainer.Rotation * Math.PI / 180.0;
-        double deltaX = e.DeltaDistance.X * Math.Cos(angle) - -e.DeltaDistance.Y * Math.Sin(angle);
-        double deltaY = -e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle);
-        fotoContainer.TranslationX += deltaX * scaleSpeed;
-        fotoContainer.TranslationY += deltaY * scaleSpeed;
+        double deltaX = (e.DeltaDistance.X * Math.Cos(angle) + e.DeltaDistance.Y * Math.Sin(angle)) * dragScale;
+        double deltaY = (-e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle)) * dragScale;
+
+        fotoContainer.TranslationX += deltaX;
+        fotoContainer.TranslationY += deltaY;
         fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX);
         fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY);
     }
@@ -432,13 +430,13 @@ public partial class ImageViewPage : IQueryAttributable
         {
             try
             {
-                var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
+                var canvasContainer = this.FindByName<Microsoft.Maui.Controls.Grid>("ImageDrawingCanvas");
 
                 if (drawingView != null)
                 {
                     drawingController.Detach();
-                    if (absoluteLayout.Children.Contains(drawingView))
-                        absoluteLayout.Children.Remove(drawingView);
+                    if (canvasContainer.Children.Contains(drawingView))
+                        canvasContainer.Children.Remove(drawingView);
                     drawingView = null;
                 }
 
@@ -449,12 +447,8 @@ public partial class ImageViewPage : IQueryAttributable
 
                 // Wenn das Menü beim Start zu ist, Input erlauben
                 drawingView.InputTransparent = _isMenuExpanded;
-
                 drawingView.Opacity = 0;
-                absoluteLayout.Children.Add(drawingView);
-
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+                canvasContainer.Children.Add(drawingView);
 
                 IsToolButtonsVisible = true;
 
@@ -488,8 +482,8 @@ public partial class ImageViewPage : IQueryAttributable
         {
             isCleared = true;
             var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            
-            FotoImage.Source = ImageSource.FromStream(() =>
+
+            FotoContainer.Source = ImageSource.FromStream(() =>
             {
                 return File.OpenRead(imgPath);
             });
@@ -530,7 +524,7 @@ public partial class ImageViewPage : IQueryAttributable
                 File.Move(origPath, imgPath);
 
                 var bytes = File.ReadAllBytes(imgPath);
-                FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
@@ -547,7 +541,7 @@ public partial class ImageViewPage : IQueryAttributable
                 await SaveFotoWithOverlay(imgPath, imgPath);
 
                 var bytes = File.ReadAllBytes(imgPath);
-                FotoImage.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
                 Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
@@ -579,10 +573,10 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void RemoveDrawingView()
     {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("FotoContainer");
-        if (drawingView != null && absoluteLayout != null)
+        var canvasContainer = this.FindByName<Microsoft.Maui.Controls.Grid>("ImageDrawingCanvas");
+        if (drawingView != null && canvasContainer != null)
         {
-            absoluteLayout.Children.Remove(drawingView);
+            canvasContainer.Children.Remove(drawingView);
             drawingView = null;
         }
     }

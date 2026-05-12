@@ -58,16 +58,9 @@
                     VerticalOptions="Center"
                     HorizontalOptions="End"
                     ToolTipProperties.Text="{x:Static res:AppResources.pin_loeschen}"                    
-                    Clicked="OnDeleteClick"/>            
+                    Clicked="OnDeleteClick"/>
         </Grid>
     </Shell.TitleView>
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
 
     <Grid Margin="16">
         <Grid.RowDefinitions>

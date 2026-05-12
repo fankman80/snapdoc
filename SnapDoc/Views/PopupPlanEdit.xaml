@@ -14,13 +14,6 @@
                x:TypeArguments="local:PlanEditReturn"
                x:Class="SnapDoc.Views.PopupPlanEdit">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-
     <Grid x:DataType="views:PopupPlanEdit"
           Padding="12"
           WidthRequest="320">

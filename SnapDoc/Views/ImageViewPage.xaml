@@ -13,12 +13,6 @@
 			 x:Class="SnapDoc.Views.ImageViewPage"
              x:Name="ThisPage">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto,Auto"
               x:DataType="views:ImageViewPage"
@@ -69,33 +63,36 @@
         </Grid>
     </Shell.TitleView>
 
-    <AbsoluteLayout x:Name="ImageView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-        <mr:ContentView x:Name="GestureContainer"
+    <Grid>
+        <mr:AbsoluteLayout x:Name="GestureContainer"
+                        x:DataType="pc:TransformViewModel"
                         PinchingCommand="{Binding PinchingCommand}"
                         Panning="OnPanning"
                         Pinching="OnPinching"
                         Pinched="OnPinched"
                         DoubleTapped="OnDoubleTapped"
                         ScrollWheelChanged="OnMouseScroll">
-            <AbsoluteLayout x:Name="FotoContainer"
-                            InputTransparent="False" 
-				            Scale="{Binding Scale}"
-				            TranslationX="{Binding TranslationX}"
-				            TranslationY="{Binding TranslationY}"
-                            AnchorX="{Binding AnchorX}"
-				            AnchorY="{Binding AnchorY}">
-                <Image x:Name="FotoImage"
+            <Grid x:Name="ImageDrawingCanvas"
+                  AbsoluteLayout.LayoutBounds="0, 0, -1, -1"
+                  AbsoluteLayout.LayoutFlags="None"
+                  Scale="{Binding Scale}"
+                  TranslationX="{Binding TranslationX}"
+                  TranslationY="{Binding TranslationY}"
+                  AnchorX="{Binding AnchorX}"
+                  AnchorY="{Binding AnchorY}">
+
+                <Image x:Name="FotoContainer"
                        InputTransparent="True" />
-            </AbsoluteLayout>
-        </mr:ContentView>
+            </Grid>
+        </mr:AbsoluteLayout>
 
         <Button x:Name="DrawBtn"
                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
                 Margin="20,0,0,20"
                 ZIndex="10000"
+                VerticalOptions="End"
+                HorizontalOptions="Start"
                 Style="{StaticResource ToolButtonStyle}"
-                AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                 Clicked="DrawingClicked"/>
 
@@ -104,9 +101,9 @@
                 ZIndex="10000"
                 ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                 BackgroundColor="LimeGreen"
+                VerticalOptions="End"
+                HorizontalOptions="End"
                 Style="{StaticResource ToolButtonStyle}"
-                AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
-                AbsoluteLayout.LayoutFlags="PositionProportional"
                 ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
                 Clicked="CheckClicked"/>
 
@@ -115,9 +112,7 @@
                              Margin="20"
                              HorizontalOptions="Start"
                              VerticalOptions="End"
-                             ZIndex="10000"
-                             AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                             AbsoluteLayout.LayoutFlags="PositionProportional">
+                             ZIndex="10000">
             
             <Button HorizontalOptions="Start"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
@@ -200,5 +195,5 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.freihandlinie_zeichnen}"/>
             </HorizontalStackLayout>
         </VerticalStackLayout>
-    </AbsoluteLayout>
+    </Grid>
 </ContentPage>

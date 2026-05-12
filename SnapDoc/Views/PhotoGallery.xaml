@@ -45,8 +45,6 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-
             <!-- Template für Liste -->
             <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
                 <Grid HeightRequest="80"

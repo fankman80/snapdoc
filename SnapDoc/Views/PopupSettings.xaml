@@ -12,12 +12,6 @@
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupSettings">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
           Padding="12"
           WidthRequest="320">

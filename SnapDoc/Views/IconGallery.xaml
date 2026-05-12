@@ -56,8 +56,6 @@
 
     <ContentPage.Resources>
         <ResourceDictionary>
-            <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>            
-            
             <!-- Template für Liste (Label sichtbar) -->
             <DataTemplate x:Key="IconListTemplate"
                           x:DataType="local:IconItem">

@@ -14,13 +14,6 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupIconEdit">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-
     <Grid x:DataType="views:PopupIconEdit"
           Padding="12"
           WidthRequest="320">

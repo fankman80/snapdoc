@@ -13,12 +13,6 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupPinView">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-    
     <Grid Padding="0"
           WidthRequest="200">
         <VerticalStackLayout Spacing="4">

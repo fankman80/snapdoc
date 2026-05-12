@@ -29,13 +29,6 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
-            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

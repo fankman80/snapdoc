@@ -14,13 +14,6 @@
                x:TypeArguments="local:PopupStyleReturn"
                x:Class="SnapDoc.Views.PopupStyleEditor">
 
-    <toolkit:Popup.Resources>
-        <ResourceDictionary>
-            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
-            <services:HexToColorConverter x:Key="HexToColorConverter" />
-        </ResourceDictionary>
-    </toolkit:Popup.Resources>
-
     <Grid x:DataType="views:PopupStyleEditor"
           Padding="12"
           WidthRequest="320">
