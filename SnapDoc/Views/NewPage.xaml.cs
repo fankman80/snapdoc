@@ -1138,50 +1138,37 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     public async Task<SKRectI> SaveCanvasAsCroppedPng(string filePath)
     {
-        int width = (int)drawingView.CanvasSize.Width;
-        int height = (int)drawingView.CanvasSize.Height;
-        var info = new SKImageInfo(width, height);
-
-        using var surface = SKSurface.Create(info);
-        var canvas = surface.Canvas;
-
-        // Rotation ermitteln
-        float rotation = (float)-planContainer.Rotation;
-
-        // BoundingBox VOR dem Zeichnen berechnen
         var boundingBox = drawingController.CalculateBoundingBox((float)-drawingController.InitialRotation);
         if (boundingBox == null)
             return new SKRectI(0, 0, 0, 0);
 
-        // Offset für Strichdicke hinzufügen
-        var offset = (lineWidth * Settings.DisplayDensity) / 2;
-        var cropRect = new SKRectI(
-            (int)Math.Floor(boundingBox.Value.Left - offset),
-            (int)Math.Floor(boundingBox.Value.Top - offset),
-            (int)Math.Ceiling(boundingBox.Value.Right + offset),
-            (int)Math.Ceiling(boundingBox.Value.Bottom + offset)
+        float padding = (float)(lineWidth * Settings.DisplayDensity) / 2;
+
+        SKRect cropRect = new(
+            boundingBox.Value.Left - padding,
+            boundingBox.Value.Top - padding,
+            boundingBox.Value.Right + padding,
+            boundingBox.Value.Bottom + padding
         );
 
-        // Zeichne final auf Canvas
+        var info = new SKImageInfo((int)Math.Ceiling(cropRect.Width), (int)Math.Ceiling(cropRect.Height));
+        using var surface = SKSurface.Create(info);
+        var canvas = surface.Canvas;
+
         canvas.Clear(SKColors.Transparent);
+        canvas.Translate(-cropRect.Left, -cropRect.Top);
+
         drawingController.RenderFinal(canvas, (float)-drawingController.InitialRotation);
         canvas.Flush();
 
-        // Ganze Zeichnung als Bitmap holen
-        using var fullImage = surface.Snapshot();
-        using var fullBitmap = SKBitmap.FromImage(fullImage);
-
-        // Croppen
-        var croppedBitmap = new SKBitmap(cropRect.Width, cropRect.Height);
-        fullBitmap.ExtractSubset(croppedBitmap, cropRect);
-
-        // PNG speichern
-        using var image = SKImage.FromBitmap(croppedBitmap);
+        using var image = surface.Snapshot();
         using var data = image.Encode(SKEncodedImageFormat.Png, 90);
-        using var stream = File.Create(filePath);
-        data.SaveTo(stream);
+        using (var stream = File.Create(filePath))
+        {
+            data.SaveTo(stream);
+        }
 
-        return cropRect;
+        return new SKRectI((int)cropRect.Left, (int)cropRect.Top, (int)cropRect.Right, (int)cropRect.Bottom);
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)

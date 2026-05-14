@@ -15,15 +15,16 @@
             </ResourceDictionary.MergedDictionaries>
             
             <services:SkColorToHexConverter x:Key="SkColorToHexConverter"/>
-            <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter" /> 
-            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter" />
-            <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter" />
-            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter" />
+            <services:RawAssetToImageSourceConverter x:Key="RawAssetConverter"/> 
+            <services:ExportToGlyphConverter x:Key="ExportToGlyphConverter"/>
+            <services:SelectedToGlyphConverter x:Key="SelectedToGlyphConverter"/>
+            <services:BoolToFontAttributesConverter x:Key="BoolToFontAttributesConverter"/>
             <services:ColorWithoutAlphaConverter x:Key="ColorWithoutAlphaConverter"/>
-            <services:HexToColorConverter x:Key="HexToColorConverter" />
-            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter" />
-            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter" />
-            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter" />
+            <services:HexToColorConverter x:Key="HexToColorConverter"/>
+            
+            <toolkit:MathExpressionConverter x:Key="MathExpressionConverter"/>
+            <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter"/>
+            <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
 
             <Style TargetType="StackLayout">
                 <Setter Property="Spacing"

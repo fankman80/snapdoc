@@ -131,13 +131,19 @@
                   ColumnDefinitions="auto, auto"
                   ColumnSpacing="40">
                 <Button Grid.Column="0" 
-                        Text="{x:Static res:AppResources.abbrechen}" 
+                        Text="{x:Static local:MaterialIcons.Close}"
+                        FontSize="26"
+                        FontFamily="MaterialOutlined"
+                        Padding="0"
                         Clicked="OnRetakeClicked" 
-                        BackgroundColor="#E53935" TextColor="White" WidthRequest="140" />
-                <Button Grid.Column="1" 
-                        Text="{x:Static res:AppResources.speichern}" 
+                        BackgroundColor="#E53935" TextColor="White" WidthRequest="80" />
+                <Button Grid.Column="1"
+                        Text="{x:Static local:MaterialIcons.Save}"
+                        FontSize="26"
+                        FontFamily="MaterialOutlined"
+                        Padding="0"
                         Clicked="OnConfirmClicked" 
-                        BackgroundColor="#43A047" TextColor="White" WidthRequest="140" />
+                        BackgroundColor="#43A047" TextColor="White" WidthRequest="80" />
             </Grid>
 
         </VerticalStackLayout>
