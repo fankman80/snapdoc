@@ -1,5 +1,6 @@
 ﻿namespace SnapDoc;
 using CommunityToolkit.Maui;
+using CommunityToolkit.Maui.Core;
 
 public static class Settings
 {
@@ -103,5 +104,15 @@ public static class Settings
             CornerRadius = new CornerRadius(14),
             StrokeThickness = 0
         }         
+    };
+
+    private static readonly bool isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
+    public static readonly SnackbarOptions SnackBarOptions = new()
+    {
+        BackgroundColor = isDark ? Color.FromRgba("#212121") : Color.FromArgb("#F5F5F5"),
+        TextColor = isDark ? Colors.White : Colors.Black,
+        ActionButtonTextColor = isDark ? Colors.Yellow : Color.FromArgb("#0066CC"),
+        CornerRadius = new CornerRadius(8),
+        Font = Microsoft.Maui.Font.SystemFontOfSize(14)
     };
 }

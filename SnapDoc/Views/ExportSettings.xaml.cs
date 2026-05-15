@@ -67,17 +67,22 @@ public partial class ExportSettings : ContentPage
         try
         {
             await ShareFileAsync(outputPath);
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_geteilt, AppResources.ok);
-            else
-                await Toast.Make(AppResources.bericht_wurde_geteilt).Show();
+
+            await Snackbar.Make(
+                message: AppResources.bericht_wurde_geteilt,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         catch
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_nicht_geteilt, AppResources.ok);
-            else
-                await Toast.Make(AppResources.bericht_wurde_nicht_geteilt).Show();
+            await Snackbar.Make(
+                message: AppResources.bericht_wurde_nicht_geteilt,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
 
         if (File.Exists(outputPath))
@@ -116,17 +121,21 @@ public partial class ExportSettings : ContentPage
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
         if (fileSaveResult.IsSuccessful)
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_gespeichert, AppResources.ok);
-            else
-                await Toast.Make(AppResources.bericht_wurde_gespeichert).Show();
+            await Snackbar.Make(
+                message: AppResources.bericht_wurde_gespeichert,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         else
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.bericht_wurde_nicht_gespeichert, AppResources.ok);
-            else
-                await Toast.Make(AppResources.bericht_wurde_nicht_gespeichert).Show();
+            await Snackbar.Make(
+                message: AppResources.bericht_wurde_nicht_gespeichert,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         saveStream.Close();
 

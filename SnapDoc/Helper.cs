@@ -169,10 +169,12 @@ public class Helper
         }
         catch (Exception ex)
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                Application.Current.Windows[0].Page.DisplayAlertAsync("", $"Fehler in der Icon-Datenbank." + ex.Message, "OK");
-            else
-                Toast.Make($"Fehler in der Icon-Datenbank." + ex.Message).Show();
+            Snackbar.Make(
+                message: $"Fehler in der Icon-Datenbank." + ex.Message,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
 
         allCategories = [.. categories];

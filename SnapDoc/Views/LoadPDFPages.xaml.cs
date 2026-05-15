@@ -4,6 +4,7 @@ using SnapDoc.Controls;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using CommunityToolkit.Maui.Alerts;
 
 namespace SnapDoc.Views;
 public partial class LoadPDFPages : ContentPage
@@ -135,7 +136,12 @@ public partial class LoadPDFPages : ContentPage
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
                 await Mopups.Services.MopupService.Instance.PopAllAsync();
 
-            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+            await Snackbar.Make(
+                message: $"{AppResources.fehler}: {ex.Message}",
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         finally
         {
@@ -216,7 +222,12 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("PDF-Error", ex.Message, "OK");
+            await Snackbar.Make(
+                message: $"PDF-Error: {ex.Message}",
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         finally
         {

@@ -873,4 +873,7 @@
   <data name="suche_standort" xml:space="preserve">
     <value>Recherche de l'emplacement...</value>
   </data>
+  <data name="einstellungen_gespeichert" xml:space="preserve">
+    <value>Paramètres enregistrés!</value>
+  </data>
 </root>

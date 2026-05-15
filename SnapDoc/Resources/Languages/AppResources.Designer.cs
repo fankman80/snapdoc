@@ -466,6 +466,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen gespeichert! ähnelt.
+        /// </summary>
+        internal static string einstellungen_gespeichert {
+            get {
+                return ResourceManager.GetString("einstellungen_gespeichert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen öffnen ähnelt.
         /// </summary>
         internal static string einstellungen_oeffnen {

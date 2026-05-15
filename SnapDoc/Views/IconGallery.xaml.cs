@@ -154,10 +154,12 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
         catch (Exception ex)
         {
-            if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.fehler_bild_import + ": " + ex.Message, AppResources.ok);
-            else
-                await Toast.Make(AppResources.fehler_bild_import + ": " + ex.Message).Show();
+            await Snackbar.Make(
+                message: AppResources.fehler_bild_import + ": " + ex.Message,
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
     }
 

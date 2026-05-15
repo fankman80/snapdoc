@@ -75,7 +75,13 @@ public partial class OpenProject : ContentPage
             string sanitizedName = OpenProject.SanitizeFileName(result.Result);
             if (string.IsNullOrWhiteSpace(sanitizedName))
             {
-                await DisplayAlertAsync(AppResources.fehler, AppResources.invalid_project_name, AppResources.ok);
+                await Snackbar.Make(
+                    message: AppResources.invalid_project_name,
+                    actionButtonText: AppResources.ok,
+                    duration: TimeSpan.FromSeconds(3),
+                    visualOptions: Settings.SnackBarOptions
+                ).Show();
+
                 return;
             }
 
@@ -167,10 +173,12 @@ public partial class OpenProject : ContentPage
         catch (Exception)
         {
             await MainThread.InvokeOnMainThreadAsync(async () => {
-                if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                    await Application.Current.Windows[0].Page.DisplayAlertAsync(AppResources.fehler, AppResources.datei_konnte_nicht_importiert_werden, AppResources.ok);
-                else
-                    await Toast.Make(AppResources.datei_konnte_nicht_importiert_werden).Show();
+                await Snackbar.Make(
+                    message: AppResources.datei_konnte_nicht_importiert_werden,
+                    actionButtonText: AppResources.ok,
+                    duration: TimeSpan.FromSeconds(3),
+                    visualOptions: Settings.SnackBarOptions
+                ).Show();
             });
         }
         finally
@@ -356,10 +364,12 @@ public partial class OpenProject : ContentPage
 
                                 if (fileSaveResult.IsSuccessful)
                                 {
-                                    if (DeviceInfo.Platform == DevicePlatform.WinUI)
-                                        await Application.Current.Windows[0].Page.DisplayAlertAsync("", AppResources.zip_wurde_exportiert, AppResources.ok);
-                                    else
-                                        await Toast.Make(AppResources.zip_wurde_exportiert).Show();
+                                    await Snackbar.Make(
+                                        message: AppResources.zip_wurde_exportiert,
+                                        actionButtonText: AppResources.ok,
+                                        duration: TimeSpan.FromSeconds(3),
+                                        visualOptions: Settings.SnackBarOptions
+                                    ).Show();
                                 }
                             }
                             File.Delete(outputPath);
@@ -428,7 +438,12 @@ public partial class OpenProject : ContentPage
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
                 await Mopups.Services.MopupService.Instance.PopAllAsync();
 
-            await DisplayAlertAsync("Error", ex.Message, "OK");
+            await Snackbar.Make(
+                message: $"Error: {ex.Message}",
+                actionButtonText: AppResources.ok,
+                duration: TimeSpan.FromSeconds(3),
+                visualOptions: Settings.SnackBarOptions
+            ).Show();
         }
         finally
         {
