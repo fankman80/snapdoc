@@ -3,6 +3,8 @@ using SnapDoc.Services;
 using System.Text.Json;
 using SnapDoc.Resources.Languages;
 using CommunityToolkit.Maui.Alerts;
+using SnapDoc.Controls;
+
 
 #if ANDROID
 using Android.Webkit;
@@ -212,12 +214,8 @@ public partial class EditorView : ContentPage, IQueryAttributable
     public async Task SaveJsonAsync(string json)
     {
         File.WriteAllText(_filePath, json);
-        await Snackbar.Make(
-            message: AppResources.einstellungen_gespeichert,
-            actionButtonText: AppResources.ok,
-            duration: TimeSpan.FromSeconds(3),
-            visualOptions: Settings.SnackBarOptions
-        ).Show();
+
+        await SnackbarExtensions.ShowSafeAsync(AppResources.einstellungen_gespeichert);
 
         await Shell.Current.GoToAsync($"..?fileType={_fileType}");
     }

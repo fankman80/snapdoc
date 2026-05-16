@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Controls;
 using SkiaSharp;
+using SnapDoc.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -154,12 +155,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
         catch (Exception ex)
         {
-            await Snackbar.Make(
-                message: AppResources.fehler_bild_import + ": " + ex.Message,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            await SnackbarExtensions.ShowSafeAsync($"{AppResources.fehler_bild_import}: {ex.Message}");
         }
     }
 

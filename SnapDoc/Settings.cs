@@ -106,13 +106,23 @@ public static class Settings
         }         
     };
 
-    private static readonly bool isDark = Application.Current?.RequestedTheme == AppTheme.Dark;
-    public static readonly SnackbarOptions SnackBarOptions = new()
+    public static SnackbarOptions SnackBarOptions
     {
-        BackgroundColor = isDark ? Color.FromRgba("#212121") : Color.FromArgb("#F5F5F5"),
-        TextColor = isDark ? Colors.White : Colors.Black,
-        ActionButtonTextColor = isDark ? Colors.Yellow : Color.FromArgb("#0066CC"),
-        CornerRadius = new CornerRadius(8),
-        Font = Microsoft.Maui.Font.SystemFontOfSize(14)
-    };
+        get
+        {
+            Color actionColor = Colors.Blue;
+
+            if (Application.Current?.Resources.TryGetValue("Primary", out var res) == true && res is Color primaryColor)
+                actionColor = primaryColor;
+
+            return new SnackbarOptions
+            {
+                BackgroundColor = Colors.White,
+                TextColor = Colors.Black,
+                ActionButtonTextColor = actionColor,
+                CornerRadius = new CornerRadius(8),
+                Font = Microsoft.Maui.Font.SystemFontOfSize(14)
+            };
+        }
+    }
 }

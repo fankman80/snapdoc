@@ -398,12 +398,7 @@ public partial class MapView : IQueryAttributable
 
     private static async Task ShowGpsDisabledMessageAsync()
     {
-        await Snackbar.Make(
-            message: AppResources.standortdienste_aktivieren_aufforderung,
-            actionButtonText: AppResources.ok,
-            duration: TimeSpan.FromSeconds(3),
-            visualOptions: Settings.SnackBarOptions
-        ).Show();
+        await SnackbarExtensions.ShowSafeAsync(AppResources.standortdienste_aktivieren_aufforderung);
     }
 
     private async void KmlExportClicked(object sender, EventArgs e)
@@ -434,23 +429,9 @@ public partial class MapView : IQueryAttributable
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".kml", saveStream);
         if (fileSaveResult.IsSuccessful)
-        {
-            await Snackbar.Make(
-                message: AppResources.kml_gespeichert,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
-        }
+            await SnackbarExtensions.ShowSafeAsync(AppResources.kml_gespeichert, includeDelay: true);
         else
-        {
-            await Snackbar.Make(
-                message: AppResources.kml_nicht_gespeichert,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
-        }
+            await SnackbarExtensions.ShowSafeAsync(AppResources.kml_nicht_gespeichert, includeDelay: true);
         saveStream.Close();
 
         if (File.Exists(outputPath))

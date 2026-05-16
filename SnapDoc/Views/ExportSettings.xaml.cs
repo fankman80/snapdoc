@@ -67,22 +67,11 @@ public partial class ExportSettings : ContentPage
         try
         {
             await ShareFileAsync(outputPath);
-
-            await Snackbar.Make(
-                message: AppResources.bericht_wurde_geteilt,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
         }
         catch
         {
-            await Snackbar.Make(
-                message: AppResources.bericht_wurde_nicht_geteilt,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
         }
 
         if (File.Exists(outputPath))
@@ -119,24 +108,11 @@ public partial class ExportSettings : ContentPage
 
         var saveStream = File.Open(outputPath, FileMode.Open);
         var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
+
         if (fileSaveResult.IsSuccessful)
-        {
-            await Snackbar.Make(
-                message: AppResources.bericht_wurde_gespeichert,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
-        }
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
         else
-        {
-            await Snackbar.Make(
-                message: AppResources.bericht_wurde_nicht_gespeichert,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
-        }
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
         saveStream.Close();
 
         if (File.Exists(outputPath))

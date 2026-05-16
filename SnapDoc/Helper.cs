@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
+using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Globalization;
@@ -132,15 +133,11 @@ public class Helper
                 // Erfasse alle Kategorien
                 var categoryValue = itemElement.Element("Category")?.Value ?? string.Empty;
                 if (!string.IsNullOrEmpty(categoryValue))
-                {
-                    categories.Add(categoryValue); // Fügt die Kategorie hinzu, wenn sie nicht leer ist
-                }
+                    categories.Add(categoryValue);
 
                 // Wenn eine Kategorie zum Filtern übergeben wurde
                 if (category != AppResources.alle_icons && !categoryValue.Equals(category, StringComparison.OrdinalIgnoreCase))
-                {
-                    continue; // Springe zum nächsten Element, wenn die Kategorie nicht übereinstimmt
-                }
+                    continue;
 
                 var fileName = itemElement.Element("FileName")?.Value ?? string.Empty;
                 var iconItem = new IconItem(
@@ -169,12 +166,7 @@ public class Helper
         }
         catch (Exception ex)
         {
-            Snackbar.Make(
-                message: $"Fehler in der Icon-Datenbank." + ex.Message,
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            _ = SnackbarExtensions.ShowSafeAsync($"Fehler in der Icon-Datenbank. {ex.Message}");
         }
 
         allCategories = [.. categories];

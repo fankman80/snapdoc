@@ -92,37 +92,35 @@ public partial class LoadPDFPages : ContentPage
                         }
 
                         byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
-                        using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
+                        using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
+                        for (int i = 0; i < nativeDoc.PageCount; i++)
                         {
-                            for (int i = 0; i < nativeDoc.PageCount; i++)
+                            string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
+                            string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
+                            string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
+
+                            await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
+
+                            int width = 0, height = 0;
+                            using (var stream = File.OpenRead(previewPath))
+                            using (var codec = SKCodec.Create(stream))
                             {
-                                string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
-                                string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
-                                string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
-
-                                await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-
-                                int width = 0, height = 0;
-                                using (var stream = File.OpenRead(previewPath))
-                                using (var codec = SKCodec.Create(stream))
-                                {
-                                    if (codec != null) { width = codec.Info.Width; height = codec.Info.Height; }
-                                }
-
-                                int targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
-
-                                pdfImages.Add(new PdfItem
-                                {
-                                    ImagePath = imgPath,
-                                    PreviewPath = previewPath,
-                                    PdfPath = localPdfPath,
-                                    IsChecked = true,
-                                    Dpi = targetDpi,
-                                    DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
-                                    ImageName = imgBaseName,
-                                    PdfPage = i,
-                                });
+                                if (codec != null) { width = codec.Info.Width; height = codec.Info.Height; }
                             }
+
+                            int targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
+
+                            pdfImages.Add(new PdfItem
+                            {
+                                ImagePath = imgPath,
+                                PreviewPath = previewPath,
+                                PdfPath = localPdfPath,
+                                IsChecked = true,
+                                Dpi = targetDpi,
+                                DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
+                                ImageName = imgBaseName,
+                                PdfPage = i,
+                            });
                         }
                     });
                 }
@@ -136,12 +134,7 @@ public partial class LoadPDFPages : ContentPage
             if (Mopups.Services.MopupService.Instance.PopupStack.Any())
                 await Mopups.Services.MopupService.Instance.PopAllAsync();
 
-            await Snackbar.Make(
-                message: $"{AppResources.fehler}: {ex.Message}",
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            await SnackbarExtensions.ShowSafeAsync($"{AppResources.fehler}: {ex.Message}", includeDelay: true);
         }
         finally
         {
@@ -222,12 +215,7 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await Snackbar.Make(
-                message: $"PDF-Error: {ex.Message}",
-                actionButtonText: AppResources.ok,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
+            await SnackbarExtensions.ShowSafeAsync($"PDF-Error: {ex.Message}", includeDelay: true);
         }
         finally
         {
