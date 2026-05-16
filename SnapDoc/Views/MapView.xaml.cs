@@ -666,7 +666,7 @@ public partial class MapView : IQueryAttributable
                     lat1, lon1, lat2, lon2, DistanceUnits.Kilometers) * 1000;
             }
 
-            MeasurementResult = totalRealDistanceInMeters >= 1000
+            measurementResult = totalRealDistanceInMeters >= 1000
                 ? $"{(totalRealDistanceInMeters / 1000.0).ToString("0.##", new CultureInfo("de-CH"))} km"
                 : $"{totalRealDistanceInMeters.ToString("N1", new CultureInfo("de-CH"))} m";
         }
