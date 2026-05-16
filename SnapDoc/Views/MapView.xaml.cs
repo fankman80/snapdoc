@@ -26,6 +26,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Diagnostics;
+using System.Globalization;
 using SnapDoc.Controls;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
@@ -643,8 +644,8 @@ public partial class MapView : IQueryAttributable
 
             double realArea = polygon.Area * (cosLat * cosLat);
             measurementResult = realArea >= 1000000
-                ? $"{(realArea / 1000000.0):0.##} km²"
-                : $"{realArea:N1} m²";
+                ? $"{(realArea / 1000000.0).ToString("0.##", new CultureInfo("de-CH"))} km²"
+                : $"{realArea.ToString("N1", new CultureInfo("de-CH"))} m²";
         }
         else if (_measurePoints.Count > 1)
         {
@@ -665,9 +666,9 @@ public partial class MapView : IQueryAttributable
                     lat1, lon1, lat2, lon2, DistanceUnits.Kilometers) * 1000;
             }
 
-            measurementResult = totalRealDistanceInMeters >= 1000
-                ? $"{(totalRealDistanceInMeters / 1000.0):0.##} km"
-                : $"{totalRealDistanceInMeters:N1} m";
+            MeasurementResult = totalRealDistanceInMeters >= 1000
+                ? $"{(totalRealDistanceInMeters / 1000.0).ToString("0.##", new CultureInfo("de-CH"))} km"
+                : $"{totalRealDistanceInMeters.ToString("N1", new CultureInfo("de-CH"))} m";
         }
 
         string prefix = _isPolygonClosed ? $"{AppResources.flaeche}" : $"{AppResources.distanz}";
