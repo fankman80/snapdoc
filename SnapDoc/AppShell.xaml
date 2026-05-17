@@ -157,16 +157,14 @@
                     <RowDefinition Height="Auto" />
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
-                <ImageButton Grid.Column="0"
+                <ImageButton Grid.Column="0" Grid.RowSpan="2"
                              HeightRequest="100"
                              WidthRequest="100"
-                             Grid.RowSpan="2"
                              Aspect="AspectFill"
                              BackgroundColor="Transparent"
                              Source="{Binding FlyoutHeaderImageThumb}"
                              Clicked="OnTitleClicked"/>
-                <Label Grid.Column="1"
-                       Grid.Row="0"
+                <Label Grid.Column="1" Grid.Row="0"
                        Text="{Binding FlyoutHeaderDesc}"
                        LineBreakMode="TailTruncation"
                        MaxLines="2"                       
@@ -175,8 +173,7 @@
                        FontAttributes="Bold"
                        VerticalTextAlignment="Center"
                        HorizontalTextAlignment="Start"/>
-                <Label Grid.Column="1"
-                       Grid.Row="1"
+                <Label Grid.Column="1" Grid.Row="1"
                        Text="{Binding FlyoutHeaderTitle}"
                        LineBreakMode="TailTruncation"
                        MaxLines="2"
