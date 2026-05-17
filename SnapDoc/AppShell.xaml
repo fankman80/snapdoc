@@ -283,7 +283,7 @@
                                 ReorderCompleted="OnReorderCompleted"
                                 SelectionChanged="OnPlanSelectionChanged">
                     <CollectionView.Footer>
-                        <Grid HeightRequest="{OnPlatform iOS=50, Default=0}" Color="Transparent" />
+                        <Grid HeightRequest="{OnPlatform iOS=50, Default=0}"/>
                     </CollectionView.Footer>
                 </CollectionView>
             </Grid>

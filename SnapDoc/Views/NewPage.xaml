@@ -268,6 +268,7 @@
                                  AbsoluteLayout.LayoutFlags="PositionProportional">
 
                 <Button IsVisible="{Binding Source={x:Reference Name=ThisPage}, Path=IsToolButtonsVisible}"
+                        HorizontalOptions="Start"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                         BackgroundColor="LimeGreen"
                         Style="{StaticResource ToolButtonStyle}"
