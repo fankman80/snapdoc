@@ -76,7 +76,7 @@ public class SelectedToGlyphConverter : IMultiValueConverter
         if (values == null || values.Length < 2)
             return MaterialIcons.Layers;
 
-        bool isSelected = values[0] is bool b && b;
+        //bool isSelected = values[0] is bool b && b;
         string id = values[1] as string ?? string.Empty;
         string icon;
         if (id.Contains("webmap"))
@@ -84,7 +84,8 @@ public class SelectedToGlyphConverter : IMultiValueConverter
         else
             icon = MaterialIcons.Layers;
 
-        return isSelected ? MaterialIcons.Check_box : icon;
+        //return isSelected ? MaterialIcons.Arrow_right : icon;
+        return icon;
     }
 
     public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)
