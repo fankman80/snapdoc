@@ -580,45 +580,53 @@ public partial class ImageViewPage : IQueryAttributable
 
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
-        using var fotoStream = File.OpenRead(fotoPath);
-        using var fotoBitmap = SKBitmap.Decode(fotoStream);
-
-        int width = fotoBitmap.Width;
-        int height = fotoBitmap.Height;
-
-        var info = new SKImageInfo(width, height);
-        using var surface = SKSurface.Create(info);
-        var canvas = surface.Canvas;
-        canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0));
-
-        // Overlay erstellen (ohne Handles)
-        using (var overlaySurface = SKSurface.Create(info))
+        SKBitmap fotoBitmap;
+    
+        using (var fotoStream = File.OpenRead(fotoPath))
         {
-            var overlayCanvas = overlaySurface.Canvas;
-            overlayCanvas.Clear(SKColors.Transparent);
-
-            float scaleX = width / drawingView.CanvasSize.Width;
-            float scaleY = height / drawingView.CanvasSize.Height;
-            overlayCanvas.Scale(scaleX, scaleY);
-
-            // Zeichne ohne Handles auf overlayCanvas
-            drawingController.DrawWithoutHandles(overlayCanvas);
-
-            overlayCanvas.Flush();
-
-            using var overlayImage = overlaySurface.Snapshot();
-            var destRect = new SKRect(0, 0, width, height);
-            canvas.DrawImage(overlayImage, destRect);
+            fotoBitmap = SKBitmap.Decode(fotoStream);
         }
 
-        canvas.Flush();
+        using (fotoBitmap)
+        {
+            int width = fotoBitmap.Width;
+            int height = fotoBitmap.Height;
 
-        using var finalImage = surface.Snapshot();
-        using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
-        using var output = File.Create(outputPath);
-        data.SaveTo(output);
+            var info = new SKImageInfo(width, height);
+            using var surface = SKSurface.Create(info);
+            var canvas = surface.Canvas;
+            canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0));
+
+            // Overlay erstellen (ohne Handles)
+            using (var overlaySurface = SKSurface.Create(info))
+            {
+                var overlayCanvas = overlaySurface.Canvas;
+                overlayCanvas.Clear(SKColors.Transparent);
+
+                float scaleX = width / drawingView.CanvasSize.Width;
+                float scaleY = height / drawingView.CanvasSize.Height;
+                overlayCanvas.Scale(scaleX, scaleY);
+
+                // Zeichne ohne Handles auf overlayCanvas
+                drawingController.DrawWithoutHandles(overlayCanvas);
+
+                overlayCanvas.Flush();
+
+                using var overlayImage = overlaySurface.Snapshot();
+                var destRect = new SKRect(0, 0, width, height);
+                canvas.DrawImage(overlayImage, destRect);
+            }
+
+            canvas.Flush();
+
+            using var finalImage = surface.Snapshot();
+            using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
+            using var output = File.Create(outputPath);
+            data.SaveTo(output);
+        }
     }
 
+    
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle);
