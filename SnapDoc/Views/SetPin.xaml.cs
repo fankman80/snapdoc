@@ -277,12 +277,15 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = DateTime.Now
             }.Initialize();
 
-            Fotos.Add(newItem);
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                Fotos.Add(newItem);
+            });
+
 #if WINDOWS
             FotoLoader();
 #endif
         }
-
     }
 
     private void OnReorderCompleted(object sender, EventArgs e)

@@ -338,11 +338,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             }
         };
 
-#if IOS
-        // Auf iOS kann es vorkommen, dass die Pins unscharf dargestellt werden, wenn sie skaliert werden.
-        // FixIosPinQuality(smallImage);
-#endif
-
         smallImage.Down += OnPinDown;
         smallImage.Up += OnPinUp;
         smallImage.Tapped += OnPinTapped;
@@ -356,6 +351,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         _pinLookup[pinId] = smallImage;
 
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
+
+#if IOS
+        // --- FIX NUR FÜR iOS ---
+        // Zwingt die Skalierung in den nächsten UI-Frame, nachdem iOS das Layout aufgebaut hat.
+        Dispatcher.Dispatch(() =>
+        {
+            if (_pinLookup.TryGetValue(pinId, out var img))
+                img.Scale = PinScaling(pinId);
+        });
+#endif
     }
 
     private void OnPinDown(object sender, EventArgs e)
@@ -1667,38 +1672,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
-        }
-#endif
-    }
-
-    private static void FixIosPinQuality(Microsoft.Maui.Controls.Image img)
-    {
-#if IOS
-        static void Apply(UIImageView imageView)
-        {
-            if (imageView.Layer == null)
-                return;
-
-            imageView.Layer.MinificationFilter = CALayer.FilterTrilinear;
-            imageView.Layer.MagnificationFilter = CALayer.FilterTrilinear;
-            imageView.Layer.ContentsScale = (System.Runtime.InteropServices.NFloat)UIScreen.MainScreen.Scale;
-            imageView.Layer.ShouldRasterize = true;
-            imageView.Layer.RasterizationScale = (System.Runtime.InteropServices.NFloat)(UIScreen.MainScreen.Scale * 2.0);
-            imageView.Layer.EdgeAntialiasingMask = CAEdgeAntialiasingMask.All;
-            imageView.Layer.AllowsEdgeAntialiasing = true;
-        }
-
-        if (img.Handler?.PlatformView is UIImageView directView)
-        {
-            Apply(directView);
-        }
-        else
-        {
-            img.HandlerChanged += (s, e) =>
-            {
-                if (img.Handler?.PlatformView is UIImageView imageView)
-                    Apply(imageView);
-            };
         }
 #endif
     }
