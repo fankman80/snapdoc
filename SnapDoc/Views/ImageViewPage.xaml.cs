@@ -447,7 +447,6 @@ public partial class ImageViewPage : IQueryAttributable
 
                 // Wenn das Menü beim Start zu ist, Input erlauben
                 drawingView.InputTransparent = _isMenuExpanded;
-                drawingView.Opacity = 0;
                 canvasContainer.Children.Add(drawingView);
 
                 IsToolButtonsVisible = true;
@@ -462,8 +461,6 @@ public partial class ImageViewPage : IQueryAttributable
                 );
 
                 drawingView.InvalidateSurface();
-                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
-                drawingView.Opacity = 1;
             }
             catch (Exception ex)
             {
