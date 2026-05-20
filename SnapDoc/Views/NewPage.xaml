@@ -60,8 +60,9 @@
     </Shell.TitleView>
     
     <Grid>
-        <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True" x:DataType="pc:TransformViewModel">
-            <mr:ContentView PinchingCommand="{Binding PinchingCommand}"
+        <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True">
+            <mr:ContentView x:DataType="pc:TransformViewModel"
+                            PinchingCommand="{Binding PinchingCommand}"
                             RotatingCommand="{Binding RotatingCommand}"
                             Panning="OnPanning"
                             Pinching="OnPinching"
@@ -258,7 +259,8 @@
                     ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                     Clicked="DrawingClicked"/>
 
-            <VerticalStackLayout IsVisible="{Binding Source={x:Reference Name=ThisPage}, Path=IsToolButtonsVisible}"
+            <VerticalStackLayout x:DataType="views:NewPage"
+                                 IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference Name=ThisPage}}"
                                  Spacing="16"
                                  Margin="20"
                                  HorizontalOptions="Start"
@@ -284,7 +286,7 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="TextClicked"/>
-                <AbsoluteLayout x:DataType="views:NewPage">
+                <AbsoluteLayout>
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                             Style="{StaticResource ToolButtonStyle}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"

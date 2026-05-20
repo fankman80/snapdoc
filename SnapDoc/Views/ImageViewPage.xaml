@@ -65,13 +65,13 @@
 
     <Grid>
         <mr:AbsoluteLayout x:Name="GestureContainer"
-                        x:DataType="pc:TransformViewModel"
-                        PinchingCommand="{Binding PinchingCommand}"
-                        Panning="OnPanning"
-                        Pinching="OnPinching"
-                        Pinched="OnPinched"
-                        DoubleTapped="OnDoubleTapped"
-                        ScrollWheelChanged="OnMouseScroll">
+                           x:DataType="pc:TransformViewModel"
+                           PinchingCommand="{Binding PinchingCommand}"
+                           Panning="OnPanning"
+                           Pinching="OnPinching"
+                           Pinched="OnPinched"
+                           DoubleTapped="OnDoubleTapped"
+                           ScrollWheelChanged="OnMouseScroll">
             <Grid x:Name="ImageDrawingCanvas"
                   AbsoluteLayout.LayoutBounds="0, 0, -1, -1"
                   AbsoluteLayout.LayoutFlags="None"
@@ -96,7 +96,8 @@
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                 Clicked="DrawingClicked"/>
 
-        <VerticalStackLayout IsVisible="{Binding Source={x:Reference Name=ThisPage}, Path=IsToolButtonsVisible}"
+        <VerticalStackLayout x:DataType="views:ImageViewPage"
+                             IsVisible="{Binding IsToolButtonsVisible}"
                              Spacing="16"
                              Margin="20"
                              HorizontalOptions="Start"
@@ -120,7 +121,7 @@
                     Style="{StaticResource ToolButtonStyle}"
                     ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                     Clicked="TextClicked"/>
-            <AbsoluteLayout x:DataType="views:ImageViewPage">
+            <AbsoluteLayout>
                 <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
