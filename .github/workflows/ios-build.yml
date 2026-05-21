@@ -21,11 +21,8 @@ jobs:
       - name: Setup Xcode
         uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: '26.4'
+          xcode-version: '26.5'
     
-      - name: Verify Xcode version
-        run: xcodebuild -version # Kontrolliert im Log, ob 26.4.1 aktiv ist.
-
       - name: Install MAUI Workloads
         run: |
           dotnet workload install maui-ios
