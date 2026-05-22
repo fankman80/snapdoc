@@ -357,8 +357,12 @@
             </VerticalStackLayout>
         </AbsoluteLayout>
 
-        <AbsoluteLayout x:Name="SetPinFrame" IsVisible="false">
-            <Border AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+        <AbsoluteLayout x:Name="SetPinFrame"
+                        IsVisible="false"
+                        InputTransparent="True"
+                        CascadeInputTransparent="False">
+            <Border InputTransparent="True"
+                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                     AbsoluteLayout.LayoutFlags="All"
                     Stroke="Red"
                     StrokeThickness="16"
@@ -369,7 +373,7 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Margin="0,0,20,20"
                     BackgroundColor="Red"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static local:MaterialIcons.Cancel}}"  
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static local:MaterialIcons.Close}}"  
                     Style="{StaticResource ToolButtonStyle}"                    
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>
