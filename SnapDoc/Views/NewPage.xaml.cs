@@ -121,7 +121,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         drawingController = new DrawingController(planContainer);
         thisPlan = GlobalJson.Data.Plans[planId];
-        _activeButton = DrawRectBtn;
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
@@ -827,9 +826,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (setDefaultMode)
         {
-            _activeButton = DrawRectBtn;
+            ShapeBtn.Text = MaterialIcons.Activity_zone;
             SetDrawMode(DrawMode.Rect);
-            SyncMenuStateInstant();
         }
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
@@ -906,100 +904,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void DrawArrowClicked(object sender, EventArgs e)
         => SetDrawMode(DrawMode.Arrow);
 
-    private async void MenuButtonClicked(object sender, EventArgs e)
+    private async void ShapeButtonClicked(object sender, EventArgs e)
     {
         if (sender is not Microsoft.Maui.Controls.Button clickedButton)
             return;
 
-        if (!_isMenuExpanded)
-        {
-            await ExpandMenu();
-        }
-        else
-        {
-            _activeButton = clickedButton;
-            await CollapseMenu();
-            ExecuteDrawingLogic(clickedButton);
-        }
-    }
+        var popup = new PopupShapeSelect();
+        var result = await this.ShowPopupAsync<int>(popup, Settings.PopupOptions);
 
-    private async Task ExpandMenu()
-    {
-        _isMenuExpanded = true;
-
-        // Zeichnen deaktivieren, solange das Menü offen ist
-        drawingView?.InputTransparent = true;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                btn.IsVisible = true;
-                btn.Opacity = 0;
-                // Kleiner Fade-In Effekt
-                _ = btn.FadeToAsync(1, 200, Easing.CubicOut);
-            }
-        }
-    }
-
-    private void SyncMenuStateInstant()
-    {
-        _isMenuExpanded = false;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                if (btn == _activeButton)
-                {
-                    btn.IsVisible = true;
-                    btn.Opacity = 1;
-                }
-                else
-                {
-                    btn.IsVisible = false;
-                    btn.Opacity = 0;
-                }
-            }
-        }
-    }
-
-    private async Task CollapseMenu()
-    {
-        _isMenuExpanded = false;
-
-        // Zeichnen erst wieder erlauben, wenn das Menü schließt
-        drawingView?.InputTransparent = false;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                if (btn == _activeButton)
-                {
-                    btn.IsVisible = true;
-                    btn.Opacity = 1;
-                }
-                else
-                {
-                    _ = btn.FadeToAsync(0, 200, Easing.CubicIn);
-                    btn.Dispatcher.Dispatch(async () =>
-                    {
-                        await Task.Delay(200);
-                        if (!_isMenuExpanded)
-                            btn.IsVisible = false;
-                    });
-                }
-            }
-        }
-    }
-
-    private void ExecuteDrawingLogic(Microsoft.Maui.Controls.Button btn)
-    {
-        if (btn == DrawRectBtn) DrawRectClicked(btn, EventArgs.Empty);
-        else if (btn == DrawPolyBtn) DrawPolyClicked(btn, EventArgs.Empty);
-        else if (btn == DrawArrowBtn) DrawArrowClicked(btn, EventArgs.Empty);
-        else if (btn == DrawFreeBtn) DrawFreeClicked(btn, EventArgs.Empty);
+        if (result.Result == 0)
+            SetDrawMode(DrawMode.Rect);
+        else if (result.Result == 1)
+            SetDrawMode(DrawMode.Poly);
+        else if (result.Result == 2)
+            SetDrawMode(DrawMode.Arrow);
+        else if (result.Result == 3) 
+            SetDrawMode(DrawMode.Free);
+        else SetDrawMode(DrawMode.Rect);
     }
 
     private void SetDrawMode(DrawMode mode)
@@ -1009,16 +930,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = mode;
         drawingController.DrawMode = mode;
 
-        _activeButton = mode switch
-        {
-            DrawMode.Rect => DrawRectBtn,
-            DrawMode.Poly => DrawPolyBtn,
-            DrawMode.Arrow => DrawArrowBtn,
-            DrawMode.Free => DrawFreeBtn,
-            _ => _activeButton
-        };
-
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
+
+        if (drawingController.DrawMode == DrawMode.Rect)
+            ShapeBtn.Text = MaterialIcons.Activity_zone;
+        else if (drawingController.DrawMode == DrawMode.Poly)
+            ShapeBtn.Text = MaterialIcons.Polyline;
+        else if (drawingController.DrawMode == DrawMode.Arrow)
+            ShapeBtn.Text = MaterialIcons.Arrow_shape_up;
+        else if (drawingController.DrawMode == DrawMode.Free)
+            ShapeBtn.Text = MaterialIcons.Gesture;
 
         var combined = drawingController.CombinedDrawable;
         if (combined != null)
@@ -1027,9 +948,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
-
-        if (!_isMenuExpanded)
-            _ = CollapseMenu();
 
         drawingView?.InvalidateSurface();
     }
@@ -1254,15 +1172,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 lineWidth = (int)style.LineThickness;
                 strokeStyle = style.StrokeStyle;
             }
-
-            if (drawingController.DrawMode == DrawMode.Rect)
-                _activeButton = DrawRectBtn;
-            else if (drawingController.DrawMode == DrawMode.Poly)
-                _activeButton = DrawPolyBtn;
-            else if (drawingController.DrawMode == DrawMode.Arrow)
-                _activeButton = DrawArrowBtn;
-            else if (drawingController.DrawMode == DrawMode.Free)
-                _activeButton = DrawFreeBtn;
 
             if (drawingController.DrawMode != DrawMode.None)
                 SetDrawMode(drawingController.DrawMode);

@@ -876,4 +876,7 @@
   <data name="einstellungen_gespeichert" xml:space="preserve">
     <value>Einstellungen gespeichert!</value>
   </data>
+  <data name="form_waehlen" xml:space="preserve">
+    <value>Form wählen...</value>
+  </data>
 </root>

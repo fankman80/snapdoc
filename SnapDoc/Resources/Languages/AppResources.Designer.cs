@@ -709,6 +709,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Form wählen... ähnelt.
+        /// </summary>
+        internal static string form_waehlen {
+            get {
+                return ResourceManager.GetString("form_waehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Formatieren ähnelt.
         /// </summary>
         internal static string formatieren {
