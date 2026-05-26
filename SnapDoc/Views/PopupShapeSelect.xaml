@@ -10,7 +10,8 @@
                xmlns:local="clr-namespace:SnapDoc"              
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
-               x:TypeArguments="x:Int32"
+               x:TypeArguments="x:Object"
+               CanBeDismissedByTappingOutsideOfPopup="True"
                x:Class="SnapDoc.Views.PopupShapeSelect">
 
     <Grid Padding="12">

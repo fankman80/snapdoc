@@ -1,10 +1,8 @@
-#nullable disable
-
 using CommunityToolkit.Maui.Views;
 
 namespace SnapDoc.Views;
 
-public partial class PopupShapeSelect : Popup<int>
+public partial class PopupShapeSelect : Popup<object>
 {
     public PopupShapeSelect()
     {

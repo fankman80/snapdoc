@@ -343,7 +343,7 @@ public class InteractiveArrowDrawable
         Width = 0;
         Height = 0;
         Center = default;
-        AllowedAngleRad = 0f;
+        //AllowedAngleRad = 0f;
         IsDrawn = false;
     }
 }

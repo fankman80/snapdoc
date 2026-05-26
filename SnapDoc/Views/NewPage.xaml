@@ -273,13 +273,6 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
-                <Button x:Name="AddTextBtn"
-                        HorizontalOptions="Start"
-                        IsVisible="False"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
-                        Style="{StaticResource ToolButtonStyle}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
-                        Clicked="TextClicked"/>
                 <AbsoluteLayout>
                     <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
                             Style="{StaticResource ToolButtonStyle}"
@@ -318,6 +311,13 @@
                         </Border.Shadow>
                     </Border>
                 </AbsoluteLayout>
+                <Button x:Name="AddTextBtn"
+                        HorizontalOptions="Start"
+                        IsVisible="False"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
+                        Clicked="TextClicked"/>                
                 <Button x:Name="ShapeBtn"
                         Rotation="90"
                         Text="{x:Static local:MaterialIcons.Activity_zone}"

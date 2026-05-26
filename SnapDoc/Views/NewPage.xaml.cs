@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Maui.Layouts;
@@ -40,8 +41,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private double minScale = 0.1;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly TransformViewModel planContainer;
-    private bool _isMenuExpanded = false;
-    private Microsoft.Maui.Controls.Button _activeButton;
 
 #if WINDOWS
     private Point mousePos;
@@ -851,10 +850,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     drawingController.Reset();
 
                 drawingView = drawingController.CreateCanvasView();
-
-                // Wenn das Menü beim Start zu ist, Input erlauben
-                drawingView.InputTransparent = _isMenuExpanded;
-
                 drawingView.Opacity = 0;
                 absoluteLayout.Children.Add(drawingView);
 
@@ -906,21 +901,27 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Button clickedButton)
+        var popup = new PopupShapeSelect();
+        var temporaryOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = true,
+            Shape = Settings.PopupOptions.Shape
+        };
+        var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
+
+        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
             return;
 
-        var popup = new PopupShapeSelect();
-        var result = await this.ShowPopupAsync<int>(popup, Settings.PopupOptions);
-
-        if (result.Result == 0)
+        if (selectedShape == 0)
             SetDrawMode(DrawMode.Rect);
-        else if (result.Result == 1)
+        else if (selectedShape == 1)
             SetDrawMode(DrawMode.Poly);
-        else if (result.Result == 2)
+        else if (selectedShape == 2)
             SetDrawMode(DrawMode.Arrow);
-        else if (result.Result == 3) 
+        else if (selectedShape == 3)
             SetDrawMode(DrawMode.Free);
-        else SetDrawMode(DrawMode.Rect);
+        else
+            SetDrawMode(DrawMode.Rect);
     }
 
     private void SetDrawMode(DrawMode mode)

@@ -1,13 +1,13 @@
 #nullable disable
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using Microsoft.Maui.Layouts;
 using MR.Gestures;
 using SkiaSharp;
 using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.DrawingTool;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
-using SnapDoc.DrawingTool;
 
 namespace SnapDoc.Views;
 
@@ -21,8 +21,6 @@ public partial class ImageViewPage : IQueryAttributable
     private bool hasFittedImage = false;
     private double minScale = 0.1;
     private readonly TransformViewModel fotoContainer;
-    private bool _isMenuExpanded = false;
-    private Microsoft.Maui.Controls.Button _activeButton;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -97,7 +95,6 @@ public partial class ImageViewPage : IQueryAttributable
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         drawingController = new DrawingController(fotoContainer);
-        _activeButton = DrawRectBtn;
     }
 
     protected override void OnAppearing()
@@ -284,102 +281,6 @@ public partial class ImageViewPage : IQueryAttributable
     private void DrawArrowClicked(object sender, EventArgs e)
     => SetDrawMode(DrawMode.Arrow);
 
-    private async void MenuButtonClicked(object sender, EventArgs e)
-    {
-        if (sender is not Microsoft.Maui.Controls.Button clickedButton)
-            return;
-
-        if (!_isMenuExpanded)
-        {
-            await ExpandMenu();
-        }
-        else
-        {
-            _activeButton = clickedButton;
-            await CollapseMenu();
-            ExecuteDrawingLogic(clickedButton);
-        }
-    }
-
-    private async Task ExpandMenu()
-    {
-        _isMenuExpanded = true;
-
-        // Zeichnen deaktivieren, solange das Menü offen ist
-        drawingView?.InputTransparent = true;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                btn.IsVisible = true;
-                btn.Opacity = 0;
-                // Kleiner Fade-In Effekt
-                _ = btn.FadeToAsync(1, 200, Easing.CubicOut);
-            }
-        }
-    }
-
-    private void SyncMenuStateInstant()
-    {
-        _isMenuExpanded = false;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                if (btn == _activeButton)
-                {
-                    btn.IsVisible = true;
-                    btn.Opacity = 1;
-                }
-                else
-                {
-                    btn.IsVisible = false;
-                    btn.Opacity = 0;
-                }
-            }
-        }
-    }
-
-    private async Task CollapseMenu()
-    {
-        _isMenuExpanded = false;
-
-        // Zeichnen erst wieder erlauben, wenn das Menü schließt
-        drawingView?.InputTransparent = false;
-
-        foreach (var view in ButtonContainer.Children)
-        {
-            if (view is Microsoft.Maui.Controls.Button btn)
-            {
-                if (btn == _activeButton)
-                {
-                    btn.IsVisible = true;
-                    btn.Opacity = 1;
-                }
-                else
-                {
-                    _ = btn.FadeToAsync(0, 200, Easing.CubicIn);
-                    btn.Dispatcher.Dispatch(async () =>
-                    {
-                        await Task.Delay(200);
-                        if (!_isMenuExpanded)
-                            btn.IsVisible = false;
-                    });
-                }
-            }
-        }
-    }
-
-    private void ExecuteDrawingLogic(Microsoft.Maui.Controls.Button btn)
-    {
-        if (btn == DrawRectBtn) DrawRectClicked(btn, EventArgs.Empty);
-        else if (btn == DrawPolyBtn) DrawPolyClicked(btn, EventArgs.Empty);
-        else if (btn == DrawArrowBtn) DrawArrowClicked(btn, EventArgs.Empty);
-        else if (btn == DrawFreeBtn) DrawFreeClicked(btn, EventArgs.Empty);
-    }
-
     private void SetDrawMode(DrawMode mode)
     {
         if (mode == DrawMode.None) return;
@@ -387,16 +288,16 @@ public partial class ImageViewPage : IQueryAttributable
         drawMode = mode;
         drawingController.DrawMode = mode;
 
-        _activeButton = mode switch
-        {
-            DrawMode.Rect => DrawRectBtn,
-            DrawMode.Poly => DrawPolyBtn,
-            DrawMode.Arrow => DrawArrowBtn,
-            DrawMode.Free => DrawFreeBtn,
-            _ => _activeButton
-        };
-
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
+
+        if (drawingController.DrawMode == DrawMode.Rect)
+            ShapeBtn.Text = MaterialIcons.Activity_zone;
+        else if (drawingController.DrawMode == DrawMode.Poly)
+            ShapeBtn.Text = MaterialIcons.Polyline;
+        else if (drawingController.DrawMode == DrawMode.Arrow)
+            ShapeBtn.Text = MaterialIcons.Arrow_shape_up;
+        else if (drawingController.DrawMode == DrawMode.Free)
+            ShapeBtn.Text = MaterialIcons.Gesture;
 
         var combined = drawingController.CombinedDrawable;
         if (combined != null)
@@ -405,9 +306,6 @@ public partial class ImageViewPage : IQueryAttributable
             combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
-
-        if (!_isMenuExpanded)
-            _ = CollapseMenu();
 
         drawingView?.InvalidateSurface();
     }
@@ -418,9 +316,8 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (setDefaultMode)
         {
-            _activeButton = DrawRectBtn;
+            ShapeBtn.Text = MaterialIcons.Activity_zone;
             SetDrawMode(DrawMode.Rect);
-            SyncMenuStateInstant();
         }
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
@@ -444,9 +341,7 @@ public partial class ImageViewPage : IQueryAttributable
                     drawingController.Reset();
 
                 drawingView = drawingController.CreateCanvasView();
-
-                // Wenn das Menü beim Start zu ist, Input erlauben
-                drawingView.InputTransparent = _isMenuExpanded;
+                drawingView.Opacity = 0;
                 canvasContainer.Children.Add(drawingView);
 
                 IsToolButtonsVisible = true;
@@ -461,6 +356,8 @@ public partial class ImageViewPage : IQueryAttributable
                 );
 
                 drawingView.InvalidateSurface();
+                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
+                drawingView.Opacity = 1;
             }
             catch (Exception ex)
             {
@@ -626,7 +523,6 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
-    
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle);
@@ -647,5 +543,30 @@ public partial class ImageViewPage : IQueryAttributable
             lineWidth,
             strokeStyle
         );
+    }
+
+    private async void ShapeButtonClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupShapeSelect();
+        var temporaryOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = true,
+            Shape = Settings.PopupOptions.Shape
+        };
+        var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
+
+        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
+            return;
+
+        if (selectedShape == 0)
+            SetDrawMode(DrawMode.Rect);
+        else if (selectedShape == 1)
+            SetDrawMode(DrawMode.Poly);
+        else if (selectedShape == 2)
+            SetDrawMode(DrawMode.Arrow);
+        else if (selectedShape == 3)
+            SetDrawMode(DrawMode.Free);
+        else
+            SetDrawMode(DrawMode.Rect);
     }
 }
