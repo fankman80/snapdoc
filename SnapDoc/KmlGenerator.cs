@@ -1,7 +1,6 @@
 ﻿#nullable disable
 using SharpKml.Base;
 using SharpKml.Dom;
-using Placemark = SharpKml.Dom.Placemark;
 using Point = SharpKml.Dom.Point;
 
 namespace SnapDoc;

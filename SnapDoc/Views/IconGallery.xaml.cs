@@ -1,9 +1,6 @@
 ﻿#nullable disable
-
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
-using Microsoft.Maui.Controls;
 using SkiaSharp;
 using SnapDoc.Controls;
 using SnapDoc.Messages;

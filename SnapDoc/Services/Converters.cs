@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using SkiaSharp;
 using System.Globalization;
 using System.Text.Json;

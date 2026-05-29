@@ -2,11 +2,9 @@
 using BruTile.Predefined;
 using BruTile.Web;
 using CommunityToolkit.Maui;
-using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
-using CommunityToolkit.Maui.Core;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;

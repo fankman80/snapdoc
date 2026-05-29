@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 namespace SnapDoc.Controls;
 
 public partial class CustomWebView : WebView

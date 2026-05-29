@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
 using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;

@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using SnapDoc.Models;
 using System.Text.Json;
 using SnapDoc.Services;

@@ -2,9 +2,7 @@
 using SnapDoc.Services;
 using System.Text.Json;
 using SnapDoc.Resources.Languages;
-using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Controls;
-
 
 #if ANDROID
 using Android.Webkit;

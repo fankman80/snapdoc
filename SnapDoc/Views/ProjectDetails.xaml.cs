@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SnapDoc.Models;

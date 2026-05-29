@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using SkiaSharp;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;

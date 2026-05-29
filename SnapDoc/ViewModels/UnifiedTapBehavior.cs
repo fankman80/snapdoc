@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using System.Windows.Input;
 
 namespace SnapDoc.ViewModels;

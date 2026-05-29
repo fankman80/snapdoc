@@ -1,5 +1,4 @@
 #nullable disable
-
 using CommunityToolkit.Maui.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;

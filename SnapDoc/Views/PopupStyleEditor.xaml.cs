@@ -1,9 +1,6 @@
 #nullable disable
-
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
-using CommunityToolkit.Mvvm.Messaging;
-using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;

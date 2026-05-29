@@ -1,5 +1,4 @@
 #nullable disable
-
 using CommunityToolkit.Maui.Views;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;

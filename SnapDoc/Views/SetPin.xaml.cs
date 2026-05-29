@@ -1,5 +1,4 @@
 ﻿#nullable disable
-
 using CommunityToolkit.Maui.Core.Extensions;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;

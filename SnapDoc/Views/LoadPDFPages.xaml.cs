@@ -4,7 +4,6 @@ using SnapDoc.Controls;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using CommunityToolkit.Maui.Alerts;
 
 namespace SnapDoc.Views;
 public partial class LoadPDFPages : ContentPage
