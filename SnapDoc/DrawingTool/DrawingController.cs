@@ -18,10 +18,13 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private SKPoint? lastClickPosition;
     private readonly bool scaleHandlesWithTransform = true;
     private SKPoint? rectDragStart;
+    private SKPoint? ovalDragStart;
     private SKPoint? arrowDragStart;
     private bool isRotatingRectangle = false;
+    private bool isRotatingOval = false;
     private bool isRotatingArrow = false;
     private SKPoint? rectResizeAnchor;
+    private SKPoint? ovalResizeAnchor;
     private SKPoint? arrowResizeAnchor;
 
     // BoundingBox
@@ -85,6 +88,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 FreeDrawable = new InteractiveFreehandDrawable(),
                 PolyDrawable = new InteractivePolylineDrawable(),
                 RectDrawable = new InteractiveRectangleDrawable(),
+                OvalDrawable = new InteractiveOvalDrawable(),
                 ArrowDrawable = new InteractiveArrowDrawable()
             };
         }
@@ -115,7 +119,18 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         rect.HandleRadius = safeHandleRadius;
         rect.PointRadius = safePointRadius;
         rect.AllowedAngleDeg = rotationAngle;
-        // rect.Text = ""; // Vorsicht: Wenn du das hier setzt, überschreibst du geladenen Text!
+
+        // Oval
+        var oval = CombinedDrawable.OvalDrawable;
+        rect.FillColor = fillColor;
+        rect.LineColor = lineColor;
+        rect.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
+        rect.TextColor = textColor;
+        rect.LineThickness = lineThickness;
+        rect.StrokeStyle = strokeStyle;
+        rect.HandleRadius = safeHandleRadius;
+        rect.PointRadius = safePointRadius;
+        rect.AllowedAngleDeg = rotationAngle;
 
         // Arrow
         var arrow = CombinedDrawable.ArrowDrawable;
@@ -157,6 +172,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (DrawMode == DrawMode.Free ||
            (DrawMode == DrawMode.Poly && activeIndex != null) ||
            (DrawMode == DrawMode.Rect && (activeIndex != null || rectDragStart.HasValue || isRotatingRectangle)) ||
+           (DrawMode == DrawMode.Oval && (activeIndex != null || ovalDragStart.HasValue || isRotatingOval)) ||
            (DrawMode == DrawMode.Arrow && (activeIndex != null || arrowDragStart.HasValue || isRotatingArrow)))
             e.Handled = true;
         else
@@ -238,6 +254,33 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             }
             canvasView?.InvalidateSurface();
         }
+        else if (DrawMode == DrawMode.Oval)
+        {
+            var oval = CombinedDrawable.OvalDrawable;
+            if (oval == null)
+                return;
+
+            if (!oval.IsDrawn)
+            {
+                ovalDragStart = p;
+                DisableViewTransforms();
+            }
+            else if (oval.IsOverRotationHandle(p))
+            {
+                isRotatingOval = true;
+                DisableViewTransforms();
+            }
+            else
+            {
+                activeIndex = oval.FindPointIndex(p.X, p.Y);
+                if (activeIndex != null)
+                {
+                    ovalResizeAnchor = oval.GetOppositePoint(activeIndex.Value);
+                    DisableViewTransforms();
+                }
+            }
+            canvasView?.InvalidateSurface();
+        }
         else if (DrawMode == DrawMode.Arrow)
         {
             var arrow = CombinedDrawable.ArrowDrawable;
@@ -288,6 +331,18 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             else if (rectDragStart.HasValue)
                 rect.SetFromDrag(rectDragStart.Value, p);
         }
+        else if (DrawMode == DrawMode.Oval)
+        {
+            var oval = CombinedDrawable.OvalDrawable;
+            if (oval == null) return;
+
+            if (isRotatingOval)
+                oval.SetRotationFromPoint(p);
+            else if (activeIndex != null)
+                oval.ResizeFromHandle(activeIndex.Value, p);
+            else if (ovalDragStart.HasValue)
+                oval.SetFromDrag(ovalDragStart.Value, p);
+        }
         else if (DrawMode == DrawMode.Arrow)
         {
             var arrow = CombinedDrawable.ArrowDrawable;
@@ -295,7 +350,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
             if (isRotatingArrow)
                 arrow.SetRotationFromPoint(p);
-            else if (activeIndex == 4) // Der gelbe Shape-Handle
+            else if (activeIndex == 4)
                 arrow.UpdateShape(p);
             else if (activeIndex != null && arrowResizeAnchor.HasValue)
                 arrow.SetFromDrag(arrowResizeAnchor.Value, p);
@@ -327,6 +382,18 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             activeIndex = null;
             isRotatingRectangle = false;
             rectDragStart = null;
+        }
+        else if (DrawMode == DrawMode.Oval)
+        {
+            var oval = CombinedDrawable?.OvalDrawable;
+
+            if (oval is { IsDrawn: false })
+                oval.IsDrawn = true;
+
+            ovalResizeAnchor = null;
+            activeIndex = null;
+            isRotatingOval = false;
+            ovalDragStart = null;
         }
         else if (DrawMode == DrawMode.Arrow)
         {
@@ -390,6 +457,12 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.PointRadius = pointRadius;
         }
 
+        if (CombinedDrawable.OvalDrawable is { } oval && DrawMode == DrawMode.Oval)
+        {
+            oval.HandleRadius = handleRadius;
+            oval.PointRadius = pointRadius;
+        }
+
         if (CombinedDrawable.ArrowDrawable is { } arrow && DrawMode == DrawMode.Arrow)
         {
             arrow.HandleRadius = handleRadius;
@@ -450,6 +523,16 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.StrokeStyle = strokeStyle;
         }
 
+        // Oval aktualisieren
+        var oval = CombinedDrawable.OvalDrawable;
+        if (oval != null)
+        {
+            oval.LineColor = lineColor;
+            oval.FillColor = fillColor;
+            oval.LineThickness = lineWidth;
+            oval.StrokeStyle = strokeStyle;
+        }
+
         // Arrow aktualisieren
         var arrow = CombinedDrawable.ArrowDrawable;
         if (arrow != null)
@@ -483,11 +566,15 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             CombinedDrawable.RectDrawable == null ||
             !CombinedDrawable.RectDrawable.HasContent;
 
+        bool ovalEmpty =
+            CombinedDrawable.OvalDrawable == null ||
+            !CombinedDrawable.OvalDrawable.HasContent;
+
         bool arrowEmpty =
             CombinedDrawable.ArrowDrawable == null ||
             !CombinedDrawable.ArrowDrawable.HasContent;
 
-        return polyEmpty && freeEmpty && rectEmpty && arrowEmpty;
+        return polyEmpty && freeEmpty && rectEmpty && ovalEmpty && arrowEmpty;
     }
 
     public void Reset()
@@ -524,6 +611,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable.RectDrawable.HasContent)
             allPoints.AddRange(CombinedDrawable.RectDrawable.Points);
 
+        if (CombinedDrawable.OvalDrawable.HasContent)
+            allPoints.AddRange(CombinedDrawable.OvalDrawable.GetBoundingCorners());
+
         if (CombinedDrawable.ArrowDrawable.HasContent)
             allPoints.AddRange(CombinedDrawable.ArrowDrawable.Points);
 
@@ -559,9 +649,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         var poly = CombinedDrawable.PolyDrawable;
         var rect = CombinedDrawable.RectDrawable;
+        var oval = CombinedDrawable.OvalDrawable;
         var arrow = CombinedDrawable.ArrowDrawable;
         bool polyOld = false;
         bool rectOld = false;
+        bool ovalOld = false;
         bool arrowOld = false;
 
         if (poly != null)
@@ -576,12 +668,19 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.DisplayHandles = false;
         }
 
+        if (oval != null)
+        {
+            ovalOld = oval.DisplayHandles;
+            oval.DisplayHandles = false;
+        }
+
         arrow?.DisplayHandles = false;
 
         CombinedDrawable.Draw(canvas);
 
         poly?.DisplayHandles = polyOld;
         rect?.DisplayHandles = rectOld;
+        oval?.DisplayHandles = ovalOld;
         arrow?.DisplayHandles = arrowOld;
     }
 
@@ -621,6 +720,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             FreeDrawable = new InteractiveFreehandDrawable(),
             PolyDrawable = new InteractivePolylineDrawable(),
             RectDrawable = new InteractiveRectangleDrawable(),
+            OvalDrawable = new InteractiveOvalDrawable(),
             ArrowDrawable = new InteractiveArrowDrawable()
         };
 
@@ -634,6 +734,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
             if (dto.Rect != null)
                 DrawMode = DrawMode.Rect;
+            else if (dto.Oval != null)
+                DrawMode = DrawMode.Oval;
             else if (dto.Poly != null)
                 DrawMode = DrawMode.Poly;
             else if (dto.Arrow != null)
@@ -658,6 +760,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         CombinedDrawable.PolyDrawable?.DisplayHandles = false;
         CombinedDrawable.RectDrawable?.DisplayHandles = false;
+        CombinedDrawable.OvalDrawable?.DisplayHandles = false;
         CombinedDrawable.ArrowDrawable?.DisplayHandles = false;
     }
 
@@ -667,6 +770,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         // Nur die Handles des aktiven Modus einblenden
         CombinedDrawable.RectDrawable.DisplayHandles = (DrawMode == DrawMode.Rect);
+        CombinedDrawable.OvalDrawable.DisplayHandles = (DrawMode == DrawMode.Oval);
         CombinedDrawable.PolyDrawable.DisplayHandles = (DrawMode == DrawMode.Poly);
         CombinedDrawable.ArrowDrawable.DisplayHandles = (DrawMode == DrawMode.Arrow);
     }

@@ -72,6 +72,18 @@ public static class DrawingMapper
                 }
                 : null,
 
+            // ---------------- OVAL ----------------
+            Oval = d.OvalDrawable?.IsDrawn == true
+                ? new OvalDto
+                {
+                    RotationDeg = NormalizeAngleDeg(d.OvalDrawable.AllowedAngleDeg - initialRotation),
+                    Points = [.. d.OvalDrawable.Points
+                        .Select(p => new PointDto(
+                            p.X - bounds.Left,
+                            p.Y - bounds.Top))]
+                }
+                : null,
+
             // ---------------- ARROW ----------------
             Arrow = d.ArrowDrawable?.IsDrawn == true
                 ? new ArrowDto
@@ -145,6 +157,40 @@ public static class DrawingMapper
             r.IsDrawn = true;
         }
 
+        // ---------------- OVAL ----------------
+        if (dto.Oval != null)
+        {
+            var o = d.OvalDrawable;
+            o.Reset();
+
+            o.AllowedAngleDeg = dto.InitialRotation + dto.Oval.RotationDeg;
+
+            var p0 = new SKPoint(
+                dto.Oval.Points[0].X + offset.X,
+                dto.Oval.Points[0].Y + offset.Y);
+
+            var p1 = new SKPoint(
+                dto.Oval.Points[1].X + offset.X,
+                dto.Oval.Points[1].Y + offset.Y);
+
+            var p2 = new SKPoint(
+                dto.Oval.Points[2].X + offset.X,
+                dto.Oval.Points[2].Y + offset.Y);
+
+            var p3 = new SKPoint(
+                dto.Oval.Points[3].X + offset.X,
+                dto.Oval.Points[3].Y + offset.Y);
+
+            var center = new SKPoint((p0.X + p2.X) / 2f, (p0.Y + p2.Y) / 2f);
+            var localXVec = new SKPoint(p1.X - center.X, p1.Y - center.Y);
+            var localYVec = new SKPoint(p2.X - center.X, p2.Y - center.Y);
+            var topLeft = new SKPoint(center.X - localXVec.X - localYVec.X, center.Y - localXVec.Y - localYVec.Y);
+            var bottomRight = new SKPoint(center.X + localXVec.X + localYVec.X, center.Y + localXVec.Y + localYVec.Y);
+
+            o.SetFromDrag(topLeft, bottomRight);
+            o.IsDrawn = true;
+        }
+
         // ---------------- ARROW ----------------
         if (dto.Arrow != null)
         {
@@ -178,6 +224,9 @@ public static class DrawingMapper
 
         if (d.RectDrawable.HasContent)
             points.AddRange(d.RectDrawable.Points);
+
+        if (d.OvalDrawable.HasContent)
+            points.AddRange(d.OvalDrawable.Points);
 
         if (d.ArrowDrawable.HasContent)
             points.AddRange(d.ArrowDrawable.Points);
@@ -221,6 +270,11 @@ public static class DrawingMapper
         d.RectDrawable.TextStyle = (RectangleTextStyle)s.TextStyle;
         d.RectDrawable.AutoSizeText = s.AutoSizeText;
         d.RectDrawable.TextPadding = s.TextPadding;
+
+        d.OvalDrawable.LineColor = lineColor;
+        d.OvalDrawable.FillColor = fillColor;
+        d.OvalDrawable.LineThickness = s.LineThickness;
+        d.OvalDrawable.StrokeStyle = s.StrokeStyle;
 
         d.ArrowDrawable.LineColor = lineColor;
         d.ArrowDrawable.FillColor = fillColor;

@@ -15,7 +15,7 @@
                x:Class="SnapDoc.Views.PopupShapeSelect">
 
     <Grid Padding="12">
-        <Grid ColumnDefinitions="Auto,Auto"
+        <Grid ColumnDefinitions="Auto,Auto,Auto"
               RowDefinitions="Auto,Auto,Auto"
               ColumnSpacing="14"
               RowSpacing="14">
@@ -31,6 +31,16 @@
                     ToolTipProperties.Text="{x:Static res:AppResources.rechteck_zeichnen}"/>
 
             <Button Grid.Column="1" Grid.Row="1"
+                    Rotation="90"
+                    Text="{x:Static local:MaterialIcons.Circle}"
+                    FontSize="34"
+                    FontFamily="MaterialOutlined"
+                    CornerRadius="8"
+                    Style="{StaticResource ToolButtonStyle}"
+                    Clicked="OvalBtnClicked"
+                    ToolTipProperties.Text="{x:Static res:AppResources.polylinie_zeichnen}"/>
+            
+            <Button Grid.Column="2" Grid.Row="1"
                     Rotation="90"
                     Text="{x:Static local:MaterialIcons.Polyline}"
                     FontSize="34"

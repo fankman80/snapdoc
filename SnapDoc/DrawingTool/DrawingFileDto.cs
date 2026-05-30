@@ -23,6 +23,7 @@ public class DrawingFileDto
     public PolyDto? Poly { get; set; }
     public FreeDto? Free { get; set; }
     public RectDto? Rect { get; set; }
+    public OvalDto? Oval { get; set; }
     public ArrowDto? Arrow { get; set; }
 }
 
@@ -49,6 +50,12 @@ public class RectDto
     public List<PointDto> Points { get; set; } = [];
     public float RotationDeg { get; set; }
     public string? Text { get; set; }
+}
+
+public class OvalDto
+{
+    public List<PointDto> Points { get; set; } = [];
+    public float RotationDeg { get; set; }
 }
 
 public class ArrowDto

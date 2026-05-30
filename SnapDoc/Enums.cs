@@ -6,6 +6,7 @@ namespace SnapDoc
         Free,
         Poly,
         Rect,
+        Oval,
         Arrow
     }
 

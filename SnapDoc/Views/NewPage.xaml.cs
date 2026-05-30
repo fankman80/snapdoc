@@ -887,18 +887,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void DrawingClicked(object sender, EventArgs e)
         => await StartDrawing();
 
-    private void DrawFreeClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Free);
-
-    private void DrawPolyClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Poly);
-
-    private void DrawRectClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Rect);
-
-    private void DrawArrowClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Arrow);
-
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupShapeSelect();
@@ -915,10 +903,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (selectedShape == 0)
             SetDrawMode(DrawMode.Rect);
         else if (selectedShape == 1)
-            SetDrawMode(DrawMode.Poly);
+            SetDrawMode(DrawMode.Oval);
         else if (selectedShape == 2)
-            SetDrawMode(DrawMode.Arrow);
+            SetDrawMode(DrawMode.Poly);
         else if (selectedShape == 3)
+            SetDrawMode(DrawMode.Arrow);
+        else if (selectedShape == 4)
             SetDrawMode(DrawMode.Free);
         else
             SetDrawMode(DrawMode.Rect);
@@ -935,6 +925,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (drawingController.DrawMode == DrawMode.Rect)
             ShapeBtn.Text = MaterialIcons.Activity_zone;
+        else if (drawingController.DrawMode == DrawMode.Oval)
+            ShapeBtn.Text = MaterialIcons.Circle;
         else if (drawingController.DrawMode == DrawMode.Poly)
             ShapeBtn.Text = MaterialIcons.Polyline;
         else if (drawingController.DrawMode == DrawMode.Arrow)
@@ -947,6 +939,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             combined.PolyDrawable.DisplayHandles = (mode == DrawMode.Poly);
             combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
+            combined.OvalDrawable.DisplayHandles = (mode == DrawMode.Oval);
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
 

@@ -7,6 +7,7 @@ public class CombinedDrawable
     public required InteractivePolylineDrawable PolyDrawable { get; set; }
     public required InteractiveFreehandDrawable FreeDrawable { get; set; }
     public required InteractiveRectangleDrawable RectDrawable { get; set; }
+    public required InteractiveOvalDrawable OvalDrawable { get; set; }
     public required InteractiveArrowDrawable ArrowDrawable { get; set; }
 
     public void Draw(SKCanvas canvas)
@@ -20,6 +21,9 @@ public class CombinedDrawable
         if (RectDrawable?.HasContent == true)
             RectDrawable.Draw(canvas);
 
+        if (OvalDrawable?.HasContent == true)
+            OvalDrawable.Draw(canvas);
+
         if (ArrowDrawable?.HasContent == true)
             ArrowDrawable.Draw(canvas);
     }
@@ -29,6 +33,7 @@ public class CombinedDrawable
         PolyDrawable?.Reset();
         FreeDrawable?.Reset();
         RectDrawable?.Reset();
+        OvalDrawable?.Reset();
         ArrowDrawable?.Reset();
     }
 }
