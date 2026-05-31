@@ -19,7 +19,8 @@
               RowDefinitions="Auto,Auto,Auto"
               ColumnSpacing="14"
               RowSpacing="14">
-            <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.form_waehlen}"/>
+            <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="3"
+                   Text="{x:Static res:AppResources.form_waehlen}"/>
             <Button Grid.Column="0" Grid.Row="1"
                     Text="{x:Static local:MaterialIcons.Activity_zone}"
                     FontSize="34"

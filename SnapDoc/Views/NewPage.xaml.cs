@@ -927,6 +927,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController.DrawMode = mode;
 
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
+        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly);
 
         if (drawingController.DrawMode == DrawMode.Rect)
             ShapeBtn.Text = MaterialIcons.Activity_zone;
@@ -1130,6 +1131,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             combined.RectDrawable?.TextPadding = result.Result.TextPadding;
         }
+
+        drawingView?.InvalidateSurface();
+    }
+
+    private async void CloudyClicked(object sender, EventArgs e)
+    {
+        var combined = drawingController.CombinedDrawable;
+
+        combined.PolyDrawable?.IsCloud = !combined.PolyDrawable.IsCloud;
+        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
 
         drawingView?.InvalidateSurface();
     }

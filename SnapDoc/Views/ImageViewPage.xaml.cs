@@ -309,6 +309,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.DrawMode = mode;
 
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
+        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly);
 
         if (drawingController.DrawMode == DrawMode.Rect)
             ShapeBtn.Text = MaterialIcons.Rectangle;
@@ -424,6 +425,16 @@ public partial class ImageViewPage : IQueryAttributable
             combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
             drawingView?.InvalidateSurface();
         }
+    }
+
+    private async void CloudyClicked(object sender, EventArgs e)
+    {
+        var combined = drawingController.CombinedDrawable;
+
+        combined.PolyDrawable?.IsCloud = !combined.PolyDrawable.IsCloud;
+        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+
+        drawingView?.InvalidateSurface();
     }
 
     private async void CheckClicked(object sender, EventArgs e)

@@ -127,7 +127,9 @@
                 </Border>
 
                 <Button x:Name="LoadCustomPinBtn"                        
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
+                        Text="{x:Static local:MaterialIcons.Draw}"
+                        FontSize="34"
+                        FontFamily="MaterialOutlined"   
                         IsVisible="False"
                         Style="{StaticResource ToolButtonStyle}"
                         Margin="20,0,0,180"
@@ -242,7 +244,9 @@
                     IsVisible="{Binding IsButtonActuallyVisible}"
                     Margin="0,0,20,20"
                     ZIndex="10000"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Add_location_alt}}"
+                    Text="{x:Static local:MaterialIcons.Add_location_alt}"
+                    FontSize="34"
+                    FontFamily="MaterialOutlined"   
                     Style="{StaticResource ToolButtonStyle}"
                     AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
@@ -250,7 +254,9 @@
                     Clicked="SetPinClicked"/>
 
             <Button x:Name="DrawBtn"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Draw}}"
+                    Text="{x:Static local:MaterialIcons.Draw}"
+                    FontSize="34"
+                    FontFamily="MaterialOutlined"    
                     Margin="20,0,0,20"
                     ZIndex="10000"
                     Style="{StaticResource ToolButtonStyle}"
@@ -268,13 +274,16 @@
                                  ZIndex="10000"
                                  AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                  AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button HorizontalOptions="Start"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Ink_eraser}}"
+                <Button Text="{x:Static local:MaterialIcons.Ink_eraser}"
+                        FontSize="34"
+                        FontFamily="MaterialOutlined"   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout>
-                    <Button ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Palette}}"
+                    <Button Text="{x:Static local:MaterialIcons.Palette}"
+                            FontSize="34"
+                            FontFamily="MaterialOutlined"   
                             Style="{StaticResource ToolButtonStyle}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                             Clicked="PenSettingsClicked"/>
@@ -312,12 +321,21 @@
                     </Border>
                 </AbsoluteLayout>
                 <Button x:Name="AddTextBtn"
-                        HorizontalOptions="Start"
                         IsVisible="False"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Text_fields}}"
+                        Text="{x:Static local:MaterialIcons.Text_fields}"
+                        FontSize="34"
+                        FontFamily="MaterialOutlined"   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
-                        Clicked="TextClicked"/>                
+                        Clicked="TextClicked"/>
+                <Button x:Name="AddCloudyBtn"
+                        IsVisible="False"
+                        Text="{x:Static local:MaterialIcons.Cloud_off}"
+                        FontSize="34"
+                        FontFamily="MaterialOutlined"   
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
+                        Clicked="CloudyClicked"/>
                 <Button x:Name="ShapeBtn"
                         Text="{x:Static local:MaterialIcons.Activity_zone}"
                         FontSize="34"
@@ -325,8 +343,9 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
                         Clicked="ShapeButtonClicked"/>
-                <Button HorizontalOptions="Start"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
+                <Button Text="{x:Static local:MaterialIcons.Check}"
+                        FontSize="34"
+                        FontFamily="MaterialOutlined"    
                         BackgroundColor="LimeGreen"
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
@@ -350,7 +369,9 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Margin="0,0,20,20"
                     BackgroundColor="Red"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Glyph={x:Static local:MaterialIcons.Close}}"  
+                    Text="{x:Static local:MaterialIcons.Close}" 
+                    FontSize="34"
+                    FontFamily="MaterialOutlined"   
                     Style="{StaticResource ToolButtonStyle}"                    
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>
