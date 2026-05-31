@@ -637,8 +637,27 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         float maxX = points.Max(p => p.X);
         float minY = points.Min(p => p.Y);
         float maxY = points.Max(p => p.Y);
+        float cloudPadding = 0f;
+        float density = (float)Settings.DisplayDensity;
 
-        return new SKRect(minX, minY, maxX, maxY);
+        // Prüfen, ob das Polygon im Wolken-Modus ist
+        if (CombinedDrawable.PolyDrawable.HasContent && CombinedDrawable.PolyDrawable.IsCloud)
+            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.PolyDrawable.CloudRadius * density);
+
+        // Prüfen, ob das Rechteck im Wolken-Modus ist
+        if (CombinedDrawable.RectDrawable.HasContent && CombinedDrawable.RectDrawable.IsCloud)
+            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.RectDrawable.CloudRadius * density);
+
+        // Prüfen, ob das Oval im Wolken-Modus ist
+        if (CombinedDrawable.OvalDrawable.HasContent && CombinedDrawable.OvalDrawable.IsCloud)
+            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.OvalDrawable.CloudRadius * density);
+
+        return new SKRect(
+            minX - cloudPadding,
+            minY - cloudPadding,
+            maxX + cloudPadding,
+            maxY + cloudPadding
+        );
     }
 
     public void DrawWithoutHandles(SKCanvas canvas)

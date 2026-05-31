@@ -30,6 +30,13 @@ public class InteractiveRectangleDrawable
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
+
+    // --- Eigenschaften für den Wolken-Modus ---
+    public bool IsCloud { get; set; } = false;
+    public float CloudRadius { get; set; } = 20f;
+    public float CloudOverlap { get; set; } = 0.8333f;
+    public float CloudInciseDeg { get; set; } = 15f;
+
     public float AllowedAngleRad
     {
         get => _allowedAngleRad;
@@ -40,6 +47,7 @@ public class InteractiveRectangleDrawable
         get => AllowedAngleRad * 180f / MathF.PI;
         set => AllowedAngleRad = value * MathF.PI / 180f;
     }
+
     public InteractiveRectangleDrawable()
     {
         InteractiveRectangleDrawable.EnsureRotationHandleLoaded().Wait();
@@ -116,46 +124,62 @@ public class InteractiveRectangleDrawable
         }
     }
 
+    private class CloudNode
+    {
+        public SKPoint Center { get; set; }
+        public float BeginAngle { get; set; }
+        public float EndAngle { get; set; }
+    }
+
     public void Draw(SKCanvas canvas)
     {
         if (!HasContent) return;
 
-        var pts = Points;
-
-        var builder = new SKPathBuilder();
-        builder.MoveTo(pts[0]);
-        builder.LineTo(pts[1]);
-        builder.LineTo(pts[2]);
-        builder.LineTo(pts[3]);
-        builder.Close();
-
-        using var path = builder.Detach();
-        using var fillPaint = new SKPaint
+        // Entweder als Wolke oder als normales Rechteck zeichnen
+        if (IsCloud)
         {
-            Color = FillColor,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true
-        };
-
-        canvas.DrawPath(path, fillPaint);
-
-        if (LineThickness > 0)
+            DrawCloudPath(canvas);
+        }
+        else
         {
-            using var linePaint = new SKPaint
+            var pts = Points;
+
+            var builder = new SKPathBuilder();
+            builder.MoveTo(pts[0]);
+            builder.LineTo(pts[1]);
+            builder.LineTo(pts[2]);
+            builder.LineTo(pts[3]);
+            builder.Close();
+
+            using var path = builder.Detach();
+            using var fillPaint = new SKPaint
             {
-                Color = LineColor,
-                StrokeWidth = LineThickness * density,
-                IsStroke = true,
-                IsAntialias = true,
-                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(
-                    Helper.ParseDashArray(StrokeStyle, density, LineThickness),
-                    0f)
+                Color = FillColor,
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
             };
-            canvas.DrawPath(path, linePaint);
+
+            canvas.DrawPath(path, fillPaint);
+
+            if (LineThickness > 0)
+            {
+                using var linePaint = new SKPaint
+                {
+                    Color = LineColor,
+                    StrokeWidth = LineThickness * density,
+                    IsStroke = true,
+                    IsAntialias = true,
+                    PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                    ? null
+                    : SKPathEffect.CreateDash(
+                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
+                        0f)
+                };
+                canvas.DrawPath(path, linePaint);
+            }
         }
 
+        // Text wird unabhaengig vom Modus gezeichnet
         if (!string.IsNullOrEmpty(Text))
             DrawMultilineText(canvas);
 
@@ -177,13 +201,13 @@ public class InteractiveRectangleDrawable
             IsAntialias = true
         };
 
-        foreach (var p in pts)
+        foreach (var p in Points)
         {
             canvas.DrawCircle(p, PointRadius * density, handlePaint);
             canvas.DrawCircle(p, PointRadius * density, handleStroke);
-        }          
+        }
 
-        if (_rotationHandleImage != null) // Prüfung auf das geladene Image
+        if (_rotationHandleImage != null)
         {
             using var paint = new SKPaint { IsAntialias = true };
 
@@ -199,6 +223,156 @@ public class InteractiveRectangleDrawable
 
             canvas.DrawImage(_rotationHandleImage, destRect, sampling, paint);
         }
+    }
+
+    private void DrawCloudPath(SKCanvas canvas)
+    {
+        float radius = CloudRadius * density;
+        float delta = 2f * radius * CloudOverlap;
+
+        var workingPoints = new List<SKPoint>(Points);
+        if (IsClockwise(workingPoints))
+            workingPoints.Reverse();
+
+        var nodes = new List<CloudNode>();
+        SKPoint prev = workingPoints[^1];
+
+        // Kreis-Zentren entlang der 4 Kanten berechnen
+        for (int i = 0; i < workingPoints.Count; i++)
+        {
+            SKPoint curr = workingPoints[i];
+            float dx = curr.X - prev.X;
+            float dy = curr.Y - prev.Y;
+            float len = MathF.Sqrt(dx * dx + dy * dy);
+
+            if (len > 0)
+            {
+                dx /= len;
+                dy /= len;
+
+                int n = (int)(len / delta + 0.5f);
+                if (n < 1) n = 1;
+                float d = len / n;
+
+                for (float a = 0f; a + 0.1f * d < len; a += d)
+                {
+                    nodes.Add(new CloudNode { Center = new SKPoint(prev.X + a * dx, prev.Y + a * dy) });
+                }
+            }
+            prev = curr;
+        }
+
+        // Schnittwinkel der benachbarten Kreise berechnen
+        if (nodes.Count > 1)
+        {
+            CloudNode prevNode = nodes[^1];
+
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                CloudNode currNode = nodes[i];
+                var (end, begin) = CalculateIntersectAngles(prevNode.Center, currNode.Center, radius);
+
+                prevNode.EndAngle = end;
+                currNode.BeginAngle = begin;
+                prevNode = currNode;
+            }
+        }
+
+        if (FillColor.Alpha > 0)
+        {
+            using var fillPaint = new SKPaint
+            {
+                Color = FillColor,
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
+            };
+
+            var fillBuilder = new SKPathBuilder();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                float startDeg = (node.BeginAngle * 180f / MathF.PI) % 360f;
+                if (startDeg < 0) startDeg += 360f;
+                float endDeg = (node.EndAngle * 180f / MathF.PI) % 360f;
+                if (endDeg < 0) endDeg += 360f;
+                float sweepDeg = endDeg - startDeg;
+                if (sweepDeg < 0) sweepDeg += 360f;
+
+                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius, node.Center.X + radius, node.Center.Y + radius);
+                fillBuilder.ArcTo(rect, startDeg, sweepDeg, false);
+            }
+            fillBuilder.Close();
+
+            using var fillPath = fillBuilder.Detach();
+            canvas.DrawPath(fillPath, fillPaint);
+        }
+
+        if (LineThickness > 0)
+        {
+            using var linePaint = new SKPaint
+            {
+                Color = LineColor,
+                StrokeWidth = LineThickness * density,
+                IsStroke = true,
+                IsAntialias = true,
+                StrokeJoin = SKStrokeJoin.Round,
+                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                    ? null
+                    : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f)
+            };
+
+            var outlineBuilder = new SKPathBuilder();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                float startDeg = (node.BeginAngle * 180f / MathF.PI) % 360f;
+                if (startDeg < 0) startDeg += 360f;
+                float endDeg = (node.EndAngle * 180f / MathF.PI) % 360f;
+                if (endDeg < 0) endDeg += 360f;
+                float sweepDeg = endDeg - startDeg;
+                if (sweepDeg < 0) sweepDeg += 360f;
+
+                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius, node.Center.X + radius, node.Center.Y + radius);
+
+                outlineBuilder.AddArc(rect, startDeg, sweepDeg + CloudInciseDeg);
+            }
+
+            using var outlinePath = outlineBuilder.Detach();
+            canvas.DrawPath(outlinePath, linePaint);
+        }
+    }
+
+    private static (float endAngle, float beginAngle) CalculateIntersectAngles(SKPoint p, SKPoint q, float r)
+    {
+        float dx = q.X - p.X;
+        float dy = q.Y - p.Y;
+        float len = MathF.Sqrt(dx * dx + dy * dy);
+        float a = 0.5f * len / r;
+
+        if (a < -1f) a = -1f;
+        if (a > 1f) a = 1f;
+
+        float phi = MathF.Atan2(dy, dx);
+        float gamma = MathF.Acos(a);
+
+        return (phi - gamma, MathF.PI + phi + gamma);
+    }
+
+    private static bool IsClockwise(List<SKPoint> points)
+    {
+        if (points.Count < 3)
+            return false;
+
+        float sum = 0f;
+        for (int i = 0; i < points.Count; i++)
+        {
+            var p1 = points[i];
+            var p2 = points[(i + 1) % points.Count];
+
+            sum += (p2.X - p1.X) * (p2.Y + p1.Y);
+        }
+
+        return sum > 0f;
     }
 
     private void DrawMultilineText(SKCanvas canvas)

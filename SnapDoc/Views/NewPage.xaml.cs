@@ -825,7 +825,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (setDefaultMode)
         {
-            ShapeBtn.Text = MaterialIcons.Activity_zone;
+            ShapeBtn.Text = MaterialIcons.Rectangle;
+            AddCloudyBtn.Text = MaterialIcons.Cloud_off;
             SetDrawMode(DrawMode.Rect);
         }
 
@@ -927,7 +928,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController.DrawMode = mode;
 
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
-        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly);
+        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly || mode == DrawMode.Rect || mode == DrawMode.Oval);
 
         if (drawingController.DrawMode == DrawMode.Rect)
             ShapeBtn.Text = MaterialIcons.Activity_zone;
@@ -1140,7 +1141,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var combined = drawingController.CombinedDrawable;
 
         combined.PolyDrawable?.IsCloud = !combined.PolyDrawable.IsCloud;
-        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+        combined.RectDrawable?.IsCloud = !combined.RectDrawable.IsCloud;
+        combined.OvalDrawable?.IsCloud = !combined.OvalDrawable.IsCloud;
+
+        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud || combined.RectDrawable.IsCloud || combined.OvalDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
 
         drawingView?.InvalidateSurface();
     }

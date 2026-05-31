@@ -309,7 +309,7 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.DrawMode = mode;
 
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
-        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly);
+        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly || mode == DrawMode.Rect || mode == DrawMode.Oval);
 
         if (drawingController.DrawMode == DrawMode.Rect)
             ShapeBtn.Text = MaterialIcons.Rectangle;
@@ -341,6 +341,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (setDefaultMode)
         {
             ShapeBtn.Text = MaterialIcons.Rectangle;
+            AddCloudyBtn.Text = MaterialIcons.Cloud_off;
             SetDrawMode(DrawMode.Rect);
         }
 
@@ -432,7 +433,10 @@ public partial class ImageViewPage : IQueryAttributable
         var combined = drawingController.CombinedDrawable;
 
         combined.PolyDrawable?.IsCloud = !combined.PolyDrawable.IsCloud;
-        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+        combined.RectDrawable?.IsCloud = !combined.RectDrawable.IsCloud;
+        combined.OvalDrawable?.IsCloud = !combined.OvalDrawable.IsCloud;
+
+        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud || combined.RectDrawable.IsCloud || combined.OvalDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
 
         drawingView?.InvalidateSurface();
     }

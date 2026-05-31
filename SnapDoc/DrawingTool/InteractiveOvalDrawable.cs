@@ -23,6 +23,12 @@ public class InteractiveOvalDrawable
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
 
+    // --- Eigenschaften fuer den Wolken-Modus ---
+    public bool IsCloud { get; set; } = false;
+    public float CloudRadius { get; set; } = 20f;
+    public float CloudOverlap { get; set; } = 0.8333f;
+    public float CloudInciseDeg { get; set; } = 15f;
+
     public float AllowedAngleRad
     {
         get => _allowedAngleRad;
@@ -111,43 +117,58 @@ public class InteractiveOvalDrawable
         }
     }
 
+    private class CloudNode
+    {
+        public SKPoint Center { get; set; }
+        public float BeginAngle { get; set; }
+        public float EndAngle { get; set; }
+    }
+
     public void Draw(SKCanvas canvas)
     {
         if (!HasContent) return;
 
-        canvas.Save();
-        canvas.Translate(Center.X, Center.Y);
-        canvas.RotateDegrees(AllowedAngleDeg);
-
-        var ovalRect = new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f);
-
-        using var fillPaint = new SKPaint
+        // Entweder als Wolke oder als normales Oval zeichnen
+        if (IsCloud)
         {
-            Color = FillColor,
-            Style = SKPaintStyle.Fill,
-            IsAntialias = true
-        };
-
-        canvas.DrawOval(ovalRect, fillPaint);
-
-        if (LineThickness > 0)
-        {
-            using var linePaint = new SKPaint
-            {
-                Color = LineColor,
-                StrokeWidth = LineThickness * density,
-                IsStroke = true,
-                IsAntialias = true,
-                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(
-                    Helper.ParseDashArray(StrokeStyle, density, LineThickness),
-                    0f)
-            };
-            canvas.DrawOval(ovalRect, linePaint);
+            DrawCloudPath(canvas);
         }
+        else
+        {
+            canvas.Save();
+            canvas.Translate(Center.X, Center.Y);
+            canvas.RotateDegrees(AllowedAngleDeg);
 
-        canvas.Restore();
+            var ovalRect = new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f);
+
+            using var fillPaint = new SKPaint
+            {
+                Color = FillColor,
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
+            };
+
+            canvas.DrawOval(ovalRect, fillPaint);
+
+            if (LineThickness > 0)
+            {
+                using var linePaint = new SKPaint
+                {
+                    Color = LineColor,
+                    StrokeWidth = LineThickness * density,
+                    IsStroke = true,
+                    IsAntialias = true,
+                    PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                    ? null
+                    : SKPathEffect.CreateDash(
+                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
+                        0f)
+                };
+                canvas.DrawOval(ovalRect, linePaint);
+            }
+
+            canvas.Restore();
+        }
 
         if (!DisplayHandles) return;
 
@@ -190,6 +211,172 @@ public class InteractiveOvalDrawable
             var sampling = new SKSamplingOptions(SKCubicResampler.Mitchell);
             canvas.DrawImage(_rotationHandleImage, destRect, sampling, paint);
         }
+    }
+
+    private void DrawCloudPath(SKCanvas canvas)
+    {
+        float hw = Width / 2f;
+        float hh = Height / 2f;
+        float radius = CloudRadius * density;
+        float delta = 2f * radius * CloudOverlap;
+
+        // Ramanujan-Approximation fuer den exakten Ellipsenumfang
+        float pApprox = MathF.PI * (3f * (hw + hh) - MathF.Sqrt((3f * hw + hh) * (hw + 3f * hh)));
+        int n = (int)(pApprox / delta + 0.5f);
+        if (n < 4) n = 4;
+
+        float segmentLength = pApprox / n;
+
+        // Schrittweise Abtastung der lokalen Ellipse zur Ermittlung gleichmaessiger Bogenlaengen
+        var nodes = new List<CloudNode>();
+        int steps = 360;
+        float lastX = hw;
+        float lastY = 0f;
+        float currentLength = 0f;
+
+        var arcLengths = new float[steps + 1];
+        var pointsOnEllipse = new SKPoint[steps + 1];
+        arcLengths[0] = 0f;
+        pointsOnEllipse[0] = new SKPoint(hw, 0f);
+
+        for (int i = 1; i <= steps; i++)
+        {
+            float theta = (i / (float)steps) * 2f * MathF.PI;
+            float cx = hw * MathF.Cos(theta);
+            float cy = hh * MathF.Sin(theta);
+            float dist = MathF.Sqrt((cx - lastX) * (cx - lastX) + (cy - lastY) * (cy - lastY));
+            currentLength += dist;
+            arcLengths[i] = currentLength;
+            pointsOnEllipse[i] = new SKPoint(cx, cy);
+            lastX = cx;
+            lastY = cy;
+        }
+
+        float cos = MathF.Cos(AllowedAngleRad);
+        float sin = MathF.Sin(AllowedAngleRad);
+
+        int sampleIdx = 0;
+        for (int i = 0; i < n; i++)
+        {
+            float targetLength = i * segmentLength;
+            while (sampleIdx < steps && arcLengths[sampleIdx] < targetLength)
+            {
+                sampleIdx++;
+            }
+
+            SKPoint localPt = pointsOnEllipse[sampleIdx];
+            if (sampleIdx > 0 && sampleIdx < steps)
+            {
+                float l1 = arcLengths[sampleIdx - 1];
+                float l2 = arcLengths[sampleIdx];
+                if (l2 > l1)
+                {
+                    float t = (targetLength - l1) / (l2 - l1);
+                    float ix = pointsOnEllipse[sampleIdx - 1].X + t * (pointsOnEllipse[sampleIdx].X - pointsOnEllipse[sampleIdx - 1].X);
+                    float iy = pointsOnEllipse[sampleIdx - 1].Y + t * (pointsOnEllipse[sampleIdx].Y - pointsOnEllipse[sampleIdx - 1].Y);
+                    localPt = new SKPoint(ix, iy);
+                }
+            }
+
+            float worldX = Center.X + localPt.X * cos - localPt.Y * sin;
+            float worldY = Center.Y + localPt.X * sin + localPt.Y * cos;
+
+            nodes.Add(new CloudNode { Center = new SKPoint(worldX, worldY) });
+        }
+
+        if (nodes.Count > 1)
+        {
+            CloudNode prevNode = nodes[^1];
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                CloudNode currNode = nodes[i];
+                var (end, begin) = CalculateIntersectAngles(prevNode.Center, currNode.Center, radius);
+
+                prevNode.EndAngle = end;
+                currNode.BeginAngle = begin;
+                prevNode = currNode;
+            }
+        }
+
+        // Flaeche ausfüllen
+        if (FillColor.Alpha > 0)
+        {
+            using var fillPaint = new SKPaint
+            {
+                Color = FillColor,
+                Style = SKPaintStyle.Fill,
+                IsAntialias = true
+            };
+
+            var fillBuilder = new SKPathBuilder();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                float startDeg = (node.BeginAngle * 180f / MathF.PI) % 360f;
+                if (startDeg < 0) startDeg += 360f;
+                float endDeg = (node.EndAngle * 180f / MathF.PI) % 360f;
+                if (endDeg < 0) endDeg += 360f;
+                float sweepDeg = endDeg - startDeg;
+                if (sweepDeg < 0) sweepDeg += 360f;
+
+                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius, node.Center.X + radius, node.Center.Y + radius);
+                fillBuilder.ArcTo(rect, startDeg, sweepDeg, false);
+            }
+            fillBuilder.Close();
+
+            using var fillPath = fillBuilder.Detach();
+            canvas.DrawPath(fillPath, fillPaint);
+        }
+
+        // Kontur zeichnen
+        if (LineThickness > 0)
+        {
+            using var linePaint = new SKPaint
+            {
+                Color = LineColor,
+                StrokeWidth = LineThickness * density,
+                IsStroke = true,
+                IsAntialias = true,
+                StrokeJoin = SKStrokeJoin.Round,
+                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                    ? null
+                    : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f)
+            };
+
+            var outlineBuilder = new SKPathBuilder();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var node = nodes[i];
+                float startDeg = (node.BeginAngle * 180f / MathF.PI) % 360f;
+                if (startDeg < 0) startDeg += 360f;
+                float endDeg = (node.EndAngle * 180f / MathF.PI) % 360f;
+                if (endDeg < 0) endDeg += 360f;
+                float sweepDeg = endDeg - startDeg;
+                if (sweepDeg < 0) sweepDeg += 360f;
+
+                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius, node.Center.X + radius, node.Center.Y + radius);
+                outlineBuilder.AddArc(rect, startDeg, sweepDeg + CloudInciseDeg);
+            }
+
+            using var outlinePath = outlineBuilder.Detach();
+            canvas.DrawPath(outlinePath, linePaint);
+        }
+    }
+
+    private static (float endAngle, float beginAngle) CalculateIntersectAngles(SKPoint p, SKPoint q, float r)
+    {
+        float dx = q.X - p.X;
+        float dy = q.Y - p.Y;
+        float len = MathF.Sqrt(dx * dx + dy * dy);
+        float a = 0.5f * len / r;
+
+        if (a < -1f) a = -1f;
+        if (a > 1f) a = 1f;
+
+        float phi = MathF.Atan2(dy, dx);
+        float gamma = MathF.Acos(a);
+
+        return (phi - gamma, MathF.PI + phi + gamma);
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;
