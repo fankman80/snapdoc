@@ -879,4 +879,7 @@
   <data name="form_waehlen" xml:space="preserve">
     <value>Choisir une forme...</value>
   </data>
+  <data name="kreis_zeichnen" xml:space="preserve">
+    <value>Dessiner un cercle</value>
+  </data>
 </root>

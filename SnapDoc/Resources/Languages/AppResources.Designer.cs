@@ -1132,6 +1132,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kreis zeichnen ähnelt.
+        /// </summary>
+        internal static string kreis_zeichnen {
+            get {
+                return ResourceManager.GetString("kreis_zeichnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kritisch ähnelt.
         /// </summary>
         internal static string kritisch {

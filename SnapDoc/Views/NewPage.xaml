@@ -319,12 +319,12 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="TextClicked"/>                
                 <Button x:Name="ShapeBtn"
-                        Rotation="90"
                         Text="{x:Static local:MaterialIcons.Activity_zone}"
                         FontSize="34"
                         FontFamily="MaterialOutlined"                    
-                        Clicked="ShapeButtonClicked"
-                        Style="{StaticResource ToolButtonStyle}"/>
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
+                        Clicked="ShapeButtonClicked"/>
                 <Button HorizontalOptions="Start"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Glyph={x:Static local:MaterialIcons.Check}}"
                         BackgroundColor="LimeGreen"

@@ -33,4 +33,9 @@ public partial class PopupShapeSelect : Popup<object>
     {
         await CloseAsync(4);
     }
+
+    private async void TxtBtnClicked(object sender, EventArgs e)
+    {
+        await CloseAsync(5);
+    }
 }

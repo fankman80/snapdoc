@@ -122,15 +122,14 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         // Oval
         var oval = CombinedDrawable.OvalDrawable;
-        rect.FillColor = fillColor;
-        rect.LineColor = lineColor;
-        rect.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
-        rect.TextColor = textColor;
-        rect.LineThickness = lineThickness;
-        rect.StrokeStyle = strokeStyle;
-        rect.HandleRadius = safeHandleRadius;
-        rect.PointRadius = safePointRadius;
-        rect.AllowedAngleDeg = rotationAngle;
+        oval.FillColor = fillColor;
+        oval.LineColor = lineColor;
+        oval.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
+        oval.LineThickness = lineThickness;
+        oval.StrokeStyle = strokeStyle;
+        oval.HandleRadius = safeHandleRadius;
+        oval.PointRadius = safePointRadius;
+        oval.AllowedAngleDeg = rotationAngle;
 
         // Arrow
         var arrow = CombinedDrawable.ArrowDrawable;

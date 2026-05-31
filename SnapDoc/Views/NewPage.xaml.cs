@@ -910,6 +910,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SetDrawMode(DrawMode.Arrow);
         else if (selectedShape == 4)
             SetDrawMode(DrawMode.Free);
+        else if (selectedShape == 5)
+        {
+            SetDrawMode(DrawMode.Rect);
+            TextClicked(null, null);
+        }
         else
             SetDrawMode(DrawMode.Rect);
     }

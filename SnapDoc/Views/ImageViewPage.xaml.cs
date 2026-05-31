@@ -269,17 +269,37 @@ public partial class ImageViewPage : IQueryAttributable
     private async void DrawingClicked(object sender, EventArgs e)
     => await StartDrawing();
 
-    private void DrawFreeClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Free);
+    private async void ShapeButtonClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupShapeSelect();
+        var temporaryOptions = new PopupOptions
+        {
+            CanBeDismissedByTappingOutsideOfPopup = true,
+            Shape = Settings.PopupOptions.Shape
+        };
+        var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
 
-    private void DrawPolyClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Poly);
+        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
+            return;
 
-    private void DrawRectClicked(object sender, EventArgs e)
-        => SetDrawMode(DrawMode.Rect);
-
-    private void DrawArrowClicked(object sender, EventArgs e)
-    => SetDrawMode(DrawMode.Arrow);
+        if (selectedShape == 0)
+            SetDrawMode(DrawMode.Rect);
+        else if (selectedShape == 1)
+            SetDrawMode(DrawMode.Oval);
+        else if (selectedShape == 2)
+            SetDrawMode(DrawMode.Poly);
+        else if (selectedShape == 3)
+            SetDrawMode(DrawMode.Arrow);
+        else if (selectedShape == 4)
+            SetDrawMode(DrawMode.Free);
+        else if (selectedShape == 5)
+        {
+            SetDrawMode(DrawMode.Rect);
+            TextClicked(null, null);
+        }
+        else
+            SetDrawMode(DrawMode.Rect);
+    }
 
     private void SetDrawMode(DrawMode mode)
     {
@@ -291,7 +311,9 @@ public partial class ImageViewPage : IQueryAttributable
         AddTextBtn.IsVisible = (mode == DrawMode.Rect);
 
         if (drawingController.DrawMode == DrawMode.Rect)
-            ShapeBtn.Text = MaterialIcons.Activity_zone;
+            ShapeBtn.Text = MaterialIcons.Rectangle;
+        else if (drawingController.DrawMode == DrawMode.Oval)
+            ShapeBtn.Text = MaterialIcons.Circle;
         else if (drawingController.DrawMode == DrawMode.Poly)
             ShapeBtn.Text = MaterialIcons.Polyline;
         else if (drawingController.DrawMode == DrawMode.Arrow)
@@ -304,6 +326,7 @@ public partial class ImageViewPage : IQueryAttributable
         {
             combined.PolyDrawable.DisplayHandles = (mode == DrawMode.Poly);
             combined.RectDrawable.DisplayHandles = (mode == DrawMode.Rect);
+            combined.OvalDrawable.DisplayHandles = (mode == DrawMode.Oval);
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
 
@@ -316,7 +339,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (setDefaultMode)
         {
-            ShapeBtn.Text = MaterialIcons.Activity_zone;
+            ShapeBtn.Text = MaterialIcons.Rectangle;
             SetDrawMode(DrawMode.Rect);
         }
 
@@ -543,30 +566,5 @@ public partial class ImageViewPage : IQueryAttributable
             lineWidth,
             strokeStyle
         );
-    }
-
-    private async void ShapeButtonClicked(object sender, EventArgs e)
-    {
-        var popup = new PopupShapeSelect();
-        var temporaryOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = true,
-            Shape = Settings.PopupOptions.Shape
-        };
-        var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
-
-        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
-            return;
-
-        if (selectedShape == 0)
-            SetDrawMode(DrawMode.Rect);
-        else if (selectedShape == 1)
-            SetDrawMode(DrawMode.Poly);
-        else if (selectedShape == 2)
-            SetDrawMode(DrawMode.Arrow);
-        else if (selectedShape == 3)
-            SetDrawMode(DrawMode.Free);
-        else
-            SetDrawMode(DrawMode.Rect);
     }
 }
