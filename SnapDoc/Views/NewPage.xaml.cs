@@ -901,23 +901,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
             return;
 
-        if (selectedShape == 0)
-            SetDrawMode(DrawMode.Rect);
-        else if (selectedShape == 1)
-            SetDrawMode(DrawMode.Oval);
-        else if (selectedShape == 2)
-            SetDrawMode(DrawMode.Poly);
-        else if (selectedShape == 3)
-            SetDrawMode(DrawMode.Arrow);
-        else if (selectedShape == 4)
-            SetDrawMode(DrawMode.Free);
-        else if (selectedShape == 5)
+        var mode = selectedShape switch
         {
-            SetDrawMode(DrawMode.Rect);
+            0 => DrawMode.Rect,
+            1 => DrawMode.Oval,
+            2 => DrawMode.Poly,
+            3 => DrawMode.Arrow,
+            4 => DrawMode.Free,
+            _ => DrawMode.Rect 
+        };
+
+        SetDrawMode(mode);
+
+        if (selectedShape == 5)
             TextClicked(null, null);
-        }
-        else
-            SetDrawMode(DrawMode.Rect);
     }
 
     private void SetDrawMode(DrawMode mode)
@@ -927,21 +924,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawMode = mode;
         drawingController.DrawMode = mode;
 
-        AddTextBtn.IsVisible = (mode == DrawMode.Rect);
-        AddCloudyBtn.IsVisible = (mode == DrawMode.Poly || mode == DrawMode.Rect || mode == DrawMode.Oval);
-
-        if (drawingController.DrawMode == DrawMode.Rect)
-            ShapeBtn.Text = MaterialIcons.Activity_zone;
-        else if (drawingController.DrawMode == DrawMode.Oval)
-            ShapeBtn.Text = MaterialIcons.Circle;
-        else if (drawingController.DrawMode == DrawMode.Poly)
-            ShapeBtn.Text = MaterialIcons.Polyline;
-        else if (drawingController.DrawMode == DrawMode.Arrow)
-            ShapeBtn.Text = MaterialIcons.Arrow_shape_up;
-        else if (drawingController.DrawMode == DrawMode.Free)
-            ShapeBtn.Text = MaterialIcons.Gesture;
+        AddTextBtn.IsVisible = mode is DrawMode.Rect or DrawMode.Oval;
+        AddCloudyBtn.IsVisible = mode is DrawMode.Poly or DrawMode.Rect or DrawMode.Oval;
 
         var combined = drawingController.CombinedDrawable;
+
+        (ShapeBtn.Text, bool isCloud) = mode switch
+        {
+            DrawMode.Rect => (MaterialIcons.Activity_zone, combined?.RectDrawable?.IsCloud ?? false),
+            DrawMode.Oval => (MaterialIcons.Circle, combined?.OvalDrawable?.IsCloud ?? false),
+            DrawMode.Poly => (MaterialIcons.Polyline, combined?.PolyDrawable?.IsCloud ?? false),
+            DrawMode.Arrow => (MaterialIcons.Arrow_shape_up, false),
+            DrawMode.Free => (MaterialIcons.Gesture, false),
+            _ => (ShapeBtn.Text, false)
+        };
+
+        AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+
         if (combined != null)
         {
             combined.PolyDrawable.DisplayHandles = (mode == DrawMode.Poly);
@@ -1119,33 +1118,80 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void TextClicked(object sender, EventArgs e)
     {
-        var combined = drawingController.CombinedDrawable;
+        if (drawingController?.CombinedDrawable == null) return;
 
-        var popup = new PopupTextEdit(combined.RectDrawable.TextSize, combined.RectDrawable.TextAlignment, combined.RectDrawable.TextStyle, combined.RectDrawable.AutoSizeText, combined.RectDrawable.Text, combined.RectDrawable.TextPadding, okText: AppResources.ok);
-        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
-        if (result.Result != null)
+        var rectDrawable = drawingController.CombinedDrawable.RectDrawable;
+        var ovalDrawable = drawingController.CombinedDrawable.OvalDrawable;
+        string currentText;
+        float textSize;
+        bool autoSizeText;
+        int textPadding;
+        RectangleTextAlignment textAlignment;
+        RectangleTextStyle textStyle;
+
+        if (drawMode == DrawMode.Rect)
         {
-            combined.RectDrawable?.Text = result.Result.InputTxt;
-            combined.RectDrawable?.TextSize = result.Result.FontSize;
-            combined.RectDrawable?.TextAlignment = result.Result.Alignment;
-            combined.RectDrawable?.TextStyle = result.Result.Style;
-            combined.RectDrawable?.AutoSizeText = result.Result.AutoSize;
-            combined.RectDrawable?.TextPadding = result.Result.TextPadding;
+            currentText = rectDrawable.Text;
+            textSize = rectDrawable.TextSize;
+            textAlignment = rectDrawable.TextAlignment;
+            textStyle = rectDrawable.TextStyle;
+            autoSizeText = rectDrawable.AutoSizeText;
+            textPadding = rectDrawable.TextPadding;
+        }
+        else if (drawMode == DrawMode.Oval)
+        {
+            currentText = ovalDrawable.Text;
+            textSize = ovalDrawable.TextSize;
+            textAlignment = ovalDrawable.TextAlignment;
+            textStyle = ovalDrawable.TextStyle;
+            autoSizeText = ovalDrawable.AutoSizeText;
+            textPadding = ovalDrawable.TextPadding;
+        }
+        else
+            return; // Kein unterstützter Modus für Textbearbeitung
+
+        var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
+        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
+
+        if (result?.Result != null)
+        {
+            if (drawMode == DrawMode.Rect)
+            {
+                rectDrawable.Text = result.Result.InputTxt;
+                rectDrawable.TextSize = result.Result.FontSize;
+                rectDrawable.TextAlignment = result.Result.Alignment;
+                rectDrawable.TextStyle = result.Result.Style;
+                rectDrawable.AutoSizeText = result.Result.AutoSize;
+                rectDrawable.TextPadding = result.Result.TextPadding;
+            }
+            else if (drawMode == DrawMode.Oval)
+            {
+                ovalDrawable.Text = result.Result.InputTxt;
+                ovalDrawable.TextSize = result.Result.FontSize;
+                ovalDrawable.TextAlignment = result.Result.Alignment;
+                ovalDrawable.TextStyle = result.Result.Style;
+                ovalDrawable.AutoSizeText = result.Result.AutoSize;
+                ovalDrawable.TextPadding = result.Result.TextPadding;
+            }
         }
 
         drawingView?.InvalidateSurface();
     }
 
-    private async void CloudyClicked(object sender, EventArgs e)
+    private void CloudyClicked(object sender, EventArgs e)
     {
-        var combined = drawingController.CombinedDrawable;
+        var combined = drawingController?.CombinedDrawable;
+        if (combined == null) return;
 
-        combined.PolyDrawable?.IsCloud = !combined.PolyDrawable.IsCloud;
-        combined.RectDrawable?.IsCloud = !combined.RectDrawable.IsCloud;
-        combined.OvalDrawable?.IsCloud = !combined.OvalDrawable.IsCloud;
+        bool isCloud = drawingController.DrawMode switch
+        {
+            DrawMode.Rect => combined.RectDrawable.IsCloud = !combined.RectDrawable.IsCloud,
+            DrawMode.Oval => combined.OvalDrawable.IsCloud = !combined.OvalDrawable.IsCloud,
+            DrawMode.Poly => combined.PolyDrawable.IsCloud = !combined.PolyDrawable.IsCloud,
+            _ => false
+        };
 
-        AddCloudyBtn.Text = combined.PolyDrawable.IsCloud || combined.RectDrawable.IsCloud || combined.OvalDrawable.IsCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-
+        AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
         drawingView?.InvalidateSurface();
     }
 
@@ -1182,7 +1228,31 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
                 SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
-                SelectedTextColor = SKColor.Parse(style.TextColor).ToMauiColor();
+
+                var textColor = SKColors.Black; // Fallback, falls kein Text-Shape aktiv ist
+                bool isCloud = false;           // Fallback für den Wolken-Status
+
+                if (drawingController.CombinedDrawable != null)
+                {
+                    if (drawingController.DrawMode == DrawMode.Rect)
+                    {
+                        textColor = drawingController.CombinedDrawable.RectDrawable.TextColor;
+                        isCloud = drawingController.CombinedDrawable.RectDrawable.IsCloud;
+                    }
+                    else if (drawingController.DrawMode == DrawMode.Oval)
+                    {
+                        textColor = drawingController.CombinedDrawable.OvalDrawable.TextColor;
+                        isCloud = drawingController.CombinedDrawable.OvalDrawable.IsCloud;
+                    }
+                    else if (drawingController.DrawMode == DrawMode.Poly)
+                    {
+                        isCloud = drawingController.CombinedDrawable.PolyDrawable.IsCloud;
+                    }
+                }
+                AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+
+                SelectedTextColor = textColor.ToMauiColor();
+
                 lineWidth = (int)style.LineThickness;
                 strokeStyle = style.StrokeStyle;
             }

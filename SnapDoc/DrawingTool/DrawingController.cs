@@ -125,6 +125,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         oval.FillColor = fillColor;
         oval.LineColor = lineColor;
         oval.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
+        oval.TextColor = textColor;
         oval.LineThickness = lineThickness;
         oval.StrokeStyle = strokeStyle;
         oval.HandleRadius = safeHandleRadius;
@@ -528,6 +529,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         {
             oval.LineColor = lineColor;
             oval.FillColor = fillColor;
+            oval.TextColor = textColor;
             oval.LineThickness = lineWidth;
             oval.StrokeStyle = strokeStyle;
         }

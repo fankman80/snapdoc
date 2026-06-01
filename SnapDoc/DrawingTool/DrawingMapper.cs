@@ -12,12 +12,6 @@ public static class DrawingMapper
             FillColor = d.PolyDrawable.FillColor.ToString(),
             LineThickness = d.PolyDrawable.LineThickness,
             StrokeStyle = d.PolyDrawable.StrokeStyle,
-            TextColor = d.RectDrawable.TextColor.ToString(),
-            TextSize = d.RectDrawable.TextSize,
-            TextAlignment = (int)d.RectDrawable.TextAlignment,
-            TextStyle = (int)d.RectDrawable.TextStyle,
-            AutoSizeText = d.RectDrawable.AutoSizeText,
-            TextPadding = d.RectDrawable.TextPadding,
         };
 
         var bounds = CalculateBounds(d);
@@ -39,6 +33,7 @@ public static class DrawingMapper
                 ? new PolyDto
                 {
                     IsClosed = d.PolyDrawable.IsClosed,
+                    IsCloud = d.PolyDrawable.IsCloud,
                     Points = [.. d.PolyDrawable.Points
                     .Select(p => new PointDto(
                         p.X - bounds.Left,
@@ -65,10 +60,20 @@ public static class DrawingMapper
                 {
                     RotationDeg = NormalizeAngleDeg(d.RectDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.RectDrawable.Text,
+                    IsCloud = d.RectDrawable.IsCloud,
                     Points = [.. d.RectDrawable.Points
                         .Select(p => new PointDto(
                             p.X - bounds.Left,
-                            p.Y - bounds.Top))]
+                            p.Y - bounds.Top))],
+                    TextStyle = new TextStyleDto
+                    {
+                        TextColor = d.RectDrawable.TextColor.ToString(),
+                        TextSize = d.RectDrawable.TextSize,
+                        TextAlignment = (int)d.RectDrawable.TextAlignment,
+                        TextStyle = (int)d.RectDrawable.TextStyle,
+                        AutoSizeText = d.RectDrawable.AutoSizeText,
+                        TextPadding = d.RectDrawable.TextPadding
+                    }
                 }
                 : null,
 
@@ -77,10 +82,21 @@ public static class DrawingMapper
                 ? new OvalDto
                 {
                     RotationDeg = NormalizeAngleDeg(d.OvalDrawable.AllowedAngleDeg - initialRotation),
+                    Text = d.OvalDrawable.Text,
+                    IsCloud = d.OvalDrawable.IsCloud,
                     Points = [.. d.OvalDrawable.Points
                         .Select(p => new PointDto(
                             p.X - bounds.Left,
-                            p.Y - bounds.Top))]
+                            p.Y - bounds.Top))],
+                    TextStyle = new TextStyleDto
+                    {
+                        TextColor = d.OvalDrawable.TextColor.ToString(),
+                        TextSize = d.OvalDrawable.TextSize,
+                        TextAlignment = (int)d.OvalDrawable.TextAlignment,
+                        TextStyle = (int)d.OvalDrawable.TextStyle,
+                        AutoSizeText = d.OvalDrawable.AutoSizeText,
+                        TextPadding = d.OvalDrawable.TextPadding
+                    }
                 }
                 : null,
 
@@ -116,6 +132,7 @@ public static class DrawingMapper
         {
             d.PolyDrawable.Reset();
             d.PolyDrawable.IsClosed = dto.Poly.IsClosed;
+            d.PolyDrawable.IsCloud = dto.Poly.IsCloud;
             d.PolyDrawable.Points.AddRange(
                 dto.Poly.Points.Select(p =>
                     new SKPoint(p.X + offset.X, p.Y + offset.Y))
@@ -144,6 +161,17 @@ public static class DrawingMapper
 
             r.Text = dto.Rect.Text ?? "";
             r.AllowedAngleDeg = dto.InitialRotation + dto.Rect.RotationDeg;
+            r.IsCloud = dto.Rect.IsCloud;
+
+            if (dto.Rect.TextStyle != null)
+            {
+                r.TextColor = SKColor.Parse(dto.Rect.TextStyle.TextColor);
+                r.TextSize = dto.Rect.TextStyle.TextSize;
+                r.TextAlignment = (RectangleTextAlignment)dto.Rect.TextStyle.TextAlignment;
+                r.TextStyle = (RectangleTextStyle)dto.Rect.TextStyle.TextStyle;
+                r.AutoSizeText = dto.Rect.TextStyle.AutoSizeText;
+                r.TextPadding = dto.Rect.TextStyle.TextPadding;
+            }
 
             var p0 = new SKPoint(
                 dto.Rect.Points[0].X + offset.X,
@@ -163,7 +191,19 @@ public static class DrawingMapper
             var o = d.OvalDrawable;
             o.Reset();
 
+            o.Text = dto.Oval.Text ?? "";
             o.AllowedAngleDeg = dto.InitialRotation + dto.Oval.RotationDeg;
+            o.IsCloud = dto.Oval.IsCloud;
+
+            if (dto.Oval.TextStyle != null)
+            {
+                o.TextColor = SKColor.Parse(dto.Oval.TextStyle.TextColor);
+                o.TextSize = dto.Oval.TextStyle.TextSize;
+                o.TextAlignment = (RectangleTextAlignment)dto.Oval.TextStyle.TextAlignment;
+                o.TextStyle = (RectangleTextStyle)dto.Oval.TextStyle.TextStyle;
+                o.AutoSizeText = dto.Oval.TextStyle.AutoSizeText;
+                o.TextPadding = dto.Oval.TextStyle.TextPadding;
+            }
 
             var p0 = new SKPoint(
                 dto.Oval.Points[0].X + offset.X,
@@ -250,32 +290,30 @@ public static class DrawingMapper
 
         var lineColor = SKColor.Parse(s.LineColor);
         var fillColor = SKColor.Parse(s.FillColor);
-        var textColor = SKColor.Parse(s.TextColor);
 
+        // ---------------- FREE ----------------
         d.FreeDrawable.LineColor = lineColor;
         d.FreeDrawable.LineThickness = s.LineThickness;
-        
+
+        // ---------------- POLY ----------------
         d.PolyDrawable.LineColor = lineColor;
         d.PolyDrawable.FillColor = fillColor;
         d.PolyDrawable.LineThickness = s.LineThickness;
         d.PolyDrawable.StrokeStyle = s.StrokeStyle;
 
+        // ---------------- RECT ----------------
         d.RectDrawable.LineColor = lineColor;
         d.RectDrawable.FillColor = fillColor;
         d.RectDrawable.LineThickness = s.LineThickness;
         d.RectDrawable.StrokeStyle = s.StrokeStyle;
-        d.RectDrawable.TextColor = textColor;
-        d.RectDrawable.TextSize = s.TextSize;
-        d.RectDrawable.TextAlignment = (RectangleTextAlignment)s.TextAlignment;
-        d.RectDrawable.TextStyle = (RectangleTextStyle)s.TextStyle;
-        d.RectDrawable.AutoSizeText = s.AutoSizeText;
-        d.RectDrawable.TextPadding = s.TextPadding;
 
+        // ---------------- OVAL ----------------
         d.OvalDrawable.LineColor = lineColor;
         d.OvalDrawable.FillColor = fillColor;
         d.OvalDrawable.LineThickness = s.LineThickness;
         d.OvalDrawable.StrokeStyle = s.StrokeStyle;
 
+        // ---------------- ARROW ----------------
         d.ArrowDrawable.LineColor = lineColor;
         d.ArrowDrawable.FillColor = fillColor;
         d.ArrowDrawable.LineThickness = s.LineThickness;

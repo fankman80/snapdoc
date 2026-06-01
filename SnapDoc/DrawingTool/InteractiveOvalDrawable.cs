@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Microsoft.Maui.Graphics.Text;
+using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
@@ -13,10 +14,19 @@ public class InteractiveOvalDrawable
     public bool IsDrawn { get; set; } = false;
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
+    public SKColor TextColor { get; set; } = SKColors.Black;
     public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKPoint Center { get; private set; }
     public float Width { get; private set; }
     public float Height { get; set; }
+    public string Text { get; set; } = "";
+    public float TextSize { get; set; } = 60;
+    public float MinTextSize { get; set; } = 6f;
+    public float MaxTextSize { get; set; } = 200f;
+    public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
+    public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
+    public bool AutoSizeText { get; set; } = true;
+    public int TextPadding { get; set; } = 10;
 
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
@@ -169,6 +179,10 @@ public class InteractiveOvalDrawable
 
             canvas.Restore();
         }
+
+        // Text wird unabhaengig vom Modus gezeichnet
+        if (!string.IsNullOrEmpty(Text))
+            DrawMultilineText(canvas);
 
         if (!DisplayHandles) return;
 
@@ -377,6 +391,163 @@ public class InteractiveOvalDrawable
         float gamma = MathF.Acos(a);
 
         return (phi - gamma, MathF.PI + phi + gamma);
+    }
+
+    private void DrawMultilineText(SKCanvas canvas)
+    {
+        if (string.IsNullOrWhiteSpace(Text))
+            return;
+
+        canvas.Save();
+        canvas.Translate(Center.X, Center.Y);
+        canvas.RotateDegrees(AllowedAngleDeg);
+
+        float maxTextWidth = Width / 100 * (100 - TextPadding);
+        float maxTextHeight = Height / 100 * (100 - TextPadding);
+
+        TextSize = AutoSizeText
+            ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
+            : TextSize;
+
+        var font = new SKFont(TextStyle.ToTypeface())
+        {
+            Size = TextSize
+        };
+
+        var paint = new SKPaint
+        {
+            IsAntialias = true,
+            Color = TextColor,
+            IsStroke = false
+        };
+
+        var lines = BreakTextIntoLines(Text, font, maxTextWidth);
+
+        var metrics = font.Metrics;
+        float lineHeight = metrics.Descent - metrics.Ascent;
+        float totalHeight = lines.Count * lineHeight;
+        float y = -totalHeight / 2f - metrics.Ascent;
+
+        canvas.ClipRect(new SKRect(
+            -Width / 2f,
+            -Height / 2f,
+                Width / 2f,
+                Height / 2f
+        ));
+
+        foreach (var line in lines)
+        {
+            float x = GetAlignedX(line, font);
+            canvas.DrawText(line, x, y, font, paint);
+            y += lineHeight;
+        }
+
+        canvas.Restore();
+    }
+
+    private static List<string> BreakTextIntoLines(string text, SKFont font, float maxWidth)
+    {
+        var result = new List<string>();
+        var hardLines = text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
+
+        foreach (var hardLine in hardLines)
+        {
+            if (string.IsNullOrEmpty(hardLine))
+            {
+                result.Add(string.Empty);
+                continue;
+            }
+
+            var words = hardLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
+            string line = "";
+
+            foreach (var word in words)
+            {
+                var test = string.IsNullOrEmpty(line) ? word : $"{line} {word}";
+
+                if (font.MeasureText(test) <= maxWidth)
+                {
+                    line = test;
+                }
+                else
+                {
+                    if (!string.IsNullOrEmpty(line))
+                        result.Add(line);
+
+                    line = word;
+                }
+            }
+
+            if (!string.IsNullOrEmpty(line))
+                result.Add(line);
+        }
+        return result;
+    }
+
+    float GetAlignedX(string line, SKFont font)
+    {
+        float lineWidth = font.MeasureText(line);
+
+        return TextAlignment switch
+        {
+            RectangleTextAlignment.Left =>
+                -Width / 2f + TextPadding * density,
+
+            RectangleTextAlignment.Right =>
+                Width / 2f - TextPadding * density - lineWidth,
+
+            _ => // Center
+                -lineWidth / 2f
+        };
+    }
+
+    private float CalculateAutoFontSize(string text, float maxWidth, float maxHeight)
+    {
+        float low = MinTextSize;
+        float high = MaxTextSize;
+        float best = low;
+
+        while (high - low > 0.5f)
+        {
+            float mid = (low + high) / 2f;
+
+            if (DoesTextFit(text, mid, maxWidth, maxHeight))
+            {
+                best = mid;
+                low = mid;
+            }
+            else
+            {
+                high = mid;
+            }
+        }
+
+        return best;
+    }
+
+    private bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
+    {
+        var font = new SKFont(TextStyle.ToTypeface())
+        {
+            Size = fontSize
+        };
+
+        var lines = BreakTextIntoLines(text, font, maxWidth);
+
+        var metrics = font.Metrics;
+        float lineHeight = metrics.Descent - metrics.Ascent;
+        float totalHeight = lines.Count * lineHeight;
+
+        if (totalHeight > maxHeight)
+            return false;
+
+        foreach (var line in lines)
+        {
+            if (font.MeasureText(line) > maxWidth)
+                return false;
+        }
+
+        return true;
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;

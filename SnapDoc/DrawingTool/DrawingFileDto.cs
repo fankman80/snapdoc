@@ -1,5 +1,4 @@
-﻿
-namespace SnapDoc.DrawingTool;
+﻿namespace SnapDoc.DrawingTool;
 
 public class DrawingStyleDto
 {
@@ -7,6 +6,10 @@ public class DrawingStyleDto
     public string FillColor { get; set; } = "#00000000";
     public float LineThickness { get; set; }
     public string StrokeStyle { get; set; } = "";
+}
+
+public class TextStyleDto
+{
     public string TextColor { get; set; } = "#FF000000";
     public float TextSize { get; set; }
     public int TextAlignment { get; set; }
@@ -38,6 +41,7 @@ public class PolyDto
 {
     public List<PointDto> Points { get; set; } = [];
     public bool IsClosed { get; set; }
+    public bool IsCloud { get; set; }
 }
 
 public class FreeDto
@@ -50,12 +54,17 @@ public class RectDto
     public List<PointDto> Points { get; set; } = [];
     public float RotationDeg { get; set; }
     public string? Text { get; set; }
+    public TextStyleDto? TextStyle { get; set; }
+    public bool IsCloud { get; set; }
 }
 
 public class OvalDto
 {
     public List<PointDto> Points { get; set; } = [];
     public float RotationDeg { get; set; }
+    public string? Text { get; set; }
+    public TextStyleDto? TextStyle { get; set; }
+    public bool IsCloud { get; set; }
 }
 
 public class ArrowDto
@@ -63,6 +72,5 @@ public class ArrowDto
     public List<PointDto> Points { get; set; } = [];
     public float RotationDeg { get; set; }
 }
-
 
 public record PointDto(float X, float Y);

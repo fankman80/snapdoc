@@ -26,6 +26,7 @@ public class InteractiveRectangleDrawable
     public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
     public bool AutoSizeText { get; set; } = true;
     public int TextPadding { get; set; } = 10;
+
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
