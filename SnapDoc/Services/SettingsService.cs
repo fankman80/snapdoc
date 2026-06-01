@@ -188,40 +188,64 @@ public partial class SettingsService : ObservableObject
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
+
+    // --- Drawing-Style Templates ---
     [ObservableProperty] public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
     [
         new() {
-            Text = "Text",
-            BackgroundColor = Colors.LightGreen.WithAlpha(0.5f).ToArgbHex(true),
-            BorderColor = Colors.Green.WithAlpha(1f).ToArgbHex(true),
-            TextColor = Colors.DarkGreen.WithAlpha(1f).ToArgbHex(true),
+            Text = "Fluchtweg",
+            BackgroundColor = "#7F90EE90",
+            BorderColor = "#FF008000",
+            TextColor = "#FF006400",
             LineWidth = 3,
             StrokeStyle = "",
-            },
+            StrokeDashArray = null
+        },
         new() {
-            Text = "Text",
-            BackgroundColor = Colors.LightYellow.WithAlpha(0.5f).ToArgbHex(true),
-            BorderColor = Colors.Goldenrod.WithAlpha(1f).ToArgbHex(true),
-            TextColor = Colors.DarkGoldenrod.WithAlpha(1f).ToArgbHex(true),
-            LineWidth = 6,
-            StrokeStyle = "4 2",
+            Text = "Textfeld",
+            BackgroundColor = "#FFFFFF",
+            BorderColor = "#000000",
+            TextColor = "#000000",
+            LineWidth = 3,
+            StrokeStyle = "",
+            StrokeDashArray = null
+        },
+        new() {
+            Text = "Hinweis",
+            BackgroundColor = "#66FFB6C1",
+            BorderColor = "#FF0000",
+            TextColor = "#8B0000",
+            LineWidth = 4,
+            StrokeStyle = "",
+            StrokeDashArray = null
+        },
+        new() {
+            Text = "Gefahr",
+            BackgroundColor = "#7FFFFFE0",
+            BorderColor = "#DAA520",
+            TextColor = "#B8860B",
+            LineWidth = 5,
+            StrokeStyle = "4 3",
+            StrokeDashArray = [4, 3]
         },
         new() {
             Text = "Text",
-            BackgroundColor = Colors.LightPink.WithAlpha(0.5f).ToArgbHex(true),
-            BorderColor = Colors.Red.WithAlpha(1f).ToArgbHex(true),
-            TextColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
-            LineWidth = 2,
-            StrokeStyle = "4 2 8 2",
-            },
-        new() {
-            Text = "Text",
-            BackgroundColor = Colors.OrangeRed.WithAlpha(0.5f).ToArgbHex(true),
-            BorderColor = Colors.DarkRed.WithAlpha(1f).ToArgbHex(true),
-            TextColor = Colors.White.WithAlpha(1f).ToArgbHex(true),
+            BackgroundColor = "#7FFF4500",
+            BorderColor = "#8B0000",
+            TextColor = "#FFFFFF",
             LineWidth = 0,
-            StrokeStyle = "4 4",
-            }
+            StrokeStyle = "",
+            StrokeDashArray = null
+        },
+        new() {
+            Text = "RWA",
+            BackgroundColor = "#FFFF00",
+            BorderColor = "#000000",
+            TextColor = "#000000",
+            LineWidth = 3,
+            StrokeStyle = "",
+            StrokeDashArray = null
+        }
     ];
 
     // --- Selected ColorTheme ---
