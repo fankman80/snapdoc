@@ -198,8 +198,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#FF008000",
             TextColor = "#FF006400",
             LineWidth = 3,
-            StrokeStyle = "",
-            StrokeDashArray = null
+            StrokeStyle = ""
         },
         new() {
             Text = "Textfeld",
@@ -207,8 +206,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
-            StrokeStyle = "",
-            StrokeDashArray = null
+            StrokeStyle = ""
         },
         new() {
             Text = "Hinweis",
@@ -216,8 +214,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#FF0000",
             TextColor = "#8B0000",
             LineWidth = 4,
-            StrokeStyle = "",
-            StrokeDashArray = null
+            StrokeStyle = ""
         },
         new() {
             Text = "Gefahr",
@@ -225,8 +222,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#DAA520",
             TextColor = "#B8860B",
             LineWidth = 5,
-            StrokeStyle = "4 3",
-            StrokeDashArray = [4, 3]
+            StrokeStyle = "4 3"
         },
         new() {
             Text = "Text",
@@ -234,8 +230,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#8B0000",
             TextColor = "#FFFFFF",
             LineWidth = 0,
-            StrokeStyle = "",
-            StrokeDashArray = null
+            StrokeStyle = ""
         },
         new() {
             Text = "RWA",
@@ -243,8 +238,7 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
-            StrokeStyle = "",
-            StrokeDashArray = null
+            StrokeStyle = ""
         }
     ];
 
