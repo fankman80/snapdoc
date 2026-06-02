@@ -152,8 +152,7 @@
                         TitleColor="{DynamicResource SecondaryBackground}"
                         BorderColor="{DynamicResource SecondaryBackground}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        Icon="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"                        
+                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                        
                         AllowClear="False"
                         Title="{x:Static res:AppResources.datum}">
                     </material:DatePickerField>
