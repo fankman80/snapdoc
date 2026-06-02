@@ -124,7 +124,7 @@
         <VerticalStackLayout x:DataType="views:MapView"
                              HorizontalOptions="End"
                              VerticalOptions="End"
-                             Spacing="14"
+                             Spacing="16"
                              Padding="20">
             <Button Text="{x:Static local:MaterialIcons.Add_location_alt}"
                     FontSize="34"
