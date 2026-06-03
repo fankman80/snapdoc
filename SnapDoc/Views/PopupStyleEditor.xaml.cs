@@ -112,7 +112,63 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         }
     }
 
-    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string strokeStyle, string okText = null, string cancelText = null)
+    private float cloudRadius;
+    public float CloudRadius
+    {
+        get => cloudRadius;
+        set
+        {
+            if (cloudRadius != value)
+            {
+                cloudRadius = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private float cloudOverlap;
+    public float CloudOverlap
+    {
+        get => cloudOverlap;
+        set
+        {
+            if (cloudOverlap != value)
+            {
+                cloudOverlap = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private float cloudInciseDeg;
+    public float CloudInciseDeg
+    {
+        get => cloudInciseDeg;
+        set
+        {
+            if (cloudInciseDeg != value)
+            {
+                cloudInciseDeg = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private bool isCloudSettingsVisible;
+    public bool IsCloudSettingsVisible
+    {
+        get => isCloudSettingsVisible;
+        set
+        {
+            if (isCloudSettingsVisible != value)
+            {
+                isCloudSettingsVisible = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string strokeStyle, float cloudRadius, float cloudInciseDeg, bool isCloudSettingsVisible = false, string okText = null, string cancelText = null)
     {
         InitializeComponent();
 
@@ -121,6 +177,9 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         LineWidth = lineWidth;
         StrokeStyle = strokeStyle;
         TemplateText = "Text";
+        CloudRadius = cloudRadius;
+        CloudInciseDeg = cloudInciseDeg;
+        IsCloudSettingsVisible = isCloudSettingsVisible;
 
         SelectedBorderColor = Color.FromArgb(borderColor);
         SelectedFillColor = Color.FromArgb(fillColor);
@@ -209,7 +268,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle));
+        await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, CloudRadius, CloudInciseDeg));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)

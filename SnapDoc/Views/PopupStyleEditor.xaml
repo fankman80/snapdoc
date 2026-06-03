@@ -122,6 +122,7 @@
                 </Grid>
 
                 <controls:RangeSlider
+                     IsVisible="{Binding IsCloudSettingsVisible}"
                      LabelText="{x:Static res:AppResources.linienbreite}"
                      IsRange="False"
                      Minimum="0"
@@ -131,6 +132,35 @@
                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                      MinimumValueDisplayFormat="{}{0} px"
                      LowerValue="{Binding LineWidth}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                </controls:RangeSlider>
+
+                <controls:RangeSlider
+                     IsVisible="{Binding IsCloudSettingsVisible}"
+                     LabelText="{x:Static res:AppResources.wolken_radius}"
+                     IsRange="False"
+                     Minimum="1"
+                     Maximum="50"
+                     Step="1"
+                     ValueFontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0} px"
+                     LowerValue="{Binding CloudRadius}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                </controls:RangeSlider>
+
+                <controls:RangeSlider
+                     LabelText="{x:Static res:AppResources.wolken_ueberschneidung}"
+                     IsRange="False"
+                     Minimum="0"
+                     Maximum="60"
+                     Step="1"
+                     ValueFontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0}°"
+                     LowerValue="{Binding CloudInciseDeg}"
                      MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                      MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                 </controls:RangeSlider>

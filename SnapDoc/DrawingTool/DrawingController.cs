@@ -489,7 +489,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         }
     }
 
-    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle)
+    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle, float cloudRadius, float cloudInciseDeg)
     {
         if (CombinedDrawable == null)
             return;
@@ -510,6 +510,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             poly.FillColor = fillColor;
             poly.LineThickness = lineWidth;
             poly.StrokeStyle = strokeStyle;
+            poly.CloudRadius = cloudRadius;
+            poly.CloudInciseDeg = cloudInciseDeg;
         }
 
         // Rectangle aktualisieren
@@ -521,6 +523,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.TextColor = textColor;
             rect.LineThickness = lineWidth;
             rect.StrokeStyle = strokeStyle;
+            rect.CloudRadius = cloudRadius;
+            rect.CloudInciseDeg = cloudInciseDeg;
         }
 
         // Oval aktualisieren
@@ -532,6 +536,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             oval.TextColor = textColor;
             oval.LineThickness = lineWidth;
             oval.StrokeStyle = strokeStyle;
+            oval.CloudRadius = cloudRadius;
+            oval.CloudInciseDeg = cloudInciseDeg;
         }
 
         // Arrow aktualisieren

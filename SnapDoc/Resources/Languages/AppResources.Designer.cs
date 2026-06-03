@@ -2221,6 +2221,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wolkenradius ähnelt.
+        /// </summary>
+        internal static string wolken_radius {
+            get {
+                return ResourceManager.GetString("wolken_radius", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wolkenüberschneidung ähnelt.
+        /// </summary>
+        internal static string wolken_ueberschneidung {
+            get {
+                return ResourceManager.GetString("wolken_ueberschneidung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Wollen Sie diese Vorlage wirklich löschen? ähnelt.
         /// </summary>
         internal static string wollen_sie_diese_vorlage_wirklich_loeschen {

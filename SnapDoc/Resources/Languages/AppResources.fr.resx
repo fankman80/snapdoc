@@ -882,4 +882,10 @@
   <data name="kreis_zeichnen" xml:space="preserve">
     <value>Dessiner un cercle</value>
   </data>
+  <data name="wolken_radius" xml:space="preserve">
+    <value>Rayon du nuage</value>
+  </data>
+  <data name="wolken_ueberschneidung" xml:space="preserve">
+    <value>Intersection de nuages</value>
+  </data>
 </root>

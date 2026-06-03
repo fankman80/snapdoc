@@ -290,13 +290,15 @@ namespace SnapDoc
         public byte FillOpacity { get; set; } = fillOpacity;
     }
 
-    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle)
+    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle, float cloudRadius, float cloudInciseDeg)
     {
         public string BorderColorHex { get; set; } = borderColorHex;
         public string FillColorHex { get; set; } = fillColorHex;
         public string TextColorHex { get; set; } = textColorHex;
         public int PenWidth { get; set; } = width;
         public string StrokeStyle { get; set; } = strokeStyle;
+        public float CloudRadius { get; set; } = cloudRadius;
+        public float CloudInciseDeg { get; set; } = cloudInciseDeg;
     }
 
     public class PlanSelectorReturn(string planTarget, bool isPinCopy)

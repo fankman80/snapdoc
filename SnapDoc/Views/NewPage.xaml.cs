@@ -54,6 +54,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private DrawMode drawMode = DrawMode.None;
     private int lineWidth = (int)(3 * SettingsService.Instance.OsBaseScale);
     private string strokeStyle = "";
+    private float cloudRadius = 20;
+    private float cloudInciseDeg = 15;
 
     private string planImageSource = "";
     public string PlanImageSource
@@ -1096,7 +1098,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle);
+        bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
@@ -1106,13 +1109,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
         lineWidth = result.Result.PenWidth;
         strokeStyle = result.Result.StrokeStyle;
+        cloudRadius = result.Result.CloudRadius;
+        cloudInciseDeg = result.Result.CloudInciseDeg;
 
         drawingController?.UpdateDrawingStyles(
             SelectedBorderColor.ToSKColor(),
             SelectedFillColor.ToSKColor(),
             SelectedTextColor.ToSKColor(),
             lineWidth,
-            strokeStyle
+            strokeStyle,
+            cloudRadius,
+            cloudInciseDeg
         );
     }
 

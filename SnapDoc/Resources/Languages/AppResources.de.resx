@@ -882,4 +882,10 @@
   <data name="kreis_zeichnen" xml:space="preserve">
     <value>Kreis zeichnen</value>
   </data>
+  <data name="wolken_radius" xml:space="preserve">
+    <value>Wolkenradius</value>
+  </data>
+  <data name="wolken_ueberschneidung" xml:space="preserve">
+    <value>Wolkenüberschneidung</value>
+  </data>
 </root>
