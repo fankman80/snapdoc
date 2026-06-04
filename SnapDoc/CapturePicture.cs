@@ -91,7 +91,7 @@ public class CapturePicture
             if (thumbnailPath != null && resultPath != null)
             {
                 string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                _ = Task.Run(() => Thumbnail.Generate(resultPath, thumbFilePath));
+                await Task.Run(() => Thumbnail.Generate(resultPath, thumbFilePath));
             }
 
             if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
