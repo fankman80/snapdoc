@@ -83,34 +83,35 @@
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:FotoItem">
-                    <VerticalStackLayout>
-                        <Grid>
-                            <local:SquareView Opacity="{Binding DisplayOpacity}">
-                                <Image Source="{Binding DisplayImage}"
-                                       Aspect="AspectFill"
-                                       HorizontalOptions="Fill"
-                                       VerticalOptions="Fill">                                       
-                                    <Image.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnImageTapped" />
-                                    </Image.GestureRecognizers>
-                                </Image>
-                            </local:SquareView>
-                            <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                    WidthRequest="36"
-                                    HeightRequest="36"
-                                    MinimumWidthRequest="36"
-                                    MinimumHeightRequest="36"
-                                    Padding="0"
-                                    Margin="2"
-                                    FontFamily="MaterialOutlined"
-                                    FontSize="24"
-                                    VerticalOptions="End"                                    
-                                    HorizontalOptions="End"
-                                    BackgroundColor="Transparent"
-                                    TextColor="White"
-                                    Clicked="OnAllowExportClicked"/>
-                        </Grid>
-                    </VerticalStackLayout>
+                    <Grid Padding="0">
+                        <local:SquareView Opacity="{Binding DisplayOpacity}"
+                               HorizontalOptions="Fill"
+                               VerticalOptions="Fill">
+                            <Image Source="{Binding DisplayImage}" 
+                       Aspect="AspectFill"
+                       HorizontalOptions="Fill"
+                       VerticalOptions="Fill">
+                                <Image.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnImageTapped" />
+                                </Image.GestureRecognizers>
+                            </Image>
+                        </local:SquareView>
+
+                        <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    MinimumWidthRequest="36"
+                    MinimumHeightRequest="36"
+                    Padding="0"
+                    Margin="2"
+                    FontFamily="MaterialOutlined"
+                    FontSize="24"
+                    VerticalOptions="End"                                    
+                    HorizontalOptions="End"
+                    BackgroundColor="Transparent"
+                    TextColor="White"
+                    Clicked="OnAllowExportClicked"/>
+                    </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>

@@ -61,7 +61,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
-        SizeChanged += OnSizeChanged;;
+        SizeChanged += OnSizeChanged;
 
         UpdateSpan();
         FotoLoader();
@@ -71,7 +71,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnDisappearing();
         
-        SizeChanged -= OnSizeChanged;;
+        SizeChanged -= OnSizeChanged;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -264,26 +264,25 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = DateTime.Now,
                 ImageSize = imgSize
             };
+
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
             GlobalJson.SaveToFile();
 
             var newItem = new FotoItem
             {
-                ImagePath = path.FullPath,
+                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName),
                 OnPlanId = this.PlanId,
                 OnPinId = this.PinId,
                 AllowExport = true,
                 DateTime = DateTime.Now
             }.Initialize();
 
+            await Task.Delay(150);
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Fotos.Add(newItem);
+                OnPropertyChanged(nameof(DynamicSpan));
             });
-
-#if WINDOWS
-            FotoLoader();
-#endif
         }
     }
 

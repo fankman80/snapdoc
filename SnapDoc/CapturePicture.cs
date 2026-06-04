@@ -46,6 +46,8 @@ public class CapturePicture
 
             string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
             string resultPath = null;
+            int finalWidth = 0;
+            int finalHeight = 0;
 
             if (filepath != null)
             {
@@ -72,6 +74,9 @@ public class CapturePicture
                     if (orientation != SKEncodedOrigin.TopLeft)
                         finalBitmap = RotateBitmap(originalBitmap, orientation);
 
+                    finalWidth = finalBitmap.Width;
+                    finalHeight = finalBitmap.Height;
+
                     using (var image = SKImage.FromBitmap(finalBitmap))
                     using (var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality))
                     {
@@ -86,17 +91,14 @@ public class CapturePicture
             if (thumbnailPath != null && resultPath != null)
             {
                 string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                Thumbnail.Generate(resultPath, thumbFilePath);
+                _ = Task.Run(() => Thumbnail.Generate(resultPath, thumbFilePath));
             }
 
             if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
                 File.Delete(foto.FullPath);
 
             if (resultPath != null)
-            {
-                using var finalCodec = SKCodec.Create(resultPath);
-                return (new FileResult(resultPath), new Size(finalCodec.Info.Width, finalCodec.Info.Height));
-            }
+                return (new FileResult(resultPath), new Size(finalWidth, finalHeight));
 
             return (null, new Size(0, 0));
         }
