@@ -55,7 +55,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private int lineWidth = (int)(3 * SettingsService.Instance.OsBaseScale);
     private string strokeStyle = "";
     private float cloudRadius = (float)(20 * SettingsService.Instance.OsBaseScale);
-    private float cloudInciseDeg = (float)(15 * SettingsService.Instance.OsBaseScale);
+    private float cloudInciseDeg = 15;
 
 
     private string planImageSource = "";
