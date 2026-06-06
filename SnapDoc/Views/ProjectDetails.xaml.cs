@@ -88,7 +88,7 @@ public partial class ProjectDetails : ContentPage
                 {
                     sourceStream.CopyTo(destinationStream);
                 }
-                Thumbnail.Generate(sourceFilePath, destinationThumbPath);
+                await Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
                 if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
                     File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));

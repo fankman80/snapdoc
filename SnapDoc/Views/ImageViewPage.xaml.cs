@@ -508,7 +508,7 @@ public partial class ImageViewPage : IQueryAttributable
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-                Thumbnail.Generate(imgPath, thumbPath);
+                await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
             }
             else
@@ -525,7 +525,7 @@ public partial class ImageViewPage : IQueryAttributable
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
-                Thumbnail.Generate(imgPath, thumbPath);
+                await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
             }
 

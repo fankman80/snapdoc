@@ -53,57 +53,79 @@ public class CapturePicture
             {
                 resultPath = Path.Combine(Settings.DataDirectory, filepath, filename);
 
+                string mainDir = Path.GetDirectoryName(resultPath);
+                if (!Directory.Exists(mainDir))
+                    Directory.CreateDirectory(mainDir);
+
+                using var memoryStream = new MemoryStream();
+                using (var originalStream = await foto.OpenReadAsync())
+                {
+                    await originalStream.CopyToAsync(memoryStream);
+                }
+
                 await Task.Run(async () =>
                 {
-                    using var stream = await foto.OpenReadAsync();
-                    using var managedStream = new SKManagedStream(stream);
-                    using var codec = SKCodec.Create(managedStream);
-
-                    if (codec == null)
-                        return;
-
-                    var decodeInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height);
-                    using var originalBitmap = SKBitmap.Decode(codec, decodeInfo);
-
-                    if (originalBitmap == null)
-                        return;
-
-                    var orientation = codec.EncodedOrigin;
-                    SKBitmap finalBitmap = originalBitmap;
-
-                    if (orientation != SKEncodedOrigin.TopLeft)
-                        finalBitmap = RotateBitmap(originalBitmap, orientation);
-
-                    finalWidth = finalBitmap.Width;
-                    finalHeight = finalBitmap.Height;
-
-                    using (var image = SKImage.FromBitmap(finalBitmap))
-                    using (var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality))
+                    // 1. THUMBNAIL-PASS
+                    if (thumbnailPath != null)
                     {
-                        using var newStream = File.Create(resultPath);
-                        data.SaveTo(newStream);
+                        string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
+                        memoryStream.Position = 0;
+                        await Thumbnail.Generate(memoryStream, thumbFilePath);
                     }
 
-                    if (finalBitmap != originalBitmap) finalBitmap.Dispose();
+                    // 2. HAUPTBILD-PASS
+                    try
+                    {
+                        memoryStream.Position = 0;
+                        using var managedStream = new SKManagedStream(memoryStream, false);
+                        using var codec = SKCodec.Create(managedStream);
+
+                        if (codec == null)
+                            return;
+
+                        var decodeInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height);
+                        using var originalBitmap = SKBitmap.Decode(codec, decodeInfo);
+
+                        if (originalBitmap == null)
+                            return;
+
+                        var orientation = codec.EncodedOrigin;
+                        SKBitmap finalBitmap = originalBitmap;
+
+                        if (orientation != SKEncodedOrigin.TopLeft)
+                            finalBitmap = RotateBitmap(originalBitmap, orientation);
+
+                        finalWidth = finalBitmap.Width;
+                        finalHeight = finalBitmap.Height;
+
+                        using (var image = SKImage.FromBitmap(finalBitmap))
+                        using (var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality))
+                        {
+                            using var newStream = File.Create(resultPath);
+                            data.SaveTo(newStream);
+                        }
+
+                        if (finalBitmap != originalBitmap) finalBitmap.Dispose();
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Main image save failed: {ex.Message}");
+                    }
                 });
             }
 
-            if (thumbnailPath != null && resultPath != null)
-            {
-                string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                await Task.Run(() => Thumbnail.Generate(resultPath, thumbFilePath));
-            }
-
+            // Temporaeren Kamera-Cache aufraeumen
             if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
-                File.Delete(foto.FullPath);
+                try { File.Delete(foto.FullPath); } catch { }
 
             if (resultPath != null)
                 return (new FileResult(resultPath), new Size(finalWidth, finalHeight));
 
             return (null, new Size(0, 0));
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Capture crashed completely: {ex.Message}");
             return (null, new Size(0, 0));
         }
     }

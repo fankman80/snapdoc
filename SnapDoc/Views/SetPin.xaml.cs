@@ -253,7 +253,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void TakeFoto(object sender, EventArgs e)
     {
-        (FileResult path, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
+        (FileResult path, Size imgSize) = await CapturePicture.Capture(
+            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
+            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
         if (path != null)
         {
@@ -268,20 +270,22 @@ public partial class SetPin : ContentPage, IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
             GlobalJson.SaveToFile();
 
+            string expectedThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
+
             var newItem = new FotoItem
             {
-                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName),
+                ImagePath = expectedThumbPath,
                 OnPlanId = this.PlanId,
                 OnPinId = this.PinId,
                 AllowExport = true,
                 DateTime = DateTime.Now
             }.Initialize();
 
-            await Task.Delay(150);
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 Fotos.Add(newItem);
-                OnPropertyChanged(nameof(DynamicSpan));
+                await Task.Yield();
+                this.ForceLayout();
             });
         }
     }

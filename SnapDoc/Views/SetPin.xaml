@@ -88,9 +88,9 @@
                                HorizontalOptions="Fill"
                                VerticalOptions="Fill">
                             <Image Source="{Binding DisplayImage}" 
-                       Aspect="AspectFill"
-                       HorizontalOptions="Fill"
-                       VerticalOptions="Fill">
+                                   Aspect="AspectFill"
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="Fill">
                                 <Image.GestureRecognizers>
                                     <TapGestureRecognizer Tapped="OnImageTapped" />
                                 </Image.GestureRecognizers>

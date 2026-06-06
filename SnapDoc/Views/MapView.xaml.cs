@@ -490,7 +490,7 @@ public partial class MapView : IQueryAttributable
 
                 await File.WriteAllBytesAsync(filepath, imageBytes);
 
-                Thumbnail.Generate(filepath, thumbPath);
+                await Thumbnail.Generate(filepath, thumbPath);
 
                 Foto newImageData = new()
                 {

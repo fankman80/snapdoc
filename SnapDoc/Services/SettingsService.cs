@@ -104,7 +104,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int MaxPdfImageSizeW { get; set; } = 8192;
     [ObservableProperty] public partial int MaxPdfImageSizeH { get; set; } = 8192;
     [ObservableProperty] public partial int FotoThumbSize { get; set; } = 150;
-    [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 80;
+    [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 75;
     [ObservableProperty] public partial int FotoQuality { get; set; } = 90;
     [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
     [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
