@@ -116,7 +116,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
     [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
     [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 60;
-    [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 100;
+    [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 90;
     [ObservableProperty] public partial int MaxPdfPixelCount { get; set; } = 30;
     [ObservableProperty] public partial int PdfThumbDpi { get; set; } = 72;
     [ObservableProperty] public partial int MapIconSize { get; set; } = 85;
