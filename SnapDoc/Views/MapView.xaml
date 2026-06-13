@@ -127,7 +127,6 @@
                              Spacing="16"
                              Padding="20">
             <Button Text="{x:Static local:MaterialIcons.Add_location_alt}"
-                    FontSize="34"
                     FontFamily="MaterialOutlined"
                     HorizontalOptions="End"
                     Style="{StaticResource ToolButtonStyle}"
