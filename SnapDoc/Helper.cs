@@ -67,20 +67,22 @@ public class Helper
     {
         // Graustufen-ColorMatrix erstellen basierend auf Luminanz
         float[] grayscaleMatrix = [
-        0.299f, 0.587f, 0.114f, 0, 0,
-        0.299f, 0.587f, 0.114f, 0, 0,
-        0.299f, 0.587f, 0.114f, 0, 0,
-        0,      0,      0,      1, 0];
+            0.299f, 0.587f, 0.114f, 0, 0,
+            0.299f, 0.587f, 0.114f, 0, 0,
+            0.299f, 0.587f, 0.114f, 0, 0,
+            0,      0,      0,      1, 0
+        ];
 
         using var colorFilter = SKColorFilter.CreateColorMatrix(grayscaleMatrix);
         var grayBitmap = new SKBitmap(originalBitmap.Width, originalBitmap.Height);
         using var canvas = new SKCanvas(grayBitmap);
-        var paint = new SKPaint
+
+        using var paint = new SKPaint
         {
-            ColorFilter = colorFilter
+            ColorFilter = colorFilter,
         };
 
-        canvas.DrawBitmap(originalBitmap, 0, 0, paint);
+        canvas.DrawBitmap(originalBitmap, 0, 0, SKSamplingOptions.Default, paint);
         canvas.Flush();
 
         return grayBitmap;

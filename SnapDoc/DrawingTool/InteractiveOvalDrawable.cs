@@ -438,7 +438,7 @@ public class InteractiveOvalDrawable
         foreach (var line in lines)
         {
             float x = GetAlignedX(line, font);
-            canvas.DrawText(line, x, y, font, paint);
+            canvas.DrawText(line, x, y, SKTextAlign.Left, font, paint);
             y += lineHeight;
         }
 

@@ -129,17 +129,17 @@
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
 		<PackageReference Include="Mapsui" Version="5.1.0" />
 		<PackageReference Include="Mapsui.Maui" Version="5.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.7" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.60" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.51" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.7" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.9" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.71" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.71" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.9" />
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.6.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.147.0-preview.3.1" />
-		<PackageReference Include="UraniumUI" Version="2.16.0" />
-		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="2.16.0" />
-		<PackageReference Include="UraniumUI.Material" Version="2.16.0" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0-rc.1.2" />
+		<PackageReference Include="UraniumUI" Version="3.0.0" />
+		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
+		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -187,9 +187,6 @@
 
 	<ItemGroup>
 	  <MauiXaml Update="Controls\RangeSlider.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Controls\TooltipPopup.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Controls\MyBusyPage.xaml">

@@ -95,6 +95,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial double CaptureRatio { get; set; } = 1.33;
     [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
     [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
+    [ObservableProperty] public partial string LastPinId { get; set; }
     [ObservableProperty] public partial string FlyoutHeaderTitle { get; set; } = "by Emch+Berger AG Bern";
     [ObservableProperty] public partial string FlyoutHeaderDesc { get; set; } = "SnapDoc";
     [ObservableProperty] public partial string FlyoutHeaderImageThumb { get; set; } = "banner_thumbnail.png";

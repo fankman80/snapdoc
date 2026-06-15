@@ -580,7 +580,7 @@ public partial class ImageViewPage : IQueryAttributable
             var info = new SKImageInfo(width, height);
             using var surface = SKSurface.Create(info);
             var canvas = surface.Canvas;
-            canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0));
+            canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0), SKSamplingOptions.Default);
 
             // Overlay erstellen (ohne Handles)
             using (var overlaySurface = SKSurface.Create(info))
@@ -599,7 +599,7 @@ public partial class ImageViewPage : IQueryAttributable
 
                 using var overlayImage = overlaySurface.Snapshot();
                 var destRect = new SKRect(0, 0, width, height);
-                canvas.DrawImage(overlayImage, destRect);
+                canvas.DrawImage(overlayImage, destRect, SKSamplingOptions.Default);
             }
 
             canvas.Flush();

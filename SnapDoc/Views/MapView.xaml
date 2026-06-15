@@ -97,25 +97,23 @@
         </Button>
 
         <Border VerticalOptions="Start"
-                HorizontalOptions="Start"
+                HorizontalOptions="Start"                
                 Margin="10"
                 MinimumHeightRequest="32"
                 BackgroundColor="White"
-                StrokeThickness="0.5"
+                StrokeThickness="1"
                 Stroke="#999"
                 StrokeShape="RoundRectangle 4">
-            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                <Picker x:Name="LayerPicker"
-                        MinimumHeightRequest="32"  
-                        FontSize="11"
-                        BackgroundColor="White"
-                        TextColor="Black"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Fill"
-                        ItemDisplayBinding="{Binding Desc, x:DataType=local:MapViewItem}"
-                        SelectedIndexChanged="OnLayerChanged">
-                </Picker>
-            </Grid>
+            <Picker x:Name="LayerPicker"
+                    MinimumHeightRequest="32"  
+                    FontSize="11"
+                    BackgroundColor="White"
+                    TextColor="Black"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    ItemDisplayBinding="{Binding Desc, x:DataType=local:MapViewItem}"
+                    SelectedIndexChanged="OnLayerChanged">
+            </Picker>
             <Border.Shadow>
                 <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
             </Border.Shadow>            

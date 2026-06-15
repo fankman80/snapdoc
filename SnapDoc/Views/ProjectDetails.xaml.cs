@@ -167,9 +167,7 @@ public partial class ProjectDetails : ContentPage
         GlobalJson.Data.Project_nr = project_nr.Text;
         GlobalJson.Data.Object_name = object_name.Text;
         GlobalJson.Data.Project_manager = project_manager.Text;
-        GlobalJson.Data.Creation_date = (creation_date.Date == DateTime.MinValue)
-                                        ? DateTime.Today
-                                        : creation_date.Date;
+        GlobalJson.Data.Creation_date = creation_date?.Date ?? DateTime.Today;
 
         // save data to file
         GlobalJson.SaveToFile();

@@ -153,9 +153,8 @@
                         BorderColor="{DynamicResource SecondaryBackground}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                        
-                        AllowClear="False"
-                        Title="{x:Static res:AppResources.datum}">
-                    </material:DatePickerField>
+                        AllowClear="False"                        
+                        Title="{x:Static res:AppResources.datum}"/>
                 </VerticalStackLayout>
             </ScrollView>
 

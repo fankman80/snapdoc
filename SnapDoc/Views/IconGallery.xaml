@@ -121,22 +121,22 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" HorizontalOptions="Start"
+        <Border Grid.Row="0"
                 VerticalOptions="Center"
-                HeightRequest="38"
+                HorizontalOptions="Start"
+                MinimumHeightRequest="38"
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
                 StrokeShape="RoundRectangle 4">
-            <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                <Picker x:Name="CategoryPicker"
-                        x:DataType="services:SettingsService"
-                        BindingContext="{x:Static services:SettingsService.Instance}"
-                        FontSize="10"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Fill"
-                        ItemsSource="{Binding IconCategories}"
-                        SelectedItem="{Binding IconCategory}" />
-            </Grid>
+            <Picker x:Name="CategoryPicker"
+                    x:DataType="services:SettingsService"
+                    BindingContext="{x:Static services:SettingsService.Instance}"
+                    MinimumHeightRequest="38"
+                    FontSize="11"
+                    VerticalOptions="Center"
+                    HorizontalOptions="Fill"
+                    ItemsSource="{Binding IconCategories}"
+                    SelectedItem="{Binding IconCategory}" />
         </Border>
 
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
@@ -155,19 +155,19 @@
                     BackgroundColor="Transparent"
                     Clicked="OnSortDirectionClicked"/>
             <Border VerticalOptions="Center"
-                    HeightRequest="38"
+                    HorizontalOptions="Start"
+                    MinimumHeightRequest="38"
                     StrokeThickness="1"
                     Stroke="{DynamicResource Primary}"
                     StrokeShape="RoundRectangle 4">
-                <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                    <Picker x:Name="SortPicker"
-                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                            FontSize="10"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Fill"
-                            ItemsSource="{Binding IconSortCrits}"
-                            SelectedItem="{Binding IconSortCrit}"/>
-                </Grid>
+                <Picker x:Name="SortPicker"
+                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                        MinimumHeightRequest="38"
+                        FontSize="11"
+                        VerticalOptions="Center"
+                        HorizontalOptions="Fill"
+                        ItemsSource="{Binding IconSortCrits}"
+                        SelectedItem="{Binding IconSortCrit}"/>
             </Border>
         </HorizontalStackLayout>
 

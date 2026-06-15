@@ -47,12 +47,12 @@
                         <VerticalStackLayout Grid.Column="0">
                             <Label Text="{x:Static res:AppResources.export_vorlage}"/>
                             <Border Grid.Column="1"
-                                Stroke="{DynamicResource SecondaryBackground}"
-                                StrokeThickness="1"
-                                StrokeShape="RoundRectangle 8">
+                                    Stroke="{DynamicResource SecondaryBackground}"
+                                    StrokeThickness="1"
+                                    StrokeShape="RoundRectangle 8">
                                 <Picker x:Name="colorThemePicker"
-                                    ItemsSource="{Binding Templates}"
-                                    SelectedItem="{Binding SelectedTemplate}"/>
+                                        ItemsSource="{Binding Templates}"
+                                        SelectedItem="{Binding SelectedTemplate}"/>
                             </Border>
                         </VerticalStackLayout>
                         <Button Grid.Column="1"

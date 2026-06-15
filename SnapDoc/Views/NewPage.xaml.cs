@@ -1570,7 +1570,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         canvas.RotateDegrees(angle);
         canvas.Translate(-cx, -cy);
 
-        canvas.DrawBitmap(originalBitmap, 0, 0);
+        canvas.DrawBitmap(originalBitmap, 0, 0, SKSamplingOptions.Default);
 
         using var image = SKImage.FromBitmap(rotatedBitmap);
         using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);

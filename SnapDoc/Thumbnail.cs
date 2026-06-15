@@ -103,7 +103,7 @@ public class Thumbnail
                 {
                     canvas.Clear();
                     canvas.RotateDegrees(180, bitmap.Width / 2f, bitmap.Height / 2f);
-                    canvas.DrawBitmap(bitmap, 0, 0);
+                    canvas.DrawBitmap(bitmap, 0, 0, SKSamplingOptions.Default);
                 }
                 break;
             case SKEncodedOrigin.RightTop: // 90° CW
@@ -113,7 +113,7 @@ public class Thumbnail
                     canvas.Clear();
                     canvas.Translate(bitmap.Height, 0);
                     canvas.RotateDegrees(90);
-                    canvas.DrawBitmap(bitmap, 0, 0);
+                    canvas.DrawBitmap(bitmap, 0, 0, SKSamplingOptions.Default);
                 }
                 break;
             case SKEncodedOrigin.LeftBottom: // 270° CW
@@ -123,7 +123,7 @@ public class Thumbnail
                     canvas.Clear();
                     canvas.Translate(0, bitmap.Width);
                     canvas.RotateDegrees(270);
-                    canvas.DrawBitmap(bitmap, 0, 0);
+                    canvas.DrawBitmap(bitmap, 0, 0, SKSamplingOptions.Default);
                 }
                 break;
             default:
