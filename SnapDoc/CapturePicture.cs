@@ -63,21 +63,46 @@ public class CapturePicture
                     await originalStream.CopyToAsync(memoryStream);
                 }
 
-                await Task.Run(async () =>
+                // OPTIMIERUNG 1: Bildmasse direkt aus den Codec-Metadaten lesen (Dauer: ~0ms)
+                // Wir müssen nicht das ganze Bild dekodieren, um die Grösse für den Rückgabewert zu kennen!
+                memoryStream.Position = 0;
+                using (var managedStream = new SKManagedStream(memoryStream, false))
+                using (var codec = SKCodec.Create(managedStream))
                 {
-                    // 1. THUMBNAIL-PASS
-                    if (thumbnailPath != null)
+                    if (codec != null)
                     {
-                        string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                        memoryStream.Position = 0;
-                        await Thumbnail.Generate(memoryStream, thumbFilePath);
+                        var orientation = codec.EncodedOrigin;
+                        if (orientation == SKEncodedOrigin.RightTop || orientation == SKEncodedOrigin.LeftBottom)
+                        {
+                            finalWidth = codec.Info.Height;
+                            finalHeight = codec.Info.Width;
+                        }
+                        else
+                        {
+                            finalWidth = codec.Info.Width;
+                            finalHeight = codec.Info.Height;
+                        }
                     }
+                }
 
-                    // 2. HAUPTBILD-PASS
+                // RAM-Inhalt sichern, damit der Task im Hintergrund unabhängig weiterarbeiten kann
+                byte[] imageBytes = memoryStream.ToArray();
+
+                // OPTIMIERUNG 2: Nur auf das Thumbnail warten (Geht dank kleiner Grösse blitzschnell)
+                if (thumbnailPath != null)
+                {
+                    string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
+                    await Task.Run(() => Thumbnail.Generate(new MemoryStream(imageBytes), thumbFilePath));
+                }
+
+                // OPTIMIERUNG 3: Den schweren Hauptbild-Pass entkoppeln (Fire-and-Forget)
+                // Das "_" signalisiert dem Compiler, dass wir bewusst nicht auf das Ende des Tasks warten.
+                _ = Task.Run(() =>
+                {
                     try
                     {
-                        memoryStream.Position = 0;
-                        using var managedStream = new SKManagedStream(memoryStream, false);
+                        using var bgStream = new MemoryStream(imageBytes);
+                        using var managedStream = new SKManagedStream(bgStream, false);
                         using var codec = SKCodec.Create(managedStream);
 
                         if (codec == null)
@@ -94,9 +119,6 @@ public class CapturePicture
 
                         if (orientation != SKEncodedOrigin.TopLeft)
                             finalBitmap = RotateBitmap(originalBitmap, orientation);
-
-                        finalWidth = finalBitmap.Width;
-                        finalHeight = finalBitmap.Height;
 
                         using (var image = SKImage.FromBitmap(finalBitmap))
                         using (var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality))

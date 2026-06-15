@@ -89,7 +89,6 @@
 
         <Button x:Name="DrawBtn"
                 Text="{x:Static local:MaterialIcons.Draw}"
-                FontSize="34"
                 FontFamily="MaterialOutlined"    
                 Margin="20,0,0,20"
                 ZIndex="10000"
@@ -107,14 +106,12 @@
                              VerticalOptions="End"
                              ZIndex="10000">
             <Button Text="{x:Static local:MaterialIcons.Ink_eraser}"
-                        FontSize="34"
                         FontFamily="MaterialOutlined"   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
             <AbsoluteLayout>
                 <Button Text="{x:Static local:MaterialIcons.Palette}"
-                            FontSize="34"
                             FontFamily="MaterialOutlined"   
                             Style="{StaticResource ToolButtonStyle}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
@@ -155,7 +152,6 @@
             <Button x:Name="AddTextBtn"
                         IsVisible="False"
                         Text="{x:Static local:MaterialIcons.Text_fields}"
-                        FontSize="34"
                         FontFamily="MaterialOutlined"   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
@@ -163,20 +159,17 @@
             <Button x:Name="AddCloudyBtn"
                         IsVisible="False"
                         Text="{x:Static local:MaterialIcons.Cloud_off}"
-                        FontSize="34"
                         FontFamily="MaterialOutlined"   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="CloudyClicked"/>
             <Button x:Name="ShapeBtn"
                         Text="{x:Static local:MaterialIcons.Activity_zone}"
-                        FontSize="34"
                         FontFamily="MaterialOutlined"                    
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
                         Clicked="ShapeButtonClicked"/>
             <Button Text="{x:Static local:MaterialIcons.Check}"
-                        FontSize="34"
                         FontFamily="MaterialOutlined"    
                         BackgroundColor="LimeGreen"
                         Style="{StaticResource ToolButtonStyle}"
