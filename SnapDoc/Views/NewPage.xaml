@@ -127,8 +127,7 @@
                 </Border>
 
                 <Button x:Name="LoadCustomPinBtn"                        
-                        Text="{x:Static local:MaterialIcons.Draw}"
-                        FontFamily="MaterialOutlined"   
+                        Text="{x:Static local:MaterialIcons.Draw}"  
                         IsVisible="False"
                         Style="{StaticResource ToolButtonStyle}"
                         Margin="20,0,0,180"
@@ -243,8 +242,7 @@
                     IsVisible="{Binding IsButtonActuallyVisible}"
                     Margin="0,0,20,20"
                     ZIndex="10000"
-                    Text="{x:Static local:MaterialIcons.Add_location_alt}"
-                    FontFamily="MaterialOutlined"   
+                    Text="{x:Static local:MaterialIcons.Add_location_alt}"  
                     Style="{StaticResource ToolButtonStyle}"
                     AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
@@ -252,8 +250,7 @@
                     Clicked="SetPinClicked"/>
 
             <Button x:Name="DrawBtn"
-                    Text="{x:Static local:MaterialIcons.Draw}"
-                    FontFamily="MaterialOutlined"    
+                    Text="{x:Static local:MaterialIcons.Draw}"   
                     Margin="20,0,0,20"
                     ZIndex="10000"
                     Style="{StaticResource ToolButtonStyle}"
@@ -271,14 +268,12 @@
                                  ZIndex="10000"
                                  AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                                  AbsoluteLayout.LayoutFlags="PositionProportional">
-                <Button Text="{x:Static local:MaterialIcons.Ink_eraser}"
-                        FontFamily="MaterialOutlined"   
+                <Button Text="{x:Static local:MaterialIcons.Ink_eraser}"  
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout>
-                    <Button Text="{x:Static local:MaterialIcons.Palette}"
-                            FontFamily="MaterialOutlined"   
+                    <Button Text="{x:Static local:MaterialIcons.Palette}"  
                             Style="{StaticResource ToolButtonStyle}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                             Clicked="PenSettingsClicked"/>
@@ -317,26 +312,22 @@
                 </AbsoluteLayout>
                 <Button x:Name="AddTextBtn"
                         IsVisible="False"
-                        Text="{x:Static local:MaterialIcons.Text_fields}"
-                        FontFamily="MaterialOutlined"   
+                        Text="{x:Static local:MaterialIcons.Text_fields}" 
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="TextClicked"/>
                 <Button x:Name="AddCloudyBtn"
                         IsVisible="False"
-                        Text="{x:Static local:MaterialIcons.Cloud_off}"
-                        FontFamily="MaterialOutlined"   
+                        Text="{x:Static local:MaterialIcons.Cloud_off}" 
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="CloudyClicked"/>
                 <Button x:Name="ShapeBtn"
-                        Text="{x:Static local:MaterialIcons.Activity_zone}"
-                        FontFamily="MaterialOutlined"                    
+                        Text="{x:Static local:MaterialIcons.Activity_zone}"                   
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
                         Clicked="ShapeButtonClicked"/>
-                <Button Text="{x:Static local:MaterialIcons.Check}"
-                        FontFamily="MaterialOutlined"    
+                <Button Text="{x:Static local:MaterialIcons.Check}"   
                         BackgroundColor="LimeGreen"
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
@@ -360,8 +351,7 @@
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     Margin="0,0,20,20"
                     BackgroundColor="Red"
-                    Text="{x:Static local:MaterialIcons.Close}" 
-                    FontFamily="MaterialOutlined"   
+                    Text="{x:Static local:MaterialIcons.Close}"    
                     Style="{StaticResource ToolButtonStyle}"                    
                     Clicked="OnPinSetCancelClicked"
                     ZIndex="9999"/>

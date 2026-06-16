@@ -23,7 +23,6 @@
                    Text="{x:Static res:AppResources.form_waehlen}"/>
             <Button Grid.Column="0" Grid.Row="1"
                     Text="{x:Static local:MaterialIcons.Activity_zone}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="RectBtnClicked"
@@ -31,7 +30,6 @@
 
             <Button Grid.Column="1" Grid.Row="1"
                     Text="{x:Static local:MaterialIcons.Circle}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="OvalBtnClicked"
@@ -39,7 +37,6 @@
             
             <Button Grid.Column="2" Grid.Row="1"
                     Text="{x:Static local:MaterialIcons.Polyline}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="PolyBtnClicked"
@@ -47,7 +44,6 @@
 
             <Button Grid.Column="0" Grid.Row="2"
                     Text="{x:Static local:MaterialIcons.Arrow_shape_up}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="ArrowBtnClicked"
@@ -55,7 +51,6 @@
 
             <Button Grid.Column="1" Grid.Row="2"
                     Text="{x:Static local:MaterialIcons.Gesture}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="FreeBtnClicked"
@@ -63,7 +58,6 @@
             
             <Button Grid.Column="2" Grid.Row="2"
                     Text="{x:Static local:MaterialIcons.Format_shapes}"
-                    FontFamily="MaterialOutlined"
                     CornerRadius="8"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="TxtBtnClicked"
