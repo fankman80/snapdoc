@@ -165,9 +165,7 @@ public partial class ProjectDetails : ContentPage
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (!string.IsNullOrEmpty(result.Result))
-        {
             creation_date.Text = result.Result;
-        }
     }
 
     private void UpdateProjectData()

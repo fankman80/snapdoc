@@ -149,9 +149,13 @@
 
                     <Button
                         x:Name="creation_date"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
+                        FontSize="{StaticResource AppFontSizeNormal}"
+                        HorizontalOptions="Start"
+                        BackgroundColor="Transparent"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        BorderWidth="2"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
                         Clicked="CalendarClicked"/>                        
                 </VerticalStackLayout>
             </ScrollView>
