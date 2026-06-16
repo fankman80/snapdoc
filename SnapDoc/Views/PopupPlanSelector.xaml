@@ -14,7 +14,7 @@
                xmlns:local="clr-namespace:SnapDoc"
                x:Class="SnapDoc.Views.PopupPlanSelector">
 
-    <Grid Padding="12"
+    <Grid Padding="6"
           WidthRequest="320">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
