@@ -11,7 +11,7 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupProjectEdit">
 
-    <Grid Padding="12"
+    <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout HorizontalOptions="Fill">
             <material:TextField x:Name="text_entry"
