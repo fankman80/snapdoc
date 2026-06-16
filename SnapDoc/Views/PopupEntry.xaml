@@ -10,7 +10,7 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupEntry">
 
-    <Grid Padding="12"
+    <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <Label x:Name="headerText"
