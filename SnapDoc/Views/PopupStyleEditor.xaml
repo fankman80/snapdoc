@@ -15,7 +15,7 @@
                x:Class="SnapDoc.Views.PopupStyleEditor">
 
     <Grid x:DataType="views:PopupStyleEditor"
-          Padding="12"
+          Padding="6"
           WidthRequest="320">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
