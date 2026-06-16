@@ -15,7 +15,7 @@
                x:Class="SnapDoc.Views.PopupPlanEdit">
 
     <Grid x:DataType="views:PopupPlanEdit"
-          Padding="12"
+          Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <material:TextField x:Name="name_entry"
