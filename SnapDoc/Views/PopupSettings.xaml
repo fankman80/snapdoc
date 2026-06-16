@@ -13,7 +13,7 @@
                x:Class="SnapDoc.Views.PopupSettings">
 
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-          Padding="12"
+          Padding="6"
           WidthRequest="320">
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />
