@@ -23,7 +23,7 @@ public partial class ProjectDetails : ContentPage
         project_nr.Text = GlobalJson.Data.Project_nr;
         object_name.Text = GlobalJson.Data.Object_name;
         project_manager.Text = GlobalJson.Data.Project_manager;
-        creation_date.Date = GlobalJson.Data.Creation_date;
+        creation_date.Text = GlobalJson.Data.Creation_date.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
 
         Helper.HeaderUpdate();
     }
@@ -159,6 +159,17 @@ public partial class ProjectDetails : ContentPage
         }
     }
 
+    private async void CalendarClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupCalendarView(DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+        if (!string.IsNullOrEmpty(result.Result))
+        {
+            creation_date.Text = result.Result;
+        }
+    }
+
     private void UpdateProjectData()
     {
         GlobalJson.Data.Client_name = client_name.Text;
@@ -167,7 +178,7 @@ public partial class ProjectDetails : ContentPage
         GlobalJson.Data.Project_nr = project_nr.Text;
         GlobalJson.Data.Object_name = object_name.Text;
         GlobalJson.Data.Project_manager = project_manager.Text;
-        GlobalJson.Data.Creation_date = creation_date?.Date ?? DateTime.Today;
+        GlobalJson.Data.Creation_date = DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today;
 
         // save data to file
         GlobalJson.SaveToFile();

@@ -136,7 +136,7 @@
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.6.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.148.0-rc.1.2" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.150.0-preview.1.1" />
 		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
@@ -156,6 +156,9 @@
 	  </Compile>
 	  <Compile Update="Views\MapView.xaml.cs">
 	    <DependentUpon>MapView.xaml</DependentUpon>
+	  </Compile>
+	  <Compile Update="Views\PopupCalendarView.xaml.cs">
+	    <DependentUpon>PopupCalendarView.xaml</DependentUpon>
 	  </Compile>
 	  <Compile Update="Views\PopupShapeSelect.xaml.cs">
 	    <DependentUpon>PopupShapeSelect.xaml</DependentUpon>
@@ -199,6 +202,9 @@
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\MapView.xaml">
+	    <Generator>MSBuild:Compile</Generator>
+	  </MauiXaml>
+	  <MauiXaml Update="Views\PopupCalendarView.xaml">
 	    <Generator>MSBuild:Compile</Generator>
 	  </MauiXaml>
 	  <MauiXaml Update="Views\PopupShapeSelect.xaml">

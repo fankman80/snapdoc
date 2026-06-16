@@ -147,14 +147,12 @@
                         AllowClear="True"
                         Title="{x:Static res:AppResources.projektleitung}"/>
 
-                    <material:DatePickerField
-                        x:Name="creation_date"
-                        TitleColor="{DynamicResource SecondaryBackground}"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"                        
-                        AllowClear="False"                        
-                        Title="{x:Static res:AppResources.datum}"/>
+                    <Button x:Name="creation_date"
+                            Text="16.02.1980"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
+                            Clicked="CalendarClicked"/>                        
                 </VerticalStackLayout>
             </ScrollView>
 
@@ -182,6 +180,7 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
                         Clicked="OnAddPdfClicked"/>
                 <Button Grid.Column="3"
+                        Padding="0"
                         Text="{x:Static res:AppResources.ok}"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
