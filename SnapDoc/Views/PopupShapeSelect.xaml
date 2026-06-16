@@ -14,7 +14,7 @@
                CanBeDismissedByTappingOutsideOfPopup="True"
                x:Class="SnapDoc.Views.PopupShapeSelect">
 
-    <Grid Padding="12">
+    <Grid Padding="6">
         <Grid ColumnDefinitions="Auto,Auto,Auto"
               RowDefinitions="Auto,Auto,Auto"
               ColumnSpacing="14"
