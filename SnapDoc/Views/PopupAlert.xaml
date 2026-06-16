@@ -9,7 +9,7 @@
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupAlert">
 
-    <Grid Padding="12"
+    <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <Label x:Name="titleText"
