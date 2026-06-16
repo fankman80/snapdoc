@@ -907,6 +907,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Heute ähnelt.
+        /// </summary>
+        internal static string heute {
+            get {
+                return ResourceManager.GetString("heute", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Hinweis ähnelt.
         /// </summary>
         internal static string hinweis {

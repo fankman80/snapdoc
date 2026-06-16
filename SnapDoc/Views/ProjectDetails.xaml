@@ -147,12 +147,12 @@
                         AllowClear="True"
                         Title="{x:Static res:AppResources.projektleitung}"/>
 
-                    <Button x:Name="creation_date"
-                            Text="16.02.1980"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
-                            Clicked="CalendarClicked"/>                        
+                    <Button
+                        x:Name="creation_date"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
+                        Clicked="CalendarClicked"/>                        
                 </VerticalStackLayout>
             </ScrollView>
 

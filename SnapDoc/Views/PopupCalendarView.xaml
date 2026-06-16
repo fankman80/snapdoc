@@ -13,26 +13,28 @@
     <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
-            <uranium:CalendarView x:Name="calendar"/>
-            
+            <uranium:CalendarView x:Name="calendar" />
             <Grid>
                 <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnCancelClicked" />
-                <Button Grid.Column="1"
-                        Text="Heute"
+                <Button Grid.Column="2"
+                        Text="{x:Static res:AppResources.heute}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnTodayClicked" />
-                <Button Grid.Column="2"
+                <Button Grid.Column="3"
                         Text="{x:Static res:AppResources.ok}"
+                        Padding="0"
+                        MinimumWidthRequest="80"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />

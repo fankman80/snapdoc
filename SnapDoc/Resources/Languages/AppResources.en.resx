@@ -888,4 +888,7 @@
   <data name="wolken_ueberschneidung" xml:space="preserve">
     <value>Cloud intersection</value>
   </data>
+  <data name="heute" xml:space="preserve">
+    <value>Today</value>
+  </data>
 </root>
