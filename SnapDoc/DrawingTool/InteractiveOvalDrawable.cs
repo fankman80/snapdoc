@@ -1,5 +1,6 @@
 ﻿using Microsoft.Maui.Graphics.Text;
 using SkiaSharp;
+using SnapDoc.Services;
 
 namespace SnapDoc.DrawingTool;
 
@@ -30,7 +31,7 @@ public class InteractiveOvalDrawable
 
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
-    private readonly float density = (float)Settings.DisplayDensity;
+    private readonly float density = (float)Settings.DisplayDensity * (float)SettingsService.Instance.OsBaseScale;
     private float _allowedAngleRad;
 
     // --- Eigenschaften fuer den Wolken-Modus ---

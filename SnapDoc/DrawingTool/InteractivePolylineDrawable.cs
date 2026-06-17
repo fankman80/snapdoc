@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using SnapDoc.Services;
 
 namespace SnapDoc.DrawingTool;
 
@@ -23,7 +24,7 @@ public class InteractivePolylineDrawable
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
-    private readonly float density = (float)Settings.DisplayDensity;
+    private readonly float density = (float)Settings.DisplayDensity * (float)SettingsService.Instance.OsBaseScale;
 
     private class CloudNode
     {

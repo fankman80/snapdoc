@@ -26,9 +26,9 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = (int)(6 * SettingsService.Instance.OsBaseScale);
+    private int lineWidth = 6;
     private string strokeStyle = "";
-    private float cloudRadius = (float)(40 * SettingsService.Instance.OsBaseScale);
+    private float cloudRadius = 40;
     private float cloudInciseDeg = 15;
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
@@ -545,7 +545,6 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer.IsPanningEnabled = true;
         drawingController.Detach();
         RemoveDrawingView();
-
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         IsToolButtonsVisible = false;

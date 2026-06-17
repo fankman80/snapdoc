@@ -1,4 +1,5 @@
 ﻿using SkiaSharp;
+using SnapDoc.Services;
 
 namespace SnapDoc.DrawingTool;
 
@@ -21,7 +22,7 @@ public class InteractiveArrowDrawable
     public float TipFactor { get; set; } = 0.3f;   // Länge der Spitze (0 bis 1)
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
-    private readonly float density = (float)Settings.DisplayDensity;
+    private readonly float density = (float)Settings.DisplayDensity * (float)SettingsService.Instance.OsBaseScale;
     private float _allowedAngleRad;
     public float AllowedAngleRad
     {

@@ -52,11 +52,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = (int)(3 * SettingsService.Instance.OsBaseScale);
+    private int lineWidth = 3;
     private string strokeStyle = "";
-    private float cloudRadius = (float)(20 * SettingsService.Instance.OsBaseScale);
+    private float cloudRadius = 20;
     private float cloudInciseDeg = 15;
 
+    private bool _isShowingPopup = false;
 
     private string planImageSource = "";
     public string PlanImageSource
@@ -196,6 +197,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         PlanImage.PropertyChanged -= PlanImage_PropertyChanged;
         PlanContainer.PropertyChanged -= PlanContainer_PropertyChanged;
+
+        // Cleanup nur ausführen wenn kein Popup geschlossen wurde
+        if (!_isShowingPopup)
+            Cleanup();
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -893,13 +898,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
+
         var popup = new PopupShapeSelect();
         var temporaryOptions = new PopupOptions
         {
             CanBeDismissedByTappingOutsideOfPopup = true,
             Shape = Settings.PopupOptions.Shape
         };
+
+        _isShowingPopup = true;
         var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
+        _isShowingPopup = false;
 
         if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
             return;
@@ -963,7 +972,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void CheckClicked(object sender, EventArgs e)
     {
         if (drawingView == null || drawingController.IsEmpty())
-            goto Cleanup;
+        {
+            Cleanup();
+            return;
+        }
 
         var plan = thisPlan;
         var customPinPath = Path.Combine(
@@ -1026,8 +1038,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
             }
         }
+    }
 
-    Cleanup:
+    private void Cleanup()
+    {
         drawingController.Detach();
         RemoveDrawingView();
         drawMode = DrawMode.None;
@@ -1099,9 +1113,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
+
+
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
+
+
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
+        
+        _isShowingPopup = true;        
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
+        _isShowingPopup = false;
 
         if (result.Result == null) return;
 
@@ -1158,8 +1179,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         else
             return; // Kein unterstützter Modus für Textbearbeitung
 
+
         var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
+        
+        _isShowingPopup = true;        
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
+        _isShowingPopup = false;
 
         if (result?.Result != null)
         {
