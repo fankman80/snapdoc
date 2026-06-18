@@ -63,8 +63,7 @@ public class CapturePicture
                     await originalStream.CopyToAsync(memoryStream);
                 }
 
-                // OPTIMIERUNG 1: Bildmasse direkt aus den Codec-Metadaten lesen (Dauer: ~0ms)
-                // Wir müssen nicht das ganze Bild dekodieren, um die Grösse für den Rückgabewert zu kennen!
+                // Bildmasse direkt aus den Codec-Metadaten lesen
                 memoryStream.Position = 0;
                 using (var managedStream = new SKManagedStream(memoryStream, false))
                 using (var codec = SKCodec.Create(managedStream))
@@ -88,15 +87,14 @@ public class CapturePicture
                 // RAM-Inhalt sichern, damit der Task im Hintergrund unabhängig weiterarbeiten kann
                 byte[] imageBytes = memoryStream.ToArray();
 
-                // OPTIMIERUNG 2: Nur auf das Thumbnail warten (Geht dank kleiner Grösse blitzschnell)
+                // Auf das Thumbnail warten
                 if (thumbnailPath != null)
                 {
                     string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
                     await Task.Run(() => Thumbnail.Generate(new MemoryStream(imageBytes), thumbFilePath));
                 }
 
-                // OPTIMIERUNG 3: Den schweren Hauptbild-Pass entkoppeln (Fire-and-Forget)
-                // Das "_" signalisiert dem Compiler, dass wir bewusst nicht auf das Ende des Tasks warten.
+                // Den schweren Hauptbild-Pass entkoppeln (Fire-and-Forget)
                 _ = Task.Run(() =>
                 {
                     try

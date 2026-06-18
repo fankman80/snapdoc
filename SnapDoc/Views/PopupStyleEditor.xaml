@@ -122,7 +122,6 @@
                 </Grid>
 
                 <controls:RangeSlider
-                     IsVisible="{Binding IsCloudSettingsVisible}"
                      LabelText="{x:Static res:AppResources.linienbreite}"
                      IsRange="False"
                      Minimum="0"
@@ -152,6 +151,7 @@
                 </controls:RangeSlider>
 
                 <controls:RangeSlider
+                     IsVisible="{Binding IsCloudSettingsVisible}"
                      LabelText="{x:Static res:AppResources.wolken_ueberschneidung}"
                      IsRange="False"
                      Minimum="0"
