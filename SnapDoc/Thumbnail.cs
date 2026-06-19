@@ -24,37 +24,53 @@ public class Thumbnail
 
             if (codec != null)
             {
-                var decodeInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height);
+                // 1. Zielmasse ZUERST berechnen
+                int maxThumbSize = SettingsService.Instance.FotoThumbSize;
+                int origWidth = codec.Info.Width;
+                int origHeight = codec.Info.Height;
+                int thumbWidth, thumbHeight;
+
+                if (origWidth > origHeight)
+                {
+                    thumbWidth = maxThumbSize;
+                    thumbHeight = (int)((float)origHeight / origWidth * maxThumbSize);
+                }
+                else
+                {
+                    thumbHeight = maxThumbSize;
+                    thumbWidth = (int)((float)origWidth / origHeight * maxThumbSize);
+                }
+
+                // 2. Nativ unterstützte Untergrösse vom Codec abfragen (Subsampling)
+                float scaleFactor = (float)thumbWidth / origWidth;
+                SKSizeI supportedScale = codec.GetScaledDimensions(scaleFactor);
+
+                var decodeInfo = new SKImageInfo(supportedScale.Width, supportedScale.Height);
+
+                // Dekodiert das Bild direkt extrem speicherschonend in der kleinen Zwischengrösse
                 using var originalMinBitmap = SKBitmap.Decode(codec, decodeInfo);
 
                 if (originalMinBitmap != null)
                 {
-                    int maxThumbSize = SettingsService.Instance.FotoThumbSize;
-                    int origWidth = originalMinBitmap.Width;
-                    int origHeight = originalMinBitmap.Height;
-                    int thumbWidth, thumbHeight;
-
-                    if (origWidth > origHeight)
-                    {
-                        thumbWidth = maxThumbSize;
-                        thumbHeight = (int)((float)origHeight / origWidth * maxThumbSize);
-                    }
-                    else
-                    {
-                        thumbHeight = maxThumbSize;
-                        thumbWidth = (int)((float)origWidth / origHeight * maxThumbSize);
-                    }
-
                     var samplingOptions = new SKSamplingOptions(SKCubicResampler.CatmullRom);
 
-                    using var resizedBitmap = originalMinBitmap.Resize(new SKImageInfo(thumbWidth, thumbHeight), samplingOptions);
-                    if (resizedBitmap != null)
+                    SKBitmap baseBitmap = originalMinBitmap;
+                    SKBitmap resizedBitmap = null;
+
+                    // 3. Falls die Codec-Grösse nicht exakt mit den Zielmassen übereinstimmt, fein-skalieren
+                    if (originalMinBitmap.Width != thumbWidth || originalMinBitmap.Height != thumbHeight)
+                    {
+                        resizedBitmap = originalMinBitmap.Resize(new SKImageInfo(thumbWidth, thumbHeight), samplingOptions);
+                        baseBitmap = resizedBitmap;
+                    }
+
+                    if (baseBitmap != null)
                     {
                         var orientation = codec.EncodedOrigin;
-                        SKBitmap finalMiniBitmap = resizedBitmap;
+                        SKBitmap finalMiniBitmap = baseBitmap;
 
                         if (orientation != SKEncodedOrigin.TopLeft)
-                            finalMiniBitmap = RotateBitmap(resizedBitmap, orientation);
+                            finalMiniBitmap = RotateBitmap(baseBitmap, orientation);
 
                         using (var thumbImage = SKImage.FromBitmap(finalMiniBitmap))
                         using (var thumbData = thumbImage.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoThumbQuality))
@@ -63,7 +79,9 @@ public class Thumbnail
                             thumbData.SaveTo(fs);
                         }
 
-                        if (finalMiniBitmap != resizedBitmap) finalMiniBitmap.Dispose();
+                        // Sauberes Ressourcen-Management ohne Double-Dispose-Gefahr
+                        if (finalMiniBitmap != baseBitmap) finalMiniBitmap.Dispose();
+                        resizedBitmap?.Dispose();
                     }
                 }
             }

@@ -253,12 +253,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void TakeFoto(object sender, EventArgs e)
     {
-        (FileResult path, Size imgSize) = await CapturePicture.Capture(
-            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
-            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
-
-        if (path != null)
+        try
         {
+            (FileResult path, Size imgSize) = await CapturePicture.Capture(
+                Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
+                Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
+
+            if (path == null) return;
+
             Foto newImageData = new()
             {
                 AllowExport = true,
@@ -281,12 +283,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = DateTime.Now
             }.Initialize();
 
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                Fotos.Add(newItem);
-                await Task.Yield();
-                this.ForceLayout();
-            });
+            Fotos.Add(newItem);
+
+            await Task.Yield();
+            this.ForceLayout();
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"TakeFoto failed: {ex.Message}");
         }
     }
 

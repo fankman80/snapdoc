@@ -57,15 +57,9 @@ public class CapturePicture
                 if (!Directory.Exists(mainDir))
                     Directory.CreateDirectory(mainDir);
 
-                using var memoryStream = new MemoryStream();
-                using (var originalStream = await foto.OpenReadAsync())
-                {
-                    await originalStream.CopyToAsync(memoryStream);
-                }
-
-                // Bildmasse direkt aus den Codec-Metadaten lesen
-                memoryStream.Position = 0;
-                using (var managedStream = new SKManagedStream(memoryStream, false))
+                // Bildmasse direkt aus der temporären Datei lesen, statt alles in den RAM zu kopieren
+                using (var fileStream = File.OpenRead(foto.FullPath))
+                using (var managedStream = new SKManagedStream(fileStream, false))
                 using (var codec = SKCodec.Create(managedStream))
                 {
                     if (codec != null)
@@ -84,23 +78,21 @@ public class CapturePicture
                     }
                 }
 
-                // RAM-Inhalt sichern, damit der Task im Hintergrund unabhängig weiterarbeiten kann
-                byte[] imageBytes = memoryStream.ToArray();
-
-                // Auf das Thumbnail warten
+                // Direkte Dateipfad-Überladung nutzen (wartet auf das nun optimierte, schnelle Thumbnail)
                 if (thumbnailPath != null)
                 {
                     string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                    await Task.Run(() => Thumbnail.Generate(new MemoryStream(imageBytes), thumbFilePath));
+                    await Task.Run(() => Thumbnail.Generate(foto.FullPath, thumbFilePath));
                 }
 
                 // Den schweren Hauptbild-Pass entkoppeln (Fire-and-Forget)
+                string tempFullPath = foto.FullPath;
                 _ = Task.Run(() =>
                 {
                     try
                     {
-                        using var bgStream = new MemoryStream(imageBytes);
-                        using var managedStream = new SKManagedStream(bgStream, false);
+                        using var fileStream = File.OpenRead(tempFullPath);
+                        using var managedStream = new SKManagedStream(fileStream, false);
                         using var codec = SKCodec.Create(managedStream);
 
                         if (codec == null)
@@ -131,12 +123,19 @@ public class CapturePicture
                     {
                         System.Diagnostics.Debug.WriteLine($"Main image save failed: {ex.Message}");
                     }
+                    finally
+                    {
+                        if (!string.IsNullOrEmpty(tempFullPath) && File.Exists(tempFullPath))
+                            try { File.Delete(tempFullPath); } catch { }
+                    }
                 });
             }
-
-            // Temporaeren Kamera-Cache aufraeumen
-            if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
-                try { File.Delete(foto.FullPath); } catch { }
+            else
+            {
+                // Falls filepath null ist, die temporäre Datei direkt löschen
+                if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
+                    try { File.Delete(foto.FullPath); } catch { }
+            }
 
             if (resultPath != null)
                 return (new FileResult(resultPath), new Size(finalWidth, finalHeight));
