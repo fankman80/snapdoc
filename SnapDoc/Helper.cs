@@ -51,16 +51,6 @@ public class Helper
                 );
             }
         }
-
-#if WINDOWS
-        // UI-Refresh-Hack für Windows
-        var currentWindow = Application.Current?.Windows.Count > 0 ? Application.Current.Windows[0] : null;
-        if (currentWindow != null)
-        {
-            currentWindow.Width += 0.1; // Ein minimaler Wert reicht oft schon
-            currentWindow.Width -= 0.1;
-        }
-#endif
     }
 
     public static SKBitmap ConvertToGrayscale(SKBitmap originalBitmap)
@@ -484,18 +474,6 @@ public class Helper
             values.RemoveAt(values.Count - 1);
 
         return values.Count >= 2 ? [.. values] : null;
-    }
-}
-public static class ColorExtensions
-{
-    public static SKColor ToSKColor(this Color color)
-    {
-        byte a = (byte)(color.Alpha * 255);
-        byte r = (byte)(color.Red * 255);
-        byte g = (byte)(color.Green * 255);
-        byte b = (byte)(color.Blue * 255);
-
-        return new SKColor(r, g, b, a);
     }
 }
 

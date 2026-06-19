@@ -3,6 +3,7 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using MR.Gestures;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.DrawingTool;
 using SnapDoc.Resources.Languages;
