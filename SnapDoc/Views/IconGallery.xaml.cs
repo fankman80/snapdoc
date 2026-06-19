@@ -71,8 +71,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
     private async void SelectIcon(IconItem _pressedItem)
     {
-        if (_pressedItem == null)
-            return;
+        if (_pressedItem == null) return;
 
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName = _pressedItem.DisplayName;
         GlobalJson.Data.Plans[PlanId].Pins[PinId].PinIcon = _pressedItem.FileName;
@@ -102,8 +101,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
                 PickerTitle = AppResources.waehle_bild_aus
             });
 
-            if (result == null)
-                return;
+            if (result == null) return;
 
             var origName = Path.Combine(Settings.DataDirectory, "customicons", result.FileName);
             var ext = Path.GetExtension(origName);
@@ -194,8 +192,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
     private async void IconSorting(string order)
     {
-        if (SortPicker.SelectedItem == null || CategoryPicker.SelectedItem == null)
-            return;
+        if (SortPicker.SelectedItem == null || CategoryPicker.SelectedItem == null) return;
 
         var selectedCategory = CategoryPicker.SelectedItem.ToString();
         var selectedCrit = SortPicker.SelectedItem.ToString();

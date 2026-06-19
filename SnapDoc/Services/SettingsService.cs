@@ -250,8 +250,7 @@ public partial class SettingsService : ObservableObject
         get => _selectedColorTheme;
         set
         {
-            if (_selectedColorTheme == value)
-                return;
+            if (_selectedColorTheme == value) return;
             _selectedColorTheme = value;
             ApplyColorThemeSafe(value);
         }
@@ -259,17 +258,14 @@ public partial class SettingsService : ObservableObject
 
     private static void ApplyColorThemeSafe(string theme)
     {
-        if (App.Current == null)
-            return;
+        if (App.Current == null) return;
         ApplyColorTheme(theme);
     }
 
     public static void ApplyColorTheme(string theme)
     {
-        if (theme == null)
-            return;
-        if (!ColorThemeMapping.TryGetValue(theme, out var colors))
-            return;
+        if (theme == null) return;
+        if (!ColorThemeMapping.TryGetValue(theme, out var colors)) return;
 
         foreach (var kvp in colors)
             Application.Current?.Resources?[kvp.Key] = Color.FromArgb(kvp.Value);
@@ -288,8 +284,7 @@ public partial class SettingsService : ObservableObject
         get => _selectedAppTheme;
         set
         {
-            if (_selectedAppTheme == value)
-                return;
+            if (_selectedAppTheme == value) return;
             _selectedAppTheme = value;
             ApplyAppThemeSafe(value);
         }
@@ -297,8 +292,7 @@ public partial class SettingsService : ObservableObject
 
     private static void ApplyAppThemeSafe(string theme)
     {
-        if (App.Current == null)
-            return;
+        if (App.Current == null) return;
         App.Current.UserAppTheme = theme == AppResources.hell ? AppTheme.Light : AppTheme.Dark;
     }
 
@@ -386,8 +380,7 @@ public partial class SettingsService : ObservableObject
             if (string.IsNullOrWhiteSpace(json) || !json.TrimStart().StartsWith('{')) return;
 
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
-            if (settings == null)
-                return;
+            if (settings == null) return;
 
             OsBaseScale = settings.OsBaseScale != 0 ? settings.OsBaseScale : Settings.OsBaseScale;
             PinMinScaleLimit = settings.PinMinScaleLimit;

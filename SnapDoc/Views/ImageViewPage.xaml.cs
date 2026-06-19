@@ -231,8 +231,7 @@ public partial class ImageViewPage : IQueryAttributable
         var popup = new PopupDualResponse(AppResources.wollen_sie_dieses_bild_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        if (result.Result == null)
-            return;
+        if (result.Result == null) return;
 
         if (ImgSource == "showTitle")
         {
@@ -282,8 +281,7 @@ public partial class ImageViewPage : IQueryAttributable
         };
         var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
 
-        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
-            return;
+        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape) return;
 
         var mode = selectedShape switch
         {

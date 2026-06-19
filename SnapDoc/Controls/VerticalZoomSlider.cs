@@ -85,8 +85,7 @@
 
         private void UpdateDrawable()
         {
-            if (_drawable == null)
-                return;
+            if (_drawable == null) return;
             _drawable.Minimum = this.Minimum;
             _drawable.Maximum = this.Maximum;
             _drawable.CurrentValue = this.Value;

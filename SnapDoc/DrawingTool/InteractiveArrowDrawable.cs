@@ -117,8 +117,7 @@ public class InteractiveArrowDrawable
 
     private static async Task EnsureRotationHandleLoaded()
     {
-        if (_rotationHandleImage != null || _isLoading)
-            return;
+        if (_rotationHandleImage != null || _isLoading) return;
 
         _isLoading = true;
 

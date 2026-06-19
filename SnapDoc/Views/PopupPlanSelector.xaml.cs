@@ -112,8 +112,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
     {
         if (sender is Grid ve && ve.GestureRecognizers.FirstOrDefault() is TapGestureRecognizer tappedItem)
         {
-            if (ve.BindingContext is not PlanItem tappedPlan)
-                return;
+            if (ve.BindingContext is not PlanItem tappedPlan) return;
 
             for (int i = PlanItems.Count - 1; i >= 0; i--)
             {

@@ -90,8 +90,7 @@ public class InteractiveOvalDrawable
 
     private static async Task EnsureRotationHandleLoaded()
     {
-        if (_rotationHandleImage != null || _isLoading)
-            return;
+        if (_rotationHandleImage != null || _isLoading) return;
 
         _isLoading = true;
 
@@ -396,8 +395,7 @@ public class InteractiveOvalDrawable
 
     private void DrawMultilineText(SKCanvas canvas)
     {
-        if (string.IsNullOrWhiteSpace(Text))
-            return;
+        if (string.IsNullOrWhiteSpace(Text)) return;
 
         canvas.Save();
         canvas.Translate(Center.X, Center.Y);

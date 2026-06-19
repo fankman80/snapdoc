@@ -100,10 +100,8 @@ public class Helper
     public static async Task CopyFileFromResourcesAsync(string fileName, string destinationPath)
     {
         using var stream = await FileSystem.OpenAppPackageFileAsync(fileName);
-        if (stream == null)
-        {
-            return;
-        }
+
+        if (stream == null) return;
 
         using var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
         await stream.CopyToAsync(fileStream);
@@ -433,6 +431,7 @@ public class Helper
             }
         }
     }
+
     public static string LoadSvgWithColor(string rawFileName, string replaceColor, string newColor)
     {
         // Temporären Pfad erzeugen

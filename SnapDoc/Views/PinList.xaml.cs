@@ -58,8 +58,7 @@ public partial class PinList : ContentPage
 
     private void ApplyFilterAndSort()
     {
-        if (SortPicker.SelectedItem == null)
-            return;
+        if (SortPicker.SelectedItem == null) return;
 
         var selectedCrit = SortPicker.SelectedItem.ToString();
         SettingsService.Instance.PinSortCrit = selectedCrit;
@@ -128,19 +127,15 @@ public partial class PinList : ContentPage
         string planId = button.AutomationId;
         string pinId = button.ClassId;
 
-        if (GlobalJson.Data.Plans[planId].Pins[pinId].IsCustomPin)
-            return;
+        if (GlobalJson.Data.Plans[planId].Pins[pinId].IsCustomPin) return;
 
         await Shell.Current.GoToAsync($"icongallery?planId={planId}&pinId={pinId}");
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        if (sender is not VisualElement element)
-            return;
-
-        if (element.BindingContext is not PinItem item)
-            return;
+        if (sender is not VisualElement element) return;
+        if (element.BindingContext is not PinItem item) return;
 
         await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.SelfId}");
     }

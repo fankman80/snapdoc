@@ -19,8 +19,7 @@ public partial class FotoGalleryView : ContentPage
         get => _isActiveToggle;
         set
         {
-            if (_isActiveToggle == value)
-                return;
+            if (_isActiveToggle == value) return;
 
             _isActiveToggle = value;
             OnPropertyChanged();
@@ -155,8 +154,7 @@ public partial class FotoGalleryView : ContentPage
         var tappedButton = sender as Button;
         FotoItem item = (FotoItem)tappedButton.BindingContext;
 
-        if (item == null)
-            return;
+        if (item == null) return;
 
         item.AllowExport = !item.AllowExport;
 
@@ -172,19 +170,15 @@ public partial class FotoGalleryView : ContentPage
         var tappedButton = sender as Button;
         FotoItem item = (FotoItem)tappedButton.BindingContext;
 
-        if (item == null)
-            return;
+        if (item == null) return;
 
         await Shell.Current.GoToAsync($"setpin?planId={item.OnPlanId}&pinId={item.OnPinId}");
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        if (sender is not VisualElement element)
-            return;
-
-        if (element.BindingContext is not FotoItem item)
-            return;
+        if (sender is not VisualElement element) return;
+        if (element.BindingContext is not FotoItem item) return;
 
         var fileName = Path.GetFileName(item.ImagePath);
 
@@ -199,8 +193,7 @@ public partial class FotoGalleryView : ContentPage
 
     private void ApplyFilterAndSorting()
     {
-        if (AllFotos == null)
-            return;
+        if (AllFotos == null) return;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {

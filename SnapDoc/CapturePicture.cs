@@ -95,14 +95,12 @@ public class CapturePicture
                         using var managedStream = new SKManagedStream(fileStream, false);
                         using var codec = SKCodec.Create(managedStream);
 
-                        if (codec == null)
-                            return;
+                        if (codec == null)  return;
 
                         var decodeInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height);
                         using var originalBitmap = SKBitmap.Decode(codec, decodeInfo);
 
-                        if (originalBitmap == null)
-                            return;
+                        if (originalBitmap == null) return;
 
                         var orientation = codec.EncodedOrigin;
                         SKBitmap finalBitmap = originalBitmap;

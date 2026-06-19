@@ -125,8 +125,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         var popup = new PopupPlanSelector(PlanId);
         var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
 
-        if (result.Result == null)
-            return;
+        if (result.Result == null) return;
 
         await MoveOrCopyPinAsync(PinId, PlanId, result.Result.PlanTarget, result.Result.IsPinCopy);
     }
@@ -137,14 +136,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
     string toPlanId,
     bool isCopy)
     {
-        if (!GlobalJson.Data.Plans.TryGetValue(toPlanId, out Plan toPlan))
-            return;
-
-        if (!GlobalJson.Data.Plans.TryGetValue(fromPlanId, out Plan fromPlan))
-            return;
-
-        if (!fromPlan.Pins.TryGetValue(pinId, out Pin originalPin))
-            return;
+        if (!GlobalJson.Data.Plans.TryGetValue(toPlanId, out Plan toPlan)) return;
+        if (!GlobalJson.Data.Plans.TryGetValue(fromPlanId, out Plan fromPlan)) return;
+        if (!fromPlan.Pins.TryGetValue(pinId, out Pin originalPin)) return;
 
         Pin clonedPin = DeepClone(originalPin);
 
@@ -184,8 +178,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
-        if (Pin.IsCustomPin)
-            return;
+        if (Pin.IsCustomPin) return;
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -331,8 +324,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnTitleChanged(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Entry entry)
-            return;
+        if (sender is not Microsoft.Maui.Controls.Entry entry) return;
 
         // Fokus entfernen
         entry.Unfocus();

@@ -127,12 +127,10 @@ public partial class RangeSlider : ContentView
         _isDirectionLocked = false;
         _isScrollingTriggered = false;
 
-        if (MainContainer.Width <= 0)
-            return;
+        if (MainContainer.Width <= 0) return;
 
         var position = e.GetPosition(TouchLayer);
-        if (position == null)
-            return;
+        if (position == null) return;
 
         _touchStartPosX = position.Value.X;
 
@@ -156,8 +154,7 @@ public partial class RangeSlider : ContentView
                 break;
 
             case GestureStatus.Running:
-                if (!_isDragging || _isScrollingTriggered)
-                    return;
+                if (!_isDragging || _isScrollingTriggered) return;
 
                 if (!_isDirectionLocked)
                 {
@@ -206,8 +203,7 @@ public partial class RangeSlider : ContentView
 
     private void EndInteraction()
     {
-        if (!_wasPressedOnThisControl)
-            return;
+        if (!_wasPressedOnThisControl) return;
 
         _isDragging = false;
         _pannedDuringTouch = false;
@@ -228,8 +224,7 @@ public partial class RangeSlider : ContentView
 
     private void UpdateThumbPosition(double absoluteX)
     {
-        if (!_isDragging)
-            return;
+        if (!_isDragging) return;
 
         double width = MainContainer.Width - KnobSize;
         double newX = Math.Clamp(absoluteX - (KnobSize / 2), 0, width);
@@ -286,8 +281,7 @@ public partial class RangeSlider : ContentView
 
     private void ExpandTouchLayer(bool expand)
     {
-        if (TouchLayer == null)
-            return;
+        if (TouchLayer == null) return;
 
         if (expand)
         {
@@ -373,8 +367,7 @@ public partial class RangeSlider : ContentView
     private void FinalizeValue(double x, bool isLower)
     {
         double width = MainContainer.Width - KnobSize;
-        if (width <= 0)
-            return;
+        if (width <= 0) return;
 
         double rawValue = Minimum + (x / width) * (Maximum - Minimum);
         double steppedValue = Math.Round(rawValue / Step) * Step;
@@ -406,8 +399,7 @@ public partial class RangeSlider : ContentView
 
     public void UpdateUI()
     {
-        if (MainContainer == null || MainContainer.Width <= 0 || _painter == null)
-            return;
+        if (MainContainer == null || MainContainer.Width <= 0 || _painter == null) return;
 
         MainThread.BeginInvokeOnMainThread(() =>
         {

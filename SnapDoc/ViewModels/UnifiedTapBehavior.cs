@@ -94,8 +94,7 @@ public partial class UnifiedTapBehavior : Behavior<View>
 
     private static void Execute(ICommand command, object sender)
     {
-        if (command == null)
-            return;
+        if (command == null) return;
 
         if (sender is BindableObject bo)
             command.Execute(bo.BindingContext);

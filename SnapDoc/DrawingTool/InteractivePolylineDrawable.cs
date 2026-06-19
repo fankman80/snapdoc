@@ -35,8 +35,7 @@ public class InteractivePolylineDrawable
 
     public void Draw(SKCanvas canvas)
     {
-        if (Points.Count < 2)
-            return;
+        if (Points.Count < 2) return;
 
         // Entweder als Wolke oder als normale Linie zeichnen
         if (IsCloud)

@@ -148,8 +148,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
-        if (e.Info.Width <= 0 || e.Info.Height <= 0 || transformVm.Scale <= 0.0001)
-            return;
+        if (e.Info.Width <= 0 || e.Info.Height <= 0 || transformVm.Scale <= 0.0001) return;
 
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.Transparent);
@@ -230,8 +229,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable.RectDrawable;
-            if (rect == null)
-                return;
+
+            if (rect == null) return;
 
             if (!rect.IsDrawn)
             {
@@ -257,8 +256,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         else if (DrawMode == DrawMode.Oval)
         {
             var oval = CombinedDrawable.OvalDrawable;
-            if (oval == null)
-                return;
+
+            if (oval == null) return;
 
             if (!oval.IsDrawn)
             {
@@ -284,8 +283,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         else if (DrawMode == DrawMode.Arrow)
         {
             var arrow = CombinedDrawable.ArrowDrawable;
-            if (arrow == null)
-                return;
+
+            if (arrow == null) return;
 
             if (!arrow.IsDrawn)
             {
@@ -429,8 +428,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void ResizeHandles()
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         float currentScale = (float)transformVm.Scale;
         if (currentScale <= 0.0001f)
@@ -491,8 +489,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle, float cloudRadius, float cloudInciseDeg)
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         // Freehand aktualisieren
         var free = CombinedDrawable.FreeDrawable;
@@ -670,8 +667,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void DrawWithoutHandles(SKCanvas canvas)
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         var poly = CombinedDrawable.PolyDrawable;
         var rect = CombinedDrawable.RectDrawable;
@@ -712,8 +708,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void RenderFinal(SKCanvas canvas, float rotationDeg)
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         var pivot = GetRotationCenter();
 
@@ -733,8 +728,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void SaveToFile(string path)
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         DrawingPersistenceService.Save(path, CombinedDrawable, InitialRotation);
     }
@@ -781,8 +775,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void HideAllHandles()
     {
-        if (CombinedDrawable == null)
-            return;
+        if (CombinedDrawable == null) return;
 
         CombinedDrawable.PolyDrawable?.DisplayHandles = false;
         CombinedDrawable.RectDrawable?.DisplayHandles = false;

@@ -425,8 +425,8 @@ namespace SnapDoc
         public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
         public void ReloadImage()
         {
-            if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath))
-                return;
+            if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath)) return;
+
             try
             {
                 var bytes = File.ReadAllBytes(ImagePath);

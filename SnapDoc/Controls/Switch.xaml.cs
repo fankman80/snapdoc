@@ -79,8 +79,7 @@ public partial class Switch : ContentView
 
     private void UpdateUI()
     {
-        if (OuterContainer == null || Knob == null)
-            return;
+        if (OuterContainer == null || Knob == null) return;
 
         OuterContainer.WidthRequest = SwitchWidth;
         OuterContainer.HeightRequest = SwitchHeight;

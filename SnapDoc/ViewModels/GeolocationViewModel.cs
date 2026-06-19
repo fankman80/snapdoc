@@ -225,8 +225,7 @@ public partial class GeolocationViewModel : BaseViewModel
     {
         try
         {
-            if (IsListening)
-                return;
+            if (IsListening) return;
 
             Geolocation.LocationChanged += Geolocation_LocationChanged;
 
@@ -272,8 +271,7 @@ public partial class GeolocationViewModel : BaseViewModel
     // ----------------------------------------------------------------------
     public void HandleSystemGpsDisabled()
     {
-        if (!IsGpsActive)
-            return;
+        if (!IsGpsActive) return;
 
         IsGpsActive = false;
         StopListening();
@@ -292,8 +290,7 @@ public partial class GeolocationViewModel : BaseViewModel
     // ----------------------------------------------------------------------
     private void Geolocation_LocationChanged(object sender, GeolocationLocationChangedEventArgs e)
     {
-        if (LastKnownLocation != null && e.Location.Accuracy > LastKnownLocation.Accuracy)
-            return;
+        if (LastKnownLocation != null && e.Location.Accuracy > LastKnownLocation.Accuracy) return;
 
         LastKnownLocation = e.Location;
         ListeningLocation = FormatLocation(e.Location);

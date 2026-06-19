@@ -41,8 +41,7 @@ public partial class ExportSettings : ContentPage
         {
             var popup = new PopupDualResponse(AppResources.exportvorlage_waehlen_oder_importieren);
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-            if (result.Result != null)
-                return;
+            if (result.Result != null) return;
         }
 
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
@@ -191,8 +190,8 @@ public partial class ExportSettings : ContentPage
     private async void OnHelpClicked(object sender, EventArgs e)
     {
         using var stream = await FileSystem.OpenAppPackageFileAsync("export_placeholder.txt");
-        if (stream == null)
-            return;
+
+        if (stream == null) return;
 
         using var reader = new StreamReader(stream);
         string stringTxt = await reader.ReadToEndAsync();

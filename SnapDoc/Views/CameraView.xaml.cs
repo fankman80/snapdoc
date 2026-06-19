@@ -43,8 +43,7 @@ public partial class CameraView : ContentPage
     {
         base.OnSizeAllocated(width, height);
 
-        if (width <= 0 || height <= 0)
-            return;
+        if (width <= 0 || height <= 0) return;
 
         if (!_isInitialized)
         {
@@ -264,7 +263,11 @@ public partial class CameraView : ContentPage
     {
         if (sender is not Button btn || btn.CommandParameter is not double val) return;
 
-        if (!_isRatioPickerExpanded) { _isRatioPickerExpanded = true; UpdateRatioPickerUI(); return; }
+        if (!_isRatioPickerExpanded)
+        {
+            _isRatioPickerExpanded = true;
+            UpdateRatioPickerUI(); return;
+        }
 
         _userSelectedRatio = val;
         _isRatioPickerExpanded = false;

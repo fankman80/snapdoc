@@ -335,8 +335,7 @@ public partial class MapView : IQueryAttributable
             // Suche starten (hier wartet der Code)
             var location = await geoViewModel.TryGetLocationAsync();
 
-            if (location == null)
-                return;
+            if (location == null) return;
 
             // Karten-Logik ausführen
             await UpdateAndSavePinLocationAsync(planId, pinId, location.Longitude, location.Latitude);
@@ -439,13 +438,12 @@ public partial class MapView : IQueryAttributable
 
     private async void OnMapTapped(object sender, MapEventArgs e)
     {
-        if (map == null)
-            return;
+        if (map == null) return;
 
         // Nur Pins-Layer abfragen
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
-        if (pinLayer == null)
-            return;
+
+        if (pinLayer == null) return;
 
         var mapInfo = e.GetMapInfo([pinLayer]);
 
@@ -467,8 +465,7 @@ public partial class MapView : IQueryAttributable
                 var imageSize = new Size(2000, 2000);
                 var imageBytes = await ExportMapAsImageAsync(imageSize, feature.Geometry.Centroid);
 
-                if (imageBytes == null || imageBytes.Length == 0)
-                    return;
+                if (imageBytes == null || imageBytes.Length == 0) return;
 
                 string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
                 string folderPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath);
@@ -536,8 +533,7 @@ public partial class MapView : IQueryAttributable
         }
 
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
-        if (pinLayer == null)
-            return;
+        if (pinLayer == null) return;
 
         var mapInfo = e.GetMapInfo([pinLayer]);
         if (mapInfo?.Feature is GeometryFeature feature && feature["PinId"] != null)
@@ -610,8 +606,7 @@ public partial class MapView : IQueryAttributable
     private void UpdateMeasureLayer()
     {
         _measureFeatures.Clear();
-        if (_measurePoints.Count < 1)
-            return;
+        if (_measurePoints.Count < 1) return;
 
         var coordinates = _measurePoints.Select(p => new NetTopologySuite.Geometries.Coordinate(p.X, p.Y)).ToList();
 
@@ -691,8 +686,7 @@ public partial class MapView : IQueryAttributable
         {
             var location = await geoViewModel.TryGetLocationAsync();
 
-            if (location == null)
-                return;
+            if (location == null) return;
 
             var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
             map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
@@ -860,8 +854,7 @@ public partial class MapView : IQueryAttributable
     {
         var picker = (Picker)sender;
 
-        if (picker.SelectedItem is not MapViewItem selectedItem || map == null)
-            return;
+        if (picker.SelectedItem is not MapViewItem selectedItem || map == null) return;
 
         var functionalLayers = map.Layers
             .Where(l => l.Name == "Pins" || l.Name == "MeasureLayer")
@@ -897,11 +890,9 @@ public partial class MapView : IQueryAttributable
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
 
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result == null)
-            return;
 
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
+        if (result.Result == null) return;
+        if (Application.Current.Windows[0].Page is not AppShell shell) return;
 
         // Shell-Navigation entfernen
         var shellContent = shell
@@ -917,8 +908,7 @@ public partial class MapView : IQueryAttributable
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan))
-            return;
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
         // JSON + Files löschen
         plan = GlobalJson.Data.Plans[planId];
@@ -944,8 +934,7 @@ public partial class MapView : IQueryAttributable
 
     private static async Task UpdateAndSavePinLocationAsync(string planId, string pinId, double lon, double lat)
     {
-        if (string.IsNullOrEmpty(planId) || string.IsNullOrEmpty(pinId))
-            return;
+        if (string.IsNullOrEmpty(planId) || string.IsNullOrEmpty(pinId)) return;
 
         var pin = GlobalJson.Data.Plans[planId].Pins[pinId];
 
@@ -966,8 +955,7 @@ public partial class MapView : IQueryAttributable
 
     private void OnTitleChanged(object sender, EventArgs e)
     {
-        if (sender is not Entry entry)
-            return;
+        if (sender is not Entry entry) return;
 
         // Titel speichern
         (Application.Current.Windows[0].Page as AppShell)

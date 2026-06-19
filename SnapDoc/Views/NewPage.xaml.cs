@@ -222,8 +222,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(PlanContainer.Scale) && e.PropertyName != nameof(PlanContainer.Rotation))
-            return;
+        if (e.PropertyName != nameof(PlanContainer.Scale) && e.PropertyName != nameof(PlanContainer.Rotation)) return;
 
         double scale = 1.0 / PlanContainer.Scale;
         double invRotation = PlanContainer.Rotation * -1;
@@ -484,8 +483,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void PlanImage_PropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
     {
-        if (!isFirstLoad)
-            return;
+        if (!isFirstLoad) return;
 
         // Warte darauf, dass Width und Height gültige Werte haben
         if (e.PropertyName == nameof(PlanImage.Width) || e.PropertyName == nameof(PlanImage.Height))
@@ -732,12 +730,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task UpdatePinLocationAsync(Pin pin)
     {
-        if (!SettingsService.Instance.IsGpsActive)
-            return;
+        if (!SettingsService.Instance.IsGpsActive) return;
 
         var location = await geoViewModel.TryGetLocationAsync();
-        if (location == null)
-            return;
+
+        if (location == null) return;
 
         pin.GeoLocation = new GeoLocData(location);
         GlobalJson.SaveToFile();
@@ -746,8 +743,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
     {
 #if WINDOWS
-        if (mousePos.X < 0 || !planContainer.IsPanningEnabled)
-            return;
+        if (mousePos.X < 0 || !planContainer.IsPanningEnabled) return;
 
         double zoomFactor;
         if (planContainer.Scale > 2) // Sehr stark vergrößert
@@ -781,8 +777,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         double zoom = factor ?? SettingsService.Instance.DefaultPinZoom;
 
-        if (!thisPlan.Pins.TryGetValue(pinId, out var pin))
-            return;
+        if (!thisPlan.Pins.TryGetValue(pinId, out var pin)) return;
 
         planContainer.AnchorX = pin.Pos.X;
         planContainer.AnchorY = pin.Pos.Y;
@@ -910,8 +905,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
         _isShowingPopup = false;
 
-        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape)
-            return;
+        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape) return;
 
         var mode = selectedShape switch
         {
@@ -1239,8 +1233,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void LoadCustomPinClicked(object sender, EventArgs e)
     {
-        if (!thisPlan.Pins[doubleTappedPin.AutomationId].IsCustomPin)
-            return;
+        if (!thisPlan.Pins[doubleTappedPin.AutomationId].IsCustomPin) return;
 
         // Activate CustomPin Edit Mode
         var file = Path.GetFileNameWithoutExtension(thisPlan.Pins[doubleTappedPin.AutomationId].PinIcon) + ".data";
@@ -1473,11 +1466,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
 
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result == null)
-            return;
 
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
+        if (result.Result == null) return;
+        if (Application.Current.Windows[0].Page is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
 
@@ -1495,8 +1486,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan))
-            return;
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
         // JSON + Files löschen
         plan = thisPlan;
@@ -1656,8 +1646,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void OnTitleChanged(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Entry entry)
-            return;
+        if (sender is not Microsoft.Maui.Controls.Entry entry) return;
 
         // Titel speichern
         (Application.Current.Windows[0].Page as AppShell)

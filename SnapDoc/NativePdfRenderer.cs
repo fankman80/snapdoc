@@ -42,8 +42,7 @@ namespace SnapDoc
         {
             float scale = dpi / 72f;
 #if WINDOWS
-            if (doc.Document == null)
-                return;
+            if (doc.Document == null) return;
 
             using var page = doc.Document.GetPage((uint)pageIndex);
             var folder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(imgPath));
@@ -57,8 +56,7 @@ namespace SnapDoc
             await page.RenderToStreamAsync(outStream, options);
             await outStream.FlushAsync();
 #elif IOS
-            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex)
-                return;
+            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex) return;
 
             using var page = doc.Document.GetPage(pageIndex);
             var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
@@ -83,8 +81,7 @@ namespace SnapDoc
             using var jpegData = img.AsJPEG(0.8f);
             jpegData.AsStream().CopyTo(stream);
 #elif ANDROID
-            if (doc.Renderer == null)
-                return;
+            if (doc.Renderer == null) return;
 
             Android.Graphics.Pdf.PdfRenderer.Page page = null;
             try

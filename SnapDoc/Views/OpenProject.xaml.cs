@@ -179,11 +179,9 @@ public partial class OpenProject : ContentPage
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
         var layout = sender as BindableObject;
-        if (layout?.BindingContext is not FileItem item)
-            return;
 
-        if (item == null)
-            return;
+        if (layout?.BindingContext is not FileItem item) return;
+        if (item == null) return;
 
         // Zeige Busy-Overlay
         var busyPopup = new MyBusyPage(AppResources.projekt_wird_geladen);
@@ -267,8 +265,7 @@ public partial class OpenProject : ContentPage
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
 
             // Falls das Popup einfach weggeklickt wurde (Result null oder leer)
-            if (_result == null || string.IsNullOrEmpty(_result.Result))
-                return;
+            if (_result == null || string.IsNullOrEmpty(_result.Result)) return;
 
             switch (_result.Result)
             {
@@ -281,8 +278,7 @@ public partial class OpenProject : ContentPage
                     if (result1.Result == "Ok")
                     {
                         string fullPath = item?.FilePath;
-                        if (string.IsNullOrEmpty(fullPath))
-                            return;
+                        if (string.IsNullOrEmpty(fullPath)) return;
 
                         string projectDirectoryPath = Path.GetDirectoryName(fullPath);
                         string fileName = Path.GetFileName(fullPath);

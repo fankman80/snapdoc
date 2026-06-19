@@ -76,8 +76,7 @@ public partial class AppShell : Shell
 
     private void ApplyPlanTemplate()
     {
-        if (PlanCollectionView == null)
-            return;
+        if (PlanCollectionView == null) return;
 
         PlanCollectionView.ItemTemplate =
             SettingsService.Instance.IsPlanListThumbnails
@@ -87,8 +86,7 @@ public partial class AppShell : Shell
 
     public void ApplyFilterAndSorting()
     {
-        if (AllPlanItems == null)
-            return;
+        if (AllPlanItems == null) return;
 
         var filtered = AllPlanItems
             .Where(p => !SettingsService.Instance.IsHideInactivePlans || p.AllowExport)
@@ -189,8 +187,8 @@ public partial class AppShell : Shell
         var button = sender as Label;
 
         PlanItem item = (PlanItem)button.BindingContext;
-        if (item == null)
-            return;
+
+        if (item == null) return;
 
         item.AllowExport = !item.AllowExport;
 
@@ -215,8 +213,7 @@ public partial class AppShell : Shell
 
     private void OnReorderCompleted(object sender, EventArgs e)
     {
-        if ((sender as CollectionView)?.ItemsSource is not ObservableCollection<PlanItem> reorderedItems)
-            return;
+        if ((sender as CollectionView)?.ItemsSource is not ObservableCollection<PlanItem> reorderedItems) return;
 
         var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
 
@@ -243,8 +240,7 @@ public partial class AppShell : Shell
 
     public void HighlightCurrentPlan(string planId)
     {
-        if (PlanItems == null || PlanCollectionView == null)
-            return;
+        if (PlanItems == null || PlanCollectionView == null) return;
 
         var selected = PlanItems.FirstOrDefault(p => p.PlanId == planId);
         if (selected != null)
@@ -261,8 +257,7 @@ public partial class AppShell : Shell
 
     public static void ClearAllPlansFromShell()
     {
-        if (Application.Current.Windows[0].Page is not AppShell shell)
-            return;
+        if (Application.Current.Windows[0].Page is not AppShell shell) return;
 
         var plansToDelete = shell.AllPlanItems.ToList();
 

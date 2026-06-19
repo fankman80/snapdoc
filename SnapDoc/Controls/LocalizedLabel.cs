@@ -47,8 +47,7 @@ public partial class LocalizedLabel : Label
 
     private void UpdateText()
     {
-        if (string.IsNullOrEmpty(ResourceKey))
-            return;
+        if (string.IsNullOrEmpty(ResourceKey)) return;
 
         var label = AppResources.ResourceManager.GetString(
             ResourceKey,
