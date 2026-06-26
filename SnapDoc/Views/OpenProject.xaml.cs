@@ -234,6 +234,7 @@ public partial class OpenProject : ContentPage
                     }
                 }
                 if (repairCount)
+                    // save data to file
                     GlobalJson.SaveToFile();
             }
 
@@ -384,6 +385,8 @@ public partial class OpenProject : ContentPage
                         GlobalJson.Data.ImagePath = "images";
                         GlobalJson.Data.ThumbnailPath = "thumbnails";
                         GlobalJson.Data.CustomPinsPath = "custompins";
+
+                        // save data to file
                         GlobalJson.SaveToFile();
 
                         // Verzeichnis an die neue Stelle verschieben (umbenennen)

@@ -165,6 +165,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
         }
 
+        // save data to file
         GlobalJson.SaveToFile();
 
         await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
@@ -263,6 +264,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
+
+            // save data to file
             GlobalJson.SaveToFile();
 
             string expectedThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
@@ -276,10 +279,13 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = DateTime.Now
             }.Initialize();
 
-            Fotos.Add(newItem);
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                Fotos.Add(newItem);
 
-            await Task.Yield();
-            this.ForceLayout();
+                await Task.Yield();
+                this.ForceLayout();
+            });
         }
         catch (Exception ex)
         {
@@ -300,6 +306,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 });
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
+
+            // save data to file
             GlobalJson.SaveToFile();
         }
     }

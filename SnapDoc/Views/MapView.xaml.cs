@@ -498,6 +498,8 @@ public partial class MapView : IQueryAttributable
                 };
 
                 currentPin.Fotos[filename] = newImageData;
+
+                // save data to file
                 GlobalJson.SaveToFile();
             }
         }
@@ -726,6 +728,8 @@ public partial class MapView : IQueryAttributable
                 plan.Pins ??= [];
                 plan.Pins[currentDateTime] = newPinData;
                 GlobalJson.Data.Plans[planId].PinCount += 1;
+
+                // save data to file
                 GlobalJson.SaveToFile();
 
                 AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
@@ -918,6 +922,8 @@ public partial class MapView : IQueryAttributable
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         GlobalJson.Data.Plans.Remove(planId);
+
+        // save data to file
         GlobalJson.SaveToFile();
 
         // Anzeige neu aufbauen
@@ -949,6 +955,7 @@ public partial class MapView : IQueryAttributable
 
             await pin.GeoLocation.UpdateCH1903Async();
 
+            // save data to file
             GlobalJson.SaveToFile();
         }
     }
@@ -962,6 +969,8 @@ public partial class MapView : IQueryAttributable
             ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         GlobalJson.Data.Plans[planId].Name = Title;
+
+        // save data to file
         GlobalJson.SaveToFile();
 
         // Fokus entfernen

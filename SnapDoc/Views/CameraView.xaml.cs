@@ -90,15 +90,16 @@ public partial class CameraView : ContentPage
         var available = cameraView.Camera?.AvailableResolutions;
         if (available == null || available.Count == 0) return new Size(0, 0);
 
+        // Normalisiere das Ziel-Verhältnis immer auf einen Wert >= 1.0
         double finalTarget = (targetRatio == -1.0)
             ? Math.Max(Width, Height) / Math.Min(Width, Height)
-            : targetRatio ?? 1.33;
+            : (targetRatio != null && targetRatio < 1.0 ? 1.0 / targetRatio.Value : targetRatio ?? 1.33);
 
         return available
-            .GroupBy(r => Math.Round((double)r.Width / r.Height, 2))
+            .GroupBy(r => Math.Round(Math.Max(r.Width, r.Height) / (double)Math.Min(r.Width, r.Height), 2))
             .OrderBy(g => Math.Abs(g.Key - finalTarget))
             .First()
-            .OrderByDescending(r => r.Width)
+            .OrderByDescending(r => r.Width * r.Height) // Garantiert die höchste Pixelanzahl in dieser Gruppe
             .First();
     }
 

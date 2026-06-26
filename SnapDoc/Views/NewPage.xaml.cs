@@ -400,6 +400,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (SettingsService.Instance.IsPinAutoLock)
             pin.IsLockPosition = true;
 
+        // save data to file
         GlobalJson.SaveToFile();
     }
 
@@ -666,7 +667,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                 thisPlan.PinCount += 1;
 
-                GlobalJson.SaveToFile(); // initial speichern
+                // save data to file
+                GlobalJson.SaveToFile();
 
                 AddPin(currentDateTime, newPinData.PinIcon);
 
@@ -682,6 +684,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             pinData.PinRotation = _rotation;
             pinData.PinName = _displayName;
 
+            // save data to file
             GlobalJson.SaveToFile();
 
             var pinPath = Path.Combine(
@@ -737,6 +740,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (location == null) return;
 
         pin.GeoLocation = new GeoLocData(location);
+
+        // save data to file
         GlobalJson.SaveToFile();
     }
 
@@ -1456,6 +1461,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                     // save data to file
                     GlobalJson.SaveToFile();
+
                     break;
             }
         }
@@ -1547,53 +1553,30 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void PlanRotate(int angle)
     {
         var imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-
-        // Dateiname ändern, damit das Bild als neue Source erkannt wird
+        var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thisPlan.File);
         var imagefile = Path.GetFileNameWithoutExtension(imagePath);
+
         if (imagefile.EndsWith("_r"))
             imagefile = imagefile.Replace("_r", "");
         else
             imagefile += "_r";
         imagefile += Path.GetExtension(imagePath);
+
+        // Ziel-Pfade definieren
         var outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, imagefile);
+        var thumbOutputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", imagefile);
 
-        using var inputStream = File.OpenRead(imagePath);
-        using var originalBitmap = SKBitmap.Decode(inputStream);
+        Helper.RotateImageFile(imagePath, outputPath, angle);
+        Helper.RotateImageFile(thumbPath, thumbOutputPath, angle);
 
-        int width = originalBitmap.Width;
-        int height = originalBitmap.Height;
+        // Grösse für die UI-Aktualisierung auslesen
+        using (var stream = File.OpenRead(outputPath))
+        using (var bmp = SKBitmap.Decode(stream))
+        {
+            if (bmp != null)
+                thisPlan.ImageSize = new Size(bmp.Width, bmp.Height);
+        }
 
-        // Zielgröße: nur bei 90/270 Breite/Höhe tauschen
-        int rotatedWidth = angle % 180 == 0 ? width : height;
-        int rotatedHeight = angle % 180 == 0 ? height : width;
-
-        using var rotatedBitmap = new SKBitmap(rotatedWidth, rotatedHeight);
-
-        using var canvas = new SKCanvas(rotatedBitmap);
-        canvas.Clear(SKColors.White); // optional: Hintergrundfarbe setzen
-
-        // Mittelpunkt berechnen
-        float cx = width / 2f;
-        float cy = height / 2f;
-
-        // Zielmitte
-        float dx = rotatedWidth / 2f;
-        float dy = rotatedHeight / 2f;
-
-        // Transformation: Zielmitte → Ursprung → Rotation → Originalbild
-        canvas.Translate(dx, dy);
-        canvas.RotateDegrees(angle);
-        canvas.Translate(-cx, -cy);
-
-        canvas.DrawBitmap(originalBitmap, 0, 0, SKSamplingOptions.Default);
-
-        using var image = SKImage.FromBitmap(rotatedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
-        using var outputStream = File.Open(outputPath, FileMode.Create);
-        data.SaveTo(outputStream);
-        outputStream.Close();
-
-        thisPlan.ImageSize = new Size(rotatedBitmap.Width, rotatedBitmap.Height);
         thisPlan.File = imagefile;
 
         PlanContainer.SizeChanged += OnPlanContainerReady;
@@ -1620,7 +1603,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             }
         }
 
-        // save data to file
+        // Daten speichern
         GlobalJson.SaveToFile();
     }
 

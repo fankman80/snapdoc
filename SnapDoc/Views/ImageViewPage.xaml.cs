@@ -407,6 +407,7 @@ public partial class ImageViewPage : IQueryAttributable
                 return File.OpenRead(imgPath);
             });
 
+            // save data to file
             GlobalJson.SaveToFile();
         }
     }
@@ -537,6 +538,8 @@ public partial class ImageViewPage : IQueryAttributable
                 ImgSource = Path.GetFileName(imgPath);
             }
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
+
+            // save data to file
             GlobalJson.SaveToFile();
         }
 

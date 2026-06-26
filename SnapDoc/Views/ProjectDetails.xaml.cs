@@ -55,7 +55,10 @@ public partial class ProjectDetails : ContentPage
             
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
+
+            // save data to file
             GlobalJson.SaveToFile();
+
             Helper.HeaderUpdate();
         }
     }
@@ -101,7 +104,9 @@ public partial class ProjectDetails : ContentPage
                 else
                     GlobalJson.Data.TitleImageSize = new Size(500, 500);
 
+                // save data to file
                 GlobalJson.SaveToFile();
+
                 Helper.HeaderUpdate();
             }
         }

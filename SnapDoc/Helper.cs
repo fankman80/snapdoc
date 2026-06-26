@@ -474,6 +474,44 @@ public class Helper
 
         return values.Count >= 2 ? [.. values] : null;
     }
+
+    public static void RotateImageFile(string inputPath, string outputPath, int angle)
+    {
+        if (!File.Exists(inputPath)) return;
+
+        using var inputStream = File.OpenRead(inputPath);
+        using var originalBitmap = SKBitmap.Decode(inputStream);
+        if (originalBitmap == null) return;
+
+        int width = originalBitmap.Width;
+        int height = originalBitmap.Height;
+
+        // Zielgrösse berechnen
+        int rotatedWidth = angle % 180 == 0 ? width : height;
+        int rotatedHeight = angle % 180 == 0 ? height : width;
+
+        using var rotatedBitmap = new SKBitmap(rotatedWidth, rotatedHeight);
+        using var canvas = new SKCanvas(rotatedBitmap);
+        canvas.Clear(SKColors.White);
+
+        // Transformation
+        float cx = width / 2f;
+        float cy = height / 2f;
+        float dx = rotatedWidth / 2f;
+        float dy = rotatedHeight / 2f;
+
+        canvas.Translate(dx, dy);
+        canvas.RotateDegrees(angle);
+        canvas.Translate(-cx, -cy);
+
+        canvas.DrawBitmap(originalBitmap, 0, 0, SKSamplingOptions.Default);
+
+        // Speichern
+        using var image = SKImage.FromBitmap(rotatedBitmap);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
+        using var outputStream = File.Open(outputPath, FileMode.Create);
+        data.SaveTo(outputStream);
+    }
 }
 
 public sealed class PinContext

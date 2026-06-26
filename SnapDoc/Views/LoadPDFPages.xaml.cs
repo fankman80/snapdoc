@@ -205,6 +205,7 @@ public partial class LoadPDFPages : ContentPage
             await LoadPDFImages();
             await ProcessFileOrganizationLogic();
 
+            // save data to file
             GlobalJson.SaveToFile();
 
             if (Application.Current.Windows[0].Page is AppShell shell)
