@@ -24,6 +24,7 @@ public class CapturePicture
             return (null, new Size(0, 0));
         }
 
+        string safeTempPath = null;
         try
         {
             FileResult foto = SettingsService.Instance.SelectedCameraTool switch
@@ -44,6 +45,18 @@ public class CapturePicture
             if (foto == null)
                 return (null, new Size(0, 0));
 
+            safeTempPath = Path.Combine(FileSystem.CacheDirectory, $"safe_capture_{Guid.NewGuid()}.jpg");
+            using (var stream = await foto.OpenReadAsync())
+            using (var localFileStream = File.Create(safeTempPath))
+            {
+                await stream.CopyToAsync(localFileStream);
+            }
+
+            if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
+            {
+                try { File.Delete(foto.FullPath); } catch { }
+            }
+
             string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
             string resultPath = null;
             int finalWidth = 0;
@@ -57,8 +70,7 @@ public class CapturePicture
                 if (!Directory.Exists(mainDir))
                     Directory.CreateDirectory(mainDir);
 
-                // Bildmasse direkt aus der temporären Datei lesen, statt alles in den RAM zu kopieren
-                using (var fileStream = File.OpenRead(foto.FullPath))
+                using (var fileStream = File.OpenRead(safeTempPath))
                 using (var managedStream = new SKManagedStream(fileStream, false))
                 using (var codec = SKCodec.Create(managedStream))
                 {
@@ -78,24 +90,22 @@ public class CapturePicture
                     }
                 }
 
-                // Direkte Dateipfad-Überladung nutzen (wartet auf das nun optimierte, schnelle Thumbnail)
                 if (thumbnailPath != null)
                 {
                     string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                    await Task.Run(() => Thumbnail.Generate(foto.FullPath, thumbFilePath));
+                    await Task.Run(() => Thumbnail.Generate(safeTempPath, thumbFilePath));
                 }
 
-                // Den schweren Hauptbild-Pass entkoppeln (Fire-and-Forget)
-                string tempFullPath = foto.FullPath;
+                string threadSafeTempPath = safeTempPath;
                 _ = Task.Run(() =>
                 {
                     try
                     {
-                        using var fileStream = File.OpenRead(tempFullPath);
+                        using var fileStream = File.OpenRead(threadSafeTempPath);
                         using var managedStream = new SKManagedStream(fileStream, false);
                         using var codec = SKCodec.Create(managedStream);
 
-                        if (codec == null)  return;
+                        if (codec == null) return;
 
                         var decodeInfo = new SKImageInfo(codec.Info.Width, codec.Info.Height);
                         using var originalBitmap = SKBitmap.Decode(codec, decodeInfo);
@@ -123,16 +133,15 @@ public class CapturePicture
                     }
                     finally
                     {
-                        if (!string.IsNullOrEmpty(tempFullPath) && File.Exists(tempFullPath))
-                            try { File.Delete(tempFullPath); } catch { }
+                        if (!string.IsNullOrEmpty(threadSafeTempPath) && File.Exists(threadSafeTempPath))
+                            try { File.Delete(threadSafeTempPath); } catch { }
                     }
                 });
             }
             else
             {
-                // Falls filepath null ist, die temporäre Datei direkt löschen
-                if (!string.IsNullOrEmpty(foto.FullPath) && File.Exists(foto.FullPath))
-                    try { File.Delete(foto.FullPath); } catch { }
+                if (!string.IsNullOrEmpty(safeTempPath) && File.Exists(safeTempPath))
+                    try { File.Delete(safeTempPath); } catch { }
             }
 
             if (resultPath != null)
@@ -143,6 +152,10 @@ public class CapturePicture
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Capture crashed completely: {ex.Message}");
+
+            if (!string.IsNullOrEmpty(safeTempPath) && File.Exists(safeTempPath))
+                try { File.Delete(safeTempPath); } catch { }
+
             return (null, new Size(0, 0));
         }
     }
