@@ -898,7 +898,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
-
         var popup = new PopupShapeSelect();
         var temporaryOptions = new PopupOptions
         {
@@ -1112,11 +1111,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
-
-
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
-
-
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
         
         _isShowingPopup = true;        
