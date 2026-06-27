@@ -1036,6 +1036,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
             }
         }
+        
+        Cleanup();
     }
 
     private void Cleanup()
