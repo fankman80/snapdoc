@@ -31,7 +31,7 @@ public class InteractiveOvalDrawable
 
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
-    private readonly float density = (float)Settings.DisplayDensity * (float)SettingsService.Instance.OsBaseScale;
+    private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
 
     // --- Eigenschaften fuer den Wolken-Modus ---
