@@ -239,8 +239,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 continue;
 
             if (!pinData.IsLockAutoScale)
-                if (scale < maxLimit && scale > minLimit)
-                    img.Scale = scale * pinData.PinScale;
+                img.Scale = PinScaling(pinData.SelfId);
 
             if (!pinData.IsLockRotate)
                 img.Rotation = invRotation;
@@ -355,21 +354,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanContainer.Children.Add(smallImage);
         _pinLookup[pinId] = smallImage;
 
-        PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
-
-#if IOS
+//#if IOS
         // --- FIX NUR FÜR iOS ---
-        // Warte kurz, bis das Bild geladen ist, und zwinge iOS dazu, das Layout und die Skalierung korrekt anzuwenden.
-        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(100), () =>
-        {
-            if (_pinLookup.TryGetValue(pinId, out var img))
-            {
-                img.Scale = PinScaling(pinId);
-                img.ForceLayout();                 // Zwingt den Pin, seine Width/HeightRequest neu zu berechnen
-                PlanContainer.InvalidateMeasure(); // Zwingt den übergeordneten Container zur Aktualisierung
-            }
-        });
-#endif
+        //Dispatcher.Dispatch(() =>
+        //{
+        //    if (_pinLookup.TryGetValue(pinId, out var img))
+        //        img.Scale = PinScaling(pinId);
+        //});
+//#endif
+
+        PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
     }
 
     private void OnPinDown(object sender, EventArgs e)
