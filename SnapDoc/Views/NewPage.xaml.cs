@@ -359,11 +359,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
 #if IOS
         // --- FIX NUR FÜR iOS ---
-        // Zwingt die Skalierung in den nächsten UI-Frame, nachdem iOS das Layout aufgebaut hat.
-        Dispatcher.Dispatch(() =>
+        // Warte kurz, bis das Bild geladen ist, und zwinge iOS dazu, das Layout und die Skalierung korrekt anzuwenden.
+        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(100), () =>
         {
             if (_pinLookup.TryGetValue(pinId, out var img))
+            {
                 img.Scale = PinScaling(pinId);
+                img.ForceLayout();                 // Zwingt den Pin, seine Width/HeightRequest neu zu berechnen
+                PlanContainer.InvalidateMeasure(); // Zwingt den übergeordneten Container zur Aktualisierung
+            }
         });
 #endif
     }
