@@ -1579,6 +1579,27 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanContainer.SizeChanged += OnPlanContainerReady;
         await AddPlan();
 
+        // Thumbnail-Pfad in der Shell-CollectionView aktualisieren
+        if (Application.Current.Windows[0].Page is AppShell shell)
+        {
+            var newThumbPath = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.PlanPath,
+                "thumbnails",
+                imagefile);
+
+            var planId = GlobalJson.Data.Plans.FirstOrDefault(x => x.Value == thisPlan).Key;
+
+            if (!string.IsNullOrEmpty(planId))
+            {
+                var masterItem = shell.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+                masterItem?.Thumbnail = newThumbPath;
+            }
+
+            shell.ApplyFilterAndSorting();
+        }
+
         // Umpositionierung der Pins
         if (thisPlan.Pins != null)
         {
