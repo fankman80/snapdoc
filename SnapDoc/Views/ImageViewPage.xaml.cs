@@ -27,9 +27,9 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private int lineWidth = 6;
+    private int lineWidth = 8;
     private string strokeStyle = "";
-    private float cloudRadius = 40;
+    private float cloudRadius = 60;
     private float cloudInciseDeg = 15;
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
