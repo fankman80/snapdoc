@@ -2068,6 +2068,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Text bearbeiten ähnelt.
+        /// </summary>
+        internal static string text_bearbeiten {
+            get {
+                return ResourceManager.GetString("text_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Text eingeben ähnelt.
         /// </summary>
         internal static string text_eingeben {

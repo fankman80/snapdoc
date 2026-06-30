@@ -223,6 +223,7 @@
                     </Border>
 
                     <controls:RangeSlider
+                         IsVisible="{Binding FillOpacityVisibility}"
                          LabelText="{x:Static res:AppResources.deckkraft}"
                          IsRange="False"
                          IsRealtime="True"

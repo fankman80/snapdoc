@@ -98,19 +98,19 @@
                         </local:SquareView>
 
                         <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                    WidthRequest="36"
-                    HeightRequest="36"
-                    MinimumWidthRequest="36"
-                    MinimumHeightRequest="36"
-                    Padding="0"
-                    Margin="2"
-                    FontFamily="MaterialOutlined"
-                    FontSize="24"
-                    VerticalOptions="End"                                    
-                    HorizontalOptions="End"
-                    BackgroundColor="Transparent"
-                    TextColor="White"
-                    Clicked="OnAllowExportClicked"/>
+                                WidthRequest="36"
+                                HeightRequest="36"
+                                MinimumWidthRequest="36"
+                                MinimumHeightRequest="36"
+                                Padding="0"
+                                Margin="2"
+                                FontFamily="MaterialOutlined"
+                                FontSize="24"
+                                VerticalOptions="End"                                    
+                                HorizontalOptions="End"
+                                BackgroundColor="Transparent"
+                                TextColor="White"
+                                Clicked="OnAllowExportClicked"/>
                     </Grid>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
@@ -187,20 +187,32 @@
             <Border Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8">
-                <Grid ColumnDefinitions="*,Auto" 
+                <Grid ColumnDefinitions="Auto,*,Auto" 
                       ColumnSpacing="0">
-                    <Picker Grid.Column="0"
+                    <Button Grid.Column="0"
+                            Padding="0"
+                            Text="{x:Static local:MaterialIcons.Traffic}"
+                            FontSize="34"
+                            TextColor="{Binding Pin.PriorityColor}"
+                            FontFamily="MaterialOutlined"
+                            BackgroundColor="Transparent"
+                            ToolTipProperties.Text="{x:Static res:AppResources.farbe_waehlen}" 
+                            Clicked="OnPriorityColorClicked"/>
+                    <Picker Grid.Column="1"
+                            x:Name="PriorityPicker"
                             BackgroundColor="Transparent"
                             ItemsSource="{Binding Pin.PinPriorites}"
                             SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}"/>
-                    <Label Grid.Column="1"
-                           Text="{x:Static local:MaterialIcons.Traffic}"
-                           WidthRequest="60"
-                           HorizontalTextAlignment="Center"
-                           VerticalTextAlignment="Center"
-                           FontFamily="MaterialOutlined"
-                           TextColor="{Binding Pin.PriorityColor}"
-                           FontSize="34"/>
+                    <Button Grid.Column="2"
+                            IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
+                            Padding="0"                     
+                            Text="{x:Static local:MaterialIcons.Edit_note}"
+                            FontSize="34"
+                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"                            
+                            FontFamily="MaterialOutlined"
+                            BackgroundColor="Transparent"
+                            ToolTipProperties.Text="{x:Static res:AppResources.text_bearbeiten}"                        
+                            Clicked="OnPriorityEditClicked"/>
                 </Grid>
             </Border>
 

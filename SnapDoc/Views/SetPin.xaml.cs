@@ -330,6 +330,65 @@ public partial class SetPin : ContentPage, IQueryAttributable
         }
     }
 
+    private async void OnPriorityEditClicked(object sender, EventArgs e)
+    {
+        if (PriorityPicker.SelectedItem is not string oldKey)
+            return;
+
+        if (string.IsNullOrWhiteSpace(oldKey))
+            return;
+
+        var popup = new PopupEntry(input: oldKey, desc: AppResources.text_bearbeiten);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+        if (result.Result != null && !string.IsNullOrWhiteSpace(result.Result))
+        {
+            var items = SettingsService.Instance.PriorityItems;
+            var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
+
+            if (priorityItem != null)
+            {
+                priorityItem.Key = result.Result;
+                PriorityPicker.ItemsSource = null;
+                PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                PriorityPicker.SelectedItem = result.Result;
+            }
+
+            SettingsService.Instance.SaveSettings();
+        }
+    }
+
+    private async void OnPriorityColorClicked(object sender, EventArgs e)
+    {
+        if (PriorityPicker.SelectedItem is not string selectedKey)
+            return;
+
+        if (string.IsNullOrWhiteSpace(selectedKey))
+            return;
+
+        var items = SettingsService.Instance.PriorityItems;
+        var priorityItem = items.FirstOrDefault(x => x.Key == selectedKey);
+
+        if (priorityItem == null)
+            return;
+
+        var currentHexColor = priorityItem.Color ?? "#FFFFFF";
+        var initialColor = Color.FromArgb(currentHexColor);
+
+        var popup = new PopupColorPicker(initialColor);
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+
+        if (result.Result != null)
+        {
+            priorityItem.Color = result.Result.ColorHex;
+            PriorityPicker.ItemsSource = null;
+            PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+            PriorityPicker.SelectedItem = selectedKey;
+
+            SettingsService.Instance.SaveSettings();
+        }
+    }
+
     private void OnTitleChanged(object sender, EventArgs e)
     {
         if (sender is not Microsoft.Maui.Controls.Entry entry) return;

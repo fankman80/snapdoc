@@ -891,4 +891,7 @@
   <data name="heute" xml:space="preserve">
     <value>Today</value>
   </data>
+  <data name="text_bearbeiten" xml:space="preserve">
+    <value>Edit text</value>
+  </data>
 </root>
