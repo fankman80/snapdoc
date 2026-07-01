@@ -8,14 +8,16 @@
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
                VerticalOptions="Center" x:TypeArguments="x:String"
+               x:TypeArguments="x:String"
+               x:DataType="views:PopupRadioPicker"
                x:Class="SnapDoc.Views.PopupRadioPicker">
 
-    <Grid x:DataType="views:PopupRadioPicker"
-          Padding="6,10,6,6"
+    <Grid Padding="6,10,6,6"
           WidthRequest="240"
           VerticalOptions="Center"> <Grid RowDefinitions="Auto, Auto" RowSpacing="12">
             
-            <ScrollView Grid.Row="0" MaxHeightRequest="400"> 
+            <ScrollView Grid.Row="0"
+                        MaximumHeightRequest="400"> 
                 <material:RadioButtonGroupView x:Name="RadioGroup" 
                                                Spacing="12"
                                                Orientation="Vertical"
