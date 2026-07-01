@@ -4,17 +4,21 @@
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:material="clr-namespace:UraniumUI.Material.Controls;assembly=UraniumUI.Material"               
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-               xmlns:views="clr-namespace:SnapDoc.Views"               
+               xmlns:views="clr-namespace:SnapDoc.Views"      
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
-               x:TypeArguments="x:String"
+               VerticalOptions="Center" x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupRadioPicker">
 
     <Grid x:DataType="views:PopupRadioPicker"
           Padding="6,10,6,6"
-          WidthRequest="240">
-        <Grid RowDefinitions="*, Auto">
-            <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Default">
+          WidthRequest="240"
+          VerticalOptions="Center"> <Grid RowDefinitions="Auto, Auto" RowSpacing="12">
+            
+            <ScrollView Grid.Row="0" 
+                        VerticalScrollBarVisibility="Default"
+                        MaxHeightRequest="400"> 
+                
                 <material:RadioButtonGroupView x:Name="RadioGroup" 
                                                Spacing="12"
                                                Orientation="Vertical"
@@ -34,6 +38,17 @@
                     </BindableLayout.ItemTemplate>
                 </material:RadioButtonGroupView>
             </ScrollView>
+
+            <Button Grid.Row="1"
+                    HorizontalOptions="End"
+                    Text="{x:Static res:AppResources.abbrechen}"
+                    FontAttributes="Bold"
+                    BackgroundColor="Transparent" 
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Clicked="OnCancelClicked" />
+        </Grid>
+    </Grid>
+</toolkit:Popup>
 
             <Button Grid.Row="1"
                     HorizontalOptions="End"
