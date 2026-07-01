@@ -335,23 +335,46 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (PriorityPicker.SelectedItem is not string oldKey)
             return;
 
-        if (string.IsNullOrWhiteSpace(oldKey))
-            return;
-
+        bool isCreatingNew = string.IsNullOrWhiteSpace(oldKey);
         var popup = new PopupEntry(input: oldKey, desc: AppResources.text_bearbeiten);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        if (result.Result != null && !string.IsNullOrWhiteSpace(result.Result))
+        if (result.Result != null)
         {
             var items = SettingsService.Instance.PriorityItems;
-            var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
 
-            if (priorityItem != null)
+            if (isCreatingNew)
             {
-                priorityItem.Key = result.Result;
-                PriorityPicker.ItemsSource = null;
-                PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                PriorityPicker.SelectedItem = result.Result;
+                if (!string.IsNullOrWhiteSpace(result.Result))
+                {
+                    var newItem = new PriorityItem { Key = result.Result, Color = null };
+                    items.Add(newItem);
+                    PriorityPicker.ItemsSource = null;
+                    PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                    PriorityPicker.SelectedItem = result.Result;
+                }
+            }
+            else
+            {
+                var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
+
+                if (priorityItem != null)
+                {
+                    if (string.IsNullOrWhiteSpace(result.Result))
+                    {
+                        items.Remove(priorityItem);
+                        PriorityPicker.ItemsSource = null;
+                        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                        PriorityPicker.SelectedItem = null;
+                    }
+                    else
+                    {
+                        priorityItem.Key = result.Result;
+                        PriorityPicker.ItemsSource = null;
+                        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                        PriorityPicker.SelectedItem = result.Result;
+                    }
+                }
             }
 
             SettingsService.Instance.SaveSettings();
