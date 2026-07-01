@@ -15,10 +15,7 @@
           WidthRequest="240"
           VerticalOptions="Center"> <Grid RowDefinitions="Auto, Auto" RowSpacing="12">
             
-            <ScrollView Grid.Row="0" 
-                        VerticalScrollBarVisibility="Default"
-                        MaxHeightRequest="400"> 
-                
+            <ScrollView Grid.Row="0" MaxHeightRequest="400"> 
                 <material:RadioButtonGroupView x:Name="RadioGroup" 
                                                Spacing="12"
                                                Orientation="Vertical"
@@ -38,17 +35,6 @@
                     </BindableLayout.ItemTemplate>
                 </material:RadioButtonGroupView>
             </ScrollView>
-
-            <Button Grid.Row="1"
-                    HorizontalOptions="End"
-                    Text="{x:Static res:AppResources.abbrechen}"
-                    FontAttributes="Bold"
-                    BackgroundColor="Transparent" 
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Clicked="OnCancelClicked" />
-        </Grid>
-    </Grid>
-</toolkit:Popup>
 
             <Button Grid.Row="1"
                     HorizontalOptions="End"
