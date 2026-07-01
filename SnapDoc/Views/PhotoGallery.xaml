@@ -14,7 +14,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             Title="{x:Static res:AppResources.foto_galerie}">
+             Title="{x:Static res:AppResources.alle_fotos}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
