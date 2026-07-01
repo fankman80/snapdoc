@@ -36,7 +36,7 @@ namespace SnapDoc.Views;
 
 public partial class MapView : IQueryAttributable
 {
-    private readonly string planId;
+    private string planId;
     private string pinId = string.Empty;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly List<GeometryFeature> _features = [];
@@ -70,7 +70,11 @@ public partial class MapView : IQueryAttributable
         }
     }
 
-    public MapView(string _planId)
+    public MapView() : this(string.Empty)
+    {
+    }
+
+    public MapView(string _planId = "")
     {
         InitializeComponent();
         BindingContext = this;
@@ -150,6 +154,26 @@ public partial class MapView : IQueryAttributable
         }
     }
 
+    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    {
+        string newPinId = string.Empty;
+        if (query.TryGetValue("pinZoom", out var pinIdObj))
+            newPinId = pinIdObj as string ?? string.Empty;
+        if (query.TryGetValue("planId", out var planIdObj))
+        {
+            planId = planIdObj as string ?? string.Empty;
+            Title = (Application.Current.Windows[0].Page as AppShell)
+                ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title;
+        }
+
+
+        if (newPinId != pinId)
+        {
+            pinId = newPinId;
+            _ = UpdateUiFromQueryAsync();
+        }
+    }
+
     private void AddPin(Map map, Point pos, string planId, string pinId)
     {
         var (x, y) = SphericalMercator.FromLonLat(pos.X, pos.Y);
@@ -220,19 +244,6 @@ public partial class MapView : IQueryAttributable
             }
         }
         MapControl.RefreshGraphics();
-    }
-
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
-    {
-        string newPinId = string.Empty;
-        if (query.TryGetValue("pinZoom", out var pinIdObj))
-            newPinId = pinIdObj as string ?? string.Empty;
-
-        if (newPinId != pinId)
-        {
-            pinId = newPinId;
-            _ = UpdateUiFromQueryAsync();
-        }
     }
 
     private async Task UpdateUiFromQueryAsync()

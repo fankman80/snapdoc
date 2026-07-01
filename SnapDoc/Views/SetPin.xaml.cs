@@ -237,12 +237,15 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void ZoomToPinClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
+            await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
     }
 
-    private async void ZoomToWebMapPinClicked(object sender, EventArgs e)
+    private async void ZoomToWebPinClicked(object sender, EventArgs e)
     {
-        await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}?pinZoom={PinId}");
+        if (Pin.IsWebMapPin)
+            await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
+        else
+            await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}?pinZoom={PinId}");
     }
 
     private async void TakeFoto(object sender, EventArgs e)

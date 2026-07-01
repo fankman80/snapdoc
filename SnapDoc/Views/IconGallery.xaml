@@ -125,6 +125,7 @@
                                     x:Name="CategoryPicker"
                                     x:DataType="services:SettingsService"
                                     BindingContext="{x:Static services:SettingsService.Instance}"
+                                    HeightRequest="38"
                                     MinimumHeightRequest="38"
                                     FontSize="11"
                                     HorizontalOptions="Start"                                    
@@ -133,7 +134,7 @@
                                     BorderColor="{DynamicResource Primary}"
                                     ItemsSource="{Binding IconCategories}"
                                     SelectedItem="{Binding IconCategory}" />
-        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
+        <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
             <Button x:Name="SortDirection"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
                     CornerRadius="4"
@@ -150,6 +151,7 @@
                     Clicked="OnSortDirectionClicked"/>
             <controls:CustomRadioPicker x:Name="SortPicker"
                                         x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        HeightRequest="38"
                                         MinimumHeightRequest="38"
                                         FontSize="11"
                                         HorizontalOptions="Start"

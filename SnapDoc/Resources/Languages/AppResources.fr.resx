@@ -165,8 +165,8 @@
   <data name="foto_breite" xml:space="preserve">
     <value>Photo (largeur)</value>
   </data>
-  <data name="foto_galerie" xml:space="preserve">
-    <value>Galerie de photos</value>
+  <data name="alle_fotos" xml:space="preserve">
+    <value>Toutes les photos</value>
   </data>
   <data name="foto_loeschen" xml:space="preserve">
     <value>Supprimer la photo</value>

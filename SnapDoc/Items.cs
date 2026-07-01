@@ -100,6 +100,7 @@ namespace SnapDoc
         public string OnPlanId => _pin.OnPlanId;
         public DateTime Time => _pin.DateTime;
         public double DisplayOpacity => IsAllowExport ? 1.0 : 0.3;
+        public bool HasGeolocation => _pin.GeoLocation != null;
 
         public string DisplayIconPath
         {

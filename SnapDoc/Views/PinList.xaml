@@ -30,17 +30,17 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
-    <Grid Margin="10">
+    <Grid RowSpacing="10" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
         <Border Grid.Row="0" HorizontalOptions="Start"
                 MinimumWidthRequest="140"
                 Padding="0"
                 HeightRequest="38"
+                MinimumHeightRequest="38"
                 StrokeThickness="1"
                 Stroke="{DynamicResource Primary}"
                 StrokeShape="RoundRectangle 4">
@@ -53,7 +53,6 @@
                                    TextChanged="SearchEntry_TextChanged"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
-
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
             <Button x:Name="SortDirection"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
@@ -71,6 +70,7 @@
                     Clicked="OnSortDirectionClicked"/>
             <controls:CustomRadioPicker x:Name="SortPicker"
                                         x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        HeightRequest="38"
                                         MinimumHeightRequest="38"
                                         FontSize="11"
                                         HorizontalOptions="Start"                                    

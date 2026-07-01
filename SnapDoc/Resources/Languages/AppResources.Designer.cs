@@ -79,6 +79,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Fotos ähnelt.
+        /// </summary>
+        internal static string alle_fotos {
+            get {
+                return ResourceManager.GetString("alle_fotos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die alle Icons ähnelt.
         /// </summary>
         internal static string alle_icons {
@@ -777,15 +786,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string foto_breite {
             get {
                 return ResourceManager.GetString("foto_breite", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Foto Galerie ähnelt.
-        /// </summary>
-        internal static string foto_galerie {
-            get {
-                return ResourceManager.GetString("foto_galerie", resourceCulture);
             }
         }
         

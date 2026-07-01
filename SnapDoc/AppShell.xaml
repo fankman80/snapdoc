@@ -259,7 +259,7 @@
                                Text="{x:Static local:MaterialIcons.Photo_library}"
                                FontFamily="MaterialOutlined" FontSize="22" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                        <Label Grid.Column="1" Text="{x:Static res:AppResources.foto_galerie}" FontSize="14" VerticalOptions="Center"
+                        <Label Grid.Column="1" Text="{x:Static res:AppResources.alle_fotos}" FontSize="14" VerticalOptions="Center"
                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                     </Grid>
                     <!-- Bericht exportieren -->

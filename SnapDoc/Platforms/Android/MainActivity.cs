@@ -15,14 +15,16 @@ namespace SnapDoc.Platforms.Android
         {
             base.OnCreate(savedInstanceState);
 
+#pragma warning disable CA1422
             if (Window != null)
             {
                 AndroidX.Core.View.WindowCompat.SetDecorFitsSystemWindows(Window, false);
                 Window.SetStatusBarColor(global::Android.Graphics.Color.Transparent);
                 var controller = AndroidX.Core.View.WindowCompat.GetInsetsController(Window, Window.DecorView);
                 controller?.AppearanceLightStatusBars = false;
-                controller.AppearanceLightNavigationBars = false;
+                controller?.AppearanceLightNavigationBars = false;
             }
+#pragma warning restore CA1422
         }
     }
 }
