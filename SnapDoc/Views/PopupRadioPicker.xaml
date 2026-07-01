@@ -8,7 +8,6 @@
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
                VerticalOptions="Center" x:TypeArguments="x:String"
-               x:TypeArguments="x:String"
                x:DataType="views:PopupRadioPicker"
                x:Class="SnapDoc.Views.PopupRadioPicker">
 
