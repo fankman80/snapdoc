@@ -4,8 +4,9 @@
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
              xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
-             xmlns:views="clr-namespace:SnapDoc.Views"    
-             xmlns:services="clr-namespace:SnapDoc.Services"             
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:models="clr-namespace:SnapDoc.Models"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
@@ -45,7 +46,7 @@
                 StrokeShape="RoundRectangle 4">
             <local:BorderlessEntry x:Name="SearchEntry"
                                    Margin="6,0,0,0"
-                                   FontSize="12"
+                                   FontSize="11"
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center"
                                    Placeholder="{x:Static res:AppResources.suche}"
@@ -68,21 +69,16 @@
                     BorderWidth="1"
                     BackgroundColor="Transparent"
                     Clicked="OnSortDirectionClicked"/>
-            <Border VerticalOptions="Center"
-                    HeightRequest="38"
-                    StrokeThickness="1"
-                    Stroke="{DynamicResource Primary}"
-                    StrokeShape="RoundRectangle 4">
-                <Grid VerticalOptions="Center" HorizontalOptions="Fill">
-                    <Picker x:Name="SortPicker"
-                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                            FontSize="10"
-                            VerticalOptions="Center"
-                            HorizontalOptions="Fill"
-                            ItemsSource="{Binding PinSortCrits}"
-                            SelectedItem="{Binding PinSortCrit}"/>
-                </Grid>
-            </Border>
+            <controls:CustomRadioPicker x:Name="SortPicker"
+                                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        MinimumHeightRequest="38"
+                                        FontSize="11"
+                                        HorizontalOptions="Start"                                    
+                                        VerticalOptions="Center"
+                                        CornerRadius="4"
+                                        BorderColor="{DynamicResource Primary}"
+                                        ItemsSource="{Binding PinSortCrits}"
+                                        SelectedItem="{Binding PinSortCrit}"/>
         </HorizontalStackLayout>
 
         <Grid Grid.Row="1">

@@ -7,6 +7,7 @@
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:vm="clr-namespace:SnapDoc.ViewModels"
              xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Name="ThisPage"
@@ -120,25 +121,18 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
-        <Border Grid.Row="0"
-                VerticalOptions="Center"
-                HorizontalOptions="Start"
-                MinimumHeightRequest="38"
-                StrokeThickness="1"
-                Stroke="{DynamicResource Primary}"
-                StrokeShape="RoundRectangle 4">
-            <Picker x:Name="CategoryPicker"
-                    x:DataType="services:SettingsService"
-                    BindingContext="{x:Static services:SettingsService.Instance}"
-                    MinimumHeightRequest="38"
-                    FontSize="11"
-                    VerticalOptions="Center"
-                    HorizontalOptions="Fill"
-                    ItemsSource="{Binding IconCategories}"
-                    SelectedItem="{Binding IconCategory}" />
-        </Border>
-
+        <controls:CustomRadioPicker Grid.Row="0"
+                                    x:Name="CategoryPicker"
+                                    x:DataType="services:SettingsService"
+                                    BindingContext="{x:Static services:SettingsService.Instance}"
+                                    MinimumHeightRequest="38"
+                                    FontSize="11"
+                                    HorizontalOptions="Start"                                    
+                                    VerticalOptions="Center"
+                                    CornerRadius="4"
+                                    BorderColor="{DynamicResource Primary}"
+                                    ItemsSource="{Binding IconCategories}"
+                                    SelectedItem="{Binding IconCategory}" />
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End" >
             <Button x:Name="SortDirection"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
@@ -154,21 +148,16 @@
                     BorderWidth="1"
                     BackgroundColor="Transparent"
                     Clicked="OnSortDirectionClicked"/>
-            <Border VerticalOptions="Center"
-                    HorizontalOptions="Start"
-                    MinimumHeightRequest="38"
-                    StrokeThickness="1"
-                    Stroke="{DynamicResource Primary}"
-                    StrokeShape="RoundRectangle 4">
-                <Picker x:Name="SortPicker"
-                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                        MinimumHeightRequest="38"
-                        FontSize="11"
-                        VerticalOptions="Center"
-                        HorizontalOptions="Fill"
-                        ItemsSource="{Binding IconSortCrits}"
-                        SelectedItem="{Binding IconSortCrit}"/>
-            </Border>
+            <controls:CustomRadioPicker x:Name="SortPicker"
+                                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        MinimumHeightRequest="38"
+                                        FontSize="11"
+                                        HorizontalOptions="Start"
+                                        VerticalOptions="Center"
+                                        CornerRadius="4"
+                                        BorderColor="{DynamicResource Primary}"
+                                        ItemsSource="{Binding IconSortCrits}"
+                                        SelectedItem="{Binding IconSortCrit}"/>
         </HorizontalStackLayout>
 
         <Grid x:DataType="views:IconGallery" Grid.Row="1">

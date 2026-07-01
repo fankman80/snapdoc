@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:material="clr-namespace:UraniumUI.Material.Controls;assembly=UraniumUI.Material"               
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               xmlns:views="clr-namespace:SnapDoc.Views"               
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               HorizontalOptions="Center"
+               x:TypeArguments="x:String"
+               x:Class="SnapDoc.Views.PopupRadioPicker">
+
+    <Grid x:DataType="views:PopupRadioPicker"
+          Padding="6,10,6,6"
+          WidthRequest="240">
+        <Grid RowDefinitions="*, Auto">
+            <ScrollView Grid.Row="0" VerticalScrollBarVisibility="Default">
+                <material:RadioButtonGroupView x:Name="RadioGroup" 
+                                               Spacing="12"
+                                               Orientation="Vertical"
+                                               HorizontalOptions="Start"
+                                               SelectedItemChanged="OnSelectedItemChanged">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="x:String">
+                            <material:RadioButton Text="{Binding .}"
+                                                  Value="{Binding .}"
+                                                  FontFamily="{StaticResource AppFontFamily}"
+                                                  TextFontSize="{StaticResource AppFontSizeNormal}"                                              
+                                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                  CircleColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
+                                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                                  HorizontalOptions="Start"/>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </material:RadioButtonGroupView>
+            </ScrollView>
+
+            <Button Grid.Row="1"
+                    HorizontalOptions="End"
+                    Text="{x:Static res:AppResources.abbrechen}"
+                    FontAttributes="Bold"
+                    BackgroundColor="Transparent" 
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Clicked="OnCancelClicked" />
+        </Grid>
+    </Grid>
+</toolkit:Popup>

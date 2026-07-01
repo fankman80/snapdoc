@@ -46,14 +46,8 @@
                         </Grid.ColumnDefinitions>
                         <VerticalStackLayout Grid.Column="0">
                             <Label Text="{x:Static res:AppResources.export_vorlage}"/>
-                            <Border Grid.Column="1"
-                                    Stroke="{DynamicResource SecondaryBackground}"
-                                    StrokeThickness="1"
-                                    StrokeShape="RoundRectangle 8">
-                                <Picker x:Name="colorThemePicker"
-                                        ItemsSource="{Binding Templates}"
-                                        SelectedItem="{Binding SelectedTemplate}"/>
-                            </Border>
+                            <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
+                                                        SelectedItem="{Binding SelectedTemplate}"/>
                         </VerticalStackLayout>
                         <Button Grid.Column="1"
                                 Padding="0"

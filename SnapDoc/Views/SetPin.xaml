@@ -198,9 +198,11 @@
                             BackgroundColor="Transparent"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_waehlen}" 
                             Clicked="OnPriorityColorClicked"/>
-                    <Picker Grid.Column="1"
+                    <controls:CustomRadioPicker
+                            Grid.Column="1"
                             x:Name="PriorityPicker"
                             BackgroundColor="Transparent"
+                            BorderThickness="0"
                             ItemsSource="{Binding Pin.PinPriorites}"
                             SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}"/>
                     <Button Grid.Column="2"

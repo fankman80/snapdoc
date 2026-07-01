@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
+﻿#nullable disable
+using CommunityToolkit.Mvvm.ComponentModel;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
@@ -152,7 +153,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 160;
     [ObservableProperty] public partial Point CustomPinOffset { get; set; } = new(0,0);
     [ObservableProperty] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
-    [ObservableProperty] public partial string? SelectedTemplate { get; set; }
+    [ObservableProperty] public partial string SelectedTemplate { get; set; }
     [ObservableProperty] public partial ObservableCollection<string> Templates { get; set; } = [];
     [ObservableProperty] public partial List<string> ColorThemes { get; set; }
     [ObservableProperty] public partial List<string> AppThemes { get; set; }

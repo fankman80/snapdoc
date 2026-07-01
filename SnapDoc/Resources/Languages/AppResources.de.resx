@@ -894,4 +894,10 @@
   <data name="text_bearbeiten" xml:space="preserve">
     <value>Text bearbeiten</value>
   </data>
+  <data name="bitte_waehlen" xml:space="preserve">
+    <value>Bitte wählen...</value>
+  </data>
+  <data name="auswaehlen" xml:space="preserve">
+    <value>Auswählen</value>
+  </data>
 </root>

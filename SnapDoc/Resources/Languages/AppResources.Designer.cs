@@ -187,6 +187,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auswählen ähnelt.
+        /// </summary>
+        internal static string auswaehlen {
+            get {
+                return ResourceManager.GetString("auswaehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Auto-Skalierung sperren ähnelt.
         /// </summary>
         internal static string auto_skalierung_sperren {
@@ -345,6 +354,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string bitte_waehle_zip {
             get {
                 return ResourceManager.GetString("bitte_waehle_zip", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wählen... ähnelt.
+        /// </summary>
+        internal static string bitte_waehlen {
+            get {
+                return ResourceManager.GetString("bitte_waehlen", resourceCulture);
             }
         }
         

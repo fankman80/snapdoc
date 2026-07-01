@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SnapDoc.Controls.CustomRadioPicker"
+             x:Name="this">
+
+    <Border Stroke="{Binding BorderColor, Source={x:Reference this}}"
+            StrokeThickness="{Binding BorderThickness, Source={x:Reference this}}"
+            Background="{Binding BackgroundColor, Source={x:Reference this}}"
+            Padding="{Binding ControlPadding, Source={x:Reference this}}">
+
+        <Border.StrokeShape>
+            <RoundRectangle CornerRadius="{Binding CornerRadius, Source={x:Reference this}}" />
+        </Border.StrokeShape>
+
+        <Border.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnClicked" />
+        </Border.GestureRecognizers>
+
+        <Grid ColumnDefinitions="*, Auto">
+            <Label x:Name="DisplayLabel"
+                   TextColor="{Binding TextColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   VerticalOptions="Center" />
+
+            <Label Grid.Column="1"
+                   Text="▼"
+                   TextColor="{Binding ArrowColor, Source={x:Reference this}}"
+                   FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   VerticalOptions="Center"
+                   Margin="5,0,0,0"/>
+        </Grid>
+    </Border>
+</ContentView>
