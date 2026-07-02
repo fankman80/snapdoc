@@ -1438,6 +1438,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf Karte anzeigen ähnelt.
+        /// </summary>
+        internal static string pin_auf_karte_anzeigen {
+            get {
+                return ResourceManager.GetString("pin_auf_karte_anzeigen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin auf folgenden Plan kopieren ähnelt.
         /// </summary>
         internal static string pin_auf_plan_kopieren {

@@ -900,4 +900,7 @@
   <data name="auswaehlen" xml:space="preserve">
     <value>Auswählen</value>
   </data>
+  <data name="pin_auf_karte_anzeigen" xml:space="preserve">
+    <value>Pin auf Karte anzeigen</value>
+  </data>
 </root>

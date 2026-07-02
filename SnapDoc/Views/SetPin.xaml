@@ -243,7 +243,8 @@
                             FontSize="30"
                             FontFamily="MaterialOutlined"
                             BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            TextColor="{DynamicResource PrimaryDarkText}"                  
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
                             Clicked="ZoomToWebPinClicked"/>
                 </HorizontalStackLayout>
                 <Button Grid.Column="2"

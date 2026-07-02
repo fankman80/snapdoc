@@ -125,6 +125,7 @@
                                     x:Name="CategoryPicker"
                                     x:DataType="services:SettingsService"
                                     BindingContext="{x:Static services:SettingsService.Instance}"
+                                    ControlPadding="6,0,10,0"
                                     HeightRequest="38"
                                     MinimumHeightRequest="38"
                                     FontSize="11"
@@ -151,6 +152,7 @@
                     Clicked="OnSortDirectionClicked"/>
             <controls:CustomRadioPicker x:Name="SortPicker"
                                         x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        ControlPadding="6,0,10,0"
                                         HeightRequest="38"
                                         MinimumHeightRequest="38"
                                         FontSize="11"
