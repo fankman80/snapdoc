@@ -166,6 +166,8 @@ public partial class ProjectDetails : ContentPage
 
     private async void CalendarClicked(object sender, EventArgs e)
     {
+        UpdateProjectData();
+
         var popup = new PopupCalendarView(DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
