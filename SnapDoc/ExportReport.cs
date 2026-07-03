@@ -252,10 +252,10 @@ public partial class ExportReport
 
                                                                 crop = new OXML.Drawing.SourceRectangle
                                                                 {
-                                                                    Left = (int)((currentPin.Pos.X - factorX) * 100000),
-                                                                    Top = (int)((currentPin.Pos.Y - factorY) * 100000),
-                                                                    Right = (int)((1 - currentPin.Pos.X - factorX) * 100000),
-                                                                    Bottom = (int)((1 - currentPin.Pos.Y - factorY) * 100000),
+                                                                    Left = (int)((currentPin.Pos.X - factorX) * SettingsService.Instance.PinPosCropExportSize * 1000),
+                                                                    Top = (int)((currentPin.Pos.Y - factorY) * SettingsService.Instance.PinPosCropExportSize * 1000),
+                                                                    Right = (int)((1 - currentPin.Pos.X - factorX) * SettingsService.Instance.PinPosCropExportSize * 1000),
+                                                                    Bottom = (int)((1 - currentPin.Pos.Y - factorY) * SettingsService.Instance.PinPosCropExportSize * 1000),
                                                                 };
                                                             }
 
@@ -264,8 +264,8 @@ public partial class ExportReport
                                                             {
                                                                 var scaledPinSize = new Size
                                                                 {
-                                                                    Width = (int)(currentPin.Size.Width * exportSize.Width / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale),
-                                                                    Height = (int)(currentPin.Size.Height * exportSize.Height / SettingsService.Instance.PinPosCropExportSize * currentPin.PinScale)
+                                                                    Width = (int)(currentPin.Size.Width * exportSize.Width / 300 * currentPin.PinScale),
+                                                                    Height = (int)(currentPin.Size.Height * exportSize.Height / 300 * currentPin.PinScale)
                                                                 };
 
                                                                 PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);

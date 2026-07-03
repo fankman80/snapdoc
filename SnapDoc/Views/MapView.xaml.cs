@@ -166,7 +166,6 @@ public partial class MapView : IQueryAttributable
                 ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title;
         }
 
-
         if (newPinId != pinId)
         {
             pinId = newPinId;
