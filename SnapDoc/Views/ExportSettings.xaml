@@ -187,11 +187,11 @@
                          IsVisible="{Binding IsPosImageExport}"
                          IsRange="False"
                          Minimum="10"
-                         Maximum="100"
+                         Maximum="200"
                          Step="1"
                          ValueFontSize="12"
                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0:0} Pixel"
+                         MinimumValueDisplayFormat="{}{0:0} %"
                          LowerValue="{Binding PinPosCropExportSize}"
                          MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                          MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
