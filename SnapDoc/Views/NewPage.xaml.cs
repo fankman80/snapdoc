@@ -222,12 +222,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName != nameof(PlanContainer.Scale) && e.PropertyName != nameof(PlanContainer.Rotation)) return;
-
-        double scale = 1.0 / PlanContainer.Scale;
-        double invRotation = PlanContainer.Rotation * -1;
-        double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-        double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
+        if (e.PropertyName != nameof(PlanContainer.Scale) && e.PropertyName != nameof(PlanContainer.Rotation))
+            return;
 
         foreach (var img in _pinLookup.Values)
         {
@@ -238,11 +234,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (!thisPlan.Pins.TryGetValue(id, out var pinData))
                 continue;
 
-            if (!pinData.IsLockAutoScale)
-                img.Scale = PinScaling(pinData.SelfId);
+            img.Scale = PinScaling(pinData.SelfId);
 
             if (!pinData.IsLockRotate)
-                img.Rotation = invRotation;
+                img.Rotation = PlanContainer.Rotation * -1;
         }
     }
 
@@ -354,15 +349,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanContainer.Children.Add(smallImage);
         _pinLookup[pinId] = smallImage;
 
-//#if IOS
-        // --- FIX NUR FÜR iOS ---
-        //Dispatcher.Dispatch(() =>
-        //{
-        //    if (_pinLookup.TryGetValue(pinId, out var img))
-        //        img.Scale = PinScaling(pinId);
-        //});
-//#endif
-
         PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
     }
 
@@ -433,6 +419,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         doubleTappedPin = img;
 
         PinSizeSlider.LowerValue = pin.PinScale * 100;
+        PercentLabel.Text = $"{PinSizeSlider.LowerValue:0}%";
+
         PinRotateSlider.LowerValue = Helper.ToSliderValue(pin.PinRotation);
         DegreesLabel.Text = $"{Helper.ToSliderValue(pin.PinRotation):0}°";
 
@@ -805,11 +793,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private double PinScaling(string pinId)
     {
-        double baseScale = SettingsService.Instance.OsBaseScale;
         var pin = thisPlan.Pins[pinId];
-        double userPinScale = pin.PinScale;
 
-        if (!pin.IsCustomPin)
+        if (pin.IsCustomPin || pin.IsLockAutoScale)
+        {
+            return pin.PinScale;
+        }
+        else
         {
             double currentScale = planContainer.Scale > 0 ? planContainer.Scale : 1.0;
             double dynamicScale = 1.0 / currentScale;
@@ -819,11 +809,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (dynamicScale > maxLimit) dynamicScale = maxLimit;
             if (dynamicScale < minLimit) dynamicScale = minLimit;
 
-            return baseScale * dynamicScale * userPinScale;
-        }
-        else
-        {
-            return userPinScale;
+            return SettingsService.Instance.OsBaseScale * dynamicScale * pin.PinScale;
         }
     }
 
@@ -1366,22 +1352,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
 
-        double scale = 1.0 / PlanContainer.Scale;
-        double scaleLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-        if (scale < scaleLimit && scale > (double)SettingsService.Instance.PinMinScaleLimit / 100.0)
-            doubleTappedPin.Scale = scale * sliderValue / 100.0;
-        else
-            doubleTappedPin.Scale = sliderValue / 100.0;
+        thisPlan.Pins[doubleTappedPin.AutomationId].PinScale = sliderValue / 100.0;
+        doubleTappedPin.Scale = PinScaling(doubleTappedPin.AutomationId);
 
         PercentLabel.Text = $"{sliderValue}%";
     }
 
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
-
-        thisPlan.Pins[doubleTappedPin.AutomationId].PinScale = sliderValue / 100.0;
-
         // save data to file
         GlobalJson.SaveToFile();
 

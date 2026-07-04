@@ -247,15 +247,15 @@ public partial class ExportReport
                                                                 backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
 
                                                                 var planSize = currentPlan.ImageSize;
-                                                                double factorX = (1.0 / planSize.Width * 300) / 2.0;
-                                                                double factorY = (1.0 / planSize.Height * 300) / 2.0;
+                                                                double factorX = (1.0 / planSize.Width * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
+                                                                double factorY = (1.0 / planSize.Height * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
 
                                                                 crop = new OXML.Drawing.SourceRectangle
                                                                 {
-                                                                    Left = (int)((currentPin.Pos.X - factorX) * SettingsService.Instance.PinPosCropExportSize * 1000),
-                                                                    Top = (int)((currentPin.Pos.Y - factorY) * SettingsService.Instance.PinPosCropExportSize * 1000),
-                                                                    Right = (int)((1 - currentPin.Pos.X - factorX) * SettingsService.Instance.PinPosCropExportSize * 1000),
-                                                                    Bottom = (int)((1 - currentPin.Pos.Y - factorY) * SettingsService.Instance.PinPosCropExportSize * 1000),
+                                                                    Left = (int)((currentPin.Pos.X - factorX) * 100000),
+                                                                    Top = (int)((currentPin.Pos.Y - factorY) * 100000),
+                                                                    Right = (int)((1 - currentPin.Pos.X - factorX) * 100000),
+                                                                    Bottom = (int)((1 - currentPin.Pos.Y - factorY) * 100000),
                                                                 };
                                                             }
 
@@ -570,11 +570,18 @@ public partial class ExportReport
                 foreach (Pin pin in currentPlan.Pins.Values.Where(p => p.IsAllowExport))
                 {
                     string pinImagePath = Path.Combine(Settings.CacheDirectory, pin.PinIcon);
-                    var scaledPinSize = new SizeF
+
+                    SizeF scaledPinSize;
+                    if (pin.IsLockAutoScale || pin.IsCustomPin)
                     {
-                        Width = (float)(pin.Size.Width * scaledSize.Width / originalSize.Width * pin.PinScale),
-                        Height = (float)(pin.Size.Height * scaledSize.Height / originalSize.Height * pin.PinScale)
-                    };
+                        scaledPinSize = new SizeF {
+                            Width = (float)(pin.Size.Width * scaledSize.Width / originalSize.Width * pin.PinScale),
+                            Height = (float)(pin.Size.Height * scaledSize.Height / originalSize.Height * pin.PinScale)
+                        };
+                    }
+                    else
+                        scaledPinSize = ScaleToFit(pin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
+
                     PointF posOnPlan = PivotRecalc(pin.Pos, (float)pin.PinRotation, pin.Anchor, scaledPinSize, scaledSize);
 
                     imgRun.Append(GetImageElement(mainPart, pinImagePath, scaledPinSize, posOnPlan, (float)pin.PinRotation, "anchor"));
