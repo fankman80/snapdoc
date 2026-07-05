@@ -262,11 +262,18 @@ public partial class ExportReport
                                                             // Zeichnen, falls ein gültiges Hintergrundbild gefunden wurde
                                                             if (!string.IsNullOrEmpty(backgroundImagePath) && File.Exists(backgroundImagePath))
                                                             {
-                                                                var scaledPinSize = new Size
+
+                                                                Size scaledPinSize;
+                                                                if (currentPin.IsLockAutoScale || currentPin.IsCustomPin)
                                                                 {
-                                                                    Width = (int)(currentPin.Size.Width * exportSize.Width / 300 * currentPin.PinScale),
-                                                                    Height = (int)(currentPin.Size.Height * exportSize.Height / 300 * currentPin.PinScale)
-                                                                };
+                                                                    scaledPinSize = new Size
+                                                                    {
+                                                                        Width = currentPin.Size.Width * exportSize.Width / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale,
+                                                                        Height = currentPin.Size.Height * exportSize.Height / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale
+                                                                    };
+                                                                }
+                                                                else
+                                                                    scaledPinSize = ScaleToFit(currentPin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
 
                                                                 PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
 
