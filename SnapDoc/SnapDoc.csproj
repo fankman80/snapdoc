@@ -3,8 +3,8 @@
 		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-windows10.0.26100.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
-		<ApplicationDisplayVersion>2.4.0</ApplicationDisplayVersion>
-		<Version>2.4.0</Version>
+		<ApplicationDisplayVersion>2.4.1</ApplicationDisplayVersion>
+		<Version>2.4.1</Version>
 		<ApplicationVersion>64</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<SingleProject>true</SingleProject>

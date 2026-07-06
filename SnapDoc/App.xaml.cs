@@ -3,6 +3,8 @@ using SnapDoc.Services;
 using UraniumUI;
 using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
+using System.Xml.Linq;
+
 
 #if ANDROID
 using Android.Hardware.Display;
@@ -62,6 +64,8 @@ public partial class App : Application
             copyTasks.Add(SafeCopy("IconData.xml", iconPath));
 
         await Task.WhenAll(copyTasks);
+
+        await CheckAndExecuteUpdateTasksAsync();
 
         // Icon-Daten einlesen
         Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
@@ -133,5 +137,48 @@ public partial class App : Application
         };
 #endif
         return window;
+    }
+
+    private async static Task CheckAndExecuteUpdateTasksAsync()
+    {
+        string currentVersion = VersionTracking.Default.CurrentVersion;
+        string lastInstalledVersion = Preferences.Default.Get("LastInstalledVersion", string.Empty);
+
+        if (currentVersion == lastInstalledVersion)
+            return;
+
+        try
+        {
+            using var stream = await FileSystem.OpenAppPackageFileAsync("startTasks.xml");
+            XDocument doc = XDocument.Load(stream);
+
+            var commands = doc.Descendants("Command");
+            foreach (XElement command in commands)
+            {
+                string commandType = command.Attribute("Type")?.Value ?? string.Empty;
+                string target = command.Attribute("Target")?.Value ?? string.Empty;
+
+                switch (commandType)
+                {
+                    case "Reset":
+                        var iniFilePath = Path.Combine(Settings.DataDirectory, target);
+                        if (File.Exists(iniFilePath))
+                            File.Delete(iniFilePath);
+
+                        SettingsService.Instance.ResetSettingsToDefaults();
+                        SettingsService.Instance.SaveSettings();
+                        break;
+
+                        // Weitere Cases...
+                }
+            }
+
+            Preferences.Default.Set("LastInstalledVersion", currentVersion);
+            System.Diagnostics.Debug.WriteLine($"Update-Tasks für Version {currentVersion} erfolgreich ausgeführt.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Update-Prozess: {ex.Message}");
+        }
     }
 }
