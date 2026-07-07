@@ -7,7 +7,7 @@ namespace SnapDoc.Controls;
 
 public partial class TileImageView : ContentView
 {
-    private readonly SKCanvasView _canvasView;
+    private readonly SKGLView _canvasView;
     private readonly ActivityIndicator _loadingIndicator;
     private readonly Grid _layoutGrid;
     private float _scale = 1.0f;
@@ -20,6 +20,10 @@ public partial class TileImageView : ContentView
     private readonly Dictionary<long, SKPoint> _activeTouches = [];
     private float _oldFingerDistance = 0f;
     private float _oldFingerAngle = 0f;
+    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+    private SKPoint _touchStartPoint;
+    private const float ClickThreshold = 15f;
+    private MapPin _draggedPin = null;
 
     public static readonly BindableProperty SourceImagePathProperty =
         BindableProperty.Create(nameof(SourceImagePath), typeof(string), typeof(TileImageView), default(string),
@@ -34,6 +38,9 @@ public partial class TileImageView : ContentView
         get => (string)GetValue(SourceImagePathProperty);
         set => SetValue(SourceImagePathProperty, value);
     }
+
+    public event EventHandler<MapPin> PinTapped;
+    public event EventHandler<MapPin> PinMoved;
 
     public static readonly BindableProperty TileSizeProperty =
         BindableProperty.Create(nameof(TileSize), typeof(int), typeof(TileImageView), 256,
@@ -55,16 +62,70 @@ public partial class TileImageView : ContentView
         set => SetValue(MaxZoomLevelProperty, value);
     }
 
+    public static readonly BindableProperty PinsProperty =
+        BindableProperty.Create(nameof(Pins), typeof(IEnumerable<MapPin>), typeof(TileImageView), default(IEnumerable<MapPin>),
+            propertyChanged: (bindable, o, n) => ((TileImageView)bindable)._canvasView.InvalidateSurface());
+
+    public IEnumerable<MapPin> Pins
+    {
+        get => (IEnumerable<MapPin>)GetValue(PinsProperty);
+        set => SetValue(PinsProperty, value);
+    }
+
+    private static readonly BindablePropertyKey OriginalImageSizePropertyKey =
+        BindableProperty.CreateReadOnly(nameof(OriginalImageSize), typeof(SKSize), typeof(TileImageView), SKSize.Empty);
+
+    public static readonly BindableProperty OriginalImageSizeProperty = OriginalImageSizePropertyKey.BindableProperty;
+
+    public SKSize OriginalImageSize
+    {
+        get => (SKSize)GetValue(OriginalImageSizeProperty);
+        private set => SetValue(OriginalImageSizePropertyKey, value);
+    }
+
+    // Aktueller Zoom-Faktor
+    private static readonly BindablePropertyKey CurrentScalePropertyKey =
+        BindableProperty.CreateReadOnly(nameof(CurrentScale), typeof(float), typeof(TileImageView), 1.0f);
+
+    public static readonly BindableProperty CurrentScaleProperty = CurrentScalePropertyKey.BindableProperty;
+
+    public float CurrentScale
+    {
+        get => (float)GetValue(CurrentScaleProperty);
+        private set => SetValue(CurrentScalePropertyKey, value);
+    }
+
+    private static readonly BindablePropertyKey CurrentPanPropertyKey =
+        BindableProperty.CreateReadOnly(nameof(CurrentPan), typeof(SKPoint), typeof(TileImageView), SKPoint.Empty);
+
+    public static readonly BindableProperty CurrentPanProperty = CurrentPanPropertyKey.BindableProperty;
+
+    public SKPoint CurrentPan
+    {
+        get => (SKPoint)GetValue(CurrentPanProperty);
+        private set => SetValue(CurrentPanPropertyKey, value);
+    }
+
+    private static readonly BindablePropertyKey CurrentRotationPropertyKey =
+        BindableProperty.CreateReadOnly(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f);
+
+    public static readonly BindableProperty CurrentRotationProperty = CurrentRotationPropertyKey.BindableProperty;
+
+    public float CurrentRotation
+    {
+        get => (float)GetValue(CurrentRotationProperty);
+        private set => SetValue(CurrentRotationPropertyKey, value);
+    }
+
     public TileImageView()
     {
         BackgroundColor = Colors.White;
         _layoutGrid = [];
-        _canvasView = new SKCanvasView
+        _canvasView = new SKGLView
         {
             EnableTouchEvents = true,
             InputTransparent = false
         };
-
         _canvasView.PaintSurface += OnPaintSurface;
         _canvasView.Touch += OnCanvasTouch;
 
@@ -98,7 +159,7 @@ public partial class TileImageView : ContentView
         ClearCache();
 
         string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-        _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{TileSize}");
+        _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}");
 
         bool tilesExist = Directory.Exists(_computedTileFolder) &&
                           Directory.GetFiles(_computedTileFolder, "*.png", SearchOption.AllDirectories).Length > 0;
@@ -116,15 +177,26 @@ public partial class TileImageView : ContentView
         _loadingIndicator.IsVisible = false;
         _canvasView.IsVisible = true;
 
+        using (var codec = SKCodec.Create(imagePath))
+        {
+            if (codec != null)
+                OriginalImageSize = new SKSize(codec.Info.Width, codec.Info.Height);
+        }
+
         _scale = 1.0f;
         _panX = 0f;
         _panY = 0f;
+        _rotationDegrees = 0f;
+
+        CurrentScale = _scale;
+        CurrentPan = new SKPoint(_panX, _panY);
+        CurrentRotation = _rotationDegrees;
 
         _isGenerating = false;
         _canvasView.InvalidateSurface();
     }
 
-    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
         canvas.Clear(SKColors.LightGray);
@@ -141,8 +213,6 @@ public partial class TileImageView : ContentView
 
         float tileScaleFactor = (float)Math.Pow(2, MaxZoomLevel - currentZoom);
         float currentTileSizeInCanvasSpace = TileSize * tileScaleFactor;
-
-        var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear);
 
         float canvasWidth = (float)_canvasView.Width;
         float canvasHeight = (float)_canvasView.Height;
@@ -167,11 +237,12 @@ public partial class TileImageView : ContentView
         float viewRight = tileCenterX + viewRadius;
         float viewBottom = tileCenterY + viewRadius;
 
+        int maxTiles = (int)Math.Pow(2, currentZoom);
+
         int minX = (int)Math.Floor(viewLeft / currentTileSizeInCanvasSpace);
         int minY = (int)Math.Floor(viewTop / currentTileSizeInCanvasSpace);
         int maxX = (int)Math.Ceiling(viewRight / currentTileSizeInCanvasSpace);
         int maxY = (int)Math.Ceiling(viewBottom / currentTileSizeInCanvasSpace);
-        int maxTiles = (int)Math.Pow(2, currentZoom);
 
         minX = Math.Clamp(minX, 0, maxTiles - 1);
         minY = Math.Clamp(minY, 0, maxTiles - 1);
@@ -180,28 +251,28 @@ public partial class TileImageView : ContentView
 
         string zoomFolder = Path.Combine(_computedTileFolder, currentZoom.ToString());
 
+        if (!Directory.Exists(zoomFolder)) return;
+
         for (int x = minX; x <= maxX; x++)
         {
+            string xFolder = Path.Combine(zoomFolder, x.ToString());
+            if (!Directory.Exists(xFolder)) continue;
+
             for (int y = minY; y <= maxY; y++)
             {
                 string cacheKey = $"{currentZoom}_{x}_{y}";
 
                 if (!_tileCache.TryGetValue(cacheKey, out var bitmap))
                 {
-                    string tilePath = Path.Combine(zoomFolder, x.ToString(), $"{y}.png");
-
+                    string tilePath = $"{xFolder}/{y}.png";
                     if (File.Exists(tilePath))
                     {
-                        try
+                        using var stream = File.OpenRead(tilePath);
+                        bitmap = SKBitmap.Decode(stream);
+                        if (bitmap != null)
                         {
-                            using var stream = File.OpenRead(tilePath);
-                            bitmap = SKBitmap.Decode(stream);
-                            if (bitmap != null)
-                            {
-                                _tileCache[cacheKey] = bitmap;
-                            }
+                            _tileCache[cacheKey] = bitmap;
                         }
-                        catch { continue; }
                     }
                 }
 
@@ -211,7 +282,41 @@ public partial class TileImageView : ContentView
                 float posY = y * currentTileSizeInCanvasSpace;
 
                 var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
-                canvas.DrawBitmap(bitmap, destRect, samplingOptions, null);
+                canvas.DrawBitmap(bitmap, destRect, LinearSampling, null);
+            }
+        }
+
+        if (Pins != null && OriginalImageSize != SKSize.Empty)
+        {
+            float padding = 50f;
+            float l = viewLeft - padding;
+            float r = viewRight + padding;
+            float t = viewTop - padding;
+            float b = viewBottom + padding;
+
+            foreach (var pin in Pins)
+            {
+                if (pin.Icon == null) continue;
+
+                float absoluteX = pin.RelativeX * OriginalImageSize.Width;
+                float absoluteY = pin.RelativeY * OriginalImageSize.Height;
+
+                if (absoluteX < l || absoluteX > r || absoluteY < t || absoluteY > b)
+                    continue;
+
+                canvas.Save();
+                canvas.Translate(absoluteX, absoluteY);
+
+                if (pin.AutoRotate)
+                {
+                    canvas.RotateDegrees(-_rotationDegrees);
+                }
+
+                float left = -pin.Icon.Width / 2f;
+                float top = -pin.Icon.Height;
+
+                canvas.DrawBitmap(pin.Icon, left, top, LinearSampling, null);
+                canvas.Restore();
             }
         }
 
@@ -241,7 +346,7 @@ public partial class TileImageView : ContentView
             int levelWidth = (int)(origWidth * scale);
             int levelHeight = (int)(origHeight * scale);
 
-            using var scaledBitmap = originalBitmap.Resize(new SKImageInfo(levelWidth, levelHeight), SKSamplingOptions.Default);
+            using var scaledBitmap = originalBitmap.Resize(new SKImageInfo(levelWidth, levelHeight), LinearSampling);
             if (scaledBitmap == null) continue;
 
             int tilesX = (int)Math.Ceiling((double)levelWidth / tileSize);
@@ -266,7 +371,7 @@ public partial class TileImageView : ContentView
                         canvas.Clear(SKColors.Transparent);
                         var srcRect = new SKRect(srcX, srcY, srcX + width, srcY + height);
                         var destRect = new SKRect(0, 0, width, height);
-                        canvas.DrawBitmap(scaledBitmap, srcRect, destRect, SKSamplingOptions.Default, null);
+                        canvas.DrawBitmap(scaledBitmap, srcRect, destRect, LinearSampling, null);
                     }
 
                     using var image = SKImage.FromBitmap(tileBitmap);
@@ -284,8 +389,14 @@ public partial class TileImageView : ContentView
         {
             case SKTouchAction.Pressed:
                 _activeTouches[e.Id] = e.Location;
+                if (_activeTouches.Count == 1)
+                {
+                    _touchStartPoint = e.Location;
+                    _draggedPin = GetPinAtPosition(e.Location);
+                }
                 if (_activeTouches.Count == 2)
                 {
+                    _draggedPin = null;
                     var points = _activeTouches.Values.ToArray();
                     _oldFingerDistance = SKPoint.Distance(points[0], points[1]);
                     _oldFingerAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
@@ -295,11 +406,22 @@ public partial class TileImageView : ContentView
             case SKTouchAction.Moved:
                 if (_isGenerating) break;
 
-                if (_activeTouches.Count == 1 && _activeTouches.TryGetValue(e.Id, out SKPoint oldPt))
+                bool shouldInvalidate = false;
+
+                if (_draggedPin != null && _activeTouches.Count == 1)
+                {
+                    UpdateDraggedPinPosition(e.Location);
+                    shouldInvalidate = true;
+                }
+
+                else if (_activeTouches.Count == 1 && _activeTouches.TryGetValue(e.Id, out SKPoint oldPt))
                 {
                     _panX += e.Location.X - oldPt.X;
                     _panY += e.Location.Y - oldPt.Y;
                     _activeTouches[e.Id] = e.Location;
+
+                    CurrentPan = new SKPoint(_panX, _panY);
+                    shouldInvalidate = true;
                 }
                 else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
                 {
@@ -339,12 +461,33 @@ public partial class TileImageView : ContentView
                         _panY = centerY + (dx * sin + dy * cos);
                     }
                     _oldFingerAngle = newAngle;
+                    shouldInvalidate = true;
                 }
-                _canvasView.InvalidateSurface();
+
+                if (shouldInvalidate)
+                {
+                    CurrentScale = _scale;
+                    CurrentPan = new SKPoint(_panX, _panY);
+                    CurrentRotation = _rotationDegrees;
+
+                    _canvasView.InvalidateSurface();
+                }
                 break;
 
             case SKTouchAction.Released:
-            case SKTouchAction.Cancelled:
+                if (_draggedPin != null)
+                {
+                    if (SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold)
+                    {
+                        PinTapped?.Invoke(this, _draggedPin);
+                    }
+                    else
+                    {
+                        PinMoved?.Invoke(this, _draggedPin);
+                    }
+                    _draggedPin = null;
+                }
+
                 _activeTouches.Remove(e.Id);
                 if (_activeTouches.Count < 2)
                 {
@@ -352,8 +495,91 @@ public partial class TileImageView : ContentView
                     _oldFingerAngle = 0f;
                 }
                 break;
+
+            case SKTouchAction.Cancelled:
+                _draggedPin = null;
+                _activeTouches.Remove(e.Id);
+                break;
         }
 
         e.Handled = true;
     }
+
+    private MapPin GetPinAtPosition(SKPoint touchPoint)
+    {
+        if (Pins == null || OriginalImageSize == SKSize.Empty) return null;
+
+        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
+        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
+        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+
+        if (!matrix.TryInvert(out SKMatrix inverseMatrix)) return null;
+        SKPoint planPoint = inverseMatrix.MapPoint(touchPoint);
+
+        foreach (var pin in Pins.Reverse())
+        {
+            if (pin.Icon == null) continue;
+
+            float pinX = pin.RelativeX * OriginalImageSize.Width;
+            float pinY = pin.RelativeY * OriginalImageSize.Height;
+
+            float clickRadiusX = pin.Icon.Width / 2f;
+            float clickRadiusY = pin.Icon.Height;
+
+            var pinBounds = new SKRect(pinX - clickRadiusX, pinY - clickRadiusY, pinX + clickRadiusX, pinY);
+
+            if (pinBounds.Contains(planPoint.X, planPoint.Y))
+            {
+                return pin; // Pin gefunden!
+            }
+        }
+        return null;
+    }
+
+    private void UpdateDraggedPinPosition(SKPoint touchPoint)
+    {
+        if (_draggedPin == null || OriginalImageSize == SKSize.Empty) return;
+
+        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
+        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
+        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+
+        if (!matrix.TryInvert(out SKMatrix inverseMatrix)) return;
+        SKPoint planPoint = inverseMatrix.MapPoint(touchPoint);
+
+        float newRelX = planPoint.X / OriginalImageSize.Width;
+        float newRelY = planPoint.Y / OriginalImageSize.Height;
+
+        _draggedPin.RelativeX = Math.Clamp(newRelX, 0f, 1f);
+        _draggedPin.RelativeY = Math.Clamp(newRelY, 0f, 1f);
+    }
+
+    public Point GetPlanFactorAtControlCenter()
+    {
+        if (OriginalImageSize == SKSize.Empty || _canvasView.Width <= 0 || _canvasView.Height <= 0)
+            return new Point(0, 0);
+
+        float centerX = (float)_canvasView.Width / 2f;
+        float centerY = (float)_canvasView.Height / 2f;
+        float dx = centerX - _panX;
+        float dy = centerY - _panY;
+        float negRad = -_rotationDegrees * (float)(Math.PI / 180.0);
+        float cosNeg = (float)Math.Cos(negRad);
+        float sinNeg = (float)Math.Sin(negRad);
+        float pixelX = (dx * cosNeg - dy * sinNeg) / _scale;
+        float pixelY = (dx * sinNeg + dy * cosNeg) / _scale;
+        double factorX = Math.Clamp(pixelX / OriginalImageSize.Width, 0.0, 1.0);
+        double factorY = Math.Clamp(pixelY / OriginalImageSize.Height, 0.0, 1.0);
+
+        return new Point(factorX, factorY);
+    }
+}
+
+public class MapPin
+{
+    public string Id { get; set; }
+    public float RelativeX { get; set; }
+    public float RelativeY { get; set; }
+    public SKBitmap Icon { get; set; }
+    public bool AutoRotate { get; set; } = true;
 }
