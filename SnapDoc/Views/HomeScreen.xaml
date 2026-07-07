@@ -24,5 +24,8 @@
                    HorizontalOptions="Center"
                    VerticalOptions="End"/>
         </Grid>
+        <!--<controls:TileImageView SourceImagePath="C:\Users\fankhauser\SnapDoc\Test\plans\plan_20260424_125408_0.jpg"
+                                TileSize="512"
+                                MaxZoomLevel="4"/>-->
     </ContentPage.Content>
 </ContentPage>
