@@ -17,7 +17,7 @@ public class CapturePicture
 
         if (cameraStatus != PermissionStatus.Granted)
         {
-            await Application.Current.Windows[0].Page.DisplayAlertAsync(
+            await Shell.Current.DisplayAlertAsync(
                 AppResources.berechtigung_fehlt,
                 AppResources.berechtigung_kamera_dateien_info,
                 AppResources.ok);

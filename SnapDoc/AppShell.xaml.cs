@@ -257,7 +257,7 @@ public partial class AppShell : Shell
 
     public static void ClearAllPlansFromShell()
     {
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
 
         var plansToDelete = shell.AllPlanItems.ToList();
 

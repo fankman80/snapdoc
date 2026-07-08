@@ -208,7 +208,7 @@ public partial class LoadPDFPages : ContentPage
             // save data to file
             GlobalJson.SaveToFile();
 
-            if (Application.Current.Windows[0].Page is AppShell shell)
+            if (Shell.Current is AppShell shell)
                 shell.ApplyFilterAndSorting();
 
             await Shell.Current.GoToAsync("project_details");

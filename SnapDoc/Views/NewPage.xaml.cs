@@ -31,7 +31,7 @@ namespace SnapDoc.Views;
 public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 {
     private readonly string planId;
-    private string pinZoom = null;
+    private string pinZoom;
     private readonly Plan thisPlan;
     private bool isPinSet = false;
     private MR.Gestures.Image activePin = null; 
@@ -179,7 +179,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanContainer.PropertyChanged += PlanContainer_PropertyChanged;
 
         if (isFirstLoad)
-            await AddPlan();
+            AddPlan();
         else
         {
             if (pinZoom != null)
@@ -187,7 +187,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         // Setze den Titel der Seite und markiere den Plan im ShellManü
-        var appShell = Application.Current.Windows[0].Page as AppShell;
+        var appShell = Shell.Current as AppShell;
         appShell?.HighlightCurrentPlan(planId);
     }
 
@@ -216,8 +216,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (!_pinLookup.ContainsKey(pinId) && !isFirstLoad)
                 AddPin(pinId, thisPlan.Pins[pinId].PinIcon);
         }
-
-        query.Clear();
     }
 
     private void PlanContainer_PropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -241,7 +239,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private Task AddPlan()
+    private void AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
         if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
@@ -267,8 +265,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-        
-        return Task.CompletedTask;
     }
 
     private void AddPins()
@@ -281,6 +277,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var pinIcon = thisPlan.Pins[pinId].PinIcon;
             AddPin(pinId, pinIcon);
         }
+        PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
     }
 
     private void AddPin(string pinId, string pinIcon)
@@ -348,8 +345,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         PlanContainer.Children.Add(smallImage);
         _pinLookup[pinId] = smallImage;
-
-        PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
     }
 
     private void OnPinDown(object sender, EventArgs e)
@@ -1370,7 +1365,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         doubleTappedPin = null;
     }
 
-    private async void OnRotateSnapCklicked(object sender, EventArgs e)
+    private void OnRotateSnapCklicked(object sender, EventArgs e)
     {
         var snapValue = 0;
         if ((PinRotateSlider.LowerValue * 4 / 360) % 1 == 0)
@@ -1420,7 +1415,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     break;
 
                 default:
-                    (Application.Current.Windows[0].Page as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
+                    (Shell.Current as AppShell)?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = result.Result.NameEntry;
                     Title = result.Result.NameEntry;
 
                     thisPlan.Name = result.Result.NameEntry;
@@ -1447,7 +1442,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
 
@@ -1465,14 +1460,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
-
         // JSON + Files löschen
-        plan = thisPlan;
-
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + thisPlan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thisPlan.File));
 
         GlobalJson.Data.Plans.Remove(planId);
 
@@ -1553,10 +1544,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         thisPlan.File = imagefile;
 
         PlanContainer.SizeChanged += OnPlanContainerReady;
-        await AddPlan();
+        AddPlan();
 
         // Thumbnail-Pfad in der Shell-CollectionView aktualisieren
-        if (Application.Current.Windows[0].Page is AppShell shell)
+        if (Shell.Current is AppShell shell)
         {
             var newThumbPath = Path.Combine(
                 Settings.DataDirectory,
@@ -1595,6 +1586,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 var pinIcon = thisPlan.Pins[pinId].PinIcon;
                 AddPin(pinId, pinIcon);
             }
+            PlanContainer.InvalidateMeasure(); //Aktualisierung forcieren
         }
 
         // Daten speichern
@@ -1626,7 +1618,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (sender is not Microsoft.Maui.Controls.Entry entry) return;
 
         // Titel speichern
-        (Application.Current.Windows[0].Page as AppShell)
+        (Shell.Current as AppShell)
             ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         thisPlan.Name = Title;

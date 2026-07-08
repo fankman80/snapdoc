@@ -8,7 +8,7 @@ public partial class LoadDataToView
     public static void LoadData(FileResult path)
     {
         if (path == null || string.IsNullOrEmpty(path.FullPath)) return;
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
         if (GlobalJson.Data.Plans == null) return;
 
         foreach (var plan in GlobalJson.Data.Plans)
@@ -21,7 +21,7 @@ public partial class LoadDataToView
 
     public static void AddPlan(KeyValuePair<string, Models.Plan> plan)
     {
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
 
         string planId = plan.Key;
         string planTitle = plan.Value.Name;

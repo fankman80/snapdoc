@@ -143,7 +143,7 @@ public partial class MapView : IQueryAttributable
     {
         base.OnAppearing();
 
-        var appShell = Application.Current.Windows[0].Page as AppShell;
+        var appShell = Shell.Current as AppShell;
         appShell?.HighlightCurrentPlan(planId);
 
         if (!_mapInitialized)
@@ -162,7 +162,7 @@ public partial class MapView : IQueryAttributable
         if (query.TryGetValue("planId", out var planIdObj))
         {
             planId = planIdObj as string ?? string.Empty;
-            Title = (Application.Current.Windows[0].Page as AppShell)
+            Title = (Shell.Current as AppShell)
                 ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title;
         }
 
@@ -906,7 +906,7 @@ public partial class MapView : IQueryAttributable
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
 
         // Shell-Navigation entfernen
         var shellContent = shell
@@ -975,7 +975,7 @@ public partial class MapView : IQueryAttributable
         if (sender is not Entry entry) return;
 
         // Titel speichern
-        (Application.Current.Windows[0].Page as AppShell)
+        (Shell.Current as AppShell)
             ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         GlobalJson.Data.Plans[planId].Name = Title;

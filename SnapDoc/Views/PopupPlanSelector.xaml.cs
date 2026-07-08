@@ -81,7 +81,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
     {
         PlanItems ??= [];
 
-        if (Application.Current.Windows[0].Page is not AppShell shell)
+        if (Shell.Current is not AppShell shell)
         {
             PlanItems.Clear();
             return;

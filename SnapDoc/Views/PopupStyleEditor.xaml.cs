@@ -207,7 +207,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         StylePickerItem item = (StylePickerItem)button.BindingContext;
 
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result.Result != null)
         {
             Items.Remove(item);
@@ -237,7 +237,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     private async void OnBorderColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(SelectedBorderColor, fillOpacity: (byte)(SelectedBorderColor.Alpha * 255), fillOpacityVisibility: true);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
             SelectedBorderColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);
@@ -246,7 +246,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     private async void OnFillColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(SelectedFillColor, fillOpacity: (byte)(SelectedFillColor.Alpha * 255), fillOpacityVisibility: true);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
             SelectedFillColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);
@@ -255,7 +255,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     private async void OnTextColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(SelectedTextColor, fillOpacity: (byte)(SelectedTextColor.Alpha * 255), fillOpacityVisibility: true);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
             SelectedTextColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);

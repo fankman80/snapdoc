@@ -157,7 +157,7 @@ public partial class ProjectDetails : ContentPage
             GlobalJson.SaveToFile();
 
             // Shell aktualisieren
-            var shell = Application.Current.Windows[0].Page as AppShell;
+            var shell = Shell.Current as AppShell;
             shell.ApplyFilterAndSorting();
 
             await Shell.Current.GoToAsync($"//{planId}");

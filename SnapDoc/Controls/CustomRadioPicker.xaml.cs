@@ -152,7 +152,7 @@ public partial class CustomRadioPicker : ContentView
         var currentSelection = SelectedItem?.ToString() ?? string.Empty;
         var popup = new Views.PopupRadioPicker(items, currentSelection);
 
-        Page mainPage = Shell.Current ?? (Application.Current?.Windows.Count > 0 ? Application.Current.Windows[0].Page : null);
+        Page mainPage = Shell.Current ?? (Application.Current?.Windows.Count > 0 ? Shell.Current : null);
         if (mainPage is Shell shell) mainPage = shell.CurrentPage;
 
         if (mainPage is ContentPage currentPage)

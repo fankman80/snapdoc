@@ -68,7 +68,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
     private async void ResetPrg(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.standardeinstellungen_laden);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
@@ -84,7 +84,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
     private async void ResetIcon(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.standardeinstellungen_laden);
-        var result = await Application.Current.Windows[0].Page.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result != null)
         {
