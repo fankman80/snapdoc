@@ -763,10 +763,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
         drawingController.SaveToFile(dataPath);
 
-        var cx = imageRect.MidX / Settings.DisplayDensity;
-        var cy = imageRect.MidY / Settings.DisplayDensity;
         var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
-        SKPoint screenPoint = new((float)(cx + rotatedOffset.X), (float)(cy + rotatedOffset.Y));
+        SKPoint screenPoint = new((float)(imageRect.MidX + rotatedOffset.X), (float)(imageRect.MidY + rotatedOffset.Y));
         Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(screenPoint);
 
         SetPin(
@@ -775,7 +773,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             (int)imageRect.Width,
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
-            1 / PlanImage.CurrentScale / Settings.DisplayDensity,
+            1 / PlanImage.CurrentScale,
             0,
             drawingController.CombinedDrawable.RectDrawable.Text,
             isOverwrite
@@ -1001,8 +999,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
             await StartDrawing(false);
-            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale / Settings.DisplayDensity);
-            drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
+            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale);
+            drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2), (float)(this.Height / 2 * Settings.DisplayDensity)));
             PlanImage.CurrentRotation = (float)-thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
             
             var style = drawingController.LoadedStyle;
