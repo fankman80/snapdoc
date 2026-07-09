@@ -33,14 +33,17 @@ public partial class TileImageView : ContentView
     private float _originalPinX;
     private float _originalPinY;
     private CancellationTokenSource _cts;
+    private CancellationTokenSource _longPressCts;
+    private CancellationTokenSource _tapCts;
     private readonly HashSet<string> _loadingTiles = [];
     private DateTime _lastTapTime = DateTime.MinValue;
     private SKPoint _lastTapLocation = SKPoint.Empty;
     private bool _isDoubleTapAction = false;
+    private bool _isLongPressActive = false;
     private const float DoubleTapDistanceThreshold = 40f;
     private const int DoubleTapTimeoutMs = 300;
+    private const int LongPressTimeoutMs = 600;
     private MapPin _lastTappedPin = null;
-    private CancellationTokenSource _tapCts;
 
     public static readonly BindableProperty SourceImagePathProperty =
         BindableProperty.Create(nameof(SourceImagePath), typeof(string), typeof(TileImageView), default(string),
@@ -51,8 +54,16 @@ public partial class TileImageView : ContentView
             });
 
     public static readonly BindableProperty TileSizeProperty =
-        BindableProperty.Create(nameof(TileSize), typeof(int), typeof(TileImageView), 256,
-            propertyChanged: (bindable, o, n) => ((TileImageView)bindable)._canvasView.InvalidateSurface());
+        BindableProperty.Create(nameof(TileSize), typeof(int), typeof(TileImageView), 512,
+            propertyChanged: async (bindable, o, n) =>
+            {
+                var control = (TileImageView)bindable;
+
+                if ((int)o != (int)n && !string.IsNullOrEmpty(control.SourceImagePath))
+                    await control.ProcessNewImageAsync(control.SourceImagePath);
+                else
+                    control._canvasView?.InvalidateSurface();
+            });
 
     public static readonly BindableProperty MaxZoomLevelProperty =
         BindableProperty.Create(nameof(MaxZoomLevel), typeof(int), typeof(TileImageView), 4,
@@ -65,6 +76,13 @@ public partial class TileImageView : ContentView
             typeof(TileImageView),
             default(IEnumerable<MapPin>),
             propertyChanged: OnPinsChanged);
+
+    public static readonly BindableProperty PlaceholderColorProperty =
+        BindableProperty.Create(
+            nameof(PlaceholderColor),
+            typeof(Color),
+            typeof(TileImageView),
+            Colors.LightGray);
 
     private static void OnPinsChanged(BindableObject bindable, object oldValue, object newValue)
     {
@@ -97,12 +115,14 @@ public partial class TileImageView : ContentView
     public float CurrentScale { get => (float)GetValue(CurrentScaleProperty); private set => SetValue(CurrentScalePropertyKey, value); }
     public SKPoint CurrentPan { get => (SKPoint)GetValue(CurrentPanProperty); private set => SetValue(CurrentPanPropertyKey, value); }
     public float CurrentRotation { get => (float)GetValue(CurrentRotationProperty); private set => SetValue(CurrentRotationPropertyKey, value); }
+    public Color PlaceholderColor { get => (Color)GetValue(PlaceholderColorProperty); set => SetValue(PlaceholderColorProperty, value); }
     public ObservableCollection<MapPin> MyPins { get; set; } = [];
 
     public event EventHandler<MapPin> PinTapped;
     public event EventHandler<MapPin> PinMoved;
     public event EventHandler<MapPin> PinDoubleTapped;
     public event EventHandler<SKPoint> CanvasDoubleTapped;
+    public event EventHandler<SKPoint> CanvasLongPressed;
 
     public TileImageView()
     {
@@ -122,7 +142,9 @@ public partial class TileImageView : ContentView
             IsVisible = false,
             HorizontalOptions = LayoutOptions.Center,
             VerticalOptions = LayoutOptions.Center,
-            Color = Colors.CadetBlue
+            BackgroundColor = Colors.White,
+            Opacity = 0.5,
+            Color = Colors.Black,           
         };
 
         _layoutGrid.Children.Add(_canvasView);
@@ -150,7 +172,10 @@ public partial class TileImageView : ContentView
         try
         {
             string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-            _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}");
+
+            CleanupOldTileFolders(imagePath, TileSize);
+
+            _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{TileSize}");
 
             bool tilesExist = Directory.Exists(_computedTileFolder) &&
                               Directory.GetFiles(_computedTileFolder, "*.png", SearchOption.AllDirectories).Length > 0;
@@ -161,7 +186,6 @@ public partial class TileImageView : ContentView
                 _loadingIndicator.IsRunning = true;
                 _canvasView.IsVisible = false;
 
-                // Token wird an die Generierung durchgereicht
                 await Task.Run(() => GenerateTilePyramidInternal(imagePath, _computedTileFolder, MaxZoomLevel, TileSize, token), token);
             }
 
@@ -188,7 +212,7 @@ public partial class TileImageView : ContentView
         }
         catch (OperationCanceledException)
         {
-            return; // Sauberes Verlassen bei Bildwechsel
+            return;
         }
         catch (Exception ex)
         {
@@ -203,6 +227,31 @@ public partial class TileImageView : ContentView
             {
                 _isGenerating = false;
                 _canvasView.InvalidateSurface();
+            }
+        }
+    }
+
+    private static void CleanupOldTileFolders(string imagePath, int currentTileSize)
+    {
+        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
+        string baseFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
+
+        if (!Directory.Exists(baseFolder)) return;
+
+        var allDirs = Directory.GetDirectories(baseFolder, $"{fileNameWithoutExt}_*");
+
+        foreach (var dir in allDirs)
+        {
+            if (!dir.EndsWith($"_{currentTileSize}"))
+            {
+                try
+                {
+                    Directory.Delete(dir, true);
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine($"Fehler beim Loeschen alter Kacheln: {ex.Message}");
+                }
             }
         }
     }
@@ -226,7 +275,7 @@ public partial class TileImageView : ContentView
 
         var canvas = e.Surface.Canvas;
 
-        canvas.Clear(SKColors.Transparent);
+        canvas.Clear(PlaceholderColor.ToSKColor());
 
         if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder)) return;
 
@@ -241,8 +290,10 @@ public partial class TileImageView : ContentView
         float tileScaleFactor = (float)Math.Pow(2, MaxZoomLevel - currentZoom);
         float currentTileSizeInCanvasSpace = TileSize * tileScaleFactor;
 
-        float canvasWidth = (float)_canvasView.Width;
-        float canvasHeight = (float)_canvasView.Height;
+        int maxTiles = (int)Math.Pow(2, currentZoom);
+
+        float canvasWidth = _canvasView.CanvasSize.Width;
+        float canvasHeight = _canvasView.CanvasSize.Height;
 
         float viewRadius = (float)Math.Sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight) / (2f * _scale);
 
@@ -263,8 +314,6 @@ public partial class TileImageView : ContentView
         float viewTop = tileCenterY - viewRadius;
         float viewRight = tileCenterX + viewRadius;
         float viewBottom = tileCenterY + viewRadius;
-
-        int maxTiles = (int)Math.Pow(2, currentZoom);
 
         int minX = (int)Math.Floor(viewLeft / currentTileSizeInCanvasSpace);
         int minY = (int)Math.Floor(viewTop / currentTileSizeInCanvasSpace);
@@ -294,9 +343,6 @@ public partial class TileImageView : ContentView
                     float posX = x * currentTileSizeInCanvasSpace;
                     float posY = y * currentTileSizeInCanvasSpace;
                     var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
-
-                    using var placeholderPaint = new SKPaint { Color = SKColors.LightGray };
-                    canvas.DrawRect(destRect, placeholderPaint);
 
                     if (_loadingTiles.Contains(cacheKey))
                         continue;
@@ -460,6 +506,8 @@ public partial class TileImageView : ContentView
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
+                _isLongPressActive = false;
+
                 _activeTouches[e.Id] = e.Location;
                 if (_activeTouches.Count == 1)
                 {
@@ -485,10 +533,36 @@ public partial class TileImageView : ContentView
                             _dragOffset = new SKPoint(planPoint.X - pinAbsX, planPoint.Y - pinAbsY);
                         }
                     }
+                    else
+                    {
+                        _longPressCts?.Cancel();
+                        _longPressCts = new CancellationTokenSource();
+                        var token = _longPressCts.Token;
+                        var lpLocation = e.Location;
+
+                        _ = Task.Run(async () =>
+                        {
+                            try
+                            {
+                                await Task.Delay(LongPressTimeoutMs, token);
+                                if (!token.IsCancellationRequested)
+                                {
+                                    MainThread.BeginInvokeOnMainThread(() =>
+                                    {
+                                        _isLongPressActive = true;
+                                        CanvasLongPressed?.Invoke(this, lpLocation);
+                                    });
+                                }
+                            }
+                            catch (OperationCanceledException) { }
+                        });
+                    }
                 }
+
                 if (_activeTouches.Count == 2)
                 {
                     _draggedPin = null;
+                    _longPressCts?.Cancel();
                     var points = _activeTouches.Values.ToArray();
                     _oldFingerDistance = SKPoint.Distance(points[0], points[1]);
                     _oldFingerAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
@@ -498,6 +572,10 @@ public partial class TileImageView : ContentView
             case SKTouchAction.Moved:
                 if (_isGenerating) break;
                 if (_isDoubleTapAction) break;
+                if (_isLongPressActive) break;
+
+                if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
+                    _longPressCts?.Cancel();
 
                 bool shouldInvalidate = false;
 
@@ -567,6 +645,16 @@ public partial class TileImageView : ContentView
                 break;
 
             case SKTouchAction.Released:
+                _longPressCts?.Cancel();
+
+                if (_isLongPressActive)
+                {
+                    _isLongPressActive = false;
+                    _draggedPin = null;
+                    _activeTouches.Remove(e.Id);
+                    break;
+                }
+
                 if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold)
                 {
                     var now = DateTime.UtcNow;
@@ -615,10 +703,7 @@ public partial class TileImageView : ContentView
                                         });
                                     }
                                 }
-                                catch (OperationCanceledException)
-                                {
-                                    // Single-Tap wurde erfolgreich durch Double-Tap abgebrochen
-                                }
+                                catch (OperationCanceledException) { }
                             });
                         }
                     }
@@ -646,7 +731,9 @@ public partial class TileImageView : ContentView
                 break;
 
             case SKTouchAction.Cancelled:
+                _longPressCts?.Cancel();
                 _isDoubleTapAction = false;
+                _isLongPressActive = false;
                 if (_draggedPin != null)
                 {
                     _draggedPin.RelativeX = _originalPinX;
@@ -795,6 +882,28 @@ public partial class TileImageView : ContentView
         CurrentPan = new SKPoint(_panX, _panY);
         CurrentRotation = _rotationDegrees;
         _canvasView.InvalidateSurface();
+    }
+
+    public Point ConvertScreenToRelativePoint(SKPoint screenPoint)
+    {
+        if (OriginalImageSize == SKSize.Empty)
+            return new Point(0, 0);
+
+        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
+        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
+        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+
+        if (matrix.TryInvert(out SKMatrix inverseMatrix))
+        {
+            SKPoint planPoint = inverseMatrix.MapPoint(screenPoint);
+
+            double factorX = Math.Clamp(planPoint.X / OriginalImageSize.Width, 0.0, 1.0);
+            double factorY = Math.Clamp(planPoint.Y / OriginalImageSize.Height, 0.0, 1.0);
+
+            return new Point(factorX, factorY);
+        }
+
+        return new Point(0, 0);
     }
 
     private SKBitmap GetOrLoadPinBitmap(MapPin pin)

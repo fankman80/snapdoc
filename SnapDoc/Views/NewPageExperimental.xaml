@@ -65,6 +65,7 @@
                                     SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
                                     TileSize="1024"
                                     MaxZoomLevel="4"
+                                    PlaceholderColor="DimGrey"
                                     AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                                     AbsoluteLayout.LayoutFlags="All"/>            
             

@@ -200,6 +200,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         PlanImage.PinTapped += OnPinTapped;
         PlanImage.PinDoubleTapped += OnPinDoubleTapped;
+        PlanImage.CanvasLongPressed += OnCanvasLongPressed;
         PlanImage.PinMoved += OnPinMoved;
 
         if (isFirstLoad)
@@ -224,6 +225,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         PlanImage.PinTapped -= OnPinTapped;
         PlanImage.PinDoubleTapped -= OnPinDoubleTapped;
+        PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
         PlanImage.PinMoved -= OnPinMoved;
 
         if (!_isShowingPopup)
@@ -312,15 +314,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             resolvedPath = pinIcon;
         }
 
-        // Der zeitintensive Lade- und Dekodierungs-Block wurde komplett entfernt.
-        // Die Methode ermittelt nur noch blitzschnell die Pfade.
-
         return new MapPin
         {
             Id = pinData.SelfId,
             RelativeX = (float)pinData.Pos.X,
             RelativeY = (float)pinData.Pos.Y,
-            IconPath = resolvedPath, // WICHTIG: Hier wird nun der Pfad übergeben!
+            IconPath = resolvedPath,
             IsLockRotate = false,
             IsCustomPin = pinData.IsCustomPin,
             IsLockAutoScale = pinData.IsLockAutoScale,
@@ -384,6 +383,15 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         }
     }
 
+    private void OnCanvasLongPressed(object sender, SKPoint e)
+    {
+        if (SettingsService.Instance.PinPlaceMode == 2)
+        {
+            Point relativePoint = PlanImage.ConvertScreenToRelativePoint(e);
+            SetPin(relativePoint);
+        }
+    }
+
     private void OnPinMoved(object sender, MapPin movedPin)
     {
         if (movedPin == null) return;
@@ -412,17 +420,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             isPinSet = true;
         }
     }
-
-    //private void OnLongPressing(object sender, LongPressEventArgs e)
-    //{
-    //    if (SettingsService.Instance.PinPlaceMode == 2)
-    //    {
-    //        var x = 1.0 / PlanImage.OriginalImageSize.Width * e.Center.X;
-    //        var y = 1.0 / PlanImage.OriginalImageSize.Height * e.Center.Y;
-
-    //        SetPin(new Point(x, y));
-    //    }
-    //}
 
     private void OnPinSetCancelClicked(object sender, EventArgs e)
     {
@@ -531,11 +528,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             // save data to file
             GlobalJson.SaveToFile();
 
-            var pinPath = Path.Combine(
-                Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
-                GlobalJson.Data.CustomPinsPath,
-                _newPin);
+            //var pinPath = Path.Combine(
+            //    Settings.DataDirectory,
+            //    GlobalJson.Data.ProjectPath,
+            //    GlobalJson.Data.CustomPinsPath,
+            //    _newPin);
 
             //tappedPin.Source = ImageSource.FromFile(pinPath);
             //tappedPin.WidthRequest = pinData.Size.Width;
