@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using SnapDoc.Services;
 using SnapDoc.Views;
 
 namespace SnapDoc;
@@ -12,9 +13,7 @@ public partial class LoadDataToView
         if (GlobalJson.Data.Plans == null) return;
 
         foreach (var plan in GlobalJson.Data.Plans)
-        {
             AddPlan(plan);
-        }
 
         shell.ApplyFilterAndSorting();
     }
@@ -38,11 +37,22 @@ public partial class LoadDataToView
         }
         else
         {
-            page = new NewPage(planId)
+            if (SettingsService.Instance.IsExperimentalFunctions)
             {
-                Title = planTitle,
-                AutomationId = planId,
-            };
+                page = new NewPageExperimental(planId)
+                {
+                    Title = planTitle,
+                    AutomationId = planId,
+                };
+            }
+            else
+            {
+                page = new NewPage(planId)
+                {
+                    Title = planTitle,
+                    AutomationId = planId,
+                };
+            }
         }
 
         var shellContent = new ShellContent

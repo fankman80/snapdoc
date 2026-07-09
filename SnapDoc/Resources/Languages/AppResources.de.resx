@@ -903,4 +903,7 @@
   <data name="pin_auf_karte_anzeigen" xml:space="preserve">
     <value>Pin auf Karte anzeigen</value>
   </data>
+  <data name="experimentelle_funktionen" xml:space="preserve">
+    <value>Experimentelle Funktionen</value>
+  </data>
 </root>

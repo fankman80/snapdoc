@@ -291,8 +291,7 @@
                                         ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
                                         Clicked="ResetIcon"/>
                             </Grid>
-                            <VerticalStackLayout>
-                                <controls:RangeSlider
+                            <controls:RangeSlider
                                     LabelText="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"
                                     IsRange="False"
                                     Minimum="1"
@@ -303,10 +302,8 @@
                                     MinimumValueDisplayFormat="{}{0:0} MP"
                                     LowerValue="{Binding MaxPdfPixelCount}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>
-                            </VerticalStackLayout>
-                            <Grid>     
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                            <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />
                                     <ColumnDefinition Width="*" />
@@ -328,7 +325,17 @@
                                                             ItemsSource="{Binding AppLanguages}"
                                                             SelectedItem="{Binding SelectedAppLanguage}"/>
                                 <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
-                            </Grid>   
+                            </Grid>
+                            <controls:Switch LabelText="{x:Static res:AppResources.experimentelle_funktionen}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                IsToggled="{Binding IsExperimentalFunctions}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                         </VerticalStackLayout>                       
                     </uranium:ExpanderView>
                 </Border> 

@@ -538,6 +538,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Experimentelle Funktionen ähnelt.
+        /// </summary>
+        internal static string experimentelle_funktionen {
+            get {
+                return ResourceManager.GetString("experimentelle_funktionen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Export-Vorlage ähnelt.
         /// </summary>
         internal static string export_vorlage {

@@ -117,6 +117,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
     [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
     [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
+    [ObservableProperty] public partial bool IsExperimentalFunctions { get; set; } = false;
     [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 60;
     [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 90;
     [ObservableProperty] public partial int MaxPdfPixelCount { get; set; } = 30;
@@ -319,6 +320,7 @@ public partial class SettingsService : ObservableObject
             IsPlanListThumbnails = IsPlanListThumbnails,
             IsHideInactivePlans = IsHideInactivePlans,
             IsPinAutoLock = IsPinAutoLock,
+            IsExperimentalFunctions = IsExperimentalFunctions,
             MaxPdfPixelCount = MaxPdfPixelCount,
             PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
@@ -394,6 +396,7 @@ public partial class SettingsService : ObservableObject
             IsPlanListThumbnails = settings.IsPlanListThumbnails;
             IsHideInactivePlans = settings.IsHideInactivePlans;
             IsPinAutoLock = settings.IsPinAutoLock;
+            IsExperimentalFunctions = settings.IsExperimentalFunctions;
             MaxPdfPixelCount = settings.MaxPdfPixelCount;
             PdfThumbDpi = settings.PdfThumbDpi;
             SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
@@ -461,6 +464,7 @@ public partial class SettingsService : ObservableObject
         IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
         IsHideInactivePlans = defaultSettings.IsHideInactivePlans;
         IsPinAutoLock = defaultSettings.IsPinAutoLock;
+        IsExperimentalFunctions = defaultSettings.IsExperimentalFunctions;
         MaxPdfPixelCount = defaultSettings.MaxPdfPixelCount;
         PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;

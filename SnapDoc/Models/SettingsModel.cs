@@ -16,6 +16,7 @@ internal class SettingsModel
     public bool IsPlanListThumbnails { get; set; } // Planliste mit Thumbnails anzeigen
     public bool IsHideInactivePlans { get; set; } // Inaktive Pläne in der Planliste ausblenden
     public bool IsPinAutoLock { get; set; } // Pin nach Platzierung automatisch sperren
+    public bool IsExperimentalFunctions { get; set; } // Experimentelle Funktionen aktivieren
     public int MaxPdfPixelCount { get; set; } // Maximale Pixelanzahl eines PDF-Bildes beim Import
     public int PdfThumbDpi { get; set; } // DPI der PDF-Thumbnails im Import-Dialog
     public int SelectedColorTheme { get; set; } // App-Farbschema

@@ -1,0 +1,335 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+             xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
+             xmlns:pc="clr-namespace:SnapDoc.ViewModels"
+             xmlns:views="clr-namespace:SnapDoc.Views"                
+             xmlns:services="clr-namespace:SnapDoc.Services"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:local="clr-namespace:SnapDoc"
+             BackgroundColor="DimGrey"             
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+             x:Class="SnapDoc.Views.NewPageExperimental"
+             x:DataType="views:NewPageExperimental"
+             x:Name="ThisPage"
+             Title="{Binding Title}">
+
+    <Shell.TitleView>
+        <Grid ColumnDefinitions="*,Auto,Auto"
+              ColumnSpacing="0"
+              VerticalOptions="Center">
+            <local:BorderlessEntry Grid.Column="0"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Placeholder="{x:Static res:AppResources.titel_eingeben}"
+                   PlaceholderColor="{DynamicResource PrimaryDark}"
+                   IsSpellCheckEnabled="False"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   Completed="OnTitleChanged"
+                   Unfocused="OnTitleChanged"/>
+            <Button Grid.Column="1"                    
+                    Text="{x:Static local:MaterialIcons.Fit_screen}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.plan_auf_fenstergroesse_zoomen}"                    
+                    Clicked="ImageFit"/>
+            <Button Grid.Column="2"                    
+                    Text="{x:Static local:MaterialIcons.Edit_square}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.plan_bearbeiten}"                    
+                    Clicked="OnEditClicked"/>
+        </Grid>
+    </Shell.TitleView>
+
+    <Grid>
+        <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True">
+            <controls:TileImageView x:Name="PlanImage"
+                                    SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
+                                    TileSize="1024"
+                                    MaxZoomLevel="4"
+                                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                                    AbsoluteLayout.LayoutFlags="All"/>            
+            
+            <Grid x:Name="PinEditBorder"
+                  IsVisible="False"
+                  AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                  AbsoluteLayout.LayoutFlags="All">
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnFullScreenButtonClicked" />
+                </Grid.GestureRecognizers>
+                
+                <Border BackgroundColor="{DynamicResource Primary}"
+                        StrokeThickness="0"
+                        HeightRequest="60"
+                        VerticalOptions="End"
+                        Margin="20,0,20,100"
+                        ZIndex="10000">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <controls:RangeSlider
+                            x:Name="PinSizeSlider"
+                            ShowLabels="False"
+                            IsRealtime="True"
+                            IsRange="False"
+                            Minimum="1"
+                            Maximum="200"
+                            Step="1"
+                            Margin="65,0,65,0"
+                            ThumbColor="{DynamicResource PrimaryDarkText}"
+                            MinimumTrackColor="{DynamicResource PrimaryDarkText}"
+                            MaximumTrackColor="{DynamicResource PrimaryDarkText}"
+                            ValueChanged="OnResizeSliderValueChanged"
+                            DragCompleted="OnResizeSliderDragCompleted"/>
+                </Border>
+
+                <Button x:Name="LoadCustomPinBtn"                        
+                        Text="{x:Static local:MaterialIcons.Draw}"  
+                        IsVisible="False"
+                        Style="{StaticResource ToolButtonStyle}"
+                        Margin="20,0,0,180"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="LoadCustomPinClicked"/>
+                <Button x:Name="SizeModeBtn"
+                        FontSize="{OnPlatform 38, iOS=34}"
+                        FontFamily="MaterialOutlined"
+                        TextColor="{DynamicResource Primary}"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        CornerRadius="25"
+                        Padding="0"
+                        Margin="25,0,0,105"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="OnSizeModeClicked"/>                
+                <Label x:Name="PercentLabel"
+                       Text="100%"
+                       FontSize="16"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="End"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="0,0,30,118"
+                       ZIndex="10001"/>                
+                <Label x:Name="SizeModeLabel"
+                       FontSize="11"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="95,0,0,104"
+                       ZIndex="10001"/>                
+                <Border BackgroundColor="{DynamicResource Primary}"
+                        StrokeThickness="0"
+                        HeightRequest="60"
+                        VerticalOptions="End"
+                        Margin="20,0,20,20"
+                        ZIndex="10000">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="30"/>
+                    </Border.StrokeShape>
+                    <controls:RangeSlider
+                            x:Name="PinRotateSlider"
+                            ShowLabels="False"
+                            IsRealtime="True"
+                            IsRange="False"
+                            Minimum="-180"
+                            Maximum="180"
+                            Step="1"
+                            Margin="65,0,65,0"
+                            ThumbColor="{DynamicResource PrimaryDarkText}"
+                            MinimumTrackColor="{DynamicResource PrimaryDarkText}"
+                            MaximumTrackColor="{DynamicResource PrimaryDarkText}"
+                            ValueChanged="OnRotateSliderValueChanged"
+                            DragCompleted="OnRotateSliderDragCompleted"/>
+                </Border>
+                <Button x:Name="RotateModeBtn"
+                        FontSize="{OnPlatform 38, iOS=34}"
+                        FontFamily="MaterialOutlined"
+                        TextColor="{DynamicResource Primary}"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        CornerRadius="25"
+                        Padding="0"
+                        Margin="25,0,0,25"
+                        ZIndex="10001"
+                        HorizontalOptions="Start"
+                        VerticalOptions="End"
+                        Clicked="OnRotateModeClicked"/>
+                <Border x:Name="DegreesLabelBorder"
+                        HeightRequest="50"
+                        WidthRequest="50"
+                        BackgroundColor="{DynamicResource PrimaryDarkText}"
+                        Margin="0,0,25,25"
+                        ZIndex="10001"
+                        StrokeThickness="0"
+                        HorizontalOptions="End"
+                        VerticalOptions="End">
+                    <Border.StrokeShape>
+                        <RoundRectangle CornerRadius="25"/>
+                    </Border.StrokeShape>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnRotateSnapCklicked" />
+                    </Border.GestureRecognizers>
+                    <Label x:Name="DegreesLabel"
+                           Text="0°"
+                           FontSize="16"
+                           TextColor="{DynamicResource Primary}"
+                           VerticalOptions="Center"
+                           HorizontalOptions="Center"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Center"/>
+                </Border>
+                <Label x:Name="RotateModeLabel"
+                       FontSize="11"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="Start"
+                       VerticalOptions="End"
+                       TextColor="{DynamicResource PrimaryDarkText}"
+                       Margin="95,0,0,24"
+                       ZIndex="10001"/>
+            </Grid>
+
+            <Button x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                    IsVisible="{Binding IsButtonActuallyVisible}"
+                    Margin="0,0,20,20"
+                    ZIndex="10000"
+                    Text="{x:Static local:MaterialIcons.Add_location_alt}"  
+                    Style="{StaticResource ToolButtonStyle}"
+                    AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    ToolTipProperties.Text="{x:Static res:AppResources.pin_setzen}"
+                    Clicked="SetPinClicked"/>
+
+            <Button x:Name="DrawBtn"
+                    Text="{x:Static local:MaterialIcons.Draw}"   
+                    Margin="20,0,0,20"
+                    ZIndex="10000"
+                    Style="{StaticResource ToolButtonStyle}"
+                    AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
+                    Clicked="DrawingClicked"/>
+
+            <VerticalStackLayout x:DataType="views:NewPageExperimental"
+                                 IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference Name=ThisPage}}"
+                                 Spacing="16"
+                                 Margin="20"
+                                 HorizontalOptions="Start"
+                                 VerticalOptions="End"
+                                 ZIndex="10000"
+                                 AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                                 AbsoluteLayout.LayoutFlags="PositionProportional">
+                <Button Text="{x:Static local:MaterialIcons.Ink_eraser}"  
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
+                        Clicked="EraseClicked"/>
+                <AbsoluteLayout>
+                    <Button Text="{x:Static local:MaterialIcons.Palette}"  
+                            Style="{StaticResource ToolButtonStyle}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
+                            Clicked="PenSettingsClicked"/>
+                    <Border WidthRequest="20"
+                            HeightRequest="20"
+                            BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
+                            StrokeThickness="0"
+                            AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
+                            AbsoluteLayout.LayoutFlags="PositionProportional">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="11"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="Black" 
+                                    Opacity="0.3" 
+                                    Offset="3,3" 
+                                    Radius="3"/>
+                        </Border.Shadow>
+                    </Border>
+                    <Border WidthRequest="20"
+                            HeightRequest="20"
+                            BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
+                            StrokeThickness="0"
+                            AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
+                            AbsoluteLayout.LayoutFlags="PositionProportional">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="11"/>
+                        </Border.StrokeShape>
+                        <Border.Shadow>
+                            <Shadow Brush="Black" 
+                                    Opacity="0.3" 
+                                    Offset="3,3" 
+                                    Radius="3"/>
+                        </Border.Shadow>
+                    </Border>
+                </AbsoluteLayout>
+                <Button x:Name="AddTextBtn"
+                        IsVisible="False"
+                        Text="{x:Static local:MaterialIcons.Text_fields}" 
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
+                        Clicked="TextClicked"/>
+                <Button x:Name="AddCloudyBtn"
+                        IsVisible="False"
+                        Text="{x:Static local:MaterialIcons.Cloud_off}" 
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
+                        Clicked="CloudyClicked"/>
+                <Button x:Name="ShapeBtn"
+                        Text="{x:Static local:MaterialIcons.Activity_zone}"                   
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
+                        Clicked="ShapeButtonClicked"/>
+                <Button Text="{x:Static local:MaterialIcons.Check}"   
+                        BackgroundColor="LimeGreen"
+                        Style="{StaticResource ToolButtonStyle}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
+                        Clicked="CheckClicked"/>                
+            </VerticalStackLayout>
+        </AbsoluteLayout>
+
+        <AbsoluteLayout x:Name="SetPinFrame"
+                        IsVisible="false"
+                        InputTransparent="True"
+                        CascadeInputTransparent="False">
+            <Border InputTransparent="True"
+                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                    AbsoluteLayout.LayoutFlags="All"
+                    Stroke="Red"
+                    StrokeThickness="16"
+                    StrokeLineJoin="Miter"                    
+                    Opacity="0.2"
+                    ZIndex="9998"/>
+            <Button AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
+                    AbsoluteLayout.LayoutFlags="PositionProportional"
+                    Margin="0,0,20,20"
+                    BackgroundColor="Red"
+                    Text="{x:Static local:MaterialIcons.Close}"    
+                    Style="{StaticResource ToolButtonStyle}"                    
+                    Clicked="OnPinSetCancelClicked"
+                    ZIndex="9999"/>
+        </AbsoluteLayout>
+    </Grid>
+</ContentPage>
