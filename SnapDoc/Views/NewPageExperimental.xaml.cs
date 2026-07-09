@@ -131,40 +131,58 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         WeakReferenceMessenger.Default.Register<PinChangedMessage>(this, (r, m) =>
         {
             var pinId = m.Value;
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
                 var pin = pinList.FirstOrDefault(p => p.Id == pinId);
-                if (pin != null)
+                if (pin != null && thisPlan.Pins.TryGetValue(pinId, out var pinData))
                 {
-                    var pinData = thisPlan.Pins[pinId];
-                    var pinIcon = pinData.PinIcon;
+                    string pinIcon = pinData.PinIcon;
+                    string resolvedPath = null;
+                    var currentAnchor = pinData.Anchor;
 
-                    SKBitmap newBitmap = null;
-
-                    if (pinData.IsCustomIcon)
+                    if (pinData.IsCustomPin)
                     {
-                        var fullPath = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
-                        if (File.Exists(fullPath))
-                            newBitmap = SKBitmap.Decode(fullPath);
+                        resolvedPath = Path.Combine(
+                            Settings.DataDirectory,
+                            GlobalJson.Data.ProjectPath,
+                            GlobalJson.Data.CustomPinsPath,
+                            pinIcon);
+                    }
+                    else if (pinData.IsCustomIcon)
+                    {
+                        var customIconPath = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
+                        if (File.Exists(customIconPath))
+                        {
+                            resolvedPath = customIconPath;
+                        }
+                        else
+                        {
+                            string defaultPin = SettingsService.Instance.DefaultPinIcon;
+                            var iconItem = Helper.IconLookup.Get(defaultPin);
+                            if (iconItem != null)
+                            {
+                                resolvedPath = iconItem.FileName;
+                                currentAnchor = iconItem.AnchorPoint;
+                            }
+                        }
                     }
                     else
                     {
-                        using var stream = File.OpenRead(pinIcon);
-                        newBitmap = SKBitmap.Decode(stream);
+                        resolvedPath = pinIcon;
                     }
 
-                    if (newBitmap != null)
-                    {
-                        pin.Icon?.Dispose();
-                        pin.Icon = newBitmap;
-                        pin.IsLockAutoScale = pinData.IsLockAutoScale;
+                    pin.Icon?.Dispose();
+                    pin.Icon = null;
+                    pin.IconPath = resolvedPath;
+                    pin.Anchor = currentAnchor;
+                    pin.IsLockAutoScale = pinData.IsLockAutoScale;
+                    pin.PinScale = (float)pinData.PinScale;
 
-                        var index = pinList.IndexOf(pin);
-                        if (index != -1)
-                            pinList[index] = pin;
+                    var index = pinList.IndexOf(pin);
+                    if (index != -1)
+                        pinList[index] = pin;
 
-                        PlanImage.InvalidateSurface();
-                    }
+                    PlanImage.InvalidateSurface();
                 }
             });
         });
@@ -246,15 +264,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private MapPin AddPin(string pinId)
     {
-        // Die Logik wird komplett an CreateMapPin delegiert
         var pin = CreateMapPin(pinId);
 
         if (pin != null)
-        {
             pinList.Add(pin);
-        }
 
-        // Gibt den erstellten Pin zurück – perfekt für dynamisches Hinzufügen zur Laufzeit!
         return pin;
     }
 
@@ -267,7 +281,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         string resolvedPath = null;
         var currentAnchor = pinData.Anchor;
 
-        // 1. Pfad-Auflösung (Custom Pin vs. Custom Icon vs. Standard)
         if (pinData.IsCustomPin)
         {
             resolvedPath = Path.Combine(
@@ -296,41 +309,19 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         }
         else
         {
-            resolvedPath = pinIcon; // KORRIGIERT: Tippfehler von iconIcon zu pinIcon behoben
+            resolvedPath = pinIcon;
         }
 
-        // 2. SKBitmap laden (aus Dateisystem oder App-Package)
-        SKBitmap bitmap = null;
-        if (!string.IsNullOrEmpty(resolvedPath))
-        {
-            if (File.Exists(resolvedPath))
-            {
-                try
-                {
-                    using var stream = File.OpenRead(resolvedPath);
-                    bitmap = SKBitmap.Decode(stream);
-                }
-                catch { /* Laden fehlgeschlagen */ }
-            }
-            else
-            {
-                try
-                {
-                    // Für einkompilierte MAUI-Assets (z.B. default pins)
-                    using var stream = Task.Run(() => FileSystem.OpenAppPackageFileAsync(resolvedPath)).Result;
-                    bitmap = SKBitmap.Decode(stream);
-                }
-                catch { /* Asset nicht gefunden */ }
-            }
-        }
+        // Der zeitintensive Lade- und Dekodierungs-Block wurde komplett entfernt.
+        // Die Methode ermittelt nur noch blitzschnell die Pfade.
 
         return new MapPin
         {
             Id = pinData.SelfId,
             RelativeX = (float)pinData.Pos.X,
             RelativeY = (float)pinData.Pos.Y,
-            Icon = bitmap,
-            IsLockRotate= false,
+            IconPath = resolvedPath, // WICHTIG: Hier wird nun der Pfad übergeben!
+            IsLockRotate = false,
             IsCustomPin = pinData.IsCustomPin,
             IsLockAutoScale = pinData.IsLockAutoScale,
             PinScale = (float)pinData.PinScale,
