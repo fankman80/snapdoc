@@ -36,7 +36,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private MapPin tappedPin = null;
     private bool isFirstLoad = true;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
-    private readonly TransformViewModel planContainer;
     private readonly System.Collections.ObjectModel.ObservableCollection<MapPin> pinList = [];
 
     // DrawingController
@@ -47,10 +46,9 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private string strokeStyle = "";
     private float cloudRadius = 20;
     private float cloudInciseDeg = 15;
-
     private bool _isShowingPopup = false;
-
     private string planImageSource = "";
+
     public string PlanImageSource
     {
         get => planImageSource;
@@ -108,10 +106,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     public NewPageExperimental(string _planId)
     {
         InitializeComponent();
-        planContainer = new TransformViewModel();
-        BindingContext = planContainer;
         planId = _planId;
-        drawingController = new DrawingController(planContainer);
+        drawingController = new DrawingController(new TransformViewModel());
         thisPlan = GlobalJson.Data.Plans[planId];
 
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
@@ -152,9 +148,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     {
                         var customIconPath = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
                         if (File.Exists(customIconPath))
-                        {
                             resolvedPath = customIconPath;
-                        }
                         else
                         {
                             string defaultPin = SettingsService.Instance.DefaultPinIcon;
@@ -167,15 +161,17 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                         }
                     }
                     else
-                    {
                         resolvedPath = pinIcon;
-                    }
 
                     pin.Icon?.Dispose();
                     pin.Icon = null;
                     pin.IconPath = resolvedPath;
                     pin.Anchor = currentAnchor;
                     pin.IsLockAutoScale = pinData.IsLockAutoScale;
+                    pin.IsLockRotate = pinData.IsLockRotate;
+                    pin.Rotation = pinData.IsLockRotate
+                        ? (float)pinData.PinRotation
+                        : (float)PlanImage.Rotation * -1 + (float)pinData.PinRotation;
                     pin.PinScale = (float)pinData.PinScale;
 
                     var index = pinList.IndexOf(pin);
@@ -210,12 +206,10 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             ImageFit(null, null);
         }
         else
-        {
             if (pinZoom != null)
                 ZoomToPin(pinZoom);
-        }
 
-        var appShell = Application.Current.Windows[0].Page as AppShell;
+        var appShell = Shell.Current as AppShell;
         appShell?.HighlightCurrentPlan(planId);
     }
 
@@ -320,9 +314,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             RelativeX = (float)pinData.Pos.X,
             RelativeY = (float)pinData.Pos.Y,
             IconPath = resolvedPath,
-            IsLockRotate = false,
+            IsLockRotate = pinData.IsLockRotate,
             IsCustomPin = pinData.IsCustomPin,
             IsLockAutoScale = pinData.IsLockAutoScale,
+            Rotation = pinData.IsLockRotate
+                ? (float)pinData.PinRotation
+                : (float)PlanImage.Rotation * -1 + (float)pinData.PinRotation,
             PinScale = (float)pinData.PinScale,
             Anchor = currentAnchor
         };
@@ -353,7 +350,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         PinRotateSlider.LowerValue = Helper.ToSliderValue(pin.Rotation);
         DegreesLabel.Text = $"{Helper.ToSliderValue(pin.Rotation):0}°";
 
-        planContainer.IsPanningEnabled = false;
         DrawBtn.IsVisible = false;
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         PinEditBorder.IsVisible = true;
@@ -511,8 +507,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
                 AddPin(currentDateTime);
 
-                PlanImage.InvalidateSurface();
-
                 _ = UpdatePinLocationAsync(newPinData);
             }
         }
@@ -528,22 +522,32 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             // save data to file
             GlobalJson.SaveToFile();
 
-            //var pinPath = Path.Combine(
-            //    Settings.DataDirectory,
-            //    GlobalJson.Data.ProjectPath,
-            //    GlobalJson.Data.CustomPinsPath,
-            //    _newPin);
+            var pinPath = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.CustomPinsPath,
+                _newPin);
 
-            //tappedPin.Source = ImageSource.FromFile(pinPath);
-            //tappedPin.WidthRequest = pinData.Size.Width;
-            //tappedPin.HeightRequest = pinData.Size.Height;
-            //tappedPin.TranslationX = (PlanImage.OriginalImageSize.Width * pinData.Pos.X) - (pinData.Anchor.X * pinData.Size.Width);
-            //tappedPin.TranslationY = (PlanImage.OriginalImageSize.Height * pinData.Pos.Y) - (pinData.Anchor.Y * pinData.Size.Height);
-            //tappedPin.Rotation = _rotation;
-            //tappedPin.Scale = _scale;
-            //tappedPin.IsVisible = true;
-            //tappedPin = null;
+
+            var customPin = new MapPin
+            {
+                Id = pinData.SelfId,
+                RelativeX = (float)pinData.Pos.X,
+                RelativeY = (float)pinData.Pos.Y,
+                IconPath = pinPath,
+                IsLockRotate = pinData.IsLockRotate,
+                IsCustomPin = pinData.IsCustomPin,
+                IsLockAutoScale = pinData.IsLockAutoScale,
+                Rotation = (float)_rotation,
+                PinScale = (float)_scale,
+                Anchor = pinData.Anchor
+            };
+
+            pinList.Add(customPin);
+
+            tappedPin = null;
         }
+        PlanImage.InvalidateSurface();
     }
 
     private async Task UpdatePinLocationAsync(Pin pin)
@@ -590,7 +594,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         {
             try
             {
-                var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+                var absoluteLayout = this.FindByName<AbsoluteLayout>("PlanView");
 
                 if (drawingView != null)
                 {
@@ -607,8 +611,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 drawingView.Opacity = 0;
                 absoluteLayout.Children.Add(drawingView);
 
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-                Microsoft.Maui.Controls.AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
+                AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
+                AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
 
                 IsToolButtonsVisible = true;
 
@@ -619,11 +623,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     lineWidth,
                     strokeStyle,
                     false,
-                    (float)planContainer.Rotation,
+                    (float)PlanImage.Rotation,
                     setDefaultMode
                 );
 
-                drawingController.InitialRotation = (float)planContainer.Rotation;
+                drawingController.InitialRotation = (float)PlanImage.Rotation;
 
                 drawingView.InvalidateSurface();
                 await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
@@ -750,11 +754,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         var cx = imageRect.MidX / Settings.DisplayDensity;
         var cy = imageRect.MidY / Settings.DisplayDensity;
-        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -planContainer.Rotation);
+        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.Rotation);
         double fx = cx + rotatedOffset.X;
         double fy = cy + rotatedOffset.Y;
-        var ox = ((fx - drawingView.Width / 2) / planContainer.Scale) / PlanImage.OriginalImageSize.Width;
-        var oy = ((fy - drawingView.Height / 2) / planContainer.Scale) / PlanImage.OriginalImageSize.Height;
+        var ox = ((fx - drawingView.Width / 2) / PlanImage.Scale) / PlanImage.OriginalImageSize.Width;
+        var oy = ((fy - drawingView.Height / 2) / PlanImage.Scale) / PlanImage.OriginalImageSize.Height;
 
         SetPin(
             new Point(PlanImage.CurrentPan.X + ox, PlanImage.CurrentPan.Y + oy),
@@ -762,13 +766,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             (int)imageRect.Width,
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
-            1 / planContainer.Scale / Settings.DisplayDensity,
+            1 / PlanImage.Scale / Settings.DisplayDensity,
             0,
             drawingController.CombinedDrawable.RectDrawable.Text,
             isOverwrite
         );
 
-        // Die ALTEN Dateien löschen
         if (isOverwrite)
         {
             try
@@ -794,7 +797,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
-        //doubleTappedPin?.IsVisible = true;
         tappedPin = null;
         drawingView?.InvalidateSurface();
     }
@@ -971,7 +973,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
     {
-        planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
@@ -987,14 +988,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
         if (File.Exists(filePath))
         {
-            //doubleTappedPin.IsVisible = false;
-            planContainer.IsPanningEnabled = true;
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
             await StartDrawing(false);
             ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale / Settings.DisplayDensity);
             drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
-            planContainer.Rotation = -thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
+            PlanImage.Rotation = -thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
             
             var style = drawingController.LoadedStyle;
             if (style != null)
@@ -1077,12 +1076,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         else
         {
             thisPlan.Pins[tappedPin.Id].IsLockRotate = true;
-            thisPlan.Pins[tappedPin.Id].PinRotation = Helper.NormalizeAngle360(-planContainer.Rotation);
+            thisPlan.Pins[tappedPin.Id].PinRotation = Helper.NormalizeAngle360(-PlanImage.Rotation);
             tappedPin.IsLockRotate = true;
-            tappedPin.Rotation = (float)Helper.NormalizeAngle360(-planContainer.Rotation);
+            tappedPin.Rotation = (float)Helper.NormalizeAngle360(-PlanImage.Rotation);
             RotateModeLabel.Text = AppResources.drehung_fixiert;
             RotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
-            PinRotateSlider.LowerValue = Helper.ToSliderValue(-planContainer.Rotation);
+            PinRotateSlider.LowerValue = Helper.ToSliderValue(-PlanImage.Rotation);
         }
 
         // save data to file
@@ -1091,7 +1090,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
+        var sliderValue = Math.Round(((RangeSlider)sender).LowerValue, 0);
 
         DegreesLabel.Text = $"{sliderValue}°";
         tappedPin.Rotation = (float)Helper.SliderToRotation(sliderValue);
@@ -1117,7 +1116,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         // save data to file
         GlobalJson.SaveToFile();
 
-        planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
@@ -1147,7 +1145,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         // save data to file
         GlobalJson.SaveToFile();
 
-        planContainer.IsPanningEnabled = true;
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
@@ -1180,6 +1177,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         // save data to file
         GlobalJson.SaveToFile();
+
+        PlanImage.InvalidateSurface();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
@@ -1204,7 +1203,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     break;
 
                 default:
-                    (Application.Current.Windows[0].Page as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
+                    (Shell.Current as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
                     Title = result.Result.NameEntry;
 
                     thisPlan.Name = result.Result.NameEntry;
@@ -1231,7 +1230,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result == null) return;
-        if (Application.Current.Windows[0].Page is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
 
@@ -1339,7 +1338,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         await AddPlan();
 
         // Thumbnail-Pfad in der Shell-CollectionView aktualisieren
-        if (Application.Current.Windows[0].Page is AppShell shell)
+        if (Shell.Current is AppShell shell)
         {
             var newThumbPath = Path.Combine(
                 Settings.DataDirectory,
@@ -1400,10 +1399,10 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnTitleChanged(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Entry entry) return;
+        if (sender is not Entry entry) return;
 
         // Titel speichern
-        (Application.Current.Windows[0].Page as AppShell)
+        (Shell.Current as AppShell)
             ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         thisPlan.Name = Title;
