@@ -61,4 +61,7 @@ internal class SettingsModel
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
     public List<StylePickerItem>? StyleTemplateItems { get; set; } // Liste der Stilvorlagen für den Stil-Editor
+    public int MaxTileCache { get; set; } // Maximale Anzahl der zwischengespeicherten Kartenkacheln
+    public int TileSize { get; set; } // Größe der Kartenkacheln
+    public int MaxZoomLevel { get; set; } // Anzahl der LOD-Stufen für die Kartenkacheln
 }

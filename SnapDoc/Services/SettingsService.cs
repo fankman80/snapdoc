@@ -162,6 +162,10 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial List<string> AppCameraTools { get; set; }
     [ObservableProperty] public partial List<string> IconCategories { get; set; }
     [ObservableProperty] public partial List<string> MapIcons { get; set; } = Settings.MapIcons;
+    [ObservableProperty] public partial int MaxTileCache { get; set; } = 100;
+    [ObservableProperty] public partial int TileSize { get; set; } = 1024;
+    [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
+
 
     // Lists
     [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
@@ -368,6 +372,9 @@ public partial class SettingsService : ObservableObject
             ColorList = ColorList,
             PriorityItems = PriorityItems,
             StyleTemplateItems = StyleTemplateItems,
+            MaxTileCache = MaxTileCache,
+            TileSize = TileSize,
+            MaxZoomLevel = MaxZoomLevel,
         };
         File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
     }
@@ -442,6 +449,9 @@ public partial class SettingsService : ObservableObject
             ColorList = settings.ColorList ?? ColorList;
             PriorityItems = settings.PriorityItems ?? PriorityItems;
             StyleTemplateItems = settings.StyleTemplateItems ?? StyleTemplateItems;
+            MaxTileCache = settings.MaxTileCache;
+            TileSize = settings.TileSize;
+            MaxZoomLevel = settings.MaxZoomLevel;
         }
         catch (Exception ex)
         {
@@ -512,5 +522,8 @@ public partial class SettingsService : ObservableObject
         ColorList = [.. defaultSettings.ColorList];
         PriorityItems = [.. defaultSettings.PriorityItems];
         StyleTemplateItems = [.. defaultSettings.StyleTemplateItems];
+        MaxTileCache = defaultSettings.MaxTileCache;
+        TileSize = defaultSettings.TileSize;
+        MaxZoomLevel = defaultSettings.MaxZoomLevel;
     }
 }

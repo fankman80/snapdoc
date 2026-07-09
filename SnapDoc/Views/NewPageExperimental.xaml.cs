@@ -110,6 +110,16 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         drawingController = new DrawingController(new TransformViewModel());
         thisPlan = GlobalJson.Data.Plans[planId];
 
+        WeakReferenceMessenger.Default.Register<PinPropertyChangedMessage>(this, (r, m) =>
+        {
+            var (pinId, isLockPosition) = m.Value;
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                var pin = pinList.FirstOrDefault(p => p.Id == pinId);
+                pin?.IsLockPosition = isLockPosition;
+            });
+        });
+
         WeakReferenceMessenger.Default.Register<PinDeletedMessage>(this, (r, m) =>
         {
             var pinId = m.Value;
@@ -171,7 +181,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     pin.IsLockRotate = pinData.IsLockRotate;
                     pin.Rotation = pinData.IsLockRotate
                         ? (float)pinData.PinRotation
-                        : (float)PlanImage.Rotation * -1 + (float)pinData.PinRotation;
+                        : (float)PlanImage.CurrentRotation * -1 + (float)pinData.PinRotation;
                     pin.PinScale = (float)pinData.PinScale;
 
                     var index = pinList.IndexOf(pin);
@@ -315,11 +325,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             RelativeY = (float)pinData.Pos.Y,
             IconPath = resolvedPath,
             IsLockRotate = pinData.IsLockRotate,
+            IsLockPosition = pinData.IsLockPosition,
             IsCustomPin = pinData.IsCustomPin,
             IsLockAutoScale = pinData.IsLockAutoScale,
             Rotation = pinData.IsLockRotate
                 ? (float)pinData.PinRotation
-                : (float)PlanImage.Rotation * -1 + (float)pinData.PinRotation,
+                : (float)PlanImage.CurrentRotation * -1 + (float)pinData.PinRotation,
             PinScale = (float)pinData.PinScale,
             Anchor = currentAnchor
         };
@@ -528,7 +539,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 GlobalJson.Data.CustomPinsPath,
                 _newPin);
 
-
             var customPin = new MapPin
             {
                 Id = pinData.SelfId,
@@ -536,6 +546,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 RelativeY = (float)pinData.Pos.Y,
                 IconPath = pinPath,
                 IsLockRotate = pinData.IsLockRotate,
+                IsLockPosition = pinData.IsLockPosition,
                 IsCustomPin = pinData.IsCustomPin,
                 IsLockAutoScale = pinData.IsLockAutoScale,
                 Rotation = (float)_rotation,
@@ -623,11 +634,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     lineWidth,
                     strokeStyle,
                     false,
-                    (float)PlanImage.Rotation,
+                    (float)PlanImage.CurrentRotation,
                     setDefaultMode
                 );
 
-                drawingController.InitialRotation = (float)PlanImage.Rotation;
+                drawingController.InitialRotation = (float)PlanImage.CurrentRotation;
 
                 drawingView.InvalidateSurface();
                 await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
@@ -754,19 +765,17 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         var cx = imageRect.MidX / Settings.DisplayDensity;
         var cy = imageRect.MidY / Settings.DisplayDensity;
-        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.Rotation);
-        double fx = cx + rotatedOffset.X;
-        double fy = cy + rotatedOffset.Y;
-        var ox = ((fx - drawingView.Width / 2) / PlanImage.Scale) / PlanImage.OriginalImageSize.Width;
-        var oy = ((fy - drawingView.Height / 2) / PlanImage.Scale) / PlanImage.OriginalImageSize.Height;
+        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
+        SKPoint screenPoint = new((float)(cx + rotatedOffset.X), (float)(cy + rotatedOffset.Y));
+        Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(screenPoint);
 
         SetPin(
-            new Point(PlanImage.CurrentPan.X + ox, PlanImage.CurrentPan.Y + oy),
+            relativePos,
             pngFileName,
             (int)imageRect.Width,
             (int)imageRect.Height,
             new SKColor(SelectedBorderColor.ToUint()),
-            1 / PlanImage.Scale / Settings.DisplayDensity,
+            1 / PlanImage.CurrentScale / Settings.DisplayDensity,
             0,
             drawingController.CombinedDrawable.RectDrawable.Text,
             isOverwrite
@@ -988,12 +997,13 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
         if (File.Exists(filePath))
         {
+            pinList.Remove(tappedPin);
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
             await StartDrawing(false);
             ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale / Settings.DisplayDensity);
             drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2 * Settings.DisplayDensity), (float)(this.Height / 2 * Settings.DisplayDensity)));
-            PlanImage.Rotation = -thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
+            PlanImage.CurrentRotation = (float)-thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
             
             var style = drawingController.LoadedStyle;
             if (style != null)
@@ -1076,12 +1086,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         else
         {
             thisPlan.Pins[tappedPin.Id].IsLockRotate = true;
-            thisPlan.Pins[tappedPin.Id].PinRotation = Helper.NormalizeAngle360(-PlanImage.Rotation);
+            thisPlan.Pins[tappedPin.Id].PinRotation = Helper.NormalizeAngle360(-PlanImage.CurrentRotation);
             tappedPin.IsLockRotate = true;
-            tappedPin.Rotation = (float)Helper.NormalizeAngle360(-PlanImage.Rotation);
+            tappedPin.Rotation = (float)Helper.NormalizeAngle360(-PlanImage.CurrentRotation);
             RotateModeLabel.Text = AppResources.drehung_fixiert;
             RotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
-            PinRotateSlider.LowerValue = Helper.ToSliderValue(-PlanImage.Rotation);
+            PinRotateSlider.LowerValue = Helper.ToSliderValue(-PlanImage.CurrentRotation);
         }
 
         // save data to file
@@ -1103,7 +1113,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnRotateSliderDragCompleted(object sender, EventArgs e)
     {
-        var sliderValue = Helper.SliderToRotation(Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0));
+        var sliderValue = Helper.SliderToRotation(Math.Round(((RangeSlider)sender).LowerValue, 0));
 
         if (sliderValue != 0)
             thisPlan.Pins[tappedPin.Id].IsLockRotate = true;
@@ -1124,7 +1134,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnResizeSliderValueChanged(object sender, EventArgs e)
     {
-        var sliderValue = Math.Round(((SnapDoc.Controls.RangeSlider)sender).LowerValue, 0);
+        var sliderValue = Math.Round(((RangeSlider)sender).LowerValue, 0);
         double scaleValue = sliderValue / 100.0;
 
         if (tappedPin != null && thisPlan.Pins.TryGetValue(tappedPin.Id, out var pinData))

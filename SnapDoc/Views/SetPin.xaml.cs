@@ -192,6 +192,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
         // save data to file
         GlobalJson.SaveToFile();
 
+        // Wird nur aufgerufen wenn Experimental Features aktiviert sind
+        if (SettingsService.Instance.IsExperimentalFunctions)
+            WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, Pin.IsLockPosition));
+
         await Shell.Current.GoToAsync("..");
     }
 

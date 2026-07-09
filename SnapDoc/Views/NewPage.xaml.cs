@@ -1002,7 +1002,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             isOverwrite
         );
 
-        // Die ALTEN Dateien löschen
         if (isOverwrite)
         {
             try
