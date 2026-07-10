@@ -765,7 +765,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         SKPoint rawPoint = new((float)imageRect.MidX, (float)imageRect.MidY);
         var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, PlanImage.CurrentRotation);
-        SKPoint anchorPoint = new((float)(rawPoint.X - rotatedOffset.X), (float)(rawPoint.Y - rotatedOffset.Y));
+        SKPoint anchorPoint = new((float)((rawPoint.X - rotatedOffset.X) * Settings.DisplayDensity), (float)((rawPoint.Y - rotatedOffset.Y) * Settings.DisplayDensity));
         Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(anchorPoint);
 
         SetPin(
