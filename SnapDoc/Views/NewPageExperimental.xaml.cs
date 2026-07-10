@@ -763,9 +763,10 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
         drawingController.SaveToFile(dataPath);
 
-        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
-        SKPoint screenPoint = new((float)(imageRect.MidX + rotatedOffset.X), (float)(imageRect.MidY + rotatedOffset.Y));
-        Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(screenPoint);
+        SKPoint rawPoint = new((float)imageRect.MidX, (float)imageRect.MidY);
+        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, PlanImage.CurrentRotation);
+        SKPoint anchorPoint = new((float)(rawPoint.X - rotatedOffset.X), (float)(rawPoint.Y - rotatedOffset.Y));
+        Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(anchorPoint);
 
         SetPin(
             relativePos,

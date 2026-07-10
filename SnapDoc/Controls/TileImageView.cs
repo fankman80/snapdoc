@@ -167,11 +167,11 @@ public partial class TileImageView : ContentView
         {
             IsRunning = false,
             IsVisible = false,
-            HorizontalOptions = LayoutOptions.Center,
-            VerticalOptions = LayoutOptions.Center,
-            BackgroundColor = Colors.White,
-            Opacity = 0.5,
-            Color = Colors.Black,           
+            HorizontalOptions = LayoutOptions.End,
+            VerticalOptions = LayoutOptions.Start,
+            Margin = new Thickness(16),
+            Opacity = 0.6,
+            Color = Colors.Black
         };
 
         _layoutGrid.Children.Add(_canvasView);
@@ -193,49 +193,47 @@ public partial class TileImageView : ContentView
             return;
         }
 
-        _isGenerating = true;
         ClearCache();
 
         try
         {
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-
-            CleanupOldTileFolders(imagePath, TileSize);
-
-            _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{TileSize}");
-
-            bool tilesExist = Directory.Exists(_computedTileFolder) &&
-                              Directory.GetFiles(_computedTileFolder, "*.png", SearchOption.AllDirectories).Length > 0;
-
-            if (!tilesExist)
-            {
-                _loadingIndicator.IsVisible = true;
-                _loadingIndicator.IsRunning = true;
-                _canvasView.IsVisible = false;
-
-                await Task.Run(() => GenerateTilePyramidInternal(imagePath, _computedTileFolder, MaxZoomLevel, TileSize, token), token);
-            }
-
-            token.ThrowIfCancellationRequested();
-
-            _loadingIndicator.IsRunning = false;
-            _loadingIndicator.IsVisible = false;
-            _canvasView.IsVisible = true;
-
             using (var codec = SKCodec.Create(imagePath))
             {
                 if (codec != null)
                     OriginalImageSize = new SKSize(codec.Info.Width, codec.Info.Height);
             }
 
+            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
+            CleanupOldTileFolders(imagePath, TileSize);
+
+            _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{TileSize}");
             _scale = 1.0f;
             _panX = 0f;
             _panY = 0f;
             _rotationDegrees = 0f;
-
             CurrentScale = _scale;
             CurrentPan = new SKPoint(_panX, _panY);
             CurrentRotation = _rotationDegrees;
+            _canvasView.IsVisible = true;
+            _isGenerating = false;
+
+            bool tilesExist = Directory.Exists(_computedTileFolder) &&
+                              Directory.GetFiles(_computedTileFolder, "*.webp", SearchOption.AllDirectories).Length > 0;
+
+            if (!tilesExist)
+            {
+                _loadingIndicator.IsVisible = true;
+                _loadingIndicator.IsRunning = true;
+
+                await Task.Run(() => GenerateTilePyramidInternal(
+                    imagePath,
+                    _computedTileFolder,
+                    MaxZoomLevel,
+                    TileSize,
+                    token,
+                    () => MainThread.BeginInvokeOnMainThread(() => _canvasView.InvalidateSurface())
+                ), token);
+            }
         }
         catch (OperationCanceledException)
         {
@@ -244,17 +242,14 @@ public partial class TileImageView : ContentView
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Hintergrundbildes: {ex.Message}");
-            _loadingIndicator.IsRunning = false;
-            _loadingIndicator.IsVisible = false;
-            _canvasView.IsVisible = true;
         }
         finally
         {
-            if (!token.IsCancellationRequested)
-            {
-                _isGenerating = false;
-                _canvasView.InvalidateSurface();
-            }
+            _loadingIndicator.IsRunning = false;
+            _loadingIndicator.IsVisible = false;
+            _canvasView.IsVisible = true;
+            _isGenerating = false;
+            _canvasView.InvalidateSurface();
         }
     }
 
@@ -373,7 +368,7 @@ public partial class TileImageView : ContentView
 
                     if (_loadingTiles.Add(cacheKey))
                     {
-                        string tilePath = Path.Combine(xFolder, $"{y}.png");
+                        string tilePath = Path.Combine(xFolder, $"{y}.webp");
 
                         _ = Task.Run(() =>
                         {
@@ -499,7 +494,7 @@ public partial class TileImageView : ContentView
         _pinIconCache.Clear();
     }
 
-    private static void GenerateTilePyramidInternal(string sourceImagePath, string outputFolder, int maxZoomLevels, int tileSize, CancellationToken token)
+    private static void GenerateTilePyramidInternal(string sourceImagePath, string outputFolder, int maxZoomLevels, int tileSize, CancellationToken token, Action onLevelGenerated = null)
     {
         using var codec = SKCodec.Create(sourceImagePath);
         if (codec == null) return;
@@ -531,7 +526,8 @@ public partial class TileImageView : ContentView
 
                     string tileDirectory = Path.Combine(outputFolder, zoom.ToString(), x.ToString());
                     Directory.CreateDirectory(tileDirectory);
-                    string tilePath = Path.Combine(tileDirectory, $"{y}.png");
+
+                    string tilePath = Path.Combine(tileDirectory, $"{y}.webp");
 
                     int srcX = x * tileSize;
                     int srcY = y * tileSize;
@@ -548,11 +544,12 @@ public partial class TileImageView : ContentView
                     }
 
                     using var image = SKImage.FromBitmap(tileBitmap);
-                    using var data = image.Encode(SKEncodedImageFormat.Png, 90);
+                    using var data = image.Encode(SKEncodedImageFormat.Webp, 90);
                     using var stream = File.OpenWrite(tilePath);
                     data.SaveTo(stream);
                 }
             }
+            onLevelGenerated?.Invoke();
         }
     }
 

@@ -538,11 +538,11 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Experimentelle Funktionen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Experimentelles Rendering ähnelt.
         /// </summary>
-        internal static string experimentelle_funktionen {
+        internal static string experimentelles_rendering {
             get {
-                return ResourceManager.GetString("experimentelle_funktionen", resourceCulture);
+                return ResourceManager.GetString("experimentelles_rendering", resourceCulture);
             }
         }
         

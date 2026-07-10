@@ -326,7 +326,7 @@
                                                             SelectedItem="{Binding SelectedAppLanguage}"/>
                                 <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
                             </Grid>
-                            <controls:Switch LabelText="{x:Static res:AppResources.experimentelle_funktionen}"
+                            <controls:Switch LabelText="{x:Static res:AppResources.experimentelles_rendering}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 IsToggled="{Binding IsExperimentalFunctions}"
                                 HorizontalOptions="Start"
