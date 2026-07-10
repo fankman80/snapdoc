@@ -37,12 +37,10 @@ public partial class App : Application
 
     private async static Task InitializeAsync()
     {
-        // Template-Dateien und Konfigurationsdatei kopieren
         Directory.CreateDirectory(Settings.TemplateDirectory);
 
         var copyTasks = new List<Task>();
 
-        // Hilfsfunktion zum sicheren Kopieren
         static async Task SafeCopy(string fileName, string targetPath)
         {
             try

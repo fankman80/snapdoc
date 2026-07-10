@@ -766,10 +766,23 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
         drawingController.SaveToFile(dataPath);
 
-        SKPoint rawPoint = new((float)imageRect.MidX, (float)imageRect.MidY);
-        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, PlanImage.CurrentRotation);
-        SKPoint anchorPoint = new((float)(rawPoint.X - rotatedOffset.X), (float)(rawPoint.Y - rotatedOffset.Y));
-        Point relativePos = PlanImage.GetRelativeFactorFromScreenPoint(anchorPoint);
+        float centerX = (float)(drawingView.Width * Settings.DisplayDensity) / 2f;
+        float centerY = (float)(drawingView.Height * Settings.DisplayDensity) / 2f;
+        float panDx = centerX - PlanImage.CurrentPan.X;
+        float panDy = centerY - PlanImage.CurrentPan.Y;
+        float negRad = (float)(-PlanImage.CurrentRotation * Math.PI / 180.0);
+        float cosNeg = (float)Math.Cos(negRad);
+        float sinNeg = (float)Math.Sin(negRad);
+        float centerPixelX = (panDx * cosNeg - panDy * sinNeg) / PlanImage.CurrentScale;
+        float centerPixelY = (panDx * sinNeg + panDy * cosNeg) / PlanImage.CurrentScale;
+        double centerFactorX = centerPixelX / PlanImage.OriginalImageSize.Width;
+        double centerFactorY = centerPixelY / PlanImage.OriginalImageSize.Height;
+        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
+        float fx = (float)imageRect.MidX + (float)(rotatedOffset.X * Settings.DisplayDensity)- centerX;
+        float fy = (float)imageRect.MidY + (float)(rotatedOffset.Y * Settings.DisplayDensity)- centerY;
+        double ox = (fx / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Width;
+        double oy = (fy / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Height;
+        Point relativePos = new(centerFactorX + ox, centerFactorY + oy);
 
         SetPin(
             relativePos,

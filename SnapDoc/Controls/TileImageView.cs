@@ -46,6 +46,7 @@ public partial class TileImageView : ContentView
     private const int LongPressTimeoutMs = 600;
     private readonly Dictionary<string, SKBitmap> _pinIconCache = [];
     private MapPin _lastTappedPin = null;
+    private List<MapPin> _sortedPins = [];
 
 #if WINDOWS
     private bool _isRightMouseRotating = false;
@@ -97,6 +98,7 @@ public partial class TileImageView : ContentView
         if (newValue is INotifyCollectionChanged newCollection)
             newCollection.CollectionChanged += control.OnPinsCollectionChanged;
 
+        control.UpdateSortedPins();
         control._canvasView?.InvalidateSurface();
     }
 
@@ -588,7 +590,7 @@ public partial class TileImageView : ContentView
             float t = viewTop - padding;
             float b = viewBottom + padding;
 
-            foreach (var pin in Pins)
+            foreach (var pin in _sortedPins)
             {
                 SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
                 if (pinBitmap == null) continue;
@@ -912,6 +914,7 @@ public partial class TileImageView : ContentView
 
     private void OnPinsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
+        UpdateSortedPins();
         _canvasView?.InvalidateSurface();
     }
 
@@ -1012,6 +1015,16 @@ public partial class TileImageView : ContentView
                 }
             }
         }
+    }
+
+    private void UpdateSortedPins()
+    {
+        if (Pins == null)
+        {
+            _sortedPins.Clear();
+            return;
+        }
+        _sortedPins = Pins.OrderByDescending(p => p.PinScale).ToList();
     }
 
     private static void GenerateTilePyramidInternal(string sourceImagePath, string outputFolder, int maxZoomLevels, int tileSize, CancellationToken token, Action onLevelGenerated = null)
@@ -1182,8 +1195,10 @@ public partial class TileImageView : ContentView
     {
         if (Pins == null || OriginalImageSize == SKSize.Empty) return null;
 
-        foreach (var pin in Pins.Reverse())
+        for (int i = _sortedPins.Count - 1; i >= 0; i--)
         {
+            var pin = _sortedPins[i];
+
             SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
             if (pinBitmap == null) continue;
 
