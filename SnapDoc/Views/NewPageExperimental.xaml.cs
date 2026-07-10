@@ -777,9 +777,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         float centerPixelY = (panDx * sinNeg + panDy * cosNeg) / PlanImage.CurrentScale;
         double centerFactorX = centerPixelX / PlanImage.OriginalImageSize.Width;
         double centerFactorY = centerPixelY / PlanImage.OriginalImageSize.Height;
-        var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
-        float fx = (float)imageRect.MidX + (float)(rotatedOffset.X * Settings.DisplayDensity)- centerX;
-        float fy = (float)imageRect.MidY + (float)(rotatedOffset.Y * Settings.DisplayDensity)- centerY;
+        //var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
+        //float fx = (float)imageRect.MidX + (float)(rotatedOffset.X * Settings.DisplayDensity)- centerX;
+        //float fy = (float)imageRect.MidY + (float)(rotatedOffset.Y * Settings.DisplayDensity)- centerY;
+        float fx = (float)imageRect.MidX - centerX;
+        float fy = (float)imageRect.MidY - centerY;
         double ox = (fx / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Width;
         double oy = (fy / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Height;
         Point relativePos = new(centerFactorX + ox, centerFactorY + oy);
