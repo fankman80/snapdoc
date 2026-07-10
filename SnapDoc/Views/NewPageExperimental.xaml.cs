@@ -116,7 +116,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 var pin = pinList.FirstOrDefault(p => p.Id == pinId);
-                pin?.IsLockPosition = isLockPosition;
+                if (pin != null)
+                    pin?.IsLockPosition = isLockPosition;
             });
         });
 
@@ -246,9 +247,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             var pinId = value2 as string;
             pinZoom = value2 as string;
 
-            var pin = pinList.FirstOrDefault(p => p.Id == pinId);
-            if (pin != null && !isFirstLoad)
+            if (!isFirstLoad)
+            {
                 AddPin(pinId);
+                PlanImage.InvalidateSurface();
+            }
         }
 
         query.Clear();
