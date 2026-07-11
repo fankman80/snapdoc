@@ -8,10 +8,6 @@ namespace SnapDoc.DrawingTool;
 
 public partial class DrawingController(TransformViewModel transformVm) : IDisposable
 {
-    public CombinedDrawable? CombinedDrawable { get; private set; }
-    public DrawingStyleDto? LoadedStyle { get; private set; }
-    public DrawMode DrawMode { get; set; } = DrawMode.None;
-    public float InitialRotation = 0f;
     private SKCanvasView? canvasView;
     private int? activeIndex = null;
     private DateTime? lastClickTime;
@@ -27,7 +23,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private SKPoint? ovalResizeAnchor;
     private SKPoint? arrowResizeAnchor;
 
-    // BoundingBox
+    public CombinedDrawable? CombinedDrawable { get; private set; }
+    public DrawingStyleDto? LoadedStyle { get; private set; }
+    public DrawMode DrawMode { get; set; } = DrawMode.None;
+    public float InitialRotation = 0f;
+    public double ViewRotation { get => canvasView?.Rotation ?? 0; set { canvasView?.Rotation = value; }}
     public float MinX { get; private set; }
     public float MinY { get; private set; }
     public float MaxX { get; private set; }

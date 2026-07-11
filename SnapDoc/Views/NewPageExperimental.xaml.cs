@@ -940,27 +940,32 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     {
         if (!thisPlan.Pins[tappedPin.Id].IsCustomPin) return;
 
-        // Activate CustomPin Edit Mode
         var file = Path.GetFileNameWithoutExtension(thisPlan.Pins[tappedPin.Id].PinIcon) + ".data";
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
+
         if (File.Exists(filePath))
         {
+            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale / Settings.DisplayDensity);
             pinList.Remove(tappedPin);
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
+
             await StartDrawing(false);
-            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale);
-            drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2), (float)(this.Height / 2)));
-            PlanImage.CurrentRotation = (float)-thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
-            
+
+            drawingController.LoadFromFile(filePath, new SKPoint(
+                (float)(this.Width / 2 * Settings.DisplayDensity),
+                (float)(this.Height / 2 * Settings.DisplayDensity)));
+
+            drawingController.ViewRotation = thisPlan.Pins[tappedPin.Id].PinRotation - drawingController.InitialRotation;
+
             var style = drawingController.LoadedStyle;
             if (style != null)
             {
                 SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
                 SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
 
-                var textColor = SKColors.Black; // Fallback, falls kein Text-Shape aktiv ist
-                bool isCloud = false;           // Fallback für den Wolken-Status
+                var textColor = SKColors.Black;
+                bool isCloud = false;
 
                 if (drawingController.CombinedDrawable != null)
                 {
