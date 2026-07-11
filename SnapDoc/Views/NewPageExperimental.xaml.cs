@@ -953,8 +953,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             await StartDrawing(false);
 
             drawingController.LoadFromFile(filePath, new SKPoint(
-                (float)(this.Width / 2 * Settings.DisplayDensity + SettingsService.Instance.CustomPinOffset.X),
-                (float)(this.Height / 2 * Settings.DisplayDensity + SettingsService.Instance.CustomPinOffset.Y)));
+                (float)(this.Width / 2 + SettingsService.Instance.CustomPinOffset.X),
+                (float)(this.Height / 2 + SettingsService.Instance.CustomPinOffset.Y)));
 
             drawingController.ViewRotation = thisPlan.Pins[tappedPin.Id].PinRotation - drawingController.InitialRotation;
 
