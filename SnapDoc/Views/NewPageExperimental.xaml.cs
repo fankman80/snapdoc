@@ -945,7 +945,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         if (File.Exists(filePath))
         {
-            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale / Settings.DisplayDensity);
+            ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale);
             pinList.Remove(tappedPin);
             PinEditBorder.IsVisible = false;
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
