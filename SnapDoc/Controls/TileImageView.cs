@@ -1024,7 +1024,11 @@ public partial class TileImageView : ContentView
             _sortedPins.Clear();
             return;
         }
-        _sortedPins = [.. Pins.OrderByDescending(p => p.PinScale)];
+
+        _sortedPins = [.. Pins
+        .OrderByDescending(p => p.IsCustomPin)
+        .ThenByDescending(p => p.PinScale)
+        ];
     }
 
     private static void GenerateTilePyramidInternal(string sourceImagePath, string outputFolder, int maxZoomLevels, int tileSize, CancellationToken token, Action onLevelGenerated = null)

@@ -1542,7 +1542,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         thisPlan.File = imagefile;
 
-        PlanContainer.SizeChanged += OnPlanContainerReady;
+        PlanContainer.SizeChanged  += (object sender, EventArgs e) => ImageFit(null, null);
         AddPlan();
 
         // Thumbnail-Pfad in der Shell-CollectionView aktualisieren
@@ -1590,12 +1590,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // Daten speichern
         GlobalJson.SaveToFile();
-    }
-
-    private void OnPlanContainerReady(object sender, EventArgs e)
-    {
-        PlanContainer.SizeChanged -= OnPlanContainerReady;
-        ImageFit(null, null);
     }
 
     static Point RotatePin(Point oldPos, int angle)

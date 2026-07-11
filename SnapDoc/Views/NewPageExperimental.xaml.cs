@@ -48,60 +48,16 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private float cloudInciseDeg = 15;
     private bool _isShowingPopup = false;
     private string planImageSource = "";
-
-    public string PlanImageSource
-    {
-        get => planImageSource;
-        set
-        {
-            planImageSource = value;
-            OnPropertyChanged();
-        }
-    }
-
     private Color selectedBorderColor = new(0, 153, 0, 255);
-    public Color SelectedBorderColor
-    {
-        get => selectedBorderColor;
-        set
-        {
-            selectedBorderColor = value;
-            OnPropertyChanged();
-        }
-    }
-
     private Color selectedFillColor = new(202, 255, 150, 128);
-    public Color SelectedFillColor
-    {
-        get => selectedFillColor;
-        set
-        {
-            selectedFillColor = value;
-            OnPropertyChanged();
-        }
-    }
-
     private Color selectedTextColor = new(0, 0, 0, 255);
-    public Color SelectedTextColor
-    {
-        get => selectedTextColor;
-        set
-        {
-            selectedTextColor = value;
-            OnPropertyChanged();
-        }
-    }
-
     private bool isToolButtonsVisible = false;
-    public bool IsToolButtonsVisible
-    {
-        get => isToolButtonsVisible;
-        set
-        {
-            isToolButtonsVisible = value;
-            OnPropertyChanged();
-        }
-    }
+
+    public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
+    public Color SelectedBorderColor { get => selectedBorderColor; set { selectedBorderColor = value; OnPropertyChanged(); }}
+    public Color SelectedFillColor { get => selectedFillColor; set { selectedFillColor = value; OnPropertyChanged(); }}
+    public Color SelectedTextColor { get => selectedTextColor; set { selectedTextColor = value; OnPropertyChanged(); }}
+    public bool IsToolButtonsVisible { get => isToolButtonsVisible; set { isToolButtonsVisible = value; OnPropertyChanged(); }}
 
     public NewPageExperimental(string _planId)
     {
@@ -253,7 +209,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 PlanImage.InvalidateSurface();
             }
         }
-
         query.Clear();
     }
 
@@ -317,9 +272,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             }
         }
         else
-        {
             resolvedPath = pinIcon;
-        }
 
         return new MapPin
         {
@@ -587,10 +540,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         pinZoom = null;
     }
 
-    private void ImageFit(object sender, EventArgs e)
-    {
-        PlanImage.ImageFit();
-    }
+    private void ImageFit(object sender, EventArgs e) => PlanImage.ImageFit();
 
     private async Task StartDrawing(bool setDefaultMode = true)
     {
@@ -656,8 +606,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         });
     }
 
-    private async void DrawingClicked(object sender, EventArgs e)
-        => await StartDrawing();
+    private async void DrawingClicked(object sender, EventArgs e) => await StartDrawing();
 
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
@@ -725,10 +674,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         drawingView?.InvalidateSurface();
     }
 
-    private void EraseClicked(object sender, EventArgs e)
-    {
-        drawingController.Reset();
-    }
+    private void EraseClicked(object sender, EventArgs e) => drawingController.Reset();
 
     private async void CheckClicked(object sender, EventArgs e)
     {
@@ -777,9 +723,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         float centerPixelY = (panDx * sinNeg + panDy * cosNeg) / PlanImage.CurrentScale;
         double centerFactorX = centerPixelX / PlanImage.OriginalImageSize.Width;
         double centerFactorY = centerPixelY / PlanImage.OriginalImageSize.Height;
-        //var rotatedOffset = RotateOffset(SettingsService.Instance.CustomPinOffset, -PlanImage.CurrentRotation);
-        //float fx = (float)imageRect.MidX + (float)(rotatedOffset.X * Settings.DisplayDensity)- centerX;
-        //float fy = (float)imageRect.MidY + (float)(rotatedOffset.Y * Settings.DisplayDensity)- centerY;
         float fx = (float)imageRect.MidX - centerX;
         float fy = (float)imageRect.MidY - centerY;
         double ox = (fx / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Width;
@@ -825,18 +768,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
         tappedPin = null;
         drawingView?.InvalidateSurface();
-    }
-
-    static Point RotateOffset(Point offset, double angleDeg)
-    {
-        var rad = angleDeg * Math.PI / 180.0;
-        var cos = Math.Cos(rad);
-        var sin = Math.Sin(rad);
-
-        return new Point(
-            offset.X * cos - offset.Y * sin,
-            offset.X * sin + offset.Y * cos
-        );
     }
 
     private void RemoveDrawingView()
@@ -1019,7 +950,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             SettingsService.Instance.IsPinPlaceBtnManualHide = false;
             await StartDrawing(false);
             ZoomToPin(tappedPin.Id, 1 / thisPlan.Pins[tappedPin.Id].PinScale);
-            drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2), (float)(this.Height / 2 * Settings.DisplayDensity)));
+            drawingController.LoadFromFile(filePath, new SKPoint((float)(this.Width / 2), (float)(this.Height / 2)));
             PlanImage.CurrentRotation = (float)-thisPlan.Pins[tappedPin.Id].PinRotation + drawingController.InitialRotation;  
             
             var style = drawingController.LoadedStyle;
@@ -1403,11 +1334,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         // Daten speichern
         GlobalJson.SaveToFile();
-    }
-
-    private void OnPlanContainerReady(object sender, EventArgs e)
-    {
-        ImageFit(null, null);
     }
 
     static Point RotatePin(Point oldPos, int angle)
