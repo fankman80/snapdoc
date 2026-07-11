@@ -13,7 +13,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/neo.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/theme/idea.min.css">
 
-
     <!-- CodeMirror JS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/codemirror.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.14/mode/javascript/javascript.min.js"></script>
@@ -41,6 +40,7 @@
         }
 
         button, select {
+            height: 32px;
             background: #999999;
             border: none;
             color: white;
@@ -51,8 +51,11 @@
         }
 
         #btnUndo, #btnRedo {
+            height: 32px;
             font-weight: bold;
-            font-size: 20px; 
+            font-size: 20px;
+            padding: 2px 12px;
+            line-height: 1;
         }
 
             button:hover, select:hover {
@@ -78,8 +81,8 @@
 </head>
 <body>
     <div id="toolbar">
-        <button id="btnUndo" onclick="editor.undo()">↩</button>
-        <button id="btnRedo" onclick="editor.redo()">↪</button>
+        <button id="btnUndo" onclick="editor.undo()">🡄</button>
+        <button id="btnRedo" onclick="editor.redo()">🡆</button>
         <button id="btnFormat" onclick="formatJson()">@Formatieren@</button>
         <button id="btnValidate" onclick="validateContent()">@Validieren@</button>
         <select id="themeSelector" onchange="changeTheme(this.value)">
