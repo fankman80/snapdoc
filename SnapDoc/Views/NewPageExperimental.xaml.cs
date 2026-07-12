@@ -630,7 +630,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             2 => DrawMode.Poly,
             3 => DrawMode.Arrow,
             4 => DrawMode.Free,
-            _ => DrawMode.Rect 
+            _ => DrawMode.Rect
         };
 
         SetDrawMode(mode);
@@ -753,7 +753,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
             }
         }
-        
+
         Cleanup();
     }
 
@@ -819,8 +819,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     {
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
-        
-        _isShowingPopup = true;        
+
+        _isShowingPopup = true;
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
         _isShowingPopup = false;
 
@@ -881,8 +881,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
 
         var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
-        
-        _isShowingPopup = true;        
+
+        _isShowingPopup = true;
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
         _isShowingPopup = false;
 
@@ -1132,7 +1132,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         {
             snapValue = (int)Math.Round(PinRotateSlider.LowerValue * 4 / 360, 0) * 90;
         }
-        
+
         PinRotateSlider.LowerValue = snapValue;
         DegreesLabel.Text = $"{snapValue}°";
         tappedPin.Rotation = (float)Helper.SliderToRotation(snapValue);

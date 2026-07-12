@@ -26,6 +26,8 @@ public partial class TileImageView : ContentView
     private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
     private SKPoint _touchStartPoint;
     private const float ClickThreshold = 15f;
+    private bool _hasDraggedPin = false;
+    private DateTime _touchStartTime;
     private MapPin _draggedPin = null;
     private string _pendingPinId = null;
     private double? _pendingZoomFactor = null;
@@ -644,6 +646,8 @@ public partial class TileImageView : ContentView
                 if (_activeTouches.Count == 1)
                 {
                     _touchStartPoint = e.Location;
+                    _touchStartTime = DateTime.UtcNow;
+                    _hasDraggedPin = false;
                     _isDoubleTapAction = false;
 
                     _draggedPin = GetPinAtPosition(e.Location);
@@ -716,6 +720,8 @@ public partial class TileImageView : ContentView
 
                 if (_draggedPin != null && _activeTouches.Count == 1)
                 {
+                    if (SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
+                        _hasDraggedPin = true;
                     UpdateDraggedPinPosition(e.Location);
                     shouldInvalidate = true;
                 }
@@ -790,7 +796,11 @@ public partial class TileImageView : ContentView
                     break;
                 }
 
-                if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold)
+                bool isInsideThreshold = SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold;
+                bool isQuickTap = (DateTime.UtcNow - _touchStartTime).TotalMilliseconds < 300;
+                bool isTap = isInsideThreshold && !_hasDraggedPin && isQuickTap;
+
+                if (_activeTouches.Count == 1 && isTap)
                 {
                     var now = DateTime.UtcNow;
                     double elapsed = (now - _lastTapTime).TotalMilliseconds;
@@ -843,12 +853,12 @@ public partial class TileImageView : ContentView
                         }
                     }
                 }
-                else if (_draggedPin != null && SKPoint.Distance(_touchStartPoint, e.Location) >= ClickThreshold)
+                else if (_draggedPin != null)
                     PinMoved?.Invoke(this, _draggedPin);
 
                 if (_draggedPin != null)
                 {
-                    if (SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold)
+                    if (isTap)
                     {
                         _draggedPin.RelativeX = _originalPinX;
                         _draggedPin.RelativeY = _originalPinY;
@@ -869,12 +879,14 @@ public partial class TileImageView : ContentView
                 _longPressCts?.Cancel();
                 _isDoubleTapAction = false;
                 _isLongPressActive = false;
+
                 if (_draggedPin != null)
                 {
                     _draggedPin.RelativeX = _originalPinX;
                     _draggedPin.RelativeY = _originalPinY;
                     _draggedPin = null;
                 }
+
                 _activeTouches.Remove(e.Id);
                 _canvasView.InvalidateSurface();
                 break;
