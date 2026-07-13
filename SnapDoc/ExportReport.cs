@@ -19,6 +19,12 @@ public partial class ExportReport
 {
     [GeneratedRegex(@"\$\{(?<type>title_image|plan_images|pin_fotoList|pin_posImage|pin_posIcon)(?:/(?<w>\d+))?(?:/(?<h>\d+))?\}")]
     private static partial Regex UniversalImageRegex();
+
+    [GeneratedRegex(@"\$\{creation_date(?:/(?<format>[^}]+))?\}")]
+    private static partial Regex CreationDateRegex();
+
+    [GeneratedRegex(@"\$\{(?<type>pin_captureTime|pin_captureDate)(?:/(?<format>[^}]+))?\}")]
+    private static partial Regex PinDateTimeRegex();
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
     private static readonly Dictionary<string, string> imageRelationshipIds = [];
     private static string storeItemId;
@@ -37,13 +43,12 @@ public partial class ExportReport
         // Platzhalter
         Dictionary<string, string> placeholders = new()
         {
-            {"${client_name}", GlobalJson.Data.Client_name.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${object_address}", GlobalJson.Data.Object_address.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${working_title}", GlobalJson.Data.Working_title.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${project_nr}", GlobalJson.Data.Project_nr.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${object_name}", GlobalJson.Data.Object_name.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
-            {"${creation_date}", GlobalJson.Data.Creation_date.Date.ToString("D")},
-            {"${project_manager}", GlobalJson.Data.Project_manager.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}")},
+            {"${client_name}", GlobalJson.Data.Client_name.ToLinebreakPlaceholder()},
+            {"${object_address}", GlobalJson.Data.Object_address.ToLinebreakPlaceholder()},
+            {"${working_title}", GlobalJson.Data.Working_title.ToLinebreakPlaceholder()},
+            {"${project_nr}", GlobalJson.Data.Project_nr.ToLinebreakPlaceholder()},
+            {"${object_name}", GlobalJson.Data.Object_name.ToLinebreakPlaceholder()},
+            {"${project_manager}", GlobalJson.Data.Project_manager.ToLinebreakPlaceholder()},
             {"${title_image/", "${title_image/"}, 
             {"${plan_indexes}", "${plan_indexes}"},
             {"${plan_images/", "${plan_images/"},
@@ -58,8 +63,8 @@ public partial class ExportReport
             {"${pin_priority}", "${pin_priority}"},
             {"${pin_geolocWGS84}", "${pin_geolocWGS84}"},
             {"${pin_geolocCH1903}", "${pin_geolocCH1903}"},
-            {"${pin_captureTime}", "${pin_captureTime}"},
-            {"${pin_captureDate}", "${pin_captureDate}"},
+            {"${pin_captureTime}", "${pin_captureTime"},
+            {"${pin_captureDate}", "${pin_captureDate"},
         };
 
         // create a list with all icons, each icon only one times
@@ -81,6 +86,35 @@ public partial class ExportReport
 
         using (WordprocessingDocument wordDoc = WordprocessingDocument.Open(memoryStream, true))
         {
+            List<Paragraph> allParagraphs = [.. wordDoc.MainDocumentPart.Document.Descendants<Paragraph>()];
+            if (wordDoc.MainDocumentPart.HeaderParts != null)
+                foreach (var headerPart in wordDoc.MainDocumentPart.HeaderParts)
+                    allParagraphs.AddRange(headerPart.Header.Descendants<Paragraph>());
+            if (wordDoc.MainDocumentPart.FooterParts != null)
+                foreach (var footerPart in wordDoc.MainDocumentPart.FooterParts)
+                    allParagraphs.AddRange(footerPart.Footer.Descendants<Paragraph>());
+
+            // ersetze Platzhalter für das Erstellungsdatum mit dynamischem Format
+            var dateMatches = allParagraphs
+                .SelectMany(p => CreationDateRegex().Matches(p.InnerText).Cast<Match>())
+                .GroupBy(m => m.Value)
+                .Select(g => g.First());
+
+            foreach (var match in dateMatches)
+            {
+                string fullPlaceholder = match.Value;
+                string format = match.Groups["format"].Success ? match.Groups["format"].Value : "D";
+
+                try
+                {
+                    placeholders[fullPlaceholder] = GlobalJson.Data.Creation_date.ToString(format, new System.Globalization.CultureInfo("de-CH"));
+                }
+                catch (FormatException)
+                {
+                    placeholders[fullPlaceholder] = GlobalJson.Data.Creation_date.ToString("D", new System.Globalization.CultureInfo("de-CH"));
+                }
+            }
+
             // Platzhalter durch die entsprechenden Werte ersetzen und splitted runs bereinigen
             foreach (KeyValuePair<string, string> placeholder in placeholders)
                 if (!string.IsNullOrEmpty(placeholder.Value))
@@ -122,21 +156,11 @@ public partial class ExportReport
 
             propPart.DataStoreItem ??= new DataStoreItem { ItemId = storeItemId };
 
-            // suche Tabelle mit Namen "Pin_Table"
-            string tableTitle = "Pin_Table";
-            Table table = mainPart?.Document?.Body?.Elements<Table>().FirstOrDefault(t =>
-            {
-                // Überprüfen, ob die Tabelle Eigenschaften hat
-                TableProperties tableProperties = t.GetFirstChild<TableProperties>();
-                if (tableProperties != null)
-                {
-                    // Überprüfen, ob die Tabelle einen Titel (TableCaption) hat
-                    TableCaption tableCaption = tableProperties.GetFirstChild<TableCaption>();
-                    if (tableCaption != null && tableCaption.Val == tableTitle)
-                        return true;
-                }
-                return false;
-            });
+            // suche Tabelle mit Namen "${pin_table}"
+            string tableTitle = "${pin_table}";
+            Table table = mainPart?.Document?.Body?.Elements<Table>()
+                .FirstOrDefault(t => t.GetFirstChild<TableProperties>()?
+                                      .GetFirstChild<TableCaption>()?.Val == tableTitle);
 
             if (mainPart != null)
             {
@@ -148,6 +172,12 @@ public partial class ExportReport
                     TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
 
                     var pinCounter = 1;
+
+                    // Cache für Platzhalter-Daten erstellen, um wiederholte Berechnungen zu vermeiden
+                    Dictionary<string, ImagePlaceholderData> placeholderDataCache = columnList
+                        .Select(c => c.Item4)
+                        .Distinct()
+                        .ToDictionary(k => k, k => GetPlaceholderData(k));
                     foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                     {
                         var currentPlan = GlobalJson.Data.Plans[plan.Key];
@@ -211,7 +241,7 @@ public partial class ExportReport
                                                     case string s when s.StartsWith("${pin_posIcon"):
                                                         if (!currentPin.IsCustomPin)
                                                         {
-                                                            var posData = GetPlaceholderData(s);
+                                                            var posData = placeholderDataCache[s];
                                                             SizeF exportSize = posData?.Size ?? new SizeF(14, 14);
                                                             string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
                                                             string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
@@ -229,7 +259,7 @@ public partial class ExportReport
                                                     case string s when s.StartsWith("${pin_posImage"):
                                                         if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
                                                         {
-                                                            var posData = GetPlaceholderData(s);
+                                                            var posData = placeholderDataCache[s];
                                                             SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
                                                             string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
                                                             string backgroundImagePath = null;
@@ -297,7 +327,7 @@ public partial class ExportReport
                                                     case string s when s.StartsWith("${pin_fotoList"):
                                                         if (SettingsService.Instance.IsImageExport)
                                                         {
-                                                            var posData = GetPlaceholderData(s);
+                                                            var posData = placeholderDataCache[s];
                                                             SizeF exportSize = posData?.Size ?? new SizeF(40, 40);
                                                             var pinFotos = currentPin.Fotos.Values;
                                                             foreach (var img in pinFotos)
@@ -375,14 +405,32 @@ public partial class ExportReport
                                                             AddText(currentPin.GeoLocation.CH1903.ToString());
                                                         break;
 
-                                                    case "${pin_captureDate}":
+                                                    case string s when s.StartsWith("${pin_captureDate"):
                                                         if (currentPin.DateTime != DateTime.MinValue)
-                                                            AddText(currentPin.DateTime.ToShortDateString());
+                                                        {
+                                                            var match = PinDateTimeRegex().Match(ph.Item4);
+                                                            string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
+
+                                                            string dateText = format != null
+                                                                ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
+                                                                : currentPin.DateTime.ToShortDateString(); // Fallback auf Standard-Datum
+
+                                                            AddText(dateText);
+                                                        }
                                                         break;
 
-                                                    case "${pin_captureTime}":
+                                                    case string s when s.StartsWith("${pin_captureTime"):
                                                         if (currentPin.DateTime != DateTime.MinValue)
-                                                            AddText(currentPin.DateTime.ToShortTimeString());
+                                                        {
+                                                            var match = PinDateTimeRegex().Match(ph.Item4);
+                                                            string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
+
+                                                            string timeText = format != null
+                                                                ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
+                                                                : currentPin.DateTime.ToShortTimeString(); // Fallback auf Standard-Uhrzeit
+
+                                                            AddText(timeText);
+                                                        }
                                                         break;
                                                 }
                                             }
@@ -418,10 +466,8 @@ public partial class ExportReport
 
                         // Add Linebreak
                         if (fullText.Contains("${linebreak}"))
-                        {
                             if (para.InnerText.Contains("${linebreak}"))
                                 ProcessLineBreaksInParagraph(para, "${linebreak}");
-                        }
 
                         // Title Image
                         if (imageMatch.Success && imageMatch.Value.Contains("title_image"))
@@ -1008,25 +1054,13 @@ public partial class ExportReport
 
     private static List<string> GetUniquePinIcons(JsonDataModel jsonDataModel)
     {
-        HashSet<string> uniquePinIcons = [];
-        if (jsonDataModel.Plans != null)
-        {
-            foreach (Plan plan in jsonDataModel.Plans.Values)
-            {
-                if (plan.Pins != null)
-                {
-                    foreach (Pin pin in plan.Pins.Values)
-                    {
-                        if (!string.IsNullOrEmpty(pin.PinIcon))
-                            if (pin.IsCustomIcon)
-                                uniquePinIcons.Add(Path.Combine("customicons", pin.PinIcon));
-                            else
-                                uniquePinIcons.Add(pin.PinIcon);
-                    }
-                }
-            }
-        }
-        return [.. uniquePinIcons];
+        return jsonDataModel.Plans?.Values
+            .Where(p => p.Pins != null)
+            .SelectMany(p => p.Pins.Values)
+            .Where(pin => !string.IsNullOrEmpty(pin.PinIcon))
+            .Select(pin => pin.IsCustomIcon ? Path.Combine("customicons", pin.PinIcon) : pin.PinIcon)
+            .Distinct()
+            .ToList() ?? [];
     }
 
     private static List<(int rowIndex, int columnIndex, int positionInText, string placeholderKey)> SearchTableColumns(Table table, Dictionary<string, string> placeholders_table)
@@ -1250,7 +1284,7 @@ public partial class ExportReport
             p.AppendChild(new Run(new Text(newText) { Space = SpaceProcessingModeValues.Preserve }));
     }
 
-    public static void CopyImageToDirectory(string destinationPath, string path, string icon)
+    private static void CopyImageToDirectory(string destinationPath, string path, string icon)
     {
         string destinationFilePath = Path.Combine(destinationPath, icon);
         string sourceFilePath = Path.Combine(Settings.DataDirectory, path, icon);
@@ -1306,5 +1340,14 @@ public partial class ExportReport
                 }
             }, taskCt);
         });
+    }
+}
+
+public static class StringExtensions
+{
+    public static string ToLinebreakPlaceholder(this string input)
+    {
+        if (string.IsNullOrEmpty(input)) return input;
+        return input.Replace("\r\n", "\n").Replace("\r", "\n").Replace("\n", "${linebreak}");
     }
 }

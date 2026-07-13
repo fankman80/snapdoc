@@ -1,5 +1,8 @@
 ﻿// SYSTEMVARIABELN FÜR EXPORTVORLAGEN
 
+${pin_table}
+// Tabelle mit allen Pins (Platzhalter als Titel in Tabelleneigenschaften)
+
 ${client_name}
 // Name des Kunden
 
@@ -14,9 +17,6 @@ ${project_nr}
 
 ${object_name}
 // Objektbezeichnung
-
-${creation_date}
-// Erstellungsdatum
 
 ${project_manager}
 // Projektleiter
@@ -66,5 +66,20 @@ ${pin_geolocCH1903}
 ${pin_captureDate}
 // Erfassungsdatum des Pins
 
+${creation_date/x}
+// Erstellungsdatum Berichts, x = Datumsformat (siehe unten)
+
 ${pin_captureTime}
-// Erfassungszeit des Pins
+// Erfassungszeit des Pins, x = Datumsformat (siehe unten)
+
+// Datumsformatierung
+// d = Tag ohne führende Null (z. B. 5 oder 12)
+// dd = Tag immer zweistellig (z. B. 05 oder 12)
+// ddd = Wochentag abgekürzt (z. B. Di)
+// dddd = Wochentag ausgeschrieben (z. B. Dienstag)
+// M = Monat ohne führende Null (z. B. 5 oder 11)
+// MM = Monat immer zweistellig (z. B. 05 oder 11)
+// MMM = Monatsname abgekürzt (z. B. Mai oder Nov)
+// MMMM = Monatsname ausgeschrieben (z. B. Mai oder November)
+// yy = Jahr zweistellig (z. B. 26)
+// yyyy = Jahr vierstellig (z. B. 2026)
