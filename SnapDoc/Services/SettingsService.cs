@@ -145,7 +145,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
     [ObservableProperty] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
     [ObservableProperty] public partial bool IsGpsActive { get; set; } = false;
-    [ObservableProperty] public partial string EditorTheme { get; set; } = "material-darker";
+    [ObservableProperty] public partial string EditorTheme { get; set; } = "3024-night";
     [ObservableProperty] public partial float PolyLineHandleRadius { get; set; } = 10f;
     [ObservableProperty] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
     [ObservableProperty] public partial int DoubleClickThresholdMs { get; set; } = 300;
