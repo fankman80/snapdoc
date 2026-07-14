@@ -166,7 +166,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int TileSize { get; set; } = 1024;
     [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
     [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = false;
-    [ObservableProperty] public partial float LoupeRadius { get; set; } = 130f;
+    [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
 
     // Lists

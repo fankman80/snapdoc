@@ -49,12 +49,13 @@ public partial class TileImageView : ContentView
     private readonly Dictionary<string, SKBitmap> _pinIconCache = [];
     private MapPin _lastTappedPin = null;
     private List<MapPin> _sortedPins = [];
+    private SKPoint _lastTouchPoint;
 
     private readonly SKPaint _loupeBorderPaint = new()
     {
         Style = SKPaintStyle.Stroke,
         Color = SKColors.Black,
-        StrokeWidth = 4f,
+        StrokeWidth = 3f * (float)Settings.DisplayDensity,
         IsAntialias = true
     };
 
@@ -661,7 +662,7 @@ public partial class TileImageView : ContentView
         float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
         SKPoint pinScreenPos = mapMatrix.MapPoint(pinAbsX, pinAbsY);
 
-        float loupeRadius = SettingsService.Instance.LoupeRadius;
+        float loupeRadius = SettingsService.Instance.LoupeRadius * (float)Settings.DisplayDensity;
         float zoomFactor = SettingsService.Instance.LoupeZoomFactor;
 
         float margin = 30f;
@@ -714,6 +715,8 @@ public partial class TileImageView : ContentView
                     _isDoubleTapAction = false;
 
                     _draggedPin = GetPinAtPosition(e.Location);
+
+                    _lastTouchPoint = e.Location;
 
                     if (_draggedPin != null && _draggedPin.IsLockPosition)
                         _draggedPin = null;
@@ -1321,13 +1324,13 @@ public partial class TileImageView : ContentView
 
         double currentScale = _scale > 0 ? _scale : 1.0;
         double dynamicScale = 1.0 / currentScale;
-        double maxLimit = Services.SettingsService.Instance.PinMaxScaleLimit / 100.0;
-        double minLimit = Services.SettingsService.Instance.PinMinScaleLimit / 100.0;
+        double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
+        double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
 
         if (dynamicScale > maxLimit) dynamicScale = maxLimit;
         if (dynamicScale < minLimit) dynamicScale = minLimit;
 
-        return (float)(Services.SettingsService.Instance.OsBaseScale * dynamicScale * pin.PinScale);
+        return (float)(SettingsService.Instance.OsBaseScale * dynamicScale * pin.PinScale);
     }
 
     private void UpdateDraggedPinPosition(SKPoint touchPoint)
@@ -1339,13 +1342,23 @@ public partial class TileImageView : ContentView
         matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
 
         if (!matrix.TryInvert(out SKMatrix inverseMatrix)) return;
-        SKPoint planPoint = inverseMatrix.MapPoint(touchPoint);
 
-        float newRelX = (planPoint.X - _dragOffset.X) / OriginalImageSize.Width;
-        float newRelY = (planPoint.Y - _dragOffset.Y) / OriginalImageSize.Height;
+        // Berechne die Verschiebung des Fingers im Koordinatensystem des Bildes
+        SKPoint currentPlanPoint = inverseMatrix.MapPoint(touchPoint);
+        SKPoint previousPlanPoint = inverseMatrix.MapPoint(_lastTouchPoint);
+
+        float deltaX = currentPlanPoint.X - previousPlanPoint.X;
+        float deltaY = currentPlanPoint.Y - previousPlanPoint.Y;
+
+        // Das Delta direkt auf die aktuellen relativen Koordinaten aufaddieren
+        float newRelX = _draggedPin.RelativeX + (deltaX / OriginalImageSize.Width);
+        float newRelY = _draggedPin.RelativeY + (deltaY / OriginalImageSize.Height);
 
         _draggedPin.RelativeX = Math.Clamp(newRelX, 0f, 1f);
         _draggedPin.RelativeY = Math.Clamp(newRelY, 0f, 1f);
+
+        // Aktuellen Punkt für das nächste Moved-Event merken
+        _lastTouchPoint = touchPoint;
     }
 
     private void ClearCache()
