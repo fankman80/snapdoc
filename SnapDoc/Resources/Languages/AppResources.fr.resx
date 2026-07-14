@@ -906,4 +906,7 @@
   <data name="experimentelles_rendering" xml:space="preserve">
     <value>Rendu expérimental</value>
   </data>
+  <data name="lupe_aktivieren" xml:space="preserve">
+    <value>Activer la loupe</value>
+  </data>
 </root>

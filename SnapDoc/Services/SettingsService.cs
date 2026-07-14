@@ -165,7 +165,9 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int MaxTileCache { get; set; } = 100;
     [ObservableProperty] public partial int TileSize { get; set; } = 1024;
     [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
-
+    [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = false;
+    [ObservableProperty] public partial float LoupeRadius { get; set; } = 130f;
+    [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
 
     // Lists
     [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
@@ -374,7 +376,10 @@ public partial class SettingsService : ObservableObject
             StyleTemplateItems = StyleTemplateItems,
             MaxTileCache = MaxTileCache,
             TileSize = TileSize,
+            IsLoupeEnabled = IsLoupeEnabled,
             MaxZoomLevel = MaxZoomLevel,
+            LoupeRadius = LoupeRadius,
+            LoupeZoomFactor = LoupeZoomFactor
         };
         File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
     }
@@ -451,7 +456,10 @@ public partial class SettingsService : ObservableObject
             StyleTemplateItems = settings.StyleTemplateItems ?? StyleTemplateItems;
             MaxTileCache = settings.MaxTileCache;
             TileSize = settings.TileSize;
+            IsLoupeEnabled = settings.IsLoupeEnabled;
             MaxZoomLevel = settings.MaxZoomLevel;
+            LoupeRadius = settings.LoupeRadius;
+            LoupeZoomFactor = settings.LoupeZoomFactor;
         }
         catch (Exception ex)
         {
@@ -524,6 +532,9 @@ public partial class SettingsService : ObservableObject
         StyleTemplateItems = [.. defaultSettings.StyleTemplateItems];
         MaxTileCache = defaultSettings.MaxTileCache;
         TileSize = defaultSettings.TileSize;
+        IsLoupeEnabled = defaultSettings.IsLoupeEnabled;
         MaxZoomLevel = defaultSettings.MaxZoomLevel;
+        LoupeRadius = defaultSettings.LoupeRadius;
+        LoupeZoomFactor = defaultSettings.LoupeZoomFactor;
     }
 }

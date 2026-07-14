@@ -23,8 +23,12 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         iconName.Text = iconItem.DisplayName;
         iconCategory.Text = iconItem.Category;
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
+
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
+        Anchor_X_Text = Anchor_X.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+        Anchor_Y_Text = Anchor_Y.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
+
         IconScale = iconItem.IconScale;
         allowRotate.IsToggled = iconItem.IsRotationLocked;
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
@@ -35,7 +39,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             deleteIcon.IsVisible = true;
 
         BindingContext = this;
-
         StartBlinking();
     }
 
@@ -59,10 +62,11 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_X;
         set
         {
-            if (anchor_X != value)
+            double clampedValue = Math.Clamp(value, 0.0, 1.0);
+            if (anchor_X != clampedValue)
             {
-                anchor_X = value;
-                TransX = (int)(value * IconPreviewWidth);
+                anchor_X = clampedValue;
+                TransX = (int)(clampedValue * IconPreviewWidth);
                 OnPropertyChanged();
             }
         }
@@ -74,11 +78,60 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_Y;
         set
         {
-            if (anchor_Y != value)
+            double clampedValue = Math.Clamp(value, 0.0, 1.0);
+            if (anchor_Y != clampedValue)
             {
-                anchor_Y = value;
-                TransY = (int)(value * IconPreviewHeight);
+                anchor_Y = clampedValue;
+                TransY = (int)(clampedValue * IconPreviewHeight);
                 OnPropertyChanged();
+            }
+        }
+    }
+
+    private string anchor_X_Text;
+    public string Anchor_X_Text
+    {
+        get => anchor_X_Text;
+        set
+        {
+            if (anchor_X_Text != value)
+            {
+                anchor_X_Text = value;
+                OnPropertyChanged();
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    string cleanX = value.Replace(',', '.');
+                    if (double.TryParse(cleanX, System.Globalization.CultureInfo.InvariantCulture, out double parsedX))
+                    {
+                        double clampedX = Math.Clamp(parsedX, 0.0, 1.0);
+                        TransX = (int)(clampedX * IconPreviewWidth);
+                    }
+                }
+            }
+        }
+    }
+
+    private string anchor_Y_Text;
+    public string Anchor_Y_Text
+    {
+        get => anchor_Y_Text;
+        set
+        {
+            if (anchor_Y_Text != value)
+            {
+                anchor_Y_Text = value;
+                OnPropertyChanged();
+
+                if (!string.IsNullOrEmpty(value))
+                {
+                    string cleanY = value.Replace(',', '.');
+                    if (double.TryParse(cleanY, System.Globalization.CultureInfo.InvariantCulture, out double parsedY))
+                    {
+                        double clampedY = Math.Clamp(parsedY, 0.0, 1.0);
+                        TransY = (int)(clampedY * IconPreviewHeight);
+                    }
+                }
             }
         }
     }
@@ -127,6 +180,24 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
+        if (!string.IsNullOrEmpty(Anchor_X_Text))
+        {
+            string cleanX = Anchor_X_Text.Replace(',', '.');
+            if (double.TryParse(cleanX, System.Globalization.CultureInfo.InvariantCulture, out double parsedX))
+            {
+                Anchor_X = parsedX; // Setzt den echten Double-Wert inklusive Math.Clamp
+            }
+        }
+
+        if (!string.IsNullOrEmpty(Anchor_Y_Text))
+        {
+            string cleanY = Anchor_Y_Text.Replace(',', '.');
+            if (double.TryParse(cleanY, System.Globalization.CultureInfo.InvariantCulture, out double parsedY))
+            {
+                Anchor_Y = parsedY; // Setzt den echten Double-Wert inklusive Math.Clamp
+            }
+        }
+
         var file = Path.GetFileName(iconItem.FileName);
         string returnValue = null;
 
@@ -135,7 +206,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             var updatedItem = new IconItem(
                 file,
                 iconName.Text,
-                new Point(Anchor_X, Anchor_Y),
+                new Point(Anchor_X, Anchor_Y), // Garantiert die korrekten, gecleanten Double-Werte
                 iconItem.IconSize,
                 allowRotate.IsToggled,
                 allowAutoScale.IsToggled,
@@ -174,7 +245,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             }
         }
 
-        // Icon-Daten einlesen
         Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
         IconLookup.Initialize(Settings.IconData);

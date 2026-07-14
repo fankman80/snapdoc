@@ -50,6 +50,21 @@ public partial class TileImageView : ContentView
     private MapPin _lastTappedPin = null;
     private List<MapPin> _sortedPins = [];
 
+    private readonly SKPaint _loupeBorderPaint = new()
+    {
+        Style = SKPaintStyle.Stroke,
+        Color = SKColors.Black,
+        StrokeWidth = 4f,
+        IsAntialias = true
+    };
+
+    private readonly SKPaint _loupeCrosshairPaint = new()
+    {
+        Style = SKPaintStyle.Stroke,
+        Color = SKColors.Red,
+        StrokeWidth = 2f
+    };
+
 #if WINDOWS
     private bool _isRightMouseRotating = false;
     private float _lastMouseRotationAngle = 0f;
@@ -420,7 +435,20 @@ public partial class TileImageView : ContentView
         }
     }
 #endif
+
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(PlaceholderColor.ToSKColor());
+
+        DrawMapAndPins(canvas);
+
+        // Wenn ein Pin gezogen wird, Lupe darüber zeichnen
+        if (_draggedPin != null && SettingsService.Instance.IsLoupeEnabled)
+            DrawMagnifyingGlass(canvas);
+    }
+
+    private void DrawMapAndPins(SKCanvas canvas)
     {
         if (_pendingImageFit && _canvasView.CanvasSize.Width > 0 && _canvasView.CanvasSize.Height > 0)
         {
@@ -436,10 +464,6 @@ public partial class TileImageView : ContentView
             ZoomToPin(id, factor);
             return;
         }
-
-        var canvas = e.Surface.Canvas;
-
-        canvas.Clear(PlaceholderColor.ToSKColor());
 
         if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder)) return;
 
@@ -623,6 +647,45 @@ public partial class TileImageView : ContentView
         }
 
         canvas.Restore();
+    }
+
+    private void DrawMagnifyingGlass(SKCanvas canvas)
+    {
+        if (_draggedPin == null) return;
+
+        SKMatrix mapMatrix = SKMatrix.CreateTranslation(_panX, _panY);
+        mapMatrix = mapMatrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
+        mapMatrix = mapMatrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+
+        float pinAbsX = _draggedPin.RelativeX * OriginalImageSize.Width;
+        float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
+        SKPoint pinScreenPos = mapMatrix.MapPoint(pinAbsX, pinAbsY);
+
+        float loupeRadius = SettingsService.Instance.LoupeRadius;
+        float zoomFactor = SettingsService.Instance.LoupeZoomFactor;
+
+        float margin = 30f;
+
+        float loupeCenterX = loupeRadius + margin;
+        float loupeCenterY = loupeRadius + margin;
+
+        canvas.Save();
+
+        using var pathBuilder = new SKPathBuilder();
+        pathBuilder.AddCircle(loupeCenterX, loupeCenterY, loupeRadius);
+        using var loupePath = pathBuilder.Detach();
+
+        canvas.ClipPath(loupePath, SKClipOperation.Intersect, true);
+        canvas.Translate(loupeCenterX, loupeCenterY);
+        canvas.Scale(zoomFactor);
+        canvas.Translate(-pinScreenPos.X, -pinScreenPos.Y);
+
+        DrawMapAndPins(canvas);
+
+        canvas.Restore();
+        canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeBorderPaint);
+        canvas.DrawLine(loupeCenterX - 15, loupeCenterY, loupeCenterX + 15, loupeCenterY, _loupeCrosshairPaint);
+        canvas.DrawLine(loupeCenterX, loupeCenterY - 15, loupeCenterX, loupeCenterY + 15, _loupeCrosshairPaint);
     }
 
     private void OnCanvasTouch(object sender, SKTouchEventArgs e)

@@ -53,7 +53,8 @@
                     <VerticalStackLayout Grid.Column="1">
                         <material:TextField Title="{x:Static res:AppResources.anker_x}"
                                             FontSize="{StaticResource AppFontSizeNormal}"
-                                            Text="{Binding Anchor_X}"
+                                            Text="{Binding Anchor_X_Text}"
+                                            Keyboard="Numeric"
                                             TitleColor="{DynamicResource SecondaryBackground}"
                                             BorderColor="{DynamicResource SecondaryBackground}"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -61,7 +62,8 @@
 
                         <material:TextField Title="{x:Static res:AppResources.anker_y}"
                                             FontSize="{StaticResource AppFontSizeNormal}"
-                                            Text="{Binding Anchor_Y}"
+                                            Text="{Binding Anchor_Y_Text}"
+                                            Keyboard="Numeric"
                                             TitleColor="{DynamicResource SecondaryBackground}"
                                             BorderColor="{DynamicResource SecondaryBackground}"
                                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

@@ -772,7 +772,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void RemoveDrawingView()
     {
-        var absoluteLayout = this.FindByName<Microsoft.Maui.Controls.AbsoluteLayout>("PlanView");
+        var absoluteLayout = this.FindByName<AbsoluteLayout>("PlanView");
         if (drawingView != null && absoluteLayout != null)
         {
             absoluteLayout.Children.Remove(drawingView);

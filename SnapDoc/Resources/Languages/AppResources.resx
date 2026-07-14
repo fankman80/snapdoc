@@ -906,4 +906,7 @@
   <data name="experimentelles_rendering" xml:space="preserve">
     <value>Experimentelles Rendering</value>
   </data>
+  <data name="lupe_aktivieren" xml:space="preserve">
+    <value>Lupe aktivieren</value>
+  </data>
 </root>

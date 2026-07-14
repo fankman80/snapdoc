@@ -1231,6 +1231,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Lupe aktivieren ähnelt.
+        /// </summary>
+        internal static string lupe_aktivieren {
+            get {
+                return ResourceManager.GetString("lupe_aktivieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Modus für Pinplatzierung ähnelt.
         /// </summary>
         internal static string modus_fuer_pinplatzierung {

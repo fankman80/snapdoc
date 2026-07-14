@@ -81,6 +81,17 @@
                                 SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
+                <controls:Switch LabelText="{x:Static res:AppResources.lupe_aktivieren}"
+                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                IsToggled="{Binding IsLoupeEnabled}"
+                                HorizontalOptions="Start"
+                                VerticalOptions="Center"
+                                BorderColorOff ="Transparent"
+                                KnobColorOn="White"
+                                KnobColorOff="White"
+                                SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
                 <Border Stroke="{DynamicResource SecondaryBackground}"
                         StrokeThickness="1"
                         StrokeShape="RoundRectangle 8"

@@ -58,10 +58,13 @@ internal class SettingsModel
     public byte PolyLineHandleAlpha { get; set; } // Alpha-Wert der Griffe für Polylinien (Hex-Wert)
     public Point CustomPinOffset { get; set; } // Offset für die CustomPins unterschiedlich nach Betriebssystem
     public string? DefaultPinIcon { get; set; } // Standard Pin Icon
-    public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
-    public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
-    public List<StylePickerItem>? StyleTemplateItems { get; set; } // Liste der Stilvorlagen für den Stil-Editor
     public int MaxTileCache { get; set; } // Maximale Anzahl der zwischengespeicherten Kartenkacheln
     public int TileSize { get; set; } // Größe der Kartenkacheln
     public int MaxZoomLevel { get; set; } // Anzahl der LOD-Stufen für die Kartenkacheln
+    public bool IsLoupeEnabled { get; set; } // Lupe aktivieren/deaktivieren
+    public float LoupeRadius { get; set; } // Radius der Lupe in Pixeln
+    public float LoupeZoomFactor { get; set; } // Zoomfaktor der Lupe
+    public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
+    public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
+    public List<StylePickerItem>? StyleTemplateItems { get; set; } // Liste der Stilvorlagen für den Stil-Editor
 }
