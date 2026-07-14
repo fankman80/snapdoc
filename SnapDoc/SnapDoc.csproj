@@ -136,7 +136,7 @@
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.6.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.0-preview.1.1" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.0-preview.2.1" />
 		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />

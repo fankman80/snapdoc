@@ -684,8 +684,8 @@ public partial class TileImageView : ContentView
         DrawMapAndPins(canvas);
 
         canvas.Restore();
-        
-        var crosshairHalfSize = 15.0  * (float)Settings.DisplayDensity;
+
+        float crosshairHalfSize = 15  * (float)Settings.DisplayDensity;
         canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeBorderPaint);
         canvas.DrawLine(loupeCenterX - crosshairHalfSize, loupeCenterY, loupeCenterX + crosshairHalfSize, loupeCenterY, _loupeCrosshairPaint);
         canvas.DrawLine(loupeCenterX, loupeCenterY - crosshairHalfSize, loupeCenterX, loupeCenterY + crosshairHalfSize, _loupeCrosshairPaint);
