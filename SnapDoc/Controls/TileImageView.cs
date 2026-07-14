@@ -684,9 +684,11 @@ public partial class TileImageView : ContentView
         DrawMapAndPins(canvas);
 
         canvas.Restore();
+        
+        var crosshairHalfSize = 15.0  * (float)Settings.DisplayDensity;
         canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeBorderPaint);
-        canvas.DrawLine(loupeCenterX - 15, loupeCenterY, loupeCenterX + 15, loupeCenterY, _loupeCrosshairPaint);
-        canvas.DrawLine(loupeCenterX, loupeCenterY - 15, loupeCenterX, loupeCenterY + 15, _loupeCrosshairPaint);
+        canvas.DrawLine(loupeCenterX - crosshairHalfSize, loupeCenterY, loupeCenterX + crosshairHalfSize, loupeCenterY, _loupeCrosshairPaint);
+        canvas.DrawLine(loupeCenterX, loupeCenterY - crosshairHalfSize, loupeCenterX, loupeCenterY + crosshairHalfSize, _loupeCrosshairPaint);
     }
 
     private void OnCanvasTouch(object sender, SKTouchEventArgs e)
