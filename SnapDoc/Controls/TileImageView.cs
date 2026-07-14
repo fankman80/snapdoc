@@ -63,7 +63,7 @@ public partial class TileImageView : ContentView
     {
         Style = SKPaintStyle.Stroke,
         Color = SKColors.Red,
-        StrokeWidth = 2f
+        StrokeWidth = 1.5f * (float)Settings.DisplayDensity
     };
 
 #if WINDOWS
