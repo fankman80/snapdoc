@@ -66,6 +66,18 @@ public partial class TileImageView : ContentView
         StrokeWidth = 1.5f * (float)Settings.DisplayDensity
     };
 
+    private readonly SKPaint _loupeInnerShadowPaint = new()
+    {
+        Style = SKPaintStyle.Fill,
+        IsAntialias = true
+    };
+
+    private readonly SKPaint _loupeGlarePaint = new()
+    {
+        Style = SKPaintStyle.Fill,
+        IsAntialias = true
+    };
+
 #if WINDOWS
     private bool _isRightMouseRotating = false;
     private float _lastMouseRotationAngle = 0f;
@@ -684,6 +696,52 @@ public partial class TileImageView : ContentView
         DrawMapAndPins(canvas);
 
         canvas.Restore();
+
+        // Innerer Schatten für die Lupe
+        var colors = new SKColor[] { SKColors.Transparent, SKColors.Transparent, new(0, 0, 0, 130) };
+        var colorPositions = new float[] { 0f, 0.6f, 1f };
+        using (var shader = SKShader.CreateRadialGradient(
+            new SKPoint(loupeCenterX, loupeCenterY),
+            loupeRadius,
+            colors,
+            colorPositions,
+            SKShaderTileMode.Clamp))
+        {
+            _loupeInnerShadowPaint.Shader = shader;
+            canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeInnerShadowPaint);
+        }
+        _loupeInnerShadowPaint.Shader = null; // Shader wieder freigeben
+
+        // Glanzlicht auf der Lupe
+        canvas.Save();
+
+        try
+        {
+            canvas.ClipPath(loupePath, SKClipOperation.Intersect, true);
+
+            float glareRadiusX = loupeRadius * 0.85f;
+            float glareRadiusY = loupeRadius * 0.45f;
+
+            float glareCenterX = loupeCenterX - (loupeRadius * 0.15f);
+            float glareCenterY = loupeCenterY - (loupeRadius * 0.35f);
+
+            using (var glareShader = SKShader.CreateLinearGradient(
+                new SKPoint(glareCenterX, glareCenterY - glareRadiusY),
+                new SKPoint(glareCenterX, glareCenterY + glareRadiusY),
+                [new SKColor(255, 255, 255, 140), new SKColor(255, 255, 255, 0)],
+                [0f, 1f],
+                SKShaderTileMode.Clamp))
+            {
+                _loupeGlarePaint.Shader = glareShader;
+                canvas.RotateDegrees(-25f, glareCenterX, glareCenterY);
+                canvas.DrawOval(glareCenterX, glareCenterY, glareRadiusX, glareRadiusY, _loupeGlarePaint);
+            }
+            _loupeGlarePaint.Shader = null;
+        }
+        finally
+        {
+            canvas.Restore();
+        }
 
         float crosshairHalfSize = 15  * (float)Settings.DisplayDensity;
         canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeBorderPaint);
