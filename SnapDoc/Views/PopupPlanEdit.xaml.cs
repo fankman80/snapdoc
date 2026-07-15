@@ -1,6 +1,7 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -9,6 +10,7 @@ namespace SnapDoc.Views;
 
 public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChanged
 {
+    private bool? lockAction = null;
     public PopupPlanEdit(string name, string desc, bool gray, string planColor, bool export = true, string okText = null, string cancelText = null)
     {
         InitializeComponent();
@@ -29,7 +31,7 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -39,12 +41,12 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
     }
 
     private async void OnGrayscaleClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex()));
+        await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
     }
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
@@ -70,6 +72,18 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
         if (PlanRotate > 270)
             PlanRotate = 0;
+    }
+
+    private async void OnLockedClicked(object sender, EventArgs e)
+    {
+        lockAction = true;
+        await SnackbarExtensions.ShowSafeAsync("Alle Pins gesperrt", includeDelay: true);
+    }
+
+    private async void OnUnlockedClicked(object sender, EventArgs e)
+    {
+        lockAction = false;
+        await SnackbarExtensions.ShowSafeAsync("Alle Pins entsperrt", includeDelay: true);
     }
 
     private int _planRotate = 0;

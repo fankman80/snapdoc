@@ -1178,9 +1178,24 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                     if (result.Result.PlanRotate != 0)
                         PlanRotate(result.Result.PlanRotate);
 
+                    // Update lock action
+                    if (result.Result.LockAction != null)
+                    {
+                        if (result.Result.LockAction == true)
+                        {
+                            pinList.ToList().ForEach(p => { p.IsLockPosition = true; });
+                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
+                        }
+                        else
+                        {
+                            pinList.ToList().ForEach(p => { p.IsLockPosition = false; });
+                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = false; });
+                        }
+                        PlanImage.InvalidateSurface();
+                    }
+
                     // save data to file
                     GlobalJson.SaveToFile();
-
                     break;
             }
         }

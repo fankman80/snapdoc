@@ -308,13 +308,14 @@ namespace SnapDoc
         public bool IsPinCopy { get; set; } = isPinCopy;
     }
 
-    public class PlanEditReturn(string nameEntry, string descEntry, bool allowExport, int planRotate, string planColor)
+    public class PlanEditReturn(string nameEntry, string descEntry, bool allowExport, int planRotate, string planColor, bool? lockAction)
     {
         public string NameEntry { get; set; } = nameEntry;
         public string DescEntry { get; set; } = descEntry;
         public bool AllowExport { get; set; } = allowExport;
         public int PlanRotate { get; set; } = planRotate;
         public string PlanColor { get; set; } = planColor;
+        public bool? LockAction { get; set; } = lockAction;
     }
 
     public class TextEditReturn(float fontSize, RectangleTextAlignment alignment, RectangleTextStyle style, bool autoSize, string inputTxt, int textPadding)
