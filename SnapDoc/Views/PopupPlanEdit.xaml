@@ -99,16 +99,18 @@
                     <ColumnDefinition Width="50" />
                 </Grid.ColumnDefinitions>
 
-                <Label Grid.Column="0" Text="Alle Pins auf dem Plan sperren oder entsperren" VerticalOptions="Center" />
+                <Label Grid.Column="0" Text="{x:Static res:AppResources.alle_pins_sperren_entsperren}" VerticalOptions="Center" />
                 <Button Grid.Column="1"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock}}"
                         Clicked="OnLockedClicked" />
                 <Button Grid.Column="2"
+                        Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open_right}}"
                         Clicked="OnUnlockedClicked" />
             </Grid>
             

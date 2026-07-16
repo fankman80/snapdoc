@@ -1426,6 +1426,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     if (result.Result.PlanRotate != 0)
                         PlanRotate(result.Result.PlanRotate);
 
+                    // Update lock action
+                    if (result.Result.LockAction != null)
+                    {
+                        if (result.Result.LockAction == true)
+                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
+                        else
+                            thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
+                    }
+
                     // save data to file
                     GlobalJson.SaveToFile();
 

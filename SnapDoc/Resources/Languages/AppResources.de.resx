@@ -909,4 +909,7 @@
   <data name="lupe_aktivieren" xml:space="preserve">
     <value>Lupe aktivieren</value>
   </data>
+  <data name="alle_pins_sperren_entsperren" xml:space="preserve">
+    <value>Alle Pins auf dem Plan sperren oder entsperren</value>
+  </data>
 </root>

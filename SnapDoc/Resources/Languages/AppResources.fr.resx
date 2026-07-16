@@ -909,4 +909,7 @@
   <data name="lupe_aktivieren" xml:space="preserve">
     <value>Activer la loupe</value>
   </data>
+  <data name="alle_pins_sperren_entsperren" xml:space="preserve">
+    <value>Verrouiller ou déverrouiller tous les repères sur le plan</value>
+  </data>
 </root>

@@ -1188,8 +1188,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                         }
                         else
                         {
-                            pinList.ToList().ForEach(p => { p.IsLockPosition = false; });
-                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = false; });
+                            pinList.Where(p => !p.IsCustomPin).ToList().ForEach(p => { p.IsLockPosition = false; });
+                            thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
                         }
                         PlanImage.InvalidateSurface();
                     }

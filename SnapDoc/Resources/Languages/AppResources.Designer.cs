@@ -97,6 +97,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins auf dem Plan sperren oder entsperren ähnelt.
+        /// </summary>
+        internal static string alle_pins_sperren_entsperren {
+            get {
+                return ResourceManager.GetString("alle_pins_sperren_entsperren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die An Ort duplizieren ähnelt.
         /// </summary>
         internal static string an_ort_duplizieren {
