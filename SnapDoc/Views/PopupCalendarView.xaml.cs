@@ -16,12 +16,14 @@ public partial class PopupCalendarView : Popup<string>
     {
         string formattedDate = calendar.SelectedDate?.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
 
-        await CloseAsync(formattedDate);
+        try { await CloseAsync(formattedDate); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnTodayClicked(object sender, EventArgs e)

@@ -35,34 +35,30 @@ public partial class PopupSettings : Popup, IQueryAttributable
     private void OnOkClicked(object sender, EventArgs e)
     {
         SettingsService.Instance.SaveSettings();
-        CloseAsync();
+
+        try { CloseAsync(); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OpenPrgEditor(object sender, EventArgs e)
     {
         var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
         if (File.Exists(filePath))
-        {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Prg");
-        }
     }
 
     private async void OpenDocEditor(object sender, EventArgs e)
     {
         var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile);
         if (File.Exists(filePath))
-        {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Doc");
-        }
     }
 
     private async void OpenIconEditor(object sender, EventArgs e)
     {
         var filePath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
         if (File.Exists(filePath))
-        {
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Icon");
-        }
     }
 
     private async void ResetPrg(object sender, EventArgs e)

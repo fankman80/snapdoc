@@ -9,6 +9,7 @@ public partial class PopupDualResponse : Popup<string>
     private int countdown = 5;
     private readonly string OkText;
     private IDispatcherTimer timer;
+    private bool _isClosing = false;
 
     public PopupDualResponse(string title, string okText = null, string cancelText = null, bool alert = false)
 	{
@@ -18,19 +19,29 @@ public partial class PopupDualResponse : Popup<string>
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         OkText = okText;
 
-        this.Closed += (s, e) => StopTimer();
-
         if (alert)
             StartTimer();
     }
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync("Ok");
+        if (_isClosing) return;
+        _isClosing = true;
+
+        StopTimer();
+
+        try { await CloseAsync("Ok"); }
+        catch (InvalidOperationException) {}
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        if (_isClosing) return;
+        _isClosing = true;
+
+        StopTimer();
+
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     private void StopTimer()

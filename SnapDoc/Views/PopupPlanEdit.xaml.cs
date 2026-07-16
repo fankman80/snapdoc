@@ -31,31 +31,39 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
+        try { await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
+
+        try { await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnGrayscaleClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction));
+        try { await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnColorPickerClicked(object sender, EventArgs e)
     {
         var popup = new PopupColorPicker(SelectedColor, fillOpacity: (byte)(SelectedColor.Alpha * 255), fillOpacityVisibility: true);
         var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result != null)
-            SelectedColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1f / 255f * result.Result.FillOpacity);
+        SelectedColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(1.0f / 255.0f * result.Result.FillOpacity);
     }
 
     private void PlanRotateLeft(object sender, EventArgs e)

@@ -132,12 +132,14 @@ public partial class PopupTextEdit : Popup<TextEditReturn>, INotifyPropertyChang
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new TextEditReturn(FontSize, FontAlignment, TextStyle, AutoSize, InputTxt, TextPadding));
+        try { await CloseAsync(new TextEditReturn(FontSize, FontAlignment, TextStyle, AutoSize, InputTxt, TextPadding)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;

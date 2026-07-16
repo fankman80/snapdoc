@@ -21,12 +21,17 @@ public partial class PopupPinView : Popup<string>
 
     private async void OnGoToClicked(object sender, EventArgs e)
     {
-        await CloseAsync("edit");
-        await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");
+        try
+        {
+            await CloseAsync("edit");
+            await Shell.Current.GoToAsync($"setpin?planId={planId}&pinId={pinId}");        
+        }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnExportClicked(object sender, EventArgs e)
     {
-        await CloseAsync("export");
+        try { await CloseAsync("export"); }
+        catch (InvalidOperationException) { }
     }
 }

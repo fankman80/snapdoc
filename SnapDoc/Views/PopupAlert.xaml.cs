@@ -15,6 +15,7 @@ public partial class PopupAlert : Popup
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync();
+        try { await CloseAsync(); }
+        catch (InvalidOperationException) { }
     }
 }

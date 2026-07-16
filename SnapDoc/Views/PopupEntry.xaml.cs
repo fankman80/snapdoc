@@ -21,11 +21,13 @@ public partial class PopupEntry : Popup<string>
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(textEntry.Text);
+        try { await CloseAsync(textEntry.Text); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 }

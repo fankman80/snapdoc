@@ -54,12 +54,14 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PlanSelectorReturn(selectedPlan, RadioButtonGroup.SelectedIndex != 1));
+        try { await CloseAsync(new PlanSelectorReturn(selectedPlan, RadioButtonGroup.SelectedIndex != 1)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     private void OnRadioButtonChanged(object sender, EventArgs e)

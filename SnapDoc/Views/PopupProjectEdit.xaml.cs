@@ -19,26 +19,31 @@ public partial class PopupProjectEdit : Popup<string>
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(_entry!=text_entry.Text?text_entry.Text:null);
+        try { await CloseAsync(_entry!=text_entry.Text?text_entry.Text:null); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
-        await CloseAsync("Delete");
+        try { await CloseAsync("Delete"); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        await CloseAsync("Zip");
+        try { await CloseAsync("Zip"); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnOpenFolderClicked(object sender, EventArgs e)
     {
-        await CloseAsync("Folder");
+        try { await CloseAsync("Folder"); }
+        catch (InvalidOperationException) { }
     }
 }

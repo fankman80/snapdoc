@@ -91,12 +91,15 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private async void OnOkClicked(object sender, EventArgs e)
     {
         var hex = SelectedColor?.ToHex() ?? "#000000";
-        await CloseAsync(new ColorPickerReturn(hex, FillOpacity));
+        
+        try { await CloseAsync(new ColorPickerReturn(hex, FillOpacity)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     public void OnAddTapped(object sender, EventArgs e)

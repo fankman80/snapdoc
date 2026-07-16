@@ -268,12 +268,14 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, CloudRadius, CloudInciseDeg));
+        try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, CloudRadius, CloudInciseDeg)); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;

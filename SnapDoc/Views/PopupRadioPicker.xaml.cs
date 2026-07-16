@@ -26,12 +26,14 @@ public partial class PopupRadioPicker : Popup<string>
             if (selectedValue == _initialSelection)
                 return;
 
-            await CloseAsync(selectedValue);
+            try { await CloseAsync(selectedValue); }
+            catch (InvalidOperationException) { }
         }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 }

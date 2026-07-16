@@ -249,12 +249,15 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         SettingsService.Instance.IconCategories = iconCategories;
         IconLookup.Initialize(Settings.IconData);
 
-        await CloseAsync(returnValue);
+        try { await CloseAsync(returnValue); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        await CloseAsync(null);
+        
+        try { await CloseAsync(null); }
+        catch (InvalidOperationException) { }
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;

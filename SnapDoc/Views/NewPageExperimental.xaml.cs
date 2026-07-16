@@ -1151,7 +1151,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions);
         if (result?.Result == null) return;
 
-        switch (result.Result.NameEntry)
+        switch (result?.Result.NameEntry)
         {
             case "Delete":
                 OnDeleteClick();
@@ -1198,9 +1198,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private async void OnDeleteClick()
     {
-        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
         if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
