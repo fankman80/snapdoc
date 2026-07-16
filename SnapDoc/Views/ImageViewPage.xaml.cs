@@ -230,8 +230,7 @@ public partial class ImageViewPage : IQueryAttributable
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_dieses_bild_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-
-        if (result.Result == null) return;
+        if (result?.Result == null) return;
 
         if (ImgSource == "showTitle")
         {
@@ -448,27 +447,25 @@ public partial class ImageViewPage : IQueryAttributable
 
         var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result?.Result != null)
+        if (drawMode == DrawMode.Rect)
         {
-            if (drawMode == DrawMode.Rect)
-            {
-                rectDrawable.Text = result.Result.InputTxt;
-                rectDrawable.TextSize = result.Result.FontSize;
-                rectDrawable.TextAlignment = result.Result.Alignment;
-                rectDrawable.TextStyle = result.Result.Style;
-                rectDrawable.AutoSizeText = result.Result.AutoSize;
-                rectDrawable.TextPadding = result.Result.TextPadding;
-            }
-            else if (drawMode == DrawMode.Oval)
-            {
-                ovalDrawable.Text = result.Result.InputTxt;
-                ovalDrawable.TextSize = result.Result.FontSize;
-                ovalDrawable.TextAlignment = result.Result.Alignment;
-                ovalDrawable.TextStyle = result.Result.Style;
-                ovalDrawable.AutoSizeText = result.Result.AutoSize;
-                ovalDrawable.TextPadding = result.Result.TextPadding;
-            }
+            rectDrawable.Text = result.Result.InputTxt;
+            rectDrawable.TextSize = result.Result.FontSize;
+            rectDrawable.TextAlignment = result.Result.Alignment;
+            rectDrawable.TextStyle = result.Result.Style;
+            rectDrawable.AutoSizeText = result.Result.AutoSize;
+            rectDrawable.TextPadding = result.Result.TextPadding;
+        }
+        else if (drawMode == DrawMode.Oval)
+        {
+            ovalDrawable.Text = result.Result.InputTxt;
+            ovalDrawable.TextSize = result.Result.FontSize;
+            ovalDrawable.TextAlignment = result.Result.Alignment;
+            ovalDrawable.TextStyle = result.Result.Style;
+            ovalDrawable.AutoSizeText = result.Result.AutoSize;
+            ovalDrawable.TextPadding = result.Result.TextPadding;
         }
 
         drawingView?.InvalidateSurface();
@@ -617,8 +614,7 @@ public partial class ImageViewPage : IQueryAttributable
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
         var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
-
-        if (result.Result == null) return;
+        if (result?.Result == null) return;
 
         SelectedBorderColor = Color.FromArgb(result.Result.BorderColorHex);
         SelectedFillColor = Color.FromArgb(result.Result.FillColorHex);

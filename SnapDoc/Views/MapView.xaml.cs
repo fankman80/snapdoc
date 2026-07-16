@@ -902,10 +902,9 @@ public partial class MapView : IQueryAttributable
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result == null) return;
         if (Shell.Current is not AppShell shell) return;
 
         // Shell-Navigation entfernen

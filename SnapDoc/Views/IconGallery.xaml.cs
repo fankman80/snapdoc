@@ -294,7 +294,8 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         var popup = new PopupIconEdit(item);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        if (result.Result != null)
-            IconSorting(OrderDirection);
+        if (result?.Result == null) return;
+        
+        IconSorting(OrderDirection);
     }
 }

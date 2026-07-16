@@ -112,19 +112,17 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_pin_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
-        {
-            DeletePinData(PinId);
-            WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
-            await Shell.Current.GoToAsync($"///{PlanId}");
-        }
+        if (result?.Result == null) return;
+
+        DeletePinData(PinId);
+        WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
+        await Shell.Current.GoToAsync($"///{PlanId}");
     }
 
     private async void OnMoveClick(object sender, EventArgs e)
     {
         var popup = new PopupPlanSelector(PlanId);
         var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
-
         if (result.Result == null) return;
 
         await MoveOrCopyPinAsync(PinId, PlanId, result.Result.PlanTarget, result.Result.IsPinCopy);
@@ -345,47 +343,45 @@ public partial class SetPin : ContentPage, IQueryAttributable
         bool isCreatingNew = string.IsNullOrWhiteSpace(oldKey);
         var popup = new PopupEntry(input: oldKey, desc: AppResources.text_bearbeiten);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result != null)
+        var items = SettingsService.Instance.PriorityItems;
+
+        if (isCreatingNew)
         {
-            var items = SettingsService.Instance.PriorityItems;
-
-            if (isCreatingNew)
+            if (!string.IsNullOrWhiteSpace(result.Result))
             {
-                if (!string.IsNullOrWhiteSpace(result.Result))
+                var newItem = new PriorityItem { Key = result.Result, Color = null };
+                items.Add(newItem);
+                PriorityPicker.ItemsSource = null;
+                PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                PriorityPicker.SelectedItem = result.Result;
+            }
+        }
+        else
+        {
+            var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
+
+            if (priorityItem != null)
+            {
+                if (string.IsNullOrWhiteSpace(result.Result))
                 {
-                    var newItem = new PriorityItem { Key = result.Result, Color = null };
-                    items.Add(newItem);
+                    items.Remove(priorityItem);
+                    PriorityPicker.ItemsSource = null;
+                    PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+                    PriorityPicker.SelectedItem = null;
+                }
+                else
+                {
+                    priorityItem.Key = result.Result;
                     PriorityPicker.ItemsSource = null;
                     PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
                     PriorityPicker.SelectedItem = result.Result;
                 }
             }
-            else
-            {
-                var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
-
-                if (priorityItem != null)
-                {
-                    if (string.IsNullOrWhiteSpace(result.Result))
-                    {
-                        items.Remove(priorityItem);
-                        PriorityPicker.ItemsSource = null;
-                        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                        PriorityPicker.SelectedItem = null;
-                    }
-                    else
-                    {
-                        priorityItem.Key = result.Result;
-                        PriorityPicker.ItemsSource = null;
-                        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                        PriorityPicker.SelectedItem = result.Result;
-                    }
-                }
-            }
-
-            SettingsService.Instance.SaveSettings();
         }
+
+        SettingsService.Instance.SaveSettings();
     }
 
     private async void OnPriorityColorClicked(object sender, EventArgs e)
@@ -407,16 +403,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         var popup = new PopupColorPicker(initialColor);
         var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result != null)
-        {
-            priorityItem.Color = result.Result.ColorHex;
-            PriorityPicker.ItemsSource = null;
-            PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-            PriorityPicker.SelectedItem = selectedKey;
+        priorityItem.Color = result.Result.ColorHex;
+        PriorityPicker.ItemsSource = null;
+        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
+        PriorityPicker.SelectedItem = selectedKey;
 
-            SettingsService.Instance.SaveSettings();
-        }
+        SettingsService.Instance.SaveSettings();
     }
 
     private void OnTitleChanged(object sender, EventArgs e)

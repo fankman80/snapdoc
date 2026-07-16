@@ -39,9 +39,9 @@ public partial class ExportSettings : ContentPage
     {
         if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupDualResponse(AppResources.exportvorlage_waehlen_oder_importieren);
-            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-            if (result.Result != null) return;
+            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
+            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+            return;
         }
 
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
@@ -172,17 +172,16 @@ public partial class ExportSettings : ContentPage
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
-        {
-            if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
-            {
-                var filePath = Path.Combine(Settings.TemplateDirectory, SettingsService.Instance.SelectedTemplate);
+        if (result?.Result == null) return;
 
-                if (File.Exists(filePath))
-                {
-                    File.Delete(filePath);
-                    SettingsService.Instance.Templates.Remove(SettingsService.Instance.SelectedTemplate);
-                }
+        if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
+        {
+            var filePath = Path.Combine(Settings.TemplateDirectory, SettingsService.Instance.SelectedTemplate);
+
+            if (File.Exists(filePath))
+            {
+                File.Delete(filePath);
+                SettingsService.Instance.Templates.Remove(SettingsService.Instance.SelectedTemplate);
             }
         }
     }

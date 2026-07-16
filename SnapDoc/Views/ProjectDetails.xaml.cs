@@ -132,36 +132,35 @@ public partial class ProjectDetails : ContentPage
                                    title: AppResources.plan_name,
                                    okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
+        if (result?.Result == null) return;
+
+        string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        Plan plan = new()
         {
-            string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
-            Plan plan = new()
-            {
-                Name = result.Result == "" ? "Online Map" : result.Result,
-                File = "",
-                ImageSize = new Size(0,0),
-                IsGrayscale = false,
-                Description = "",
-                AllowExport = true,
-                PlanColor = "#00FFFFFF"
-            };
+            Name = result.Result == "" ? "Online Map" : result.Result,
+            File = "",
+            ImageSize = new Size(0,0),
+            IsGrayscale = false,
+            Description = "",
+            AllowExport = true,
+            PlanColor = "#00FFFFFF"
+        };
 
-            var newPlan = new KeyValuePair<string, Plan>(planId, plan);
-            LoadDataToView.AddPlan(newPlan);
+        var newPlan = new KeyValuePair<string, Plan>(planId, plan);
+        LoadDataToView.AddPlan(newPlan);
 
-            // Überprüfen, ob die Plans-Struktur initialisiert ist
-            GlobalJson.Data.Plans ??= [];
-            GlobalJson.Data.Plans[planId] = plan;
+        // Überprüfen, ob die Plans-Struktur initialisiert ist
+        GlobalJson.Data.Plans ??= [];
+        GlobalJson.Data.Plans[planId] = plan;
 
-            // save data to file
-            GlobalJson.SaveToFile();
+        // save data to file
+        GlobalJson.SaveToFile();
 
-            // Shell aktualisieren
-            var shell = Shell.Current as AppShell;
-            shell.ApplyFilterAndSorting();
+        // Shell aktualisieren
+        var shell = Shell.Current as AppShell;
+        shell.ApplyFilterAndSorting();
 
-            await Shell.Current.GoToAsync($"//{planId}");
-        }
+        await Shell.Current.GoToAsync($"//{planId}");
     }
 
     private async void CalendarClicked(object sender, EventArgs e)

@@ -879,33 +879,30 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         else
             return; // Kein unterstützter Modus für Textbearbeitung
 
-
         var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
-
         _isShowingPopup = true;
         var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
         _isShowingPopup = false;
 
-        if (result?.Result != null)
+        if (result?.Result == null) return;
+
+        if (drawMode == DrawMode.Rect)
         {
-            if (drawMode == DrawMode.Rect)
-            {
-                rectDrawable.Text = result.Result.InputTxt;
-                rectDrawable.TextSize = result.Result.FontSize;
-                rectDrawable.TextAlignment = result.Result.Alignment;
-                rectDrawable.TextStyle = result.Result.Style;
-                rectDrawable.AutoSizeText = result.Result.AutoSize;
-                rectDrawable.TextPadding = result.Result.TextPadding;
-            }
-            else if (drawMode == DrawMode.Oval)
-            {
-                ovalDrawable.Text = result.Result.InputTxt;
-                ovalDrawable.TextSize = result.Result.FontSize;
-                ovalDrawable.TextAlignment = result.Result.Alignment;
-                ovalDrawable.TextStyle = result.Result.Style;
-                ovalDrawable.AutoSizeText = result.Result.AutoSize;
-                ovalDrawable.TextPadding = result.Result.TextPadding;
-            }
+            rectDrawable.Text = result.Result.InputTxt;
+            rectDrawable.TextSize = result.Result.FontSize;
+            rectDrawable.TextAlignment = result.Result.Alignment;
+            rectDrawable.TextStyle = result.Result.Style;
+            rectDrawable.AutoSizeText = result.Result.AutoSize;
+            rectDrawable.TextPadding = result.Result.TextPadding;
+        }
+        else if (drawMode == DrawMode.Oval)
+        {
+            ovalDrawable.Text = result.Result.InputTxt;
+            ovalDrawable.TextSize = result.Result.FontSize;
+            ovalDrawable.TextAlignment = result.Result.Alignment;
+            ovalDrawable.TextStyle = result.Result.Style;
+            ovalDrawable.AutoSizeText = result.Result.AutoSize;
+            ovalDrawable.TextPadding = result.Result.TextPadding;
         }
 
         drawingView?.InvalidateSurface();
@@ -1152,62 +1149,58 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                                       export: thisPlan.AllowExport,
                                       planColor: thisPlan.PlanColor);
         var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result != null)
+        switch (result.Result.NameEntry)
         {
-            switch (result.Result.NameEntry)
-            {
-                case "Delete":
-                    OnDeleteClick();
-                    break;
+            case "Delete":
+                OnDeleteClick();
+                break;
 
-                case "Grayscale":
-                    OnGrayscaleClick();
-                    break;
+            case "Grayscale":
+                OnGrayscaleClick();
+                break;
 
-                default:
-                    (Shell.Current as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
-                    Title = result.Result.NameEntry;
+            default:
+                (Shell.Current as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
+                Title = result.Result.NameEntry;
 
-                    thisPlan.Name = result.Result.NameEntry;
-                    thisPlan.Description = result.Result.DescEntry;
-                    thisPlan.AllowExport = result.Result.AllowExport;
-                    thisPlan.PlanColor = result.Result.PlanColor;
+                thisPlan.Name = result.Result.NameEntry;
+                thisPlan.Description = result.Result.DescEntry;
+                thisPlan.AllowExport = result.Result.AllowExport;
+                thisPlan.PlanColor = result.Result.PlanColor;
 
-                    // Rotate Plan
-                    if (result.Result.PlanRotate != 0)
-                        PlanRotate(result.Result.PlanRotate);
+                // Rotate Plan
+                if (result.Result.PlanRotate != 0)
+                    PlanRotate(result.Result.PlanRotate);
 
-                    // Update lock action
-                    if (result.Result.LockAction != null)
+                // Update lock action
+                if (result.Result.LockAction != null)
+                {
+                    if (result.Result.LockAction == true)
                     {
-                        if (result.Result.LockAction == true)
-                        {
-                            pinList.ToList().ForEach(p => { p.IsLockPosition = true; });
-                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
-                        }
-                        else
-                        {
-                            pinList.Where(p => !p.IsCustomPin).ToList().ForEach(p => { p.IsLockPosition = false; });
-                            thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
-                        }
-                        PlanImage.InvalidateSurface();
+                        pinList.ToList().ForEach(p => { p.IsLockPosition = true; });
+                        thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
                     }
+                    else
+                    {
+                        pinList.Where(p => !p.IsCustomPin).ToList().ForEach(p => { p.IsLockPosition = false; });
+                        thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
+                    }
+                    PlanImage.InvalidateSurface();
+                }
 
-                    // save data to file
-                    GlobalJson.SaveToFile();
-                    break;
-            }
+                // save data to file
+                GlobalJson.SaveToFile();
+                break;
         }
     }
 
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-
-        if (result.Result == null) return;
+        if (result?.Result == null) return;
         if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");

@@ -1400,56 +1400,53 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                                       export: thisPlan.AllowExport,
                                       planColor: thisPlan.PlanColor);
         var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result != null)
+        switch (result.Result.NameEntry)
         {
-            switch (result.Result.NameEntry)
-            {
-                case "Delete":
-                    OnDeleteClick();
-                    break;
+            case "Delete":
+                OnDeleteClick();
+                break;
 
-                case "Grayscale":
-                    OnGrayscaleClick();
-                    break;
+            case "Grayscale":
+                OnGrayscaleClick();
+                break;
 
-                default:
-                    (Shell.Current as AppShell)?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = result.Result.NameEntry;
-                    Title = result.Result.NameEntry;
+            default:
+                (Shell.Current as AppShell)?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = result.Result.NameEntry;
+                Title = result.Result.NameEntry;
 
-                    thisPlan.Name = result.Result.NameEntry;
-                    thisPlan.Description = result.Result.DescEntry;
-                    thisPlan.AllowExport = result.Result.AllowExport;
-                    thisPlan.PlanColor = result.Result.PlanColor;
+                thisPlan.Name = result.Result.NameEntry;
+                thisPlan.Description = result.Result.DescEntry;
+                thisPlan.AllowExport = result.Result.AllowExport;
+                thisPlan.PlanColor = result.Result.PlanColor;
 
-                    // Rotate Plan
-                    if (result.Result.PlanRotate != 0)
-                        PlanRotate(result.Result.PlanRotate);
+                // Rotate Plan
+                if (result.Result.PlanRotate != 0)
+                    PlanRotate(result.Result.PlanRotate);
 
-                    // Update lock action
-                    if (result.Result.LockAction != null)
-                    {
-                        if (result.Result.LockAction == true)
-                            thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
-                        else
-                            thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
-                    }
+                // Update lock action
+                if (result.Result.LockAction != null)
+                {
+                    if (result.Result.LockAction == true)
+                        thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
+                    else
+                        thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
+                }
 
-                    // save data to file
-                    GlobalJson.SaveToFile();
+                // save data to file
+                GlobalJson.SaveToFile();
 
-                    break;
-            }
+                break;
         }
     }
 
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
-        if (result.Result == null) return;
         if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
@@ -1551,7 +1548,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         thisPlan.File = imagefile;
 
-        PlanContainer.SizeChanged  += (object sender, EventArgs e) => ImageFit(null, null);
+        PlanContainer.SizeChanged  += (sender, e) => ImageFit(null, null);
         AddPlan();
 
         // Thumbnail-Pfad in der Shell-CollectionView aktualisieren

@@ -67,60 +67,59 @@ public partial class OpenProject : ContentPage
                                    title: AppResources.plan_name,
                                    okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
+        if (result?.Result == null) return;
+
+        // Eingabe säubern
+        string sanitizedName = OpenProject.SanitizeFileName(result.Result);
+        if (string.IsNullOrWhiteSpace(sanitizedName))
         {
-            // Eingabe säubern
-            string sanitizedName = OpenProject.SanitizeFileName(result.Result);
-            if (string.IsNullOrWhiteSpace(sanitizedName))
-            {
-                await SnackbarExtensions.ShowSafeAsync(AppResources.invalid_project_name, includeDelay: true);
-                return;
-            }
-
-            // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
-            int counter = 1;
-            string _result = sanitizedName;
-            while (Directory.Exists(Path.Combine(Settings.DataDirectory, _result)))
-            {
-                _result = $"{sanitizedName} ({counter})";
-                counter++;
-            }
-
-            string filePath = Path.Combine(Settings.DataDirectory, _result, _result + ".json");
-
-            LoadDataToView.ResetData();
-
-            GlobalJson.CreateNewFile(filePath);
-            GlobalJson.Data.Client_name = "";
-            GlobalJson.Data.Object_address = "";
-            GlobalJson.Data.Working_title = "";
-            GlobalJson.Data.Project_nr = "";
-            GlobalJson.Data.Object_name = "";
-            GlobalJson.Data.Creation_date = DateTime.Now;
-            GlobalJson.Data.Project_manager = "";
-            GlobalJson.Data.ProjectPath = _result;
-            GlobalJson.Data.JsonFile = _result + ".json";
-            GlobalJson.Data.PlanPath = "plans";
-            GlobalJson.Data.ImagePath = "images";
-            GlobalJson.Data.ThumbnailPath = "thumbnails";
-            GlobalJson.Data.CustomPinsPath = "custompins";
-            GlobalJson.Data.TitleImage = "banner_thumbnail.png";
-
-            SettingsService.Instance.IsProjectLoaded = true;
-            GlobalJson.LoadFromFile(filePath);
-            LoadDataToView.LoadData(new FileResult(filePath));
-            Helper.HeaderUpdate();  // UI-Aktualisierung
-
-            // save data to file
-            GlobalJson.SaveToFile();
-
-            LoadJsonFiles();
-
-            await Shell.Current.GoToAsync("project_details");
-#if ANDROID || IOS
-            Shell.Current.FlyoutIsPresented = false;
-#endif
+            await SnackbarExtensions.ShowSafeAsync(AppResources.invalid_project_name, includeDelay: true);
+            return;
         }
+
+        // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
+        int counter = 1;
+        string _result = sanitizedName;
+        while (Directory.Exists(Path.Combine(Settings.DataDirectory, _result)))
+        {
+            _result = $"{sanitizedName} ({counter})";
+            counter++;
+        }
+
+        string filePath = Path.Combine(Settings.DataDirectory, _result, _result + ".json");
+
+        LoadDataToView.ResetData();
+
+        GlobalJson.CreateNewFile(filePath);
+        GlobalJson.Data.Client_name = "";
+        GlobalJson.Data.Object_address = "";
+        GlobalJson.Data.Working_title = "";
+        GlobalJson.Data.Project_nr = "";
+        GlobalJson.Data.Object_name = "";
+        GlobalJson.Data.Creation_date = DateTime.Now;
+        GlobalJson.Data.Project_manager = "";
+        GlobalJson.Data.ProjectPath = _result;
+        GlobalJson.Data.JsonFile = _result + ".json";
+        GlobalJson.Data.PlanPath = "plans";
+        GlobalJson.Data.ImagePath = "images";
+        GlobalJson.Data.ThumbnailPath = "thumbnails";
+        GlobalJson.Data.CustomPinsPath = "custompins";
+        GlobalJson.Data.TitleImage = "banner_thumbnail.png";
+
+        SettingsService.Instance.IsProjectLoaded = true;
+        GlobalJson.LoadFromFile(filePath);
+        LoadDataToView.LoadData(new FileResult(filePath));
+        Helper.HeaderUpdate();  // UI-Aktualisierung
+
+        // save data to file
+        GlobalJson.SaveToFile();
+
+        LoadJsonFiles();
+
+        await Shell.Current.GoToAsync("project_details");
+#if ANDROID || IOS
+        Shell.Current.FlyoutIsPresented = false;
+#endif
     }
 
     private static string SanitizeFileName(string fileName)
@@ -264,8 +263,6 @@ public partial class OpenProject : ContentPage
 
             var _popup = new PopupProjectEdit(entry: item.FileName);
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
-
-            // Falls das Popup einfach weggeklickt wurde (Result null oder leer)
             if (_result == null || string.IsNullOrEmpty(_result.Result)) return;
 
             switch (_result.Result)
