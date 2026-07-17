@@ -1225,6 +1225,25 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
+        // lösche Plan-Tiles aus dem Cache-Ordner
+        string cacheDir = Settings.CacheDirectory;
+        if (Directory.Exists(cacheDir))
+        {
+            string searchPatternNormal = $"{plan.Name}*_*";
+            var normalDirs = Directory.GetDirectories(cacheDir, searchPatternNormal);
+            string searchPatternGrayscale = $"gs_{plan.Name}*_*";
+            var grayscaleDirs = Directory.GetDirectories(cacheDir, searchPatternGrayscale);
+            var allMatchingDirectories = normalDirs.Concat(grayscaleDirs);
+            foreach (var dir in allMatchingDirectories)
+            {
+                try
+                {
+                    Directory.Delete(dir, true);
+                }
+                catch (IOException) { }
+            }
+        }
+
         GlobalJson.Data.Plans.Remove(planId);
 
         // save data to file

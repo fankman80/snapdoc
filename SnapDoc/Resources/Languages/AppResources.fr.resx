@@ -912,4 +912,10 @@
   <data name="alle_pins_sperren_entsperren" xml:space="preserve">
     <value>Verrouiller ou déverrouiller tous les repères sur le plan</value>
   </data>
+  <data name="alle_pins_gesperrt" xml:space="preserve">
+    <value>Tous les repères sont verrouillés</value>
+  </data>
+  <data name="alle_pins_entsperrt" xml:space="preserve">
+    <value>Tous les repères sont déverrouillés</value>
+  </data>
 </root>

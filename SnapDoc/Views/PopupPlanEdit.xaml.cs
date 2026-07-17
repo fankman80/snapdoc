@@ -85,13 +85,13 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
     private async void OnLockedClicked(object sender, EventArgs e)
     {
         lockAction = true;
-        await SnackbarExtensions.ShowSafeAsync("Alle Pins gesperrt", includeDelay: true);
+        await SnackbarExtensions.ShowSafeAsync(AppResources.alle_pins_gesperrt, includeDelay: true);
     }
 
     private async void OnUnlockedClicked(object sender, EventArgs e)
     {
         lockAction = false;
-        await SnackbarExtensions.ShowSafeAsync("Alle Pins entsperrt", includeDelay: true);
+        await SnackbarExtensions.ShowSafeAsync(AppResources.alle_pins_entsperrt, includeDelay: true);
     }
 
     private int _planRotate = 0;

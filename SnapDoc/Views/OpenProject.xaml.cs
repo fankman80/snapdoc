@@ -1,9 +1,10 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using SnapDoc.Services;
-using SnapDoc.Resources.Languages;
 using SnapDoc.Controls;
+using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -290,6 +291,32 @@ public partial class OpenProject : ContentPage
                         FileListView.ItemsSource = tmp_list;
                         ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
 
+                        // lösche das Projektverzeichnis und alle enthaltenen Dateien
+                        if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
+                            Directory.Delete(projectDirectoryPath, true);
+
+                        // lösche Plan-Tiles aus dem Cache-Ordner
+                        string cacheDir = Settings.CacheDirectory;
+                        if (Directory.Exists(cacheDir))
+                        {
+                            foreach (var plan in GlobalJson.Data.Plans)
+                            {
+                                string searchPatternNormal = $"{GlobalJson.Data.Plans[plan.Key].Name}*_*";
+                                var normalDirs = Directory.GetDirectories(cacheDir, searchPatternNormal);
+                                string searchPatternGrayscale = $"gs_{GlobalJson.Data.Plans[plan.Key].Name}*_*";
+                                var grayscaleDirs = Directory.GetDirectories(cacheDir, searchPatternGrayscale);
+                                var allMatchingDirectories = normalDirs.Concat(grayscaleDirs);
+                                foreach (var dir in allMatchingDirectories)
+                                {
+                                    try
+                                    {
+                                        Directory.Delete(dir, true);
+                                    }
+                                    catch (IOException) { }
+                                }
+                            }
+                        }
+
                         // Wenn das gelöschte Projekt das aktuell geladene Projekt ist, zurück zum Homescreen navigieren und Daten zurücksetzen
                         if (isCurrentProject)
                         {
@@ -298,9 +325,6 @@ public partial class OpenProject : ContentPage
                             LoadDataToView.ResetData();
                             Helper.HeaderUpdate();
                         }
-
-                        if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
-                            Directory.Delete(projectDirectoryPath, true);
 
                         LoadJsonFiles();
                     }

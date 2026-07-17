@@ -912,4 +912,10 @@
   <data name="alle_pins_sperren_entsperren" xml:space="preserve">
     <value>Alle Pins auf dem Plan sperren oder entsperren</value>
   </data>
+  <data name="alle_pins_gesperrt" xml:space="preserve">
+    <value>Alle Pins gesperrt</value>
+  </data>
+  <data name="alle_pins_entsperrt" xml:space="preserve">
+    <value>Alle Pins entsperrt</value>
+  </data>
 </root>
