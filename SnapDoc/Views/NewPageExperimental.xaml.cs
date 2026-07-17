@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using BruTile.Extensions;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
@@ -1159,6 +1160,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
             case "Grayscale":
                 OnGrayscaleClick();
+                ImageFit(null, null);
                 break;
 
             default:
@@ -1172,7 +1174,10 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
                 // Rotate Plan
                 if (result.Result.PlanRotate != 0)
+                {
                     PlanRotate(result.Result.PlanRotate);
+                    ImageFit(null, null);
+                }
 
                 // Update lock action
                 if (result.Result.LockAction != null)
@@ -1222,25 +1227,27 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         plan = thisPlan;
 
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File + "_gs"));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         // lösche Plan-Tiles aus dem Cache-Ordner
-        string cacheDir = Settings.CacheDirectory;
+        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
         if (Directory.Exists(cacheDir))
         {
-            string searchPatternNormal = $"{plan.Name}*_*";
-            var normalDirs = Directory.GetDirectories(cacheDir, searchPatternNormal);
-            string searchPatternGrayscale = $"gs_{plan.Name}*_*";
-            var grayscaleDirs = Directory.GetDirectories(cacheDir, searchPatternGrayscale);
-            var allMatchingDirectories = normalDirs.Concat(grayscaleDirs);
-            foreach (var dir in allMatchingDirectories)
+            string baseFileName = Path.GetFileNameWithoutExtension(plan.File)
+                                        .Replace("_gs", "")
+                                        .Replace("_r", ""); ;
+            string searchPattern = $"*{baseFileName}*";
+            var matchingDirectories = Directory.GetDirectories(cacheDir, searchPattern);
+
+            foreach (var dir in matchingDirectories)
             {
                 try
                 {
                     Directory.Delete(dir, true);
                 }
                 catch (IOException) { }
+                catch (UnauthorizedAccessException) { }
             }
         }
 
@@ -1263,13 +1270,13 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     {
         if (thisPlan.IsGrayscale)
         {
-            string colorImageFile = thisPlan.File.Replace("gs_", "");
+            string colorImageFile = thisPlan.File.Replace("_gs", "");
             thisPlan.File = colorImageFile;
             thisPlan.IsGrayscale = false;
         }
         else
         {
-            string grayImageFile = "gs_" + thisPlan.File;
+            string grayImageFile = Path.GetFileNameWithoutExtension(thisPlan.File) + "_gs" + Path.GetExtension(thisPlan.File);
             string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
             if (!File.Exists(grayImagePath))
             {

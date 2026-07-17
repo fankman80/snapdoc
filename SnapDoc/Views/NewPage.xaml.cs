@@ -1489,13 +1489,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (thisPlan.IsGrayscale)
         {
-            string colorImageFile = thisPlan.File.Replace("gs_", "");
+            string colorImageFile = thisPlan.File.Replace("_gs", "");
             thisPlan.File = colorImageFile;
             thisPlan.IsGrayscale = false;
         }
         else
         {
-            string grayImageFile = "gs_" + thisPlan.File;
+            string grayImageFile = Path.GetFileNameWithoutExtension(thisPlan.File) + "_gs" + Path.GetExtension(thisPlan.File);
             string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
             if (!File.Exists(grayImagePath))
             {

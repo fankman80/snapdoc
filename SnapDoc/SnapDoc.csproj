@@ -1,49 +1,51 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-<PropertyGroup>
-	<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-windows10.0.26100.0</TargetFrameworks>
-	<ApplicationTitle>SnapDoc</ApplicationTitle>
-	<ApplicationId>com.ebbe.snapdoc</ApplicationId>
-	<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
-	<Version>2.4.2</Version>
-	<ApplicationVersion>68</ApplicationVersion>
-	<UseMaui>true</UseMaui>
-	<SingleProject>true</SingleProject>
-	<ImplicitUsings>enable</ImplicitUsings>
-	<Nullable>enable</Nullable>
-	<Authors>Michael Fankhauser</Authors>
-	<Company>Emch+Berger Bern AG</Company>
-	<RootNamespace>SnapDoc</RootNamespace>
-	<DefaultLanguage>de-DE</DefaultLanguage>
-	<OutputType>Exe</OutputType>
-	<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-	<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
-	<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.18362.0</SupportedOSPlatformVersion>
-	<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.18362.0</TargetPlatformMinVersion>
-	<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
-</PropertyGroup>
+	<PropertyGroup>
+		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+		<ApplicationTitle>SnapDoc</ApplicationTitle>
+		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
+		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
+		<Version>2.4.2</Version>
+		<ApplicationVersion>68</ApplicationVersion>
+		<UseMaui>true</UseMaui>
+		<SingleProject>true</SingleProject>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<Authors>Michael Fankhauser</Authors>
+		<Company>Emch+Berger Bern AG</Company>
+		<RootNamespace>SnapDoc</RootNamespace>
+		<DefaultLanguage>de-DE</DefaultLanguage>
+		<OutputType>Exe</OutputType>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
+		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
+		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<IncludeSwiftStandardLibraries>true</IncludeSwiftStandardLibraries>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
-		<PublishSingleFile>true</PublishSingleFile>
-		<SelfContained>true</SelfContained>
-		<PublishTrimmed>false</PublishTrimmed>
+		<WindowsPackageType>None</WindowsPackageType>
+		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
 	</PropertyGroup>
-	
+
 	<PropertyGroup>
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(TargetFramework)' == 'net10.0-android'">
-	  <AndroidKeyStore>true</AndroidKeyStore>
-	  <AndroidSigningKeyAlias>$(AndroidKeyAlias)</AndroidSigningKeyAlias>
-	  <AndroidSigningKeyPass>$(AndroidKeyPassword)</AndroidSigningKeyPass>
-	  <AndroidSigningStorePass>$(AndroidStorePassword)</AndroidSigningStorePass>
-	  <AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
+		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyAlias>$(AndroidKeyAlias)</AndroidSigningKeyAlias>
+		<AndroidSigningKeyPass>$(AndroidKeyPassword)</AndroidSigningKeyPass>
+		<AndroidSigningStorePass>$(AndroidStorePassword)</AndroidSigningStorePass>
+		<AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
 	</PropertyGroup>
 
 	<!-- Debug Android -->
@@ -66,12 +68,12 @@
 	</PropertyGroup>
 
 	<!-- Windows Debug -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-windows10.0.26100.0|AnyCPU'">
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows')) And '$(Configuration)' == 'Debug'">
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<!-- Windows Release -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-windows10.0.26100.0|AnyCPU'">
+	<PropertyGroup Condition="$(TargetFramework.Contains('-windows')) And '$(Configuration)' == 'Release'">
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 		<Optimize>true</Optimize>
 	</PropertyGroup>
@@ -81,12 +83,11 @@
 		<DebugSymbols>false</DebugSymbols>
 	</PropertyGroup>
 
-    <PropertyGroup>
-        <ApplicationIconScaling>true</ApplicationIconScaling>
-        <PackageIcon>appicon.png</PackageIcon>
-        <WindowsPackageType>None</WindowsPackageType>
-        <UserSecretsId>26b2a0b7-a7b6-4a99-8b47-0e34092c765d</UserSecretsId>
-    </PropertyGroup>
+	<PropertyGroup>
+		<ApplicationIconScaling>true</ApplicationIconScaling>
+		<PackageIcon>appicon.png</PackageIcon>
+		<UserSecretsId>26b2a0b7-a7b6-4a99-8b47-0e34092c765d</UserSecretsId>
+	</PropertyGroup>
 
 	<ItemGroup>
 		<!-- Android mit Hintergrundfarbe -->
@@ -97,33 +98,32 @@
 
 		<!-- Windows transparent -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
-		
+
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="160,160" />
 
 		<!-- Images -->
 		<MauiImage Include="Resources\Images\*" />
-		
-        <!-- Custom Fonts -->
+
+		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
-		<!-- Raw Assets (also remove the "Resources\Raw" prefix) -->
-		<MauiAsset Include="Resources\Raw\**" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\editor.html;Resources\Raw\north_arrow.svg" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
-    <ItemGroup>
-        <EmbeddedResource Include="Resources\Raw\editor.html" />
-    </ItemGroup>
+	<ItemGroup>
+		<EmbeddedResource Include="Resources\Raw\editor.html" />
+	</ItemGroup>
 
-    <ItemGroup>
-      <MauiImage Include="Resources\raw\north_arrow.svg" />
-    </ItemGroup>
+	<ItemGroup>
+		<MauiImage Include="Resources\raw\north_arrow.svg" />
+	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.579" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="14.2.2" />
-		<PackageReference Include="CommunityToolkit.Maui.Core" Version="14.2.2" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.2.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Core" Version="14.2.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
@@ -143,105 +143,105 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Compile Update="Controls\RangeSlider.xaml.cs">
-	    <DependentUpon>RangeSlider.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Resources\Languages\AppResources.Designer.cs">
-	    <DesignTime>True</DesignTime>
-	    <AutoGen>True</AutoGen>
-	    <DependentUpon>AppResources.resx</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\FotoGallery.xaml.cs">
-	    <DependentUpon>FotoGallery.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\MapView.xaml.cs">
-	    <DependentUpon>MapView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupCalendarView.xaml.cs">
-	    <DependentUpon>PopupCalendarView.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupShapeSelect.xaml.cs">
-	    <DependentUpon>PopupShapeSelect.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupTextEdit.xaml.cs">
-	    <DependentUpon>PopupTextEdit.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupStyleEditor.xaml.cs">
-	    <DependentUpon>PopupStyleEditor.xaml</DependentUpon>
-	  </Compile>
-	  <Compile Update="Views\PopupPinView.xaml.cs">
-	    <DependentUpon>PopupPinView.xaml</DependentUpon>
-	  </Compile>
+		<Compile Update="Controls\RangeSlider.xaml.cs">
+			<DependentUpon>RangeSlider.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Resources\Languages\AppResources.Designer.cs">
+			<DesignTime>True</DesignTime>
+			<AutoGen>True</AutoGen>
+			<DependentUpon>AppResources.resx</DependentUpon>
+		</Compile>
+		<Compile Update="Views\FotoGallery.xaml.cs">
+			<DependentUpon>FotoGallery.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\MapView.xaml.cs">
+			<DependentUpon>MapView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupCalendarView.xaml.cs">
+			<DependentUpon>PopupCalendarView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupShapeSelect.xaml.cs">
+			<DependentUpon>PopupShapeSelect.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupTextEdit.xaml.cs">
+			<DependentUpon>PopupTextEdit.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupStyleEditor.xaml.cs">
+			<DependentUpon>PopupStyleEditor.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupPinView.xaml.cs">
+			<DependentUpon>PopupPinView.xaml</DependentUpon>
+		</Compile>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Update="Resources\Languages\AppResources.de.resx">
-	    <SubType>Designer</SubType>
-	    <Generator></Generator>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\Languages\AppResources.resx">
-	    <Generator>ResXFileCodeGenerator</Generator>
-	    <LastGenOutput>AppResources.Designer.cs</LastGenOutput>
-	  </EmbeddedResource>
-	  <EmbeddedResource Update="Resources\Languages\AppResources.en.resx">
-	    <Generator></Generator>
-	  </EmbeddedResource>
+		<EmbeddedResource Update="Resources\Languages\AppResources.de.resx">
+			<SubType>Designer</SubType>
+			<Generator></Generator>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Languages\AppResources.resx">
+			<Generator>ResXFileCodeGenerator</Generator>
+			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
+		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Languages\AppResources.en.resx">
+			<Generator></Generator>
+		</EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>
-	  <MauiXaml Update="Controls\RangeSlider.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Controls\MyBusyPage.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Controls\CustomRadioPicker.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\CameraView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\FotoGallery.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\MapView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\NewPageExperimental.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupCalendarView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupRadioPicker.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupShapeSelect.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupTextEdit.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupStyleEditor.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
-	  <MauiXaml Update="Views\PopupPinView.xaml">
-	    <Generator>MSBuild:Compile</Generator>
-	  </MauiXaml>
+		<MauiXaml Update="Controls\RangeSlider.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\MyBusyPage.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\CustomRadioPicker.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\CameraView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\FotoGallery.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\MapView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\NewPageExperimental.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupCalendarView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupRadioPicker.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupShapeSelect.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupTextEdit.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupStyleEditor.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Views\PopupPinView.xaml">
+			<Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
-    <PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
-        <SentryUploadSymbols>true</SentryUploadSymbols>
-        <SentryOrg>fankman-dev</SentryOrg>
-        <SentryProject>snapdoc_maui</SentryProject>
-        <SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
+	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
+		<SentryUploadSymbols>true</SentryUploadSymbols>
+		<SentryOrg>fankman-dev</SentryOrg>
+		<SentryProject>snapdoc_maui</SentryProject>
+		<SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
 		<SentryUploadPdb>true</SentryUploadPdb>
-    </PropertyGroup>
+	</PropertyGroup>
 
 	<ItemGroup>
-	  <None Update="Resources\AppIcon\appicon.png">
-	    <Pack>True</Pack>
-	    <PackagePath>\</PackagePath>
-	  </None>
+		<None Update="Resources\AppIcon\appicon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 </Project>

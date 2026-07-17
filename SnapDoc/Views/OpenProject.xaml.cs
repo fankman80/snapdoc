@@ -296,23 +296,25 @@ public partial class OpenProject : ContentPage
                             Directory.Delete(projectDirectoryPath, true);
 
                         // lösche Plan-Tiles aus dem Cache-Ordner
-                        string cacheDir = Settings.CacheDirectory;
+                        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
                         if (Directory.Exists(cacheDir))
                         {
                             foreach (var plan in GlobalJson.Data.Plans)
                             {
-                                string searchPatternNormal = $"{GlobalJson.Data.Plans[plan.Key].Name}*_*";
-                                var normalDirs = Directory.GetDirectories(cacheDir, searchPatternNormal);
-                                string searchPatternGrayscale = $"gs_{GlobalJson.Data.Plans[plan.Key].Name}*_*";
-                                var grayscaleDirs = Directory.GetDirectories(cacheDir, searchPatternGrayscale);
-                                var allMatchingDirectories = normalDirs.Concat(grayscaleDirs);
-                                foreach (var dir in allMatchingDirectories)
+                                string baseFileName = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[plan.Key].File)
+                                                            .Replace("_gs", "")
+                                                            .Replace("_r", "");
+                                string searchPattern = $"*{baseFileName}*";
+                                var matchingDirectories = Directory.GetDirectories(cacheDir, searchPattern);
+
+                                foreach (var dir in matchingDirectories)
                                 {
                                     try
                                     {
                                         Directory.Delete(dir, true);
                                     }
                                     catch (IOException) { }
+                                    catch (UnauthorizedAccessException) { }
                                 }
                             }
                         }
