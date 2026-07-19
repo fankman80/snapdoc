@@ -998,23 +998,24 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private void OnSizeModeClicked(object sender, EventArgs e)
     {
         if (tappedPin == null) return;
-        var pinData = thisPlan.Pins[tappedPin.Id];
-
-        if (pinData.IsLockAutoScale)
+    
+        var mapPin = pinList.FirstOrDefault(p => p.Id == tappedPin.Id);
+        if (mapPin == null) return;
+    
+     if (thisPlan.Pins[tappedPin.Id].IsLockAutoScale)
         {
-            pinData.IsLockAutoScale = false;
+            thisPlan.Pins[tappedPin.Id].IsLockAutoScale = false;
             SizeModeLabel.Text = AppResources.automatische_groessenanpassung;
             SizeModeBtn.Text = Settings.PinEditSizeModeUnlockIcon;
         }
         else
         {
-            pinData.IsLockAutoScale = true;
+            thisPlan.Pins[tappedPin.Id].IsLockAutoScale = true;
             SizeModeLabel.Text = AppResources.groesse_fixiert;
             SizeModeBtn.Text = Settings.PinEditSizeModeLockIcon;
         }
 
-        var mapPin = pinList.FirstOrDefault(p => p.Id == tappedPin.Id);
-        mapPin?.IsLockAutoScale = pinData.IsLockAutoScale;
+        mapPin.IsLockAutoScale = thisPlan.Pins[tappedPin.Id].IsLockAutoScale;
 
         // save data to file
         GlobalJson.SaveToFile();
@@ -1024,6 +1025,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
     private void OnRotateModeClicked(object sender, EventArgs e)
     {
+        if (tappedPin == null) return;
+
+        var mapPin = pinList.FirstOrDefault(p => p.Id == tappedPin.Id);
+        if (mapPin == null) return;
+
         if (thisPlan.Pins[tappedPin.Id].IsLockRotate)
         {
             thisPlan.Pins[tappedPin.Id].IsLockRotate = false;
@@ -1032,21 +1038,25 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             RotateModeBtn.Text = Settings.PinEditRotateModeUnlockIcon;
             PinRotateSlider.LowerValue = 0;
 
-            tappedPin.Rotation = PlanImage.CurrentRotation * -1;
+            mapPin.IsLockRotate = false;
+            mapPin.Rotation = 0; 
         }
         else
         {
             thisPlan.Pins[tappedPin.Id].IsLockRotate = true;
             thisPlan.Pins[tappedPin.Id].PinRotation = Helper.NormalizeAngle360(-PlanImage.CurrentRotation);
-            tappedPin.IsLockRotate = true;
-            tappedPin.Rotation = (float)Helper.NormalizeAngle360(-PlanImage.CurrentRotation);
             RotateModeLabel.Text = AppResources.drehung_fixiert;
             RotateModeBtn.Text = Settings.PinEditRotateModeLockIcon;
             PinRotateSlider.LowerValue = Helper.ToSliderValue(-PlanImage.CurrentRotation);
+
+            mapPin.IsLockRotate = true;
+            mapPin.Rotation = (float)Helper.NormalizeAngle360(-PlanImage.CurrentRotation);
         }
 
         // save data to file
         GlobalJson.SaveToFile();
+
+    PlanImage.InvalidateSurface();
     }
 
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
