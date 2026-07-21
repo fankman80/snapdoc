@@ -103,6 +103,15 @@ public partial class TileImageView : ContentView
                     control._canvasView?.InvalidateSurface();
             });
 
+    public static readonly BindableProperty IsRotationLockedProperty =
+        BindableProperty.Create(nameof(IsRotationLocked), typeof(bool), typeof(TileImageView), false,
+            propertyChanged: (bindable, oldValue, newValue) =>
+            {
+                var control = (TileImageView)bindable;
+                if ((bool)newValue)
+                    control.CurrentRotation = 0f;
+        });
+
     public static readonly BindableProperty CurrentRotationProperty =
         BindableProperty.Create(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f, defaultBindingMode: BindingMode.TwoWay,
             propertyChanged: OnCurrentRotationChanged);
@@ -150,7 +159,8 @@ public partial class TileImageView : ContentView
     public SKPoint CurrentPan { get => (SKPoint)GetValue(CurrentPanProperty); private set => SetValue(CurrentPanPropertyKey, value); }
     public Color PlaceholderColor { get => (Color)GetValue(PlaceholderColorProperty); set => SetValue(PlaceholderColorProperty, value); }
     public ObservableCollection<MapPin> MyPins { get; set; } = [];
-
+    public bool IsRotationLocked { get => (bool)GetValue(IsRotationLockedProperty); set => SetValue(IsRotationLockedProperty, value); }
+    
     public event EventHandler<MapPin> PinTapped;
     public event EventHandler<MapPin> PinMoved;
     public event EventHandler<MapPin> PinDoubleTapped;
@@ -397,7 +407,7 @@ public partial class TileImageView : ContentView
 
     private void OnWinViewPointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (!_isRightMouseRotating || OriginalImageSize == SKSize.Empty || _isGenerating) return;
+        if (IsRotationLocked || !_isRightMouseRotating || OriginalImageSize == SKSize.Empty || _isGenerating) return;
 
         var winView = (Microsoft.UI.Xaml.UIElement)sender;
         var pointerPoint = e.GetCurrentPoint(winView);
@@ -882,7 +892,7 @@ public partial class TileImageView : ContentView
 
                     float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
 
-                    if (_oldFingerAngle != 0f)
+                    if (!IsRotationLocked && _oldFingerAngle != 0f)
                     {
                         float angleDiff = newAngle - _oldFingerAngle;
                         float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
