@@ -62,6 +62,7 @@
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True">
             <controls:TileImageView x:Name="PlanImage"
+                                    IsRotationLocked="{Binding IsPlanRotationLocked}"
                                     SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
                                     PlaceholderColor="DimGrey"
                                     AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
