@@ -364,6 +364,12 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         pin.Pos = new Point(movedPin.RelativeX, movedPin.RelativeY);
 
+        if (SettingsService.Instance.IsPinAutoLock)
+        {
+            pin.IsLockPosition = true;
+            movedPin.IsLockPosition = true;
+        }
+
         // save data to file
         GlobalJson.SaveToFile();
     }
