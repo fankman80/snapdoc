@@ -115,13 +115,15 @@
             </Grid>
             
             <Button x:Name="grayscaleButtonText"
+                    Padding="0"
                     Text="{x:Static res:AppResources.farben_entfernen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
                     Clicked="OnGrayscaleClicked" />
 
-            <Button Text="{x:Static res:AppResources.plan_loeschen}"
+            <Button Padding="0"
+                    Text="{x:Static res:AppResources.plan_loeschen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
