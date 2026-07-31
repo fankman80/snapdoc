@@ -1,13 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-windows10.0.19041.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
 		<Version>2.4.2</Version>
 		<ApplicationVersion>70</ApplicationVersion>
 		<UseMaui>true</UseMaui>
+		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
@@ -17,28 +17,34 @@
 		<DefaultLanguage>de-DE</DefaultLanguage>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+		<!-- Min OS Versions -->
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
 		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
+	<!-- iOS Spezifisch -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<IncludeSwiftStandardLibraries>true</IncludeSwiftStandardLibraries>
 	</PropertyGroup>
 
+	<!-- Windows Spezifisch -->
 	<PropertyGroup Condition="$(TargetFramework.Contains('-windows'))">
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<WindowsPackageType>None</WindowsPackageType>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
 	</PropertyGroup>
 
 	<PropertyGroup>
 		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
 	</PropertyGroup>
 
-	<PropertyGroup Condition="'$(Configuration)' == 'Release' And '$(TargetFramework)' == 'net10.0-android'">
+	<!-- Android Signing (Release) -->
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
 		<AndroidKeyStore>true</AndroidKeyStore>
 		<AndroidSigningKeyAlias>$(AndroidKeyAlias)</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>$(AndroidKeyPassword)</AndroidSigningKeyPass>
@@ -46,39 +52,26 @@
 		<AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
 	</PropertyGroup>
 
-	<!-- Debug Android -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Debug|net10.0-android|AnyCPU'">
+	<!-- Android Debug/Release Flags -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
 		<AndroidPackageFormat>aab</AndroidPackageFormat>
 		<AndroidUseAapt2>True</AndroidUseAapt2>
 		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 
-	<!-- Release Android -->
-	<PropertyGroup Condition="'$(Configuration)|$(TargetFramework)|$(Platform)'=='Release|net10.0-android|AnyCPU'">
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
+	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
 		<AndroidLinkTool>r8</AndroidLinkTool>
 		<RunAOTCompilation>true</RunAOTCompilation>
 		<AndroidGenerateDebugSymbols>true</AndroidGenerateDebugSymbols>
 		<AndroidStripNativeDebugSymbols>false</AndroidStripNativeDebugSymbols>
 		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
-		<AndroidUseAapt2>True</AndroidUseAapt2>
-		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
 	</PropertyGroup>
 
-	<!-- Windows Debug -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows')) And '$(Configuration)' == 'Debug'">
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-	</PropertyGroup>
-
-	<!-- Windows Release -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-windows')) And '$(Configuration)' == 'Release'">
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-		<Optimize>true</Optimize>
-	</PropertyGroup>
-
+	<!-- General Release Flags -->
 	<PropertyGroup Condition="'$(Configuration)'=='Release'">
 		<UseHotReload>false</UseHotReload>
 		<DebugSymbols>false</DebugSymbols>
+		<Optimize>true</Optimize>
 	</PropertyGroup>
 
 	<PropertyGroup>
@@ -89,21 +82,19 @@
 
 	<ItemGroup>
 		<!-- Android mit Hintergrundfarbe -->
-		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.65" Condition="'$(TargetFramework)' == 'net10.0-android'" />
+		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.65" Condition="$(TargetFramework.Contains('-android'))" />
 
 		<!-- iOS mit eigenem, flachem Icon -->
-		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Color="#ffffff" Link="appicon" Condition="'$(TargetFramework)' == 'net10.0-ios'" />
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Color="#ffffff" Link="appicon" Condition="$(TargetFramework.Contains('-ios'))" />
 
-		<!-- Windows transparent -->
-		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="'$(TargetFramework)' == 'net10.0-windows10.0.26100.0'" />
+		<!-- Windows transparent (Condition korrigiert) -->
+		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="$(TargetFramework.Contains('-windows'))" />
 
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="160,160" />
 
-		<!-- Images -->
+		<!-- Images & Fonts -->
 		<MauiImage Include="Resources\Images\*" />
-
-		<!-- Custom Fonts -->
 		<MauiFont Include="Resources\Fonts\*" />
 
 		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\editor.html;Resources\Raw\north_arrow.svg" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
@@ -111,17 +102,14 @@
 
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Raw\editor.html" />
-	</ItemGroup>
-
-	<ItemGroup>
 		<MauiImage Include="Resources\raw\north_arrow.svg" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.579" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.0" />
-		<PackageReference Include="CommunityToolkit.Maui.Core" Version="15.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="14.1.1" />
+		<PackageReference Include="CommunityToolkit.Maui.Core" Version="14.1.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
@@ -175,57 +163,28 @@
 	<ItemGroup>
 		<EmbeddedResource Update="Resources\Languages\AppResources.de.resx">
 			<SubType>Designer</SubType>
-			<Generator></Generator>
 		</EmbeddedResource>
 		<EmbeddedResource Update="Resources\Languages\AppResources.resx">
 			<Generator>ResXFileCodeGenerator</Generator>
 			<LastGenOutput>AppResources.Designer.cs</LastGenOutput>
 		</EmbeddedResource>
-		<EmbeddedResource Update="Resources\Languages\AppResources.en.resx">
-			<Generator></Generator>
-		</EmbeddedResource>
+		<EmbeddedResource Update="Resources\Languages\AppResources.en.resx" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<MauiXaml Update="Controls\RangeSlider.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Controls\MyBusyPage.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Controls\CustomRadioPicker.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\CameraView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\FotoGallery.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\MapView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\NewPageExperimental.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupCalendarView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupRadioPicker.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupShapeSelect.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupTextEdit.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupStyleEditor.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
-		<MauiXaml Update="Views\PopupPinView.xaml">
-			<Generator>MSBuild:Compile</Generator>
-		</MauiXaml>
+		<MauiXaml Update="Controls\RangeSlider.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Controls\MyBusyPage.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Controls\CustomRadioPicker.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\CameraView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\FotoGallery.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\NewPageExperimental.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupTextEdit.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupStyleEditor.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupPinView.xaml" Generator="MSBuild:Compile" />
 	</ItemGroup>
 
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
