@@ -42,7 +42,7 @@ jobs:
             /p:ApplicationVersion=${{ github.run_number }}
 
       - name: Upload artifact to GitHub (Backup)
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: AndroidApp
           path: |
