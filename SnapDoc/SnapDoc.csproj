@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.28000.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
@@ -80,20 +80,15 @@
 	<ItemGroup>
 		<!-- Android mit Hintergrundfarbe -->
 		<MauiIcon Include="Resources\AppIcon\appicon.svg" ForegroundFile="Resources\AppIcon\appiconfg.svg" ForegroundScale="0.65" Condition="$(TargetFramework.Contains('-android'))" />
-
 		<!-- iOS mit eigenem, flachem Icon -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Color="#ffffff" Link="appicon" Condition="$(TargetFramework.Contains('-ios'))" />
-
 		<!-- Windows transparent -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="$(TargetFramework.Contains('-windows'))" />
-
 		<!-- Splash Screen -->
 		<MauiSplashScreen Include="Resources\Splash\splash.svg" Color="#ffffff" BaseSize="160,160" />
-
 		<!-- Images & Fonts -->
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
-
 		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\editor.html;Resources\Raw\north_arrow.svg" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
@@ -102,9 +97,12 @@
 		<MauiImage Include="Resources\raw\north_arrow.svg" />
 	</ItemGroup>
 
+    <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+        <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
+    </ItemGroup>
+
 	<ItemGroup>
-		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
-		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.579" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.0" />
