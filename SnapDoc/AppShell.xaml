@@ -161,43 +161,47 @@
     <!-- Header -->
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                  BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                  Padding="0,0,6,0"
-                  RowSpacing="0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <ImageButton Grid.Column="0" Grid.RowSpan="2"
-                             HeightRequest="100"
-                             WidthRequest="100"
-                             Aspect="AspectFill"
-                             BackgroundColor="Transparent"
-                             Source="{Binding FlyoutHeaderImageThumb}"
-                             Clicked="OnTitleClicked"/>
-                <Label Grid.Column="1" Grid.Row="0"
-                       Text="{Binding FlyoutHeaderDesc}"
-                       LineBreakMode="TailTruncation"
-                       MaxLines="2"                       
-                       FontSize="18"
-                       TextColor="{DynamicResource PrimaryDark}"
-                       FontAttributes="Bold"
-                       VerticalTextAlignment="Center"
-                       HorizontalTextAlignment="Start"/>
-                <Label Grid.Column="1" Grid.Row="1"
-                       Text="{Binding FlyoutHeaderTitle}"
-                       LineBreakMode="TailTruncation"
-                       MaxLines="2"
-                       FontSize="14"
-                       TextColor="{DynamicResource PrimaryDark}"
-                       VerticalTextAlignment="Center"
-                       HorizontalTextAlignment="Start"/>
+            <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
+                  SafeAreaEdges="None">
+                <Grid SafeAreaEdges="Top"
+                      Padding="0,0,6,0"
+                      RowSpacing="0"
+                      x:DataType="services:SettingsService" 
+                      BindingContext="{x:Static services:SettingsService.Instance}">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <ImageButton Grid.Column="0" Grid.RowSpan="2"
+                                 HeightRequest="100"
+                                 WidthRequest="100"
+                                 Aspect="AspectFill"
+                                 BackgroundColor="Transparent"
+                                 Source="{Binding FlyoutHeaderImageThumb}"
+                                 Clicked="OnTitleClicked"/>
+                    <Label Grid.Column="1" Grid.Row="0"
+                           Text="{Binding FlyoutHeaderDesc}"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="2"                       
+                           FontSize="18"
+                           TextColor="{DynamicResource PrimaryDark}"
+                           FontAttributes="Bold"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Start"/>
+                    <Label Grid.Column="1" Grid.Row="1"
+                           Text="{Binding FlyoutHeaderTitle}"
+                           LineBreakMode="TailTruncation"
+                           MaxLines="2"
+                           FontSize="14"
+                           TextColor="{DynamicResource PrimaryDark}"
+                           VerticalTextAlignment="Center"
+                           HorizontalTextAlignment="Start"/>
+                </Grid>
             </Grid>
         </DataTemplate>
     </Shell.FlyoutHeaderTemplate>
