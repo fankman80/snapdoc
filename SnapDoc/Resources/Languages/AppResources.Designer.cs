@@ -97,29 +97,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins entsperrt ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins angeheftet ähnelt.
         /// </summary>
-        internal static string alle_pins_entsperrt {
+        internal static string alle_pins_angeheftet {
             get {
-                return ResourceManager.GetString("alle_pins_entsperrt", resourceCulture);
+                return ResourceManager.GetString("alle_pins_angeheftet", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins gesperrt ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins anheften / lösen ähnelt.
         /// </summary>
-        internal static string alle_pins_gesperrt {
+        internal static string alle_pins_anheften_loesen {
             get {
-                return ResourceManager.GetString("alle_pins_gesperrt", resourceCulture);
+                return ResourceManager.GetString("alle_pins_anheften_loesen", resourceCulture);
             }
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins auf dem Plan sperren oder entsperren ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pins gelöst ähnelt.
         /// </summary>
-        internal static string alle_pins_sperren_entsperren {
+        internal static string alle_pins_geloest {
             get {
-                return ResourceManager.GetString("alle_pins_sperren_entsperren", resourceCulture);
+                return ResourceManager.GetString("alle_pins_geloest", resourceCulture);
             }
         }
         
@@ -129,6 +129,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string an_ort_duplizieren {
             get {
                 return ResourceManager.GetString("an_ort_duplizieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die anheften ähnelt.
+        /// </summary>
+        internal static string anheften {
+            get {
+                return ResourceManager.GetString("anheften", resourceCulture);
             }
         }
         
@@ -1254,6 +1263,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string loeschen {
             get {
                 return ResourceManager.GetString("loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die lösen ähnelt.
+        /// </summary>
+        internal static string loesen {
+            get {
+                return ResourceManager.GetString("loesen", resourceCulture);
             }
         }
         

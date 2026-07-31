@@ -24,8 +24,8 @@
                 <controls:RangeSlider
                             LabelText="{x:Static res:AppResources.pingroesse_limitieren}"
                             IsRange="True"
-                            Minimum="1"
-                            Maximum="100"
+                            Minimum="50"
+                            Maximum="200"
                             Step="1"
                             ValueFontSize="12"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

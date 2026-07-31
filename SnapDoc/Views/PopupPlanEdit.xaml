@@ -94,28 +94,28 @@
                         Clicked="PlanRotateRight" />
             </Grid>
 
+            <Label Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" />
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="50" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
-
-                <Label Grid.Column="0" Text="{x:Static res:AppResources.alle_pins_sperren_entsperren}" VerticalOptions="Center" />
-                <Button Grid.Column="1"
+                <Button Grid.Column="0"
                         Padding="0"
+                        Text="{x:Static res:AppResources.anheften}"                        
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock}}"
                         Clicked="OnLockedClicked" />
-                <Button Grid.Column="2"
-                        Padding="0"
+                <Button Grid.Column="1"
+                        Padding="0"                        
+                        Text="{x:Static res:AppResources.loesen}" 
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open_right}}"
                         Clicked="OnUnlockedClicked" />
             </Grid>
-            
+
             <Button x:Name="grayscaleButtonText"
                     Padding="0"
                     Text="{x:Static res:AppResources.farben_entfernen}"

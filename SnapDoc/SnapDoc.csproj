@@ -1,11 +1,12 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android;net10.0-ios;net10.0-windows10.0.19041.0</TargetFrameworks>
+		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
 		<Version>2.4.2</Version>
-		<ApplicationVersion>70</ApplicationVersion>
+		<ApplicationVersion>71</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>
@@ -17,11 +18,10 @@
 		<DefaultLanguage>de-DE</DefaultLanguage>
 		<OutputType>Exe</OutputType>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
+		
 		<!-- Min OS Versions -->
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'android'">31.0</SupportedOSPlatformVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</SupportedOSPlatformVersion>
-		<TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.19041.0</TargetPlatformMinVersion>
 		<SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'ios'">15.0</SupportedOSPlatformVersion>
 	</PropertyGroup>
 
@@ -36,11 +36,7 @@
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<WindowsPackageType>None</WindowsPackageType>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>
-	</PropertyGroup>
-
-	<PropertyGroup>
-		<MauiEnableXamlCBindingWithSourceCompilation>true</MauiEnableXamlCBindingWithSourceCompilation>
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>	
 	</PropertyGroup>
 
 	<!-- Android Signing (Release) -->
@@ -78,6 +74,7 @@
 		<ApplicationIconScaling>true</ApplicationIconScaling>
 		<PackageIcon>appicon.png</PackageIcon>
 		<UserSecretsId>26b2a0b7-a7b6-4a99-8b47-0e34092c765d</UserSecretsId>
+		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -87,7 +84,7 @@
 		<!-- iOS mit eigenem, flachem Icon -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Color="#ffffff" Link="appicon" Condition="$(TargetFramework.Contains('-ios'))" />
 
-		<!-- Windows transparent (Condition korrigiert) -->
+		<!-- Windows transparent -->
 		<MauiIcon Include="Resources\AppIcon\appiconfg.svg" Condition="$(TargetFramework.Contains('-windows'))" />
 
 		<!-- Splash Screen -->
@@ -106,10 +103,12 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="Microsoft.WindowsAppSDK" Version="2.3.1" />
+		<PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2526" />
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.579" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="14.1.1" />
-		<PackageReference Include="CommunityToolkit.Maui.Core" Version="14.1.1" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Core" Version="15.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 		<PackageReference Include="FFImageLoading.Maui" Version="1.3.2" />
@@ -126,6 +125,13 @@
 		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Resources\AppIcon\appicon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
 	</ItemGroup>
 
 	<ItemGroup>
@@ -194,11 +200,4 @@
 		<SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
 		<SentryUploadPdb>true</SentryUploadPdb>
 	</PropertyGroup>
-
-	<ItemGroup>
-		<None Update="Resources\AppIcon\appicon.png">
-			<Pack>True</Pack>
-			<PackagePath>\</PackagePath>
-		</None>
-	</ItemGroup>
 </Project>

@@ -909,13 +909,19 @@
   <data name="lupe_aktivieren" xml:space="preserve">
     <value>Activer la loupe</value>
   </data>
-  <data name="alle_pins_sperren_entsperren" xml:space="preserve">
-    <value>Verrouiller ou déverrouiller tous les repères sur le plan</value>
+  <data name="alle_pins_anheften_loesen" xml:space="preserve">
+    <value>Épingler / détacher tous les repères</value>
   </data>
-  <data name="alle_pins_gesperrt" xml:space="preserve">
-    <value>Tous les repères sont verrouillés</value>
+  <data name="alle_pins_angeheftet" xml:space="preserve">
+    <value>Tous les repères sont épinglés</value>
   </data>
-  <data name="alle_pins_entsperrt" xml:space="preserve">
-    <value>Tous les repères sont déverrouillés</value>
+  <data name="alle_pins_geloest" xml:space="preserve">
+    <value>Tous les repères sont détachés</value>
+  </data>
+  <data name="anheften" xml:space="preserve">
+    <value>épingler</value>
+  </data>
+  <data name="loesen" xml:space="preserve">
+    <value>désépingler</value>
   </data>
 </root>
