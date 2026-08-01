@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.28000.0</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
@@ -119,7 +119,7 @@
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.8.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.0-rc.1.1" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.0" />
 		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
