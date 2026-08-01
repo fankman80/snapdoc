@@ -163,7 +163,7 @@
         <DataTemplate>
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
                   SafeAreaEdges="None">
-                <Grid SafeAreaEdges="Top"
+                <Grid SafeAreaEdges="Safe"
                       Padding="0,0,6,0"
                       RowSpacing="0"
                       x:DataType="services:SettingsService" 
