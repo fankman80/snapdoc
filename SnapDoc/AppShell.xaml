@@ -163,8 +163,7 @@
         <DataTemplate>
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
                   SafeAreaEdges="None">
-                <Grid SafeAreaEdges="Safe"
-                      Padding="0,0,6,0"
+                <Grid Padding="{OnPlatform iOS='0,50,6,0', Android='0,24,6,0', WinUI='0,0,6,0'}"
                       RowSpacing="0"
                       x:DataType="services:SettingsService" 
                       BindingContext="{x:Static services:SettingsService.Instance}">
