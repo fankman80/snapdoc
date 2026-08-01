@@ -161,17 +161,15 @@
     <!-- Header -->
     <Shell.FlyoutHeaderTemplate>
         <DataTemplate>
-            <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                  SafeAreaEdges="None">
-                <Grid Padding="{OnPlatform iOS='0,50,6,0', Android='0,24,6,0', WinUI='0,0,6,0'}"
-                      RowSpacing="0"
-                      x:DataType="services:SettingsService" 
-                      BindingContext="{x:Static services:SettingsService.Instance}">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
+            <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                  BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}"
+                  Padding="0,0,6,0"
+                  RowSpacing="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
                         <RowDefinition Height="Auto" />
@@ -200,7 +198,6 @@
                            TextColor="{DynamicResource PrimaryDark}"
                            VerticalTextAlignment="Center"
                            HorizontalTextAlignment="Start"/>
-                </Grid>
             </Grid>
         </DataTemplate>
     </Shell.FlyoutHeaderTemplate>
