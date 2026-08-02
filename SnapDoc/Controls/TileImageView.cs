@@ -872,44 +872,111 @@ public partial class TileImageView : ContentView
                 }
                 else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
                 {
-                    _activeTouches[e.Id] = e.Location;
-                    var points = _activeTouches.Values.ToArray();
-                    float centerX = (points[0].X + points[1].X) / 2f;
-                    float centerY = (points[0].Y + points[1].Y) / 2f;
-                    float newDistance = SKPoint.Distance(points[0], points[1]);
+                    // 1. Sichere und stabile Reihenfolge der Finger garantieren
+                    var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
 
+                    // 2. Altes Zentrum berechnen, BEVOR der neue Touch-Punkt gespeichert wird
+                    var oldP0 = _activeTouches[keys[0]];
+                    var oldP1 = _activeTouches[keys[1]];
+                    float oldCenterX = (oldP0.X + oldP1.X) / 2f;
+                    float oldCenterY = (oldP0.Y + oldP1.Y) / 2f;
+
+                    // 3. Touch-Punkt aktualisieren
+                    _activeTouches[e.Id] = e.Location;
+
+                    // 4. Neues Zentrum berechnen
+                    var newP0 = _activeTouches[keys[0]];
+                    var newP1 = _activeTouches[keys[1]];
+                    float newCenterX = (newP0.X + newP1.X) / 2f;
+                    float newCenterY = (newP0.Y + newP1.Y) / 2f;
+
+                    // 5. TRANSLATION (Verschieben) hinzufügen!
+                    // Das Bild muss dem sich bewegenden Mittelpunkt der Finger folgen.
+                    _panX += (newCenterX - oldCenterX);
+                    _panY += (newCenterY - oldCenterY);
+
+                    // 6. Skalierung (Zoom) um das NEUE Zentrum
+                    float newDistance = SKPoint.Distance(newP0, newP1);
                     if (_oldFingerDistance > 0)
                     {
                         float scaleFactor = newDistance / _oldFingerDistance;
                         float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
 
                         float scaleRatio = newScale / _scale;
-                        _panX = centerX - (centerX - _panX) * scaleRatio;
-                        _panY = centerY - (centerY - _panY) * scaleRatio;
+                        _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
+                        _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
                         _scale = newScale;
                     }
                     _oldFingerDistance = newDistance;
 
-                    float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
-
+                    // 7. Rotation um das NEUE Zentrum
+                    float newAngle = (float)Math.Atan2(newP1.Y - newP0.Y, newP1.X - newP0.X);
                     if (!IsRotationLocked && _oldFingerAngle != 0f)
                     {
                         float angleDiff = newAngle - _oldFingerAngle;
+
+                        // Winkel normalisieren (verhindert den PI-Überschlag)
+                        if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
+                        if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
+
                         float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
                         _rotationDegrees += rotationDiffDegrees;
 
                         double rad = angleDiff;
                         float cos = (float)Math.Cos(rad);
                         float sin = (float)Math.Sin(rad);
-                        float dx = _panX - centerX;
-                        float dy = _panY - centerY;
+        
+                        float dx = _panX - newCenterX;
+                        float dy = _panY - newCenterY;
 
-                        _panX = centerX + (dx * cos - dy * sin);
-                        _panY = centerY + (dx * sin + dy * cos);
+                        _panX = newCenterX + (dx * cos - dy * sin);
+                        _panY = newCenterY + (dx * sin + dy * cos);
                     }
                     _oldFingerAngle = newAngle;
+
                     shouldInvalidate = true;
                 }
+
+                //else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
+                //{
+                //    _activeTouches[e.Id] = e.Location;
+                //    var points = _activeTouches.Values.ToArray();
+                //    float centerX = (points[0].X + points[1].X) / 2f;
+                //    float centerY = (points[0].Y + points[1].Y) / 2f;
+                //    float newDistance = SKPoint.Distance(points[0], points[1]);
+
+                //    if (_oldFingerDistance > 0)
+                //    {
+                //        float scaleFactor = newDistance / _oldFingerDistance;
+                //        float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
+
+                //        float scaleRatio = newScale / _scale;
+                //        _panX = centerX - (centerX - _panX) * scaleRatio;
+                //        _panY = centerY - (centerY - _panY) * scaleRatio;
+                //        _scale = newScale;
+                //    }
+                //    _oldFingerDistance = newDistance;
+
+                //    float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
+
+                //    if (!IsRotationLocked && _oldFingerAngle != 0f)
+                //    {
+                //        float angleDiff = newAngle - _oldFingerAngle;
+                //        float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
+                //        _rotationDegrees += rotationDiffDegrees;
+
+                //        double rad = angleDiff;
+                //        float cos = (float)Math.Cos(rad);
+                //        float sin = (float)Math.Sin(rad);
+                //        float dx = _panX - centerX;
+                //        float dy = _panY - centerY;
+
+                //        _panX = centerX + (dx * cos - dy * sin);
+                //        _panY = centerY + (dx * sin + dy * cos);
+                //    }
+                //    _oldFingerAngle = newAngle;
+                //    shouldInvalidate = true;
+                //}
 
                 if (shouldInvalidate)
                 {
