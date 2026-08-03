@@ -32,7 +32,6 @@ public partial class TileImageView : ContentView
     private string _pendingPinId = null;
     private double? _pendingZoomFactor = null;
     private bool _pendingImageFit = false;
-    private SKPoint _dragOffset = SKPoint.Empty;
     private float _originalPinX;
     private float _originalPinY;
     private CancellationTokenSource _cts;
@@ -47,9 +46,9 @@ public partial class TileImageView : ContentView
     private const int DoubleTapTimeoutMs = 300;
     private const int LongPressTimeoutMs = 600;
     private readonly Dictionary<string, SKBitmap> _pinIconCache = [];
-    private MapPin _lastTappedPin = null;
     private List<MapPin> _sortedPins = [];
     private SKPoint _lastTouchPoint;
+    private readonly HashSet<string> _loadingPinPaths = [];
 
     private readonly SKPaint _loupeBorderPaint = new()
     {
@@ -127,6 +126,9 @@ public partial class TileImageView : ContentView
     public static readonly BindableProperty PlaceholderColorProperty =
         BindableProperty.Create( nameof(PlaceholderColor), typeof(Color), typeof(TileImageView), Colors.LightGray);
 
+    public static readonly BindableProperty PinCreationModeProperty =
+        BindableProperty.Create( nameof(PinCreationMode), typeof(PinCreationMode), typeof(TileImageView), PinCreationMode.LongPress);
+
     private static void OnPinsChanged(BindableObject bindable, object oldValue, object newValue)
     {
         var control = (TileImageView)bindable;
@@ -138,6 +140,10 @@ public partial class TileImageView : ContentView
             newCollection.CollectionChanged += control.OnPinsCollectionChanged;
 
         control.UpdateSortedPins();
+
+        if (newValue is IEnumerable<MapPin> newPins)
+            _ = control.PreloadPinBitmapsAsync(newPins);
+
         control._canvasView?.InvalidateSurface();
     }
 
@@ -157,12 +163,13 @@ public partial class TileImageView : ContentView
     public float CurrentRotation { get => (float)GetValue(CurrentRotationProperty); set => SetValue(CurrentRotationProperty, value); }
     public SKPoint CurrentPan { get => (SKPoint)GetValue(CurrentPanProperty); private set => SetValue(CurrentPanPropertyKey, value); }
     public Color PlaceholderColor { get => (Color)GetValue(PlaceholderColorProperty); set => SetValue(PlaceholderColorProperty, value); }
-    public ObservableCollection<MapPin> MyPins { get; set; } = [];
     public bool IsRotationLocked { get => (bool)GetValue(IsRotationLockedProperty); set => SetValue(IsRotationLockedProperty, value); }
-    
+    public PinCreationMode PinCreationMode { get => (PinCreationMode)GetValue(PinCreationModeProperty); set => SetValue(PinCreationModeProperty, value); }
+
     public event EventHandler<MapPin> PinTapped;
     public event EventHandler<MapPin> PinMoved;
     public event EventHandler<MapPin> PinDoubleTapped;
+    public event EventHandler<SKPoint> CanvasTapped;
     public event EventHandler<SKPoint> CanvasDoubleTapped;
     public event EventHandler<SKPoint> CanvasLongPressed;
 
@@ -282,21 +289,13 @@ public partial class TileImageView : ContentView
         float centerX = (float)_canvasView.CanvasSize.Width / 2f;
         float centerY = (float)_canvasView.CanvasSize.Height / 2f;
 
-        float dx = centerX - _panX;
-        float dy = centerY - _panY;
-        float negRad = -_rotationDegrees * (float)(Math.PI / 180.0);
-        float cosNeg = (float)Math.Cos(negRad);
-        float sinNeg = (float)Math.Sin(negRad);
-        float pixelX = (dx * cosNeg - dy * sinNeg) / _scale;
-        float pixelY = (dx * sinNeg + dy * cosNeg) / _scale;
-        double factorX = Math.Clamp(pixelX / OriginalImageSize.Width, 0.0, 1.0);
-        double factorY = Math.Clamp(pixelY / OriginalImageSize.Height, 0.0, 1.0);
-        return new Point(factorX, factorY);
+        return GetRelativeFactorFromScreenPoint(new SKPoint(centerX, centerY), clamp: true);
     }
 
-    public Point GetRelativeFactorFromScreenPoint(SKPoint screenPoint)
+    public Point GetRelativeFactorFromScreenPoint(SKPoint screenPoint, bool clamp = false)
     {
-        if (OriginalImageSize == SKSize.Empty) return new Point(0, 0);
+        if (OriginalImageSize == SKSize.Empty)
+            return new Point(0, 0);
 
         SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
         matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
@@ -310,29 +309,13 @@ public partial class TileImageView : ContentView
         double factorX = imagePixel.X / OriginalImageSize.Width;
         double factorY = imagePixel.Y / OriginalImageSize.Height;
 
-        return new Point(factorX, factorY);
-    }
-
-    public Point ConvertScreenToRelativePoint(SKPoint screenPoint)
-    {
-        if (OriginalImageSize == SKSize.Empty)
-            return new Point(0, 0);
-
-        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
-        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
-
-        if (matrix.TryInvert(out SKMatrix inverseMatrix))
+        if (clamp)
         {
-            SKPoint planPoint = inverseMatrix.MapPoint(screenPoint);
-
-            double factorX = Math.Clamp(planPoint.X / OriginalImageSize.Width, 0.0, 1.0);
-            double factorY = Math.Clamp(planPoint.Y / OriginalImageSize.Height, 0.0, 1.0);
-
-            return new Point(factorX, factorY);
+            factorX = Math.Clamp(factorX, 0.0, 1.0);
+            factorY = Math.Clamp(factorY, 0.0, 1.0);
         }
 
-        return new Point(0, 0);
+        return new Point(factorX, factorY);
     }
 
     public void ImageFit()
@@ -547,13 +530,12 @@ public partial class TileImageView : ContentView
             for (int y = minY; y <= maxY; y++)
             {
                 string cacheKey = $"{currentZoom}_{x}_{y}";
+                float posX = x * currentTileSizeInCanvasSpace;
+                float posY = y * currentTileSizeInCanvasSpace;
+                var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
 
                 if (!_tileCache.TryGetValue(cacheKey, out var bitmap))
                 {
-                    float posX = x * currentTileSizeInCanvasSpace;
-                    float posY = y * currentTileSizeInCanvasSpace;
-                    var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
-
                     if (_loadingTiles.Add(cacheKey))
                     {
                         string tilePath = Path.Combine(xFolder, $"{y}.webp");
@@ -621,10 +603,6 @@ public partial class TileImageView : ContentView
                 }
                 else
                 {
-                    float posX = x * currentTileSizeInCanvasSpace;
-                    float posY = y * currentTileSizeInCanvasSpace;
-                    var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
-
                     canvas.DrawBitmap(bitmap, destRect, LinearSampling, null);
                 }
             }
@@ -640,7 +618,7 @@ public partial class TileImageView : ContentView
 
             foreach (var pin in _sortedPins)
             {
-                SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
+                SKBitmap pinBitmap = pin.Icon ??= GetOrLoadPinBitmap(pin);
                 if (pinBitmap == null) continue;
 
                 float absoluteX = pin.RelativeX * OriginalImageSize.Width;
@@ -798,14 +776,6 @@ public partial class TileImageView : ContentView
                         SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
                         matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
                         matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
-
-                        if (matrix.TryInvert(out SKMatrix inverseMatrix))
-                        {
-                            SKPoint planPoint = inverseMatrix.MapPoint(e.Location);
-                            float pinAbsX = _draggedPin.RelativeX * OriginalImageSize.Width;
-                            float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
-                            _dragOffset = new SKPoint(planPoint.X - pinAbsX, planPoint.Y - pinAbsY);
-                        }
                     }
                     else
                     {
@@ -843,16 +813,6 @@ public partial class TileImageView : ContentView
                     _oldFingerDistance = SKPoint.Distance(p0, p1);
                     _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
                 }
-
-                // Alter Code für die Zwei-Finger-Geste
-                //if (_activeTouches.Count == 2)
-                //{
-                //    _draggedPin = null;
-                //    _longPressCts?.Cancel();
-                //    var points = _activeTouches.Values.ToArray();
-                //    _oldFingerDistance = SKPoint.Distance(points[0], points[1]);
-                //    _oldFingerAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
-                //}
                 break;
 
             case SKTouchAction.Moved:
@@ -933,45 +893,6 @@ public partial class TileImageView : ContentView
                     shouldInvalidate = true;
                 }
 
-                // Alter Code für die Zwei-Finger-Geste
-                //else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
-                //{
-                //    _activeTouches[e.Id] = e.Location;
-                //    var points = _activeTouches.Values.ToArray();
-                //    float centerX = (points[0].X + points[1].X) / 2f;
-                //    float centerY = (points[0].Y + points[1].Y) / 2f;
-                //    float newDistance = SKPoint.Distance(points[0], points[1]);
-
-                //    if (_oldFingerDistance > 0)
-                //    {
-                //        float scaleFactor = newDistance / _oldFingerDistance;
-                //        float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
-                //        float scaleRatio = newScale / _scale;
-                //        _panX = centerX - (centerX - _panX) * scaleRatio;
-                //        _panY = centerY - (centerY - _panY) * scaleRatio;
-                //        _scale = newScale;
-                //    }
-                //    _oldFingerDistance = newDistance;
-
-                //    float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
-
-                //    if (!IsRotationLocked && _oldFingerAngle != 0f)
-                //    {
-                //        float angleDiff = newAngle - _oldFingerAngle;
-                //        float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
-                //        _rotationDegrees += rotationDiffDegrees;
-                //        double rad = angleDiff;
-                //        float cos = (float)Math.Cos(rad);
-                //        float sin = (float)Math.Sin(rad);
-                //        float dx = _panX - centerX;
-                //        float dy = _panY - centerY;
-                //        _panX = centerX + (dx * cos - dy * sin);
-                //        _panY = centerY + (dx * sin + dy * cos);
-                //    }
-                //    _oldFingerAngle = newAngle;
-                //    shouldInvalidate = true;
-                //}
-
                 if (shouldInvalidate)
                 {
                     CurrentScale = _scale;
@@ -1007,11 +928,11 @@ public partial class TileImageView : ContentView
 
                     if (elapsed < DoubleTapTimeoutMs && distance < DoubleTapDistanceThreshold)
                     {
+                        // Doppelklick-Handling zurücksetzen
                         _isDoubleTapAction = true;
                         _tapCts?.Cancel();
                         _tapCts = null;
                         _lastTapTime = DateTime.MinValue;
-                        _lastTappedPin = null;
 
                         if (currentPin != null)
                             PinDoubleTapped?.Invoke(this, currentPin);
@@ -1023,35 +944,40 @@ public partial class TileImageView : ContentView
                         _isDoubleTapAction = false;
                         _lastTapTime = now;
                         _lastTapLocation = e.Location;
-                        _lastTappedPin = currentPin;
+                        _tapCts?.Cancel();
+                        _tapCts = new CancellationTokenSource();
+                        var token = _tapCts.Token;
+                        var tapLocation = e.Location;
 
-                        if (currentPin != null)
+                        _ = Task.Run(async () =>
                         {
-                            _tapCts?.Cancel();
-                            _tapCts = new CancellationTokenSource();
-                            var token = _tapCts.Token;
-
-                            _ = Task.Run(async () =>
+                            try
                             {
-                                try
-                                {
-                                    await Task.Delay(250, token);
+                                await Task.Delay(250, token);
 
-                                    if (!token.IsCancellationRequested)
+                                if (!token.IsCancellationRequested)
+                                {
+                                    MainThread.BeginInvokeOnMainThread(() =>
                                     {
-                                        MainThread.BeginInvokeOnMainThread(() =>
-                                        {
+                                        if (currentPin != null)
                                             PinTapped?.Invoke(this, currentPin);
-                                        });
-                                    }
+                                        else
+                                        {
+                                            CanvasTapped?.Invoke(this, tapLocation);
+                                            if (PinCreationMode == PinCreationMode.SingleTap)
+                                                CanvasLongPressed?.Invoke(this, tapLocation);
+                                        }
+                                    });
                                 }
-                                catch (OperationCanceledException) { }
-                            });
-                        }
+                            }
+                            catch (OperationCanceledException) { }
+                        });
                     }
                 }
                 else if (_draggedPin != null)
+                {
                     PinMoved?.Invoke(this, _draggedPin);
+                }
 
                 if (_draggedPin != null)
                 {
@@ -1123,6 +1049,9 @@ public partial class TileImageView : ContentView
     private void OnPinsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
         UpdateSortedPins();
+        if (e.NewItems != null)
+            _ = PreloadPinBitmapsAsync(e.NewItems.OfType<MapPin>());
+
         _canvasView?.InvalidateSurface();
     }
 
@@ -1161,8 +1090,6 @@ public partial class TileImageView : ContentView
             CurrentScale = _scale;
             CurrentPan = new SKPoint(_panX, _panY);
             CurrentRotation = _rotationDegrees;
-            _canvasView.IsVisible = true;
-            _isGenerating = false;
 
             bool tilesExist = Directory.Exists(_computedTileFolder) &&
                               Directory.GetFiles(_computedTileFolder, "*.webp", SearchOption.AllDirectories).Length > 0;
@@ -1302,103 +1229,12 @@ public partial class TileImageView : ContentView
     {
         if (string.IsNullOrEmpty(pin.IconPath)) return null;
 
+        // Fast-Path: Liegt es im RAM-Cache?
         if (_pinIconCache.TryGetValue(pin.IconPath, out var cachedBitmap))
             return cachedBitmap;
 
-        if (File.Exists(pin.IconPath))
-        {
-            try
-            {
-                using var stream = File.OpenRead(pin.IconPath);
-                var bitmap = SKBitmap.Decode(stream);
-                if (bitmap != null)
-                {
-                    _pinIconCache[pin.IconPath] = bitmap;
-                    return bitmap;
-                }
-            }
-            catch { /* Laden fehlgeschlagen */ }
-        }
-
-        string cacheFolder = Settings.CacheDirectory;
-        if (!Directory.Exists(cacheFolder))
-            Directory.CreateDirectory(cacheFolder);
-
-        string fileName = Path.GetFileName(pin.IconPath);
-        string targetCachePath = Path.Combine(cacheFolder, fileName);
-
-        if (File.Exists(targetCachePath))
-        {
-            try
-            {
-                using var stream = File.OpenRead(targetCachePath);
-                var bitmap = SKBitmap.Decode(stream);
-                if (bitmap != null)
-                {
-                    _pinIconCache[pin.IconPath] = bitmap;
-                    return bitmap;
-                }
-            }
-            catch { /* Laden fehlgeschlagen */ }
-        }
-
-        try
-        {
-            SKBitmap extractedBitmap = null;
-
-#if ANDROID
-            var context = Android.App.Application.Context;
-            string imageName = Path.GetFileNameWithoutExtension(fileName).ToLower();
-            int resId = context.Resources.GetIdentifier(imageName, "drawable", context.PackageName);
-
-            if (resId != 0)
-            {
-                using var resourceStream = context.Resources.OpenRawResource(resId);
-                using var targetStream = File.Create(targetCachePath);
-                resourceStream.CopyTo(targetStream);
-                targetStream.Close();
-
-                using var readStream = File.OpenRead(targetCachePath);
-                extractedBitmap = SKBitmap.Decode(readStream);
-            }
-#elif IOS
-        string imageName = Path.GetFileNameWithoutExtension(fileName);
-        using var uiImage = UIKit.UIImage.FromBundle(imageName);
-        if (uiImage != null)
-        {
-            // In ein PNG-Datenobjekt umwandeln
-            using var nsData = uiImage.AsPNG();
-            if (nsData != null)
-            {
-                using var stream = nsData.AsStream();
-                using var targetStream = File.Create(targetCachePath);
-                stream.CopyTo(targetStream);
-                targetStream.Close();
-
-                using var readStream = File.OpenRead(targetCachePath);
-                extractedBitmap = SKBitmap.Decode(readStream);
-            }
-        }
-#else
-        using var stream = Task.Run(() => FileSystem.OpenAppPackageFileAsync(pin.IconPath)).Result;
-        using var targetStream = File.Create(targetCachePath);
-        stream.CopyTo(targetStream);
-        targetStream.Close();
-
-        using var readStream = File.OpenRead(targetCachePath);
-        extractedBitmap = SKBitmap.Decode(readStream);
-#endif
-
-            if (extractedBitmap != null)
-            {
-                _pinIconCache[pin.IconPath] = extractedBitmap;
-                return extractedBitmap;
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim automatischen Extrahieren des Pins: {ex.Message}");
-        }
+        // Noch nicht da? Asynchrones Laden für diesen Pin anstoßen
+        _ = PreloadPinBitmapsAsync([pin]);
 
         return null;
     }
@@ -1491,6 +1327,154 @@ public partial class TileImageView : ContentView
         _lastTouchPoint = touchPoint;
     }
 
+    private async Task PreloadPinBitmapsAsync(IEnumerable<MapPin> pins)
+    {
+        if (pins == null) return;
+
+        // Fehlende Pfade ermitteln
+        var missingPaths = pins
+            .Select(p => p.IconPath)
+            .Where(path => !string.IsNullOrEmpty(path)
+                           && !_pinIconCache.ContainsKey(path)
+                           && !_loadingPinPaths.Contains(path))
+            .Distinct()
+            .ToList();
+
+        if (missingPaths.Count == 0) return;
+
+        // Als "wird geladen" markieren (UI-Thread)
+        foreach (var path in missingPaths)
+        {
+            _loadingPinPaths.Add(path);
+        }
+
+        try
+        {
+            // E/A-Zugriff und Dekodierung im Hintergrund-Thread ausführen
+            await Task.Run(() =>
+            {
+                foreach (var path in missingPaths)
+                {
+                    SKBitmap bitmap = null;
+                    try
+                    {
+                        bitmap = LoadPinBitmapInternal(path);
+                    }
+                    catch (Exception ex)
+                    {
+                        System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Pin-Icons '{path}': {ex.Message}");
+                    }
+
+                    // Ergebnisse thread-sicher auf dem UI-Thread anwenden & aufräumen
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        _loadingPinPaths.Remove(path);
+
+                        if (bitmap != null)
+                        {
+                            _pinIconCache[path] = bitmap;
+                            _canvasView?.InvalidateSurface();
+                        }
+                    });
+                }
+            });
+        }
+        catch
+        {
+            // Sicherheitsnetz: Falls Task.Run fehlschlägt, UI-Thread wieder freigeben
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                foreach (var path in missingPaths)
+                {
+                    _loadingPinPaths.Remove(path);
+                }
+            });
+        }
+    }
+
+    private static SKBitmap LoadPinBitmapInternal(string iconPath)
+    {
+        if (string.IsNullOrEmpty(iconPath)) return null;
+
+        if (File.Exists(iconPath))
+        {
+            try
+            {
+                using var stream = File.OpenRead(iconPath);
+                return SKBitmap.Decode(stream);
+            }
+            catch { /* Ignorieren */ }
+        }
+
+        string cacheFolder = Settings.CacheDirectory;
+        if (!Directory.Exists(cacheFolder))
+            Directory.CreateDirectory(cacheFolder);
+
+        string fileName = Path.GetFileName(iconPath);
+        string targetCachePath = Path.Combine(cacheFolder, fileName);
+
+        if (File.Exists(targetCachePath))
+        {
+            try
+            {
+                using var stream = File.OpenRead(targetCachePath);
+                return SKBitmap.Decode(stream);
+            }
+            catch { /* Ignorieren */ }
+        }
+
+        try
+        {
+#if ANDROID
+            var context = Android.App.Application.Context;
+            string imageName = Path.GetFileNameWithoutExtension(fileName).ToLower();
+            int resId = context.Resources.GetIdentifier(imageName, "drawable", context.PackageName);
+
+            if (resId != 0)
+            {
+                using var resourceStream = context.Resources.OpenRawResource(resId);
+                using var targetStream = File.Create(targetCachePath);
+                resourceStream.CopyTo(targetStream);
+                targetStream.Close();
+
+                using var readStream = File.OpenRead(targetCachePath);
+                return SKBitmap.Decode(readStream);
+            }
+#elif IOS
+        string imageName = Path.GetFileNameWithoutExtension(fileName);
+        using var uiImage = UIKit.UIImage.FromBundle(imageName);
+        if (uiImage != null)
+        {
+            using var nsData = uiImage.AsPNG();
+            if (nsData != null)
+            {
+                using var stream = nsData.AsStream();
+                using var targetStream = File.Create(targetCachePath);
+                stream.CopyTo(targetStream);
+                targetStream.Close();
+
+                using var readStream = File.OpenRead(targetCachePath);
+                return SKBitmap.Decode(readStream);
+            }
+        }
+#else
+        using var stream = FileSystem.OpenAppPackageFileAsync(iconPath).GetAwaiter().GetResult();
+        using var targetStream = File.Create(targetCachePath);
+        stream.CopyTo(targetStream);
+        targetStream.Close();
+
+        using var readStream = File.OpenRead(targetCachePath);
+        return SKBitmap.Decode(readStream);
+#endif
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Extrahieren des Pins: {ex.Message}");
+        }
+
+        return null;
+    }
+
     private void ClearCache()
     {
         _tileCache.Clear();
@@ -1573,4 +1557,10 @@ public class LruCache<TKey, TValue>(int capacity) where TValue : IDisposable
         _list.Clear();
         _cache.Clear();
     }
+}
+
+public enum PinCreationMode
+{
+    LongPress,
+    SingleTap
 }

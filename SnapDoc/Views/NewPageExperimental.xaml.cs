@@ -164,6 +164,7 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
 
         PlanImage.PinTapped += OnPinTapped;
         PlanImage.PinDoubleTapped += OnPinDoubleTapped;
+        PlanImage.CanvasTapped += OnCanvasTapped;
         PlanImage.CanvasLongPressed += OnCanvasLongPressed;
         PlanImage.PinMoved += OnPinMoved;
 
@@ -347,11 +348,28 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         }
     }
 
+    private void OnCanvasTapped(object sender, SKPoint e)
+    {
+        if (SettingsService.Instance.PinPlaceMode == 1 && isPinSet)
+        {
+            PlanImage.PinCreationMode = PinCreationMode.SingleTap;
+
+            Point relativePoint = PlanImage.GetRelativeFactorFromScreenPoint(e, clamp: true);
+            SetPin(relativePoint);
+
+            PlanImage.PinCreationMode = PinCreationMode.LongPress;
+
+            DrawBtn.IsVisible = true;
+            SetPinFrame.IsVisible = false;
+            isPinSet = false;
+        }
+    }
+
     private void OnCanvasLongPressed(object sender, SKPoint e)
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
-            Point relativePoint = PlanImage.ConvertScreenToRelativePoint(e);
+            Point relativePoint = PlanImage.GetRelativeFactorFromScreenPoint(e, clamp: true);
             SetPin(relativePoint);
         }
     }
