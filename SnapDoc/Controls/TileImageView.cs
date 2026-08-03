@@ -143,7 +143,6 @@ public partial class TileImageView : ContentView
 
     private static readonly BindablePropertyKey OriginalImageSizePropertyKey = BindableProperty.CreateReadOnly(nameof(OriginalImageSize), typeof(SKSize), typeof(TileImageView), SKSize.Empty);
     private static readonly BindablePropertyKey CurrentScalePropertyKey = BindableProperty.CreateReadOnly(nameof(CurrentScale), typeof(float), typeof(TileImageView), 1.0f);
-    private static readonly BindablePropertyKey CurrentRotationPropertyKey = BindableProperty.CreateReadOnly(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f);
     private static readonly BindablePropertyKey CurrentPanPropertyKey = BindableProperty.CreateReadOnly(nameof(CurrentPan), typeof(SKPoint), typeof(TileImageView), SKPoint.Empty);
     public static readonly BindableProperty OriginalImageSizeProperty = OriginalImageSizePropertyKey.BindableProperty;
     public static readonly BindableProperty CurrentScaleProperty = CurrentScalePropertyKey.BindableProperty;
@@ -491,8 +490,7 @@ public partial class TileImageView : ContentView
         if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder)) return;
 
         int currentZoom = MaxZoomLevel + (int)Math.Floor(Math.Log2(_scale));
-        int safeMaxZoom = Math.Max(2, MaxZoomLevel);
-        currentZoom = Math.Clamp(currentZoom, 2, safeMaxZoom);
+        currentZoom = Math.Clamp(currentZoom, 2, MaxZoomLevel);
 
         canvas.Save();
         canvas.Translate(_panX, _panY);

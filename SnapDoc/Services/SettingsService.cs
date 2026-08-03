@@ -397,69 +397,81 @@ public partial class SettingsService : ObservableObject
             var settings = JsonSerializer.Deserialize<SettingsModel>(json);
             if (settings == null) return;
 
-            OsBaseScale = settings.OsBaseScale != 0 ? settings.OsBaseScale : Settings.OsBaseScale;
-            PinMinScaleLimit = settings.PinMinScaleLimit;
-            PinMaxScaleLimit = settings.PinMaxScaleLimit;
-            MapIconSize = settings.MapIconSize;
-            MapIcon = settings.MapIcon;
-            PinPlaceMode = settings.PinPlaceMode;
-            PinDuplicateOffset = settings.PinDuplicateOffset;
-            IsPlanRotateLocked = settings.IsPlanRotateLocked;
-            IsPlanListThumbnails = settings.IsPlanListThumbnails;
-            IsHideInactivePlans = settings.IsHideInactivePlans;
-            IsPinAutoLock = settings.IsPinAutoLock;
-            IsExperimentalFunctions = settings.IsExperimentalFunctions;
-            MaxPdfPixelCount = settings.MaxPdfPixelCount;
-            PdfThumbDpi = settings.PdfThumbDpi;
-            SelectedAppTheme = (settings.SelectedAppTheme < AppThemes.Count) ? AppThemes[settings.SelectedAppTheme] : AppThemes[0];
-            SelectedColorTheme = (settings.SelectedColorTheme < ColorThemes.Count) ? ColorThemes[settings.SelectedColorTheme] : ColorThemes[0];
-            SelectedAppLanguage = (settings.SelectedAppLanguage < AppLanguages.Count) ? AppLanguages[settings.SelectedAppLanguage] : AppLanguages[0];
-            SelectedCameraTool = (settings.SelectedCameraTool < AppCameraTools.Count) ? AppCameraTools[settings.SelectedCameraTool] : AppCameraTools[0];
-            CaptureRatio = settings.CaptureRatio;
-            IconCategory = (settings.IconCategory < IconCategories.Count && settings.IconCategory > 0) ? IconCategories[settings.IconCategory] : IconCategories[0];
-            IsPlanExport = settings.IsPlanExport;
-            IsPosImageExport = settings.IsPosImageExport;
-            IsPinIconExport = settings.IsPinIconExport;
-            IsImageExport = settings.IsImageExport;
-            IsFotoOverlayExport = settings.IsFotoOverlayExport;
-            FotoCompressValue = settings.FotoCompressValue;
-            PinLabelPrefix = settings.PinLabelPrefix ?? string.Empty;
-            PinLabelFontSize = settings.PinLabelFontSize;
-            PinExportSize = settings.PinExportSize;
-            PinPosCropExportSize = settings.PinPosCropExportSize;
-            IconGalleryGridView = settings.IconGalleryGridView;
-            PhotoGalleryGridView = settings.PhotoGalleryGridView;
-            MaxPdfImageSizeW = settings.MaxPdfImageSizeW;
-            MaxPdfImageSizeH = settings.MaxPdfImageSizeH;
-            FotoThumbSize = settings.FotoThumbSize;
-            FotoThumbQuality = settings.FotoThumbQuality;
-            FotoQuality = settings.FotoQuality;
-            PlanPreviewSize = settings.PlanPreviewSize;
-            FotoPreviewSize = settings.FotoPreviewSize;
-            IconPreviewSize = settings.IconPreviewSize;
-            GridViewMinColumns = settings.GridViewMinColumns;
-            DefaultPinZoom = settings.DefaultPinZoom;
-            GpsResponseTimeOut = settings.GpsResponseTimeOut;
-            GpsMinTimeUpdate = settings.GpsMinTimeUpdate;
-            IsGpsActive = settings.IsGpsActive;
-            EditorTheme = settings.EditorTheme ?? string.Empty;
-            PolyLineHandleRadius = settings.PolyLineHandleRadius;
-            PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius;
-            DoubleClickThresholdMs = settings.DoubleClickThresholdMs;
-            PolyLineHandleColor = settings.PolyLineHandleColor ?? string.Empty;
-            PolyLineStartHandleColor = settings.PolyLineStartHandleColor ?? string.Empty;
-            PolyLineHandleAlpha = settings.PolyLineHandleAlpha;
-            CustomPinOffset = settings.CustomPinOffset;
-            DefaultPinIcon = settings.DefaultPinIcon ?? string.Empty;
-            ColorList = settings.ColorList ?? ColorList;
-            PriorityItems = settings.PriorityItems ?? PriorityItems;
-            StyleTemplateItems = settings.StyleTemplateItems ?? StyleTemplateItems;
-            MaxTileCache = settings.MaxTileCache;
-            TileSize = settings.TileSize;
-            IsLoupeEnabled = settings.IsLoupeEnabled;
-            MaxZoomLevel = settings.MaxZoomLevel;
-            LoupeRadius = settings.LoupeRadius;
-            LoupeZoomFactor = settings.LoupeZoomFactor;
+            var defaultSettings = new SettingsService();
+
+            OsBaseScale = settings.OsBaseScale ?? defaultSettings.OsBaseScale;
+            PinMinScaleLimit = settings.PinMinScaleLimit ?? defaultSettings.PinMinScaleLimit;
+            PinMaxScaleLimit = settings.PinMaxScaleLimit ?? defaultSettings.PinMaxScaleLimit;
+            MapIconSize = settings.MapIconSize ?? defaultSettings.MapIconSize;
+            MapIcon = settings.MapIcon ?? defaultSettings.MapIcon;
+            PinPlaceMode = settings.PinPlaceMode ?? defaultSettings.PinPlaceMode;
+            PinDuplicateOffset = settings.PinDuplicateOffset ?? defaultSettings.PinDuplicateOffset;
+            IsPlanRotateLocked = settings.IsPlanRotateLocked ?? defaultSettings.IsPlanRotateLocked;
+            IsPlanListThumbnails = settings.IsPlanListThumbnails ?? defaultSettings.IsPlanListThumbnails;
+            IsHideInactivePlans = settings.IsHideInactivePlans ?? defaultSettings.IsHideInactivePlans;
+            IsPinAutoLock = settings.IsPinAutoLock ?? defaultSettings.IsPinAutoLock;
+            IsExperimentalFunctions = settings.IsExperimentalFunctions ?? defaultSettings.IsExperimentalFunctions;
+            MaxPdfPixelCount = settings.MaxPdfPixelCount ?? defaultSettings.MaxPdfPixelCount;
+            PdfThumbDpi = settings.PdfThumbDpi ?? defaultSettings.PdfThumbDpi;
+
+            SelectedAppTheme = (settings.SelectedAppTheme.HasValue && settings.SelectedAppTheme >= 0 && settings.SelectedAppTheme < AppThemes.Count)
+                ? AppThemes[settings.SelectedAppTheme.Value] : defaultSettings.SelectedAppTheme;
+
+            SelectedColorTheme = (settings.SelectedColorTheme.HasValue && settings.SelectedColorTheme >= 0 && settings.SelectedColorTheme < ColorThemes.Count)
+                ? ColorThemes[settings.SelectedColorTheme.Value] : defaultSettings.SelectedColorTheme;
+
+            SelectedAppLanguage = (settings.SelectedAppLanguage.HasValue && settings.SelectedAppLanguage >= 0 && settings.SelectedAppLanguage < AppLanguages.Count)
+                ? AppLanguages[settings.SelectedAppLanguage.Value] : defaultSettings.SelectedAppLanguage;
+
+            SelectedCameraTool = (settings.SelectedCameraTool.HasValue && settings.SelectedCameraTool >= 0 && settings.SelectedCameraTool < AppCameraTools.Count)
+                ? AppCameraTools[settings.SelectedCameraTool.Value] : defaultSettings.SelectedCameraTool;
+
+            IconCategory = (settings.IconCategory.HasValue && settings.IconCategory > 0 && settings.IconCategory < IconCategories.Count)
+                ? IconCategories[settings.IconCategory.Value] : defaultSettings.IconCategory;
+
+            IsPlanExport = settings.IsPlanExport ?? defaultSettings.IsPlanExport;
+            IsPosImageExport = settings.IsPosImageExport ?? defaultSettings.IsPosImageExport;
+            IsPinIconExport = settings.IsPinIconExport ?? defaultSettings.IsPinIconExport;
+            IsImageExport = settings.IsImageExport ?? defaultSettings.IsImageExport;
+            IsFotoOverlayExport = settings.IsFotoOverlayExport ?? defaultSettings.IsFotoOverlayExport;
+            FotoCompressValue = settings.FotoCompressValue ?? defaultSettings.FotoCompressValue;
+            PinLabelPrefix = !string.IsNullOrWhiteSpace(settings.PinLabelPrefix) ? settings.PinLabelPrefix : defaultSettings.PinLabelPrefix;
+            DefaultPinIcon = !string.IsNullOrWhiteSpace(settings.DefaultPinIcon) ? settings.DefaultPinIcon : defaultSettings.DefaultPinIcon;
+            EditorTheme = !string.IsNullOrWhiteSpace(settings.EditorTheme) ? settings.EditorTheme : defaultSettings.EditorTheme;
+            PolyLineHandleColor = !string.IsNullOrWhiteSpace(settings.PolyLineHandleColor) ? settings.PolyLineHandleColor : defaultSettings.PolyLineHandleColor;
+            PolyLineStartHandleColor = !string.IsNullOrWhiteSpace(settings.PolyLineStartHandleColor) ? settings.PolyLineStartHandleColor : defaultSettings.PolyLineStartHandleColor;
+            PinLabelFontSize = settings.PinLabelFontSize ?? defaultSettings.PinLabelFontSize;
+            PinExportSize = settings.PinExportSize ?? defaultSettings.PinExportSize;
+            PinPosCropExportSize = settings.PinPosCropExportSize ?? defaultSettings.PinPosCropExportSize;
+            IconGalleryGridView = settings.IconGalleryGridView ?? defaultSettings.IconGalleryGridView;
+            PhotoGalleryGridView = settings.PhotoGalleryGridView ?? defaultSettings.PhotoGalleryGridView;
+            MaxPdfImageSizeW = settings.MaxPdfImageSizeW ?? defaultSettings.MaxPdfImageSizeW;
+            MaxPdfImageSizeH = settings.MaxPdfImageSizeH ?? defaultSettings.MaxPdfImageSizeH;
+            FotoThumbSize = settings.FotoThumbSize ?? defaultSettings.FotoThumbSize;
+            FotoThumbQuality = settings.FotoThumbQuality ?? defaultSettings.FotoThumbQuality;
+            FotoQuality = settings.FotoQuality ?? defaultSettings.FotoQuality;
+            PlanPreviewSize = settings.PlanPreviewSize ?? defaultSettings.PlanPreviewSize;
+            FotoPreviewSize = settings.FotoPreviewSize ?? defaultSettings.FotoPreviewSize;
+            IconPreviewSize = settings.IconPreviewSize ?? defaultSettings.IconPreviewSize;
+            GridViewMinColumns = settings.GridViewMinColumns ?? defaultSettings.GridViewMinColumns;
+            DefaultPinZoom = settings.DefaultPinZoom ?? defaultSettings.DefaultPinZoom;
+            GpsResponseTimeOut = settings.GpsResponseTimeOut ?? defaultSettings.GpsResponseTimeOut;
+            GpsMinTimeUpdate = settings.GpsMinTimeUpdate ?? defaultSettings.GpsMinTimeUpdate;
+            IsGpsActive = settings.IsGpsActive ?? defaultSettings.IsGpsActive;
+            PolyLineHandleRadius = settings.PolyLineHandleRadius ?? defaultSettings.PolyLineHandleRadius;
+            PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius ?? defaultSettings.PolyLineHandleTouchRadius;
+            DoubleClickThresholdMs = settings.DoubleClickThresholdMs ?? defaultSettings.DoubleClickThresholdMs;
+            PolyLineHandleAlpha = settings.PolyLineHandleAlpha ?? defaultSettings.PolyLineHandleAlpha;
+            CustomPinOffset = settings.CustomPinOffset ?? defaultSettings.CustomPinOffset;
+            ColorList = settings.ColorList?.Count > 0 ? settings.ColorList : [.. defaultSettings.ColorList];
+            PriorityItems = settings.PriorityItems?.Count > 0 ? settings.PriorityItems : [.. defaultSettings.PriorityItems];
+            StyleTemplateItems = settings.StyleTemplateItems?.Count > 0 ? settings.StyleTemplateItems : [.. defaultSettings.StyleTemplateItems];
+            MaxTileCache = settings.MaxTileCache ?? defaultSettings.MaxTileCache;
+            TileSize = settings.TileSize ?? defaultSettings.TileSize;
+            IsLoupeEnabled = settings.IsLoupeEnabled ?? defaultSettings.IsLoupeEnabled;
+            MaxZoomLevel = settings.MaxZoomLevel ?? defaultSettings.MaxZoomLevel;
+            LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
+            LoupeZoomFactor = settings.LoupeZoomFactor ?? defaultSettings.LoupeZoomFactor;
         }
         catch (Exception ex)
         {
