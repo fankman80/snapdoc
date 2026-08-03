@@ -838,17 +838,28 @@ public partial class TileImageView : ContentView
                 {
                     _draggedPin = null;
                     _longPressCts?.Cancel();
-                    var points = _activeTouches.Values.ToArray();
-                    _oldFingerDistance = SKPoint.Distance(points[0], points[1]);
-                    _oldFingerAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
+                    var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
+                    var p0 = _activeTouches[keys[0]];
+                    var p1 = _activeTouches[keys[1]];
+                    _oldFingerDistance = SKPoint.Distance(p0, p1);
+                    _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
                 }
+
+                // Alter Code für die Zwei-Finger-Geste
+                //if (_activeTouches.Count == 2)
+                //{
+                //    _draggedPin = null;
+                //    _longPressCts?.Cancel();
+                //    var points = _activeTouches.Values.ToArray();
+                //    _oldFingerDistance = SKPoint.Distance(points[0], points[1]);
+                //    _oldFingerAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
+                //}
                 break;
 
             case SKTouchAction.Moved:
                 if (_isGenerating) break;
                 if (_isDoubleTapAction) break;
                 if (_isLongPressActive) break;
-
                 if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
                     _longPressCts?.Cancel();
 
@@ -866,50 +877,101 @@ public partial class TileImageView : ContentView
                     _panX += e.Location.X - oldPt.X;
                     _panY += e.Location.Y - oldPt.Y;
                     _activeTouches[e.Id] = e.Location;
-
                     CurrentPan = new SKPoint(_panX, _panY);
                     shouldInvalidate = true;
                 }
                 else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
                 {
-                    _activeTouches[e.Id] = e.Location;
-                    var points = _activeTouches.Values.ToArray();
-                    float centerX = (points[0].X + points[1].X) / 2f;
-                    float centerY = (points[0].Y + points[1].Y) / 2f;
-                    float newDistance = SKPoint.Distance(points[0], points[1]);
+                    var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
+                    var oldP0 = _activeTouches[keys[0]];
+                    var oldP1 = _activeTouches[keys[1]];
+                    float oldCenterX = (oldP0.X + oldP1.X) / 2f;
+                    float oldCenterY = (oldP0.Y + oldP1.Y) / 2f;
 
+                    _activeTouches[e.Id] = e.Location;
+
+                    var newP0 = _activeTouches[keys[0]];
+                    var newP1 = _activeTouches[keys[1]];
+                    float newCenterX = (newP0.X + newP1.X) / 2f;
+                    float newCenterY = (newP0.Y + newP1.Y) / 2f;
+
+                    _panX += (newCenterX - oldCenterX);
+                    _panY += (newCenterY - oldCenterY);
+
+                    float newDistance = SKPoint.Distance(newP0, newP1);
                     if (_oldFingerDistance > 0)
                     {
                         float scaleFactor = newDistance / _oldFingerDistance;
                         float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
-
                         float scaleRatio = newScale / _scale;
-                        _panX = centerX - (centerX - _panX) * scaleRatio;
-                        _panY = centerY - (centerY - _panY) * scaleRatio;
+                        _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
+                        _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
                         _scale = newScale;
                     }
                     _oldFingerDistance = newDistance;
 
-                    float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
-
+                    float newAngle = (float)Math.Atan2(newP1.Y - newP0.Y, newP1.X - newP0.X);
                     if (!IsRotationLocked && _oldFingerAngle != 0f)
                     {
                         float angleDiff = newAngle - _oldFingerAngle;
+
+                        if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
+                        if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
+
                         float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
                         _rotationDegrees += rotationDiffDegrees;
 
                         double rad = angleDiff;
                         float cos = (float)Math.Cos(rad);
                         float sin = (float)Math.Sin(rad);
-                        float dx = _panX - centerX;
-                        float dy = _panY - centerY;
+                        float dx = _panX - newCenterX;
+                        float dy = _panY - newCenterY;
 
-                        _panX = centerX + (dx * cos - dy * sin);
-                        _panY = centerY + (dx * sin + dy * cos);
+                        _panX = newCenterX + (dx * cos - dy * sin);
+                        _panY = newCenterY + (dx * sin + dy * cos);
                     }
                     _oldFingerAngle = newAngle;
                     shouldInvalidate = true;
                 }
+
+                // Alter Code für die Zwei-Finger-Geste
+                //else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
+                //{
+                //    _activeTouches[e.Id] = e.Location;
+                //    var points = _activeTouches.Values.ToArray();
+                //    float centerX = (points[0].X + points[1].X) / 2f;
+                //    float centerY = (points[0].Y + points[1].Y) / 2f;
+                //    float newDistance = SKPoint.Distance(points[0], points[1]);
+
+                //    if (_oldFingerDistance > 0)
+                //    {
+                //        float scaleFactor = newDistance / _oldFingerDistance;
+                //        float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
+                //        float scaleRatio = newScale / _scale;
+                //        _panX = centerX - (centerX - _panX) * scaleRatio;
+                //        _panY = centerY - (centerY - _panY) * scaleRatio;
+                //        _scale = newScale;
+                //    }
+                //    _oldFingerDistance = newDistance;
+
+                //    float newAngle = (float)Math.Atan2(points[1].Y - points[0].Y, points[1].X - points[0].X);
+
+                //    if (!IsRotationLocked && _oldFingerAngle != 0f)
+                //    {
+                //        float angleDiff = newAngle - _oldFingerAngle;
+                //        float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
+                //        _rotationDegrees += rotationDiffDegrees;
+                //        double rad = angleDiff;
+                //        float cos = (float)Math.Cos(rad);
+                //        float sin = (float)Math.Sin(rad);
+                //        float dx = _panX - centerX;
+                //        float dy = _panY - centerY;
+                //        _panX = centerX + (dx * cos - dy * sin);
+                //        _panY = centerY + (dx * sin + dy * cos);
+                //    }
+                //    _oldFingerAngle = newAngle;
+                //    shouldInvalidate = true;
+                //}
 
                 if (shouldInvalidate)
                 {
@@ -1027,7 +1089,6 @@ public partial class TileImageView : ContentView
                 _canvasView.InvalidateSurface();
                 break;
         }
-
         e.Handled = true;
     }
 
