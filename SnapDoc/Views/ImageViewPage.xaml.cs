@@ -121,6 +121,9 @@ public partial class ImageViewPage : IQueryAttributable
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
     {
+        if (ImgSource != null)
+            return;
+
         if (query.TryGetValue("planId", out object value1)) PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2)) PinId = value2 as string;
         if (query.TryGetValue("pinIcon", out object value3)) PinIcon = value3 as string;

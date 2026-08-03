@@ -14,8 +14,8 @@
        x:Name="AppShellRoot"
        Shell.BackgroundColor="{DynamicResource Primary}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
-       Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"       
-       FlyoutBackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
+       Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"
+       FlyoutBackgroundColor="{OnIdiom Desktop=White, Default={AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}}">
 
     <Shell.Resources>
         <ResourceDictionary>
@@ -163,7 +163,8 @@
         <DataTemplate>
             <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                   Padding="0,0,6,0"
-                  RowSpacing="0">
+                  RowSpacing="0"
+                  BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
