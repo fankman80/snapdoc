@@ -701,6 +701,9 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 var target = sortedFotos[newIndex];
 
+                FotoContainer.Opacity = 0;
+                FotoContainer.Source = null;
+
                 PlanId = target.PlanId;
                 PinId = target.PinId;
                 ImgSource = target.FotoKey;
@@ -722,11 +725,13 @@ public partial class ImageViewPage : IQueryAttributable
 
                             FotoContainer.WidthRequest = imgWidth;
                             FotoContainer.HeightRequest = imgHeight;
-
                             FitImageToDimensions(imgWidth, imgHeight);
                         }
                     }
                     FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
+                    await Task.Delay(20);
+                    await FotoContainer.FadeToAsync(1, 100, Easing.CubicOut);
                 }
                 UpdateNavigationButtons();
             }
