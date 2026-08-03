@@ -22,6 +22,8 @@ public partial class ImageViewPage : IQueryAttributable
     private bool hasFittedImage = false;
     private double minScale = 0.1;
     private readonly TransformViewModel fotoContainer;
+    private bool needsImageFit = false;
+    private bool isNavigating = false;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -107,11 +109,14 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
-        if (hasFittedImage) return;
         if (FotoContainer.Width < 10 || FotoContainer.Height < 10) return;
 
-        hasFittedImage = true;
-        Dispatcher.Dispatch(() => ImageFit(null, null));
+        if (!hasFittedImage || needsImageFit)
+        {
+            hasFittedImage = true;
+            needsImageFit = false;
+            Dispatcher.Dispatch(() => ImageFit(null, null));
+        }
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -137,11 +142,27 @@ public partial class ImageViewPage : IQueryAttributable
                 this.Title = formattedDate;
             }
 
-            var bytes = File.ReadAllBytes(imgPath);
-            FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+            if (File.Exists(imgPath))
+            {
+                var bytes = File.ReadAllBytes(imgPath);
+
+                using (var ms = new MemoryStream(bytes))
+                using (var codec = SKCodec.Create(ms))
+                {
+                    if (codec != null)
+                    {
+                        FotoContainer.WidthRequest = codec.Info.Width;
+                        FotoContainer.HeightRequest = codec.Info.Height;
+                    }
+                }
+
+                FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+            }
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
+
+        UpdateNavigationButtons();
     }
 
     public void OnDoubleTapped(object sender, EventArgs e) => ImageFit(null, null);
@@ -217,13 +238,23 @@ public partial class ImageViewPage : IQueryAttributable
 
     private void ImageFit(object sender, EventArgs e)
     {
-        var scale = Math.Min(this.Width / FotoContainer.Width, this.Height / FotoContainer.Height);
+        double w = FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : FotoContainer.Width;
+        double h = FotoContainer.HeightRequest > 0 ? FotoContainer.HeightRequest : FotoContainer.Height;
+        FitImageToDimensions(w, h);
+    }
+
+    private void FitImageToDimensions(double imgWidth, double imgHeight)
+    {
+        if (imgWidth <= 0 || imgHeight <= 0 || this.Width <= 0 || this.Height <= 0)
+            return;
+
+        var scale = Math.Min(this.Width / imgWidth, this.Height / imgHeight);
         minScale = scale;
         fotoContainer.Scale = scale;
-        fotoContainer.TranslationX = (this.Width - FotoContainer.Width) / 2;
-        fotoContainer.TranslationY = (this.Height - FotoContainer.Height) / 2;
-        fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX);
-        fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY);
+        fotoContainer.TranslationX = (this.Width - imgWidth) / 2;
+        fotoContainer.TranslationY = (this.Height - imgHeight) / 2;
+        fotoContainer.AnchorX = (1 / imgWidth) * ((this.Width / 2) - fotoContainer.TranslationX);
+        fotoContainer.AnchorY = (1 / imgHeight) * ((this.Height / 2) - fotoContainer.TranslationY);
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
@@ -633,5 +664,142 @@ public partial class ImageViewPage : IQueryAttributable
             cloudRadius,
             cloudInciseDeg
         );
+    }
+
+    private void OnPreviousImageClicked(object sender, EventArgs e) => NavigateImage(-1);
+    private void OnNextImageClicked(object sender, EventArgs e) => NavigateImage(1);
+
+    private async void NavigateImage(int direction)
+    {
+        if (isNavigating || ImgSource == "showTitle")
+            return;
+
+        try
+        {
+            isNavigating = true;
+
+            var sortedFotos = GetSortedFotos();
+            if (sortedFotos.Count == 0) return;
+
+            int currentIndex = sortedFotos.FindIndex(f =>
+                f.PlanId == PlanId &&
+                f.PinId == PinId &&
+                (string.Equals(f.FotoKey, ImgSource, StringComparison.OrdinalIgnoreCase) ||
+                 string.Equals(Path.GetFileName(f.FotoKey), Path.GetFileName(ImgSource), StringComparison.OrdinalIgnoreCase)));
+
+            if (currentIndex == -1)
+            {
+                currentIndex = sortedFotos.FindIndex(f =>
+                    string.Equals(f.FotoKey, ImgSource, StringComparison.OrdinalIgnoreCase) ||
+                    string.Equals(Path.GetFileName(f.FotoKey), Path.GetFileName(ImgSource), StringComparison.OrdinalIgnoreCase));
+            }
+
+            if (currentIndex == -1) return;
+
+            int newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < sortedFotos.Count)
+            {
+                var target = sortedFotos[newIndex];
+
+                PlanId = target.PlanId;
+                PinId = target.PinId;
+                ImgSource = target.FotoKey;
+
+                string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
+
+                Title = target.DateTime.ToString("d") + " / " + target.DateTime.ToString("HH:mm");
+
+                if (File.Exists(imgPath))
+                {
+                    var bytes = File.ReadAllBytes(imgPath);
+                    using (var ms = new MemoryStream(bytes))
+                    using (var codec = SKCodec.Create(ms))
+                    {
+                        if (codec != null)
+                        {
+                            double imgWidth = codec.Info.Width;
+                            double imgHeight = codec.Info.Height;
+
+                            FotoContainer.WidthRequest = imgWidth;
+                            FotoContainer.HeightRequest = imgHeight;
+
+                            FitImageToDimensions(imgWidth, imgHeight);
+                        }
+                    }
+                    FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                }
+                UpdateNavigationButtons();
+            }
+        }
+        finally
+        {
+            isNavigating = false;
+        }
+    }
+
+    private void UpdateNavigationButtons()
+    {
+        if (ImgSource == "showTitle")
+        {
+            PrevImgBtn.IsVisible = false;
+            NextImgBtn.IsVisible = false;
+            return;
+        }
+
+        var sortedFotos = GetSortedFotos();
+
+        int currentIndex = sortedFotos.FindIndex(f =>
+            f.PlanId == PlanId &&
+            f.PinId == PinId &&
+            (string.Equals(f.FotoKey, ImgSource, StringComparison.OrdinalIgnoreCase) ||
+             string.Equals(Path.GetFileName(f.FotoKey), Path.GetFileName(ImgSource), StringComparison.OrdinalIgnoreCase)));
+
+        if (currentIndex == -1)
+        {
+            currentIndex = sortedFotos.FindIndex(f =>
+                string.Equals(f.FotoKey, ImgSource, StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(Path.GetFileName(f.FotoKey), Path.GetFileName(ImgSource), StringComparison.OrdinalIgnoreCase));
+        }
+
+        PrevImgBtn.IsVisible = currentIndex > 0;
+        NextImgBtn.IsVisible = currentIndex >= 0 && currentIndex < sortedFotos.Count - 1;
+    }
+
+    private static List<(string PlanId, string PinId, string FotoKey, DateTime DateTime)> GetSortedFotos()
+    {
+        var result = new List<(string PlanId, string PinId, string FotoKey, DateTime DateTime)>();
+
+        if (GlobalJson.Data?.Plans == null)
+            return result;
+
+        // Alle Plaene durchgehen
+        foreach (var planKvp in GlobalJson.Data.Plans)
+        {
+            var planId = planKvp.Key;
+            var plan = planKvp.Value;
+            if (plan?.Pins == null) continue;
+
+            // Alle Pins des Plans durchgehen
+            foreach (var pinKvp in plan.Pins)
+            {
+                var pinId = pinKvp.Key;
+                var pin = pinKvp.Value;
+                if (pin?.Fotos == null) continue;
+
+                // Alle Fotos des Pins durchgehen
+                foreach (var fotoKvp in pin.Fotos)
+                {
+                    var fotoKey = fotoKvp.Key;
+                    var foto = fotoKvp.Value;
+                    if (foto != null)
+                    {
+                        result.Add((planId, pinId, fotoKey, foto.DateTime));
+                    }
+                }
+            }
+        }
+
+        // Nach Aufnahmedatum sortieren
+        return [.. result.OrderBy(f => f.DateTime)];
     }
 }

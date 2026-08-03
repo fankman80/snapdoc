@@ -28,7 +28,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
-            .UseMauiCommunityToolkit(options => {options.SetShouldEnableSnackbarOnWindows(true);})
+            .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(false); }) // Setze auf true, wenn CommunityToolkit Issue #3276 gefixt wurde
             .UseUraniumUI()
             .UseFFImageLoading()
             .ConfigureMRGestures()

@@ -5,7 +5,6 @@ using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 using System.Xml.Linq;
 
-
 #if ANDROID
 using Android.Hardware.Display;
 using Android.Content;

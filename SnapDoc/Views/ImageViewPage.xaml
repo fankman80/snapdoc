@@ -87,6 +87,36 @@
             </Grid>
         </mr:AbsoluteLayout>
 
+        <!-- Pfeil links (Vorheriges Bild) -->
+        <Button x:Name="PrevImgBtn"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=66, Glyph={x:Static local:MaterialIcons.Navigate_before}}"     
+                BackgroundColor="#66000000"
+                CornerRadius="24"
+                WidthRequest="60"
+                HeightRequest="120"
+                Opacity="0.75"
+                Padding="0"
+                Margin="15,0,0,0"
+                HorizontalOptions="Start"
+                VerticalOptions="Center"
+                ZIndex="10000"
+                Clicked="OnPreviousImageClicked"/>
+
+        <!-- Pfeil rechts (Naechstes Bild) -->
+        <Button x:Name="NextImgBtn"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=66, Glyph={x:Static local:MaterialIcons.Navigate_next}}"    
+                BackgroundColor="#66000000"
+                CornerRadius="24"
+                WidthRequest="60"
+                HeightRequest="120"
+                Opacity="0.75"
+                Padding="0"
+                Margin="0,0,15,0"
+                HorizontalOptions="End"
+                VerticalOptions="Center"
+                ZIndex="10000"
+                Clicked="OnNextImageClicked"/>
+        
         <Button x:Name="DrawBtn"
                 Text="{x:Static local:MaterialIcons.Draw}"
                 Margin="20,0,0,20"
