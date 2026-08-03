@@ -491,7 +491,8 @@ public partial class TileImageView : ContentView
         if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder)) return;
 
         int currentZoom = MaxZoomLevel + (int)Math.Floor(Math.Log2(_scale));
-        currentZoom = Math.Clamp(currentZoom, 2, MaxZoomLevel);
+        int safeMaxZoom = Math.Max(2, MaxZoomLevel);
+        currentZoom = Math.Clamp(currentZoom, 2, safeMaxZoom);
 
         canvas.Save();
         canvas.Translate(_panX, _panY);
