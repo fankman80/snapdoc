@@ -109,6 +109,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 75;
     [ObservableProperty] public partial int FotoQuality { get; set; } = 90;
     [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
+    [ObservableProperty] public partial int PlanThumbSize { get; set; } = 512;
     [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
     [ObservableProperty] public partial int IconPreviewSize { get; set; } = 64;
     [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;
@@ -357,6 +358,7 @@ public partial class SettingsService : ObservableObject
             FotoThumbQuality = FotoThumbQuality,
             FotoQuality = FotoQuality,
             PlanPreviewSize = PlanPreviewSize,
+            PlanThumbSize = PlanThumbSize,
             FotoPreviewSize = FotoPreviewSize,
             IconPreviewSize = IconPreviewSize,
             GridViewMinColumns = GridViewMinColumns,
@@ -454,6 +456,7 @@ public partial class SettingsService : ObservableObject
             FotoThumbQuality = settings.FotoThumbQuality ?? defaultSettings.FotoThumbQuality;
             FotoQuality = settings.FotoQuality ?? defaultSettings.FotoQuality;
             PlanPreviewSize = settings.PlanPreviewSize ?? defaultSettings.PlanPreviewSize;
+            PlanThumbSize = settings.PlanThumbSize ?? defaultSettings.PlanThumbSize;
             FotoPreviewSize = settings.FotoPreviewSize ?? defaultSettings.FotoPreviewSize;
             IconPreviewSize = settings.IconPreviewSize ?? defaultSettings.IconPreviewSize;
             GridViewMinColumns = settings.GridViewMinColumns ?? defaultSettings.GridViewMinColumns;
@@ -527,6 +530,7 @@ public partial class SettingsService : ObservableObject
         FotoThumbQuality = defaultSettings.FotoThumbQuality;
         FotoQuality = defaultSettings.FotoQuality;
         PlanPreviewSize = defaultSettings.PlanPreviewSize;
+        PlanThumbSize = defaultSettings.PlanThumbSize;
         FotoPreviewSize = defaultSettings.FotoPreviewSize;
         IconPreviewSize = defaultSettings.IconPreviewSize;
         GridViewMinColumns = defaultSettings.GridViewMinColumns;

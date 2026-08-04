@@ -41,6 +41,7 @@ internal class SettingsModel
     public int? FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
     public int? FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
     public int? PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
+    public int? PlanThumbSize { get; set; } // Grösse Plan-Thumbnail in der Planliste
     public int? FotoPreviewSize { get; set; } // Grösse Fotovorschau in der Foto-Galerie
     public int? IconPreviewSize { get; set; } // Grösse der Icons in der Icon-Auswahl
     public int? GridViewMinColumns { get; set; } // Minimale Spaltenanzahl im Rastermodus

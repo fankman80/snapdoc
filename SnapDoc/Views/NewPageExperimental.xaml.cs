@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using BruTile.Extensions;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;

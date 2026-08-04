@@ -6,6 +6,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 
 namespace SnapDoc.Views;
+
 public partial class LoadPDFPages : ContentPage
 {
     IEnumerable<FileResult> resultList;
@@ -233,25 +234,23 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        await Task.Run(async () =>
+        await Task.Run(() =>
         {
             var groups = fileListView.ItemsSource.Cast<PdfItem>()
                             .Where(x => x.IsChecked)
-                            .GroupBy(x => x.PdfPath);
+                            .GroupBy(x => x.PdfPath)
+                            .ToList();
 
-            foreach (var group in groups)
+            Parallel.ForEach(groups, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, group =>
             {
-                byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key);
-                using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
+                byte[] pdfBytes = File.ReadAllBytes(group.Key);
+                using var nativeDoc = NativePdfRenderer.OpenDocumentAsync(pdfBytes).GetAwaiter().GetResult();
+                foreach (var item in group)
                 {
-                    foreach (var item in group)
-                    {
-                        string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
-                        await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
-                    }
+                    string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
+                    NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi).GetAwaiter().GetResult();
                 }
-                pdfBytes = null;
-            }
+            });
         });
     }
 
@@ -261,20 +260,25 @@ public partial class LoadPDFPages : ContentPage
         {
             string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
             Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
-            var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
 
-            Parallel.ForEach(items, (item, state, index) =>
+            var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
+            string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+
+            // Array vorab in der exakten Grosse erstellen, um die Reihenfolge zu garantieren
+            var processedPlans = new KeyValuePair<string, Plan>[items.Count];
+
+            Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
-                string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
-                string fileName = $"plan_{timeStamp}_{index}.jpg";
-                string planId = $"plan_{timeStamp}_{index}";
+                var item = items[i];
+                string fileName = $"plan_{timeStamp}_{i}.jpg";
+                string planId = $"plan_{timeStamp}_{i}";
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
-                // Bildgröße ermitteln (Schonend!)
+                // Bildgroesse ermitteln (Thread-sicher)
                 Size _imgSize;
                 using (var stream = File.OpenRead(item.ImagePath))
-                using (var codec = SkiaSharp.SKCodec.Create(stream))
+                using (var codec = SKCodec.Create(stream))
                 {
                     _imgSize = new Size(codec.Info.Width, codec.Info.Height);
                 }
@@ -289,19 +293,73 @@ public partial class LoadPDFPages : ContentPage
                     PlanColor = "#00FFFFFF"
                 };
 
-                lock (GlobalJson.Data)
+                try
                 {
-                    GlobalJson.Data.Plans ??= [];
-                    GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(fileName)] = plan;
+                    using var inputStream = File.OpenRead(item.PreviewPath);
+                    using var originalBitmap = SKBitmap.Decode(inputStream);
+                    int maxThumbSize = SettingsService.Instance.PlanThumbSize;
+                    int targetWidth = originalBitmap.Width;
+                    int targetHeight = originalBitmap.Height;
+
+                    if (targetWidth > maxThumbSize || targetHeight > maxThumbSize)
+                    {
+                        if (targetWidth > targetHeight)
+                        {
+                            targetHeight = (int)(targetHeight * ((double)maxThumbSize / targetWidth));
+                            targetWidth = maxThumbSize;
+                        }
+                        else
+                        {
+                            targetWidth = (int)(targetWidth * ((double)maxThumbSize / targetHeight));
+                            targetHeight = maxThumbSize;
+                        }
+                    }
+
+                    // SKSamplingOptions statt SKFilterQuality verwenden
+                    using var resizedBitmap = originalBitmap.Resize(new SKImageInfo(targetWidth, targetHeight), SKSamplingOptions.Default);
+                    if (resizedBitmap != null)
+                    {
+                        using var image = SKImage.FromBitmap(resizedBitmap);
+                        using var thumbData = image.Encode(SKEncodedImageFormat.Jpeg, 75);
+                        using var thumbStream = File.OpenWrite(destinationThumbPath);
+                        thumbData.SaveTo(thumbStream);
+                    }
+                    else
+                    {
+                        File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
+                    }
+                }
+                catch
+                {
+                    File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
                 }
 
-                // Kopieren der generierten Dateien vom Cache zum Projektordner
+                // Hauptbild in voller Auflösung kopieren
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
-                File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
 
-                MainThread.BeginInvokeOnMainThread(() => {
-                    LoadDataToView.AddPlan(new KeyValuePair<string, Plan>(planId, plan));
-                });
+                // Ergebnis exakt an der vorgegebenen Position im Array ablegen
+                processedPlans[i] = new KeyValuePair<string, Plan>(planId, plan);
+            });
+
+            // JSON sequentiell befuellen
+            lock (GlobalJson.Data)
+            {
+                GlobalJson.Data.Plans ??= [];
+                foreach (var planKvp in processedPlans)
+                {
+                    if (planKvp.Value != null)
+                        GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(planKvp.Value.File)] = planKvp.Value;
+                }
+            }
+
+            // UI sequentiell updaten
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                foreach (var planKvp in processedPlans)
+                {
+                    if (planKvp.Value != null)
+                        LoadDataToView.AddPlan(planKvp);
+                }
             });
 
             // Am Ende den gesamten Cache leeren

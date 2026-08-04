@@ -3,7 +3,6 @@ using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
-using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 
 namespace SnapDoc.Controls;

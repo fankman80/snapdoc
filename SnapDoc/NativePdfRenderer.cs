@@ -22,13 +22,13 @@ namespace SnapDoc
         {
             var doc = new NativePdfDocument();
 #if IOS
-        doc.Document = new PdfKit.PdfDocument(NSData.FromArray(pdfData));
+            doc.Document = new PdfKit.PdfDocument(NSData.FromArray(pdfData));
 #elif ANDROID
-        var path = System.IO.Path.Combine(FileSystem.CacheDirectory, Guid.NewGuid().ToString() + ".pdf");
-        await File.WriteAllBytesAsync(path, pdfData);
-        doc.TempFilePath = path;
-        doc.Fd = ParcelFileDescriptor.Open(new Java.IO.File(path), ParcelFileMode.ReadOnly);
-        doc.Renderer = new PdfRenderer(doc.Fd);
+            var path = System.IO.Path.Combine(FileSystem.CacheDirectory, Guid.NewGuid().ToString() + ".pdf");
+            await File.WriteAllBytesAsync(path, pdfData);
+            doc.TempFilePath = path;
+            doc.Fd = ParcelFileDescriptor.Open(new Java.IO.File(path), ParcelFileMode.ReadOnly);
+            doc.Renderer = new PdfRenderer(doc.Fd);
 #elif WINDOWS
             var ms = new InMemoryRandomAccessStream();
             await ms.WriteAsync(pdfData.AsBuffer());
@@ -147,7 +147,6 @@ namespace SnapDoc
         public void Dispose()
         {
             Dispose(true);
-            // Dies ist der Teil, den deine Analyse eingefordert hat:
             GC.SuppressFinalize(this);
         }
 
@@ -155,7 +154,6 @@ namespace SnapDoc
         {
             if (disposing)
             {
-                // Bereinigung der verwalteten Ressourcen (Managed Resources)
     #if IOS
                 Document?.Dispose();
                 Document = null;
@@ -170,8 +168,6 @@ namespace SnapDoc
                     try { File.Delete(TempFilePath); } catch { /* Ignore */ }
                 }
     #elif WINDOWS
-                // Das Windows PdfDocument selbst ist ein WinRT-Objekt ohne explizites IDisposable,
-                // aber wir setzen die Referenz auf null, um den RC-Count zu senken.
                 Document = null;
     #endif
             }

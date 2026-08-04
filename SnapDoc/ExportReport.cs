@@ -636,9 +636,6 @@ public partial class ExportReport
                         scaledPinSize = ScaleToFit(pin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
 
                     PointF posOnPlan = PivotRecalc(pin.Pos, (float)pin.PinRotation, pin.Anchor, scaledPinSize, scaledSize);
-					float fontSizeMM = (float)(SettingsService.Instance.PinLabelFontSize * 0.352778);
-					float labelX = posOnPlan.X + scaledPinSize.Width + 1f;
-					float labelY = posOnPlan.Y - (fontSizeMM / 2f);
 
                     imgRun.Append(GetImageElement(mainPart, pinImagePath, scaledPinSize, posOnPlan, (float)pin.PinRotation, "anchor"));
                     imgRun.Append(CreateTextBoxWithShape(
@@ -646,7 +643,7 @@ public partial class ExportReport
                         pinIndex,
                         storeItemId,
                         $"/positions/pos[@id='{pinIndex}']",
-                        new PointF(labelX, labelY),
+                        new Point((int)(posOnPlan.X + scaledPinSize.Width + 1), (int)(posOnPlan.Y - (SettingsService.Instance.PinLabelFontSize / 2))),
                         SettingsService.Instance.PinLabelFontSize,
                         pin.PinColor.ToString()[3..]));
 
@@ -1150,13 +1147,19 @@ public partial class ExportReport
         double xPt = coordinateMM.X * 2.83465;
         double yPt = coordinateMM.Y * 2.83465;
 
+        // Erzwingt den Punkt als Dezimaltrennzeichen, unabhängig von den Systemeinstellungen
+        string xPtStr = xPt.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+        string yPtStr = yPt.ToString("0.##", System.Globalization.CultureInfo.InvariantCulture);
+
         Picture picture = new();
 
         // VML-Shape
         Shape shape = new()
         {
             Id = "TextBoxShape",
-            Style = $"position:absolute;margin-left:{xPt}pt;margin-top:{yPt}pt;" +
+            Style = $"position:absolute;margin-left:{xPtStr}pt;margin-top:{yPtStr}pt;" +
+                    "mso-position-horizontal:absolute;mso-position-horizontal-relative:margin;" +
+                    "mso-position-vertical:absolute;mso-position-vertical-relative:paragraph;" +
                     "mso-fit-shape-to-text:t;mso-wrap-style:none;",
             Stroked = TrueFalseValue.FromBoolean(true),
             Filled = TrueFalseValue.FromBoolean(true)

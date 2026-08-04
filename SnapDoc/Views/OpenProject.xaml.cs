@@ -297,7 +297,7 @@ public partial class OpenProject : ContentPage
 
                         // lösche Plan-Tiles aus dem Cache-Ordner
                         string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
-                        if (Directory.Exists(cacheDir))
+                        if (Directory.Exists(cacheDir) && GlobalJson.Data?.Plans != null)
                         {
                             foreach (var plan in GlobalJson.Data.Plans)
                             {
