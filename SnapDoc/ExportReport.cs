@@ -636,6 +636,9 @@ public partial class ExportReport
                         scaledPinSize = ScaleToFit(pin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
 
                     PointF posOnPlan = PivotRecalc(pin.Pos, (float)pin.PinRotation, pin.Anchor, scaledPinSize, scaledSize);
+					float fontSizeMM = (float)(SettingsService.Instance.PinLabelFontSize * 0.352778);
+					float labelX = posOnPlan.X + scaledPinSize.Width + 1f;
+					float labelY = posOnPlan.Y - (fontSizeMM / 2f);
 
                     imgRun.Append(GetImageElement(mainPart, pinImagePath, scaledPinSize, posOnPlan, (float)pin.PinRotation, "anchor"));
                     imgRun.Append(CreateTextBoxWithShape(
@@ -643,7 +646,7 @@ public partial class ExportReport
                         pinIndex,
                         storeItemId,
                         $"/positions/pos[@id='{pinIndex}']",
-                        new Point((int)(posOnPlan.X + scaledPinSize.Width + 1), (int)(posOnPlan.Y - (SettingsService.Instance.PinLabelFontSize / 2))),
+                        new PointF(labelX, labelY),
                         SettingsService.Instance.PinLabelFontSize,
                         pin.PinColor.ToString()[3..]));
 
@@ -1140,7 +1143,7 @@ public partial class ExportReport
         int posNr,
         string storeItemId,
         string xpath,
-        Point coordinateMM,
+        PointF coordinateMM,
         double fontSizePt,
         string fontColorHex)
     {
