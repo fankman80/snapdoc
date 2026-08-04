@@ -65,7 +65,6 @@
                   IsRotationLocked="{Binding IsPlanRotateLocked, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
                   SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
                   PlaceholderColor="DimGrey"
-                  TileBackgroundColor="DimGrey"
                   AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                   AbsoluteLayout.LayoutFlags="All"/>
 
