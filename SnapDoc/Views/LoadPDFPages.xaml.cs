@@ -99,20 +99,13 @@ public partial class LoadPDFPages : ContentPage
                             string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                             string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
 
-                            await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-
-                            int width = 0, height = 0;
-                            using (var stream = File.OpenRead(previewPath))
-                            using (var codec = SKCodec.Create(stream))
-                            {
-                                if (codec != null) { width = codec.Info.Width; height = codec.Info.Height; }
-                            }
+                            var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
 
                             int targetDpi;
                             if (SettingsService.Instance.IsExperimentalFunctions)
                                 targetDpi = SettingsService.Instance.PdfFullViewDpi;
                             else
-                                targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
+                                targetDpi = CalculateMaxDpiFromMaxDimension(width, height, SettingsService.Instance.MaxPdfImageSize);
 
                             pdfImages.Add(new PdfItem
                             {
@@ -150,13 +143,18 @@ public partial class LoadPDFPages : ContentPage
         }
     }
 
-    private static int CalculateMaxDpiFromPixelLimit(int width72dpi, int height72dpi, int maxPixelCount)
+    private static int CalculateMaxDpiFromMaxDimension(int currentWidth, int currentHeight, int maxDimension)
     {
-        if (width72dpi <= 0 || height72dpi <= 0)
-            throw new ArgumentException("PDF-Seitenbreite und -höhe müssen > 0 sein.");
+        int maxEdge = Math.Max(currentWidth, currentHeight);
 
-        double dpi = 72 * Math.Sqrt((double)maxPixelCount / (width72dpi * height72dpi));
-        return Math.Max(10, (int)Math.Floor(dpi)); // Mindestwert 10 dpi zur Sicherheit    
+        if (maxEdge <= 0)
+            return SettingsService.Instance.PdfThumbDpi;
+
+        double scaleFactor = (double)maxDimension / maxEdge;
+        int currentDpi = SettingsService.Instance.PdfThumbDpi;
+        int targetDpi = (int)Math.Floor(currentDpi * scaleFactor);
+
+        return Math.Max(1, targetDpi);
     }
 
     public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()
@@ -234,23 +232,23 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        await Task.Run(() =>
-        {
-            var groups = fileListView.ItemsSource.Cast<PdfItem>()
-                            .Where(x => x.IsChecked)
-                            .GroupBy(x => x.PdfPath)
-                            .ToList();
+        var groups = fileListView.ItemsSource.Cast<PdfItem>()
+                        .Where(x => x.IsChecked)
+                        .GroupBy(x => x.PdfPath)
+                        .ToList();
 
-            Parallel.ForEach(groups, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, group =>
+        await Parallel.ForEachAsync(groups, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, async (group, cancellationToken) =>
+        {
+            byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key, cancellationToken);
+            using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
+
+            foreach (var item in group)
             {
-                byte[] pdfBytes = File.ReadAllBytes(group.Key);
-                using var nativeDoc = NativePdfRenderer.OpenDocumentAsync(pdfBytes).GetAwaiter().GetResult();
-                foreach (var item in group)
-                {
-                    string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
-                    NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi).GetAwaiter().GetResult();
-                }
-            });
+                string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
+                var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
+                item.FinalWidth = width;
+                item.FinalHeight = height;
+            }
         });
     }
 
@@ -275,13 +273,7 @@ public partial class LoadPDFPages : ContentPage
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
-                // Bildgroesse ermitteln (Thread-sicher)
-                Size _imgSize;
-                using (var stream = File.OpenRead(item.ImagePath))
-                using (var codec = SKCodec.Create(stream))
-                {
-                    _imgSize = new Size(codec.Info.Width, codec.Info.Height);
-                }
+                Size _imgSize = new(item.FinalWidth, item.FinalHeight);
 
                 Plan plan = new()
                 {

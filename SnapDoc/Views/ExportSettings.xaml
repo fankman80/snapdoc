@@ -141,6 +141,7 @@
 
                     <controls:RangeSlider
                          LabelText="{x:Static res:AppResources.fotoqualitaet}"
+                         IsVisible="{Binding IsImageExport}"
                          IsRange="False"
                          Minimum="1"
                          Maximum="100"
@@ -149,6 +150,21 @@
                          TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                          MinimumValueDisplayFormat="{}{0} %"
                          LowerValue="{Binding FotoCompressValue}"
+                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                    </controls:RangeSlider>
+
+                    <controls:RangeSlider
+                         LabelText="{x:Static res:AppResources.planqualitaet}"
+                         IsVisible="{Binding IsPlanExport}"
+                         IsRange="False"
+                         Minimum="1"
+                         Maximum="100"
+                         Step="1"
+                         ValueFontSize="12"
+                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                         MinimumValueDisplayFormat="{}{0} %"
+                         LowerValue="{Binding PlanCompressValue}"
                          MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                          MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                     </controls:RangeSlider>

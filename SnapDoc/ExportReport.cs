@@ -40,6 +40,9 @@ public partial class ExportReport
         // Alle Bilder parallel vorbereiten
         await PreProcessAllImagesAsync(GlobalJson.Data, CancellationToken.None);
 
+        // Alle Pläne parallel vorbereiten
+        await PreProcessAllPlansAsync(GlobalJson.Data, CancellationToken.None);
+
         // Platzhalter
         Dictionary<string, string> placeholders = new()
         {
@@ -274,7 +277,13 @@ public partial class ExportReport
                                                             }
                                                             else
                                                             {
-                                                                backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                string originalBgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                string cachedBgPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
+
+                                                                if (SettingsService.Instance.PlanCompressValue < 100 && File.Exists(cachedBgPath))
+                                                                    backgroundImagePath = cachedBgPath;
+                                                                else
+                                                                    backgroundImagePath = originalBgPath;
 
                                                                 var planSize = currentPlan.ImageSize;
                                                                 double factorX = (1.0 / planSize.Width * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
@@ -611,10 +620,15 @@ public partial class ExportReport
             Paragraph imagePara = new();
             Run imgRun = new();
             string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+            string cachedPlanPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
+
+            if (SettingsService.Instance.PlanCompressValue < 100 && File.Exists(cachedPlanPath))
+                planImagePath = cachedPlanPath;
+
             Size originalSize = currentPlan.ImageSize;
             SizeF scaledSize = ScaleToFit(originalSize, exportSize);
 
-            // Hintergrundbild einfügen
+            // Planbild einfügen
             imgRun.Append(GetImageElement(mainPart, planImagePath, scaledSize, new Point(0, 0), 0, "anchor"));
 
             // Pins verarbeiten
@@ -1308,7 +1322,7 @@ public partial class ExportReport
     {
         var tasks = new List<FotoWorkItem>();
 
-        // 1. Alle Fotos sammeln, die komprimiert werden müssen
+        // Alle Fotos sammeln, die komprimiert werden müssen
         foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
         {
             if (plan.Pins == null)
@@ -1324,14 +1338,18 @@ public partial class ExportReport
 
                     string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
+                    float compressValue = SettingsService.Instance.FotoCompressValue < 100
+                        ? SettingsService.Instance.FotoCompressValue / 100f
+                        : 1.0f;
+
                     // Nur hinzufügen, wenn Kompression gewünscht und Ziel noch nicht existiert
-                    if (SettingsService.Instance.FotoCompressValue < 100 && !File.Exists(targetPath))
-                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, SettingsService.Instance.FotoCompressValue / 100f));
+                    if (compressValue < 1.0f && !File.Exists(targetPath))
+                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, compressValue));
                 }
             }
         }
 
-        // 2. Parallel abarbeiten
+        // Parallel abarbeiten
         await Parallel.ForEachAsync(tasks, new ParallelOptions
         {
             MaxDegreeOfParallelism = Environment.ProcessorCount,
@@ -1341,9 +1359,42 @@ public partial class ExportReport
             await Task.Run(() =>
             {
                 if (File.Exists(work.SourcePath))
-                {
-                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue);
-                }
+                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue, SettingsService.Instance.FotoQuality);
+            }, taskCt);
+        });
+    }
+
+    private static async Task PreProcessAllPlansAsync(JsonDataModel data, CancellationToken ct)
+    {
+        var tasks = new List<FotoWorkItem>();
+
+        foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
+        {
+            if (string.IsNullOrEmpty(plan.File)) continue;
+
+            string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.PlanPath, plan.File);
+            string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(plan.File));
+
+            float compressValue = SettingsService.Instance.PlanCompressValue < 100
+                ? SettingsService.Instance.PlanCompressValue / 100f
+                : 1.0f;
+
+            // Nur komprimieren, falls gewünscht und das Bild noch nicht im Cache liegt
+            if (compressValue < 1.0f && !File.Exists(targetPath))
+                tasks.Add(new FotoWorkItem(sourcePath, targetPath, compressValue));
+        }
+
+        // Parallel abarbeiten
+        await Parallel.ForEachAsync(tasks, new ParallelOptions
+        {
+            MaxDegreeOfParallelism = Environment.ProcessorCount,
+            CancellationToken = ct
+        }, async (work, taskCt) =>
+        {
+            await Task.Run(() =>
+            {
+                if (File.Exists(work.SourcePath))
+                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue, SettingsService.Instance.PlanQuality);
             }, taskCt);
         });
     }

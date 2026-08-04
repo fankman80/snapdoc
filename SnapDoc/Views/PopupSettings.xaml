@@ -306,13 +306,13 @@
                             <controls:RangeSlider
                                     LabelText="{x:Static res:AppResources.aufloesung_fuer_export}"
                                     IsRange="False"
-                                    Minimum="1"
-                                    Maximum="50"
-                                    Step="1"
+                                    Minimum="1024"
+                                    Maximum="10240"
+                                    Step="1024"
                                     ValueFontSize="12"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    MinimumValueDisplayFormat="{}{0:0} MP"
-                                    LowerValue="{Binding MaxPdfPixelCount}"
+                                    MinimumValueDisplayFormat="{}{0:0} px"
+                                    LowerValue="{Binding MaxPdfImageSize}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                             <controls:RangeSlider

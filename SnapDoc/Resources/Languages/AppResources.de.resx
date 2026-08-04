@@ -370,7 +370,7 @@
     <value>Pingrösse limitieren</value>
   </data>
   <data name="aufloesung_fuer_export" xml:space="preserve">
-    <value>PDF-Auflösung für Export</value>
+    <value>Maximale Bildgrösse für den Export</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Projekt Titel</value>
@@ -926,5 +926,8 @@
   </data>
   <data name="aufloesung_vollbildanzeige" xml:space="preserve">
     <value>PDF-Auflösung Vollbildanzeige</value>
+  </data>
+  <data name="planqualitaet" xml:space="preserve">
+    <value>Planqualität</value>
   </data>
 </root>

@@ -370,7 +370,7 @@
     <value>Limiter la taille du pin's</value>
   </data>
   <data name="aufloesung_fuer_export" xml:space="preserve">
-    <value>Résolution d'exportation PDF</value>
+    <value>Taille d'image maximale pour l'exportation</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Titre du projet</value>
@@ -926,5 +926,8 @@
   </data>
   <data name="aufloesung_vollbildanzeige" xml:space="preserve">
     <value>Résolution PDF plein écran</value>
+  </data>
+  <data name="planqualitaet" xml:space="preserve">
+    <value>Qualité du plan</value>
   </data>
 </root>

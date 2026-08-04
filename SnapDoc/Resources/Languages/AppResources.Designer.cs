@@ -214,7 +214,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Auflösung für Export ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maximale Bildgrösse für den Export ähnelt.
         /// </summary>
         internal static string aufloesung_fuer_export {
             get {
@@ -1767,6 +1767,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string planliste_mit_vorschau {
             get {
                 return ResourceManager.GetString("planliste_mit_vorschau", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planqualität ähnelt.
+        /// </summary>
+        internal static string planqualitaet {
+            get {
+                return ResourceManager.GetString("planqualitaet", resourceCulture);
             }
         }
         

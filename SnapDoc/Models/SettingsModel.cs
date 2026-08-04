@@ -29,17 +29,18 @@ internal class SettingsModel
     public bool? IsImageExport { get; set; } // Fotos im Bericht exportieren
     public bool? IsFotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
     public int? FotoCompressValue { get; set; } // Bildqualität der Fotos im Worddokument (0-100%)
+    public int? PlanCompressValue { get; set; } // Bildqualität der Pläne im Worddokument (0-100%)
     public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
     public double? PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
     public double? PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter
     public int? PinPosCropExportSize { get; set; } // Größe der zugeschnittenen Pin-Position-Bilder im Bericht
     public bool? IconGalleryGridView { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
     public bool? PhotoGalleryGridView { get; set; } // Modus der Foto-Galerie (Raster oder Liste)
-    public int? MaxPdfImageSizeW { get; set; } // Maximale Breite eines PDF-Bildes beim Import
-    public int? MaxPdfImageSizeH { get; set; } // Maximale Höhe eines PDF-Bildes beim Import
+    public int? MaxPdfImageSize { get; set; } // Maximale Breite/Höhe eines PDF-Bildes
     public int? FotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
     public int? FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
     public int? FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)
+    public int? PlanQuality { get; set; } // Plan Kompressionsqualität (0-100)
     public int? PlanPreviewSize { get; set; } // Grösse Planvorschau im PDF-Import-Dialog
     public int? PlanThumbSize { get; set; } // Grösse Plan-Thumbnail in der Planliste
     public int? FotoPreviewSize { get; set; } // Grösse Fotovorschau in der Foto-Galerie

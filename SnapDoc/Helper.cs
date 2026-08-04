@@ -252,19 +252,19 @@ public class Helper
         }
     }
 
-    public static void BitmapResizer(string sourcePath, string destinationPath, double scaleFactor)
+    public static void BitmapResizer(string sourcePath, string destinationPath, double scaleFactor, int quality)
     {
         using var inputBitmap = SKBitmap.Decode(sourcePath);
 
         int newWidth = (int)(inputBitmap.Width * scaleFactor);
         int newHeight = (int)(inputBitmap.Height * scaleFactor);
         var resizedBitmap = new SKBitmap(newWidth, newHeight);
-        var samplingOptions = new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.None);
+        var samplingOptions = new SKSamplingOptions(SKCubicResampler.Mitchell);
 
         inputBitmap.ScalePixels(resizedBitmap, samplingOptions);
 
         using var image = SKImage.FromBitmap(resizedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
         using var stream = File.OpenWrite(destinationPath);
         data.SaveTo(stream);
     }

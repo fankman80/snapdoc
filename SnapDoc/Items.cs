@@ -469,6 +469,8 @@ namespace SnapDoc
         public string DisplayName { get; set; }
         public string ImageName { get; set; }
         public int PdfPage { get; set; }
+        public int FinalWidth { get; set; }
+        public int FinalHeight { get; set; }
     }
 
     public class StylePickerItem

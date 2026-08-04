@@ -242,20 +242,20 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void AddPlan()
     {
         //calculate aspect-ratio, resolution and imagesize
-        if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSizeW || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSizeH)
+        if (thisPlan.ImageSize.Width > SettingsService.Instance.MaxPdfImageSize || thisPlan.ImageSize.Height > SettingsService.Instance.MaxPdfImageSize)
         {
             var oversizeScaleFac = Math.Min(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height) /
                                Math.Max(thisPlan.ImageSize.Width, thisPlan.ImageSize.Height);
 
             if (thisPlan.ImageSize.Width > thisPlan.ImageSize.Height)
             {
-                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW;
-                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH * oversizeScaleFac;
+                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSize;
+                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSize * oversizeScaleFac;
             }
             else
             {
-                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSizeW * oversizeScaleFac;
-                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSizeH;
+                PlanImage.WidthRequest = SettingsService.Instance.MaxPdfImageSize * oversizeScaleFac;
+                PlanImage.HeightRequest = SettingsService.Instance.MaxPdfImageSize;
             }
         }
         else
@@ -1443,10 +1443,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void OnDeleteClick()
     {
-        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
-
         if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
@@ -1464,6 +1460,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
+
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
         // JSON + Files löschen
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File));

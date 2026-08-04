@@ -38,25 +38,30 @@ namespace SnapDoc
             return doc;
         }
 
-        public static async Task SavePageAsync(NativePdfDocument doc, string imgPath, int pageIndex, int dpi)
+        public static async Task<(int Width, int Height)> SavePageAsync(NativePdfDocument doc, string imgPath, int pageIndex, int dpi)
         {
             float scale = dpi / 72f;
 #if WINDOWS
-            if (doc.Document == null) return;
+            if (doc.Document == null) return (0, 0);
 
             using var page = doc.Document.GetPage((uint)pageIndex);
             var folder = await Windows.Storage.StorageFolder.GetFolderFromPathAsync(Path.GetDirectoryName(imgPath));
             var file = await folder.CreateFileAsync(Path.GetFileName(imgPath), Windows.Storage.CreationCollisionOption.ReplaceExisting);
             using var outStream = await file.OpenAsync(Windows.Storage.FileAccessMode.ReadWrite);
 
+            int width = (int)Math.Max(1, Math.Round(page.Size.Width * scale));
+            int height = (int)Math.Max(1, Math.Round(page.Size.Height * scale));
+
             var options = new PdfPageRenderOptions
             {
-                DestinationWidth = (uint)Math.Max(1, Math.Round(page.Size.Width * scale))
+                DestinationWidth = (uint)width
             };
             await page.RenderToStreamAsync(outStream, options);
             await outStream.FlushAsync();
+            
+            return (width, height);
 #elif IOS
-            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex) return;
+            if (doc.Document == null || (nint)doc.Document.PageCount <= pageIndex) return (0, 0);
 
             using var page = doc.Document.GetPage(pageIndex);
             var pageRect = page.GetBoundsForBox(PdfDisplayBox.Media);
@@ -80,15 +85,19 @@ namespace SnapDoc
             using var stream = File.OpenWrite(imgPath);
             using var jpegData = img.AsJPEG(0.8f);
             jpegData.AsStream().CopyTo(stream);
+            
+            return ((int)width, (int)height);
 #elif ANDROID
-            if (doc.Renderer == null) return;
+            if (doc.Renderer == null) return (0, 0);
 
+            int width = 0;
+            int height = 0;
             Android.Graphics.Pdf.PdfRenderer.Page page = null;
             try
             {
                 page = doc.Renderer.OpenPage(pageIndex);
-                int width = (int)(page.Width * scale);
-                int height = (int)(page.Height * scale);
+                width = (int)(page.Width * scale);
+                height = (int)(page.Height * scale);
                 using var bitmap = Bitmap.CreateBitmap(width, height, Bitmap.Config.Argb8888);
                 using (var canvas = new Canvas(bitmap))
                 {
@@ -104,11 +113,15 @@ namespace SnapDoc
             {
                 if (page != null)
                 {
-                    page.Close(); // Expliziter Java-Aufruf
-                    page.Dispose(); // .NET-Bereinigung
+                    page.Close();
+                    page.Dispose();
                 }
             }
-            await Task.Delay(50); 
+            await Task.Delay(50);
+
+            return (width, height);
+#else
+            return (0, 0);
 #endif
         }
     }
