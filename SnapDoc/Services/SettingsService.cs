@@ -121,6 +121,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 60;
     [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 90;
     [ObservableProperty] public partial int MaxPdfPixelCount { get; set; } = 30;
+    [ObservableProperty] public partial int PdfFullViewDpi { get; set; } = 360;
     [ObservableProperty] public partial int PdfThumbDpi { get; set; } = 72;
     [ObservableProperty] public partial int MapIconSize { get; set; } = 85;
     [ObservableProperty] public partial int MapIcon { get; set; } = 0;
@@ -328,6 +329,7 @@ public partial class SettingsService : ObservableObject
             IsPinAutoLock = IsPinAutoLock,
             IsExperimentalFunctions = IsExperimentalFunctions,
             MaxPdfPixelCount = MaxPdfPixelCount,
+            PdfFullViewDpi = PdfFullViewDpi,
             PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
             SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
@@ -412,6 +414,7 @@ public partial class SettingsService : ObservableObject
             IsPinAutoLock = settings.IsPinAutoLock ?? defaultSettings.IsPinAutoLock;
             IsExperimentalFunctions = settings.IsExperimentalFunctions ?? defaultSettings.IsExperimentalFunctions;
             MaxPdfPixelCount = settings.MaxPdfPixelCount ?? defaultSettings.MaxPdfPixelCount;
+            PdfFullViewDpi = settings.PdfFullViewDpi ?? defaultSettings.PdfFullViewDpi;
             PdfThumbDpi = settings.PdfThumbDpi ?? defaultSettings.PdfThumbDpi;
 
             SelectedAppTheme = (settings.SelectedAppTheme.HasValue && settings.SelectedAppTheme >= 0 && settings.SelectedAppTheme < AppThemes.Count)
@@ -496,6 +499,7 @@ public partial class SettingsService : ObservableObject
         IsPinAutoLock = defaultSettings.IsPinAutoLock;
         IsExperimentalFunctions = defaultSettings.IsExperimentalFunctions;
         MaxPdfPixelCount = defaultSettings.MaxPdfPixelCount;
+        PdfFullViewDpi = defaultSettings.PdfFullViewDpi;
         PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;
         SelectedAppTheme = defaultSettings.SelectedAppTheme;

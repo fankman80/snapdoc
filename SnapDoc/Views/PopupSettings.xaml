@@ -304,7 +304,7 @@
                                         Clicked="ResetIcon"/>
                             </Grid>
                             <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.aufloesung_pdf_umwandlung}"
+                                    LabelText="{x:Static res:AppResources.aufloesung_fuer_export}"
                                     IsRange="False"
                                     Minimum="1"
                                     Maximum="50"
@@ -315,6 +315,19 @@
                                     LowerValue="{Binding MaxPdfPixelCount}"
                                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                            <controls:RangeSlider
+                                    IsVisible="{Binding IsExperimentalFunctions}"
+                                    LabelText="{x:Static res:AppResources.aufloesung_vollbildanzeige}"
+                                    IsRange="False"
+                                    Minimum="72"
+                                    Maximum="576"
+                                    Step="72"
+                                    ValueFontSize="12"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    MinimumValueDisplayFormat="{}{0:0} DPI"
+                                    LowerValue="{Binding PdfFullViewDpi}"
+                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>                            
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto" />

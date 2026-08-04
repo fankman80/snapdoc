@@ -369,8 +369,8 @@
   <data name="pingroesse_limitieren" xml:space="preserve">
     <value>Limiter la taille du pin's</value>
   </data>
-  <data name="aufloesung_pdf_umwandlung" xml:space="preserve">
-    <value>Résolution conversion PDF</value>
+  <data name="aufloesung_fuer_export" xml:space="preserve">
+    <value>Résolution d'exportation PDF</value>
   </data>
   <data name="projekt_titel" xml:space="preserve">
     <value>Titre du projet</value>
@@ -923,5 +923,8 @@
   </data>
   <data name="loesen" xml:space="preserve">
     <value>désépingler</value>
+  </data>
+  <data name="aufloesung_vollbildanzeige" xml:space="preserve">
+    <value>Résolution PDF plein écran</value>
   </data>
 </root>

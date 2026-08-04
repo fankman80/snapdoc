@@ -109,7 +109,7 @@ public partial class TileImageView : ContentView
                 var control = (TileImageView)bindable;
                 if ((bool)newValue)
                     control.CurrentRotation = 0f;
-        });
+            });
 
     public static readonly BindableProperty CurrentRotationProperty =
         BindableProperty.Create(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f, defaultBindingMode: BindingMode.TwoWay,
@@ -256,7 +256,8 @@ public partial class TileImageView : ContentView
 
         float zoomFactor = delta > 0 ? 1.1f : 0.9f;
         float oldScale = _scale;
-        float newScale = Math.Clamp(_scale * zoomFactor, 0.1f, 16.0f);
+        float minScale = GetMinScale();
+        float newScale = Math.Clamp(_scale * zoomFactor, minScale, 16.0f);
 
         if (Math.Abs(newScale - oldScale) < 0.001f) return;
 
@@ -441,6 +442,21 @@ public partial class TileImageView : ContentView
     }
 #endif
 
+    private float GetMinScale()
+    {
+        if (OriginalImageSize.IsEmpty || _canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
+            return 0.001f;
+
+        // Skalierung, bei der das gesamte Bild komplett in den Canvas passt
+        float fitScale = Math.Min(
+            _canvasView.CanvasSize.Width / OriginalImageSize.Width,
+            _canvasView.CanvasSize.Height / OriginalImageSize.Height
+        );
+
+        // Erlaube z. B. bis zu 50% von fitScale herauszuzoomen (maximal aber 0.1f)
+        return Math.Min(0.1f, fitScale * 0.5f);
+    }
+
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
@@ -470,10 +486,10 @@ public partial class TileImageView : ContentView
             return;
         }
 
-        if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder)) return;
+        if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder) || OriginalImageSize.IsEmpty) return;
 
         int currentZoom = MaxZoomLevel + (int)Math.Floor(Math.Log2(_scale));
-        currentZoom = Math.Clamp(currentZoom, 2, MaxZoomLevel);
+        currentZoom = Math.Clamp(currentZoom, 0, MaxZoomLevel);
 
         canvas.Save();
         canvas.Translate(_panX, _panY);
@@ -482,27 +498,23 @@ public partial class TileImageView : ContentView
 
         float tileScaleFactor = (float)Math.Pow(2, MaxZoomLevel - currentZoom);
         float currentTileSizeInCanvasSpace = TileSize * tileScaleFactor;
-
-        int maxTiles = (int)Math.Pow(2, currentZoom);
-
+        double zoomScale = Math.Pow(0.5, MaxZoomLevel - currentZoom);
+        float levelWidth = OriginalImageSize.Width * (float)zoomScale;
+        float levelHeight = OriginalImageSize.Height * (float)zoomScale;
+        int maxTilesX = (int)Math.Ceiling(levelWidth / TileSize);
+        int maxTilesY = (int)Math.Ceiling(levelHeight / TileSize);
         float canvasWidth = _canvasView.CanvasSize.Width;
         float canvasHeight = _canvasView.CanvasSize.Height;
-
         float viewRadius = (float)Math.Sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight) / (2f * _scale);
-
         float canvasCenterX = canvasWidth / 2f;
         float canvasCenterY = canvasHeight / 2f;
-
         float dx = canvasCenterX - _panX;
         float dy = canvasCenterY - _panY;
-
         float negRad = -_rotationDegrees * (float)(Math.PI / 180.0);
         float cosNeg = (float)Math.Cos(negRad);
         float sinNeg = (float)Math.Sin(negRad);
-
         float tileCenterX = (dx * cosNeg - dy * sinNeg) / _scale;
         float tileCenterY = (dx * sinNeg + dy * cosNeg) / _scale;
-
         float viewLeft = tileCenterX - viewRadius;
         float viewTop = tileCenterY - viewRadius;
         float viewRight = tileCenterX + viewRadius;
@@ -513,101 +525,103 @@ public partial class TileImageView : ContentView
         int maxX = (int)Math.Ceiling(viewRight / currentTileSizeInCanvasSpace);
         int maxY = (int)Math.Ceiling(viewBottom / currentTileSizeInCanvasSpace);
 
-        minX = Math.Clamp(minX, 0, maxTiles - 1);
-        minY = Math.Clamp(minY, 0, maxTiles - 1);
-        maxX = Math.Clamp(maxX, 0, maxTiles - 1);
-        maxY = Math.Clamp(maxY, 0, maxTiles - 1);
+        minX = Math.Clamp(minX, 0, Math.Max(0, maxTilesX - 1));
+        minY = Math.Clamp(minY, 0, Math.Max(0, maxTilesY - 1));
+        maxX = Math.Clamp(maxX, 0, Math.Max(0, maxTilesX - 1));
+        maxY = Math.Clamp(maxY, 0, Math.Max(0, maxTilesY - 1));
 
         string zoomFolder = Path.Combine(_computedTileFolder, currentZoom.ToString());
 
-        if (!Directory.Exists(zoomFolder)) return;
-
-        for (int x = minX; x <= maxX; x++)
+        if (Directory.Exists(zoomFolder))
         {
-            string xFolder = Path.Combine(zoomFolder, x.ToString());
-            if (!Directory.Exists(xFolder)) continue;
-
-            for (int y = minY; y <= maxY; y++)
+            for (int x = minX; x <= maxX; x++)
             {
-                string cacheKey = $"{currentZoom}_{x}_{y}";
-                float posX = x * currentTileSizeInCanvasSpace;
-                float posY = y * currentTileSizeInCanvasSpace;
-                var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
+                string xFolder = Path.Combine(zoomFolder, x.ToString());
+                if (!Directory.Exists(xFolder)) continue;
 
-                if (!_tileCache.TryGetValue(cacheKey, out var bitmap))
+                for (int y = minY; y <= maxY; y++)
                 {
-                    if (_loadingTiles.Add(cacheKey))
-                    {
-                        string tilePath = Path.Combine(xFolder, $"{y}.webp");
+                    string cacheKey = $"{currentZoom}_{x}_{y}";
+                    float posX = x * currentTileSizeInCanvasSpace;
+                    float posY = y * currentTileSizeInCanvasSpace;
+                    var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
 
-                        _ = Task.Run(() =>
+                    if (!_tileCache.TryGetValue(cacheKey, out var bitmap))
+                    {
+                        if (_loadingTiles.Add(cacheKey))
                         {
-                            try
+                            string tilePath = Path.Combine(xFolder, $"{y}.jpg");
+
+                            _ = Task.Run(() =>
                             {
-                                if (File.Exists(tilePath))
+                                try
                                 {
-                                    using var stream = File.OpenRead(tilePath);
-                                    var decodedBitmap = SKBitmap.Decode(stream);
-                                    if (decodedBitmap != null)
+                                    if (File.Exists(tilePath))
                                     {
-                                        MainThread.BeginInvokeOnMainThread(() =>
+                                        using var stream = File.OpenRead(tilePath);
+                                        var decodedBitmap = SKBitmap.Decode(stream);
+                                        if (decodedBitmap != null)
                                         {
-                                            _tileCache[cacheKey] = decodedBitmap;
-                                            _canvasView.InvalidateSurface();
-                                        });
+                                            MainThread.BeginInvokeOnMainThread(() =>
+                                            {
+                                                _tileCache[cacheKey] = decodedBitmap;
+                                                _canvasView.InvalidateSurface();
+                                            });
+                                        }
                                     }
                                 }
-                            }
-                            catch (Exception ex)
-                            {
-                                System.Diagnostics.Debug.WriteLine($"Fehler beim Kachelladen: {ex.Message}");
-                            }
-                            finally
-                            {
-                                MainThread.BeginInvokeOnMainThread(() => _loadingTiles.Remove(cacheKey));
-                            }
-                        });
-                    }
-
-                    int fallbackZoom = currentZoom - 1;
-                    int fallbackX = x / 2;
-                    int fallbackY = y / 2;
-                    int deltaZoom = 1;
-
-                    while (fallbackZoom >= 0)
-                    {
-                        string fallbackKey = $"{fallbackZoom}_{fallbackX}_{fallbackY}";
-
-                        if (_tileCache.TryGetValue(fallbackKey, out var fallbackBitmap))
-                        {
-                            int factor = 1 << deltaZoom;
-
-                            float srcWidth = (float)TileSize / factor;
-                            float srcHeight = (float)TileSize / factor;
-
-                            float srcX = (x % factor) * srcWidth;
-                            float srcY = (y % factor) * srcHeight;
-
-                            var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
-
-                            canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, null);
-
-                            break;
+                                catch (Exception ex)
+                                {
+                                    System.Diagnostics.Debug.WriteLine($"Fehler beim Kachelladen: {ex.Message}");
+                                }
+                                finally
+                                {
+                                    MainThread.BeginInvokeOnMainThread(() => _loadingTiles.Remove(cacheKey));
+                                }
+                            });
                         }
 
-                        fallbackZoom--;
-                        fallbackX /= 2;
-                        fallbackY /= 2;
-                        deltaZoom++;
+                        // Fallback-Logik fuer noch nicht geladene Kacheln
+                        int fallbackZoom = currentZoom - 1;
+                        int fallbackX = x / 2;
+                        int fallbackY = y / 2;
+                        int deltaZoom = 1;
+
+                        while (fallbackZoom >= 0)
+                        {
+                            string fallbackKey = $"{fallbackZoom}_{fallbackX}_{fallbackY}";
+
+                            if (_tileCache.TryGetValue(fallbackKey, out var fallbackBitmap))
+                            {
+                                int factor = 1 << deltaZoom;
+
+                                float srcWidth = (float)TileSize / factor;
+                                float srcHeight = (float)TileSize / factor;
+
+                                float srcX = (x % factor) * srcWidth;
+                                float srcY = (y % factor) * srcHeight;
+
+                                var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
+
+                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, null);
+                                break;
+                            }
+
+                            fallbackZoom--;
+                            fallbackX /= 2;
+                            fallbackY /= 2;
+                            deltaZoom++;
+                        }
                     }
-                }
-                else
-                {
-                    canvas.DrawBitmap(bitmap, destRect, LinearSampling, null);
+                    else
+                    {
+                        canvas.DrawBitmap(bitmap, destRect, LinearSampling, null);
+                    }
                 }
             }
         }
 
+        // Pins zeichnen
         if (Pins != null && OriginalImageSize != SKSize.Empty)
         {
             float padding = 50f;
@@ -861,7 +875,8 @@ public partial class TileImageView : ContentView
                     if (_oldFingerDistance > 0)
                     {
                         float scaleFactor = newDistance / _oldFingerDistance;
-                        float newScale = Math.Clamp(_scale * scaleFactor, 0.1f, 16.0f);
+                        float minScale = GetMinScale();
+                        float newScale = Math.Clamp(_scale * scaleFactor, minScale, 16.0f);
                         float scaleRatio = newScale / _scale;
                         _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
                         _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
@@ -1092,7 +1107,7 @@ public partial class TileImageView : ContentView
             CurrentRotation = _rotationDegrees;
 
             bool tilesExist = Directory.Exists(_computedTileFolder) &&
-                              Directory.GetFiles(_computedTileFolder, "*.webp", SearchOption.AllDirectories).Length > 0;
+                              Directory.GetFiles(_computedTileFolder, "*.jpg", SearchOption.AllDirectories).Length > 0;
 
             if (!tilesExist)
             {
@@ -1104,6 +1119,7 @@ public partial class TileImageView : ContentView
                     _computedTileFolder,
                     MaxZoomLevel,
                     TileSize,
+                    PlaceholderColor.ToSKColor(),
                     token,
                     () => MainThread.BeginInvokeOnMainThread(() => _canvasView.InvalidateSurface())
                 ), token);
@@ -1166,61 +1182,108 @@ public partial class TileImageView : ContentView
         ];
     }
 
-    private static void GenerateTilePyramidInternal(string sourceImagePath, string outputFolder, int maxZoomLevels, int tileSize, CancellationToken token, Action onLevelGenerated = null)
+    private static void GenerateTilePyramidInternal(
+        string sourceImagePath,
+        string outputFolder,
+        int maxZoomLevels,
+        int tileSize,
+        SKColor tileBackgroundColor,
+        CancellationToken token,
+        Action onLevelGenerated = null)
     {
         using var codec = SKCodec.Create(sourceImagePath);
         if (codec == null) return;
+
         using var originalBitmap = SKBitmap.Decode(codec);
+        if (originalBitmap == null) return;
+
         int origWidth = originalBitmap.Width;
         int origHeight = originalBitmap.Height;
 
+        // Parallelitaet drosseln, um Windows-Dateisystem-Engpaesse zu vermeiden
+        var parallelOptions = new ParallelOptions
+        {
+            CancellationToken = token,
+            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1)
+        };
+
+        // Von grob (0) bis detailliert (maxZoomLevels)
         for (int zoom = 0; zoom <= maxZoomLevels; zoom++)
         {
             token.ThrowIfCancellationRequested();
 
             double scale = Math.Pow(0.5, maxZoomLevels - zoom);
-            int levelWidth = (int)(origWidth * scale);
-            int levelHeight = (int)(origHeight * scale);
+            int levelWidth = Math.Max(1, (int)(origWidth * scale));
+            int levelHeight = Math.Max(1, (int)(origHeight * scale));
 
-            using var scaledBitmap = originalBitmap.Resize(new SKImageInfo(levelWidth, levelHeight), LinearSampling);
-            if (scaledBitmap == null) continue;
+            using var scaledBitmap = (zoom == maxZoomLevels)
+                ? null
+                : originalBitmap.Resize(new SKImageInfo(levelWidth, levelHeight), LinearSampling);
 
-            int tilesX = (int)Math.Ceiling((double)levelWidth / tileSize);
-            int tilesY = (int)Math.Ceiling((double)levelHeight / tileSize);
+            SKBitmap currentLevelBitmap = scaledBitmap ?? originalBitmap;
+
+            int tilesX = (int)Math.Ceiling((double)currentLevelBitmap.Width / tileSize);
+            int tilesY = (int)Math.Ceiling((double)currentLevelBitmap.Height / tileSize);
+
+            string zoomFolder = Path.Combine(outputFolder, zoom.ToString());
 
             for (int x = 0; x < tilesX; x++)
+                Directory.CreateDirectory(Path.Combine(zoomFolder, x.ToString()));
+
+            Parallel.For(0, tilesX, parallelOptions, x =>
             {
-                token.ThrowIfCancellationRequested();
+                string xFolder = Path.Combine(zoomFolder, x.ToString());
 
                 for (int y = 0; y < tilesY; y++)
                 {
                     token.ThrowIfCancellationRequested();
 
-                    string tileDirectory = Path.Combine(outputFolder, zoom.ToString(), x.ToString());
-                    Directory.CreateDirectory(tileDirectory);
-
-                    string tilePath = Path.Combine(tileDirectory, $"{y}.webp");
+                    string tilePath = Path.Combine(xFolder, $"{y}.jpg");
+                    if (File.Exists(tilePath)) continue;
 
                     int srcX = x * tileSize;
                     int srcY = y * tileSize;
-                    int width = Math.Min(tileSize, levelWidth - srcX);
-                    int height = Math.Min(tileSize, levelHeight - srcY);
+                    int width = Math.Min(tileSize, currentLevelBitmap.Width - srcX);
+                    int height = Math.Min(tileSize, currentLevelBitmap.Height - srcY);
 
-                    using var tileBitmap = new SKBitmap(tileSize, tileSize);
-                    using (var canvas = new SKCanvas(tileBitmap))
+                    if (width <= 0 || height <= 0) continue;
+
+                    var srcRectI = new SKRectI(srcX, srcY, srcX + width, srcY + height);
+
+                    using var subsetBitmap = new SKBitmap();
+                    if (currentLevelBitmap.ExtractSubset(subsetBitmap, srcRectI))
                     {
-                        canvas.Clear(SKColors.Transparent);
-                        var srcRect = new SKRect(srcX, srcY, srcX + width, srcY + height);
-                        var destRect = new SKRect(0, 0, width, height);
-                        canvas.DrawBitmap(scaledBitmap, srcRect, destRect, LinearSampling, null);
-                    }
+                        SKBitmap tileToSave = subsetBitmap;
+                        bool needsDispose = false;
 
-                    using var image = SKImage.FromBitmap(tileBitmap);
-                    using var data = image.Encode(SKEncodedImageFormat.Webp, 90);
-                    using var stream = File.OpenWrite(tilePath);
-                    data.SaveTo(stream);
+                        if (width < tileSize || height < tileSize)
+                        {
+                            tileToSave = new SKBitmap(tileSize, tileSize);
+                            using (var canvas = new SKCanvas(tileToSave))
+                            {
+                                canvas.Clear(tileBackgroundColor);
+                                canvas.DrawBitmap(subsetBitmap, 0, 0, LinearSampling);
+                            }
+                            needsDispose = true;
+                        }
+
+                        try
+                        {
+                            using var image = SKImage.FromBitmap(tileToSave);
+                            using var data = image.Encode(SKEncodedImageFormat.Jpeg, 85);
+                            using var stream = File.Create(tilePath);
+                            data.SaveTo(stream);
+                        }
+                        finally
+                        {
+                            if (needsDispose)
+                                tileToSave.Dispose();
+                        }
+                    }
                 }
-            }
+            });
+
+            // Event ausloesen, damit die UI die neuen Kacheln sofort anzeigen kann
             onLevelGenerated?.Invoke();
         }
     }

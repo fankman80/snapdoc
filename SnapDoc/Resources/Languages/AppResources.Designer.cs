@@ -214,11 +214,20 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Auflösung PDF-Umwandlung ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Auflösung für Export ähnelt.
         /// </summary>
-        internal static string aufloesung_pdf_umwandlung {
+        internal static string aufloesung_fuer_export {
             get {
-                return ResourceManager.GetString("aufloesung_pdf_umwandlung", resourceCulture);
+                return ResourceManager.GetString("aufloesung_fuer_export", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Auflösung Vollbildanzeige ähnelt.
+        /// </summary>
+        internal static string aufloesung_vollbildanzeige {
+            get {
+                return ResourceManager.GetString("aufloesung_vollbildanzeige", resourceCulture);
             }
         }
         

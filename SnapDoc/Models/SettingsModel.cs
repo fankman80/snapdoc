@@ -18,6 +18,7 @@ internal class SettingsModel
     public bool? IsPinAutoLock { get; set; } // Pin nach Platzierung automatisch sperren
     public bool? IsExperimentalFunctions { get; set; } // Experimentelle Funktionen aktivieren
     public int? MaxPdfPixelCount { get; set; } // Maximale Pixelanzahl eines PDF-Bildes beim Import
+    public int? PdfFullViewDpi { get; set; } // DPI für die vollständige PDF-Anzeige
     public int? PdfThumbDpi { get; set; } // DPI der PDF-Thumbnails im Import-Dialog
     public int? SelectedColorTheme { get; set; } // App-Farbschema
     public int? SelectedAppTheme { get; set; } // App-Design (Hell/Dunkel)

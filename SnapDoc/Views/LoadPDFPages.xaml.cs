@@ -107,7 +107,11 @@ public partial class LoadPDFPages : ContentPage
                                 if (codec != null) { width = codec.Info.Width; height = codec.Info.Height; }
                             }
 
-                            int targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
+                            int targetDpi;
+                            if (SettingsService.Instance.IsExperimentalFunctions)
+                                targetDpi = SettingsService.Instance.PdfFullViewDpi;
+                            else
+                                targetDpi = CalculateMaxDpiFromPixelLimit(width, height, SettingsService.Instance.MaxPdfPixelCount * 1000000);
 
                             pdfImages.Add(new PdfItem
                             {
@@ -237,7 +241,6 @@ public partial class LoadPDFPages : ContentPage
 
             foreach (var group in groups)
             {
-                // group.Key ist jetzt unser sicherer lokaler Pfad im Cache
                 byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key);
                 using (var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes))
                 {
@@ -258,14 +261,13 @@ public partial class LoadPDFPages : ContentPage
         {
             string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
             Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
-
-            int i = 0;
             var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
 
-            foreach (var item in items)
+            Parallel.ForEach(items, (item, state, index) =>
             {
-                string fileName = $"plan_{DateTime.Now:yyyyMMdd_HHmmss}_{i}.jpg";
-                string planId = $"plan_{DateTime.Now:yyyyMMdd_HHmmss}_{i}";
+                string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+                string fileName = $"plan_{timeStamp}_{index}.jpg";
+                string planId = $"plan_{timeStamp}_{index}";
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
@@ -297,12 +299,10 @@ public partial class LoadPDFPages : ContentPage
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
                 File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
 
-                i++;
-
                 MainThread.BeginInvokeOnMainThread(() => {
                     LoadDataToView.AddPlan(new KeyValuePair<string, Plan>(planId, plan));
                 });
-            }
+            });
 
             // Am Ende den gesamten Cache leeren
             if (Directory.Exists(Settings.CacheDirectory))
