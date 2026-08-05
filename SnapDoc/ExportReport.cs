@@ -28,7 +28,7 @@ public partial class ExportReport
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
     private static readonly Dictionary<string, string> imageRelationshipIds = [];
     private static string storeItemId;
-    private record FotoWorkItem(string SourcePath, string TargetPath, float CompressValue);
+    private record FotoWorkItem(string SourcePath, string TargetPath, int MaxDimension);
 
     public static async Task DocX(string templateDoc, string savePath)
     {
@@ -280,7 +280,7 @@ public partial class ExportReport
                                                                 string originalBgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
                                                                 string cachedBgPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
 
-                                                                if (SettingsService.Instance.PlanCompressValue < 100 && File.Exists(cachedBgPath))
+                                                                if (SettingsService.Instance.MaxPlanExportSize > 0 && File.Exists(cachedBgPath))
                                                                     backgroundImagePath = cachedBgPath;
                                                                 else
                                                                     backgroundImagePath = originalBgPath;
@@ -350,7 +350,7 @@ public partial class ExportReport
                                                                 string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
                                                                 string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
-                                                                if (SettingsService.Instance.FotoCompressValue < 100 && File.Exists(cachedPath))
+                                                                if (SettingsService.Instance.MaxFotoExportSize > 0 && File.Exists(cachedPath))
                                                                     imgPath = cachedPath;
                                                                 else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
                                                                     imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
@@ -622,7 +622,7 @@ public partial class ExportReport
             string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
             string cachedPlanPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
 
-            if (SettingsService.Instance.PlanCompressValue < 100 && File.Exists(cachedPlanPath))
+            if (SettingsService.Instance.MaxPlanExportSize > 0 && File.Exists(cachedPlanPath))
                 planImagePath = cachedPlanPath;
 
             Size originalSize = currentPlan.ImageSize;
@@ -1322,7 +1322,6 @@ public partial class ExportReport
     {
         var tasks = new List<FotoWorkItem>();
 
-        // Alle Fotos sammeln, die komprimiert werden müssen
         foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
         {
             if (plan.Pins == null)
@@ -1337,14 +1336,10 @@ public partial class ExportReport
                         sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, "originals", img.File);
 
                     string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
+                    int maxDim = SettingsService.Instance.MaxFotoExportSize;
 
-                    float compressValue = SettingsService.Instance.FotoCompressValue < 100
-                        ? SettingsService.Instance.FotoCompressValue / 100f
-                        : 1.0f;
-
-                    // Nur hinzufügen, wenn Kompression gewünscht und Ziel noch nicht existiert
-                    if (compressValue < 1.0f && !File.Exists(targetPath))
-                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, compressValue));
+                    if (maxDim > 0 && !File.Exists(targetPath))
+                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, maxDim));
                 }
             }
         }
@@ -1359,7 +1354,7 @@ public partial class ExportReport
             await Task.Run(() =>
             {
                 if (File.Exists(work.SourcePath))
-                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue, SettingsService.Instance.FotoQuality);
+                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, SettingsService.Instance.FotoQuality);
             }, taskCt);
         });
     }
@@ -1370,18 +1365,15 @@ public partial class ExportReport
 
         foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
         {
-            if (string.IsNullOrEmpty(plan.File)) continue;
+            if (string.IsNullOrEmpty(plan.File))
+                continue;
 
             string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.PlanPath, plan.File);
             string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(plan.File));
+            int maxDim = SettingsService.Instance.MaxPlanExportSize;
 
-            float compressValue = SettingsService.Instance.PlanCompressValue < 100
-                ? SettingsService.Instance.PlanCompressValue / 100f
-                : 1.0f;
-
-            // Nur komprimieren, falls gewünscht und das Bild noch nicht im Cache liegt
-            if (compressValue < 1.0f && !File.Exists(targetPath))
-                tasks.Add(new FotoWorkItem(sourcePath, targetPath, compressValue));
+            if (maxDim > 0 && !File.Exists(targetPath))
+                tasks.Add(new FotoWorkItem(sourcePath, targetPath, maxDim));
         }
 
         // Parallel abarbeiten
@@ -1394,7 +1386,7 @@ public partial class ExportReport
             await Task.Run(() =>
             {
                 if (File.Exists(work.SourcePath))
-                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.CompressValue, SettingsService.Instance.PlanQuality);
+                    Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, SettingsService.Instance.PlanQuality);
             }, taskCt);
         });
     }

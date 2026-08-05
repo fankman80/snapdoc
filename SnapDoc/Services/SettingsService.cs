@@ -106,7 +106,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int MaxPdfImageSize { get; set; } = 8192;
     [ObservableProperty] public partial int FotoThumbSize { get; set; } = 150;
     [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 75;
-    [ObservableProperty] public partial int FotoQuality { get; set; } = 90;
+    [ObservableProperty] public partial int FotoQuality { get; set; } = 80;
     [ObservableProperty] public partial int PlanQuality { get; set; } = 90;
     [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
     [ObservableProperty] public partial int PlanThumbSize { get; set; } = 512;
@@ -140,9 +140,9 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsImageExport { get; set; } = true;
     [ObservableProperty] public partial bool IsPinIconExport { get; set; } = true;
     [ObservableProperty] public partial bool IsFotoOverlayExport { get; set; } = true;
-    [ObservableProperty] public partial int FotoCompressValue { get; set; } = 30;
-    [ObservableProperty] public partial int PlanCompressValue { get; set; } = 70;
-    [ObservableProperty] public partial double PinExportSize { get; set; } = 3.2;
+    [ObservableProperty] public partial int MaxFotoExportSize { get; set; } = 1000;
+    [ObservableProperty] public partial int MaxPlanExportSize { get; set; } = 6000;
+    [ObservableProperty] public partial double PinExportSize { get; set; } = 3.6;
     [ObservableProperty] public partial int PinPosCropExportSize { get; set; } = 30;
     [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
     [ObservableProperty] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
@@ -344,8 +344,8 @@ public partial class SettingsService : ObservableObject
             IsPinIconExport = IsPinIconExport,
             IsImageExport = IsImageExport,
             IsFotoOverlayExport = IsFotoOverlayExport,
-            FotoCompressValue = FotoCompressValue,
-            PlanCompressValue = PlanCompressValue,
+            MaxFotoExportSize = MaxFotoExportSize,
+            MaxPlanExportSize = MaxPlanExportSize,
             PinLabelPrefix = PinLabelPrefix,
             PinLabelFontSize = Math.Round(PinLabelFontSize, 1),
             PinExportSize = Math.Round(PinExportSize, 1),
@@ -438,8 +438,8 @@ public partial class SettingsService : ObservableObject
             IsPinIconExport = settings.IsPinIconExport ?? defaultSettings.IsPinIconExport;
             IsImageExport = settings.IsImageExport ?? defaultSettings.IsImageExport;
             IsFotoOverlayExport = settings.IsFotoOverlayExport ?? defaultSettings.IsFotoOverlayExport;
-            FotoCompressValue = settings.FotoCompressValue ?? defaultSettings.FotoCompressValue;
-            PlanCompressValue = settings.PlanCompressValue ?? defaultSettings.PlanCompressValue;
+            MaxFotoExportSize = settings.MaxFotoExportSize ?? defaultSettings.MaxFotoExportSize;
+            MaxPlanExportSize = settings.MaxPlanExportSize ?? defaultSettings.MaxPlanExportSize;
             PinLabelPrefix = !string.IsNullOrWhiteSpace(settings.PinLabelPrefix) ? settings.PinLabelPrefix : defaultSettings.PinLabelPrefix;
             DefaultPinIcon = !string.IsNullOrWhiteSpace(settings.DefaultPinIcon) ? settings.DefaultPinIcon : defaultSettings.DefaultPinIcon;
             EditorTheme = !string.IsNullOrWhiteSpace(settings.EditorTheme) ? settings.EditorTheme : defaultSettings.EditorTheme;
@@ -516,8 +516,8 @@ public partial class SettingsService : ObservableObject
         IsPinIconExport = defaultSettings.IsPinIconExport;
         IsImageExport = defaultSettings.IsImageExport;
         IsFotoOverlayExport = defaultSettings.IsFotoOverlayExport;
-        FotoCompressValue = defaultSettings.FotoCompressValue;
-        PlanCompressValue = defaultSettings.PlanCompressValue;
+        MaxFotoExportSize = defaultSettings.MaxFotoExportSize;
+        MaxPlanExportSize = defaultSettings.MaxPlanExportSize;
         PinLabelPrefix = defaultSettings.PinLabelPrefix;
         PinLabelFontSize = defaultSettings.PinLabelFontSize;
         PinExportSize = defaultSettings.PinExportSize;

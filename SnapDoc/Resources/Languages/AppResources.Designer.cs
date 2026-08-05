@@ -394,6 +394,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bildkompression ähnelt.
+        /// </summary>
+        internal static string bildkompression {
+            get {
+                return ResourceManager.GetString("bildkompression", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wähle ein Bild aus... ähnelt.
         /// </summary>
         internal static string bitte_waehle_bild {
@@ -853,15 +862,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Fotoqualität ähnelt.
-        /// </summary>
-        internal static string fotoqualitaet {
-            get {
-                return ResourceManager.GetString("fotoqualitaet", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Fotos ähnelt.
         /// </summary>
         internal static string fotos {
@@ -1290,6 +1290,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string lupe_aktivieren {
             get {
                 return ResourceManager.GetString("lupe_aktivieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maximale Fotoabmessung ähnelt.
+        /// </summary>
+        internal static string maximale_fotoabmessung {
+            get {
+                return ResourceManager.GetString("maximale_fotoabmessung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Maximale Planabmessung ähnelt.
+        /// </summary>
+        internal static string maximale_planabmessung {
+            get {
+                return ResourceManager.GetString("maximale_planabmessung", resourceCulture);
             }
         }
         
@@ -1767,15 +1785,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string planliste_mit_vorschau {
             get {
                 return ResourceManager.GetString("planliste_mit_vorschau", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Planqualität ähnelt.
-        /// </summary>
-        internal static string planqualitaet {
-            get {
-                return ResourceManager.GetString("planqualitaet", resourceCulture);
             }
         }
         

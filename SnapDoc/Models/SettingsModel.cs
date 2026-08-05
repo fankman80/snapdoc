@@ -28,8 +28,8 @@ internal class SettingsModel
     public bool? IsPinIconExport { get; set; } // Pin-Icons im Bericht exportieren
     public bool? IsImageExport { get; set; } // Fotos im Bericht exportieren
     public bool? IsFotoOverlayExport { get; set; } // Foto-Overlays im Bericht exportieren
-    public int? FotoCompressValue { get; set; } // Bildqualität der Fotos im Worddokument (0-100%)
-    public int? PlanCompressValue { get; set; } // Bildqualität der Pläne im Worddokument (0-100%)
+    public int? MaxFotoExportSize { get; set; } // Maximale Bildabmessung der Fotos im Worddokument (Breite oder Höhe in Pixel)
+    public int? MaxPlanExportSize { get; set; } // Maximale Bildabmessung der Pläne im Worddokument (Breite oder Höhe in Pixel)
     public string? PinLabelPrefix { get; set; } // Präfix für Pin-Beschriftungen
     public double? PinLabelFontSize { get; set; } // Schriftgröße der Pin-Beschriftungen
     public double? PinExportSize { get; set; } // Größe der Pins im Bericht in Milimeter

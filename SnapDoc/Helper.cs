@@ -252,20 +252,31 @@ public class Helper
         }
     }
 
-    public static void BitmapResizer(string sourcePath, string destinationPath, double scaleFactor, int quality)
+    public static void BitmapResizer(string sourcePath, string destinationPath, int maxDimension, int quality = 90)
     {
         using var inputBitmap = SKBitmap.Decode(sourcePath);
 
-        int newWidth = (int)(inputBitmap.Width * scaleFactor);
-        int newHeight = (int)(inputBitmap.Height * scaleFactor);
-        var resizedBitmap = new SKBitmap(newWidth, newHeight);
-        var samplingOptions = new SKSamplingOptions(SKCubicResampler.Mitchell);
+        int originalWidth = inputBitmap.Width;
+        int originalHeight = inputBitmap.Height;
+        int newWidth = originalWidth;
+        int newHeight = originalHeight;
 
-        inputBitmap.ScalePixels(resizedBitmap, samplingOptions);
+        // Nur verkleinern, wenn das Bild größer als die maximale Kantenlänge ist
+        if (originalWidth > maxDimension || originalHeight > maxDimension)
+        {
+            double ratio = (double)maxDimension / Math.Max(originalWidth, originalHeight);
+            newWidth = (int)(originalWidth * ratio);
+            newHeight = (int)(originalHeight * ratio);
+        }
+
+        using var resizedBitmap = new SKBitmap(newWidth, newHeight, inputBitmap.ColorType, inputBitmap.AlphaType);
+        using var canvas = new SKCanvas(resizedBitmap);
+        var samplingOptions = new SKSamplingOptions(SKCubicResampler.Mitchell);
+        canvas.DrawBitmap(inputBitmap, new SKRect(0, 0, newWidth, newHeight), samplingOptions);
 
         using var image = SKImage.FromBitmap(resizedBitmap);
-        using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
         using var stream = File.OpenWrite(destinationPath);
+        using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
         data.SaveTo(stream);
     }
 

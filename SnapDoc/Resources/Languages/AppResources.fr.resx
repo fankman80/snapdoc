@@ -126,8 +126,8 @@
   <data name="beschreibung" xml:space="preserve">
     <value>Description</value>
   </data>
-  <data name="fotoqualitaet" xml:space="preserve">
-    <value>Qualité photo</value>
+  <data name="maximale_fotoabmessung" xml:space="preserve">
+    <value>Dimensions maximales de la photo</value>
   </data>
   <data name="datum" xml:space="preserve">
     <value>Date</value>
@@ -927,7 +927,10 @@
   <data name="aufloesung_vollbildanzeige" xml:space="preserve">
     <value>Résolution PDF plein écran</value>
   </data>
-  <data name="planqualitaet" xml:space="preserve">
-    <value>Qualité du plan</value>
+  <data name="maximale_planabmessung" xml:space="preserve">
+    <value>Dimensions maximales du plan</value>
+  </data>
+  <data name="bildkompression" xml:space="preserve">
+    <value>Compression d'image</value>
   </data>
 </root>
