@@ -142,7 +142,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsFotoOverlayExport { get; set; } = true;
     [ObservableProperty] public partial int MaxFotoExportSize { get; set; } = 1000;
     [ObservableProperty] public partial int MaxPlanExportSize { get; set; } = 6000;
-    [ObservableProperty] public partial double PinExportSize { get; set; } = 3.6;
+    [ObservableProperty] public partial double PinExportSize { get; set; } = 4.0;
     [ObservableProperty] public partial int PinPosCropExportSize { get; set; } = 30;
     [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
     [ObservableProperty] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
