@@ -556,6 +556,7 @@ public partial class TileImageView : ContentView
         maxY = Math.Clamp(maxY, 0, Math.Max(0, maxTilesY - 1));
 
         string zoomFolder = Path.Combine(_computedTileFolder, currentZoom.ToString());
+        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
 
         if (Directory.Exists(zoomFolder))
         {
@@ -627,8 +628,6 @@ public partial class TileImageView : ContentView
                                 float srcY = (y % factor) * srcHeight;
 
                                 var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
-                                var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
-                                
                                 canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, paint);
                                 break;
                             }
@@ -640,10 +639,7 @@ public partial class TileImageView : ContentView
                         }
                     }
                     else
-                    {
-                        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
                         canvas.DrawBitmap(bitmap, destRect, LinearSampling, paint);
-                    }
                 }
             }
         }
