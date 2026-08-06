@@ -109,7 +109,6 @@ public partial class TileImageView : ContentView
             propertyChanged: async (bindable, o, n) =>
             {
                 var control = (TileImageView)bindable;
-
                 if ((int)o != (int)n && !string.IsNullOrEmpty(control.SourceImagePath))
                     await control.ProcessNewImageAsync(control.SourceImagePath);
                 else
@@ -123,6 +122,14 @@ public partial class TileImageView : ContentView
                 var control = (TileImageView)bindable;
                 if ((bool)newValue)
                     control.CurrentRotation = 0f;
+            });
+
+    public static readonly BindableProperty IsGrayscaleEnabledProperty =
+        BindableProperty.Create(nameof(IsGrayscaleEnabled), typeof(bool), typeof(TileImageView), false,
+            propertyChanged: (bindable, oldValue, newValue) =>
+            {
+                var control = (TileImageView)bindable;
+                control._canvasView?.InvalidateSurface();
             });
 
     public static readonly BindableProperty CurrentRotationProperty =
@@ -179,6 +186,7 @@ public partial class TileImageView : ContentView
     public Color PlaceholderColor { get => (Color)GetValue(PlaceholderColorProperty); set => SetValue(PlaceholderColorProperty, value); }
     public bool IsRotationLocked { get => (bool)GetValue(IsRotationLockedProperty); set => SetValue(IsRotationLockedProperty, value); }
     public PinCreationMode PinCreationMode { get => (PinCreationMode)GetValue(PinCreationModeProperty); set => SetValue(PinCreationModeProperty, value); }
+    public bool IsGrayscaleEnabled { get => (bool)GetValue(IsGrayscaleEnabledProperty); set => SetValue(IsGrayscaleEnabledProperty, value); }
 
     public event EventHandler<MapPin> PinTapped;
     public event EventHandler<MapPin> PinMoved;

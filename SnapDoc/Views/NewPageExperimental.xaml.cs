@@ -48,12 +48,14 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private float cloudInciseDeg = 15;
     private bool _isShowingPopup = false;
     private string planImageSource = "";
+    private bool isGrayscaleMode;
     private Color selectedBorderColor = new(0, 153, 0, 255);
     private Color selectedFillColor = new(202, 255, 150, 128);
     private Color selectedTextColor = new(0, 0, 0, 255);
     private bool isToolButtonsVisible = false;
 
     public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
+    public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); }}
     public Color SelectedBorderColor { get => selectedBorderColor; set { selectedBorderColor = value; OnPropertyChanged(); }}
     public Color SelectedFillColor { get => selectedFillColor; set { selectedFillColor = value; OnPropertyChanged(); }}
     public Color SelectedTextColor { get => selectedTextColor; set { selectedTextColor = value; OnPropertyChanged(); }}
@@ -216,6 +218,8 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     private Task AddPlan()
     {
         PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+
+        IsGrayscaleMode = thisPlan.IsGrayscale;
 
         pinList.Clear();
 
@@ -1192,8 +1196,10 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 break;
 
             case "Grayscale":
-                OnGrayscaleClick();
-                ImageFit(null, null);
+                IsGrayscaleMode = thisPlan.IsGrayscale = !thisPlan.IsGrayscale;
+
+                // save data to file
+                GlobalJson.SaveToFile();
                 break;
 
             default:
@@ -1297,40 +1303,6 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
     {
         if (File.Exists(path))
             File.Delete(path);
-    }
-
-    private void OnGrayscaleClick()
-    {
-        if (thisPlan.IsGrayscale)
-        {
-            string colorImageFile = thisPlan.File.Replace("_gs", "");
-            thisPlan.File = colorImageFile;
-            thisPlan.IsGrayscale = false;
-        }
-        else
-        {
-            string grayImageFile = Path.GetFileNameWithoutExtension(thisPlan.File) + "_gs" + Path.GetExtension(thisPlan.File);
-            string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
-            if (!File.Exists(grayImagePath))
-            {
-                using var originalStream = File.OpenRead(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File));
-                using var originalBitmap = SKBitmap.Decode(originalStream);
-                var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
-                using SKImage image = SKImage.FromBitmap(grayBitmap);
-                using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
-                using var fileStream = File.OpenWrite(grayImagePath);
-                data.SaveTo(fileStream);
-            }
-            thisPlan.File = grayImageFile;
-            thisPlan.IsGrayscale = true;
-        }
-
-        // save data to file
-        GlobalJson.SaveToFile();
-
-        isFirstLoad = true;
-
-        PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
     }
 
     private async void PlanRotate(int angle)
