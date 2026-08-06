@@ -54,6 +54,15 @@ public partial class TileImageView : ContentView
     private SKPath _cachedLoupePath;
     private SKShader _cachedInnerShadowShader;
     private SKShader _cachedGlareShader;
+    private static readonly SKPaint GrayscalePaint = new()
+    {
+        ColorFilter = SKColorFilter.CreateColorMatrix([
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0.2126f, 0.7152f, 0.0722f, 0, 0,
+            0,       0,       0,       1, 0
+        ])
+    };
 
     private readonly SKPaint _loupeBorderPaint = new()
     {
@@ -618,8 +627,9 @@ public partial class TileImageView : ContentView
                                 float srcY = (y % factor) * srcHeight;
 
                                 var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
-
-                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling);
+                                var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
+                                
+                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, paint);
                                 break;
                             }
 
@@ -631,7 +641,8 @@ public partial class TileImageView : ContentView
                     }
                     else
                     {
-                        canvas.DrawBitmap(bitmap, destRect, LinearSampling);
+                        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
+                        canvas.DrawBitmap(bitmap, destRect, LinearSampling, paint);
                     }
                 }
             }
