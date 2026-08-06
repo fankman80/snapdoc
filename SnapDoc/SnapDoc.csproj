@@ -6,7 +6,7 @@
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.4.2</ApplicationDisplayVersion>
 		<Version>2.4.2</Version>
-		<ApplicationVersion>73</ApplicationVersion>
+		<ApplicationVersion>74</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>
@@ -120,7 +120,7 @@
 		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.8.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.0" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.151.1" />
 		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />

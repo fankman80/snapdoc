@@ -18,7 +18,7 @@ public partial class TileImageView : ContentView
     private bool _isGenerating = false;
     private float _rotationDegrees = 0f;
     private string _computedTileFolder = string.Empty;
-    private readonly LruCache<string, SKBitmap> _tileCache = new(SettingsService.Instance.MaxTileCache);
+    private readonly LruCache<TileKey, SKBitmap> _tileCache = new(SettingsService.Instance.MaxTileCache);
     private readonly Dictionary<long, SKPoint> _activeTouches = [];
     private float _oldFingerDistance = 0f;
     private float _oldFingerAngle = 0f;
@@ -36,7 +36,7 @@ public partial class TileImageView : ContentView
     private CancellationTokenSource _cts;
     private CancellationTokenSource _longPressCts;
     private CancellationTokenSource _tapCts;
-    private readonly HashSet<string> _loadingTiles = [];
+    private readonly HashSet<TileKey> _loadingTiles = [];
     private DateTime _lastTapTime = DateTime.MinValue;
     private SKPoint _lastTapLocation = SKPoint.Empty;
     private bool _isDoubleTapAction = false;
@@ -48,6 +48,12 @@ public partial class TileImageView : ContentView
     private List<MapPin> _sortedPins = [];
     private SKPoint _lastTouchPoint;
     private readonly HashSet<string> _loadingPinPaths = [];
+    private readonly SKPaint _loupeShadowPaint;
+    private readonly float _loupeRadius = 150f;
+    private float _cachedLoupeRadius = -1f;
+    private SKPath _cachedLoupePath;
+    private SKShader _cachedInnerShadowShader;
+    private SKShader _cachedGlareShader;
 
     private readonly SKPaint _loupeBorderPaint = new()
     {
@@ -183,6 +189,17 @@ public partial class TileImageView : ContentView
         };
         _canvasView.PaintSurface += OnPaintSurface;
         _canvasView.Touch += OnCanvasTouch;
+
+        _loupeShadowPaint = new SKPaint
+        {
+            IsAntialias = true,
+            Shader = SKShader.CreateRadialGradient(
+                new SKPoint(0, 0),
+                _loupeRadius,
+                [SKColors.Transparent, SKColors.Black.WithAlpha(100)],
+                null,
+                SKShaderTileMode.Clamp)
+        };
 
 #if WINDOWS
         this.Loaded += (s, e) =>
@@ -540,7 +557,7 @@ public partial class TileImageView : ContentView
 
                 for (int y = minY; y <= maxY; y++)
                 {
-                    string cacheKey = $"{currentZoom}_{x}_{y}";
+                    var cacheKey = new TileKey(currentZoom, x, y);
                     float posX = x * currentTileSizeInCanvasSpace;
                     float posY = y * currentTileSizeInCanvasSpace;
                     var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
@@ -588,7 +605,7 @@ public partial class TileImageView : ContentView
 
                         while (fallbackZoom >= 0)
                         {
-                            string fallbackKey = $"{fallbackZoom}_{fallbackX}_{fallbackY}";
+                            var fallbackKey = new TileKey(fallbackZoom, fallbackX, fallbackY);
 
                             if (_tileCache.TryGetValue(fallbackKey, out var fallbackBitmap))
                             {
@@ -602,7 +619,7 @@ public partial class TileImageView : ContentView
 
                                 var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
 
-                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, null);
+                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling);
                                 break;
                             }
 
@@ -614,13 +631,13 @@ public partial class TileImageView : ContentView
                     }
                     else
                     {
-                        canvas.DrawBitmap(bitmap, destRect, LinearSampling, null);
+                        canvas.DrawBitmap(bitmap, destRect, LinearSampling);
                     }
                 }
             }
         }
 
-        // Pins zeichnen
+        // Pins zeichnenLinearSampling
         if (Pins != null && OriginalImageSize != SKSize.Empty)
         {
             float padding = 50f;
@@ -654,17 +671,22 @@ public partial class TileImageView : ContentView
                 float left = -(float)(pin.Anchor.X * pinBitmap.Width);
                 float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
 
-                canvas.DrawBitmap(pinBitmap, left, top, LinearSampling, null);
+                canvas.DrawBitmap(pinBitmap, left, top, LinearSampling);
                 canvas.Restore();
             }
         }
-
         canvas.Restore();
     }
 
     private void DrawMagnifyingGlass(SKCanvas canvas)
     {
         if (_draggedPin == null) return;
+
+        float currentLoupeRadius = SettingsService.Instance.LoupeRadius * (float)Settings.DisplayDensity;
+
+        // Shader und Pfade nur neu berechnen, wenn sich der Radius geändert hat
+        if (Math.Abs(_cachedLoupeRadius - currentLoupeRadius) > 0.1f)
+            UpdateLoupeCache(currentLoupeRadius);
 
         SKMatrix mapMatrix = SKMatrix.CreateTranslation(_panX, _panY);
         mapMatrix = mapMatrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
@@ -674,79 +696,72 @@ public partial class TileImageView : ContentView
         float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
         SKPoint pinScreenPos = mapMatrix.MapPoint(pinAbsX, pinAbsY);
 
-        float loupeRadius = SettingsService.Instance.LoupeRadius * (float)Settings.DisplayDensity;
         float zoomFactor = SettingsService.Instance.LoupeZoomFactor;
-
         float margin = 30f;
-
-        float loupeCenterX = loupeRadius + margin;
-        float loupeCenterY = loupeRadius + margin;
+        float loupeCenterX = _cachedLoupeRadius + margin;
+        float loupeCenterY = _cachedLoupeRadius + margin;
 
         canvas.Save();
-
-        using var pathBuilder = new SKPathBuilder();
-        pathBuilder.AddCircle(loupeCenterX, loupeCenterY, loupeRadius);
-        using var loupePath = pathBuilder.Detach();
-
-        canvas.ClipPath(loupePath, SKClipOperation.Intersect, true);
         canvas.Translate(loupeCenterX, loupeCenterY);
+        canvas.ClipPath(_cachedLoupePath, SKClipOperation.Intersect, true);
+        canvas.Save();
         canvas.Scale(zoomFactor);
         canvas.Translate(-pinScreenPos.X, -pinScreenPos.Y);
-
         DrawMapAndPins(canvas);
-
         canvas.Restore();
-
-        // Innerer Schatten für die Lupe
-        var colors = new SKColor[] { SKColors.Transparent, SKColors.Transparent, new(0, 0, 0, 130) };
-        var colorPositions = new float[] { 0f, 0.6f, 1f };
-        using (var shader = SKShader.CreateRadialGradient(
-            new SKPoint(loupeCenterX, loupeCenterY),
-            loupeRadius,
-            colors,
-            colorPositions,
-            SKShaderTileMode.Clamp))
-        {
-            _loupeInnerShadowPaint.Shader = shader;
-            canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeInnerShadowPaint);
-        }
-        _loupeInnerShadowPaint.Shader = null; // Shader wieder freigeben
-
-        // Glanzlicht auf der Lupe
+        canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeInnerShadowPaint);
         canvas.Save();
 
-        try
-        {
-            canvas.ClipPath(loupePath, SKClipOperation.Intersect, true);
+        float glareRadiusX = _cachedLoupeRadius * 0.85f;
+        float glareRadiusY = _cachedLoupeRadius * 0.45f;
+        float glareOffsetX = -(_cachedLoupeRadius * 0.15f);
+        float glareOffsetY = -(_cachedLoupeRadius * 0.35f);
 
-            float glareRadiusX = loupeRadius * 0.85f;
-            float glareRadiusY = loupeRadius * 0.45f;
+        canvas.RotateDegrees(-25f, glareOffsetX, glareOffsetY);
+        canvas.DrawOval(glareOffsetX, glareOffsetY, glareRadiusX, glareRadiusY, _loupeGlarePaint);
+        canvas.Restore();
+        canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeBorderPaint);
 
-            float glareCenterX = loupeCenterX - (loupeRadius * 0.15f);
-            float glareCenterY = loupeCenterY - (loupeRadius * 0.35f);
+        float crosshairHalfSize = 15 * (float)Settings.DisplayDensity;
+        canvas.DrawLine(-crosshairHalfSize, 0, crosshairHalfSize, 0, _loupeCrosshairPaint);
+        canvas.DrawLine(0, -crosshairHalfSize, 0, crosshairHalfSize, _loupeCrosshairPaint);
+        canvas.Restore();
+    }
 
-            using (var glareShader = SKShader.CreateLinearGradient(
-                new SKPoint(glareCenterX, glareCenterY - glareRadiusY),
-                new SKPoint(glareCenterX, glareCenterY + glareRadiusY),
-                [new SKColor(255, 255, 255, 140), new SKColor(255, 255, 255, 0)],
-                [0f, 1f],
-                SKShaderTileMode.Clamp))
-            {
-                _loupeGlarePaint.Shader = glareShader;
-                canvas.RotateDegrees(-25f, glareCenterX, glareCenterY);
-                canvas.DrawOval(glareCenterX, glareCenterY, glareRadiusX, glareRadiusY, _loupeGlarePaint);
-            }
-            _loupeGlarePaint.Shader = null;
-        }
-        finally
-        {
-            canvas.Restore();
-        }
+    private void UpdateLoupeCache(float newRadius)
+    {
+        _cachedLoupeRadius = newRadius;
+        _cachedLoupePath?.Dispose();
+        _cachedInnerShadowShader?.Dispose();
+        _cachedGlareShader?.Dispose();
 
-        float crosshairHalfSize = 15  * (float)Settings.DisplayDensity;
-        canvas.DrawCircle(loupeCenterX, loupeCenterY, loupeRadius, _loupeBorderPaint);
-        canvas.DrawLine(loupeCenterX - crosshairHalfSize, loupeCenterY, loupeCenterX + crosshairHalfSize, loupeCenterY, _loupeCrosshairPaint);
-        canvas.DrawLine(loupeCenterX, loupeCenterY - crosshairHalfSize, loupeCenterX, loupeCenterY + crosshairHalfSize, _loupeCrosshairPaint);
+        var pathBuilder = new SKPathBuilder();
+        pathBuilder.AddCircle(0, 0, newRadius);
+        _cachedLoupePath = pathBuilder.Detach();
+
+        var shadowColors = new SKColor[] { SKColors.Transparent, SKColors.Transparent, new(0, 0, 0, 130) };
+        var shadowPositions = new float[] { 0f, 0.6f, 1f };
+        _cachedInnerShadowShader = SKShader.CreateRadialGradient(
+            new SKPoint(0, 0), // Zentriert auf 0,0
+            newRadius,
+            shadowColors,
+            shadowPositions,
+            SKShaderTileMode.Clamp);
+
+        _loupeInnerShadowPaint.Shader = _cachedInnerShadowShader;
+
+        float glareRadiusY = newRadius * 0.45f;
+        float glareOffsetX = -(newRadius * 0.15f);
+        float glareOffsetY = -(newRadius * 0.35f);
+
+        _cachedGlareShader = SKShader.CreateLinearGradient(
+            new SKPoint(glareOffsetX, glareOffsetY - glareRadiusY),
+            new SKPoint(glareOffsetX, glareOffsetY + glareRadiusY),
+            [new SKColor(255, 255, 255, 140), new SKColor(255, 255, 255, 0)],
+            [0f, 1f],
+            SKShaderTileMode.Clamp);
+
+        _loupeGlarePaint.Shader = _cachedGlareShader;
     }
 
     private void OnCanvasTouch(object sender, SKTouchEventArgs e)
@@ -1626,3 +1641,5 @@ public enum PinCreationMode
     LongPress,
     SingleTap
 }
+
+public readonly record struct TileKey(int Zoom, int X, int Y);
