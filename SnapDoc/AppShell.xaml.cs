@@ -70,8 +70,16 @@ public partial class AppShell : Shell
 
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
         AllPlanItems.CollectionChanged += (s, e) => UpdateButtonVisibility();
+        FlyoutIsPresentedChanged += OnFlyoutIsPresentedChanged;
 
         ApplyPlanTemplate();
+    }
+
+    private void OnFlyoutIsPresentedChanged(object sender, EventArgs e)
+    {
+        // Wenn das Flyout geschlossen wird, senden wir den Reset-Befehl
+        if (!FlyoutIsPresented)
+            WeakReferenceMessenger.Default.Send(new ResetTouchesMessage());
     }
 
     private void ApplyPlanTemplate()
