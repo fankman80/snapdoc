@@ -1577,6 +1577,19 @@ public partial class TileImageView : ContentView
 
         _pinIconCache.Clear();
     }
+
+    public void ResetTouchState()
+    {
+        _activeTouches.Clear();
+        _draggedPin = null;
+        _isLongPressActive = false;
+        _isDoubleTapAction = false;
+        _oldFingerDistance = 0f;
+        _oldFingerAngle = 0f;
+        _longPressCts?.Cancel();
+        _tapCts?.Cancel();
+        _canvasView?.InvalidateSurface();
+    }
 }
 
 public class MapPin
