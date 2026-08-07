@@ -151,6 +151,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
                 }
             });
         });
+
+        WeakReferenceMessenger.Default.Register<ResetTouchesMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(() => { ResetTouchState(); });
+        });
     }
 
     protected override bool OnBackButtonPressed()
@@ -213,6 +218,11 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
             }
         }
         query.Clear();
+    }
+
+    private void ResetTouchState()
+    {
+        PlanImage?.ResetTouchState();
     }
 
     private Task AddPlan()
