@@ -229,20 +229,30 @@ public class Helper
 
     public static void BitmapResizer(string sourcePath, string destinationPath, int maxDimension, int quality = 90)
     {
-        using var inputBitmap = SKBitmap.Decode(sourcePath);
+        if (!File.Exists(sourcePath)) return;
 
-        int originalWidth = inputBitmap.Width;
-        int originalHeight = inputBitmap.Height;
-        int newWidth = originalWidth;
-        int newHeight = originalHeight;
+        using var inputStream = File.OpenRead(sourcePath);
+        using var codec = SKCodec.Create(inputStream);
+        if (codec == null) return;
 
-        // Nur verkleinern, wenn das Bild größer als die maximale Kantenlänge ist
-        if (originalWidth > maxDimension || originalHeight > maxDimension)
+        int originalWidth = codec.Info.Width;
+        int originalHeight = codec.Info.Height;
+
+        if (originalWidth <= maxDimension && originalHeight <= maxDimension)
         {
-            double ratio = (double)maxDimension / Math.Max(originalWidth, originalHeight);
-            newWidth = (int)(originalWidth * ratio);
-            newHeight = (int)(originalHeight * ratio);
+            inputStream.Dispose();
+            File.Copy(sourcePath, destinationPath, overwrite: true);
+            return;
         }
+
+        double ratio = (double)maxDimension / Math.Max(originalWidth, originalHeight);
+        int newWidth = Math.Max(1, (int)(originalWidth * ratio));
+        int newHeight = Math.Max(1, (int)(originalHeight * ratio));
+        SKSizeI supportedSize = codec.GetScaledDimensions((float)ratio);
+        var decodeInfo = new SKImageInfo(supportedSize.Width, supportedSize.Height, codec.Info.ColorType, codec.Info.AlphaType);
+
+        using var inputBitmap = SKBitmap.Decode(codec, decodeInfo);
+        if (inputBitmap == null) return;
 
         using var resizedBitmap = new SKBitmap(newWidth, newHeight, inputBitmap.ColorType, inputBitmap.AlphaType);
         using var canvas = new SKCanvas(resizedBitmap);
@@ -250,12 +260,12 @@ public class Helper
         canvas.DrawBitmap(inputBitmap, new SKRect(0, 0, newWidth, newHeight), samplingOptions);
 
         using var image = SKImage.FromBitmap(resizedBitmap);
-        using var stream = File.OpenWrite(destinationPath);
         using var data = image.Encode(SKEncodedImageFormat.Jpeg, quality);
-        data.SaveTo(stream);
+        using var outputStream = File.Create(destinationPath);
+        data.SaveTo(outputStream);
     }
 
-    // REFRAME Webservice Aufruf für Koorinaten-Transformation
+
     private static readonly HttpClient _httpClient = new();
     public static async Task<(double E, double N)> Wgs84ToLv95Async(double latitude, double longitude)
     {

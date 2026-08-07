@@ -1174,7 +1174,7 @@ public partial class ExportReport
 
         if (!string.IsNullOrWhiteSpace(newText))
         {
-            Run newRun = new Run();
+            Run newRun = new();
             if (originalRunProperties != null)
                 newRun.AppendChild(originalRunProperties);
 
@@ -1202,7 +1202,7 @@ public partial class ExportReport
 
             p.RemoveAllChildren<Run>();
 
-            Run newRun = new Run(new Text(newText));
+            Run newRun = new(new Text(newText));
             if (originalRunProperties != null)
                 newRun.PrependChild(originalRunProperties);
 
@@ -1237,72 +1237,80 @@ public partial class ExportReport
 
     private static async Task PreProcessAllImagesAsync(JsonDataModel data, CancellationToken ct)
     {
-        var tasks = new List<FotoWorkItem>();
+        int maxDim = SettingsService.Instance.MaxFotoExportSize;
+        if (maxDim <= 0) return;
+
+        int quality = SettingsService.Instance.FotoQuality;
+        bool isOverlayExport = SettingsService.Instance.IsFotoOverlayExport;
+        var tasks = new Dictionary<string, FotoWorkItem>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
         {
-            if (plan.Pins == null)
-                continue;
+            if (plan.Pins == null) continue;
 
             foreach (var pin in plan.Pins.Values.Where(p => p.IsAllowExport))
             {
                 foreach (var img in pin.Fotos.Values.Where(f => f.AllowExport))
                 {
+                    if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
+                        continue;
+
                     string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, img.File);
-                    if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
+                    if (!isOverlayExport && img.HasOverlay)
                         sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, "originals", img.File);
 
                     string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
-                    int maxDim = SettingsService.Instance.MaxFotoExportSize;
 
-                    if (maxDim > 0 && !File.Exists(targetPath))
-                        tasks.Add(new FotoWorkItem(sourcePath, targetPath, maxDim));
+                    if (!File.Exists(targetPath))
+                        tasks.TryAdd(targetPath, new FotoWorkItem(sourcePath, targetPath, maxDim));
                 }
             }
         }
 
-        // Parallel abarbeiten
-        await Parallel.ForEachAsync(tasks, new ParallelOptions
-        {
-            MaxDegreeOfParallelism = Environment.ProcessorCount,
-            CancellationToken = ct
-        }, (work, taskCt) =>
+        if (tasks.Count == 0) return;
+
+        int maxDegree = Math.Max(1, Environment.ProcessorCount - 1);
+
+        await Parallel.ForEachAsync(tasks.Values, new ParallelOptions { MaxDegreeOfParallelism = maxDegree, CancellationToken = ct }, (work, taskCt) =>
         {
             if (File.Exists(work.SourcePath))
-                Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, SettingsService.Instance.FotoQuality);
-        return ValueTask.CompletedTask;
+                Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, quality);
+
+            return ValueTask.CompletedTask;
         });
     }
 
     private static async Task PreProcessAllPlansAsync(JsonDataModel data, CancellationToken ct)
     {
-        var tasks = new List<FotoWorkItem>();
+        int maxDim = SettingsService.Instance.MaxPlanExportSize;
+        if (maxDim <= 0) return;
+
+        int quality = SettingsService.Instance.PlanQuality;
+        var tasks = new Dictionary<string, FotoWorkItem>(StringComparer.OrdinalIgnoreCase);
 
         foreach (var plan in data.Plans.Values.Where(p => p.AllowExport))
         {
-            if (string.IsNullOrEmpty(plan.File))
-                continue;
+            if (string.IsNullOrEmpty(plan.File)) continue;
 
             string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.PlanPath, plan.File);
             string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(plan.File));
-            int maxDim = SettingsService.Instance.MaxPlanExportSize;
 
-            if (maxDim > 0 && !File.Exists(targetPath))
-                tasks.Add(new FotoWorkItem(sourcePath, targetPath, maxDim));
+            if (!File.Exists(targetPath))
+                tasks.TryAdd(targetPath, new FotoWorkItem(sourcePath, targetPath, maxDim));
         }
 
-        // Parallel abarbeiten
-        await Parallel.ForEachAsync(tasks, new ParallelOptions
-        {
-            MaxDegreeOfParallelism = Environment.ProcessorCount,
-            CancellationToken = ct
-        }, (work, taskCt) =>
+        if (tasks.Count == 0) return;
+
+        int maxDegree = Math.Max(1, Environment.ProcessorCount - 1);
+
+        await Parallel.ForEachAsync(tasks.Values, new ParallelOptions { MaxDegreeOfParallelism = maxDegree, CancellationToken = ct }, (work, taskCt) =>
         {
             if (File.Exists(work.SourcePath))
-                Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, SettingsService.Instance.PlanQuality);
+                Helper.BitmapResizer(work.SourcePath, work.TargetPath, work.MaxDimension, quality);
+
             return ValueTask.CompletedTask;
-            });
-        }
+        });
+    }
 }
 
 public static class StringExtensions
