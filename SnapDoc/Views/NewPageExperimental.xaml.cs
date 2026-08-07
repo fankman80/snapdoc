@@ -1266,16 +1266,13 @@ public partial class NewPageExperimental : IQueryAttributable, INotifyPropertyCh
         plan = thisPlan;
 
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File + "_gs"));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         // lösche Plan-Tiles aus dem Cache-Ordner
         string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
         if (Directory.Exists(cacheDir))
         {
-            string baseFileName = Path.GetFileNameWithoutExtension(plan.File)
-                                        .Replace("_gs", "")
-                                        .Replace("_r", ""); ;
+            string baseFileName = Path.GetFileNameWithoutExtension(plan.File).Replace("_r", "");
             string searchPattern = $"*{baseFileName}*";
             var matchingDirectories = Directory.GetDirectories(cacheDir, searchPattern);
 

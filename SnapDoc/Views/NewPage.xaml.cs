@@ -1408,10 +1408,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 OnDeleteClick();
                 break;
 
-            case "Grayscale":
-                OnGrayscaleClick();
-                break;
-
             default:
                 (Shell.Current as AppShell)?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = result.Result.NameEntry;
                 Title = result.Result.NameEntry;
@@ -1481,40 +1477,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (File.Exists(path))
             File.Delete(path);
-    }
-
-    private void OnGrayscaleClick()
-    {
-        if (thisPlan.IsGrayscale)
-        {
-            string colorImageFile = thisPlan.File.Replace("_gs", "");
-            thisPlan.File = colorImageFile;
-            thisPlan.IsGrayscale = false;
-        }
-        else
-        {
-            string grayImageFile = Path.GetFileNameWithoutExtension(thisPlan.File) + "_gs" + Path.GetExtension(thisPlan.File);
-            string grayImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, grayImageFile);
-            if (!File.Exists(grayImagePath))
-            {
-                using var originalStream = File.OpenRead(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File));
-                using var originalBitmap = SKBitmap.Decode(originalStream);
-                var grayBitmap = Helper.ConvertToGrayscale(originalBitmap);
-                using SKImage image = SKImage.FromBitmap(grayBitmap);
-                using var data = image.Encode(SKEncodedImageFormat.Jpeg, 80);
-                using var fileStream = File.OpenWrite(grayImagePath);
-                data.SaveTo(fileStream);
-            }
-            thisPlan.File = grayImageFile;
-            thisPlan.IsGrayscale = true;
-        }
-
-        // save data to file
-        GlobalJson.SaveToFile();
-
-        isFirstLoad = true;
-
-        PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
     }
 
     private async void PlanRotate(int angle)

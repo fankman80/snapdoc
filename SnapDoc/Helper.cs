@@ -53,31 +53,6 @@ public class Helper
         }
     }
 
-    public static SKBitmap ConvertToGrayscale(SKBitmap originalBitmap)
-    {
-        // Graustufen-ColorMatrix erstellen basierend auf Luminanz
-        float[] grayscaleMatrix = [
-            0.299f, 0.587f, 0.114f, 0, 0,
-            0.299f, 0.587f, 0.114f, 0, 0,
-            0.299f, 0.587f, 0.114f, 0, 0,
-            0,      0,      0,      1, 0
-        ];
-
-        using var colorFilter = SKColorFilter.CreateColorMatrix(grayscaleMatrix);
-        var grayBitmap = new SKBitmap(originalBitmap.Width, originalBitmap.Height);
-        using var canvas = new SKCanvas(grayBitmap);
-
-        using var paint = new SKPaint
-        {
-            ColorFilter = colorFilter,
-        };
-
-        canvas.DrawBitmap(originalBitmap, 0, 0, SKSamplingOptions.Default, paint);
-        canvas.Flush();
-
-        return grayBitmap;
-    }
-
     public static void PackDirectory(string sourceDirectory, string destinationZipFile)
     {
         if (!Directory.Exists(sourceDirectory))

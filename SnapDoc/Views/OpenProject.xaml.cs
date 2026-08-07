@@ -301,9 +301,7 @@ public partial class OpenProject : ContentPage
                         {
                             foreach (var plan in GlobalJson.Data.Plans)
                             {
-                                string baseFileName = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[plan.Key].File)
-                                                            .Replace("_gs", "")
-                                                            .Replace("_r", "");
+                                string baseFileName = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[plan.Key].File).Replace("_r", "");
                                 string searchPattern = $"*{baseFileName}*";
                                 var matchingDirectories = Directory.GetDirectories(cacheDir, searchPattern);
 

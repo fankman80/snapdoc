@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"              
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml" 
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:brush="clr-namespace:Microsoft.Maui.Controls;assembly=Microsoft.Maui.Controls"
-               xmlns:views="clr-namespace:SnapDoc.Views"                 
+               xmlns:views="clr-namespace:SnapDoc.Views"
+               xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
@@ -117,6 +118,8 @@
             </Grid>
 
             <Button x:Name="grayscaleButtonText"
+                    x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                    IsVisible="{Binding IsExperimentalFunctions}"
                     Padding="0"
                     Text="{x:Static res:AppResources.farben_entfernen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

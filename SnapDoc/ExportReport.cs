@@ -317,7 +317,7 @@ public partial class ExportReport
                                                                 PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
 
                                                                 // Hintergrundbild einfügen
-                                                                var planImgElement = GetImageElement(mainPart, backgroundImagePath, exportSize, new Point(0, 0), 0, "anchor", crop);
+                                                                var planImgElement = GetImageElement(mainPart, backgroundImagePath, exportSize, new Point(0, 0), 0, "anchor", crop, currentPlan.IsGrayscale);
                                                                 if (planImgElement != null)
                                                                     newParagraph.Append(new Run(planImgElement));
 
@@ -629,7 +629,7 @@ public partial class ExportReport
             SizeF scaledSize = ScaleToFit(originalSize, exportSize);
 
             // Planbild einfügen
-            imgRun.Append(GetImageElement(mainPart, planImagePath, scaledSize, new Point(0, 0), 0, "anchor"));
+            imgRun.Append(GetImageElement(mainPart, planImagePath, scaledSize, new Point(0, 0), 0, "anchor", isGrayscale: currentPlan.IsGrayscale));
 
             // Pins verarbeiten
             if (currentPlan.Pins != null)
@@ -722,7 +722,7 @@ public partial class ExportReport
         );
     }
 
-    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, OXML.Drawing.SourceRectangle crop = null)
+    private static Drawing GetImageElement(MainDocumentPart mainPart, string imgPath, SizeF size, Point pos, float rotationAngle, string wrap, OXML.Drawing.SourceRectangle crop = null, bool isGrayscale = false)
     {
         crop ??= new OXML.Drawing.SourceRectangle();
 
@@ -739,9 +739,9 @@ public partial class ExportReport
         }
 
         if (wrap == "inline")
-            return GetInlinePicture(relationshipId, size, rotationAngle, crop);
+            return GetInlinePicture(relationshipId, size, rotationAngle, crop, isGrayscale);
         else
-            return GetAnchorPicture(relationshipId, size, pos, rotationAngle, crop);
+            return GetAnchorPicture(relationshipId, size, pos, rotationAngle, crop, isGrayscale);
     }
 
     private static PointF PivotRecalc(PointF pos, float angle, PointF anchor, SizeF scaledPinSize, SizeF scaledPlanSize)
@@ -773,7 +773,7 @@ public partial class ExportReport
         return new PointF(finalX, finalY);
     }
 
-    private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, OXML.Drawing.SourceRectangle crop)
+    private static Drawing GetInlinePicture(String imagePartId, SizeF size, float rotationAngle, OXML.Drawing.SourceRectangle crop, bool isGrayscale = false)
     {
         Drawing drawing = new();
         DDW.Inline inline = new()
@@ -812,17 +812,21 @@ public partial class ExportReport
             Id = 0U,
             Name = "Picture"
         };
-        OXML.Drawing.Pictures.NonVisualPictureDrawingProperties nonVisualPicDrawingProps = new();
+        OXML.Drawing.Pictures.NonVisualPictureDrawingProperties nvPicDrawProps = new();
         nvPicProps.Append(nvDrawProps);
-        nvPicProps.Append(nonVisualPicDrawingProps);
+        nvPicProps.Append(nvPicDrawProps);
 
         OXML.Drawing.Pictures.BlipFill blipFill = new();
-
         OXML.Drawing.Blip blip = new()
         {
             Embed = imagePartId,
             CompressionState = OXML.Drawing.BlipCompressionValues.Print
         };
+
+        if (isGrayscale)
+        {
+            blip.Append(new OXML.Drawing.Grayscale());
+        }
 
         OXML.Drawing.SourceRectangle srcRect = new()
         {
@@ -879,10 +883,10 @@ public partial class ExportReport
         return drawing;
     }
 
-    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle, OXML.Drawing.SourceRectangle crop)
+    private static Drawing GetAnchorPicture(String imagePartId, SizeF size, Point pos, float rotationAngle, OXML.Drawing.SourceRectangle crop, bool isGrayscale = false)
     {
-        Drawing _drawing = new();
-        DDW.Anchor _anchor = new()
+        Drawing drawing = new();
+        DDW.Anchor anchor = new()
         {
             DistanceFromTop = (OXML.UInt32Value)0U,
             DistanceFromBottom = (OXML.UInt32Value)0U,
@@ -897,39 +901,40 @@ public partial class ExportReport
             EditId = "44CEF5E4",
             AnchorId = "44803ED1"
         };
-        DDW.SimplePosition _spos = new()
+
+        DDW.SimplePosition simplePos = new()
         {
             X = MillimetersToEMU(pos.X),
             Y = MillimetersToEMU(pos.Y)
         };
 
-        DDW.HorizontalPosition _hp = new()
+        DDW.HorizontalPosition horizontalPos = new()
         {
             RelativeFrom = DDW.HorizontalRelativePositionValues.Column
         };
-        DDW.PositionOffset _hPO = new()
+        DDW.PositionOffset horizontalOffset = new()
         {
             Text = MillimetersToEMU(pos.X).ToString()
         };
-        _hp.Append(_hPO);
+        horizontalPos.Append(horizontalOffset);
 
-        DDW.VerticalPosition _vp = new()
+        DDW.VerticalPosition verticalPos = new()
         {
             RelativeFrom = DDW.VerticalRelativePositionValues.Paragraph
         };
-        DDW.PositionOffset _vPO = new()
+        DDW.PositionOffset verticalOffset = new()
         {
             Text = MillimetersToEMU(pos.Y).ToString()
         };
-        _vp.Append(_vPO);
+        verticalPos.Append(verticalOffset);
 
-        DDW.Extent _e = new()
+        DDW.Extent extent = new()
         {
             Cx = MillimetersToEMU(size.Width),
             Cy = MillimetersToEMU(size.Height)
         };
 
-        DDW.EffectExtent _ee = new()
+        DDW.EffectExtent effectExtent = new()
         {
             LeftEdge = 0L,
             TopEdge = 0L,
@@ -937,64 +942,61 @@ public partial class ExportReport
             BottomEdge = 0L
         };
 
-        DDW.WrapSquare _wp = new()
+        DDW.WrapSquare wrapSquare = new()
         {
             WrapText = DDW.WrapTextValues.BothSides
         };
 
-        DDW.WrapPolygon _wpp = new()
+        DDW.WrapPolygon wrapPolygon = new()
         {
             Edited = false
         };
 
-        DDW.StartPoint _sp = new()
-        {
-            X = 0L,
-            Y = 0L
-        };
+        DDW.StartPoint startPoint = new() { X = 0L, Y = 0L };
+        DDW.LineTo line1 = new() { X = 0L, Y = 0L };
+        DDW.LineTo line2 = new() { X = 0L, Y = 0L };
+        DDW.LineTo line3 = new() { X = 0L, Y = 0L };
+        DDW.LineTo line4 = new() { X = 0L, Y = 0L };
 
-        DDW.LineTo _l1 = new() { X = 0L, Y = 0L };
-        DDW.LineTo _l2 = new() { X = 0L, Y = 0L };
-        DDW.LineTo _l3 = new() { X = 0L, Y = 0L };
-        DDW.LineTo _l4 = new() { X = 0L, Y = 0L };
+        wrapPolygon.Append(startPoint);
+        wrapPolygon.Append(line1);
+        wrapPolygon.Append(line2);
+        wrapPolygon.Append(line3);
+        wrapPolygon.Append(line4);
 
-        _wpp.Append(_sp);
-        _wpp.Append(_l1);
-        _wpp.Append(_l2);
-        _wpp.Append(_l3);
-        _wpp.Append(_l4);
+        wrapSquare.Append(wrapPolygon);
 
-        _wp.Append(_wpp);
-
-        DDW.DocProperties _dp = new()
+        DDW.DocProperties docProps = new()
         {
             Id = 1U,
             Name = "Picture"
         };
 
-        OXML.Drawing.Graphic _g = new();
-        OXML.Drawing.GraphicData _gd = new() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
-        OXML.Drawing.Pictures.Picture _pic = new();
+        OXML.Drawing.Graphic graphic = new();
+        OXML.Drawing.GraphicData graphicData = new() { Uri = "http://schemas.openxmlformats.org/drawingml/2006/picture" };
+        OXML.Drawing.Pictures.Picture picture = new();
 
-        OXML.Drawing.Pictures.NonVisualPictureProperties _nvpp = new();
-        OXML.Drawing.Pictures.NonVisualDrawingProperties _nvdp = new()
+        OXML.Drawing.Pictures.NonVisualPictureProperties nvPicProps = new();
+        OXML.Drawing.Pictures.NonVisualDrawingProperties nvDrawProps = new()
         {
-            Id = 0,
+            Id = 0U,
             Name = "Picture"
         };
-        OXML.Drawing.Pictures.NonVisualPictureDrawingProperties _nvpdp = new();
-        _nvpp.Append(_nvdp);
-        _nvpp.Append(_nvpdp);
+        OXML.Drawing.Pictures.NonVisualPictureDrawingProperties nvPicDrawProps = new();
+        nvPicProps.Append(nvDrawProps);
+        nvPicProps.Append(nvPicDrawProps);
 
-
-        OXML.Drawing.Pictures.BlipFill _bf = new();
-
-        OXML.Drawing.Blip _b = new()
+        OXML.Drawing.Pictures.BlipFill blipFill = new();
+        OXML.Drawing.Blip blip = new()
         {
             Embed = imagePartId,
             CompressionState = OXML.Drawing.BlipCompressionValues.Print
         };
-        _bf.Append(_b);
+
+        if (isGrayscale)
+        {
+            blip.Append(new OXML.Drawing.Grayscale());
+        }
 
         OXML.Drawing.SourceRectangle srcRect = new()
         {
@@ -1003,62 +1005,60 @@ public partial class ExportReport
             Right = crop.Right,
             Bottom = crop.Bottom
         };
-        _bf.Append(srcRect);
+        blipFill.Append(blip);
+        blipFill.Append(srcRect);
 
-        OXML.Drawing.Stretch _str = new();
-        OXML.Drawing.FillRectangle _fr = new();
+        OXML.Drawing.Stretch stretch = new();
+        OXML.Drawing.FillRectangle fillRect = new();
+        stretch.Append(fillRect);
+        blipFill.Append(stretch);
 
-        _str.Append(_fr);
-        _bf.Append(_str);
-
-        OXML.Drawing.Pictures.ShapeProperties _shp = new();
-        OXML.Drawing.Transform2D _t2d = new();
-        OXML.Drawing.Offset _os = new()
+        OXML.Drawing.Pictures.ShapeProperties shapeProps = new();
+        OXML.Drawing.Transform2D transform2D = new();
+        OXML.Drawing.Offset offset = new()
         {
             X = 0L,
             Y = 0L
         };
-        OXML.Drawing.Extents _ex = new()
+        OXML.Drawing.Extents extents = new()
         {
             Cx = MillimetersToEMU(size.Width),
             Cy = MillimetersToEMU(size.Height)
         };
 
-        _t2d.Rotation = (OXML.Int32Value)(int)(rotationAngle * 60000); // (in 1/60000 Grad, daher multiplizieren)
-        _t2d.Append(_os);
-        _t2d.Append(_ex);
+        transform2D.Rotation = (OXML.Int32Value)(int)(rotationAngle * 60000); // Rotation in 1/60000 Grad
+        transform2D.Append(offset);
+        transform2D.Append(extents);
 
-        OXML.Drawing.PresetGeometry _preGeo = new()
+        OXML.Drawing.PresetGeometry presetGeometry = new()
         {
             Preset = OXML.Drawing.ShapeTypeValues.Rectangle
         };
-        OXML.Drawing.AdjustValueList _adl = new();
+        OXML.Drawing.AdjustValueList adjustValueList = new();
+        presetGeometry.Append(adjustValueList);
 
-        _preGeo.Append(_adl);
+        shapeProps.Append(transform2D);
+        shapeProps.Append(presetGeometry);
 
-        _shp.Append(_t2d);
-        _shp.Append(_preGeo);
+        picture.Append(nvPicProps);
+        picture.Append(blipFill);
+        picture.Append(shapeProps);
 
-        _pic.Append(_nvpp);
-        _pic.Append(_bf);
-        _pic.Append(_shp);
+        graphicData.Append(picture);
+        graphic.Append(graphicData);
 
-        _gd.Append(_pic);
+        anchor.Append(simplePos);
+        anchor.Append(horizontalPos);
+        anchor.Append(verticalPos);
+        anchor.Append(extent);
+        anchor.Append(effectExtent);
+        anchor.Append(wrapSquare);
+        anchor.Append(docProps);
+        anchor.Append(graphic);
 
-        _g.Append(_gd);
+        drawing.Append(anchor);
 
-        _anchor.Append(_spos);
-        _anchor.Append(_hp);
-        _anchor.Append(_vp);
-        _anchor.Append(_e);
-        _anchor.Append(_ee);
-        _anchor.Append(_wp);
-        _anchor.Append(_dp);
-        _anchor.Append(_g);
-
-        _drawing.Append(_anchor);
-
-        return _drawing;
+        return drawing;
     }
 
     private static long MillimetersToEMU(double millimeters)
