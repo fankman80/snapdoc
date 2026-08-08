@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.4.2" android:versionCode="431">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.4.2" android:versionCode="432">
 	<!-- Berechtigungen -->
-	<uses-permission android:name="android.permission.CAMERA" />
-	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-	<uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-	<uses-permission android:name="android.permission.INTERNET" />
-	<uses-permission android:name="android.permission.ACCESS_GPS" />
-	<uses-permission android:name="android.permission.ACCESS_ASSISTED_GPS" />
-	<uses-permission android:name="android.permission.ACCESS_LOCATION" />
 	<!-- Package Visibility für Kamera -->
 	<queries>
 		<intent>

@@ -1,10 +1,12 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
+using SnapDoc.Messages;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using SnapDoc.Resources.Languages;
+using CommunityToolkit.Mvvm.Messaging;
 
 namespace SnapDoc;
 
@@ -75,11 +77,10 @@ public partial class AppShell : Shell
         ApplyPlanTemplate();
     }
 
-    private void OnAppShellPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    private void OnAppShellPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(FlyoutIsPresented))
         {
-            // Wenn das Flyout geschlossen wird, senden wir den Reset-Befehl
             if (!FlyoutIsPresented)
                 WeakReferenceMessenger.Default.Send(new ResetTouchesMessage());
         }

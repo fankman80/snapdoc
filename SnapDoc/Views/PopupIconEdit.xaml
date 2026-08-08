@@ -21,8 +21,8 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-        <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout>
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout Margin="0,0,0,6">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -163,8 +163,7 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
-
-        <Grid Grid.Row="1" Margin="0,10,0,0">
+        <Grid Grid.Row="2">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="*" />
                 <ColumnDefinition Width="*" />

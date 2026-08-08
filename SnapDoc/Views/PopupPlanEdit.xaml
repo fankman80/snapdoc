@@ -15,126 +15,129 @@
                x:TypeArguments="local:PlanEditReturn"
                x:Class="SnapDoc.Views.PopupPlanEdit">
 
-    <Grid x:DataType="views:PopupPlanEdit"
-          Padding="6"
+    <Grid Padding="6"
           WidthRequest="320">
-        <VerticalStackLayout>
-            <material:TextField x:Name="name_entry"
-                                Title="{x:Static res:AppResources.planbezeichnung}"
-                                FontSize="{StaticResource AppFontSizeNormal}"
-                                MaxLength="200"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                AllowClear="True"/>
+        <Grid RowDefinitions="Auto, *, Auto" x:DataType="views:PopupPlanEdit">
+            <VerticalStackLayout Grid.Row="0" Spacing="0">
+                <material:TextField x:Name="name_entry"
+                                    Title="{x:Static res:AppResources.planbezeichnung}"
+                                    FontSize="{StaticResource AppFontSizeNormal}"
+                                    MaxLength="200"
+                                    TitleColor="{DynamicResource SecondaryBackground}"
+                                    BorderColor="{DynamicResource SecondaryBackground}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    AllowClear="True"/>
 
-            <material:EditorField x:Name="desc_entry"
-                                  Title="{x:Static res:AppResources.beschreibung}"
-                                  FontSize="{StaticResource AppFontSizeNormal}"
-                                  MaxLength="2000"
-                                  TitleColor="{DynamicResource SecondaryBackground}"
-                                  BorderColor="{DynamicResource SecondaryBackground}"
-                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                  AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <material:EditorField x:Name="desc_entry"
+                                        Title="{x:Static res:AppResources.beschreibung}"
+                                        FontSize="{StaticResource AppFontSizeNormal}"
+                                        MaxLength="2000"
+                                        TitleColor="{DynamicResource SecondaryBackground}"
+                                        BorderColor="{DynamicResource SecondaryBackground}"
+                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                        AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+            </VerticalStackLayout>
+            <ScrollView Grid.Row="1">
+                <VerticalStackLayout Margin="0,0,0,6">
+                    <Grid>
+                        <Border HeightRequest="44"
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10">
+                            <Image Source="pattern.png" Aspect="Center"/>
+                        </Border>
+                        <Border BackgroundColor="{Binding SelectedColor}"
+                                HeightRequest="44"                        
+                                StrokeThickness="0"
+                                StrokeShape="RoundRectangle 10"/>
+                        <Button BorderWidth="1"
+                                HeightRequest="44"
+                                BorderColor="Black"
+                                BackgroundColor="Transparent"
+                                Text="{x:Static res:AppResources.planfarbe}"
+                                TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
+                                Clicked="OnColorPickerClicked"/>
+                    </Grid>
 
-            <Grid>
-                <Border HeightRequest="44"
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10">
-                    <Image Source="pattern.png" Aspect="Center"/>
-                </Border>
-                <Border BackgroundColor="{Binding SelectedColor}"
-                        HeightRequest="44"                        
-                        StrokeThickness="0"
-                        StrokeShape="RoundRectangle 10"/>
-                <Button BorderWidth="1"
-                        HeightRequest="44"
-                        BorderColor="Black"
-                        BackgroundColor="Transparent"
-                        Text="{x:Static res:AppResources.planfarbe}"
-                        TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
-                        Clicked="OnColorPickerClicked"/>
-            </Grid>
+                    <controls:Switch x:Name="allow_export"
+                                    LabelText="{x:Static res:AppResources.plan_exportieren}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    HeightRequest="44"                             
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-            <controls:Switch x:Name="allow_export"
-                            LabelText="{x:Static res:AppResources.plan_exportieren}"
-                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            HeightRequest="44"                             
-                            HorizontalOptions="Start"
-                            VerticalOptions="Center"
-                            BorderColorOff ="Transparent"
-                            KnobColorOn="White"
-                            KnobColorOff="White"
-                            SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="50" />
+                            <ColumnDefinition Width="50" />
+                        </Grid.ColumnDefinitions>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="50" />
-                    <ColumnDefinition Width="50" />
-                </Grid.ColumnDefinitions>
+                        <controls:LocalizedLabel Grid.Column="0"
+                                                 VerticalTextAlignment="Center"
+                                                 ResourceKey="plan_drehung"
+                                                 Value="{Binding PlanRotate}"
+                                                 ValueFormat="{}: {0}°"/>
+                        <Button Grid.Column="1"
+                                Padding="0"
+                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                TextColor="{DynamicResource PrimaryDarkText}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_left}}"
+                                Clicked="PlanRotateLeft"/>
+                        <Button Grid.Column="2"
+                                Padding="0"
+                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                TextColor="{DynamicResource PrimaryDarkText}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_right}}"
+                                Clicked="PlanRotateRight" />
+                    </Grid>
 
-                <controls:LocalizedLabel Grid.Column="0"
-                                         VerticalTextAlignment="Center"
-                                         ResourceKey="plan_drehung"
-                                         Value="{Binding PlanRotate}"
-                                         ValueFormat="{}: {0}°"/>
-                <Button Grid.Column="1"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_left}}"
-                        Clicked="PlanRotateLeft"/>
-                <Button Grid.Column="2"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_right}}"
-                        Clicked="PlanRotateRight" />
-            </Grid>
+                    <Label Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <Button Grid.Column="0"
+                                Padding="0"
+                                Text="{x:Static res:AppResources.anheften}"                        
+                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                TextColor="{DynamicResource PrimaryDarkText}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock}}"
+                                Clicked="OnLockedClicked" />
+                        <Button Grid.Column="1"
+                                Padding="0"                        
+                                Text="{x:Static res:AppResources.loesen}" 
+                                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                TextColor="{DynamicResource PrimaryDarkText}"
+                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open_right}}"
+                                Clicked="OnUnlockedClicked" />
+                    </Grid>
 
-            <Label Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Button Grid.Column="0"
-                        Padding="0"
-                        Text="{x:Static res:AppResources.anheften}"                        
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock}}"
-                        Clicked="OnLockedClicked" />
-                <Button Grid.Column="1"
-                        Padding="0"                        
-                        Text="{x:Static res:AppResources.loesen}" 
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open_right}}"
-                        Clicked="OnUnlockedClicked" />
-            </Grid>
+                    <Button x:Name="grayscaleButtonText"
+                            x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                            IsVisible="{Binding IsExperimentalFunctions}"
+                            Padding="0"
+                            Text="{x:Static res:AppResources.farben_entfernen}"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
+                            Clicked="OnGrayscaleClicked" />
 
-            <Button x:Name="grayscaleButtonText"
-                    x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                    IsVisible="{Binding IsExperimentalFunctions}"
-                    Padding="0"
-                    Text="{x:Static res:AppResources.farben_entfernen}"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
-                    Clicked="OnGrayscaleClicked" />
-
-            <Button Padding="0"
-                    Text="{x:Static res:AppResources.plan_loeschen}"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
-                    Clicked="OnDeleteClicked" />
-
-            <Grid Margin="0,16,0,0">
+                        <Button Padding="0"
+                            Text="{x:Static res:AppResources.plan_loeschen}"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
+                            Clicked="OnDeleteClicked" />
+                </VerticalStackLayout>
+            </ScrollView>
+            <Grid Grid.Row="2">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
@@ -151,7 +154,7 @@
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />
-            </Grid>
-        </VerticalStackLayout>
+             </Grid>
+        </Grid>
     </Grid>
 </toolkit:Popup>
