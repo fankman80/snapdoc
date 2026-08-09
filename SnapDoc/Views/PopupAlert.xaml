@@ -15,7 +15,7 @@
             <Label x:Name="titleText"
                    Text=""
                    HorizontalOptions="Start"/>
-            <Grid RowDefinitions="*, *">
+            <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
                         Text="{x:Static res:AppResources.ok}"
