@@ -124,7 +124,7 @@
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
                     Clicked="OnDeleteClicked" />
 
-            <Grid RowDefinitions="*, *">
+            <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"
