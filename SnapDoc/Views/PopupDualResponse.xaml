@@ -17,7 +17,7 @@
                 HorizontalOptions="Start"
                 x:Name="titleText"
                 Text=""/>
-            <Grid RowDefinitions="*, *">
+            <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"
