@@ -90,6 +90,7 @@ public static class MauiProgram
             if (view is BorderlessEditor)
             {
 #if ANDROID
+                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
                 handler.PlatformView.Background = null;
                 handler.PlatformView.SetPadding(0, 0, 0, 0);
 #elif IOS || MACCATALYST
@@ -119,6 +120,7 @@ public static class MauiProgram
         {
             if (handler.PlatformView is Android.Widget.EditText editText)
             {
+                editText.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
                 editText.Background = null; // Unterstreichung weg
 
                 // Padding setzen (links, oben, rechts, unten)
