@@ -224,7 +224,7 @@
             </VerticalStackLayout>     
         </ScrollView>
 
-        <Grid Grid.Row="1" RowDefinitions="*, *">
+        <Grid Grid.Row="1" ColumnDefinitions="*, *">
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     Text="{x:Static res:AppResources.abbrechen}"
