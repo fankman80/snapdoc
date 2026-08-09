@@ -97,7 +97,7 @@
             </CollectionView>
         </ScrollView>
 
-        <Grid Grid.Row="3" RowDefinitions="*, *">
+        <Grid Grid.Row="3" ColumnDefinitions="*, *">
             <Button Grid.Column="0"
                     Text="{x:Static res:AppResources.abbrechen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
