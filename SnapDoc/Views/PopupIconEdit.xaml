@@ -16,19 +16,11 @@
 
     <Grid x:DataType="views:PopupIconEdit"
           Padding="6"
-          WidthRequest="320">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-        <ScrollView Grid.Row="0">
+          WidthRequest="320"
+          RowDefinitions="*, Auto">
+        <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout Margin="0,0,0,6">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-
+                <Grid  RowDefinitions="Auto, *">
                     <AbsoluteLayout WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
                                     HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}">
                         <Image x:Name="iconImage"
@@ -163,11 +155,8 @@
                 </VerticalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
-        <Grid Grid.Row="2">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+
+        <Grid Grid.Row="1" RowDefinitions="*, *">
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     Text="{x:Static res:AppResources.abbrechen}"

@@ -16,7 +16,6 @@
           WidthRequest="240"
           VerticalOptions="Center">
         <Grid RowDefinitions="Auto, Auto" RowSpacing="12">
-
             <ScrollView Grid.Row="0"
                         MaximumHeightRequest="400"> 
                 <material:RadioButtonGroupView x:Name="RadioGroup" 

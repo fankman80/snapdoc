@@ -14,13 +14,7 @@
           WidthRequest="320">
         <VerticalStackLayout>
             <uranium:CalendarView x:Name="calendar" />
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+            <Grid RowDefinitions="Auto, *, Auto, Auto">
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

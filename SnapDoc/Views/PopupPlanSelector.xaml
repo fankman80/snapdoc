@@ -15,13 +15,8 @@
                x:Class="SnapDoc.Views.PopupPlanSelector">
 
     <Grid Padding="6"
-          WidthRequest="320">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+          WidthRequest="320"
+          RowDefinitions="Auto, *, Auto, Auto">
         <material:RadioButtonGroupView Grid.Row="0"
                                        x:Name="RadioButtonGroup"
                                        Margin="2,0,0,0"
@@ -102,11 +97,7 @@
             </CollectionView>
         </ScrollView>
 
-        <Grid Grid.Row="3">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="3" RowDefinitions="*, *">
             <Button Grid.Column="0"
                     Text="{x:Static res:AppResources.abbrechen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

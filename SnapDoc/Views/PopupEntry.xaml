@@ -21,7 +21,6 @@
             <Label x:Name="titleText"
                    HorizontalOptions="Start"
                    Text=""/>
-
             <material:TextField x:Name="textEntry"
                                 FontSize="{StaticResource AppFontSizeNormal}"
                                 MaxLength="200"
@@ -30,11 +29,7 @@
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"/>
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Grid RowDefinitions="*, *">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"

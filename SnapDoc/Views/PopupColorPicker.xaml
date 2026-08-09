@@ -30,7 +30,7 @@
           WidthRequest="320">
         <Grid RowDefinitions="*, Auto" VerticalOptions="Center">
             <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-                <VerticalStackLayout x:DataType="views:PopupColorPicker">
+                <VerticalStackLayout x:DataType="views:PopupColorPicker" Margin="0,0,0,6">
                     <Label Text="{x:Static res:AppResources.doppelklick_farbe_loeschen}" FontSize="12"/>
                     <CollectionView x:Name="ColorListPicker"
                                     ItemsSource="{Binding ColorsList}"
@@ -237,11 +237,7 @@
                 </VerticalStackLayout>
             </ScrollView>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Grid Grid.Row="1" RowDefinitions="*, *">
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

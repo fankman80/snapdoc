@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+ <?xml version="1.0" encoding="utf-8" ?>
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
@@ -13,9 +13,8 @@
 
     <Grid Padding="6"
           WidthRequest="320">
-        <Grid RowDefinitions="Auto, *, Auto">
-            <material:TextField Grid.Row="0"
-                                x:Name="text_entry"
+        <VerticalStackLayout HorizontalOptions="Fill">
+            <material:TextField x:Name="text_entry"
                                 Title="{x:Static res:AppResources.projekt_titel}"
                                 FontSize="{StaticResource AppFontSizeNormal}"
                                 TitleColor="{DynamicResource SecondaryBackground}"
@@ -23,38 +22,32 @@
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"/>
-            <ScrollView Grid.Row="1">
-                <VerticalStackLayout Margin="0,0,0,6">
-                    <Button Text="{x:Static res:AppResources.zip_exportieren}"
-                            Padding="0"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_zip}}"
-                            Clicked="OnSaveClicked" />
 
-                    <Button x:Name="openFolderBtn"
-                            Padding="0"
-                            IsVisible="{OnPlatform Default=False, WinUI=True, iOS=False, Android=False}"
-                            Text="{x:Static res:AppResources.verzeichnis_oeffnen}"
-                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            TextColor="{DynamicResource PrimaryDarkText}"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
-                            Clicked="OnOpenFolderClicked"/>
+            <Button Text="{x:Static res:AppResources.zip_exportieren}"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_zip}}"
+                    Clicked="OnSaveClicked" />
 
+            <Button x:Name="openFolderBtn"
+                    Padding="0"
+                    IsVisible="{OnPlatform Default=False, WinUI=True, iOS=False, Android=False}"
+                    Text="{x:Static res:AppResources.verzeichnis_oeffnen}"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
+                    Clicked="OnOpenFolderClicked">
+            </Button>
 
-                    <Button Text="{x:Static res:AppResources.projekt_loeschen}"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
-                        Clicked="OnDeleteClicked" />
-                </VerticalStackLayout>
-            </ScrollView>
-            <Grid Grid.Row="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
+            <Button Text="{x:Static res:AppResources.projekt_loeschen}"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
+                    Clicked="OnDeleteClicked" />
+
+            <Grid RowDefinitions="*, *">
                 <Button Grid.Column="0"
                         HorizontalOptions="Fill"
                         x:Name="cancelButtonText"
@@ -70,6 +63,6 @@
                         TextColor="{DynamicResource PrimaryDarkText}"
                         Clicked="OnOkClicked" />
             </Grid>
-        </Grid>
+        </VerticalStackLayout>
     </Grid>
 </toolkit:Popup>

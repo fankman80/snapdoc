@@ -16,12 +16,8 @@
 
     <Grid x:DataType="views:PopupStyleEditor"
           Padding="6"
-          WidthRequest="320">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
-
+          WidthRequest="320"
+          RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
                 <Grid>
@@ -228,11 +224,7 @@
             </VerticalStackLayout>     
         </ScrollView>
 
-        <Grid Grid.Row="1">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="*" />
-            </Grid.ColumnDefinitions>
+        <Grid Grid.Row="1" RowDefinitions="*, *">
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     Text="{x:Static res:AppResources.abbrechen}"
