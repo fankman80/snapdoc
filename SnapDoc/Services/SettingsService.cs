@@ -113,7 +113,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
     [ObservableProperty] public partial int IconPreviewSize { get; set; } = 64;
     [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;
-    [ObservableProperty] public partial double DefaultPinZoom { get; set; } = 2;
+    [ObservableProperty] public partial double DefaultPinZoom { get; set; } = 4;
     [ObservableProperty] public partial bool IsPlanRotateLocked { get; set; } = false;
     [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
     [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
