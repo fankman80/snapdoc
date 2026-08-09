@@ -28,7 +28,6 @@
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                 AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                 AllowClear="True"/>
-
             <material:EditorField x:Name="desc_entry"
                                   Title="{x:Static res:AppResources.beschreibung}"
                                   FontSize="{StaticResource AppFontSizeNormal}"
@@ -37,7 +36,6 @@
                                   BorderColor="{DynamicResource SecondaryBackground}"
                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                   AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-
             <Grid>
                 <Border HeightRequest="44"
                         StrokeThickness="0"
@@ -56,7 +54,6 @@
                         TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                         Clicked="OnColorPickerClicked"/>
             </Grid>
-
             <controls:Switch x:Name="allow_export"
                             LabelText="{x:Static res:AppResources.plan_exportieren}"
                             TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -69,7 +66,7 @@
                             SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-            <Grid RowDefinitions="*, 50, 50">
+            <Grid ColumnDefinitions="*, 50, 50">
                 <controls:LocalizedLabel Grid.Column="0"
                                          VerticalTextAlignment="Center"
                                          ResourceKey="plan_drehung"
@@ -90,7 +87,7 @@
             </Grid>
 
             <Label Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" />
-            <Grid RowDefinitions="*, *">
+            <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="0"
                         Padding="0"
                         Text="{x:Static res:AppResources.anheften}"                        
@@ -116,14 +113,12 @@
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
                     Clicked="OnGrayscaleClicked" />
-
             <Button Padding="0"
                     Text="{x:Static res:AppResources.plan_loeschen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
                     Clicked="OnDeleteClicked" />
-
             <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"

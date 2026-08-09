@@ -20,8 +20,9 @@
           RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout Margin="0,0,0,6">
-                <Grid  RowDefinitions="Auto, *">
-                    <AbsoluteLayout WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
+                <Grid ColumnDefinitions="Auto, *">
+                    <AbsoluteLayout Grid.Column="0"
+                                    WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
                                     HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}">
                         <Image x:Name="iconImage"
                                Margin="12"
@@ -41,7 +42,6 @@
                                TranslationY="{Binding TransY}">
                         </Label>
                     </AbsoluteLayout>
-
                     <VerticalStackLayout Grid.Column="1">
                         <material:TextField Title="{x:Static res:AppResources.anker_x}"
                                             FontSize="{StaticResource AppFontSizeNormal}"

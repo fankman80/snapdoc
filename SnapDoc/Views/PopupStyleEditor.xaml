@@ -30,7 +30,6 @@
                         <RowDefinition Height="44" />
                         <RowDefinition Height="44" />
                     </Grid.RowDefinitions>
-
                     <Grid Grid.Column="0" Grid.Row="0">
                         <Border HeightRequest="44"
                                 StrokeThickness="0"
