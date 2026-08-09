@@ -364,7 +364,7 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="1" RowDefinitions="*, Auto">
+        <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
             <Button Grid.Column="1"
                     Text="{x:Static res:AppResources.ok}"
                     MinimumWidthRequest="100"
