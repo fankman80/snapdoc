@@ -2,7 +2,6 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:views="clr-namespace:SnapDoc.Views"               
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -71,16 +70,65 @@
                     PlaceholderColor="{DynamicResource SecondaryBackground}"
                     FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                                x:Name="iconCategory"
-                                                FontFamily="{StaticResource AppFontFamily}"
-                                                FontSize="{StaticResource AppFontSizeNormal}"                                                
-                                                Title="{x:Static res:AppResources.kategorie}"
-                                                TitleColor="{DynamicResource SecondaryBackground}"
-                                                BorderColor="{DynamicResource SecondaryBackground}"
-                                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                                ItemsSource="{Binding IconCategories}"/>
+                <VerticalStackLayout Spacing="2">
+                    <Grid RowDefinitions="Auto, Auto">
+                        <!-- Input-Feld -->
+                        <controls:BorderedEntry x:Name="iconCategory"
+                               Grid.Row="0"
+                               TextChanged="OnCategoryTextChanged"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                               Placeholder="{x:Static res:AppResources.kategorie}"
+                               BorderColor="{DynamicResource SecondaryBackground}"
+                               PlaceholderColor="{DynamicResource SecondaryBackground}"
+                               FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+
+                        <!-- Schwebender Container fuer die Vorschlaege -->
+                        <Border Grid.Row="1"
+                                IsVisible="{Binding IsCategorySuggestionsVisible}"
+                                BackgroundColor="{AppThemeBinding Light=White, Dark=#2B2B2B}"
+                                Stroke="{DynamicResource SecondaryBackground}"
+                                StrokeThickness="1"
+                                StrokeShape="RoundRectangle 8"
+                                Margin="0,4,0,0"
+                                ZIndex="99">
+                            <Border.Shadow>
+                                <Shadow Brush="Black"
+                                        Offset="0,4"
+                                        Radius="8"
+                                        Opacity="0.25" />
+                            </Border.Shadow>
+
+                            <CollectionView x:Name="CategorySuggestionsView"
+                                            ItemsSource="{Binding FilteredCategories}"
+                                            SelectionMode="Single"
+                                            SelectionChanged="OnCategorySelectionChanged"
+                                            MaximumHeightRequest="160">
+                                <CollectionView.ItemTemplate>
+                                    <DataTemplate x:DataType="x:String">
+                                        <Grid Padding="12,10">
+                                            <VisualStateManager.VisualStateGroups>
+                                                <VisualStateGroupList>
+                                                    <VisualStateGroup x:Name="CommonStates">
+                                                        <VisualState x:Name="Normal" />
+                                                        <VisualState x:Name="PointerOver">
+                                                            <VisualState.Setters>
+                                                                <Setter Property="BackgroundColor" Value="{AppThemeBinding Light=#EFEFEF, Dark=#3D3D3D}" />
+                                                            </VisualState.Setters>
+                                                        </VisualState>
+                                                    </VisualStateGroup>
+                                                </VisualStateGroupList>
+                                            </VisualStateManager.VisualStateGroups>
+
+                                            <Label Text="{Binding .}" 
+                                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                                   VerticalOptions="Center" />
+                                        </Grid>
+                                    </DataTemplate>
+                                </CollectionView.ItemTemplate>
+                            </CollectionView>
+                        </Border>
+                    </Grid>
+                </VerticalStackLayout>
 
                 <Button Text="{x:Static res:AppResources.farbe_waehlen}"
                         BorderWidth="1"

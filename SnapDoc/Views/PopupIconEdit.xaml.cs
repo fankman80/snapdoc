@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SkiaSharp;
 using SnapDoc.Services;
+using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using static SnapDoc.Helper;
@@ -15,13 +16,35 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     public int IconPreviewWidth { get; set; } = 120;
     public int IconPreviewHeight { get; set; }
 
+    // AutoComplete / Kategorien-Eigenschaften
+    private readonly List<string> _allCategories = [];
+    public ObservableCollection<string> FilteredCategories { get; set; } = [];
+
+    private bool _isCategorySuggestionsVisible;
+    public bool IsCategorySuggestionsVisible
+    {
+        get => _isCategorySuggestionsVisible;
+        set
+        {
+            if (_isCategorySuggestionsVisible != value)
+            {
+                _isCategorySuggestionsVisible = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public PopupIconEdit(IconItem _iconItem)
     {
         InitializeComponent();
         iconItem = _iconItem;
         iconImage.Source = iconItem.DisplayIconPath;
         iconName.Text = iconItem.DisplayName;
+
+        // Alle vorhandenen Kategorien aus dem Service laden
+        _allCategories = SettingsService.Instance.IconCategories ?? [];
         iconCategory.Text = iconItem.Category;
+
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
 
         Anchor_X = iconItem.AnchorPoint.X;
@@ -178,6 +201,44 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         }
     }
 
+    // --- AutoComplete Event-Handler für die Kategorie ---
+    private void OnCategoryTextChanged(object sender, TextChangedEventArgs e)
+    {
+        var keyword = e.NewTextValue;
+
+        if (string.IsNullOrWhiteSpace(keyword))
+        {
+            FilteredCategories.Clear();
+            IsCategorySuggestionsVisible = false;
+            return;
+        }
+
+        var filtered = _allCategories
+            .Where(x => x.Contains(keyword, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+        FilteredCategories.Clear();
+        foreach (var item in filtered)
+        {
+            FilteredCategories.Add(item);
+        }
+
+        IsCategorySuggestionsVisible = FilteredCategories.Count > 0;
+    }
+
+    private void OnCategorySelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is string selectedCategory)
+        {
+            iconCategory.Text = selectedCategory;
+            IsCategorySuggestionsVisible = false;
+
+            // Auswahl fuer den naechsten Klick zuruecksetzen
+            if (sender is CollectionView cv)
+                cv.SelectedItem = null;
+        }
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
         if (!string.IsNullOrEmpty(Anchor_X_Text))
@@ -185,7 +246,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             string cleanX = Anchor_X_Text.Replace(',', '.');
             if (double.TryParse(cleanX, System.Globalization.CultureInfo.InvariantCulture, out double parsedX))
             {
-                Anchor_X = parsedX; // Setzt den echten Double-Wert inklusive Math.Clamp
+                Anchor_X = parsedX;
             }
         }
 
@@ -194,7 +255,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             string cleanY = Anchor_Y_Text.Replace(',', '.');
             if (double.TryParse(cleanY, System.Globalization.CultureInfo.InvariantCulture, out double parsedY))
             {
-                Anchor_Y = parsedY; // Setzt den echten Double-Wert inklusive Math.Clamp
+                Anchor_Y = parsedY;
             }
         }
 
@@ -206,7 +267,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             var updatedItem = new IconItem(
                 file,
                 iconName.Text,
-                new Point(Anchor_X, Anchor_Y), // Garantiert die korrekten, gecleanten Double-Werte
+                new Point(Anchor_X, Anchor_Y),
                 iconItem.IconSize,
                 allowRotate.IsToggled,
                 allowAutoScale.IsToggled,
@@ -255,7 +316,6 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
-        
         try { await CloseAsync(null); }
         catch (InvalidOperationException) { }
     }

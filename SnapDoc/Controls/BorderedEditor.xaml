@@ -6,30 +6,27 @@
              x:Class="SnapDoc.Controls.BorderedEditor"
              x:Name="this">
 
-    <!-- Padding oben etwas erhöht für das schwebende Label -->
-    <Grid Padding="0,10,0,0">
-        <!-- SkiaSharp Canvas anstelle des MAUI Borders -->
+    <Grid Padding="0,8,0,4" MinimumHeightRequest="50">
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
-                           HeightRequest="120"
                            IgnorePixelScaling="False"
                            Margin="0" />
 
-        <!-- BorderlessEditor statt BorderlessEntry -->
         <local:BorderlessEditor x:Name="InnerEditor"
                                Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}"
                                TextColor="{Binding TextColor, Source={x:Reference this}}"
                                FontSize="{Binding FontSize, Source={x:Reference this}}"
                                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                                Keyboard="{Binding Keyboard, Source={x:Reference this}}"
+                               AutoSize="TextChanges"
                                BackgroundColor="Transparent"
-                               VerticalOptions="Fill"
-                               Margin="16,16,16,16"
+                               VerticalOptions="Center"
+                               Margin="16,14"
                                Focused="InnerEditor_Focused"
                                Unfocused="InnerEditor_Unfocused"
-                               TextChanged="InnerEditor_TextChanged" />
+                               TextChanged="InnerEditor_TextChanged"
+                               SizeChanged="InnerEditor_SizeChanged" />
 
-        <!-- Label startet nun am oberen Rand (Start) -->
         <Label x:Name="FloatingLabel"
                Text="{Binding Placeholder, Source={x:Reference this}}"
                TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
@@ -37,8 +34,8 @@
                FontSize="{Binding FontSize, Source={x:Reference this}}"
                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                HorizontalOptions="Start"
-               VerticalOptions="Start"
-               Margin="10,16,0,0"
+               VerticalOptions="Center"
+               Margin="10,0,0,0"
                Padding="8,0"
                AnchorX="0"
                InputTransparent="True" />

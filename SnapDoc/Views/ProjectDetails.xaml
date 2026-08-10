@@ -15,8 +15,7 @@
              Title="{x:Static res:AppResources.projektverwaltung}">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*, Auto,Auto"
-              ColumnSpacing="0">
+        <Grid ColumnDefinitions="*, Auto,Auto" ColumnSpacing="0">
             <Label Grid.Row="0"
                    x:DataType="views:ProjectDetails"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
@@ -80,7 +79,7 @@
             </Grid.RowDefinitions>
 
             <ScrollView Grid.Row="0" Margin="0,10,0,10">
-                <VerticalStackLayout Spacing="16">
+                <VerticalStackLayout Spacing="8">
                     <controls:BorderedEntry
                         x:Name="client_name"
                         Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
@@ -131,6 +130,7 @@
 
                     <Button
                         x:Name="creation_date"
+                        Margin="0,8,0,0"
                         FontSize="{StaticResource AppFontSizeNormal}"
                         HorizontalOptions="Start"
                         BackgroundColor="Transparent"

@@ -6,8 +6,14 @@ namespace SnapDoc.Controls;
 public partial class BorderedEditor : ContentView
 {
     public event EventHandler<TextChangedEventArgs>? TextChanged;
+
     public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(nameof(Text), typeof(string), typeof(BorderedEditor), defaultBindingMode: BindingMode.TwoWay);
+        BindableProperty.Create(
+            nameof(Text),
+            typeof(string),
+            typeof(BorderedEditor),
+            defaultBindingMode: BindingMode.TwoWay,
+            propertyChanged: OnTextChanged);
 
     public static readonly BindableProperty PlaceholderProperty =
         BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEditor), string.Empty);
@@ -74,8 +80,23 @@ public partial class BorderedEditor : ContentView
     public BorderedEditor()
     {
         InitializeComponent();
-        this.Loaded += (s, e) => UpdateFloatingLabelState(animate: false);
-        FloatingLabel.SizeChanged += (s, e) => BorderCanvas.InvalidateSurface();
+
+        this.Loaded += (s, e) =>
+        {
+            UpdateFloatingLabelState(animate: false);
+            BorderCanvas?.InvalidateSurface();
+        };
+
+        this.Unloaded += (s, e) =>
+        {
+            FloatingLabel.CancelAnimations();
+        };
+
+        FloatingLabel.SizeChanged += (s, e) =>
+        {
+            UpdateFloatingLabelState(animate: false);
+            BorderCanvas?.InvalidateSurface();
+        };
     }
 
     private void InnerEditor_Focused(object sender, FocusEventArgs e)
@@ -177,46 +198,83 @@ public partial class BorderedEditor : ContentView
 
     private void UpdateFloatingLabelState(bool animate)
     {
-        bool hasText = !string.IsNullOrEmpty(InnerEditor.Text);
+        if (this.Handler == null || !this.IsLoaded)
+            return;
+
+        bool hasText = !string.IsNullOrEmpty(Text);
         bool isFocused = InnerEditor.IsFocused;
         bool shouldFloat = isFocused || hasText;
+        double fineTuningOffsetY = 4.0;
 
-        FloatingLabel.TextColor = isFocused ? FocusedBorderColor : PlaceholderColor;
-
-        // Angepasster Y-Wert, da das Label oben startet und nicht in der Mitte
-        double floatingY = -16;
-
-        if (shouldFloat)
+        Dispatcher.Dispatch(() =>
         {
-            if (animate)
+            if (this.Handler == null || !this.IsLoaded)
+                return;
+
+            FloatingLabel.TextColor = isFocused ? FocusedBorderColor : PlaceholderColor;
+
+            double floatingY;
+            if (FloatingLabel.Height > 0)
             {
-                FloatingLabel.TranslateToAsync(0, floatingY, 150, Easing.CubicOut);
-                FloatingLabel.ScaleToAsync(0.8, 150, Easing.CubicOut);
+                floatingY = -(FloatingLabel.Y + (FloatingLabel.Height / 2.0)) + fineTuningOffsetY;
             }
             else
             {
-                FloatingLabel.TranslationY = floatingY;
-                FloatingLabel.Scale = 0.8;
+                floatingY = -16;
             }
-        }
-        else
-        {
-            if (animate)
+
+            if (shouldFloat)
             {
-                FloatingLabel.TranslateToAsync(0, 0, 150, Easing.CubicIn);
-                FloatingLabel.ScaleToAsync(1.0, 150, Easing.CubicIn);
+                if (animate)
+                {
+                    FloatingLabel.TranslateToAsync(0, floatingY, 150, Easing.CubicOut);
+                    FloatingLabel.ScaleToAsync(0.8, 150, Easing.CubicOut);
+                }
+                else
+                {
+                    FloatingLabel.TranslationY = floatingY;
+                    FloatingLabel.Scale = 0.8;
+                }
             }
             else
             {
-                FloatingLabel.TranslationY = 0;
-                FloatingLabel.Scale = 1.0;
+                if (animate)
+                {
+                    FloatingLabel.TranslateToAsync(0, 0, 150, Easing.CubicIn);
+                    FloatingLabel.ScaleToAsync(1.0, 150, Easing.CubicIn);
+                }
+                else
+                {
+                    FloatingLabel.TranslationY = 0;
+                    FloatingLabel.Scale = 1.0;
+                }
             }
+        });
+    }
+
+    private void InnerEditor_SizeChanged(object sender, EventArgs e)
+    {
+        this.InvalidateMeasure();
+        BorderCanvas?.InvalidateSurface();
+    }
+
+    private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is BorderedEditor control)
+        {
+            if (control.InnerEditor != null && control.InnerEditor.Text != control.Text)
+                control.InnerEditor.Text = control.Text;
+
+            control.UpdateFloatingLabelState(animate: false);
+            control.BorderCanvas?.InvalidateSurface();
         }
     }
 
-    private void InnerEntry_TextChanged(object sender, TextChangedEventArgs e)
+    protected override void OnBindingContextChanged()
     {
-        UpdateFloatingLabelState(animate: true);
-        TextChanged?.Invoke(this, e);
+        base.OnBindingContextChanged();
+
+        UpdateFloatingLabelState(animate: false);
+        BorderCanvas?.InvalidateSurface();
     }
 }

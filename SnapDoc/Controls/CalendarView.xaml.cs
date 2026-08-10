@@ -5,11 +5,17 @@ namespace SnapDoc.Controls;
 public partial class CalendarView : ContentView
 {
     private readonly CalendarViewModel _viewModel;
+    private DateTime _currentDate;
 
     public event EventHandler<DateTime>? DayTapped;
 
     public static readonly BindableProperty SelectedDateProperty =
-        BindableProperty.Create(nameof(SelectedDate), typeof(DateTime), typeof(CalendarView), DateTime.Today, propertyChanged: OnStartDateChanged);
+        BindableProperty.Create(
+            nameof(SelectedDate),
+            typeof(DateTime),
+            typeof(CalendarView),
+            DateTime.Today,
+            propertyChanged: OnStartDateChanged);
 
     public DateTime SelectedDate
     {
@@ -23,28 +29,38 @@ public partial class CalendarView : ContentView
         _viewModel = new CalendarViewModel();
         BindingContext = _viewModel;
 
-        // Initial mit dem Startdatum generieren
-        _viewModel.GenerateCalendar(SelectedDate);
+        _currentDate = SelectedDate;
+        _viewModel.GenerateCalendar(_currentDate, SelectedDate);
     }
 
     private static void OnStartDateChanged(BindableObject bindable, object oldValue, object newValue)
     {
         if (bindable is CalendarView control && newValue is DateTime date)
         {
-            control._viewModel.GenerateCalendar(date);
+            control._currentDate = date;
+            control._viewModel.GenerateCalendar(date, date);
         }
     }
 
-    private void OnDaySelected(object sender, SelectionChangedEventArgs e)
+    private void OnPreviousMonthClicked(object sender, EventArgs e)
     {
-        if (e.CurrentSelection.FirstOrDefault() is CalendarDay selectedDay)
-        {
-            DayTapped?.Invoke(this, selectedDay.Date);
-        }
+        _currentDate = _currentDate.AddMonths(-1);
+        _viewModel.GenerateCalendar(_currentDate, SelectedDate);
+    }
 
-        if (sender is CollectionView cv)
+    private void OnNextMonthClicked(object sender, EventArgs e)
+    {
+        _currentDate = _currentDate.AddMonths(1);
+        _viewModel.GenerateCalendar(_currentDate, SelectedDate);
+    }
+
+    private void OnDayTapped(object sender, TappedEventArgs e)
+    {
+        if (e.Parameter is CalendarDay selectedDay)
         {
-            cv.SelectedItem = null;
+            SelectedDate = selectedDay.Date;
+            _viewModel.SelectDate(selectedDay.Date);
+            DayTapped?.Invoke(this, selectedDay.Date);
         }
     }
 }
