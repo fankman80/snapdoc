@@ -97,6 +97,7 @@
                     <controls:BorderedEntry
                         x:Name="client_name"
                         Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
+                        BackgroundColor="{Binding BackgroundColor, Source={x:Reference ThisPage}}"
                         BorderColor="{DynamicResource SecondaryBackground}"
                         PlaceholderColor="{DynamicResource SecondaryBackground}"
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>

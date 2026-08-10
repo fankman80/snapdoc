@@ -7,6 +7,7 @@
 
     <Grid Padding="0,4,0,0">
         <Border x:Name="ContainerBorder"
+                BackgroundColor="{Binding BackgroundColor, Source={x:Reference this}}"
                 Stroke="{Binding BorderColor, Source={x:Reference this}}"
                 StrokeThickness="{Binding BorderThickness, Source={x:Reference this}}"
                 Padding="16,0"
@@ -40,7 +41,7 @@
         <Label x:Name="FloatingLabel"
                Text="{Binding Placeholder, Source={x:Reference this}}"
                TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
-               BackgroundColor="{Binding LabelBackgroundColor, Source={x:Reference this}}"
+               BackgroundColor="{Binding BackgroundColor, Source={x:Reference this}}"
                FontSize="{Binding FontSize, Source={x:Reference this}}"
                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                HorizontalOptions="Start"

@@ -24,7 +24,7 @@ public partial class BorderedEntry : ContentView
         BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
 
     public static readonly BindableProperty CornerRadiusProperty =
-        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(8));
+        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(6));
 
     public static readonly BindableProperty IsPasswordProperty =
         BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(BorderedEntry), false);
@@ -32,8 +32,8 @@ public partial class BorderedEntry : ContentView
     public static readonly BindableProperty KeyboardProperty =
         BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEntry), Keyboard.Default);
 
-    public static readonly BindableProperty LabelBackgroundColorProperty =
-        BindableProperty.Create(nameof(LabelBackgroundColor), typeof(Color), typeof(BorderedEntry), Colors.White);
+    public static new readonly BindableProperty BackgroundColorProperty =
+        BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEntry), Colors.White);
 
     public static readonly BindableProperty TextColorProperty =
             BindableProperty.Create(
@@ -66,7 +66,7 @@ public partial class BorderedEntry : ContentView
     public CornerRadius CornerRadius { get => (CornerRadius)GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
     public bool IsPassword { get => (bool)GetValue(IsPasswordProperty); set => SetValue(IsPasswordProperty, value); }
     public Keyboard Keyboard { get => (Keyboard)GetValue(KeyboardProperty); set => SetValue(KeyboardProperty, value); }
-    public Color LabelBackgroundColor { get => (Color)GetValue(LabelBackgroundColorProperty); set => SetValue(LabelBackgroundColorProperty, value); }
+    public new Color BackgroundColor { get => (Color)GetValue(BackgroundColorProperty); set => SetValue(BackgroundColorProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
     public string FontFamily { get => (string)GetValue(FontFamilyProperty); set => SetValue(FontFamilyProperty, value); }
@@ -106,8 +106,8 @@ public partial class BorderedEntry : ContentView
             if (animate)
             {
                 // TranslateTo und ScaleTo statt TranslateToAsync / ScaleToAsync
-                FloatingLabel.TranslateToAsync(0, -25, 200, Easing.CubicOut);
-                FloatingLabel.ScaleToAsync(0.8, 200, Easing.CubicOut);
+                FloatingLabel.TranslateToAsync(0, -25, 150, Easing.CubicOut);
+                FloatingLabel.ScaleToAsync(0.8, 150, Easing.CubicOut);
             }
             else
             {
@@ -119,8 +119,8 @@ public partial class BorderedEntry : ContentView
         {
             if (animate)
             {
-                FloatingLabel.TranslateToAsync(0, 0, 200, Easing.CubicIn);
-                FloatingLabel.ScaleToAsync(1.0, 200, Easing.CubicIn);
+                FloatingLabel.TranslateToAsync(0, 0, 150, Easing.CubicIn);
+                FloatingLabel.ScaleToAsync(1.0, 150, Easing.CubicIn);
             }
             else
             {
