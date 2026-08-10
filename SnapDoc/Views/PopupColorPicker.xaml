@@ -2,8 +2,6 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:views="clr-namespace:SnapDoc.Views"
                xmlns:vm="clr-namespace:SnapDoc.ViewModels"
                xmlns:services="clr-namespace:SnapDoc.Services"
@@ -87,136 +85,129 @@
                         </CollectionView.ItemTemplate>
                     </CollectionView>
 
-                    <Border Stroke="{DynamicResource SecondaryBackground}"
-                            StrokeThickness="1"
-                            StrokeShape="RoundRectangle 8"
-                            Margin="0,0,0,10">
-                        <uranium:ExpanderView>
-                            <uranium:ExpanderView.Header>
-                                <Grid>
-                                    <Border HeightRequest="44" StrokeThickness="0">
-                                        <Image Source="pattern.png" Aspect="Center"/>
-                                    </Border>
-                                    <Border BackgroundColor="{Binding SelectedColor}"
+                    <controls:BorderedExpander HeaderText="{x:Static res:AppResources.farbdefinition}">
+                        <VerticalStackLayout Margin="10,0,10,10" Spacing="4">
+                            <Grid>
+                                <Border HeightRequest="44" StrokeThickness="0">
+                                    <Image Source="pattern.png" Aspect="Center"/>
+                                </Border>
+                                <Border BackgroundColor="{Binding SelectedColor}"
                                             StrokeThickness="0"
                                             Opacity="{Binding FillOpacity, Converter={StaticResource MathExpressionConverter}, ConverterParameter='1/255*x'}"
                                             HeightRequest="44"/>
-                                    <Label Text="{x:Static res:AppResources.farbdefinition}"
+                                <Label Text="{x:Static res:AppResources.farbdefinition}"
                                            TextColor="{Binding SelectedColor, Converter={StaticResource ColorToColorForTextConverter}}"
                                            HorizontalTextAlignment="Center"
                                            VerticalTextAlignment="Center"
                                            BackgroundColor="Transparent"
                                            HeightRequest="44"/>
-                                </Grid>
-                            </uranium:ExpanderView.Header>
-                            <VerticalStackLayout Margin="10,0,10,10" Spacing="4">
-                                <!-- Slider for Red -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.rot_r}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    TextColor="Red"
-                                    MinimumValueDisplayFormat="{}{0:0}"
-                                    LabelCalculation="*255"
-                                    LowerValue="{Binding RedValue, Mode=TwoWay}"
-                                    MinimumTrackColor="Red"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>
+                            </Grid>                            
+                            <!-- Slider for Red -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.rot_r}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                TextColor="Red"
+                                MinimumValueDisplayFormat="{}{0:0}"
+                                LabelCalculation="*255"
+                                LowerValue="{Binding RedValue, Mode=TwoWay}"
+                                MinimumTrackColor="Red"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
 
-                                <!-- Slider for Green -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.gruen_g}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    TextColor="Green"
-                                    MinimumValueDisplayFormat="{}{0:0}"
-                                    LabelCalculation="*255"
-                                    LowerValue="{Binding GreenValue, Mode=TwoWay}"
-                                    MinimumTrackColor="Green"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>
-                                
-                                <!-- Slider for Blue -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.blau_b}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    TextColor="Blue"
-                                    MinimumValueDisplayFormat="{}{0:0}"
-                                    LabelCalculation="*255"
-                                    LowerValue="{Binding BlueValue, Mode=TwoWay}"
-                                    MinimumTrackColor="Blue"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>  
-                                
-                                <!-- Slider for Hue -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.farbwert_h}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    MinimumValueDisplayFormat="{}{0:0}°"
-                                    LabelCalculation="*360"
-                                    LowerValue="{Binding HueValue, Mode=TwoWay}"
-                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>
-                                
-                                <!-- Slider for Saturation -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.saettigung_s}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    MinimumValueDisplayFormat="{}{0:0}%"
-                                    LabelCalculation="*100"
-                                    LowerValue="{Binding SaturationValue, Mode=TwoWay}"
-                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>                                
-                                
-                                <!-- Slider for Brightness -->
-                                <controls:RangeSlider
-                                    LabelText="{x:Static res:AppResources.helligkeit_l}"
-                                    TextSize="12"
-                                    IsRange="False"
-                                    IsRealtime="True"
-                                    Minimum="0"
-                                    Maximum="1"
-                                    Step="0.001"
-                                    ValueFontSize="12"
-                                    MinimumValueDisplayFormat="{}{0:0}%"
-                                    LabelCalculation="*100"
-                                    LowerValue="{Binding BrightnessValue, Mode=TwoWay}"
-                                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                                </controls:RangeSlider>
-                            </VerticalStackLayout>
-                        </uranium:ExpanderView>
-                    </Border>
+                            <!-- Slider for Green -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.gruen_g}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                TextColor="Green"
+                                MinimumValueDisplayFormat="{}{0:0}"
+                                LabelCalculation="*255"
+                                LowerValue="{Binding GreenValue, Mode=TwoWay}"
+                                MinimumTrackColor="Green"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
+
+                            <!-- Slider for Blue -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.blau_b}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                TextColor="Blue"
+                                MinimumValueDisplayFormat="{}{0:0}"
+                                LabelCalculation="*255"
+                                LowerValue="{Binding BlueValue, Mode=TwoWay}"
+                                MinimumTrackColor="Blue"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
+
+                            <!-- Slider for Hue -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.farbwert_h}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                MinimumValueDisplayFormat="{}{0:0}°"
+                                LabelCalculation="*360"
+                                LowerValue="{Binding HueValue, Mode=TwoWay}"
+                                MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
+
+                            <!-- Slider for Saturation -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.saettigung_s}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                MinimumValueDisplayFormat="{}{0:0}%"
+                                LabelCalculation="*100"
+                                LowerValue="{Binding SaturationValue, Mode=TwoWay}"
+                                MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
+
+                            <!-- Slider for Brightness -->
+                            <controls:RangeSlider
+                                LabelText="{x:Static res:AppResources.helligkeit_l}"
+                                TextSize="12"
+                                IsRange="False"
+                                IsRealtime="True"
+                                Minimum="0"
+                                Maximum="1"
+                                Step="0.001"
+                                ValueFontSize="12"
+                                MinimumValueDisplayFormat="{}{0:0}%"
+                                LabelCalculation="*100"
+                                LowerValue="{Binding BrightnessValue, Mode=TwoWay}"
+                                MinimumTrackColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
+                            </controls:RangeSlider>
+                        </VerticalStackLayout>
+                    </controls:BorderedExpander>
 
                     <controls:RangeSlider
                          IsVisible="{Binding FillOpacityVisibility}"

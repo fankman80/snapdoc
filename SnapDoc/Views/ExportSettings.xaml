@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:views="clr-namespace:SnapDoc.Views"             
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -128,16 +126,13 @@
                                         SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </VerticalStackLayout>
 
-                    <material:TextField Grid.Column="0" Grid.Row="1"
-                            Title="{x:Static res:AppResources.pinbeschriftung}"
-                            FontSize="{StaticResource AppFontSizeNormal}"
-                            MaxLength="20"
-                            Text="{Binding PinLabelPrefix}"
-                            TitleColor="{DynamicResource SecondaryBackground}"
-                            BorderColor="{DynamicResource SecondaryBackground}"
-                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            AllowClear="True"/>
+                    <controls:BorderedEntry
+                        Text="{Binding PinLabelPrefix}"
+                        Placeholder="{x:Static res:AppResources.pinbeschriftung}"
+                        BackgroundColor="Transparent"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        PlaceholderColor="{DynamicResource SecondaryBackground}"
+                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <controls:RangeSlider
                          LabelText="{x:Static res:AppResources.maximale_fotoabmessung}"

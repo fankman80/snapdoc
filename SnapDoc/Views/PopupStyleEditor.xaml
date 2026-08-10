@@ -2,8 +2,6 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:views="clr-namespace:SnapDoc.Views"     
@@ -93,15 +91,16 @@
                                 Stroke="{Binding SelectedBorderColor}"
                                 StrokeLineCap="Square"
                                 StrokeDashArray="{Binding StrokeDashArray}"/>
-                        <material:TextField Text="{Binding TemplateText}"
-                                            Padding="0"
-                                            FontAttributes="Bold"
-                                            FontSize="16"
-                                            TextColor="{Binding SelectedTextColor}"
-                                            BackgroundColor="Transparent"
-                                            BorderThickness="0"
-                                            VerticalOptions="Center"                                              
-                                            HorizontalOptions="Center"/>
+                        <controls:BorderedEntry
+                            Text="{Binding TemplateText}"
+                            FontSize="16"
+                            TextColor="{Binding SelectedTextColor}"
+                            BackgroundColor="Transparent"
+                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            BorderThickness="0"
+                            VerticalOptions="Center"                                              
+                            HorizontalOptions="Center"/>
+
                     </Grid>
                     <Button Grid.Column="1" Grid.Row="2"
                             WidthRequest="44"
@@ -160,66 +159,58 @@
                      MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
                 </controls:RangeSlider>
 
-                <material:TextField Text="{Binding StrokeStyle}"
-                                    Title="Linienmuster"
-                                    FontSize="{StaticResource AppFontSizeNormal}"
-                                    TextChanged="OnStrokeTextChanged"
-                                    TitleColor="{DynamicResource SecondaryBackground}"
-                                    BorderColor="{DynamicResource SecondaryBackground}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                        Text="{Binding StrokeStyle}"
+                        FontSize="{StaticResource AppFontSizeNormal}"
+                        Placeholder="Linienmuster"
+                        BackgroundColor="Transparent"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        PlaceholderColor="{DynamicResource SecondaryBackground}"
+                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextChanged="OnStrokeTextChanged"/>
 
-                <Border Stroke="{DynamicResource SecondaryBackground}"
-                        StrokeThickness="1"
-                        StrokeShape="RoundRectangle 8"
-                        Padding="8"
-                        Margin="0,0,0,10">
-                    <uranium:ExpanderView Margin="6,6,6,6">
-                        <uranium:ExpanderView.Header>
-                            <Label Text="{x:Static res:AppResources.vorlagen}"/>
-                        </uranium:ExpanderView.Header>
-                        <CollectionView ItemsSource="{Binding Items}"
+                <controls:BorderedExpander HeaderText="{x:Static res:AppResources.vorlagen}">
+                    <CollectionView ItemsSource="{Binding Items}"
                                         SelectionMode="None"
                                         Margin="0">
-                            <CollectionView.ItemsLayout>
-                                <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
-                            </CollectionView.ItemsLayout>
-                            <CollectionView.ItemTemplate>
-                                <DataTemplate>
-                                    <Grid x:DataType="local:StylePickerItem"
-                                          Grid.ColumnDefinitions="*,Auto"
-                                          HeightRequest="44"
-                                          ColumnSpacing="0">
-                                        <Border Grid.Column="0">
-                                            <Image Source="pattern.png" Aspect="Center"/>
-                                        </Border>
-                                        <Border Grid.Column="0"
-                                                BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
-                                                StrokeThickness="{Binding LineWidth}"
-                                                Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
-                                                StrokeLineCap="Square"
-                                                StrokeDashArray="{Binding StrokeDashArray}"/>
-                                        <Button Grid.Column="0"
-                                                Text="{Binding Text}"
-                                                FontSize="14"                                                
-                                                TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
-                                                BackgroundColor="Transparent"
-                                                HorizontalOptions="Fill"
-                                                Clicked="OnTemplateClicked"/>
-                                        <Button Grid.Column="1"
-                                                Text="{x:Static local:MaterialIcons.Delete}"
-                                                FontSize="24"
-                                                FontFamily="MaterialOutlined"
-                                                TextColor="{DynamicResource PrimaryDark}"
-                                                BackgroundColor="Transparent"
-                                                Padding="0"
-                                                Clicked="OnTemplateDeleteClicked"/>
-                                    </Grid>
-                                </DataTemplate>
-                            </CollectionView.ItemTemplate>
-                        </CollectionView>
-                    </uranium:ExpanderView>
-                </Border>
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid x:DataType="local:StylePickerItem"
+                                        Grid.ColumnDefinitions="*,Auto"
+                                        HeightRequest="44"
+                                        ColumnSpacing="0">
+                                    <Border Grid.Column="0">
+                                        <Image Source="pattern.png" Aspect="Center"/>
+                                    </Border>
+                                    <Border Grid.Column="0"
+                                            BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
+                                            StrokeThickness="{Binding LineWidth}"
+                                            Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
+                                            StrokeLineCap="Square"
+                                            StrokeDashArray="{Binding StrokeDashArray}"/>
+                                    <Button Grid.Column="0"
+                                            Text="{Binding Text}"
+                                            FontSize="14"                                                
+                                            TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
+                                            BackgroundColor="Transparent"
+                                            HorizontalOptions="Fill"
+                                            Clicked="OnTemplateClicked"/>
+                                    <Button Grid.Column="1"
+                                            Text="{x:Static local:MaterialIcons.Delete}"
+                                            FontSize="24"
+                                            FontFamily="MaterialOutlined"
+                                            TextColor="{DynamicResource PrimaryDark}"
+                                            BackgroundColor="Transparent"
+                                            Padding="0"
+                                            Clicked="OnTemplateDeleteClicked"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </controls:BorderedExpander>
             </VerticalStackLayout>     
         </ScrollView>
 

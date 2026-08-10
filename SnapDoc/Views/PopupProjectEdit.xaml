@@ -2,8 +2,7 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                xmlns:local="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
@@ -14,14 +13,13 @@
     <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout HorizontalOptions="Fill">
-            <material:TextField x:Name="text_entry"
-                                Title="{x:Static res:AppResources.projekt_titel}"
-                                FontSize="{StaticResource AppFontSizeNormal}"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                AllowClear="True"/>
+            <controls:BorderedEntry
+                    x:Name="text_entry"
+                    Placeholder="{x:Static res:AppResources.projekt_titel}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
             <Button Text="{x:Static res:AppResources.zip_exportieren}"
                     Padding="0"

@@ -14,7 +14,7 @@ public partial class PopupCalendarView : Popup<string>
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        string formattedDate = calendar.SelectedDate?.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        string formattedDate = calendar.SelectedDate.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
 
         try { await CloseAsync(formattedDate); }
         catch (InvalidOperationException) { }

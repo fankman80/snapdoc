@@ -2,8 +2,7 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
@@ -13,7 +12,7 @@
     <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
-            <uranium:CalendarView x:Name="calendar" />
+            <controls:CalendarView x:Name="calendar" />
             <Grid ColumnDefinitions="Auto, *, Auto, Auto">
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"

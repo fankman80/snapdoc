@@ -11,17 +11,17 @@ public partial class PopupRadioPicker : Popup<string>
     {
         InitializeComponent();
 
-        BindableLayout.SetItemsSource(RadioGroup, items);
-
         _initialSelection = currentSelection ?? string.Empty;
-        RadioGroup.SelectedItem = currentSelection;
+
+        BindableLayout.SetItemsSource(RadioGroupContainer, items);
+        RadioButtonGroup.SetSelectedValue(RadioGroupContainer, _initialSelection);
     }
 
-    private async void OnSelectedItemChanged(object sender, EventArgs e)
+    private async void OnRadioButtonCheckedChanged(object sender, CheckedChangedEventArgs e)
     {
-        if (sender is UraniumUI.Material.Controls.RadioButtonGroupView radioGroup)
+        if (e.Value && sender is RadioButton radioButton)
         {
-            var selectedValue = radioGroup.SelectedItem?.ToString();
+            var selectedValue = radioButton.Value?.ToString();
 
             if (selectedValue == _initialSelection)
                 return;

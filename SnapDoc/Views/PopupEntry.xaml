@@ -2,8 +2,7 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
-               xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
@@ -21,14 +20,12 @@
             <Label x:Name="titleText"
                    HorizontalOptions="Start"
                    Text=""/>
-            <material:TextField x:Name="textEntry"
-                                FontSize="{StaticResource AppFontSizeNormal}"
-                                MaxLength="200"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                AllowClear="True"/>
+            <controls:BorderedEntry
+                        x:Name="textEntry"
+                        BackgroundColor="Transparent"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        PlaceholderColor="{DynamicResource SecondaryBackground}"
+                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
             <Grid ColumnDefinitions="*, *">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"

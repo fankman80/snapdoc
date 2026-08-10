@@ -8,7 +8,8 @@ namespace SnapDoc.Views;
 public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPropertyChanged
 {
     private readonly string PlanId;
-    private static string selectedPlan;
+    private string selectedPlan;
+    private int selectedRadioButtonIndex;
 
     private ObservableCollection<PlanItem> _planItems;
     public ObservableCollection<PlanItem> PlanItems
@@ -38,8 +39,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         }
     }
 
-    public bool IsNotDuplicateAtLocation => RadioButtonGroup.SelectedIndex == 0 || RadioButtonGroup.SelectedIndex == 1;
-
+    public bool IsNotDuplicateAtLocation => selectedRadioButtonIndex == 0 || selectedRadioButtonIndex == 1;
     public PopupPlanSelector(string planId)
     {
         InitializeComponent();
@@ -47,14 +47,40 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         BindingContext = this;
 
         PlanId = planId;
-        RadioButtonGroup.SelectedIndex = 0;
+        selectedRadioButtonIndex = 0;
 
         LoadingPlans();
     }
 
+    private string _selectedPlanOption = "0";
+    public string SelectedPlanOption
+    {
+        get => _selectedPlanOption;
+        set
+        {
+            if (_selectedPlanOption != value)
+            {
+                _selectedPlanOption = value;
+                OnPropertyChanged();
+
+                // 1. String sauber in int umwandeln
+                if (int.TryParse(value, out int result))
+                {
+                    selectedRadioButtonIndex = result;
+                }
+
+                // 2. UI mitteilen, dass sich diese abgeleitete Property geändert hat
+                OnPropertyChanged(nameof(IsNotDuplicateAtLocation));
+
+                // 3. Logik ausführen (ersetzt das alte OnRadioButtonChanged-Event)
+                HandleOptionChanged();
+            }
+        }
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(new PlanSelectorReturn(selectedPlan, RadioButtonGroup.SelectedIndex != 1)); }
+        try { await CloseAsync(new PlanSelectorReturn(selectedPlan, selectedRadioButtonIndex != 1)); }
         catch (InvalidOperationException) { }
     }
 
@@ -64,19 +90,19 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         catch (InvalidOperationException) { }
     }
 
-    private void OnRadioButtonChanged(object sender, EventArgs e)
+    private void HandleOptionChanged()
     {
         LoadingPlans();
 
-        OnPropertyChanged(nameof(IsNotDuplicateAtLocation));
-
-        if (RadioButtonGroup.SelectedIndex == 2)
+        if (selectedRadioButtonIndex == 2)
         {
             IsPlanSelected = true;
             selectedPlan = PlanId;
         }
         else
+        {
             IsPlanSelected = false;
+        }
     }
 
     private void LoadingPlans()
@@ -89,7 +115,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
             return;
         }
 
-        var index = RadioButtonGroup.SelectedIndex;
+        var index = selectedRadioButtonIndex;
 
         var filteredPlans = shell.PlanItems.Where(plan =>
         {

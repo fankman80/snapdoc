@@ -3,30 +3,33 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
-             x:Class="SnapDoc.Controls.BorderedEntry"
+             x:Class="SnapDoc.Controls.BorderedEditor"
              x:Name="this">
 
-    <Grid Padding="0,4,0,0">
+    <!-- Padding oben etwas erhöht für das schwebende Label -->
+    <Grid Padding="0,10,0,0">
+        <!-- SkiaSharp Canvas anstelle des MAUI Borders -->
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
-                           HeightRequest="50"
+                           HeightRequest="120"
                            IgnorePixelScaling="False"
                            Margin="0" />
 
-        <local:BorderlessEntry x:Name="InnerEntry"
+        <!-- BorderlessEditor statt BorderlessEntry -->
+        <local:BorderlessEditor x:Name="InnerEditor"
                                Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}"
                                TextColor="{Binding TextColor, Source={x:Reference this}}"
                                FontSize="{Binding FontSize, Source={x:Reference this}}"
                                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
-                               IsPassword="{Binding IsPassword, Source={x:Reference this}}"
                                Keyboard="{Binding Keyboard, Source={x:Reference this}}"
                                BackgroundColor="Transparent"
-                               VerticalOptions="Center"
-                               Margin="16,0"
-                               Focused="InnerEntry_Focused"
-                               Unfocused="InnerEntry_Unfocused"
-                               TextChanged="InnerEntry_TextChanged" />
+                               VerticalOptions="Fill"
+                               Margin="16,16,16,16"
+                               Focused="InnerEditor_Focused"
+                               Unfocused="InnerEditor_Unfocused"
+                               TextChanged="InnerEditor_TextChanged" />
 
+        <!-- Label startet nun am oberen Rand (Start) -->
         <Label x:Name="FloatingLabel"
                Text="{Binding Placeholder, Source={x:Reference this}}"
                TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
@@ -34,8 +37,8 @@
                FontSize="{Binding FontSize, Source={x:Reference this}}"
                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                HorizontalOptions="Start"
-               VerticalOptions="Center"
-               Margin="10,0,0,0"
+               VerticalOptions="Start"
+               Margin="10,16,0,0"
                Padding="8,0"
                AnchorX="0"
                InputTransparent="True" />

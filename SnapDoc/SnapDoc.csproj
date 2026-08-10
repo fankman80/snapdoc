@@ -134,6 +134,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Update="Controls\BorderedEditor.xaml.cs">
+		  <DependentUpon>BorderedEditor.xaml</DependentUpon>
+		</Compile>
 		<Compile Update="Controls\RangeSlider.xaml.cs">
 			<DependentUpon>RangeSlider.xaml</DependentUpon>
 		</Compile>
@@ -177,7 +180,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<MauiXaml Update="Controls\BorderedEditor.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Controls\BorderedEntry.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\BorderedExpander.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\CalendarView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Controls\RangeSlider.xaml" Generator="MSBuild:Compile" />

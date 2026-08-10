@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SnapDoc.Controls.CalendarView">
+
+    <Grid RowDefinitions="Auto, Auto, *" Padding="8">
+
+        <!-- Monatsname Header -->
+        <Label Grid.Row="0" 
+               Text="{Binding MonthName}" 
+               FontSize="18" 
+               FontAttributes="Bold"
+               HorizontalOptions="Center" 
+               Margin="0,0,0,12" />
+
+        <!-- Kopfzeile: Wochentage -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,0,0,6">
+            <Label Grid.Column="0" Text="Mo" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="1" Text="Di" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="2" Text="Mi" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="3" Text="Do" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="4" Text="Fr" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="5" Text="Sa" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="6" Text="So" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+        </Grid>
+
+        <!-- Das Raster -->
+        <CollectionView Grid.Row="2" 
+                        ItemsSource="{Binding Days}"
+                        SelectionMode="Single"
+                        SelectionChanged="OnDaySelected">
+
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="7" VerticalItemSpacing="4" HorizontalItemSpacing="4" />
+            </CollectionView.ItemsLayout>
+
+            <CollectionView.ItemTemplate>
+                <DataTemplate>
+                    <Border Stroke="Transparent"
+                            StrokeShape="RoundRectangle 8"
+                            BackgroundColor="{AppThemeBinding Light=#F5F5F5, Dark=#1E1E1E}"
+                            HeightRequest="42">
+                        <Grid>
+                            <Label Text="{Binding DayNumber}"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center"
+                                   FontSize="14">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsCurrentMonth}" Value="False">
+                                        <Setter Property="Opacity" Value="0.3" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+
+                            <Ellipse IsVisible="{Binding HasEvent}"
+                                     Fill="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                     WidthRequest="5"
+                                     HeightRequest="5"
+                                     HorizontalOptions="Center"
+                                     VerticalOptions="End"
+                                     Margin="0,0,0,5" />
+                        </Grid>
+                    </Border>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+    </Grid>
+</ContentView>

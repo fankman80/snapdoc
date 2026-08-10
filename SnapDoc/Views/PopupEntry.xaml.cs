@@ -16,7 +16,7 @@ public partial class PopupEntry : Popup<string>
         headerText.Text = header;
         titleText.Text = desc;
         textEntry.Text = input;
-        textEntry.Title = title;
+        textEntry.Placeholder = title;
     }
 
     private async void OnOkClicked(object sender, EventArgs e)

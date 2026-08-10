@@ -2,7 +2,6 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-               xmlns:uranium="http://schemas.enisn-projects.io/dotnet/maui/uraniumui"
                xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
                xmlns:views="clr-namespace:SnapDoc.Views"               
                xmlns:services="clr-namespace:SnapDoc.Services"
@@ -43,35 +42,34 @@
                         </Label>
                     </AbsoluteLayout>
                     <VerticalStackLayout Grid.Column="1">
-                        <material:TextField Title="{x:Static res:AppResources.anker_x}"
-                                            FontSize="{StaticResource AppFontSizeNormal}"
-                                            Text="{Binding Anchor_X_Text}"
-                                            Keyboard="Numeric"
-                                            TitleColor="{DynamicResource SecondaryBackground}"
-                                            BorderColor="{DynamicResource SecondaryBackground}"
-                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                        <controls:BorderedEntry
+                            Text="{Binding Anchor_X_Text}"
+                            Placeholder="{x:Static res:AppResources.anker_x}"
+                            BackgroundColor="Transparent"
+                            Keyboard="Numeric"
+                            BorderColor="{DynamicResource SecondaryBackground}"
+                            PlaceholderColor="{DynamicResource SecondaryBackground}"
+                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                        <material:TextField Title="{x:Static res:AppResources.anker_y}"
-                                            FontSize="{StaticResource AppFontSizeNormal}"
-                                            Text="{Binding Anchor_Y_Text}"
-                                            Keyboard="Numeric"
-                                            TitleColor="{DynamicResource SecondaryBackground}"
-                                            BorderColor="{DynamicResource SecondaryBackground}"
-                                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                            AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                        <controls:BorderedEntry
+                            Text="{Binding Anchor_Y_Text}"
+                            Placeholder="{x:Static res:AppResources.anker_y}"
+                            BackgroundColor="Transparent"
+                            Keyboard="Numeric"
+                            BorderColor="{DynamicResource SecondaryBackground}"
+                            PlaceholderColor="{DynamicResource SecondaryBackground}"
+                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                     </VerticalStackLayout>
                 </Grid>
 
-                <material:TextField x:Name="iconName"
-                                    Title="{x:Static res:AppResources.bezeichnung}"
-                                    FontSize="{StaticResource AppFontSizeNormal}"
-                                    MaxLength="200"
-                                    TitleColor="{DynamicResource SecondaryBackground}"
-                                    BorderColor="{DynamicResource SecondaryBackground}"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    AllowClear="True"/>
+                <controls:BorderedEntry
+                    x:Name="iconName"
+                    Placeholder="{x:Static res:AppResources.bezeichnung}"
+                    BackgroundColor="Transparent"
+                    Keyboard="Numeric"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                 <material:AutoCompleteTextField x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                                 x:Name="iconCategory"

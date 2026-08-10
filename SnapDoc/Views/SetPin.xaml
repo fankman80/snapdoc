@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:material="http://schemas.enisn-projects.io/dotnet/maui/uraniumui/material"
              xmlns:views="clr-namespace:SnapDoc.Views"                 
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
@@ -117,23 +116,20 @@
         </CollectionView>
 
         <VerticalStackLayout Grid.Row="1">
-            <material:TextField Text="{Binding Pin.PinLocation}"
-                                FontSize="{StaticResource AppFontSizeNormal}"
-                                MaxLength="200"
-                                TitleColor="{DynamicResource SecondaryBackground}"
-                                BorderColor="{DynamicResource SecondaryBackground}"                        
-                                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                AllowClear="True"
-                                Title="{x:Static res:AppResources.standort}"/>
-            <material:EditorField Text="{Binding Pin.PinDesc}"
-                                  FontSize="{StaticResource AppFontSizeNormal}"
-                                  MaxLength="2000"
-                                  TitleColor="{DynamicResource SecondaryBackground}"
-                                  BorderColor="{DynamicResource SecondaryBackground}"                        
-                                  TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                  AccentColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                  Title="{x:Static res:AppResources.beschreibung}"/>
+            <controls:BorderedEntry
+                Text="{Binding Pin.PinLocation}"
+                Placeholder="{x:Static res:AppResources.standort}"
+                BackgroundColor="Transparent"
+                BorderColor="{DynamicResource SecondaryBackground}"
+                PlaceholderColor="{DynamicResource SecondaryBackground}"
+                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+            <controls:BorderedEditor
+                Text="{Binding Pin.PinDesc}"
+                Placeholder="{x:Static res:AppResources.beschreibung}"
+                BackgroundColor="Transparent"
+                BorderColor="{DynamicResource SecondaryBackground}"
+                PlaceholderColor="{DynamicResource SecondaryBackground}"
+                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>            
             <Grid RowSpacing="0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
@@ -144,7 +140,6 @@
                     <RowDefinition Height="50" />
                     <RowDefinition Height="50" />
                 </Grid.RowDefinitions>
-
                 <controls:Switch Grid.Row="0"
                                 LabelText="{x:Static res:AppResources.pin_exportieren}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
