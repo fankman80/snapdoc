@@ -52,8 +52,8 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
         LoadingPlans();
     }
 
-    private string _selectedPlanOption = "0";
-    public string SelectedPlanOption
+    private int _selectedPlanOption = 0;
+    public int SelectedPlanOption
     {
         get => _selectedPlanOption;
         set
@@ -61,18 +61,11 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
             if (_selectedPlanOption != value)
             {
                 _selectedPlanOption = value;
+                selectedRadioButtonIndex = value;
+
                 OnPropertyChanged();
-
-                // 1. String sauber in int umwandeln
-                if (int.TryParse(value, out int result))
-                {
-                    selectedRadioButtonIndex = result;
-                }
-
-                // 2. UI mitteilen, dass sich diese abgeleitete Property geändert hat
                 OnPropertyChanged(nameof(IsNotDuplicateAtLocation));
 
-                // 3. Logik ausführen (ersetzt das alte OnRadioButtonChanged-Event)
                 HandleOptionChanged();
             }
         }
