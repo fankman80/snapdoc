@@ -121,9 +121,7 @@
 		<PackageReference Include="Sentry.Maui" Version="6.8.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.152.0-preview.1.1" />
-		<PackageReference Include="UraniumUI" Version="3.0.0" />
 		<PackageReference Include="UraniumUI.Dialogs.Mopups" Version="3.0.0" />
-		<PackageReference Include="UraniumUI.Material" Version="3.0.0" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -190,6 +188,9 @@
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Controls\CalendarView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Resources\Styles\RadioButtonStyles.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
 		<MauiXaml Update="Controls\RangeSlider.xaml" Generator="MSBuild:Compile" />

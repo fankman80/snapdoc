@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ResourceDictionary xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml">
+
+    <ControlTemplate x:Key="TileRadioButtonTemplate">
+        <Border Stroke="Transparent"
+                StrokeThickness="0"
+                StrokeShape="RoundRectangle 10"
+                BackgroundColor="Transparent"
+                Padding="0, 8">
+            <VisualStateManager.VisualStateGroups>
+                <VisualStateGroupList>
+                    <VisualStateGroup x:Name="CheckedStates">
+                        <VisualState x:Name="Checked">
+                            <VisualState.Setters>
+                                <Setter TargetName="check" Property="Opacity" Value="1" />
+                            </VisualState.Setters>
+                        </VisualState>
+                        <VisualState x:Name="Unchecked">
+                            <VisualState.Setters>
+                                <Setter TargetName="check" Property="Opacity" Value="0" />
+                            </VisualState.Setters>
+                        </VisualState>
+                    </VisualStateGroup>
+                </VisualStateGroupList>
+            </VisualStateManager.VisualStateGroups>
+
+            <!-- Spalte 0 fuer den Kreis (Auto), Spalte 1 fuer den Text (*) -->
+            <Grid ColumnDefinitions="Auto, *" 
+                  ColumnSpacing="10" 
+                  VerticalOptions="Center">
+
+                <!-- Spalte 0: Radio-Indikator -->
+                <Grid Grid.Column="0"
+                      WidthRequest="24"
+                      HeightRequest="24"
+                      VerticalOptions="Center">
+                    <Ellipse Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                             Fill="White"
+                             WidthRequest="22"
+                             HeightRequest="22"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center" />
+                    <Ellipse x:Name="check"
+                             Fill="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                             WidthRequest="14"
+                             HeightRequest="14"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Spalte 1: Text / Content -->
+                <ContentPresenter Grid.Column="1"
+                                  HorizontalOptions="Start"
+                                  VerticalOptions="Center" />
+            </Grid>
+        </Border>
+    </ControlTemplate>
+
+    <Style TargetType="RadioButton">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+        <Setter Property="TextColor" Value="{AppThemeBinding Light={StaticResource Black}, Dark={StaticResource White}}" />
+        <Setter Property="ControlTemplate" Value="{StaticResource TileRadioButtonTemplate}" />
+    </Style>
+</ResourceDictionary>

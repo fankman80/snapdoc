@@ -6,11 +6,12 @@
     x:Class="SnapDoc.Controls.Switch"
     x:Name="this">
 
-    <Grid ColumnDefinitions="Auto, Auto" 
+    <Grid x:DataType="controls:Switch"
+          Padding="0,2"
+          ColumnDefinitions="Auto, Auto" 
           ColumnSpacing="16"
           VerticalOptions="Center"
-          HorizontalOptions="Start"
-          x:DataType="controls:Switch">
+          HorizontalOptions="Start">
         <Grid.GestureRecognizers>
             <TapGestureRecognizer Tapped="OnTapped" />
         </Grid.GestureRecognizers>

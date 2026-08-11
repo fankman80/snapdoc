@@ -204,7 +204,7 @@ public partial class BorderedEditor : ContentView
         bool hasText = !string.IsNullOrEmpty(Text);
         bool isFocused = InnerEditor.IsFocused;
         bool shouldFloat = isFocused || hasText;
-        double fineTuningOffsetY = 4.0;
+        double fineTuningOffsetY = 6.0;
 
         Dispatcher.Dispatch(() =>
         {

@@ -204,7 +204,7 @@ public partial class BorderedEntry : ContentView
         bool hasText = !string.IsNullOrEmpty(Text);
         bool isFocused = InnerEntry.IsFocused;
         bool shouldFloat = isFocused || hasText;
-        double fineTuningOffsetY = 4.0;
+        double fineTuningOffsetY = 6.0;
 
         Dispatcher.Dispatch(() =>
         {

@@ -117,7 +117,6 @@
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.kartenservice}">
                     <VerticalStackLayout Spacing="0">
                         <HorizontalStackLayout Spacing="24"
-                                               Margin="7,0,0,0"
                                                HorizontalOptions="Fill"
                                                RadioButtonGroup.GroupName="MapIconGroup"
                                                RadioButtonGroup.SelectedValue="{Binding MapIcon, Mode=TwoWay}">
@@ -154,34 +153,39 @@
                         </HorizontalStackLayout>
 
                         <HorizontalStackLayout Spacing="24" Margin="0,0,0,10">
-                            <controls:SvgView 
+                            <controls:SvgView     
                                 Source="customcolor.svg"
                                 TintColor="{DynamicResource Primary}"
                                 TargetHexColor="#999999"
+                                HorizontalOptions="Start"
                                 WidthRequest="30"
                                 MinimumWidthRequest="30"
                                 HeightRequest="30"
                                 Aspect="AspectFit" />
                             <controls:SvgView 
                                 Source="locationpin1a.svg"
+                                HorizontalOptions="Start"
                                 WidthRequest="30"
                                 MinimumWidthRequest="30"
                                 HeightRequest="30"
                                 Aspect="AspectFit" />
                             <controls:SvgView 
                                 Source="locationpin2a.svg"
+                                HorizontalOptions="Start"
                                 WidthRequest="30"
                                 MinimumWidthRequest="30"
                                 HeightRequest="30"
                                 Aspect="AspectFit" />
                             <controls:SvgView 
                                 Source="locationpin3a.svg"
+                                HorizontalOptions="Start"
                                 WidthRequest="30"
                                 MinimumWidthRequest="30"
                                 HeightRequest="30"
                                 Aspect="AspectFit" />
                             <controls:SvgView 
                                 Source="locationpin4a.svg"
+                                HorizontalOptions="Start"
                                 WidthRequest="30"
                                 MinimumWidthRequest="30"
                                 HeightRequest="30"
