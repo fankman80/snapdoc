@@ -21,10 +21,16 @@
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center" />
                             <Image Grid.Column="1"
-                                   Source="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Stat_minus_1}}"
-                                   HeightRequest="16"
-                                   WidthRequest="16"
+                                   HeightRequest="24"
+                                   WidthRequest="24"
                                    VerticalOptions="Center">
+                                <Image.Source>
+                                    <FontImageSource
+                                        FontFamily="MaterialOutlined"
+                                        Glyph="{x:Static local:MaterialIcons.Stat_minus_1}"
+                                        FontSize="24"
+                                        Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
+                                </Image.Source>
                                 <Image.Triggers>
                                     <DataTrigger TargetType="Image"
                                                  Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
@@ -35,7 +41,6 @@
                             </Image>
                         </Grid>
                     </toolkit:Expander.Header>
-
                     <ContentPresenter Margin="0,8,0,0" />
                 </toolkit:Expander>
             </Border>
