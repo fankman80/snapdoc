@@ -3,6 +3,7 @@
 <ResourceDictionary 
     xmlns="http://schemas.microsoft.com/dotnet/maui/global"
     xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:vm="clr-namespace:SnapDoc.ViewModels"
     xmlns:controls="clr-namespace:SnapDoc.Controls">
 
     <x:String x:Key="AppFontFamily">OpenSansRegular</x:String>
@@ -10,26 +11,25 @@
 
     <!-- BusyIndicator Overlay -->
     <ControlTemplate x:Key="BasePageWithLoadingTemplate">
-        <Grid>
+        <Grid x:DataType="ContentPage">
             <ContentPresenter />
-            <Grid IsVisible="{Binding BindingContext.IsBusy, Source={RelativeSource TemplatedParent}}"
+            <Grid BindingContext="{TemplateBinding BindingContext}"
+                  x:DataType="vm:BaseViewModel"
+                  IsVisible="{Binding IsBusy}"
                   BackgroundColor="#CC000000">
-
                 <Grid.GestureRecognizers>
                     <TapGestureRecognizer />
                 </Grid.GestureRecognizers>
-                
                 <VerticalStackLayout VerticalOptions="Center" 
                                      HorizontalOptions="Center" 
                                      Spacing="20">
-                    <ActivityIndicator IsRunning="{Binding BindingContext.IsBusy, Source={RelativeSource TemplatedParent}}"
+                    <ActivityIndicator IsRunning="{Binding IsBusy}"
                                        Color="White"
                                        Scale="1"
                                        HorizontalOptions="Center"
                                        VerticalOptions="Center" />
-                
                     <Label x:Name="BusyTextLabel"
-                           Text="{Binding BindingContext.BusyText, Source={RelativeSource TemplatedParent}}"
+                           Text="{Binding BusyText}"
                            HorizontalOptions="Center"
                            HorizontalTextAlignment="Center" 
                            TextColor="White" 
