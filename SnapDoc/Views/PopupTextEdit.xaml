@@ -14,7 +14,7 @@
     <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout x:DataType="views:PopupTextEdit">
-            <controls:BorderedEntry
+            <controls:BorderedEditor
                     Text="{Binding InputTxt}"
                     Placeholder="{x:Static res:AppResources.text_eingeben}"
                     BackgroundColor="Transparent"
