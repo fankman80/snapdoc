@@ -1,6 +1,5 @@
 #nullable disable
 using SnapDoc.Services;
-using UraniumUI;
 using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 using System.Xml.Linq;
@@ -22,9 +21,12 @@ namespace SnapDoc;
 
 public partial class App : Application
 {
-    public App()
+    private readonly IServiceProvider _serviceProvider;
+
+    public App(IServiceProvider serviceProvider)
     {
         InitializeComponent();
+        _serviceProvider = serviceProvider;
     }
 
     protected override async void OnStart()
@@ -119,7 +121,9 @@ public partial class App : Application
 
     protected override Window CreateWindow(IActivationState activationState)
     {
-        var window = new Window(UraniumServiceProvider.Current.GetRequiredService<AppShell>())
+        var shell = _serviceProvider.GetRequiredService<AppShell>();
+
+        var window = new Window(shell)
         {
             Title = "SnapDoc"
         };
