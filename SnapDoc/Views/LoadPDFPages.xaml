@@ -4,13 +4,15 @@
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
+             xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
              BackgroundColor="DimGrey"
-             x:DataType="views:LoadPDFPages"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              x:Class="SnapDoc.Views.LoadPDFPages"
+             x:DataType="viewmodels:BaseViewModel"              
              x:Name="ThisPage"
-             Title="PDF Seiten hinzufügen">
+             Title="PDF Seiten hinzufügen"
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
@@ -68,7 +70,7 @@
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical"
-                                     Span="{Binding DynamicSpan}" 
+                                     Span="{Binding DynamicSpan, Source={x:Reference Name=ThisPage}}"
                                      HorizontalItemSpacing="4"
                                      VerticalItemSpacing="4"/>
                 </CollectionView.ItemsLayout>

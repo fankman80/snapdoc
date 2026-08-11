@@ -77,7 +77,7 @@ public partial class MapView : IQueryAttributable
     public MapView(string _planId = "")
     {
         InitializeComponent();
-        BindingContext = this;
+        BindingContext = new BaseViewModel();
         planId = _planId;
 
         _widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
@@ -247,14 +247,15 @@ public partial class MapView : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
-        MyBusyPage busyPopup = null;
+        var viewModel = BindingContext as BaseViewModel;
 
         async Task ShowBusyIfNeeded()
         {
-            if (busyPopup == null)
+            if (viewModel != null && !viewModel.IsBusy)
             {
-                busyPopup = new MyBusyPage(AppResources.suche_standort);
-                await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+                viewModel.BusyText = AppResources.suche_standort;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
             }
         }
 
@@ -282,7 +283,7 @@ public partial class MapView : IQueryAttributable
                     }
                     else if (SettingsService.Instance.IsGpsActive)
                     {
-                        // GPS benötigt -> Popup zeigen
+                        // GPS benoetigt -> Ladeanzeige aktivieren
                         await ShowBusyIfNeeded();
 
                         var location = await geoViewModel.TryGetLocationAsync();
@@ -297,7 +298,7 @@ public partial class MapView : IQueryAttributable
             }
             else if (SettingsService.Instance.IsGpsActive)
             {
-                // GPS benötigt -> Popup zeigen
+                // GPS benoetigt -> Ladeanzeige aktivieren
                 await ShowBusyIfNeeded();
 
                 var location = await geoViewModel.TryGetLocationAsync();
@@ -322,9 +323,8 @@ public partial class MapView : IQueryAttributable
         }
         finally
         {
-            // Popup schließen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
-                await Mopups.Services.MopupService.Instance.PopAsync();
+            // Ladeanzeige schliessen
+            viewModel?.IsBusy = false;
         }
     }
 
@@ -336,18 +336,24 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        // Popup erstellen und anzeigen
-        var busyPopup = new MyBusyPage(AppResources.suche_standort);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+        var viewModel = BindingContext as BaseViewModel;
 
         try
         {
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.suche_standort;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
+
             // Suche starten (hier wartet der Code)
             var location = await geoViewModel.TryGetLocationAsync();
 
             if (location == null) return;
 
-            // Karten-Logik ausführen
+            // Karten-Logik ausfuehren
             await UpdateAndSavePinLocationAsync(planId, pinId, location.Longitude, location.Latitude);
 
             var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
@@ -379,9 +385,8 @@ public partial class MapView : IQueryAttributable
         }
         finally
         {
-            // Popup schließen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
-                await Mopups.Services.MopupService.Instance.PopAsync();
+            // Ladeanzeige schliessen
+            viewModel?.IsBusy = false;
         }
     }
 
@@ -690,12 +695,18 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        // Popup erstellen und anzeigen
-        var busyPopup = new MyBusyPage(AppResources.suche_standort);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+        var viewModel = BindingContext as BaseViewModel;
 
         try
         {
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.suche_standort;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
+
             var location = await geoViewModel.TryGetLocationAsync();
 
             if (location == null) return;
@@ -707,7 +718,6 @@ public partial class MapView : IQueryAttributable
 
             Models.Pin newPinData = new()
             {
-                // ... (deine bestehende Initialisierung)
                 Pos = new Microsoft.Maui.Graphics.Point(0, 0),
                 Anchor = new Microsoft.Maui.Graphics.Point(0, 0),
                 Size = new Microsoft.Maui.Graphics.Size(0, 0),
@@ -739,7 +749,7 @@ public partial class MapView : IQueryAttributable
                 plan.Pins[currentDateTime] = newPinData;
                 GlobalJson.Data.Plans[planId].PinCount += 1;
 
-                // save data to file
+                // Save data to file
                 GlobalJson.SaveToFile();
 
                 AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
@@ -751,9 +761,8 @@ public partial class MapView : IQueryAttributable
         }
         finally
         {
-            // Popup schließen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Contains(busyPopup))
-                await Mopups.Services.MopupService.Instance.PopAsync();
+            // Ladeanzeige schliessen
+            viewModel?.IsBusy = false;
         }
     }
 

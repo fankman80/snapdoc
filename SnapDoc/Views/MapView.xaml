@@ -13,7 +13,8 @@
              x:Class="SnapDoc.Views.MapView"
              x:DataType="views:MapView"             
              x:Name="ThisPage"
-             Title="{Binding Title}">
+             Title="{Binding Title}"
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"

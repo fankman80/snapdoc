@@ -2,9 +2,9 @@
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
-using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.ViewModels;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -18,6 +18,7 @@ public partial class OpenProject : ContentPage
     public OpenProject()
     {
         InitializeComponent();
+        BindingContext = new BaseViewModel();
 
         LoadJsonFiles();
     }
@@ -147,57 +148,56 @@ public partial class OpenProject : ContentPage
 
         if (fileResult == null) return;
 
+        var viewModel = BindingContext as BaseViewModel;
+
         try
         {
             var targetDirectory = Settings.DataDirectory;
             var sourcePath = fileResult.FullPath;
 
-            await Task.Delay(250);
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.projekt_wird_importiert;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
+            }
 
-            // Zeige Busy-Overlay
-            var busyPopup = new MyBusyPage(AppResources.projekt_wird_importiert);
-            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
-            // Hintergrundoperation (nicht UI-Operationen)
+            // Entpacken im Hintergrund ausführen
             await Task.Run(() => Helper.UnpackDirectory(sourcePath, targetDirectory));
-            await MainThread.InvokeOnMainThreadAsync(() => LoadJsonFiles());
+
+            // Liste nach dem Entpacken neu laden
+            LoadJsonFiles();
         }
         catch (Exception)
         {
-            await MainThread.InvokeOnMainThreadAsync(async () => {
-                await SnackbarExtensions.ShowSafeAsync(AppResources.datei_konnte_nicht_importiert_werden, includeDelay: true);
-            });
+            await SnackbarExtensions.ShowSafeAsync(AppResources.datei_konnte_nicht_importiert_werden, includeDelay: true);
         }
         finally
         {
-            // Busy-Overlay entfernen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
         }
     }
 
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
         var layout = sender as BindableObject;
-
         if (layout?.BindingContext is not FileItem item) return;
-        if (item == null) return;
-
-        // Zeige Busy-Overlay
-        var busyPopup = new MyBusyPage(AppResources.projekt_wird_geladen);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
-        await Task.Delay(100);
+        if (BindingContext is not BaseViewModel viewModel) return;
 
         try
         {
-            if (item.IsActive)
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
             {
-                // Busy-Overlay entfernen
-                if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                    await Mopups.Services.MopupService.Instance.PopAllAsync();
-                return;
+                viewModel.BusyText = AppResources.projekt_wird_geladen;
+                viewModel.IsBusy = true;
+                await Task.Delay(100);
             }
+
+            if (item.IsActive)
+                return; // Finally-Block setzt IsBusy automatisch wieder auf false
 
             // Aktives Projekt setzen
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
@@ -211,7 +211,7 @@ public partial class OpenProject : ContentPage
             SettingsService.Instance.IsProjectLoaded = true;
             LoadDataToView.ResetData();
 
-            // Laden kann im UI-Thread bleiben
+            // Laden der Daten
             GlobalJson.LoadFromFile(item.FilePath);
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
@@ -234,7 +234,6 @@ public partial class OpenProject : ContentPage
                     }
                 }
                 if (repairCount)
-                    // save data to file
                     GlobalJson.SaveToFile();
             }
 
@@ -246,9 +245,8 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            // Busy-Overlay entfernen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
         }
     }
 
@@ -257,10 +255,12 @@ public partial class OpenProject : ContentPage
         if (_isProcessing) return;
         _isProcessing = true;
 
+        var viewModel = BindingContext as BaseViewModel;
+
         try
         {
             var button = sender as Button;
-            FileItem item = (FileItem)button.BindingContext;
+            if (button?.BindingContext is not FileItem item) return;
 
             var _popup = new PopupProjectEdit(entry: item.FileName);
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
@@ -276,12 +276,12 @@ public partial class OpenProject : ContentPage
 
                     if (result1.Result == "Ok")
                     {
-                        string fullPath = item?.FilePath;
+                        string fullPath = item.FilePath;
                         if (string.IsNullOrEmpty(fullPath)) return;
 
                         string projectDirectoryPath = Path.GetDirectoryName(fullPath);
                         string fileName = Path.GetFileName(fullPath);
-                        string currentActiveJson = GlobalJson.Data.JsonFile;
+                        string currentActiveJson = GlobalJson.Data?.JsonFile;
                         bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
                                                  fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
 
@@ -291,11 +291,11 @@ public partial class OpenProject : ContentPage
                         FileListView.ItemsSource = tmp_list;
                         ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
 
-                        // lösche das Projektverzeichnis und alle enthaltenen Dateien
+                        // Lösche das Projektverzeichnis und alle enthaltenen Dateien
                         if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
                             Directory.Delete(projectDirectoryPath, true);
 
-                        // lösche Plan-Tiles aus dem Cache-Ordner
+                        // Lösche Plan-Tiles aus dem Cache-Ordner
                         string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
                         if (Directory.Exists(cacheDir) && GlobalJson.Data?.Plans != null)
                         {
@@ -341,24 +341,25 @@ public partial class OpenProject : ContentPage
                         string sourceDirectory = Path.GetDirectoryName(item.FilePath);
                         string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
 
-                        await Task.Delay(250);
-
-                        // Zeige Busy-Overlay
-                        var busyPopup = new MyBusyPage(AppResources.daten_werden_komprimiert);
-                        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
                         try
                         {
+                            // Ladeanzeige aktivieren
+                            if (viewModel != null)
+                            {
+                                viewModel.BusyText = AppResources.daten_werden_komprimiert;
+                                viewModel.IsBusy = true;
+                                await Task.Delay(100);
+                            }
+
                             // Hintergrundoperation
                             await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
                         }
                         finally
                         {
-                            // Busy-Overlay entfernen bevor der FileSaver Dialog kommt
-                            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                                await Mopups.Services.MopupService.Instance.PopAllAsync();
+                            // Ladeanzeige deaktivieren
+                            viewModel?.IsBusy = false;
 
-                            await Task.Delay(200); // Dem System Zeit geben das Overlay zu schließen
+                            await Task.Delay(100);
                         }
 
                         if (File.Exists(outputPath))
@@ -376,17 +377,17 @@ public partial class OpenProject : ContentPage
                     break;
 
                 case "Folder":
-                    var directoryPath = Path.GetDirectoryName((Path.Combine(Settings.DataDirectory,item.FilePath)));
+                    var directoryPath = Path.GetDirectoryName(Path.Combine(Settings.DataDirectory, item.FilePath));
                     if (Directory.Exists(directoryPath))
                     {
-    #if WINDOWS
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = directoryPath,
-                            UseShellExecute = true,
-                            Verb = "open"
-                        });
-    #endif
+#if WINDOWS
+                    Process.Start(new ProcessStartInfo
+                    {
+                        FileName = directoryPath,
+                        UseShellExecute = true,
+                        Verb = "open"
+                    });
+#endif
                     }
                     break;
 
@@ -407,7 +408,7 @@ public partial class OpenProject : ContentPage
                         GlobalJson.Data.ThumbnailPath = "thumbnails";
                         GlobalJson.Data.CustomPinsPath = "custompins";
 
-                        // save data to file
+                        // Save data to file
                         GlobalJson.SaveToFile();
 
                         // Verzeichnis an die neue Stelle verschieben (umbenennen)
@@ -419,7 +420,7 @@ public partial class OpenProject : ContentPage
 
                         GlobalJson.UpdateFilePath(newFilePath);
 
-                        if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath,GlobalJson.Data.JsonFile)))
+                        if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)))
                         {
                             // Daten laden und verarbeiten (nicht UI-bezogen)
                             LoadDataToView.ResetData();
@@ -434,14 +435,13 @@ public partial class OpenProject : ContentPage
         }
         catch (Exception ex)
         {
-            // Sicherstellen, dass Busy-Popups bei Fehlern verschwinden
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
-
             await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
         }
         finally
         {
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
+
             _isProcessing = false;
         }
     }

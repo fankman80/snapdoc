@@ -4,6 +4,7 @@ using SnapDoc.Controls;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.ViewModels;
 
 namespace SnapDoc.Views;
 
@@ -16,9 +17,8 @@ public partial class LoadPDFPages : ContentPage
     public LoadPDFPages()
     {
         InitializeComponent();
-
+        BindingContext = new BaseViewModel();
         btnRows.Text = Settings.TableRowIcon;
-        BindingContext = this;
     }
 
     protected override void OnAppearing()
@@ -47,8 +47,11 @@ public partial class LoadPDFPages : ContentPage
         if (_isProcessing) return;
         _isProcessing = true;
 
+        var viewModel = BindingContext as BaseViewModel;
+
         try
         {
+            // Cache leeren
             if (Directory.Exists(Settings.CacheDirectory))
             {
                 foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
@@ -61,85 +64,83 @@ public partial class LoadPDFPages : ContentPage
 
             if (resultList == null || !resultList.Any())
             {
-                _isProcessing = false; // Wichtig: Hier wieder freigeben
                 await Shell.Current.GoToAsync("..");
                 return;
             }
 
-            // Warten, bis der FilePicker Dialog vollständig geschlossen ist
-            await Task.Delay(250);
-
-            // Zeige Busy-Overlay
-            var busyPopup = new MyBusyPage(AppResources.lade_pdf_seiten);
-            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.lade_pdf_seiten;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
 
             string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
             List<PdfItem> pdfImages = [];
 
-            int pdfIndex = 0;
-            foreach (var file in resultList)
+            // Die zeitintensive PDF-Verarbeitung komplett im Hintergrund ausfuehren
+            await Task.Run(async () =>
             {
-                string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}.pdf");
-                using (var sourceStream = await file.OpenReadAsync())
+                Directory.CreateDirectory(Settings.CacheDirectory);
+
+                int pdfIndex = 0;
+                foreach (var file in resultList)
                 {
-                    await Task.Run(async () =>
+                    string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}.pdf");
+
+                    using (var sourceStream = await file.OpenReadAsync())
+                    using (var destStream = File.Create(localPdfPath))
                     {
-                        Directory.CreateDirectory(Settings.CacheDirectory);
+                        await sourceStream.CopyToAsync(destStream);
+                    }
 
-                        using (var destStream = File.Create(localPdfPath))
+                    byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
+                    using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
+
+                    for (int i = 0; i < nativeDoc.PageCount; i++)
+                    {
+                        string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
+                        string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
+                        string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
+
+                        var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
+
+                        int targetDpi;
+                        if (SettingsService.Instance.IsExperimentalFunctions)
+                            targetDpi = SettingsService.Instance.PdfFullViewDpi;
+                        else
+                            targetDpi = CalculateMaxDpiFromMaxDimension(width, height, SettingsService.Instance.MaxPdfImageSize);
+
+                        pdfImages.Add(new PdfItem
                         {
-                            await sourceStream.CopyToAsync(destStream);
-                        }
-
-                        byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
-                        using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
-                        for (int i = 0; i < nativeDoc.PageCount; i++)
-                        {
-                            string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
-                            string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
-                            string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
-
-                            var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-
-                            int targetDpi;
-                            if (SettingsService.Instance.IsExperimentalFunctions)
-                                targetDpi = SettingsService.Instance.PdfFullViewDpi;
-                            else
-                                targetDpi = CalculateMaxDpiFromMaxDimension(width, height, SettingsService.Instance.MaxPdfImageSize);
-
-                            pdfImages.Add(new PdfItem
-                            {
-                                ImagePath = imgPath,
-                                PreviewPath = previewPath,
-                                PdfPath = localPdfPath,
-                                IsChecked = true,
-                                Dpi = targetDpi,
-                                DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
-                                ImageName = imgBaseName,
-                                PdfPage = i,
-                            });
-                        }
-                    });
+                            ImagePath = imgPath,
+                            PreviewPath = previewPath,
+                            PdfPath = localPdfPath,
+                            IsChecked = true,
+                            Dpi = targetDpi,
+                            DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
+                            ImageName = imgBaseName,
+                            PdfPage = i,
+                        });
+                    }
+                    pdfIndex++;
                 }
-                pdfIndex++;
-            }
+            });
+
+            // UI-Aktualisierung nach Abschluss des Hintergrund-Tasks
             fileListView.ItemsSource = pdfImages;
         }
         catch (Exception ex)
         {
-            // Popup schließen vor Fehlermeldung
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
-
             await SnackbarExtensions.ShowSafeAsync($"{AppResources.fehler}: {ex.Message}", includeDelay: true);
         }
         finally
         {
-            _isProcessing = false;
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
 
-            // Busy-Overlay entfernen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
+            _isProcessing = false;
         }
     }
 
@@ -197,18 +198,22 @@ public partial class LoadPDFPages : ContentPage
         if (_isProcessing) return;
         _isProcessing = true;
 
+        var viewModel = BindingContext as BaseViewModel;
+
         try
         {
-            await Task.Delay(250);
-
-            // Zeige Busy-Overlay
-            var busyPopup = new MyBusyPage(AppResources.pdf_wird_konvertiert);
-            await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.pdf_wird_konvertiert;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
 
             await LoadPDFImages();
             await ProcessFileOrganizationLogic();
 
-            // save data to file
+            // Daten speichern
             GlobalJson.SaveToFile();
 
             if (Shell.Current is AppShell shell)
@@ -222,11 +227,10 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            _isProcessing = false;
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
 
-            // Busy-Overlay entfernen
-            if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-                await Mopups.Services.MopupService.Instance.PopAllAsync();
+            _isProcessing = false;
         }
     }
 

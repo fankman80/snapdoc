@@ -1,9 +1,10 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using SnapDoc.Services;
-using SnapDoc.Resources.Languages;
 using SnapDoc.Controls;
+using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
+using SnapDoc.ViewModels;
 
 namespace SnapDoc.Views;
 
@@ -16,6 +17,7 @@ public partial class ExportSettings : ContentPage
     public ExportSettings()
     {
         InitializeComponent();
+        BindingContext = new BaseViewModel();
     }
     
     protected override void OnAppearing()
@@ -37,30 +39,46 @@ public partial class ExportSettings : ContentPage
 
     private async void OnShareClicked(object sender, EventArgs e)
     {
-        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
+        if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
             var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
             await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             return;
         }
 
+        var viewModel = BindingContext as BaseViewModel;
+
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        // Zeige Busy-Overlay
-        var busyPopup = new MyBusyPage(AppResources.bericht_wird_geteilt);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
-        // Hintergrundoperation (nicht UI-Operationen)
-        await Task.Run(async () =>
+        try
         {
-            await ExportReport.DocX(templatePath, outputPath);
-        });
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.bericht_wird_geteilt;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
 
-        // Busy-Overlay entfernen
-        if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-            await Mopups.Services.MopupService.Instance.PopAllAsync();
+            // Bericht im Hintergrund generieren
+            await Task.Run(async () =>
+            {
+                await ExportReport.DocX(templatePath, outputPath);
+            });
+        }
+        catch (Exception ex)
+        {
+            await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
+            return;
+        }
+        finally
+        {
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
+        }
 
+        // Nativer Teilen-Dialog des Betriebssystems
         try
         {
             await ShareFileAsync(outputPath);
@@ -71,6 +89,7 @@ public partial class ExportSettings : ContentPage
             await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
         }
 
+        // Temporäre Datei aufräumen
         if (File.Exists(outputPath))
             File.Delete(outputPath);
 
@@ -79,41 +98,69 @@ public partial class ExportSettings : ContentPage
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
-        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
+        if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
             var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
             await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             return;
         }
 
+        var viewModel = BindingContext as BaseViewModel;
+
         string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
         string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
-        // Zeige Busy-Overlay
-        var busyPopup = new MyBusyPage(AppResources.bericht_wird_gespeichert);
-        await Mopups.Services.MopupService.Instance.PushAsync(busyPopup);
-
-        // Hintergrundoperation (nicht UI-Operationen)
-        await Task.Run(async () =>
+        try
         {
-            await ExportReport.DocX(templatePath, outputPath);
-        });
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.bericht_wird_gespeichert;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
+            }
 
-        // Busy-Overlay entfernen
-        if (Mopups.Services.MopupService.Instance.PopupStack.Any())
-            await Mopups.Services.MopupService.Instance.PopAllAsync();
+            // Bericht im Hintergrund generieren
+            await Task.Run(async () =>
+            {
+                await ExportReport.DocX(templatePath, outputPath);
+            });
+        }
+        catch (Exception ex)
+        {
+            await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
+            return;
+        }
+        finally
+        {
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
+        }
 
-        var saveStream = File.Open(outputPath, FileMode.Open);
-        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
-
-        if (fileSaveResult.IsSuccessful)
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
-        else
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
-        saveStream.Close();
-
+        // Speichern ueber den nativen FileSaver
         if (File.Exists(outputPath))
-            File.Delete(outputPath);
+        {
+            try
+            {
+                using var saveStream = File.Open(outputPath, FileMode.Open);
+                var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
+
+                if (fileSaveResult.IsSuccessful)
+                    await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
+                else
+                    await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
+            }
+            catch (Exception ex)
+            {
+                await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
+            }
+            finally
+            {
+                // Temporaere Datei nach dem Speichern loeschen
+                if (File.Exists(outputPath))
+                    File.Delete(outputPath);
+            }
+        }
 
         await Shell.Current.GoToAsync("//homescreen");
     }

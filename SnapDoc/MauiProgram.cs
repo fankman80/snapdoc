@@ -5,9 +5,6 @@ using Camera.MAUI;
 using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
-using UraniumUI;
-using Mopups.Hosting;
-
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
@@ -29,10 +26,8 @@ public static class MauiProgram
         builder
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(false); }) // Setze auf true, wenn CommunityToolkit Issue #3276 gefixt wurde
-            .UseUraniumUI()
             .UseFFImageLoading()
             .ConfigureMRGestures()
-            .ConfigureMopups()
             .UseSkiaSharp()
             .UseSentry(options =>
             {
@@ -54,7 +49,6 @@ public static class MauiProgram
                 fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
             });
 
-        builder.Services.AddMopupsDialogs();
         builder.UseMauiCameraView();
         
 #if IOS || MACCATALYST

@@ -2,19 +2,12 @@
 
 public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
 {
-    bool isBusy;
+    [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
+    [CommunityToolkit.Mvvm.ComponentModel.NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    private bool isBusy;
 
-    public bool IsBusy
-    {
-        get => isBusy;
-        set
-        {
-            if (SetProperty(ref isBusy, value))
-            {
-                OnPropertyChanged(nameof(IsNotBusy));
-            }
-        }
-    }
+    [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
+    private string busyText = "Bitte warten...";
 
     public bool IsNotBusy => !IsBusy;
 

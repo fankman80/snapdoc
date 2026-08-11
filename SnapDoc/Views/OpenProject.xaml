@@ -10,7 +10,8 @@
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.OpenProject"
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.projektliste}">
+             Title="{x:Static res:AppResources.projektliste}"
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"

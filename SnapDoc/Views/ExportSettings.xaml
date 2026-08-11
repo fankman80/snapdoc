@@ -6,12 +6,13 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
-             x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ExportSettings"
-             Title="{x:Static res:AppResources.bericht_exportieren}">
+             x:Name="ThisPage"             
+             Title="{x:Static res:AppResources.bericht_exportieren}"
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">

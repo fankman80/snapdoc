@@ -8,6 +8,37 @@
     <x:String x:Key="AppFontFamily">OpenSansRegular</x:String>
     <x:Double x:Key="AppFontSizeNormal">14</x:Double>
 
+    <!-- BusyIndicator Overlay -->
+    <ControlTemplate x:Key="BasePageWithLoadingTemplate">
+        <Grid>
+            <ContentPresenter />
+            <Grid IsVisible="{Binding BindingContext.IsBusy, Source={RelativeSource TemplatedParent}}"
+                  BackgroundColor="#CC000000">
+
+                <Grid.GestureRecognizers>
+                    <TapGestureRecognizer />
+                </Grid.GestureRecognizers>
+                
+                <VerticalStackLayout VerticalOptions="Center" 
+                                     HorizontalOptions="Center" 
+                                     Spacing="20">
+                    <ActivityIndicator IsRunning="{Binding BindingContext.IsBusy, Source={RelativeSource TemplatedParent}}"
+                                       Color="White"
+                                       Scale="1"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                
+                    <Label x:Name="BusyTextLabel"
+                           Text="{Binding BindingContext.BusyText, Source={RelativeSource TemplatedParent}}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" 
+                           TextColor="White" 
+                           FontSize="20" />
+                </VerticalStackLayout>
+            </Grid>
+        </Grid>
+    </ControlTemplate>
+
     <Style x:Key="ToolButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
         <Setter Property="TextColor" Value="{DynamicResource PrimaryDarkText}" />
