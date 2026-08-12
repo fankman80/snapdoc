@@ -21,14 +21,14 @@
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center" />
                             <Image Grid.Column="1"
-                                   HeightRequest="24"
-                                   WidthRequest="24"
+                                   HeightRequest="18"
+                                   WidthRequest="18"
                                    VerticalOptions="Center">
                                 <Image.Source>
                                     <FontImageSource
                                         FontFamily="MaterialOutlined"
                                         Glyph="{x:Static local:MaterialIcons.Stat_minus_1}"
-                                        FontSize="24"
+                                        Size="36"
                                         Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
                                 </Image.Source>
                                 <Image.Triggers>

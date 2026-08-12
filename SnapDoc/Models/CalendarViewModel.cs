@@ -9,7 +9,16 @@ public partial class CalendarViewModel : BindableObject
     public ObservableCollection<CalendarDay> Days { get; } = [];
 
     private DateTime _currentMonth;
-    public string MonthName => _currentMonth.ToString("MMMM yyyy");
+    public string MonthName
+    {
+        get
+        {
+            var rawName = _currentMonth.ToString("MMMM yyyy");
+            if (string.IsNullOrEmpty(rawName)) return string.Empty;
+
+            return char.ToUpper(rawName[0]) + rawName[1..];
+        }
+    }
 
     public CalendarViewModel()
     {

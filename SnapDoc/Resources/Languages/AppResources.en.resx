@@ -933,4 +933,61 @@
   <data name="bildkompression" xml:space="preserve">
     <value>Image compression</value>
   </data>
+  <data name="MonthJanuary" xml:space="preserve">
+    <value>January</value>
+  </data>
+	<data name="MonthFebruary" xml:space="preserve">
+    <value>February</value>
+  </data>
+	<data name="MonthMarch" xml:space="preserve">
+    <value>March</value>
+  </data>
+	<data name="MonthApril" xml:space="preserve">
+    <value>April</value>
+  </data>
+	<data name="MonthMay" xml:space="preserve">
+    <value>May</value>
+  </data>
+	<data name="MonthJune" xml:space="preserve">
+    <value>June</value>
+  </data>
+	<data name="MonthJuly" xml:space="preserve">
+    <value>July</value>
+  </data>
+	<data name="MonthAugust" xml:space="preserve">
+    <value>August</value>
+  </data>
+	<data name="MonthSeptember" xml:space="preserve">
+    <value>September</value>
+  </data>
+	<data name="MonthOctober" xml:space="preserve">
+    <value>October</value>
+  </data>
+	<data name="MonthNovember" xml:space="preserve">
+    <value>November</value>
+  </data>
+	<data name="MonthDecember" xml:space="preserve">
+    <value>December</value>
+  </data>
+  <data name="DayMondayAbbrev" xml:space="preserve">
+    <value>Mon</value>
+  </data>
+	<data name="DayTuesdayAbbrev" xml:space="preserve">
+    <value>Tue</value>
+  </data>
+	<data name="DayWednesdayAbbrev" xml:space="preserve">
+    <value>Wed</value>
+  </data>
+	<data name="DayThursdayAbbrev" xml:space="preserve">
+    <value>Thu</value>
+  </data>
+	<data name="DayFridayAbbrev" xml:space="preserve">
+    <value>Fri</value>
+  </data>
+	<data name="DaySaturdayAbbrev" xml:space="preserve">
+    <value>Sat</value>
+  </data>
+	<data name="DaySundayAbbrev" xml:space="preserve">
+    <value>Sun</value>
+  </data>
 </root>

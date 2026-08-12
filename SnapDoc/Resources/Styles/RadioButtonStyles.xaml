@@ -25,12 +25,9 @@
                 </VisualStateGroupList>
             </VisualStateManager.VisualStateGroups>
 
-            <!-- Spalte 0 fuer den Kreis (Auto), Spalte 1 fuer den Text (*) -->
             <Grid ColumnDefinitions="Auto, *" 
                   ColumnSpacing="10" 
                   VerticalOptions="Center">
-
-                <!-- Spalte 0: Radio-Indikator -->
                 <Grid Grid.Column="0"
                       WidthRequest="24"
                       HeightRequest="24"
@@ -49,7 +46,6 @@
                              VerticalOptions="Center" />
                 </Grid>
 
-                <!-- Spalte 1: Text / Content -->
                 <ContentPresenter Grid.Column="1"
                                   HorizontalOptions="Start"
                                   VerticalOptions="Center" />

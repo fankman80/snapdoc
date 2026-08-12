@@ -2,6 +2,7 @@
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:models="clr-namespace:SnapDoc.Models"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              x:Class="SnapDoc.Controls.CalendarView"
              x:DataType="models:CalendarViewModel">
 
@@ -45,14 +46,14 @@
         </Grid>
 
         <!-- Kopfzeile: Wochentage -->
-        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*" Margin="0,0,0,0">
-            <Label Grid.Column="0" Text="Mo" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="1" Text="Di" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="2" Text="Mi" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="3" Text="Do" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="4" Text="Fr" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="5" Text="Sa" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
-            <Label Grid.Column="6" Text="So" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+        <Grid Grid.Row="1" ColumnDefinitions="*,*,*,*,*,*,*" Margin="6,0,6,0">
+            <Label Grid.Column="0" Text="{x:Static res:AppResources.DayMondayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="1" Text="{x:Static res:AppResources.DayTuesdayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="2" Text="{x:Static res:AppResources.DayWednesdayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="3" Text="{x:Static res:AppResources.DayThursdayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="4" Text="{x:Static res:AppResources.DayFridayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="5" Text="{x:Static res:AppResources.DaySaturdayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
+            <Label Grid.Column="6" Text="{x:Static res:AppResources.DaySundayAbbrev}" HorizontalOptions="Center" TextColor="Gray" FontSize="12" />
         </Grid>
 
         <!-- Das Raster -->
@@ -71,14 +72,13 @@
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:CalendarDay">
                     <Border Stroke="Transparent"
-                    StrokeThickness="0"
-                    StrokeShape="RoundRectangle 22"
-                    Padding="0"
-                    Margin="0"
-                    HorizontalOptions="Fill"
-                    VerticalOptions="Fill"
-                    HeightRequest="44">
-
+                            StrokeThickness="0"
+                            StrokeShape="RoundRectangle 22"
+                            Padding="0"
+                            Margin="0"
+                            HorizontalOptions="Fill"
+                            VerticalOptions="Fill"
+                            HeightRequest="44">
                         <Border.Triggers>
                             <DataTrigger TargetType="Border" Binding="{Binding IsSelected}" Value="True">
                                 <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />

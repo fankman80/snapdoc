@@ -368,7 +368,7 @@
                     <ImageButton.Source>
                         <FontImageSource Glyph="{x:Static local:MaterialIcons.Settings}"
                                          FontFamily="MaterialOutlined"
-                                         Size="26"
+                                         Size="28"
                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
                     </ImageButton.Source>
                 </ImageButton>
