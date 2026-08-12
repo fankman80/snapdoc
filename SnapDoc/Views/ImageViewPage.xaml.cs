@@ -189,21 +189,25 @@ public partial class ImageViewPage : IQueryAttributable
             case GestureStatus.Running:
                 double targetScale = pinchStartScale * e.Scale;
                 targetScale = Math.Min(targetScale, minScale * 15.0);
-                double originX = (e.ScaleOrigin.X - 0.5) * FotoContainer.Width * pinchStartScale;
-                double originY = (e.ScaleOrigin.Y - 0.5) * FotoContainer.Height * pinchStartScale;
+                double focusX = e.ScaleOrigin.X * this.Width;
+                double focusY = e.ScaleOrigin.Y * this.Height;
+                double imgWidth = FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : FotoContainer.Width;
+                double imgHeight = FotoContainer.HeightRequest > 0 ? FotoContainer.HeightRequest : FotoContainer.Height;
+                double centerX = (imgWidth / 2.0) + pinchStartX;
+                double centerY = (imgHeight / 2.0) + pinchStartY;
                 double scaleRatio = targetScale / pinchStartScale;
-                fotoContainer.TranslationX = pinchStartX - originX * (scaleRatio - 1);
-                fotoContainer.TranslationY = pinchStartY - originY * (scaleRatio - 1);
-
+                fotoContainer.TranslationX = pinchStartX + (centerX - focusX) * (scaleRatio - 1.0);
+                fotoContainer.TranslationY = pinchStartY + (centerY - focusY) * (scaleRatio - 1.0);
                 fotoContainer.Scale = targetScale;
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 fotoContainer.IsPanningEnabled = true;
-                if (fotoContainer.Scale <= minScale + 0.01)
+            
+                if (fotoContainer.Scale < minScale - 0.001)
                     ImageFit(null, null);
-                break;
+            break;
         }
     }
 
