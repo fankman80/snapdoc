@@ -933,61 +933,25 @@
   <data name="bildkompression" xml:space="preserve">
     <value>Compression d'image</value>
   </data>
-  <data name="MonthJanuary" xml:space="preserve">
-    <value>Janvier</value>
-  </data>
-	<data name="MonthFebruary" xml:space="preserve">
-    <value>Février</value>
-  </data>
-	<data name="MonthMarch" xml:space="preserve">
-    <value>Mars</value>
-  </data>
-	<data name="MonthApril" xml:space="preserve">
-    <value>Avril</value>
-  </data>
-	<data name="MonthMay" xml:space="preserve">
-    <value>Mai</value>
-  </data>
-	<data name="MonthJune" xml:space="preserve">
-    <value>Juin</value>
-  </data>
-	<data name="MonthJuly" xml:space="preserve">
-    <value>Juillet</value>
-  </data>
-	<data name="MonthAugust" xml:space="preserve">
-    <value>Août</value>
-  </data>
-	<data name="MonthSeptember" xml:space="preserve">
-    <value>Septembre</value>
-  </data>
-	<data name="MonthOctober" xml:space="preserve">
-    <value>Octobre</value>
-  </data>
-	<data name="MonthNovember" xml:space="preserve">
-    <value>Novembre</value>
-  </data>
-	<data name="MonthDecember" xml:space="preserve">
-    <value>Décembre</value>
-  </data>
   <data name="DayMondayAbbrev" xml:space="preserve">
     <value>Lun</value>
   </data>
-	<data name="DayTuesdayAbbrev" xml:space="preserve">
+  <data name="DayTuesdayAbbrev" xml:space="preserve">
     <value>Mar</value>
   </data>
-	<data name="DayWednesdayAbbrev" xml:space="preserve">
+  <data name="DayWednesdayAbbrev" xml:space="preserve">
     <value>Mer</value>
   </data>
-	<data name="DayThursdayAbbrev" xml:space="preserve">
+  <data name="DayThursdayAbbrev" xml:space="preserve">
     <value>Jeu</value>
   </data>
-	<data name="DayFridayAbbrev" xml:space="preserve">
+  <data name="DayFridayAbbrev" xml:space="preserve">
     <value>Ven</value>
   </data>
-	<data name="DaySaturdayAbbrev" xml:space="preserve">
+  <data name="DaySaturdayAbbrev" xml:space="preserve">
     <value>Sam</value>
   </data>
-	<data name="DaySundayAbbrev" xml:space="preserve">
+  <data name="DaySundayAbbrev" xml:space="preserve">
     <value>Dim</value>
   </data>
 </root>

@@ -102,7 +102,6 @@
 
             <Button x:Name="grayscaleButtonText"
                     x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                    IsVisible="{Binding IsExperimentalFunctions}"
                     Padding="0"
                     Text="{x:Static res:AppResources.farben_entfernen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

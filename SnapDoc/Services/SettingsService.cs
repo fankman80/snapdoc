@@ -103,7 +103,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial string FlyoutHeaderImage { get; set; } = "";
     [ObservableProperty] public partial bool IconGalleryGridView { get; set; } = false;
     [ObservableProperty] public partial bool PhotoGalleryGridView { get; set; } = false;
-    [ObservableProperty] public partial int MaxPdfImageSize { get; set; } = 8192;
     [ObservableProperty] public partial int FotoThumbSize { get; set; } = 150;
     [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 75;
     [ObservableProperty] public partial int FotoQuality { get; set; } = 80;
@@ -118,7 +117,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
     [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
     [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
-    [ObservableProperty] public partial bool IsExperimentalFunctions { get; set; } = false;
     [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 60;
     [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 100;
     [ObservableProperty] public partial int PdfFullViewDpi { get; set; } = 360;
@@ -328,7 +326,6 @@ public partial class SettingsService : ObservableObject
             IsPlanListThumbnails = IsPlanListThumbnails,
             IsHideInactivePlans = IsHideInactivePlans,
             IsPinAutoLock = IsPinAutoLock,
-            IsExperimentalFunctions = IsExperimentalFunctions,
             PdfFullViewDpi = PdfFullViewDpi,
             PdfThumbDpi = PdfThumbDpi,
             SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
@@ -352,7 +349,6 @@ public partial class SettingsService : ObservableObject
             PinPosCropExportSize = PinPosCropExportSize,
             IconGalleryGridView = IconGalleryGridView,
             PhotoGalleryGridView = PhotoGalleryGridView,
-            MaxPdfImageSize = MaxPdfImageSize,
             FotoThumbSize = FotoThumbSize,
             FotoThumbQuality = FotoThumbQuality,
             FotoQuality = FotoQuality,
@@ -414,7 +410,6 @@ public partial class SettingsService : ObservableObject
             IsPlanListThumbnails = settings.IsPlanListThumbnails ?? defaultSettings.IsPlanListThumbnails;
             IsHideInactivePlans = settings.IsHideInactivePlans ?? defaultSettings.IsHideInactivePlans;
             IsPinAutoLock = settings.IsPinAutoLock ?? defaultSettings.IsPinAutoLock;
-            IsExperimentalFunctions = settings.IsExperimentalFunctions ?? defaultSettings.IsExperimentalFunctions;
             PdfFullViewDpi = settings.PdfFullViewDpi ?? defaultSettings.PdfFullViewDpi;
             PdfThumbDpi = settings.PdfThumbDpi ?? defaultSettings.PdfThumbDpi;
 
@@ -450,7 +445,6 @@ public partial class SettingsService : ObservableObject
             PinPosCropExportSize = settings.PinPosCropExportSize ?? defaultSettings.PinPosCropExportSize;
             IconGalleryGridView = settings.IconGalleryGridView ?? defaultSettings.IconGalleryGridView;
             PhotoGalleryGridView = settings.PhotoGalleryGridView ?? defaultSettings.PhotoGalleryGridView;
-            MaxPdfImageSize = settings.MaxPdfImageSize ?? defaultSettings.MaxPdfImageSize;
             FotoThumbSize = settings.FotoThumbSize ?? defaultSettings.FotoThumbSize;
             FotoThumbQuality = settings.FotoThumbQuality ?? defaultSettings.FotoThumbQuality;
             FotoQuality = settings.FotoQuality ?? defaultSettings.FotoQuality;
@@ -500,7 +494,6 @@ public partial class SettingsService : ObservableObject
         IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
         IsHideInactivePlans = defaultSettings.IsHideInactivePlans;
         IsPinAutoLock = defaultSettings.IsPinAutoLock;
-        IsExperimentalFunctions = defaultSettings.IsExperimentalFunctions;
         PdfFullViewDpi = defaultSettings.PdfFullViewDpi;
         PdfThumbDpi = defaultSettings.PdfThumbDpi;
         SelectedColorTheme = defaultSettings.SelectedColorTheme;
@@ -524,7 +517,6 @@ public partial class SettingsService : ObservableObject
         PinPosCropExportSize = defaultSettings.PinPosCropExportSize;
         IconGalleryGridView = defaultSettings.IconGalleryGridView;
         PhotoGalleryGridView = defaultSettings.PhotoGalleryGridView;
-        MaxPdfImageSize = defaultSettings.MaxPdfImageSize;
         FotoThumbSize = defaultSettings.FotoThumbSize;
         FotoThumbQuality = defaultSettings.FotoThumbQuality;
         FotoQuality = defaultSettings.FotoQuality;

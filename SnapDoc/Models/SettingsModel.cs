@@ -16,7 +16,6 @@ internal class SettingsModel
     public bool? IsPlanListThumbnails { get; set; } // Planliste mit Thumbnails anzeigen
     public bool? IsHideInactivePlans { get; set; } // Inaktive Pläne in der Planliste ausblenden
     public bool? IsPinAutoLock { get; set; } // Pin nach Platzierung automatisch sperren
-    public bool? IsExperimentalFunctions { get; set; } // Experimentelle Funktionen aktivieren
     public int? MaxPdfPixelCount { get; set; } // Maximale Pixelanzahl eines PDF-Bildes beim Import
     public int? PdfFullViewDpi { get; set; } // DPI für die vollständige PDF-Anzeige
     public int? PdfThumbDpi { get; set; } // DPI der PDF-Thumbnails im Import-Dialog
@@ -36,7 +35,6 @@ internal class SettingsModel
     public int? PinPosCropExportSize { get; set; } // Größe der zugeschnittenen Pin-Position-Bilder im Bericht
     public bool? IconGalleryGridView { get; set; } // Modus der Icon-Galerie (Raster oder Liste)
     public bool? PhotoGalleryGridView { get; set; } // Modus der Foto-Galerie (Raster oder Liste)
-    public int? MaxPdfImageSize { get; set; } // Maximale Breite/Höhe eines PDF-Bildes
     public int? FotoThumbSize { get; set; } // Thumbnail-Größe der Fotos (minimale Kantenlänge)
     public int? FotoThumbQuality { get; set; } // Thumbnail Kompressionsqualität (0-100)
     public int? FotoQuality { get; set; } // Foto Kompressionsqualität (0-100)

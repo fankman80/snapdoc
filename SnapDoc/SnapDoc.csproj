@@ -117,7 +117,6 @@
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.90" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.10" />
-		<PackageReference Include="MR.Gestures" Version="5.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="6.8.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.152.0-preview.1.1" />
@@ -147,6 +146,9 @@
 		</Compile>
 		<Compile Update="Views\MapView.xaml.cs">
 			<DependentUpon>MapView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\NewPage.xaml.cs">
+		  <DependentUpon>NewPage.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\PopupCalendarView.xaml.cs">
 			<DependentUpon>PopupCalendarView.xaml</DependentUpon>
@@ -197,7 +199,7 @@
 		<MauiXaml Update="Views\CameraView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\FotoGallery.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
-		<MauiXaml Update="Views\NewPageExperimental.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\NewPage.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />

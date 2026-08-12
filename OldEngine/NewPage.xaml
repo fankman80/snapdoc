@@ -3,6 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
+             xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
@@ -12,8 +13,8 @@
              BackgroundColor="DimGrey"             
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-             x:Class="SnapDoc.Views.NewPageExperimental"
-             x:DataType="views:NewPageExperimental"
+             x:Class="SnapDoc.Views.NewPage"
+             x:DataType="views:NewPage"
              x:Name="ThisPage"
              Title="{Binding Title}">
 
@@ -57,16 +58,40 @@
                     Clicked="OnEditClicked"/>
         </Grid>
     </Shell.TitleView>
-
+    
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True">
-            <controls:TileImageView x:Name="PlanImage"
-                  IsRotationLocked="{Binding IsPlanRotateLocked, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
-                  SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
-                  IsGrayscaleEnabled="{Binding IsGrayscaleMode, Source={x:Reference Name=ThisPage}}"
-                  PlaceholderColor="DimGrey"                                    
-                  AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
-                  AbsoluteLayout.LayoutFlags="All"/>
+            <mr:ContentView x:DataType="pc:TransformViewModel"
+                            PinchingCommand="{Binding PinchingCommand}"
+                            RotatingCommand="{Binding RotatingCommand}"
+                            Panning="OnPanning"
+                            Pinching="OnPinching"
+                            Pinched="OnPinched"
+                            MouseMoved="OnMouseMoved"
+                            ScrollWheelChanged="OnMouseScroll">
+                <mr:AbsoluteLayout x:Name="PlanContainer"
+                                   LongPressing="OnLongPressing"
+                                   Tapped="OnTapped"
+                                   Scale="{Binding Scale}"
+				                   Rotation="{Binding Rotation}"
+				                   TranslationX="{Binding TranslationX}"
+				                   TranslationY="{Binding TranslationY}"
+				                   AnchorX="{Binding AnchorX}"
+				                   AnchorY="{Binding AnchorY}">
+                    <ff:CachedImageView x:Name="PlanImage"
+                                        x:DataType="views:NewPage"
+                                        Source="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
+                                        CacheType="All"
+                                        BitmapOptimizations="True"
+                                        DownsampleUseDipUnits="False"
+                                        DownsampleToViewSize="True"
+                                        FadeAnimationEnabled ="False"
+                                        LoadingPriority="High"
+                                        FadeAnimationForCachedImages ="False"
+                                        LoadingDelay="40"
+                                        ZIndex="0"/>
+                </mr:AbsoluteLayout>
+            </mr:ContentView>
 
             <Grid x:Name="PinEditBorder"
                   IsVisible="False"
@@ -234,7 +259,7 @@
                     ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                     Clicked="DrawingClicked"/>
 
-            <VerticalStackLayout x:DataType="views:NewPageExperimental"
+            <VerticalStackLayout x:DataType="views:NewPage"
                                  IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference Name=ThisPage}}"
                                  Spacing="16"
                                  Margin="20"

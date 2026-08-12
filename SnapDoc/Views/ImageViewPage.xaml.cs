@@ -1,7 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using MR.Gestures;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
@@ -21,9 +20,11 @@ public partial class ImageViewPage : IQueryAttributable
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private double minScale = 0.1;
-    private readonly TransformViewModel fotoContainer;
     private bool needsImageFit = false;
     private bool isNavigating = false;
+    private double panStartX;
+    private double panStartY;
+    private TransformViewModel fotoContainer;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -100,6 +101,8 @@ public partial class ImageViewPage : IQueryAttributable
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         drawingController = new DrawingController(fotoContainer);
+
+        SetupDesktopScrollWheel();
     }
 
     protected override void OnAppearing()
@@ -168,50 +171,93 @@ public partial class ImageViewPage : IQueryAttributable
         UpdateNavigationButtons();
     }
 
+    public void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
+    {
+        switch (e.Status)
+        {
+            case GestureStatus.Started:
+                fotoContainer.IsPanningEnabled = false; 
+                drawingController.ResizeHandles(); 
+            break;
+
+            case GestureStatus.Running:
+                double targetScale = fotoContainer.Scale * e.Scale;
+                fotoContainer.Scale = Math.Max(minScale, targetScale);
+                break;
+
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                fotoContainer.IsPanningEnabled = true; 
+                if (fotoContainer.Scale < minScale) 
+                    ImageFit(null, null); 
+            break;
+        }
+    }
+
+    public void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    {
+        if (!fotoContainer.IsPanningEnabled) return; 
+
+    switch (e.StatusType)
+        {
+            case GestureStatus.Started:
+                panStartX = fotoContainer.TranslationX;
+                panStartY = fotoContainer.TranslationY;
+                break;
+
+            case GestureStatus.Running:
+                var dragScale = 1.0 / fotoContainer.Scale; 
+            double angle = FotoContainer.Rotation * Math.PI / 180.0; 
+            double deltaX = (e.TotalX * Math.Cos(angle) + e.TotalY * Math.Sin(angle)) * dragScale; 
+            double deltaY = (-e.TotalX * Math.Sin(angle) + e.TotalY * Math.Cos(angle)) * dragScale; 
+
+            fotoContainer.TranslationX = panStartX + deltaX;
+                fotoContainer.TranslationY = panStartY + deltaY;
+
+                fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX); 
+            fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY); 
+            break;
+
+            case GestureStatus.Completed:
+            case GestureStatus.Canceled:
+                break;
+        }
+    }
+
     public void OnDoubleTapped(object sender, EventArgs e) => ImageFit(null, null);
 
-    public void OnPinching(object sender, PinchEventArgs e)
+    private void SetupDesktopScrollWheel()
     {
-        fotoContainer.IsPanningEnabled = false;
-        drawingController.ResizeHandles();
+        GestureContainer.HandlerChanged += (s, e) =>
+        {
+            if (GestureContainer.Handler?.PlatformView == null) return;
+
+#if WINDOWS
+        if (GestureContainer.Handler.PlatformView is Microsoft.UI.Xaml.FrameworkElement winView)
+        {
+            winView.PointerWheelChanged += (sender, args) =>
+            {
+                var point = args.GetCurrentPoint(winView);
+                var mousePos = new Point(point.Position.X, point.Position.Y);
+                int delta = point.Properties.MouseWheelDelta;
+
+                HandleScrollWheel(mousePos, delta);
+                args.Handled = true; // Event als verarbeitet markieren
+            };
+        }
+#endif
+        };
     }
 
-    public void OnPinched(object sender, PinchEventArgs e)
+    private void HandleScrollWheel(Point mousePos, int scrollDelta)
     {
-        fotoContainer.IsPanningEnabled = true;
-        
-        if (fotoContainer.Scale < minScale)
-            ImageFit(null, null);
-        
-        fotoContainer.IsPanningEnabled = true;
-    }
-
-    public void OnPanning(object sender, PanEventArgs e)
-    {
-        if (!fotoContainer.IsPanningEnabled) return;
-
-        var dragScale = 1.0 / fotoContainer.Scale;
-        double angle = FotoContainer.Rotation * Math.PI / 180.0;
-        double deltaX = (e.DeltaDistance.X * Math.Cos(angle) + e.DeltaDistance.Y * Math.Sin(angle)) * dragScale;
-        double deltaY = (-e.DeltaDistance.X * Math.Sin(angle) + e.DeltaDistance.Y * Math.Cos(angle)) * dragScale;
-
-        fotoContainer.TranslationX += deltaX;
-        fotoContainer.TranslationY += deltaY;
-        fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX);
-        fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY);
-    }
-
-    private void OnMouseScroll(object sender, ScrollWheelEventArgs e)
-    {
-        var mousePos = e.Center;
-
         double zoomFactor;
         if (fotoContainer.Scale > 2)
-            zoomFactor = e.ScrollDelta.Y > 0 ? 1.05 : 0.95;
+            zoomFactor = scrollDelta > 0 ? 1.05 : 0.95;
         else if (fotoContainer.Scale > 1)
-            zoomFactor = e.ScrollDelta.Y > 0 ? 1.1 : 0.9;
+            zoomFactor = scrollDelta > 0 ? 1.1 : 0.9;
         else
-            zoomFactor = e.ScrollDelta.Y > 0 ? 1.15 : 0.85;
+            zoomFactor = scrollDelta > 0 ? 1.15 : 0.85;
 
         double targetScale = fotoContainer.Scale * zoomFactor;
         if (targetScale <= minScale)

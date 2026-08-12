@@ -103,14 +103,8 @@ public partial class LoadPDFPages : ContentPage
                         string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
                         string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                         string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
-
                         var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-
-                        int targetDpi;
-                        if (SettingsService.Instance.IsExperimentalFunctions)
-                            targetDpi = SettingsService.Instance.PdfFullViewDpi;
-                        else
-                            targetDpi = CalculateMaxDpiFromMaxDimension(width, height, SettingsService.Instance.MaxPdfImageSize);
+                        int targetDpi = SettingsService.Instance.PdfFullViewDpi;
 
                         pdfImages.Add(new PdfItem
                         {

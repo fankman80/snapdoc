@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-			 xmlns:mr="clr-namespace:MR.Gestures;assembly=MR.Gestures"		 
+			 xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"	 
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views" 
              xmlns:services="clr-namespace:SnapDoc.Services"
@@ -64,15 +63,15 @@
     </Shell.TitleView>
 
     <Grid>
-        <mr:AbsoluteLayout x:Name="GestureContainer"
-                           x:DataType="pc:TransformViewModel"
-                           IsClippedToBounds="True"
-                           PinchingCommand="{Binding PinchingCommand}"
-                           Panning="OnPanning"
-                           Pinching="OnPinching"
-                           Pinched="OnPinched"
-                           DoubleTapped="OnDoubleTapped"
-                           ScrollWheelChanged="OnMouseScroll">
+        <AbsoluteLayout x:Name="GestureContainer"
+                        x:DataType="pc:TransformViewModel"
+                        IsClippedToBounds="True">
+            <AbsoluteLayout.GestureRecognizers>
+                <PanGestureRecognizer PanUpdated="OnPanUpdated" />
+                <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
+                <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnDoubleTapped" />
+            </AbsoluteLayout.GestureRecognizers>
+            
             <Grid x:Name="ImageDrawingCanvas"
                   AbsoluteLayout.LayoutBounds="0, 0, -1, -1"
                   AbsoluteLayout.LayoutFlags="None"
@@ -85,7 +84,7 @@
                 <Image x:Name="FotoContainer"
                        InputTransparent="True" />
             </Grid>
-        </mr:AbsoluteLayout>
+        </AbsoluteLayout>
 
         <!-- Pfeil links (Vorheriges Bild) -->
         <Button x:Name="PrevImgBtn"

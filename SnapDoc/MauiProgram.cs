@@ -2,7 +2,6 @@
 using CommunityToolkit.Maui.Storage;
 using FFImageLoading.Maui;
 using Camera.MAUI;
-using MR.Gestures;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
 
@@ -27,7 +26,6 @@ public static class MauiProgram
             .UseMauiApp<App>()
             .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(false); }) // Setze auf true, wenn CommunityToolkit Issue #3276 gefixt wurde
             .UseFFImageLoading()
-            .ConfigureMRGestures()
             .UseSkiaSharp()
             .UseSentry(options =>
             {

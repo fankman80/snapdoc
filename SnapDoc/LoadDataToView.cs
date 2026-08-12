@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using SnapDoc.Services;
 using SnapDoc.Views;
 
 namespace SnapDoc;
@@ -37,22 +36,11 @@ public partial class LoadDataToView
         }
         else
         {
-            if (SettingsService.Instance.IsExperimentalFunctions)
+            page = new NewPage(planId)
             {
-                page = new NewPageExperimental(planId)
-                {
-                    Title = planTitle,
-                    AutomationId = planId,
-                };
-            }
-            else
-            {
-                page = new NewPage(planId)
-                {
-                    Title = planTitle,
-                    AutomationId = planId,
-                };
-            }
+                Title = planTitle,
+                AutomationId = planId,
+            };
         }
 
         var shellContent = new ShellContent
