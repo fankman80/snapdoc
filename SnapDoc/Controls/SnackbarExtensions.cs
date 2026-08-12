@@ -14,22 +14,21 @@ public static class SnackbarExtensions
         if (includeDelay)
             await Task.Delay(100);
 
-        // Prüfen, ob die App auf Windows läuft
-        if (DeviceInfo.Platform == DevicePlatform.WinUI)
+        await MainThread.InvokeOnMainThreadAsync(async () =>
         {
-            // Alternative für Windows: Verwende einen Toast statt Snackbar
-            var toast = Toast.Make(message, ToastDuration.Short);
-            await toast.Show();
-        }
-        else
-        {
-            // Reguläre Snackbar für Android, iOS, macOS
-            await Snackbar.Make(
-                message: message,
-                actionButtonText: actionButtonText,
-                duration: TimeSpan.FromSeconds(3),
-                visualOptions: Settings.SnackBarOptions
-            ).Show();
-        }
+            try
+            {
+                await Snackbar.Make(
+                    message: message,
+                    actionButtonText: actionButtonText,
+                    duration: TimeSpan.FromSeconds(3),
+                    visualOptions: Settings.SnackBarOptions
+                ).Show();
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fehler bei der Toast-Anzeige: {ex.Message}");
+            }
+        });
     }
 }

@@ -1861,6 +1861,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Pläne wurden aus dem Zwischenspeicher (Cache) gelöscht. Das Neuberechnen der Pläne kann beim erstmaligen Aufrufen einige Sekunden dauern. ähnelt.
+        /// </summary>
+        internal static string PlansCacheCleared {
+            get {
+                return ResourceManager.GetString("PlansCacheCleared", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Polygon ähnelt.
         /// </summary>
         internal static string polygon {
@@ -2284,6 +2293,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tile-Cache löschen ähnelt.
+        /// </summary>
+        internal static string tile_cache_loeschen {
+            get {
+                return ResourceManager.GetString("tile_cache_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Tippen und ziehen, um den Messvorgang zu starten ähnelt.
         /// </summary>
         internal static string tippen_und_ziehen_messvorgang {
@@ -2406,6 +2424,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string warte_auf_datei {
             get {
                 return ResourceManager.GetString("warte_auf_datei", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Warte auf Dateiauswahl... ähnelt.
+        /// </summary>
+        internal static string warte_auf_dateiauswahl {
+            get {
+                return ResourceManager.GetString("warte_auf_dateiauswahl", resourceCulture);
             }
         }
         

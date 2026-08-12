@@ -954,4 +954,13 @@
   <data name="DaySundayAbbrev" xml:space="preserve">
     <value>So</value>
   </data>
+  <data name="warte_auf_dateiauswahl" xml:space="preserve">
+    <value>Warte auf Dateiauswahl...</value>
+  </data>
+  <data name="tile_cache_loeschen" xml:space="preserve">
+    <value>Tile-Cache löschen</value>
+  </data>
+  <data name="PlansCacheCleared" xml:space="preserve">
+    <value>Alle Pläne wurden aus dem Zwischenspeicher (Cache) gelöscht. Das Neuberechnen der Pläne kann beim erstmaligen Aufrufen einige Sekunden dauern.</value>
+  </data>
 </root>

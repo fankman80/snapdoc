@@ -954,4 +954,13 @@
   <data name="DaySundayAbbrev" xml:space="preserve">
     <value>Dim</value>
   </data>
+  <data name="warte_auf_dateiauswahl" xml:space="preserve">
+    <value>En attente de la sélection du fichier...</value>
+  </data>
+  <data name="tile_cache_loeschen" xml:space="preserve">
+    <value>Vider le cache de tuiles</value>
+  </data>
+  <data name="PlansCacheCleared" xml:space="preserve">
+    <value>Tous les plans ont été supprimés du cache. Le recalcul des plans peut prendre quelques secondes lors de la première ouverture.</value>
+  </data>
 </root>

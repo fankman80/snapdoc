@@ -90,12 +90,11 @@
 		<!-- Images & Fonts -->
 		<MauiImage Include="Resources\Images\*" />
 		<MauiFont Include="Resources\Fonts\*" />
-		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\editor.html;Resources\Raw\north_arrow.svg" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
+		<MauiAsset Include="Resources\Raw\**" Exclude="Resources\Raw\editor.html" LogicalName="%(RecursiveDir)%(Filename)%(Extension)" />
 	</ItemGroup>
 
 	<ItemGroup>
 		<EmbeddedResource Include="Resources\Raw\editor.html" />
-		<MauiImage Include="Resources\raw\north_arrow.svg" />
 	</ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">

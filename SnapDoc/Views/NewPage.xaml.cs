@@ -233,8 +233,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         pinList.Clear();
 
-        foreach (var pinId in thisPlan.Pins.Keys)
-            AddPin(pinId);
+        if (thisPlan.Pins != null)
+            foreach (var pinId in thisPlan.Pins.Keys)
+                AddPin(pinId);
 
         PlanImage.Pins = pinList;
 

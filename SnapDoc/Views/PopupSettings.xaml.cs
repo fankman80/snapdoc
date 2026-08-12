@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using static SnapDoc.Helper;
@@ -95,5 +96,16 @@ public partial class PopupSettings : Popup, IQueryAttributable
             SettingsService.Instance.IconCategories = iconCategories;
             IconLookup.Initialize(Settings.IconData);
         }
+    }
+
+    private async void OnDeleteTileCacheClicked(object sender, EventArgs e)
+    {
+        // Lösche Plan-Tiles aus dem Cache-Ordner
+        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
+
+        if (Directory.Exists(cacheDir))
+            Directory.Delete(cacheDir, recursive: true);
+
+        await SnackbarExtensions.ShowSafeAsync(AppResources.PlansCacheCleared, includeDelay: true);
     }
 }

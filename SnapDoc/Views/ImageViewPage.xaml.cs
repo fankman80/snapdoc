@@ -187,8 +187,10 @@ public partial class ImageViewPage : IQueryAttributable
                 break;
 
             case GestureStatus.Running:
-                double targetScale = pinchStartScale * e.Scale;
+                double targetScale = fotoContainer.Scale * e.Scale;
+                targetScale = Math.Max(targetScale, minScale * 0.5);
                 targetScale = Math.Min(targetScale, minScale * 15.0);
+
                 double focusX = e.ScaleOrigin.X * this.Width;
                 double focusY = e.ScaleOrigin.Y * this.Height;
                 double imgWidth = FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : FotoContainer.Width;
@@ -196,6 +198,7 @@ public partial class ImageViewPage : IQueryAttributable
                 double centerX = (imgWidth / 2.0) + pinchStartX;
                 double centerY = (imgHeight / 2.0) + pinchStartY;
                 double scaleRatio = targetScale / pinchStartScale;
+
                 fotoContainer.TranslationX = pinchStartX + (centerX - focusX) * (scaleRatio - 1.0);
                 fotoContainer.TranslationY = pinchStartY + (centerY - focusY) * (scaleRatio - 1.0);
                 fotoContainer.Scale = targetScale;

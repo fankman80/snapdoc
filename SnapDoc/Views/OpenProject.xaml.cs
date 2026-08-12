@@ -146,7 +146,7 @@ public partial class OpenProject : ContentPage
         {
             if (viewModel != null)
             {
-                viewModel.BusyText = "Warte auf Dateiauswahl / Download..."; // Alternativ: AppResources.bitte_warten
+                viewModel.BusyText = AppResources.warte_auf_dateiauswahl;
                 viewModel.IsBusy = true;
                 await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
             }
@@ -176,8 +176,7 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            if (viewModel != null)
-                viewModel.IsBusy = false;
+            viewModel?.IsBusy = false;
         }
     }
 

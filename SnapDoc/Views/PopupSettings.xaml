@@ -291,6 +291,7 @@
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
                                 <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
                             </Grid.RowDefinitions>
                             <Label Grid.Column="0" Grid.Row="0" Text="{x:Static res:AppResources.kamera}" VerticalOptions="Center"/>
                             <controls:CustomRadioPicker Grid.Column="1" Grid.Row="0"
@@ -304,6 +305,11 @@
                                                         ItemsSource="{Binding AppLanguages}"
                                                         SelectedItem="{Binding SelectedAppLanguage}"/>
                             <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
+                            <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
+                                    Text="{x:Static res:AppResources.tile_cache_loeschen}"
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{DynamicResource PrimaryDarkText}"                                                           
+                                    Clicked="OnDeleteTileCacheClicked"/>
                         </Grid>
                     </VerticalStackLayout>
                 </controls:BorderedExpander>

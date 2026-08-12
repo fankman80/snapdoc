@@ -67,9 +67,8 @@ public partial class ExportSettings : ContentPage
                 await ExportReport.DocX(templatePath, outputPath);
             });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
             return;
         }
         finally
@@ -78,22 +77,30 @@ public partial class ExportSettings : ContentPage
             viewModel?.IsBusy = false;
         }
 
-        // Nativer Teilen-Dialog des Betriebssystems
+        bool isShared = false;
+
         try
         {
             await ShareFileAsync(outputPath);
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
+            isShared = true;
         }
         catch
         {
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
+            isShared = false;
+        }
+        finally
+        {
+            // Temporäre Datei aufräumen
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
         }
 
-        // Temporäre Datei aufräumen
-        if (File.Exists(outputPath))
-            File.Delete(outputPath);
-
         await Shell.Current.GoToAsync("..");
+
+        if (isShared)
+            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
+        else
+            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
@@ -126,9 +133,8 @@ public partial class ExportSettings : ContentPage
                 await ExportReport.DocX(templatePath, outputPath);
             });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
             return;
         }
         finally
@@ -137,22 +143,19 @@ public partial class ExportSettings : ContentPage
             viewModel?.IsBusy = false;
         }
 
-        // Speichern ueber den nativen FileSaver
+        bool isSaved = false;
+
         if (File.Exists(outputPath))
         {
             try
             {
                 using var saveStream = File.Open(outputPath, FileMode.Open);
                 var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
-
-                if (fileSaveResult.IsSuccessful)
-                    await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
-                else
-                    await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
+                isSaved = fileSaveResult.IsSuccessful;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
+                return;
             }
             finally
             {
@@ -162,7 +165,12 @@ public partial class ExportSettings : ContentPage
             }
         }
 
-        await Shell.Current.GoToAsync("//homescreen");
+        await Shell.Current.GoToAsync("..");
+
+        if (isSaved)
+            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
+        else
+            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
     }
 
     private static async Task ShareFileAsync(string filePath)
