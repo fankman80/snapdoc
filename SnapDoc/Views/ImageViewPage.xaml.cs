@@ -22,9 +22,12 @@ public partial class ImageViewPage : IQueryAttributable
     private double minScale = 0.1;
     private bool needsImageFit = false;
     private bool isNavigating = false;
+    private double pinchStartScale;
+    private double pinchStartX;
+    private double pinchStartY;
     private double panStartX;
     private double panStartY;
-    private TransformViewModel fotoContainer;
+    private readonly TransformViewModel fotoContainer;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -176,29 +179,40 @@ public partial class ImageViewPage : IQueryAttributable
         switch (e.Status)
         {
             case GestureStatus.Started:
-                fotoContainer.IsPanningEnabled = false; 
-                drawingController.ResizeHandles(); 
-            break;
+                fotoContainer.IsPanningEnabled = false;
+                pinchStartScale = fotoContainer.Scale;
+                pinchStartX = fotoContainer.TranslationX;
+                pinchStartY = fotoContainer.TranslationY;
+                drawingController.ResizeHandles();
+                break;
 
             case GestureStatus.Running:
-                double targetScale = fotoContainer.Scale * e.Scale;
-                fotoContainer.Scale = Math.Max(minScale, targetScale);
+                double targetScale = pinchStartScale * e.Scale;
+                targetScale = Math.Min(targetScale, minScale * 15.0);
+                double originX = (e.ScaleOrigin.X - 0.5) * FotoContainer.Width * pinchStartScale;
+                double originY = (e.ScaleOrigin.Y - 0.5) * FotoContainer.Height * pinchStartScale;
+                double scaleRatio = targetScale / pinchStartScale;
+                fotoContainer.TranslationX = pinchStartX - originX * (scaleRatio - 1);
+                fotoContainer.TranslationY = pinchStartY - originY * (scaleRatio - 1);
+
+                fotoContainer.Scale = targetScale;
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
-                fotoContainer.IsPanningEnabled = true; 
-                if (fotoContainer.Scale < minScale) 
-                    ImageFit(null, null); 
-            break;
+                fotoContainer.IsPanningEnabled = true;
+                if (fotoContainer.Scale <= minScale + 0.01)
+                    ImageFit(null, null);
+                break;
         }
     }
 
     public void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
-        if (!fotoContainer.IsPanningEnabled) return; 
+        if (!fotoContainer.IsPanningEnabled) return;
+        if (fotoContainer.Scale <= minScale + 0.01) return;
 
-    switch (e.StatusType)
+        switch (e.StatusType)
         {
             case GestureStatus.Started:
                 panStartX = fotoContainer.TranslationX;
@@ -206,17 +220,9 @@ public partial class ImageViewPage : IQueryAttributable
                 break;
 
             case GestureStatus.Running:
-                var dragScale = 1.0 / fotoContainer.Scale; 
-            double angle = FotoContainer.Rotation * Math.PI / 180.0; 
-            double deltaX = (e.TotalX * Math.Cos(angle) + e.TotalY * Math.Sin(angle)) * dragScale; 
-            double deltaY = (-e.TotalX * Math.Sin(angle) + e.TotalY * Math.Cos(angle)) * dragScale; 
-
-            fotoContainer.TranslationX = panStartX + deltaX;
-                fotoContainer.TranslationY = panStartY + deltaY;
-
-                fotoContainer.AnchorX = 1 / FotoContainer.Width * ((this.Width / 2) - fotoContainer.TranslationX); 
-            fotoContainer.AnchorY = 1 / FotoContainer.Height * ((this.Height / 2) - fotoContainer.TranslationY); 
-            break;
+                fotoContainer.TranslationX = panStartX + e.TotalX;
+                fotoContainer.TranslationY = panStartY + e.TotalY;
+                break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
@@ -260,21 +266,21 @@ public partial class ImageViewPage : IQueryAttributable
             zoomFactor = scrollDelta > 0 ? 1.15 : 0.85;
 
         double targetScale = fotoContainer.Scale * zoomFactor;
-        if (targetScale <= minScale)
+
+        if (targetScale <= minScale + 0.01)
         {
             ImageFit(null, null);
             return;
         }
 
-        double newAnchorX = 1 / FotoContainer.Width * (mousePos.X - fotoContainer.TranslationX);
-        double newAnchorY = 1 / FotoContainer.Height * (mousePos.Y - fotoContainer.TranslationY);
-        double deltaTranslationX = (FotoContainer.Width * (newAnchorX - fotoContainer.AnchorX)) * (targetScale / fotoContainer.Scale - 1);
-        double deltaTranslationY = (FotoContainer.Height * (newAnchorY - fotoContainer.AnchorY)) * (targetScale / fotoContainer.Scale - 1);
+        targetScale = Math.Min(targetScale, minScale * 15.0);
+        double scaleRatio = targetScale / fotoContainer.Scale;
+        double originX = mousePos.X - (fotoContainer.TranslationX + FotoContainer.Width / 2);
+        double originY = mousePos.Y - (fotoContainer.TranslationY + FotoContainer.Height / 2);
 
-        fotoContainer.AnchorX = newAnchorX;
-        fotoContainer.AnchorY = newAnchorY;
-        fotoContainer.TranslationX -= deltaTranslationX;
-        fotoContainer.TranslationY -= deltaTranslationY;
+        fotoContainer.TranslationX -= originX * (scaleRatio - 1);
+        fotoContainer.TranslationY -= originY * (scaleRatio - 1);
+
         fotoContainer.Scale = targetScale;
 
         drawingController.ResizeHandles();
@@ -299,11 +305,13 @@ public partial class ImageViewPage : IQueryAttributable
 
         var scale = Math.Min(this.Width / imgWidth, this.Height / imgHeight);
         minScale = scale;
+
+        fotoContainer.AnchorX = 0.5;
+        fotoContainer.AnchorY = 0.5;
         fotoContainer.Scale = scale;
+
         fotoContainer.TranslationX = (this.Width - imgWidth) / 2;
         fotoContainer.TranslationY = (this.Height - imgHeight) / 2;
-        fotoContainer.AnchorX = (1 / imgWidth) * ((this.Width / 2) - fotoContainer.TranslationX);
-        fotoContainer.AnchorY = (1 / imgHeight) * ((this.Height / 2) - fotoContainer.TranslationY);
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)

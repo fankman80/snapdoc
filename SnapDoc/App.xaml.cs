@@ -150,6 +150,11 @@ public partial class App : Application
 
         try
         {
+            // Task-Samples
+            //< Command Type = "Reset" Target = "appsettings.ini" />
+            //< Command Type = "Delete" Target = "templates/template_ebbe.docx" />
+            //< Command Type = "Copy" Target = "templates/template_ebbe.docx" />
+
             using var stream = await FileSystem.OpenAppPackageFileAsync("startTasks.xml");
             XDocument doc = XDocument.Load(stream);
 
@@ -170,7 +175,25 @@ public partial class App : Application
                         SettingsService.Instance.SaveSettings();
                         break;
 
-                        // Weitere Cases...
+                    case "Delete":
+                        string[] deleteParts = target.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                        var deleteFilePath = Path.Combine([Settings.DataDirectory, .. deleteParts]);
+                        if (File.Exists(deleteFilePath))
+                            File.Delete(deleteFilePath);
+                        break;
+
+                    case "Copy":
+                        string[] copyParts = target.Split('/', StringSplitOptions.RemoveEmptyEntries);
+                        var copyFilePath = Path.Combine([Settings.DataDirectory, .. copyParts]);
+                        try
+                        {
+                            await Helper.CopyFileFromResourcesAsync(Path.GetFileName(copyFilePath), copyFilePath);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"Fehler beim Kopieren von {Path.GetFileName(copyFilePath)}: {ex.Message}");
+                        }
+                        break;
                 }
             }
 
