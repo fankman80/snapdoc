@@ -141,32 +141,33 @@ public partial class OpenProject : ContentPage
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
-        var fileResult = await FilePicker.Default.PickAsync(new PickOptions
-        {
-            PickerTitle = AppResources.bitte_waehle_zip
-        });
-
-        if (fileResult == null) return;
-
         var viewModel = BindingContext as BaseViewModel;
-
         try
         {
-            var targetDirectory = Settings.DataDirectory;
-            var sourcePath = fileResult.FullPath;
-
-            // Ladeanzeige aktivieren
             if (viewModel != null)
             {
-                viewModel.BusyText = AppResources.projekt_wird_importiert;
+                viewModel.BusyText = "Warte auf Dateiauswahl / Download..."; // Alternativ: AppResources.bitte_warten
                 viewModel.IsBusy = true;
                 await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
             }
 
-            // Entpacken im Hintergrund ausführen
+            var fileResult = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = AppResources.bitte_waehle_zip
+            });
+
+            if (fileResult == null) return; 
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.projekt_wird_importiert;
+                await Task.Delay(100); // Overlay-Text aktualisieren
+            }
+        
+            var targetDirectory = Settings.DataDirectory;
+            var sourcePath = fileResult.FullPath;
+            
             await Task.Run(() => Helper.UnpackDirectory(sourcePath, targetDirectory));
 
-            // Liste nach dem Entpacken neu laden
             LoadJsonFiles();
         }
         catch (Exception)
@@ -175,8 +176,8 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            // Ladeanzeige deaktivieren
-            viewModel?.IsBusy = false;
+            if (viewModel != null)
+                viewModel.IsBusy = false;
         }
     }
 
