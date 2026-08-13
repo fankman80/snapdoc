@@ -38,7 +38,7 @@
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center" />
                             <Label Grid.Column="1"
-                                   Margin="0,0,0,4"
+                                   Margin="0,0,0,5"
                                    FontFamily="MaterialOutlined"
                                    Text="{x:Static local:MaterialIcons.Stat_minus_1}"
                                    FontSize="24"
@@ -56,7 +56,7 @@
                             </Label>
                         </Grid>
                     </toolkit:Expander.Header>
-                    <ContentPresenter Margin="0,0,0,10" />
+                    <ContentPresenter Margin="0,-14,0,14"/>
                 </toolkit:Expander>
             </Border>
         </ControlTemplate>

@@ -115,7 +115,7 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <VerticalStackLayout Grid.Row="1">
+        <VerticalStackLayout Grid.Row="1" Spacing="8">
             <controls:BorderedEntry
                 Text="{Binding Pin.PinLocation}"
                 Placeholder="{x:Static res:AppResources.standort}"
@@ -130,7 +130,7 @@
                 BorderColor="{DynamicResource SecondaryBackground}"
                 PlaceholderColor="{DynamicResource SecondaryBackground}"
                 FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>            
-            <Grid RowSpacing="0">
+            <Grid RowSpacing="0" Margin="0,6,0,0">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="Auto" />
@@ -179,7 +179,8 @@
                 </Border>
             </Grid>
 
-            <Border Stroke="{DynamicResource SecondaryBackground}"
+            <Border  Margin="0,8,0,10"
+                     Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8">
                 <Grid ColumnDefinitions="Auto,*,Auto" 

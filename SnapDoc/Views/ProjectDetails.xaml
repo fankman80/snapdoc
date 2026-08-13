@@ -131,13 +131,15 @@
                     <Button
                         x:Name="creation_date"
                         Margin="0,8,0,0"
+                        HeightRequest="44"
                         FontSize="{StaticResource AppFontSizeNormal}"
                         HorizontalOptions="Start"
+                        VerticalOptions="Center"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
                         BorderWidth="1"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
                         Clicked="CalendarClicked"/>                        
                 </VerticalStackLayout>
             </ScrollView>
