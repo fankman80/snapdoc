@@ -2,7 +2,6 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:ff="clr-namespace:FFImageLoading.Maui;assembly=FFImageLoading.Maui"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
              xmlns:views="clr-namespace:SnapDoc.Views"                
              xmlns:services="clr-namespace:SnapDoc.Services"
