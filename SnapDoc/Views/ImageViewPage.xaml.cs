@@ -24,6 +24,7 @@ public partial class ImageViewPage : IQueryAttributable
     private bool isNavigating = false;
     private double panStartX;
     private double panStartY;
+    private bool isPanningActive = false;
     private readonly TransformViewModel fotoContainer;
 
     // --- DrawingController ---
@@ -176,12 +177,14 @@ public partial class ImageViewPage : IQueryAttributable
         switch (e.Status)
         {
             case GestureStatus.Started:
+                isPanningActive = false;
                 fotoContainer.IsPanningEnabled = false;
                 drawingController.ResizeHandles();
                 break;
 
             case GestureStatus.Running:
-                if (e.Scale <= 0) return;
+                if (e.Scale <= 0 || double.IsNaN(e.Scale) || double.IsInfinity(e.Scale)) return;
+                if (double.IsNaN(e.ScaleOrigin.X) || double.IsNaN(e.ScaleOrigin.Y)) return;
 
                 double currentScale = fotoContainer.Scale;
                 double targetScale = currentScale * e.Scale;
@@ -202,6 +205,7 @@ public partial class ImageViewPage : IQueryAttributable
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
+                isPanningActive = false;
                 fotoContainer.IsPanningEnabled = true;
 
                 if (fotoContainer.Scale < minScale - 0.001)
@@ -218,17 +222,21 @@ public partial class ImageViewPage : IQueryAttributable
         switch (e.StatusType)
         {
             case GestureStatus.Started:
+                isPanningActive = true;
                 panStartX = fotoContainer.TranslationX;
                 panStartY = fotoContainer.TranslationY;
                 break;
 
             case GestureStatus.Running:
+                if (!isPanningActive) return;
+
                 fotoContainer.TranslationX = panStartX + e.TotalX;
                 fotoContainer.TranslationY = panStartY + e.TotalY;
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
+                isPanningActive = false;
                 break;
         }
     }
