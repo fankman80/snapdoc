@@ -86,7 +86,9 @@
                     KnobColorOff="White"
                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                
+
+                <controls:BorderedEntry Text="Test" Placeholder="Test" CornerRadius="8"/>
+
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
                     <VerticalStackLayout Spacing="0"
                                          HorizontalOptions="Start"
@@ -317,7 +319,7 @@
         </ScrollView>
 
         <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
-            <Button Grid.Column="1"
+            <Button Grid.Column="1"                    
                     Text="{x:Static res:AppResources.ok}"
                     MinimumWidthRequest="100"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

@@ -34,7 +34,7 @@ public partial class BorderedEditor : ContentView
         BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEditor), 1.0);
 
     public static readonly BindableProperty CornerRadiusProperty =
-        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEditor), new CornerRadius(6));
+        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEditor), new CornerRadius(8));
 
     public static readonly BindableProperty KeyboardProperty =
         BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEditor), Keyboard.Default);

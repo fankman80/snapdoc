@@ -34,7 +34,7 @@ public partial class BorderedEntry : ContentView
         BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
 
     public static readonly BindableProperty CornerRadiusProperty =
-        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(6));
+        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(8));
 
     public static readonly BindableProperty IsPasswordProperty =
         BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(BorderedEntry), false);

@@ -10,40 +10,56 @@
         <ControlTemplate>
             <Border Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
-                    StrokeShape="RoundRectangle 8"
-                    Padding="8,0,12,0"
-                    Margin="0,0,0,8">
-                <toolkit:Expander Margin="6">
+                    Padding="16,0,10,0"
+                    Margin="0,0,0,4">
+                <Border.Triggers>
+                    <DataTrigger TargetType="Border"
+                                 Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
+                                 Value="False">
+                        <Setter Property="HeightRequest" Value="44" />
+                    </DataTrigger>
+                    <DataTrigger TargetType="Border"
+                                 Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
+                                 Value="True">
+                        <Setter Property="HeightRequest" Value="-1" />
+                    </DataTrigger>
+                </Border.Triggers>
+                <Border.StrokeShape>
+                    <RoundRectangle CornerRadius="{TemplateBinding CornerRadius}" />
+                </Border.StrokeShape>
+                <toolkit:Expander x:Name="expanderControl" Padding="0">
                     <toolkit:Expander.Header>
-                        <Grid ColumnDefinitions="*, Auto" Padding="0,8,0,0">
+                        <Grid ColumnDefinitions="*, Auto" ColumnSpacing="0" HeightRequest="46" VerticalOptions="Fill">
                             <Label Grid.Column="0"
+                                   Margin="0,0,0,5"
                                    Text="{TemplateBinding HeaderText}"
+                                   FontSize="{TemplateBinding FontSize}"
+                                   FontFamily="{TemplateBinding FontFamily}"
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center" />
-                            <Image Grid.Column="1"
-                                   HeightRequest="18"
-                                   WidthRequest="18"
-                                   VerticalOptions="Center">
-                                <Image.Source>
-                                    <FontImageSource
-                                        FontFamily="MaterialOutlined"
-                                        Glyph="{x:Static local:MaterialIcons.Stat_minus_1}"
-                                        Size="36"
-                                        Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}" />
-                                </Image.Source>
-                                <Image.Triggers>
-                                    <DataTrigger TargetType="Image"
-                                                 Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
-                                                 Value="True">
+                            <Label Grid.Column="1"
+                                   Margin="0,0,0,4"
+                                   FontFamily="MaterialOutlined"
+                                   Text="{x:Static local:MaterialIcons.Stat_minus_1}"
+                                   FontSize="24"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   VerticalTextAlignment="Center"
+                                   VerticalOptions="Center"
+                                   HorizontalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label"
+                                         Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
+                                         Value="True">
                                         <Setter Property="Rotation" Value="180" />
                                     </DataTrigger>
-                                </Image.Triggers>
-                            </Image>
+                                </Label.Triggers>
+                            </Label>
                         </Grid>
                     </toolkit:Expander.Header>
-                    <ContentPresenter Margin="0,8,0,0" />
+                    <ContentPresenter Margin="0,0,0,10" />
                 </toolkit:Expander>
             </Border>
         </ControlTemplate>
     </ContentView.ControlTemplate>
 </ContentView>
+           

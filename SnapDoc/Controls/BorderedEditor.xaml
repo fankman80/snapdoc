@@ -6,7 +6,7 @@
              x:Class="SnapDoc.Controls.BorderedEditor"
              x:Name="this">
 
-    <Grid Padding="0,8,0,4" MinimumHeightRequest="50">
+    <Grid Padding="0,8,0,4" MinimumHeightRequest="44">
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
                            IgnorePixelScaling="False"
@@ -21,7 +21,7 @@
                                AutoSize="TextChanges"
                                BackgroundColor="Transparent"
                                VerticalOptions="Center"
-                               Margin="16,14"
+                               Margin="16,12"
                                Focused="InnerEditor_Focused"
                                Unfocused="InnerEditor_Unfocused"
                                TextChanged="InnerEditor_TextChanged"
