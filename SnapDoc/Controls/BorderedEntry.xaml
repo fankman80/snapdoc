@@ -9,7 +9,6 @@
     <Grid Padding="0,8,0,4" MinimumHeightRequest="44">
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
-                           HeightRequest="44"
                            IgnorePixelScaling="False"
                            Margin="0" />
 
