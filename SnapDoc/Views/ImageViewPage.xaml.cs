@@ -22,9 +22,6 @@ public partial class ImageViewPage : IQueryAttributable
     private double minScale = 0.1;
     private bool needsImageFit = false;
     private bool isNavigating = false;
-    private double pinchStartScale;
-    private double pinchStartX;
-    private double pinchStartY;
     private double panStartX;
     private double panStartY;
     private readonly TransformViewModel fotoContainer;
@@ -180,37 +177,36 @@ public partial class ImageViewPage : IQueryAttributable
         {
             case GestureStatus.Started:
                 fotoContainer.IsPanningEnabled = false;
-                pinchStartScale = fotoContainer.Scale;
-                pinchStartX = fotoContainer.TranslationX;
-                pinchStartY = fotoContainer.TranslationY;
                 drawingController.ResizeHandles();
                 break;
 
             case GestureStatus.Running:
-                double targetScale = pinchStartScale * e.Scale;
-                targetScale = Math.Max(targetScale, minScale * 0.5);
-                targetScale = Math.Min(targetScale, minScale * 15.0);
+                if (e.Scale <= 0) return;
 
+                double currentScale = fotoContainer.Scale;
+                double targetScale = currentScale * e.Scale;
+                targetScale = Math.Clamp(targetScale, minScale * 0.5, minScale * 15.0);
+
+                double scaleFactor = targetScale / currentScale;
                 double focusX = e.ScaleOrigin.X * this.Width;
                 double focusY = e.ScaleOrigin.Y * this.Height;
-                double imgWidth = FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : FotoContainer.Width;
-                double imgHeight = FotoContainer.HeightRequest > 0 ? FotoContainer.HeightRequest : FotoContainer.Height;
-                double centerX = (imgWidth / 2.0) + pinchStartX;
-                double centerY = (imgHeight / 2.0) + pinchStartY;
-                double scaleRatio = targetScale / pinchStartScale;
+                double imgWidth = FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : (FotoContainer.Width > 0 ? FotoContainer.Width : this.Width);
+                double imgHeight = FotoContainer.HeightRequest > 0 ? FotoContainer.HeightRequest : (FotoContainer.Height > 0 ? FotoContainer.Height : this.Height);
+                double centerX = (imgWidth / 2.0) + fotoContainer.TranslationX;
+                double centerY = (imgHeight / 2.0) + fotoContainer.TranslationY;
 
-                fotoContainer.TranslationX = pinchStartX + (centerX - focusX) * (scaleRatio - 1.0);
-                fotoContainer.TranslationY = pinchStartY + (centerY - focusY) * (scaleRatio - 1.0);
+                fotoContainer.TranslationX += (centerX - focusX) * (scaleFactor - 1.0);
+                fotoContainer.TranslationY += (centerY - focusY) * (scaleFactor - 1.0);
                 fotoContainer.Scale = targetScale;
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
                 fotoContainer.IsPanningEnabled = true;
-            
+
                 if (fotoContainer.Scale < minScale - 0.001)
                     ImageFit(null, null);
-            break;
+                break;
         }
     }
 
