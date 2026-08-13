@@ -187,7 +187,7 @@ public partial class ImageViewPage : IQueryAttributable
                 break;
 
             case GestureStatus.Running:
-                double targetScale = fotoContainer.Scale * e.Scale;
+                double targetScale = pinchStartScale * e.Scale;
                 targetScale = Math.Max(targetScale, minScale * 0.5);
                 targetScale = Math.Min(targetScale, minScale * 15.0);
 
