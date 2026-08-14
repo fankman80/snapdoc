@@ -138,20 +138,6 @@ public partial class LoadPDFPages : ContentPage
         }
     }
 
-    private static int CalculateMaxDpiFromMaxDimension(int currentWidth, int currentHeight, int maxDimension)
-    {
-        int maxEdge = Math.Max(currentWidth, currentHeight);
-
-        if (maxEdge <= 0)
-            return SettingsService.Instance.PdfThumbDpi;
-
-        double scaleFactor = (double)maxDimension / maxEdge;
-        int currentDpi = SettingsService.Instance.PdfThumbDpi;
-        int targetDpi = (int)Math.Floor(currentDpi * scaleFactor);
-
-        return Math.Max(1, targetDpi);
-    }
-
     public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()
     {
         try

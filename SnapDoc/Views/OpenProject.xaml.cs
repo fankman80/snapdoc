@@ -144,34 +144,48 @@ public partial class OpenProject : ContentPage
         var viewModel = BindingContext as BaseViewModel;
         try
         {
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.warte_auf_dateiauswahl;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
-            }
-
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
                 PickerTitle = AppResources.bitte_waehle_zip
             });
 
-            if (fileResult == null) return; 
+            if (fileResult == null) return;
+
             if (viewModel != null)
             {
                 viewModel.BusyText = AppResources.projekt_wird_importiert;
-                await Task.Delay(100); // Overlay-Text aktualisieren
+                viewModel.IsBusy = true;
+                await Task.Delay(100);
             }
-        
+
             var targetDirectory = Settings.DataDirectory;
-            var sourcePath = fileResult.FullPath;
-            
-            await Task.Run(() => Helper.UnpackDirectory(sourcePath, targetDirectory));
+
+            await Task.Run(async () =>
+            {
+                string tempZipPath = Path.Combine(FileSystem.CacheDirectory, fileResult.FileName);
+
+                try
+                {
+                    using (var stream = await fileResult.OpenReadAsync())
+                    using (var localStream = File.Create(tempZipPath))
+                    {
+                        await stream.CopyToAsync(localStream);
+                    }
+
+                    Helper.UnpackDirectory(tempZipPath, targetDirectory);
+                }
+                finally
+                {
+                    if (File.Exists(tempZipPath))
+                        File.Delete(tempZipPath);
+                }
+            });
 
             LoadJsonFiles();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Import-Fehler: {ex.Message}");
             await SnackbarExtensions.ShowSafeAsync(AppResources.datei_konnte_nicht_importiert_werden, includeDelay: true);
         }
         finally

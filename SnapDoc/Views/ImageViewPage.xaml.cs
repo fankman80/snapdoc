@@ -25,6 +25,7 @@ public partial class ImageViewPage : IQueryAttributable
     private double panStartX;
     private double panStartY;
     private bool isPanningActive = false;
+    private double totalPanX = 0;
     private readonly TransformViewModel fotoContainer;
 
     // --- DrawingController ---
@@ -217,7 +218,8 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
         if (!fotoContainer.IsPanningEnabled) return;
-        if (fotoContainer.Scale <= minScale + 0.01) return;
+
+        bool isAtMinScale = fotoContainer.Scale <= minScale + 0.01;
 
         switch (e.StatusType)
         {
@@ -225,18 +227,37 @@ public partial class ImageViewPage : IQueryAttributable
                 isPanningActive = true;
                 panStartX = fotoContainer.TranslationX;
                 panStartY = fotoContainer.TranslationY;
+                totalPanX = 0;
                 break;
 
             case GestureStatus.Running:
                 if (!isPanningActive) return;
 
-                fotoContainer.TranslationX = panStartX + e.TotalX;
-                fotoContainer.TranslationY = panStartY + e.TotalY;
+                if (isAtMinScale)
+                    totalPanX = e.TotalX;
+                else
+                {
+                    if (!isPanningActive) return;
+
+                    fotoContainer.TranslationX = panStartX + e.TotalX;
+                    fotoContainer.TranslationY = panStartY + e.TotalY;
+                }
                 break;
 
             case GestureStatus.Completed:
             case GestureStatus.Canceled:
+                if (isAtMinScale)
+                {
+                    double threshold = 60;
+
+                    if (totalPanX < -threshold)
+                        NavigateImage(1);
+                    else if (totalPanX > threshold)
+                        NavigateImage(-1);
+                }
+
                 isPanningActive = false;
+                totalPanX = 0;
                 break;
         }
     }
