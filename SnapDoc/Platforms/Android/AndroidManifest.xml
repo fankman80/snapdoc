@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.5.0" android:versionCode="447">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.5.0" android:versionCode="448">
 	<!-- Berechtigungen -->
 	<!-- Package Visibility für Kamera -->
 	<queries>
@@ -11,17 +11,13 @@
 	<!-- Kamera & Internet -->
 	<uses-permission android:name="android.permission.CAMERA" />
 	<uses-permission android:name="android.permission.INTERNET" />
-
 	<!-- Standort -->
 	<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 	<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
 	<!-- EXIF-Standortdaten aus ausgewaehlten Fotos auslesen (Android 10+) -->
 	<uses-permission android:name="android.permission.ACCESS_MEDIA_LOCATION" />
-
 	<!-- Galerie-Lesezugriff fuer neuere Android-Versionen (Android 13+) -->
 	<uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
 	<!-- Abwaertskompatibilitaet fuer aeltere Android-Versionen -->
 	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
 	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" android:maxSdkVersion="28" />

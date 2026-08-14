@@ -129,7 +129,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     else
                         resolvedPath = pinIcon;
 
-                    pin.Icon?.Dispose();
                     pin.Icon = null;
                     pin.IconPath = resolvedPath;
                     pin.Anchor = currentAnchor;
@@ -175,16 +174,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             await AddPlan();
             isFirstLoad = false;
-        }
 
-        if (pinZoom != null)
-        {
+            if (pinZoom != null)
+                ZoomToPin(pinZoom);
+            else
+                ImageFit(null, null);
+        }
+        else if (pinZoom != null)
             ZoomToPin(pinZoom);
-        }
-        else
-        {
-            ImageFit(null, null);
-        }
 
         var appShell = Shell.Current as AppShell;
         appShell?.HighlightCurrentPlan(planId);
@@ -1038,11 +1035,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnSizeModeClicked(object sender, EventArgs e)
     {
         if (tappedPin == null) return;
-    
+
         var mapPin = pinList.FirstOrDefault(p => p.Id == tappedPin.Id);
         if (mapPin == null) return;
-    
-     if (thisPlan.Pins[tappedPin.Id].IsLockAutoScale)
+
+        if (thisPlan.Pins[tappedPin.Id].IsLockAutoScale)
         {
             thisPlan.Pins[tappedPin.Id].IsLockAutoScale = false;
             SizeModeLabel.Text = AppResources.automatische_groessenanpassung;
@@ -1079,7 +1076,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinRotateSlider.LowerValue = 0;
 
             mapPin.IsLockRotate = false;
-            mapPin.Rotation = 0; 
+            mapPin.Rotation = 0;
         }
         else
         {
@@ -1096,7 +1093,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // save data to file
         GlobalJson.SaveToFile();
 
-    PlanImage.InvalidateSurface();
+        PlanImage.InvalidateSurface();
     }
 
     private void OnRotateSliderValueChanged(object sender, EventArgs e)
