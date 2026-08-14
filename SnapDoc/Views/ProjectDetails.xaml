@@ -164,9 +164,18 @@
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Picture_as_pdf}}"
+                        FontFamily="MaterialOutlined"
+                        FontSize="20"
                         ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
-                        Clicked="OnAddPdfClicked"/>
+                        Clicked="OnAddPdfClicked">
+                    <Button.FormattedText>
+                        <FormattedString>
+                            <Span Text="{x:Static local:MaterialIcons.Picture_as_pdf}" />
+                            <Span Text="/" />
+                            <Span Text="{x:Static local:MaterialIcons.image_search}" />
+                        </FormattedString>
+                    </Button.FormattedText>
+                </Button>
                 <Button Grid.Column="3"
                         Padding="0"
                         Text="{x:Static res:AppResources.ok}"
