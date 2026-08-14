@@ -105,7 +105,7 @@
                             <!-- Slider for Red -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.rot_r}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"
@@ -123,7 +123,7 @@
                             <!-- Slider for Green -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.gruen_g}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"
@@ -141,7 +141,7 @@
                             <!-- Slider for Blue -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.blau_b}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"
@@ -159,7 +159,7 @@
                             <!-- Slider for Hue -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.farbwert_h}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"
@@ -176,7 +176,7 @@
                             <!-- Slider for Saturation -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.saettigung_s}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"
@@ -193,7 +193,7 @@
                             <!-- Slider for Brightness -->
                             <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.helligkeit_l}"
-                                TextSize="12"
+                                FontSize="12"
                                 IsRange="False"
                                 IsRealtime="True"
                                 Minimum="0"

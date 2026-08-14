@@ -4,10 +4,10 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
 {
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
     [CommunityToolkit.Mvvm.ComponentModel.NotifyPropertyChangedFor(nameof(IsNotBusy))]
-    private bool isBusy;
+    public partial bool IsBusy { get; set; }
 
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
-    private string busyText = "Bitte warten...";
+    public partial string BusyText { get; set; } = "Bitte warten...";
 
     public bool IsNotBusy => !IsBusy;
 
