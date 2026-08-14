@@ -16,11 +16,13 @@
                     Margin="0,0,0,4">
                 <Border.Triggers>
                     <DataTrigger TargetType="Border"
+                                 x:DataType="toolkit:Expander"
                                  Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
                                  Value="False">
                         <Setter Property="HeightRequest" Value="44" />
                     </DataTrigger>
                     <DataTrigger TargetType="Border"
+                                 x:DataType="toolkit:Expander"
                                  Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
                                  Value="True">
                         <Setter Property="HeightRequest" Value="-1" />
@@ -50,8 +52,9 @@
                                    HorizontalOptions="Center">
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label"
-                                         Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
-                                         Value="True">
+                                                 x:DataType="toolkit:Expander"
+                                                 Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
+                                                 Value="True">
                                         <Setter Property="Rotation" Value="180" />
                                     </DataTrigger>
                                 </Label.Triggers>
