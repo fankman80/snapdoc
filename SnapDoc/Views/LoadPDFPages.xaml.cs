@@ -12,6 +12,16 @@ public partial class LoadPDFPages : ContentPage
 {
     IEnumerable<FileResult> resultList;
     private bool _isProcessing = false;
+
+    private static readonly FilePickerFileType CustomMediaFileType = new(
+    new Dictionary<DevicePlatform, IEnumerable<string>>
+    {
+        { DevicePlatform.iOS, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } },
+        { DevicePlatform.Android, new[] { "application/pdf", "image/jpeg", "image/png" } },
+        { DevicePlatform.WinUI, new[] { ".pdf", ".jpg", ".jpeg", ".png" } },
+        { DevicePlatform.MacCatalyst, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } }
+    });
+
     public int DynamicSpan { get; set; } = 0;
 
     public LoadPDFPages()
@@ -38,7 +48,6 @@ public partial class LoadPDFPages : ContentPage
 
     protected override bool OnBackButtonPressed()
     {
-        // Zurück-Taste ignorieren
         return true;
     }
 
@@ -60,7 +69,7 @@ public partial class LoadPDFPages : ContentPage
                 }
             }
 
-            resultList = await PickPdfFileAsync();
+            resultList = await PickMediaFileAsync();
 
             if (resultList == null || !resultList.Any())
             {
@@ -73,56 +82,123 @@ public partial class LoadPDFPages : ContentPage
             {
                 viewModel.BusyText = AppResources.lade_pdf_seiten;
                 viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+                await Task.Delay(100);
             }
 
             string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
             List<PdfItem> pdfImages = [];
 
-            // Die zeitintensive PDF-Verarbeitung komplett im Hintergrund ausfuehren
+            // Verarbeitung im Hintergrund ausfuehren
             await Task.Run(async () =>
             {
                 Directory.CreateDirectory(Settings.CacheDirectory);
 
-                int pdfIndex = 0;
+                int fileIndex = 0;
                 foreach (var file in resultList)
                 {
-                    string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{pdfIndex}.pdf");
+                    string ext = Path.GetExtension(file.FileName).ToLowerInvariant();
 
-                    using (var sourceStream = await file.OpenReadAsync())
-                    using (var destStream = File.Create(localPdfPath))
+                    if (ext == ".pdf")
                     {
-                        await sourceStream.CopyToAsync(destStream);
+                        // --- A) PDF-VERARBEITUNG ---
+                        string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{fileIndex}.pdf");
+
+                        using (var sourceStream = await file.OpenReadAsync())
+                        using (var destStream = File.Create(localPdfPath))
+                        {
+                            await sourceStream.CopyToAsync(destStream);
+                        }
+
+                        byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
+                        using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
+
+                        for (int i = 0; i < nativeDoc.PageCount; i++)
+                        {
+                            string imgBaseName = $"pdf_{importId}_{fileIndex}_page_{i}";
+                            string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
+                            string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
+                            var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
+                            int targetDpi = SettingsService.Instance.PdfFullViewDpi;
+
+                            pdfImages.Add(new PdfItem
+                            {
+                                ImagePath = imgPath,
+                                PreviewPath = previewPath,
+                                PdfPath = localPdfPath,
+                                IsChecked = true,
+                                Dpi = targetDpi,
+                                DisplayName = $"Plan {fileIndex + 1} – Seite {i + 1}",
+                                ImageName = imgBaseName,
+                                PdfPage = i,
+                                FinalWidth = width,
+                                FinalHeight = height
+                            });
+                        }
                     }
-
-                    byte[] pdfBytes = await File.ReadAllBytesAsync(localPdfPath);
-                    using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
-
-                    for (int i = 0; i < nativeDoc.PageCount; i++)
+                    else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
                     {
-                        string imgBaseName = $"pdf_{importId}_{pdfIndex}_page_{i}";
+                        // --- B) BILD-VERARBEITUNG (JPG / PNG) ---
+                        string imgBaseName = $"img_{importId}_{fileIndex}";
                         string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                         string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
-                        var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-                        int targetDpi = SettingsService.Instance.PdfFullViewDpi;
+
+                        int imageWidth = 0;
+                        int imageHeight = 0;
+
+                        if (ext == ".png")
+                        {
+                            // PNG zu JPG konvertieren
+                            using var sourceStream = await file.OpenReadAsync();
+                            using var bitmap = SKBitmap.Decode(sourceStream);
+                            imageWidth = bitmap.Width;
+                            imageHeight = bitmap.Height;
+
+                            using var image = SKImage.FromBitmap(bitmap);
+                            using var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
+
+                            using (var destStream = File.Create(imgPath))
+                                data.SaveTo(destStream);
+
+                            File.Copy(imgPath, previewPath, overwrite: true);
+                        }
+                        else
+                        {
+                            // JPG/JPEG direkt in Cache kopieren
+                            using (var sourceStream = await file.OpenReadAsync())
+                            using (var destStream = File.Create(imgPath))
+                            {
+                                await sourceStream.CopyToAsync(destStream);
+                            }
+
+                            // Bildgroesse mittels SkiaSharp ermitteln
+                            using (var bitmap = SKBitmap.Decode(imgPath))
+                            {
+                                imageWidth = bitmap.Width;
+                                imageHeight = bitmap.Height;
+                            }
+
+                            File.Copy(imgPath, previewPath, overwrite: true);
+                        }
 
                         pdfImages.Add(new PdfItem
                         {
                             ImagePath = imgPath,
                             PreviewPath = previewPath,
-                            PdfPath = localPdfPath,
+                            PdfPath = null, // Ist kein PDF
                             IsChecked = true,
-                            Dpi = targetDpi,
-                            DisplayName = $"Plan {pdfIndex + 1} – Seite {i + 1}",
+                            Dpi = 0,
+                            DisplayName = Path.GetFileNameWithoutExtension(file.FileName),
                             ImageName = imgBaseName,
-                            PdfPage = i,
+                            PdfPage = -1,
+                            FinalWidth = imageWidth,
+                            FinalHeight = imageHeight
                         });
                     }
-                    pdfIndex++;
+
+                    fileIndex++;
                 }
             });
 
-            // UI-Aktualisierung nach Abschluss des Hintergrund-Tasks
             fileListView.ItemsSource = pdfImages;
         }
         catch (Exception ex)
@@ -131,21 +207,19 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            // Ladeanzeige deaktivieren
             viewModel?.IsBusy = false;
-
             _isProcessing = false;
         }
     }
 
-    public static async Task<IEnumerable<FileResult>> PickPdfFileAsync()
+    public static async Task<IEnumerable<FileResult>> PickMediaFileAsync()
     {
         try
         {
             var fileResult = await FilePicker.Default.PickMultipleAsync(new PickOptions
             {
                 PickerTitle = AppResources.pdf_dateien_auswaehlen,
-                FileTypes = FilePickerFileType.Pdf // Nur PDF-Dateien anzeigen
+                FileTypes = CustomMediaFileType
             });
 
             if (fileResult != null)
@@ -153,9 +227,9 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
+            Console.WriteLine($"Fehler beim Auswaehlen der Datei: {ex.Message}");
         }
-        return null; // Kein PDF ausgewählt
+        return null;
     }
 
     private void OnCancelClicked(object sender, EventArgs e)
@@ -182,18 +256,16 @@ public partial class LoadPDFPages : ContentPage
 
         try
         {
-            // Ladeanzeige aktivieren
             if (viewModel != null)
             {
                 viewModel.BusyText = AppResources.pdf_wird_konvertiert;
                 viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+                await Task.Delay(100);
             }
 
             await LoadPDFImages();
             await ProcessFileOrganizationLogic();
 
-            // Daten speichern
             GlobalJson.SaveToFile();
 
             if (Shell.Current is AppShell shell)
@@ -207,17 +279,16 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            // Ladeanzeige deaktivieren
             viewModel?.IsBusy = false;
-
             _isProcessing = false;
         }
     }
 
     private async Task LoadPDFImages()
     {
+        // Nur die Elemente filtern, die wirklich aus einem PDF gerendert werden muessen (PdfPath != null)
         var groups = fileListView.ItemsSource.Cast<PdfItem>()
-                        .Where(x => x.IsChecked)
+                        .Where(x => x.IsChecked && !string.IsNullOrEmpty(x.PdfPath))
                         .GroupBy(x => x.PdfPath)
                         .ToList();
 
@@ -246,7 +317,6 @@ public partial class LoadPDFPages : ContentPage
             var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
             string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
 
-            // Array vorab in der exakten Grosse erstellen, um die Reihenfolge zu garantieren
             var processedPlans = new KeyValuePair<string, Plan>[items.Count];
 
             Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
@@ -291,7 +361,6 @@ public partial class LoadPDFPages : ContentPage
                         }
                     }
 
-                    // SKSamplingOptions statt SKFilterQuality verwenden
                     using var resizedBitmap = originalBitmap.Resize(new SKImageInfo(targetWidth, targetHeight), SKSamplingOptions.Default);
                     if (resizedBitmap != null)
                     {
@@ -310,14 +379,11 @@ public partial class LoadPDFPages : ContentPage
                     File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
                 }
 
-                // Hauptbild in voller Auflösung kopieren
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
 
-                // Ergebnis exakt an der vorgegebenen Position im Array ablegen
                 processedPlans[i] = new KeyValuePair<string, Plan>(planId, plan);
             });
 
-            // JSON sequentiell befuellen
             lock (GlobalJson.Data)
             {
                 GlobalJson.Data.Plans ??= [];
@@ -328,7 +394,6 @@ public partial class LoadPDFPages : ContentPage
                 }
             }
 
-            // UI sequentiell updaten
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 foreach (var planKvp in processedPlans)
@@ -338,7 +403,6 @@ public partial class LoadPDFPages : ContentPage
                 }
             });
 
-            // Am Ende den gesamten Cache leeren
             if (Directory.Exists(Settings.CacheDirectory))
             {
                 var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
@@ -375,7 +439,7 @@ public partial class LoadPDFPages : ContentPage
         if (DynamicSpan != 1)
         {
             double screenWidth = this.Width;
-            double imageWidth = SettingsService.Instance.PlanPreviewSize; // Mindestbreite in Pixeln
+            double imageWidth = SettingsService.Instance.PlanPreviewSize;
             DynamicSpan = Math.Max(SettingsService.Instance.GridViewMinColumns, (int)(screenWidth / imageWidth));
         }
 
