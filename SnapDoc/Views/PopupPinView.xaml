@@ -27,7 +27,7 @@
                         <Label Text=":" FontSize="12"
                                TextColor="{DynamicResource Primary}"/>
                     </HorizontalStackLayout>
-                    <local:BorderlessEntry Text="{Binding Pin.PinName}" FontSize="12"/>
+                    <local:BorderlessEntry Text="{Binding Pin.PinName}" FontFamily="{x:StaticResource AppFontFamily}" FontSize="12"/>
                 </VerticalStackLayout>
             </Grid>
             
@@ -43,7 +43,7 @@
                 <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <local:BorderlessEntry Text="{Binding Pin.PinLocation}" FontSize="12"/>
+            <local:BorderlessEntry Text="{Binding Pin.PinLocation}" FontFamily="{x:StaticResource AppFontFamily}" FontSize="12"/>
 
             <!-- Trennlinie -->
             <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
@@ -57,7 +57,7 @@
                 <Label Text=":" FontSize="12"
                        TextColor="{DynamicResource Primary}"/>
             </HorizontalStackLayout>
-            <local:BorderlessEditor Text="{Binding Pin.PinDesc}" FontSize="12" Margin="0,0,0,16"/>
+            <local:BorderlessEditor Text="{Binding Pin.PinDesc}" FontFamily="{x:StaticResource AppFontFamily}" FontSize="12" Margin="0,0,0,16"/>
 
             <Grid ColumnDefinitions="*, 50, 50">
                 <Button Grid.Column="1"

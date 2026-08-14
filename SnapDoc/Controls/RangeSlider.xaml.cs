@@ -20,7 +20,8 @@ public partial class RangeSlider : ContentView
     public static readonly BindableProperty LabelCalculationProperty = BindableProperty.Create(nameof(LabelCalculation), typeof(string), typeof(RangeSlider), string.Empty);
     public static readonly BindableProperty IsRealtimeProperty = BindableProperty.Create(nameof(IsRealtime), typeof(bool), typeof(RangeSlider), false);
     public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(RangeSlider), string.Empty, propertyChanged: OnAnyPropertyChanged);
-    public static readonly BindableProperty TextSizeProperty = BindableProperty.Create(nameof(TextSize), typeof(double), typeof(RangeSlider), defaultValue: GetDefaultFontSize());
+    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(RangeSlider), defaultValue: GetDefaultFontSize());
+    public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create(nameof(FontFamily), typeof(string), typeof(BorderedEntry), defaultValue: (string)Entry.FontFamilyProperty.DefaultValue);
 
     public static readonly BindableProperty LowerValueProperty = BindableProperty.Create(
         nameof(LowerValue), typeof(double), typeof(RangeSlider), 0.0, BindingMode.TwoWay,
@@ -41,7 +42,7 @@ public partial class RangeSlider : ContentView
         });
 
     public string LabelText { get => (string)GetValue(LabelTextProperty); set => SetValue(LabelTextProperty, value); }
-    public double TextSize { get => (double)GetValue(TextSizeProperty); set => SetValue(TextSizeProperty, value); }
+    public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
 
     public event EventHandler<ValueChangedEventArgs>? ValueChanged;
 
@@ -60,6 +61,7 @@ public partial class RangeSlider : ContentView
     public double KnobSize { get => (double)GetValue(KnobSizeProperty); set => SetValue(KnobSizeProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
     public double ValueFontSize { get => (double)GetValue(ValueFontSizeProperty); set => SetValue(ValueFontSizeProperty, value); }
+    public string FontFamily { get => (string)GetValue(FontFamilyProperty); set => SetValue(FontFamilyProperty, value); }
     public bool ShowLabels { get => (bool)GetValue(ShowLabelsProperty); set => SetValue(ShowLabelsProperty, value); }
     public string LabelCalculation { get => (string)GetValue(LabelCalculationProperty); set => SetValue(LabelCalculationProperty, value); }
     public bool IsRealtime { get => (bool)GetValue(IsRealtimeProperty); set => SetValue(IsRealtimeProperty, value); }

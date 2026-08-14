@@ -7,64 +7,20 @@ public partial class BorderedEntry : ContentView
 {
     public event EventHandler<TextChangedEventArgs>? TextChanged;
 
-    public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(
-            nameof(Text),
-            typeof(string),
-            typeof(BorderedEntry),
-            defaultBindingMode: BindingMode.TwoWay,
-            propertyChanged: OnTextChanged);
-
-    public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEntry), string.Empty);
-
-    public static readonly BindableProperty PlaceholderColorProperty =
-        BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(BorderedEntry), Colors.Gray);
-
-    public static readonly BindableProperty BorderColorProperty =
-        BindableProperty.Create(nameof(BorderColor), typeof(Color), typeof(BorderedEntry), Colors.Gray);
-
-    public static readonly BindableProperty FocusedBorderColorProperty =
-        BindableProperty.Create(nameof(FocusedBorderColor), typeof(Color), typeof(BorderedEntry), Color.FromArgb("#512BD4"));
-
-    public static readonly BindableProperty BorderThicknessProperty =
-        BindableProperty.Create(nameof(BorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
-
-    public static readonly BindableProperty FocusedBorderThicknessProperty =
-        BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
-
-    public static readonly BindableProperty CornerRadiusProperty =
-        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(8));
-
-    public static readonly BindableProperty IsPasswordProperty =
-        BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(BorderedEntry), false);
-
-    public static readonly BindableProperty KeyboardProperty =
-        BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEntry), Keyboard.Default);
-
-    public static new readonly BindableProperty BackgroundColorProperty =
-        BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEntry), Colors.White);
-
-    public static readonly BindableProperty TextColorProperty =
-            BindableProperty.Create(
-                nameof(TextColor),
-                typeof(Color),
-                typeof(BorderedEntry),
-                defaultValue: (Color)Entry.TextColorProperty.DefaultValue);
-
-    public static readonly BindableProperty FontSizeProperty =
-            BindableProperty.Create(
-                nameof(FontSize),
-                typeof(double),
-                typeof(BorderedEntry),
-                defaultValue: (double)Entry.FontSizeProperty.DefaultValue);
-
-    public static readonly BindableProperty FontFamilyProperty =
-            BindableProperty.Create(
-                nameof(FontFamily),
-                typeof(string),
-                typeof(BorderedEntry),
-                defaultValue: (string)Entry.FontFamilyProperty.DefaultValue);
+    public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(BorderedEntry), defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnTextChanged);
+    public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEntry), string.Empty);
+    public static readonly BindableProperty PlaceholderColorProperty = BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(BorderedEntry), Colors.Gray);
+    public static readonly BindableProperty BorderColorProperty = BindableProperty.Create(nameof(BorderColor), typeof(Color), typeof(BorderedEntry), Colors.Gray);
+    public static readonly BindableProperty FocusedBorderColorProperty = BindableProperty.Create(nameof(FocusedBorderColor), typeof(Color), typeof(BorderedEntry), Color.FromArgb("#512BD4"));
+    public static readonly BindableProperty BorderThicknessProperty = BindableProperty.Create(nameof(BorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
+    public static readonly BindableProperty FocusedBorderThicknessProperty = BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
+    public static readonly BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(8));
+    public static readonly BindableProperty IsPasswordProperty = BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(BorderedEntry), false);
+    public static readonly BindableProperty KeyboardProperty = BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEntry), Keyboard.Default);
+    public static new readonly BindableProperty BackgroundColorProperty = BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEntry), Colors.White);
+    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(BorderedEntry), defaultValue: (Color)Entry.TextColorProperty.DefaultValue);
+    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create( nameof(FontSize), typeof(double), typeof(BorderedEntry), defaultValue: (double)Entry.FontSizeProperty.DefaultValue);
+    public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create( nameof(FontFamily), typeof(string), typeof(BorderedEntry), defaultValue: (string)Entry.FontFamilyProperty.DefaultValue);
 
     public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
@@ -215,13 +171,9 @@ public partial class BorderedEntry : ContentView
 
             double floatingY;
             if (FloatingLabel.Height > 0)
-            {
                 floatingY = -(FloatingLabel.Y + (FloatingLabel.Height / 2.0)) + fineTuningOffsetY;
-            }
             else
-            {
                 floatingY = -16;
-            }
 
             if (shouldFloat)
             {

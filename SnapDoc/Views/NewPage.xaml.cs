@@ -37,8 +37,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isFirstLoad = true;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly System.Collections.ObjectModel.ObservableCollection<MapPin> pinList = [];
-
-    // DrawingController
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
@@ -53,7 +51,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Color selectedFillColor = new(202, 255, 150, 128);
     private Color selectedTextColor = new(0, 0, 0, 255);
     private bool isToolButtonsVisible = false;
-
     public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
     public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); }}
     public Color SelectedBorderColor { get => selectedBorderColor; set { selectedBorderColor = value; OnPropertyChanged(); }}
@@ -178,11 +175,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             await AddPlan();
             isFirstLoad = false;
-            ImageFit(null, null);
+        }
+
+        if (pinZoom != null)
+        {
+            ZoomToPin(pinZoom);
         }
         else
-            if (pinZoom != null)
-                ZoomToPin(pinZoom);
+        {
+            ImageFit(null, null);
+        }
 
         var appShell = Shell.Current as AppShell;
         appShell?.HighlightCurrentPlan(planId);

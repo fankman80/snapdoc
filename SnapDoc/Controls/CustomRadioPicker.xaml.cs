@@ -7,17 +7,12 @@ namespace SnapDoc.Controls;
 
 public partial class CustomRadioPicker : ContentView
 {
-    // Kern-Eigenschaften für Daten und Popup
     public static readonly BindableProperty ItemsSourceProperty = BindableProperty.Create(nameof(ItemsSource), typeof(IEnumerable), typeof(CustomRadioPicker), null, propertyChanged: OnItemsSourceChanged);
     public static readonly BindableProperty SelectedItemProperty = BindableProperty.Create(nameof(SelectedItem), typeof(object), typeof(CustomRadioPicker), null, BindingMode.TwoWay, propertyChanged: OnSelectedItemChanged);
-
-    // SelectedIndex Property
     public static readonly BindableProperty SelectedIndexProperty = BindableProperty.Create(nameof(SelectedIndex), typeof(int), typeof(CustomRadioPicker), -1, BindingMode.TwoWay, propertyChanged: OnSelectedIndexChanged);
-
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(CustomRadioPicker), AppResources.bitte_waehlen, propertyChanged: OnControlStateChanged);
-    public static readonly BindableProperty ControlPaddingProperty = BindableProperty.Create(nameof(ControlPadding), typeof(Thickness), typeof(CustomRadioPicker), new Thickness(10, 12));
-
-    // Styling-Eigenschaften für XAML
+    public static readonly BindableProperty ControlPaddingProperty = BindableProperty.Create(nameof(ControlPadding), typeof(Thickness), typeof(CustomRadioPicker), new Thickness(10, 11));
+    public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create(nameof(FontFamily), typeof(string), typeof(BorderedEntry), defaultValue: (string)Entry.FontFamilyProperty.DefaultValue);
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Label), Label.TextColorProperty.DefaultValue);
     public static readonly BindableProperty ArrowColorProperty = BindableProperty.Create(nameof(ArrowColor), typeof(Color), typeof(CustomRadioPicker), Colors.DarkGray);
     public static readonly BindableProperty BorderColorProperty = BindableProperty.Create(nameof(BorderColor), typeof(Color), typeof(CustomRadioPicker), Colors.DarkGray);
@@ -29,6 +24,7 @@ public partial class CustomRadioPicker : ContentView
     public object SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
     public int SelectedIndex { get => (int)GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
+    public string FontFamily { get => (string)GetValue(FontFamilyProperty); set => SetValue(FontFamilyProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
     public Color ArrowColor { get => (Color)GetValue(ArrowColorProperty); set => SetValue(ArrowColorProperty, value); }
     public Color BorderColor { get => (Color)GetValue(BorderColorProperty); set => SetValue(BorderColorProperty, value); }

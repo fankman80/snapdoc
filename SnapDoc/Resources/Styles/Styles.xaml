@@ -9,6 +9,31 @@
     <x:String x:Key="AppFontFamily">OpenSansRegular</x:String>
     <x:Double x:Key="AppFontSizeNormal">14</x:Double>
 
+    <Style TargetType="controls:BorderedEntry">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+    </Style>
+
+    <Style TargetType="controls:BorderedEditor">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+    </Style>
+
+    <Style TargetType="controls:BorderedExpander">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+    </Style>
+
+    <Style TargetType="controls:CustomRadioPicker">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+    </Style>
+
+    <Style TargetType="controls:RangeSlider">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
+        <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+    </Style>
+
     <!-- BusyIndicator Overlay -->
     <ControlTemplate x:Key="BasePageWithLoadingTemplate">
         <Grid x:DataType="ContentPage">

@@ -19,8 +19,8 @@
         <Label Grid.Column="0"
                Text="{Binding LabelText, Source={x:Reference this}}"
                TextColor="{Binding TextColor, Source={x:Reference this}}"
-               FontSize="{Binding TextSize, Source={x:Reference this}}"
-               FontFamily="{StaticResource AppFontFamily}"
+               FontSize="{Binding FontSize, Source={x:Reference this}}"
+               FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                VerticalTextAlignment="Start">
             <Label.Triggers>
                 <DataTrigger TargetType="Label" 
@@ -43,6 +43,7 @@
             <Label x:Name="LowerLabel"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding ValueFontSize, Source={x:Reference this}}"
+                   FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    HorizontalTextAlignment="Center"
@@ -52,6 +53,7 @@
                    IsVisible="{Binding IsRange, Source={x:Reference this}}"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding ValueFontSize, Source={x:Reference this}}"
+                   FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                    HorizontalOptions="Start"
                    VerticalOptions="End"
                    HorizontalTextAlignment="Center"

@@ -6,7 +6,7 @@
              x:Class="SnapDoc.Controls.BorderedEntry"
              x:Name="this">
 
-    <Grid Padding="0,8,0,4" MinimumHeightRequest="44">
+    <Grid Padding="0,8,0,4">
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
                            IgnorePixelScaling="False"
@@ -21,7 +21,7 @@
                                Keyboard="{Binding Keyboard, Source={x:Reference this}}"
                                BackgroundColor="Transparent"
                                VerticalOptions="Center"
-                               Margin="16,0"
+                               Margin="16,12"
                                Focused="InnerEntry_Focused"
                                Unfocused="InnerEntry_Unfocused"
                                TextChanged="InnerEntry_TextChanged" />
@@ -29,12 +29,12 @@
         <Label x:Name="FloatingLabel"
                Text="{Binding Placeholder, Source={x:Reference this}}"
                TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
-               BackgroundColor="Transparent"
                FontSize="{Binding FontSize, Source={x:Reference this}}"
                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
+               BackgroundColor="Transparent"               
                HorizontalOptions="Start"
-               VerticalOptions="Center"
-               Margin="10,0,0,0"
+               VerticalOptions="Start"
+               Margin="10,11,0,0"
                Padding="8,0"
                AnchorX="0"
                InputTransparent="True" />

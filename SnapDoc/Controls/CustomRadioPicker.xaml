@@ -23,12 +23,14 @@
             <Label x:Name="DisplayLabel"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                    VerticalOptions="Center" />
 
             <Label Grid.Column="1"
                    Text="▼"
                    TextColor="{Binding ArrowColor, Source={x:Reference this}}"
                    FontSize="{Binding FontSize, Source={x:Reference this}}"
+                   FontFamily="{Binding FontFamily, Source={x:Reference this}}"
                    VerticalOptions="Center"
                    Margin="5,0,0,0"/>
         </Grid>

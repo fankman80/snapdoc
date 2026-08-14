@@ -7,61 +7,19 @@ public partial class BorderedEditor : ContentView
 {
     public event EventHandler<TextChangedEventArgs>? TextChanged;
 
-    public static readonly BindableProperty TextProperty =
-        BindableProperty.Create(
-            nameof(Text),
-            typeof(string),
-            typeof(BorderedEditor),
-            defaultBindingMode: BindingMode.TwoWay,
-            propertyChanged: OnTextChanged);
-
-    public static readonly BindableProperty PlaceholderProperty =
-        BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEditor), string.Empty);
-
-    public static readonly BindableProperty PlaceholderColorProperty =
-        BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(BorderedEditor), Colors.Gray);
-
-    public static readonly BindableProperty BorderColorProperty =
-        BindableProperty.Create(nameof(BorderColor), typeof(Color), typeof(BorderedEditor), Colors.Gray);
-
-    public static readonly BindableProperty FocusedBorderColorProperty =
-        BindableProperty.Create(nameof(FocusedBorderColor), typeof(Color), typeof(BorderedEditor), Color.FromArgb("#512BD4"));
-
-    public static readonly BindableProperty BorderThicknessProperty =
-        BindableProperty.Create(nameof(BorderThickness), typeof(double), typeof(BorderedEditor), 1.0);
-
-    public static readonly BindableProperty FocusedBorderThicknessProperty =
-        BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEditor), 1.0);
-
-    public static readonly BindableProperty CornerRadiusProperty =
-        BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEditor), new CornerRadius(8));
-
-    public static readonly BindableProperty KeyboardProperty =
-        BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEditor), Keyboard.Default);
-
-    public static new readonly BindableProperty BackgroundColorProperty =
-        BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEditor), Colors.White);
-
-    public static readonly BindableProperty TextColorProperty =
-            BindableProperty.Create(
-                nameof(TextColor),
-                typeof(Color),
-                typeof(BorderedEditor),
-                defaultValue: (Color)Editor.TextColorProperty.DefaultValue);
-
-    public static readonly BindableProperty FontSizeProperty =
-            BindableProperty.Create(
-                nameof(FontSize),
-                typeof(double),
-                typeof(BorderedEditor),
-                defaultValue: (double)Editor.FontSizeProperty.DefaultValue);
-
-    public static readonly BindableProperty FontFamilyProperty =
-            BindableProperty.Create(
-                nameof(FontFamily),
-                typeof(string),
-                typeof(BorderedEditor),
-                defaultValue: (string)Editor.FontFamilyProperty.DefaultValue);
+    public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(BorderedEditor), defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnTextChanged);
+    public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEditor), string.Empty);
+    public static readonly BindableProperty PlaceholderColorProperty = BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(BorderedEditor), Colors.Gray);
+    public static readonly BindableProperty BorderColorProperty = BindableProperty.Create(nameof(BorderColor), typeof(Color), typeof(BorderedEditor), Colors.Gray);
+    public static readonly BindableProperty FocusedBorderColorProperty = BindableProperty.Create(nameof(FocusedBorderColor), typeof(Color), typeof(BorderedEditor), Color.FromArgb("#512BD4"));
+    public static readonly BindableProperty BorderThicknessProperty = BindableProperty.Create(nameof(BorderThickness), typeof(double), typeof(BorderedEditor), 1.0);
+    public static readonly BindableProperty FocusedBorderThicknessProperty = BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEditor), 1.0);
+    public static readonly BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEditor), new CornerRadius(8));
+    public static readonly BindableProperty KeyboardProperty = BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEditor), Keyboard.Default);
+    public static new readonly BindableProperty BackgroundColorProperty = BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEditor), Colors.White);
+    public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(BorderedEditor), defaultValue: (Color)Editor.TextColorProperty.DefaultValue);
+    public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(BorderedEditor), defaultValue: (double)Editor.FontSizeProperty.DefaultValue);
+    public static readonly BindableProperty FontFamilyProperty = BindableProperty.Create(nameof(FontFamily), typeof(string), typeof(BorderedEditor), defaultValue: (string)Editor.FontFamilyProperty.DefaultValue);
 
     public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
     public string Placeholder { get => (string)GetValue(PlaceholderProperty); set => SetValue(PlaceholderProperty, value); }
@@ -215,13 +173,9 @@ public partial class BorderedEditor : ContentView
 
             double floatingY;
             if (FloatingLabel.Height > 0)
-            {
                 floatingY = -(FloatingLabel.Y + (FloatingLabel.Height / 2.0)) + fineTuningOffsetY;
-            }
             else
-            {
                 floatingY = -16;
-            }
 
             if (shouldFloat)
             {
@@ -232,6 +186,7 @@ public partial class BorderedEditor : ContentView
                 }
                 else
                 {
+                    FloatingLabel.CancelAnimations();
                     FloatingLabel.TranslationY = floatingY;
                     FloatingLabel.Scale = 0.8;
                 }
@@ -245,6 +200,7 @@ public partial class BorderedEditor : ContentView
                 }
                 else
                 {
+                    FloatingLabel.CancelAnimations();
                     FloatingLabel.TranslationY = 0;
                     FloatingLabel.Scale = 1.0;
                 }
@@ -255,7 +211,6 @@ public partial class BorderedEditor : ContentView
     private void InnerEditor_SizeChanged(object sender, EventArgs e)
     {
         this.InvalidateMeasure();
-        BorderCanvas?.InvalidateSurface();
     }
 
     private static void OnTextChanged(BindableObject bindable, object oldValue, object newValue)
@@ -276,5 +231,16 @@ public partial class BorderedEditor : ContentView
 
         UpdateFloatingLabelState(animate: false);
         BorderCanvas?.InvalidateSurface();
+    }
+
+    protected override void OnSizeAllocated(double width, double height)
+    {
+        base.OnSizeAllocated(width, height);
+
+        Dispatcher.Dispatch(() =>
+        {
+            UpdateFloatingLabelState(animate: false);
+            BorderCanvas?.InvalidateSurface();
+        });
     }
 }

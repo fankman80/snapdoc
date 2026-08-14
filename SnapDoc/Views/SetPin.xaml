@@ -26,6 +26,7 @@
             <local:BorderlessEntry Grid.Column="0"
                    Text="{Binding Pin.PinName}"                
                    TextColor="{DynamicResource PrimaryDark}"
+                   FontFamily="{x:StaticResource AppFontFamily}"
                    Placeholder="{x:Static res:AppResources.titel_eingeben}"
                    PlaceholderColor="{DynamicResource PrimaryDark}"
                    IsSpellCheckEnabled="False"

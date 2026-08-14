@@ -45,6 +45,7 @@
             <local:BorderlessEntry x:Name="SearchEntry"
                                    Margin="6,0,0,0"
                                    FontSize="11"
+                                   FontFamily="{x:StaticResource AppFontFamily}"
                                    VerticalTextAlignment="Center"
                                    VerticalOptions="Center"
                                    Placeholder="{x:Static res:AppResources.suche}"
