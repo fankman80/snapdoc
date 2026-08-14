@@ -17,7 +17,7 @@
           WidthRequest="320"
           RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout Margin="0,0,0,6">
+            <VerticalStackLayout Margin="0,0,0,6" Spacing="8">
                 <Grid ColumnDefinitions="Auto, *">
                     <AbsoluteLayout Grid.Column="0"
                                     WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"

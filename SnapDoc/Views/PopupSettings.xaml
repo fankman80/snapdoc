@@ -87,8 +87,6 @@
                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <controls:BorderedEntry Text="Test" Placeholder="Test" CornerRadius="8"/>
-
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
                     <VerticalStackLayout Spacing="0"
                                          HorizontalOptions="Start"
@@ -212,15 +210,15 @@
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.farbschema}">
                     <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
                         <Label Grid.Column="0" Grid.Row="0"
-                                VerticalTextAlignment="Center"
-                                Text="{x:Static res:AppResources.app_modus}"/>
+                               VerticalTextAlignment="Center"
+                               Text="{x:Static res:AppResources.app_modus}"/>
                         <controls:CustomRadioPicker Grid.Column="1" Grid.Row="0"
                                                     ItemsSource="{Binding AppThemes}"
                                                     SelectedItem="{Binding SelectedAppTheme}"
                                                     BorderColor="{DynamicResource SecondaryBackground}"/>
                         <Label Grid.Column="0" Grid.Row="1"
-                                VerticalTextAlignment="Center"
-                                Text="{x:Static res:AppResources.farb_thema}"/>
+                               VerticalTextAlignment="Center"
+                               Text="{x:Static res:AppResources.farb_thema}"/>
                         <controls:CustomRadioPicker Grid.Column="1" Grid.Row="1"
                                                     ItemsSource="{Binding ColorThemes}"
                                                     SelectedItem="{Binding SelectedColorTheme}"

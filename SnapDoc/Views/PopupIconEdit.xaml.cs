@@ -44,6 +44,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         // Alle vorhandenen Kategorien aus dem Service laden
         _allCategories = SettingsService.Instance.IconCategories ?? [];
         iconCategory.Text = iconItem.Category;
+        FilteredCategories.Clear();
+        IsCategorySuggestionsVisible = false;
 
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
 
