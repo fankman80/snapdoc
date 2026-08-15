@@ -211,7 +211,7 @@
     <value>OK</value>
   </data>
   <data name="pdf_seiten_hinzufügen" xml:space="preserve">
-    <value>Ajouter des pages PDF</value>
+    <value>Ajouter des plans depuis PDF ou JPG/PNG</value>
   </data>
   <data name="pin_liste" xml:space="preserve">
     <value>Liste des pin's</value>
