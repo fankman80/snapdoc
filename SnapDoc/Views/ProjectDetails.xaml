@@ -172,7 +172,7 @@
                         <FormattedString>
                             <Span Text="{x:Static local:MaterialIcons.Picture_as_pdf}" />
                             <Span Text="/" />
-                            <Span Text="{x:Static local:MaterialIcons.image_search}" />
+                            <Span Text="{x:Static local:MaterialIcons.Image_search}" />
                         </FormattedString>
                     </Button.FormattedText>
                 </Button>
