@@ -128,15 +128,11 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                 <Button Grid.Column="1"
                         IsVisible="{Binding Pin.HasGeolocation}"
-                        HeightRequest="44"
-                        Margin="10,0,0,0"
                         Padding="0"
-                        MinimumWidthRequest="50"                        
-                        Text="{x:Static local:MaterialIcons.Globe_location_pin}"
-                        FontSize="30"
-                        FontFamily="MaterialOutlined"
-                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        Margin="10,0,0,0"
+                        VerticalOptions="End"
                         BackgroundColor="Transparent"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
                         Clicked="ZoomToWebPinClicked"/>
             </Grid>
