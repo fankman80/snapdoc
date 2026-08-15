@@ -117,25 +117,29 @@
         </CollectionView>
 
         <VerticalStackLayout Grid.Row="1" Spacing="8">
-            <HorizontalStackLayout>
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0">
                 <controls:BorderedEntry
-                    Text="{Binding Pin.PinLocation}"
-                    Placeholder="{x:Static res:AppResources.standort}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                <Button IsVisible="{Binding Pin.HasGeolocation}"
-                    Padding="0"
-                    MinimumWidthRequest="50"                        
-                    Text="{x:Static local:MaterialIcons.Globe_location_pin}"
-                    FontSize="30"
-                    FontFamily="MaterialOutlined"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
-                    Clicked="ZoomToWebPinClicked"/>
-            </HorizontalStackLayout>
+                        Grid.Column="0"
+                        Text="{Binding Pin.PinLocation}"
+                        Placeholder="{x:Static res:AppResources.standort}"
+                        BackgroundColor="Transparent"
+                        BorderColor="{DynamicResource SecondaryBackground}"
+                        PlaceholderColor="{DynamicResource SecondaryBackground}"
+                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <Button Grid.Column="1"
+                        IsVisible="{Binding Pin.HasGeolocation}"
+                        HeightRequest="44"
+                        Margin="10,2,0,0"
+                        Padding="0"
+                        MinimumWidthRequest="50"                        
+                        Text="{x:Static local:MaterialIcons.Globe_location_pin}"
+                        FontSize="30"
+                        FontFamily="MaterialOutlined"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
+                        Clicked="ZoomToWebPinClicked"/>
+            </Grid>
             <controls:BorderedEditor
                 Text="{Binding Pin.PinDesc}"
                 Placeholder="{x:Static res:AppResources.beschreibung}"
@@ -192,8 +196,8 @@
                 </Border>
             </Grid>
 
-            <Border  Margin="0,8,0,10"
-                     Stroke="{DynamicResource SecondaryBackground}"
+            <Border Margin="0,8,0,10"
+                    Stroke="{DynamicResource SecondaryBackground}"
                     StrokeThickness="1"
                     StrokeShape="RoundRectangle 8">
                 <Grid ColumnDefinitions="Auto,*,Auto" 
