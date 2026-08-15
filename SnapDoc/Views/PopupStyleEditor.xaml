@@ -91,20 +91,20 @@
                                 Stroke="{Binding SelectedBorderColor}"
                                 StrokeLineCap="Square"
                                 StrokeDashArray="{Binding StrokeDashArray}"/>
-                        <controls:BorderedEntry
+                        <local:BorderlessEditor
+                            Margin="{Binding LineWidth}"
                             Text="{Binding TemplateText}"
                             FontSize="16"
                             TextColor="{Binding SelectedTextColor}"
                             BackgroundColor="Transparent"
-                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            BorderThickness="0"
-                            VerticalOptions="Center"                                              
-                            HorizontalOptions="Center"/>
-
+                            HorizontalTextAlignment="Center"
+                            VerticalTextAlignment="Center"
+                            VerticalOptions="Fill"                                              
+                            HorizontalOptions="Fill"/>
                     </Grid>
                     <Button Grid.Column="1" Grid.Row="2"
                             WidthRequest="44"
-                            Text="{x:Static local:MaterialIcons.Stack_star}"
+                            Text="{x:Static local:MaterialIcons.Bookmark_add}"
                             FontSize="36"
                             FontFamily="MaterialOutlined"
                             TextColor="{DynamicResource PrimaryDark}"
@@ -117,6 +117,7 @@
 
                 <controls:RangeSlider
                      LabelText="{x:Static res:AppResources.linienbreite}"
+                    IsRealtime="True"
                      IsRange="False"
                      Minimum="0"
                      Maximum="20"

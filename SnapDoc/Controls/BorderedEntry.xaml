@@ -14,6 +14,19 @@
                            IgnorePixelScaling="False"
                            Margin="0" />
 
+        <Label x:Name="FloatingLabel"
+               Text="{Binding Placeholder, Source={x:Reference this}}"
+               TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
+               FontSize="{Binding FontSize, Source={x:Reference this}}"
+               FontFamily="{Binding FontFamily, Source={x:Reference this}}"
+               BackgroundColor="Transparent"               
+               HorizontalOptions="Start"
+               VerticalOptions="Start"
+               Margin="10,11,10,0"
+               Padding="8,0"
+               AnchorX="0"
+               InputTransparent="True" />
+        
         <local:BorderlessEntry x:Name="InnerEntry"
                                Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}"
                                TextColor="{Binding TextColor, Source={x:Reference this}}"
@@ -27,18 +40,5 @@
                                Focused="InnerEntry_Focused"
                                Unfocused="InnerEntry_Unfocused"
                                TextChanged="InnerEntry_TextChanged" />
-
-        <Label x:Name="FloatingLabel"
-               Text="{Binding Placeholder, Source={x:Reference this}}"
-               TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
-               FontSize="{Binding FontSize, Source={x:Reference this}}"
-               FontFamily="{Binding FontFamily, Source={x:Reference this}}"
-               BackgroundColor="Transparent"               
-               HorizontalOptions="Start"
-               VerticalOptions="Start"
-               Margin="10,11,10,0"
-               Padding="8,0"
-               AnchorX="0"
-               InputTransparent="True" />
     </Grid>
 </ContentView>
