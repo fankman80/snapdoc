@@ -129,7 +129,7 @@
                 <Button Grid.Column="1"
                         IsVisible="{Binding Pin.HasGeolocation}"
                         Padding="0"
-                        Margin="10,0,0,0"
+                        Margin="10,0,2,0"
                         VerticalOptions="End"
                         BackgroundColor="Transparent"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
