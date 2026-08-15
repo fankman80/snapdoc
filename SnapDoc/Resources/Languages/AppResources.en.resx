@@ -211,7 +211,7 @@
     <value>OK</value>
   </data>
   <data name="pdf_seiten_hinzufügen" xml:space="preserve">
-    <value>Add PDF pages</value>
+    <value>Add plans from PDF or JPG/PNG</value>
   </data>
   <data name="pin_liste" xml:space="preserve">
     <value>Pin list</value>
