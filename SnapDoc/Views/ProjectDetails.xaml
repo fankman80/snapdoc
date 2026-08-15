@@ -161,21 +161,14 @@
                         Clicked="OnAddWebMapClicked"/>
                 <Button Grid.Column="2"
                         Padding="0"
+                        Text="&#xE415;/&#xE43F;"
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         FontFamily="MaterialOutlined"
                         FontSize="30"
                         ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
-                        Clicked="OnAddPdfClicked">
-                    <Button.FormattedText>
-                        <FormattedString>
-                            <Span Text="{x:Static local:MaterialIcons.Picture_as_pdf}" />
-                            <Span Text="/" />
-                            <Span Text="{x:Static local:MaterialIcons.Image_search}" />
-                        </FormattedString>
-                    </Button.FormattedText>
-                </Button>
+                        Clicked="OnAddPdfClicked"/>
                 <Button Grid.Column="3"
                         Padding="0"
                         Text="{x:Static res:AppResources.ok}"
