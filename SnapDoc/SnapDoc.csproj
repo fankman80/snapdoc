@@ -6,7 +6,7 @@
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.5.0</ApplicationDisplayVersion>
 		<Version>2.5.0</Version>
-		<ApplicationVersion>80</ApplicationVersion>
+		<ApplicationVersion>81</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>
@@ -154,6 +154,9 @@
 		<Compile Update="Views\PopupShapeSelect.xaml.cs">
 			<DependentUpon>PopupShapeSelect.xaml</DependentUpon>
 		</Compile>
+		<Compile Update="Views\PopupLoupeSettings.xaml.cs">
+		  <DependentUpon>PopupLoupeSettings.xaml</DependentUpon>
+		</Compile>
 		<Compile Update="Views\PopupTextEdit.xaml.cs">
 			<DependentUpon>PopupTextEdit.xaml</DependentUpon>
 		</Compile>
@@ -201,6 +204,9 @@
 		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupLoupeSettings.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\PopupTextEdit.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupStyleEditor.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupPinView.xaml" Generator="MSBuild:Compile" />

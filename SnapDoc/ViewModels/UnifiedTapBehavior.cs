@@ -5,10 +5,6 @@ namespace SnapDoc.ViewModels;
 
 public partial class UnifiedTapBehavior : Behavior<View>
 {
-    // ==========================
-    // BindableProperties
-    // ==========================
-
     public static readonly BindableProperty SingleTapCommandProperty =
         BindableProperty.Create(
             nameof(SingleTapCommand),
@@ -33,10 +29,6 @@ public partial class UnifiedTapBehavior : Behavior<View>
         set => SetValue(DoubleTapCommandProperty, value);
     }
 
-    // ==========================
-    // Settings
-    // ==========================
-
     public int DoubleTapDelay { get; set; } = 250;
 
     private CancellationTokenSource _tapCts;
@@ -56,10 +48,6 @@ public partial class UnifiedTapBehavior : Behavior<View>
         base.OnDetachingFrom(bindable);
         _tapCts?.Cancel();
     }
-
-    // ==========================
-    // Tap Logic
-    // ==========================
 
     private async void OnTapped(object sender, EventArgs e)
     {
@@ -86,10 +74,7 @@ public partial class UnifiedTapBehavior : Behavior<View>
                 Execute(SingleTapCommand, sender);
             }
         }
-        catch
-        {
-            // ignore
-        }
+        catch { }
     }
 
     private static void Execute(ICommand command, object sender)

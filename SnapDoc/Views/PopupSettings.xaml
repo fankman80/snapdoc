@@ -15,7 +15,7 @@
           WidthRequest="320"
           RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
-            <VerticalStackLayout>
+            <VerticalStackLayout Spacing="14">
                 <controls:RangeSlider
                     LabelText="{x:Static res:AppResources.pingroesse_limitieren}"
                     IsRange="True"
@@ -76,17 +76,28 @@
                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                <controls:Switch LabelText="{x:Static res:AppResources.lupe_aktivieren}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    IsToggled="{Binding IsLoupeEnabled}"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    BorderColorOff="Transparent"
-                    KnobColorOn="White"
-                    KnobColorOff="White"
-                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                <HorizontalStackLayout>
+                    <controls:Switch LabelText="{x:Static res:AppResources.lupe_aktivieren}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        IsToggled="{Binding IsLoupeEnabled}"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BorderColorOff="Transparent"
+                        KnobColorOn="White"
+                        KnobColorOff="White"
+                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Button
+                        Padding="0"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        MaximumHeightRequest="28"
+                        MinimumHeightRequest="28"
+                        BackgroundColor="Transparent"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.lupeneinstellungen}"
+                        Clicked="LoupeSettingsClicked"/>
+                </HorizontalStackLayout>
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
                     <VerticalStackLayout Spacing="0"
                                          HorizontalOptions="Start"

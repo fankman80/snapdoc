@@ -963,4 +963,13 @@
   <data name="PlansCacheCleared" xml:space="preserve">
     <value>Alle Pläne wurden aus dem Zwischenspeicher (Cache) gelöscht. Das Neuberechnen der Pläne kann beim erstmaligen Aufrufen einige Sekunden dauern.</value>
   </data>
+  <data name="lupengroesse" xml:space="preserve">
+    <value>Lupengrösse (Durchmesser)</value>
+  </data>
+  <data name="vergroesserungsfaktor" xml:space="preserve">
+    <value>Vergrösserungsfaktor</value>
+  </data>
+  <data name="lupeneinstellungen" xml:space="preserve">
+    <value>Lupeneinstellungen</value>
+  </data>
 </root>

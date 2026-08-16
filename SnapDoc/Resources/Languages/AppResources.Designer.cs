@@ -1357,6 +1357,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Lupeneinstellungen ähnelt.
+        /// </summary>
+        internal static string lupeneinstellungen {
+            get {
+                return ResourceManager.GetString("lupeneinstellungen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Lupengrösse (Durchmesser) ähnelt.
+        /// </summary>
+        internal static string lupengroesse {
+            get {
+                return ResourceManager.GetString("lupengroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Maximale Fotoabmessung ähnelt.
         /// </summary>
         internal static string maximale_fotoabmessung {
@@ -1564,7 +1582,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Seiten hinzufügen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pläne aus PDF oder JPG/PNG hinzufügen ähnelt.
         /// </summary>
         internal static string pdf_seiten_hinzufügen {
             get {
@@ -2352,6 +2370,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string validieren {
             get {
                 return ResourceManager.GetString("validieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vergrösserungsfaktor ähnelt.
+        /// </summary>
+        internal static string vergroesserungsfaktor {
+            get {
+                return ResourceManager.GetString("vergroesserungsfaktor", resourceCulture);
             }
         }
         

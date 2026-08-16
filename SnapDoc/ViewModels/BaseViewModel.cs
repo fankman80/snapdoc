@@ -5,10 +5,8 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
     [CommunityToolkit.Mvvm.ComponentModel.NotifyPropertyChangedFor(nameof(IsNotBusy))]
     public partial bool IsBusy { get; set; }
-
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
     public partial string BusyText { get; set; } = "Bitte warten...";
-
     public bool IsNotBusy => !IsBusy;
     private FlyoutBehavior _previousBehavior = FlyoutBehavior.Flyout;
 
@@ -20,9 +18,11 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
         {
             _previousBehavior = Shell.Current.FlyoutBehavior;
             Shell.Current.FlyoutBehavior = FlyoutBehavior.Disabled;
+            Shell.Current.IsEnabled = false;
         }
         else
         {
+            Shell.Current.IsEnabled = true;
             Shell.Current.FlyoutBehavior = _previousBehavior;
         }
     }

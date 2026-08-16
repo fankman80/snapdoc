@@ -963,4 +963,13 @@
   <data name="PlansCacheCleared" xml:space="preserve">
     <value>Tous les plans ont été supprimés du cache. Le recalcul des plans peut prendre quelques secondes lors de la première ouverture.</value>
   </data>
+  <data name="lupengroesse" xml:space="preserve">
+    <value>Taille de la loupe (diamètre)</value>
+  </data>
+  <data name="vergroesserungsfaktor" xml:space="preserve">
+    <value>Facteur de grossissement</value>
+  </data>
+  <data name="lupeneinstellungen" xml:space="preserve">
+    <value>Paramètres de la loupe</value>
+  </data>
 </root>

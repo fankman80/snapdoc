@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:controls="clr-namespace:SnapDoc.Controls"
+               xmlns:services="clr-namespace:SnapDoc.Services"
+               xmlns:views="clr-namespace:SnapDoc.Views"
+               xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               xmlns:local="clr-namespace:SnapDoc"              
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               HorizontalOptions="Center"
+               x:Class="SnapDoc.Views.PopupLoupeSettings">
+
+    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+          Padding="6"
+          WidthRequest="320">
+        <VerticalStackLayout>
+            <controls:RangeSlider
+                LabelText="{x:Static res:AppResources.lupengroesse}"
+                IsRange="False"
+                Minimum="50"
+                Maximum="200"
+                Step="1"
+                ValueFontSize="12"
+                TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                MinimumValueDisplayFormat="{}{0} px"
+                LowerValue="{Binding LoupeRadius}"
+                MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+            <controls:RangeSlider
+                    LabelText="{x:Static res:AppResources.vergroesserungsfaktor}"
+                    IsRange="False"
+                    Minimum="1"
+                    Maximum="10"
+                    Step="0.5"
+                    ValueFontSize="12"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    MinimumValueDisplayFormat="{}{0}x"
+                    LowerValue="{Binding LoupeZoomFactor}"
+                    MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+            <Grid ColumnDefinitions="*, *">
+                <Button Grid.Column="0"
+                            x:Name="cancelButtonText"
+                            Text="{x:Static res:AppResources.abbrechen}"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            Clicked="OnCancelClicked" />
+                <Button Grid.Column="1"
+                            x:Name="okButtonText"
+                            Text="{x:Static res:AppResources.ok}"
+                            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            TextColor="{DynamicResource PrimaryDarkText}"
+                            Clicked="OnOkClicked" />
+            </Grid>
+        </VerticalStackLayout>        
+    </Grid>
+</toolkit:Popup>
