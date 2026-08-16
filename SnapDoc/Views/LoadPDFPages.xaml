@@ -18,6 +18,12 @@
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Shell.TitleView>
         <Grid IsEnabled="{Binding IsNotBusy}"
               ColumnDefinitions="Auto,*,Auto"
