@@ -10,6 +10,22 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
     public partial string BusyText { get; set; } = "Bitte warten...";
 
     public bool IsNotBusy => !IsBusy;
+    private FlyoutBehavior _previousBehavior = FlyoutBehavior.Flyout;
+
+    partial void OnIsBusyChanged(bool value)
+    {
+        if (Shell.Current == null) return;
+
+        if (value)
+        {
+            _previousBehavior = Shell.Current.FlyoutBehavior;
+            Shell.Current.FlyoutBehavior = FlyoutBehavior.Disabled;
+        }
+        else
+        {
+            Shell.Current.FlyoutBehavior = _previousBehavior;
+        }
+    }
 
     public virtual void OnAppearing() { }
     public virtual void OnDisappearing() { }

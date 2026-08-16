@@ -16,14 +16,8 @@
              Title="{Binding Title}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
     <Shell.TitleView>
-        <Grid IsEnabled="{Binding IsNotBusy}"
+        <Grid IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
               ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">

@@ -11,17 +11,11 @@
              x:Class="SnapDoc.Views.OpenProject"
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektliste}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}"
-             Shell.FlyoutBehavior="{Binding IsBusy, Converter={StaticResource BusyToFlyoutConverter}}">>
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto"
+        <Grid IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
+              ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
@@ -33,7 +27,7 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-            <Button Grid.Column="1"                    
+            <Button Grid.Column="1"    
                     Text="{x:Static local:MaterialIcons.Folder_zip}"
                     FontSize="24"
                     Padding="0"
@@ -44,7 +38,7 @@
                     HorizontalOptions="End"
                     ToolTipProperties.Text="{x:Static res:AppResources.projektdatei_importieren}"
                     Clicked="OnUploadClicked"/>
-            <Button Grid.Column="2"                    
+            <Button Grid.Column="2"         
                     Text="{x:Static local:MaterialIcons.Add_home}"
                     FontSize="24"
                     Padding="0"

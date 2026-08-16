@@ -152,23 +152,3 @@ public class SKColorConverter : JsonConverter<SKColor>
         writer.WriteStringValue(colorString);
     }
 }
-
-public class IsBusyToFlyoutBehaviorConverter : IValueConverter
-{
-    public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        // Wenn IsBusy true ist, deaktiviere das Flyout
-        if (value is bool isBusy && isBusy)
-        {
-            return FlyoutBehavior.Disabled;
-        }
-        
-        // Ansonsten zeige das Flyout normal an
-        return FlyoutBehavior.Flyout;
-    }
-
-    public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)
-    {
-        throw new NotImplementedException();
-    }
-}

@@ -113,6 +113,7 @@
                                        Margin="6,4,0,0"
                                        FontSize="12"
                                        Text="{Binding PlanDisplay}"
+                                       MaxLines="1"
                                        LineBreakMode="TailTruncation"/>
 
                                 <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
@@ -120,6 +121,7 @@
                                        FontAttributes="Bold"
                                        FontSize="12"
                                        Text="{Binding PinName}"
+                                       MaxLines="1"
                                        LineBreakMode="TailTruncation"/>
 
                                 <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"

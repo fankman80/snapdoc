@@ -13,15 +13,9 @@
              x:Name="ThisPage"             
              Title="{x:Static res:AppResources.bericht_exportieren}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
-
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
+    
     <Shell.TitleView>
-        <HorizontalStackLayout IsEnabled="{Binding IsNotBusy}"
+        <HorizontalStackLayout IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
                                Spacing="0">
             <Label x:DataType="views:ExportSettings"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
