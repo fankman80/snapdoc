@@ -15,7 +15,8 @@
              Title="{x:Static res:AppResources.alle_fotos}">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto"
+        <Grid IsEnabled="{Binding IsNotBusy}"
+              ColumnDefinitions="*,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
