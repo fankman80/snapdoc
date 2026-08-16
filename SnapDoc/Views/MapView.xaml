@@ -17,7 +17,8 @@
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto"
+        <Grid IsEnabled="{Binding IsNotBusy}"
+              ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <local:BorderlessEntry Grid.Column="0"
