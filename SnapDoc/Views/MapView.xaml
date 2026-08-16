@@ -16,6 +16,12 @@
              Title="{Binding Title}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
+
     <Shell.TitleView>
         <Grid IsEnabled="{Binding IsNotBusy}"
               ColumnDefinitions="*,Auto,Auto"
