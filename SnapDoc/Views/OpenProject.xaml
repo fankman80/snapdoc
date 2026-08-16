@@ -11,7 +11,14 @@
              x:Class="SnapDoc.Views.OpenProject"
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektliste}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}"
+             Shell.FlyoutBehavior="{Binding IsBusy, Converter={StaticResource BusyToFlyoutConverter}}">>
+
+    <ContentPage.Resources>
+        <ResourceDictionary>
+            <services:IsBusyToFlyoutBehaviorConverter x:Key="BusyToFlyoutConverter" />
+        </ResourceDictionary>
+    </ContentPage.Resources>
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto,Auto"
