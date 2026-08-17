@@ -299,12 +299,6 @@ public partial class OpenProject : ContentPage
                         bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
                                                  fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
 
-                        var tmp_list = (List<FileItem>)FileListView.ItemsSource;
-                        tmp_list.Remove(item);
-                        FileListView.ItemsSource = null;
-                        FileListView.ItemsSource = tmp_list;
-                        ProjectCounterLabel.Text = $"{tmp_list.Count} {AppResources.projekte}";
-
                         // Lösche das Projektverzeichnis und alle enthaltenen Dateien
                         if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
                             Directory.Delete(projectDirectoryPath, true);

@@ -47,30 +47,16 @@ namespace SnapDoc
         }
     }
 
-    public class FileItem
+    public partial class FileItem : ObservableObject
     {
         public required string FileName { get; set; }
         public required string FilePath { get; set; }
         public required DateTime FileDate { get; set; }
         public required string ImagePath { get; set; }
         public required string ThumbnailPath { get; set; }
-        private bool _isActive;
-        public bool IsActive
-        {
-            get => _isActive;
-            set
-            {
-                if (_isActive != value)
-                {
-                    _isActive = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
 
-        public event PropertyChangedEventHandler PropertyChanged;
-        protected void OnPropertyChanged([CallerMemberName] string name = null)
-            => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));
+        [ObservableProperty]
+        public partial bool IsActive { get; set; }
     }
 
     public partial class PinItem : ObservableObject

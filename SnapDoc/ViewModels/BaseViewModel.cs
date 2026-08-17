@@ -5,9 +5,12 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
     [CommunityToolkit.Mvvm.ComponentModel.NotifyPropertyChangedFor(nameof(IsNotBusy))]
     public partial bool IsBusy { get; set; }
+
     [CommunityToolkit.Mvvm.ComponentModel.ObservableProperty]
     public partial string BusyText { get; set; } = "Bitte warten...";
+
     public bool IsNotBusy => !IsBusy;
+
     private FlyoutBehavior _previousBehavior = FlyoutBehavior.Flyout;
 
     partial void OnIsBusyChanged(bool value)
@@ -18,11 +21,26 @@ public partial class BaseViewModel : CommunityToolkit.Mvvm.ComponentModel.Observ
         {
             _previousBehavior = Shell.Current.FlyoutBehavior;
             Shell.Current.FlyoutBehavior = FlyoutBehavior.Disabled;
-            Shell.Current.IsEnabled = false;
+            Shell.Current.Navigating += OnShellNavigating;
         }
         else
         {
-            Shell.Current.IsEnabled = true;
+            RestoreShellStateAsync();
+        }
+    }
+
+    private void OnShellNavigating(object? sender, ShellNavigatingEventArgs e)
+    {
+        e.Cancel();
+    }
+
+    private async void RestoreShellStateAsync()
+    {
+        await Task.Delay(300);
+
+        if (Shell.Current != null)
+        {
+            Shell.Current.Navigating -= OnShellNavigating;
             Shell.Current.FlyoutBehavior = _previousBehavior;
         }
     }
