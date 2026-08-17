@@ -173,7 +173,7 @@ public class InteractiveRectangleDrawable
             canvas.Save();
             canvas.ClipPath(path, SKClipOperation.Intersect, true);
             var bounds = path.TightBounds;
-            bounds.Inflate(10, 10);
+            bounds.Inflate(bounds.Width, bounds.Height);
             canvas.DrawRect(bounds, fillPaint);
             canvas.Restore();
 
@@ -185,11 +185,7 @@ public class InteractiveRectangleDrawable
                     StrokeWidth = LineThickness * density,
                     IsStroke = true,
                     IsAntialias = true,
-                    PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                    ? null
-                    : SKPathEffect.CreateDash(
-                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
-                        0f)
+                    PathEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness)
                 };
                 canvas.DrawPath(path, linePaint);
             }

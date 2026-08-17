@@ -1,16 +1,24 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
+using SkiaSharp;
+using SkiaSharp.Views.Maui;
+using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.DrawingTool;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.RegularExpressions;
 
 namespace SnapDoc.Views;
 
 public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyPropertyChanged
 {
+    [GeneratedRegex(@"\s+")]
+    private static partial Regex MultipleSpacesRegex();
+
     public ObservableCollection<StylePickerItem> Items { get; } = new ObservableCollection<StylePickerItem>(SettingsService.Instance.StyleTemplateItems);
 
     private Color selectedFillColor;
@@ -248,6 +256,83 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         BindingContext = this;
     }
 
+    private void OnPreviewPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        var width = e.Info.Width;
+        var height = e.Info.Height;
+
+        if (width <= 0 || height <= 0) return;
+
+        var rectDrawable = new InteractiveRectangleDrawable
+        {
+            FillColor = SelectedFillColor.ToSKColor(),
+            LineColor = SelectedBorderColor.ToSKColor(),
+            TextColor = SelectedTextColor.ToSKColor(),
+
+            LineThickness = (float)LineWidth,
+            StrokeStyle = StrokeStyle ?? "",
+
+            IsHatchEffect = IsHatchEffect,
+            HatchRotation = (float)HatchRotation,
+            HatchStrokeWitdh = (float)HatchStrokeWitdh,
+            HatchStrokeSpace = (float)HatchStrokeSpace,
+
+            IsCloud = false,
+            CloudRadius = (float)CloudRadius,
+            CloudInciseDeg = (float)CloudInciseDeg,
+            DisplayHandles = false,
+            IsDrawn = true
+        };
+
+        rectDrawable.SetFromDrag(
+            new SKPoint(0, 0),
+            new SKPoint(width, height)
+        );
+
+        rectDrawable.Draw(canvas);
+    }
+
+    private void OnListItemPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
+        if (sender is SKCanvasView canvasView && canvasView.BindingContext is StylePickerItem item)
+        {
+            var width = e.Info.Width;
+            var height = e.Info.Height;
+
+            if (width <= 0 || height <= 0) return;
+
+            var rectDrawable = new InteractiveRectangleDrawable
+            {
+                FillColor = Color.FromArgb(item.BackgroundColor).ToSKColor(),
+                LineColor = Color.FromArgb(item.BorderColor).ToSKColor(),
+                TextColor = Color.FromArgb(item.TextColor).ToSKColor(),
+
+                LineThickness = item.LineWidth,
+                StrokeStyle = item.StrokeStyle ?? "",
+
+                IsHatchEffect = item.IsHatchEffect,
+                HatchRotation = item.HatchRotation,
+                HatchStrokeWitdh = item.HatchStrokeWitdh,
+                HatchStrokeSpace = item.HatchStrokeSpace,
+                DisplayHandles = false,
+                IsDrawn = true
+            };
+
+            rectDrawable.SetFromDrag(
+                new SKPoint(0, 0),
+                new SKPoint(width, height)
+            );
+
+            rectDrawable.Draw(canvas);
+        }
+    }
+
     private async void OnTemplateClicked(object sender, EventArgs e)
     {
         var button = sender as Button;
@@ -258,6 +343,10 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         SelectedTextColor = Color.FromArgb(item.TextColor);
         LineWidth = item.LineWidth;
         StrokeStyle = item.StrokeStyle;
+        IsHatchEffect = item.IsHatchEffect;
+        HatchStrokeWitdh = item.HatchStrokeWitdh;
+        HatchStrokeSpace = item.HatchStrokeSpace;
+        HatchRotation = item.HatchRotation;
         TemplateText = item.Text;
     }
 
@@ -285,7 +374,11 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
             BorderColor = SelectedBorderColor.ToArgbHex(),
             TextColor = SelectedTextColor.ToArgbHex(),
             LineWidth = LineWidth,
-            StrokeStyle = StrokeStyle
+            StrokeStyle = StrokeStyle,
+            IsHatchEffect = IsHatchEffect,
+            HatchStrokeWitdh = HatchStrokeWitdh,
+            HatchStrokeSpace = HatchStrokeSpace,
+            HatchRotation = HatchRotation
         };
 
         Items.Add(item);
@@ -323,12 +416,15 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private void OnStrokeTextChanged(object sender, TextChangedEventArgs e)
     {
-        StrokeStyle = string.Concat(e.NewTextValue.Where(c => char.IsDigit(c) || c == ' '));
+        if (e.NewTextValue == null) return;
+
+        var filtered = string.Concat(e.NewTextValue.Where(c => char.IsDigit(c) || c == ' '));
+        StrokeStyle = MultipleSpacesRegex().Replace(filtered, " ");
     }
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, IsHatchEffect, HatchStrokeWitdh, hatchStrokeSpace, HatchRotation, CloudRadius, CloudInciseDeg)); }
+        try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, IsHatchEffect, HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, CloudRadius, CloudInciseDeg)); }
         catch (InvalidOperationException) { }
     }
 
@@ -339,8 +435,10 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     }
 
     public new event PropertyChangedEventHandler PropertyChanged;
+
     protected new virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        PreviewCanvas?.InvalidateSurface();
     }
 }

@@ -508,6 +508,24 @@ public class Helper
         using var outputStream = File.Open(outputPath, FileMode.Create);
         data.SaveTo(outputStream);
     }
+
+    public static SKPathEffect GetValidDashEffect(string strokeStyle, float density, float lineThickness)
+    {
+        if (string.IsNullOrWhiteSpace(strokeStyle))
+            return null;
+
+        try
+        {
+            var dashArray = Helper.ParseDashArray(strokeStyle, density, lineThickness);
+
+            // Prüfen, ob das Array nicht null ist und mindestens einen gültigen Wert > 0 enthält
+            if (dashArray != null && dashArray.Length > 0 && dashArray.Any(v => v > 0))
+                return SKPathEffect.CreateDash(dashArray, 0f);
+        }
+        catch (Exception) { }
+
+        return null;
+    }
 }
 
 public sealed class PinContext

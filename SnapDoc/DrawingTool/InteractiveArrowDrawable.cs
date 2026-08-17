@@ -205,11 +205,7 @@ public class InteractiveArrowDrawable
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Miter,
-                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                    ? null
-                    : SKPathEffect.CreateDash(
-                        Helper.ParseDashArray(StrokeStyle, density, LineThickness),
-                        0f)
+                PathEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness)
             };
             canvas.DrawPath(path, linePaint);
         }

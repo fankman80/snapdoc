@@ -2,6 +2,7 @@
 <toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/maui/global"
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
                xmlns:controls="clr-namespace:SnapDoc.Controls"
                xmlns:services="clr-namespace:SnapDoc.Services"
                xmlns:views="clr-namespace:SnapDoc.Views"     
@@ -86,11 +87,11 @@
                         <Border>
                             <Image Source="pattern.png" Aspect="Center"/>
                         </Border>
-                        <Border BackgroundColor="{Binding SelectedFillColor}"
-                                StrokeThickness="{Binding LineWidth}"
-                                Stroke="{Binding SelectedBorderColor}"
-                                StrokeLineCap="Square"
-                                StrokeDashArray="{Binding StrokeDashArray}"/>
+
+                        <skia:SKCanvasView x:Name="PreviewCanvas"
+                                           PaintSurface="OnPreviewPaintSurface"
+                                           IgnorePixelScaling="False" />
+
                         <local:BorderlessEditor
                             Margin="{Binding LineWidth}"
                             Text="{Binding TemplateText}"
@@ -225,8 +226,8 @@
 
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.vorlagen}">
                     <CollectionView ItemsSource="{Binding Items}"
-                                        SelectionMode="None"
-                                        Margin="0">
+                                    SelectionMode="None"
+                                    Margin="0">
                         <CollectionView.ItemsLayout>
                             <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
                         </CollectionView.ItemsLayout>
@@ -236,15 +237,15 @@
                                         Grid.ColumnDefinitions="*,Auto"
                                         HeightRequest="44"
                                         ColumnSpacing="0">
+
                                     <Border Grid.Column="0">
                                         <Image Source="pattern.png" Aspect="Center"/>
                                     </Border>
-                                    <Border Grid.Column="0"
-                                            BackgroundColor="{Binding BackgroundColor, Converter={StaticResource HexToColorConverter}}"                       
-                                            StrokeThickness="{Binding LineWidth}"
-                                            Stroke="{Binding BorderColor, Converter={StaticResource HexToColorConverter}}"
-                                            StrokeLineCap="Square"
-                                            StrokeDashArray="{Binding StrokeDashArray}"/>
+
+                                    <skia:SKCanvasView Grid.Column="0"
+                                                       PaintSurface="OnListItemPaintSurface"
+                                                       IgnorePixelScaling="False"/>
+
                                     <Button Grid.Column="0"
                                             Text="{Binding Text}"
                                             FontSize="14"                                                
@@ -252,6 +253,7 @@
                                             BackgroundColor="Transparent"
                                             HorizontalOptions="Fill"
                                             Clicked="OnTemplateClicked"/>
+
                                     <Button Grid.Column="1"
                                             Text="{x:Static local:MaterialIcons.Delete}"
                                             FontSize="24"
