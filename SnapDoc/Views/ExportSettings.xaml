@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
@@ -10,12 +11,21 @@
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ExportSettings"
-             x:Name="ThisPage"             
+             x:DataType="views:ExportSettings" 
+             x:Name="ThisPage"
              Title="{x:Static res:AppResources.bericht_exportieren}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
-    
+
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
+                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+                            IsVisible="{Binding IsNotBusy}" />
+    </Shell.BackButtonBehavior>
+
     <Shell.TitleView>
-        <HorizontalStackLayout IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
+        <HorizontalStackLayout x:DataType="viewmodels:BaseViewModel"
+                               BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+                               IsVisible="{Binding IsNotBusy}"
                                Spacing="0">
             <Label x:DataType="views:ExportSettings"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"

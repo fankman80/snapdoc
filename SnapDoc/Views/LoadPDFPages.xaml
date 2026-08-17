@@ -9,9 +9,9 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              x:Class="SnapDoc.Views.LoadPDFPages"
-             x:DataType="viewmodels:BaseViewModel"              
+             x:DataType="views:LoadPDFPages"  
              x:Name="ThisPage"
-             Title="PDF Seiten hinzufügen"
+             Title="{x:Static res:AppResources.plaene_hinzufuegen}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.BackButtonBehavior>
@@ -19,11 +19,12 @@
     </Shell.BackButtonBehavior>
 
     <Shell.TitleView>
-        <Grid IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
+        <Grid x:DataType="viewmodels:BaseViewModel"
+              BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+              IsVisible="{Binding IsNotBusy}"
               ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
-
             <Button Grid.Column="0"
                     Text="{x:Static local:MaterialIcons.Arrow_back}"
                     FontFamily="MaterialOutlined"

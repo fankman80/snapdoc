@@ -2,21 +2,21 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
-             x:Name="ThisPage"
-             x:Class="SnapDoc.Views.FotoGalleryView"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             x:Class="SnapDoc.Views.FotoGalleryView"             
+             x:Name="ThisPage"             
              Title="{x:Static res:AppResources.alle_fotos}">
 
     <Shell.TitleView>
-        <Grid IsEnabled="{Binding IsNotBusy}"
-              ColumnDefinitions="*,Auto"
+        <Grid ColumnDefinitions="*,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"

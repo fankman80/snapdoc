@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"             
+             xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
              xmlns:mapsui="clr-namespace:Mapsui.UI.Maui;assembly=Mapsui.UI.Maui"
-             xmlns:views="clr-namespace:SnapDoc.Views"             
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
@@ -11,17 +12,26 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              x:Class="SnapDoc.Views.MapView"
-             x:DataType="views:MapView"             
+             x:DataType="views:MapView"
              x:Name="ThisPage"
              Title="{Binding Title}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
+                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+                            IsVisible="{Binding IsNotBusy}" />
+    </Shell.BackButtonBehavior>
+    
     <Shell.TitleView>
-        <Grid IsVisible="{Binding BindingContext.IsNotBusy, Source={x:Reference Name=ThisPage}}"
+        <Grid x:DataType="viewmodels:BaseViewModel"
+              BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+              IsVisible="{Binding IsNotBusy}"
               ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <local:BorderlessEntry Grid.Column="0"
+                   x:DataType="views:MapView"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    FontFamily="{x:StaticResource AppFontFamily}"

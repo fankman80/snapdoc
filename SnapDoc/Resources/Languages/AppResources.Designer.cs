@@ -1780,6 +1780,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pläne hinzufügen ähnelt.
+        /// </summary>
+        internal static string plaene_hinzufuegen {
+            get {
+                return ResourceManager.GetString("plaene_hinzufuegen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pläne umsortieren: Gedrückt halten und ziehen ähnelt.
         /// </summary>
         internal static string plaene_umsortieren_gedrueckt_halten_und_ziehen {

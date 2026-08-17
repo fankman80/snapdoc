@@ -972,4 +972,7 @@
   <data name="lupeneinstellungen" xml:space="preserve">
     <value>Lupeneinstellungen</value>
   </data>
+  <data name="plaene_hinzufuegen" xml:space="preserve">
+    <value>Pläne hinzufügen</value>
+  </data>
 </root>
