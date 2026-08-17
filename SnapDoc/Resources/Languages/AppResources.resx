@@ -975,4 +975,16 @@
   <data name="plaene_hinzufuegen" xml:space="preserve">
     <value>Pläne hinzufügen</value>
   </data>
+  <data name="hatchAngle" xml:space="preserve">
+    <value>Schraffurwinkel</value>
+  </data>
+  <data name="HatchSpacing" xml:space="preserve">
+    <value>Schraffurzwischenraum</value>
+  </data>
+  <data name="HatchLineWidth" xml:space="preserve">
+    <value>Schraffurlinienbreite</value>
+  </data>
+  <data name="hatchFill" xml:space="preserve">
+    <value>Schraffurfüllung</value>
+  </data>
 </root>

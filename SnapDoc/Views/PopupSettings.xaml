@@ -29,8 +29,7 @@
                     LowerValue="{Binding PinMinScaleLimit, Mode=TwoWay}"
                     UpperValue="{Binding PinMaxScaleLimit, Mode=TwoWay}"
                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                </controls:RangeSlider>
+                    MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

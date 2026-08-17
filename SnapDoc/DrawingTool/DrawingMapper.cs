@@ -1,4 +1,5 @@
-﻿using SkiaSharp;
+﻿using Codeuctivity.OpenXmlPowerTools;
+using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
@@ -12,6 +13,10 @@ public static class DrawingMapper
             FillColor = d.PolyDrawable.FillColor.ToString(),
             LineThickness = d.PolyDrawable.LineThickness,
             StrokeStyle = d.PolyDrawable.StrokeStyle,
+            IsHatchEffect = d.PolyDrawable.IsHatchEffect,
+            HatchStrokeWitdh = d.PolyDrawable.HatchStrokeWitdh,
+            HatchStrokeSpace = d.PolyDrawable.HatchStrokeSpace,
+            HatchRotation = d.PolyDrawable.HatchRotation
         };
 
         var bounds = CalculateBounds(d);
@@ -34,6 +39,7 @@ public static class DrawingMapper
                 {
                     IsClosed = d.PolyDrawable.IsClosed,
                     IsCloud = d.PolyDrawable.IsCloud,
+                    IsHatchEffect = d.PolyDrawable.IsHatchEffect,
                     Points = [.. d.PolyDrawable.Points
                     .Select(p => new PointDto(
                         p.X - bounds.Left,
@@ -61,6 +67,7 @@ public static class DrawingMapper
                     RotationDeg = NormalizeAngleDeg(d.RectDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.RectDrawable.Text,
                     IsCloud = d.RectDrawable.IsCloud,
+                    IsHatchEffect = d.RectDrawable.IsHatchEffect,
                     Points = [.. d.RectDrawable.Points
                         .Select(p => new PointDto(
                             p.X - bounds.Left,
@@ -84,6 +91,7 @@ public static class DrawingMapper
                     RotationDeg = NormalizeAngleDeg(d.OvalDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.OvalDrawable.Text,
                     IsCloud = d.OvalDrawable.IsCloud,
+                    IsHatchEffect = d.OvalDrawable.IsHatchEffect,
                     Points = [.. d.OvalDrawable.Points
                         .Select(p => new PointDto(
                             p.X - bounds.Left,
@@ -133,6 +141,7 @@ public static class DrawingMapper
             d.PolyDrawable.Reset();
             d.PolyDrawable.IsClosed = dto.Poly.IsClosed;
             d.PolyDrawable.IsCloud = dto.Poly.IsCloud;
+            d.PolyDrawable.IsHatchEffect = dto.Poly.IsHatchEffect;
             d.PolyDrawable.Points.AddRange(
                 dto.Poly.Points.Select(p =>
                     new SKPoint(p.X + offset.X, p.Y + offset.Y))
@@ -162,6 +171,7 @@ public static class DrawingMapper
             r.Text = dto.Rect.Text ?? "";
             r.AllowedAngleDeg = dto.InitialRotation + dto.Rect.RotationDeg;
             r.IsCloud = dto.Rect.IsCloud;
+            r.IsHatchEffect = dto.Rect.IsHatchEffect;
 
             if (dto.Rect.TextStyle != null)
             {
@@ -194,6 +204,7 @@ public static class DrawingMapper
             o.Text = dto.Oval.Text ?? "";
             o.AllowedAngleDeg = dto.InitialRotation + dto.Oval.RotationDeg;
             o.IsCloud = dto.Oval.IsCloud;
+            o.IsHatchEffect = dto.Oval.IsHatchEffect;
 
             if (dto.Oval.TextStyle != null)
             {
@@ -300,18 +311,30 @@ public static class DrawingMapper
         d.PolyDrawable.FillColor = fillColor;
         d.PolyDrawable.LineThickness = s.LineThickness;
         d.PolyDrawable.StrokeStyle = s.StrokeStyle;
+        d.PolyDrawable.IsHatchEffect = s.IsHatchEffect;
+        d.PolyDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.PolyDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
+        d.PolyDrawable.HatchRotation = s.HatchRotation;
 
         // ---------------- RECT ----------------
         d.RectDrawable.LineColor = lineColor;
         d.RectDrawable.FillColor = fillColor;
         d.RectDrawable.LineThickness = s.LineThickness;
         d.RectDrawable.StrokeStyle = s.StrokeStyle;
+        d.RectDrawable.IsHatchEffect = s.IsHatchEffect;
+        d.RectDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.RectDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
+        d.RectDrawable.HatchRotation = s.HatchRotation;
 
         // ---------------- OVAL ----------------
         d.OvalDrawable.LineColor = lineColor;
         d.OvalDrawable.FillColor = fillColor;
         d.OvalDrawable.LineThickness = s.LineThickness;
         d.OvalDrawable.StrokeStyle = s.StrokeStyle;
+        d.OvalDrawable.IsHatchEffect = s.IsHatchEffect;
+        d.OvalDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.OvalDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
+        d.OvalDrawable.HatchRotation = s.HatchRotation;
 
         // ---------------- ARROW ----------------
         d.ArrowDrawable.LineColor = lineColor;

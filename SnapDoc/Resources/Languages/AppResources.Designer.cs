@@ -1024,6 +1024,42 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schraffurwinkel ähnelt.
+        /// </summary>
+        internal static string hatchAngle {
+            get {
+                return ResourceManager.GetString("hatchAngle", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schraffurfüllung ähnelt.
+        /// </summary>
+        internal static string hatchFill {
+            get {
+                return ResourceManager.GetString("hatchFill", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schraffurlinienbreite ähnelt.
+        /// </summary>
+        internal static string HatchLineWidth {
+            get {
+                return ResourceManager.GetString("HatchLineWidth", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schraffurzwischenraum ähnelt.
+        /// </summary>
+        internal static string HatchSpacing {
+            get {
+                return ResourceManager.GetString("HatchSpacing", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Hell ähnelt.
         /// </summary>
         internal static string hell {

@@ -1,6 +1,4 @@
-﻿using Microsoft.Maui.Graphics.Text;
-using SkiaSharp;
-using SnapDoc.Services;
+﻿using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 
@@ -33,6 +31,12 @@ public class InteractiveOvalDrawable
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
+
+    // Eigenschaften für den Schraffurmodus
+    public bool IsHatchEffect { get; set; } = false;
+    public float HatchStrokeWitdh { get; set; } = 2f;
+    public float HatchStrokeSpace { get; set; } = 8f;
+    public float HatchRotation { get; set; } = 45f;
 
     // --- Eigenschaften fuer den Wolken-Modus ---
     public bool IsCloud { get; set; } = false;
@@ -140,9 +144,7 @@ public class InteractiveOvalDrawable
 
         // Entweder als Wolke oder als normales Oval zeichnen
         if (IsCloud)
-        {
             DrawCloudPath(canvas);
-        }
         else
         {
             canvas.Save();
@@ -150,15 +152,30 @@ public class InteractiveOvalDrawable
             canvas.RotateDegrees(AllowedAngleDeg);
 
             var ovalRect = new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f);
+            float hatchLineWidth = HatchStrokeWitdh * density;
+            float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
+            var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
+            var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
+            var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
+            using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
 
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = IsHatchEffect ? hatchEffect : null,
                 IsAntialias = true
             };
 
-            canvas.DrawOval(ovalRect, fillPaint);
+            canvas.Save();
+            var builder = new SKPathBuilder();
+            builder.AddOval(ovalRect);
+            using var ovalPath = builder.Detach();
+            canvas.ClipPath(ovalPath, SKClipOperation.Intersect, true);
+            var bounds = ovalPath.TightBounds;
+            bounds.Inflate(10, 10);
+            canvas.DrawRect(bounds, fillPaint);
+            canvas.Restore();
 
             if (LineThickness > 0)
             {

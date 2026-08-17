@@ -1,5 +1,4 @@
 ﻿using SkiaSharp;
-using SnapDoc.Services;
 
 namespace SnapDoc.DrawingTool;
 
@@ -13,6 +12,12 @@ public class InteractivePolylineDrawable
     public string StrokeStyle { get; set; } = "";
     public bool DisplayHandles { get; set; } = true;
     public bool IsClosed { get; set; } = false;
+
+    // Eigenschaften für den Schraffurmodus
+    public bool IsHatchEffect { get; set; } = false;
+    public float HatchStrokeWitdh { get; set; } = 2f;
+    public float HatchStrokeSpace { get; set; } = 8f;
+    public float HatchRotation { get; set; } = 45f;
 
     // --- Eigenschaften für den Wolken-Modus ---
     public bool IsCloud { get; set; } = false;
@@ -89,6 +94,12 @@ public class InteractivePolylineDrawable
         }
 
         using var path = builder.Detach();
+        float hatchLineWidth = HatchStrokeWitdh * density;
+        float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
+        var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
+        var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
+        var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
+        using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
 
         if (IsClosed)
         {
@@ -96,9 +107,16 @@ public class InteractivePolylineDrawable
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = IsHatchEffect ? hatchEffect : null,
                 IsAntialias = true
             };
-            canvas.DrawPath(path, fillPaint);
+
+            canvas.Save();
+            canvas.ClipPath(path, SKClipOperation.Intersect, true);
+            var bounds = path.TightBounds;
+            bounds.Inflate(10, 10);
+            canvas.DrawRect(bounds, fillPaint);
+            canvas.Restore();
         }
 
         if (LineThickness > 0)

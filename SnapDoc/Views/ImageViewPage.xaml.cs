@@ -32,6 +32,10 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
+    private bool isHatchEffect = false;
+    private float hatchStrokeWitdh = 2f;
+    private float hatchStrokeSpace = 8f;
+    private float hatchRotation = 45f;
     private int lineWidth = 8;
     private string strokeStyle = "";
     private float cloudRadius = 60;
@@ -496,6 +500,10 @@ public partial class ImageViewPage : IQueryAttributable
                     SelectedTextColor.ToSKColor(),
                     lineWidth,
                     strokeStyle,
+                    isHatchEffect,
+                    hatchStrokeWitdh,
+                    hatchStrokeSpace,
+                    hatchRotation,
                     forceReset: true
                 );
 
@@ -732,7 +740,7 @@ public partial class ImageViewPage : IQueryAttributable
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, false, 2, 8, 45, cloudRadius, cloudInciseDeg, isCloud);
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
         if (result?.Result == null) return;
 
@@ -750,6 +758,10 @@ public partial class ImageViewPage : IQueryAttributable
             SelectedTextColor.ToSKColor(),
             lineWidth,
             strokeStyle,
+            isHatchEffect,
+            hatchStrokeWitdh,
+            hatchStrokeSpace,
+            hatchRotation,
             cloudRadius,
             cloudInciseDeg
         );

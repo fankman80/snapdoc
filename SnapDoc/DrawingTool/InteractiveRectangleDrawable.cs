@@ -1,5 +1,4 @@
 ﻿using SkiaSharp;
-using SnapDoc.Services;
 
 namespace SnapDoc.DrawingTool;
 
@@ -33,7 +32,13 @@ public class InteractiveRectangleDrawable
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
 
-    // --- Eigenschaften für den Wolken-Modus ---
+    // Eigenschaften für den Schraffurmodus
+    public bool IsHatchEffect { get; set; } = false;
+    public float HatchStrokeWitdh { get; set; } = 2f;
+    public float HatchStrokeSpace { get; set; } = 8f;
+    public float HatchRotation { get; set; } = 45f;
+
+    // Eigenschaften für den Wolken-Modus
     public bool IsCloud { get; set; } = false;
     public float CloudRadius { get; set; } = 20f;
     public float CloudOverlap { get; set; } = 0.8333f;
@@ -136,11 +141,8 @@ public class InteractiveRectangleDrawable
     {
         if (!HasContent) return;
 
-        // Entweder als Wolke oder als normales Rechteck zeichnen
         if (IsCloud)
-        {
             DrawCloudPath(canvas);
-        }
         else
         {
             var pts = Points;
@@ -153,14 +155,27 @@ public class InteractiveRectangleDrawable
             builder.Close();
 
             using var path = builder.Detach();
+            float hatchLineWidth = HatchStrokeWitdh * density;
+            float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
+            var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
+            var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
+            var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
+            using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
+
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = IsHatchEffect ? hatchEffect : null,
                 IsAntialias = true
             };
 
-            canvas.DrawPath(path, fillPaint);
+            canvas.Save();
+            canvas.ClipPath(path, SKClipOperation.Intersect, true);
+            var bounds = path.TightBounds;
+            bounds.Inflate(10, 10);
+            canvas.DrawRect(bounds, fillPaint);
+            canvas.Restore();
 
             if (LineThickness > 0)
             {

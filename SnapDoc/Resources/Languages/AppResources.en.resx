@@ -975,4 +975,16 @@
   <data name="plaene_hinzufuegen" xml:space="preserve">
     <value>Add plans</value>
   </data>
+  <data name="hatchAngle" xml:space="preserve">
+    <value>Hatch angle</value>
+  </data>
+  <data name="HatchSpacing" xml:space="preserve">
+    <value>Hatch spacing</value>
+  </data>
+  <data name="HatchLineWidth" xml:space="preserve">
+    <value>Hatch line width</value>
+  </data>
+  <data name="hatchFill" xml:space="preserve">
+    <value>Hatch fill</value>
+  </data>
 </root>

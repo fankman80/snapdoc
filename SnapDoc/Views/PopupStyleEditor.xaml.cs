@@ -168,7 +168,63 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         }
     }
 
-    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string strokeStyle, float cloudRadius, float cloudInciseDeg, bool isCloudSettingsVisible = false, string okText = null, string cancelText = null)
+    private bool isHatchEffect;
+    public bool IsHatchEffect
+    {
+        get => isHatchEffect;
+        set
+        {
+            if (isHatchEffect != value)
+            {
+                isHatchEffect = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private float hatchStrokeWitdh;
+    public float HatchStrokeWitdh
+    {
+        get => hatchStrokeWitdh;
+        set
+        {
+            if (hatchStrokeWitdh != value)
+            {
+                hatchStrokeWitdh = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private float hatchStrokeSpace;
+    public float HatchStrokeSpace
+    {
+        get => hatchStrokeSpace;
+        set
+        {
+            if (hatchStrokeSpace != value)
+            {
+                hatchStrokeSpace = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    private float hatchRotation;
+    public float HatchRotation
+    {
+        get => hatchRotation;
+        set
+        {
+            if (hatchRotation != value)
+            {
+                hatchRotation = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
+    public PopupStyleEditor(int lineWidth, string borderColor, string fillColor, string textColor, string strokeStyle, bool isHatchEffect, float hatchStrokeWitdh, float hatchStrokeSpace, float hatchRotation, float cloudRadius, float cloudInciseDeg, bool isCloudSettingsVisible = false, string okText = null, string cancelText = null)
     {
         InitializeComponent();
 
@@ -176,6 +232,10 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         LineWidth = lineWidth;
         StrokeStyle = strokeStyle;
+        IsHatchEffect = isHatchEffect;
+        HatchStrokeWitdh = hatchStrokeWitdh;
+        HatchStrokeSpace = hatchStrokeSpace;
+        HatchRotation = hatchRotation;
         TemplateText = "Text";
         CloudRadius = cloudRadius;
         CloudInciseDeg = cloudInciseDeg;
@@ -268,7 +328,7 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, CloudRadius, CloudInciseDeg)); }
+        try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, IsHatchEffect, HatchStrokeWitdh, hatchStrokeSpace, HatchRotation, CloudRadius, CloudInciseDeg)); }
         catch (InvalidOperationException) { }
     }
 

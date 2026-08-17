@@ -115,9 +115,20 @@
                             Clicked="OnTemplateAddClicked"/>
                 </Grid>
 
+                <controls:Switch LabelText="{x:Static res:AppResources.hatchFill}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    IsToggled="{Binding IsHatchEffect}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BorderColorOff ="Transparent"
+                    KnobColorOn="White"
+                    KnobColorOff="White"
+                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
                 <controls:RangeSlider
                      LabelText="{x:Static res:AppResources.linienbreite}"
-                    IsRealtime="True"
+                     IsRealtime="True"
                      IsRange="False"
                      Minimum="0"
                      Maximum="20"
@@ -127,9 +138,53 @@
                      MinimumValueDisplayFormat="{}{0} px"
                      LowerValue="{Binding LineWidth}"
                      MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                </controls:RangeSlider>
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
+                <controls:RangeSlider
+                     IsVisible="{Binding IsHatchEffect}"
+                     LabelText="{x:Static res:AppResources.hatchAngle}"
+                     IsRealtime="True"
+                     IsRange="False"
+                     Minimum="0"
+                     Maximum="90"
+                     Step="1"
+                     ValueFontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0}°"
+                     LowerValue="{Binding HatchRotation}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                     IsVisible="{Binding IsHatchEffect}"
+                     LabelText="{x:Static res:AppResources.HatchLineWidth}"
+                     IsRealtime="True"
+                     IsRange="False"
+                     Minimum="0"
+                     Maximum="20"
+                     Step="1"
+                     ValueFontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0} px"
+                     LowerValue="{Binding HatchStrokeWitdh}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                     IsVisible="{Binding IsHatchEffect}"
+                     LabelText="{x:Static res:AppResources.HatchSpacing}"
+                     IsRealtime="True"
+                     IsRange="False"
+                     Minimum="0"
+                     Maximum="20"
+                     Step="1"
+                     ValueFontSize="12"
+                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                     MinimumValueDisplayFormat="{}{0} px"
+                     LowerValue="{Binding HatchStrokeSpace}"
+                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                
                 <controls:RangeSlider
                      IsVisible="{Binding IsCloudSettingsVisible}"
                      LabelText="{x:Static res:AppResources.wolken_radius}"
@@ -142,8 +197,7 @@
                      MinimumValueDisplayFormat="{}{0} px"
                      LowerValue="{Binding CloudRadius}"
                      MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                </controls:RangeSlider>
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:RangeSlider
                      IsVisible="{Binding IsCloudSettingsVisible}"
@@ -157,8 +211,7 @@
                      MinimumValueDisplayFormat="{}{0}°"
                      LowerValue="{Binding CloudInciseDeg}"
                      MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}">
-                </controls:RangeSlider>
+                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:BorderedEntry
                         Text="{Binding StrokeStyle}"

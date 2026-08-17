@@ -277,13 +277,17 @@ namespace SnapDoc
         public byte FillOpacity { get; set; } = fillOpacity;
     }
 
-    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle, float cloudRadius, float cloudInciseDeg)
+    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle, bool isHatchEffect, float hatchStrokeWitdh, float hatchStrokeSpace, float hatchRotation, float cloudRadius, float cloudInciseDeg)
     {
         public string BorderColorHex { get; set; } = borderColorHex;
         public string FillColorHex { get; set; } = fillColorHex;
         public string TextColorHex { get; set; } = textColorHex;
         public int PenWidth { get; set; } = width;
         public string StrokeStyle { get; set; } = strokeStyle;
+        public bool IsHatchEffect { get; set; } = isHatchEffect;
+        public float HatchStrokeWitdh { get; set; } = hatchStrokeWitdh;
+        public float HatchStrokeSpace { get; set; } = hatchStrokeSpace;
+        public float HatchRotation { get; set; } = hatchRotation;
         public float CloudRadius { get; set; } = cloudRadius;
         public float CloudInciseDeg { get; set; } = cloudInciseDeg;
     }
@@ -467,7 +471,10 @@ namespace SnapDoc
         public string TextColor { get; set; }
         public int LineWidth { get; set; }
         public string StrokeStyle { get; set; }
-
+        public bool IsHatchEffect { get; set; } = false;
+        public float HatchStrokeWitdh { get; set; }
+        public float HatchStrokeSpace { get; set; }
+        public float HatchRotation { get; set; }
 
         public double[] StrokeDashArray =>
             Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();

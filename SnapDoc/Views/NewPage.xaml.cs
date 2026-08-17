@@ -40,6 +40,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
+    private bool isHatchEffect = false;
+    private float hatchStrokeWitdh = 2f;
+    private float hatchStrokeSpace = 8f;
+    private float hatchRotation = 45f;
     private int lineWidth = 3;
     private string strokeStyle = "";
     private float cloudRadius = 20;
@@ -624,6 +628,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     SelectedTextColor.ToSKColor(),
                     lineWidth,
                     strokeStyle,
+                    isHatchEffect,
+                    hatchStrokeWitdh,
+                    hatchStrokeSpace,
+                    hatchRotation,
                     false,
                     (float)PlanImage.CurrentRotation,
                     setDefaultMode
@@ -856,7 +864,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void PenSettingsClicked(object sender, EventArgs e)
     {
         bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, cloudRadius, cloudInciseDeg, isCloud);
+        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation, cloudRadius, cloudInciseDeg, isCloud);
 
         _isShowingPopup = true;
         var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
@@ -869,6 +877,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
         lineWidth = result.Result.PenWidth;
         strokeStyle = result.Result.StrokeStyle;
+        isHatchEffect = result.Result.IsHatchEffect;
+        hatchStrokeWitdh = result.Result.HatchStrokeWitdh;
+        hatchStrokeSpace = result.Result.HatchStrokeSpace;
+        hatchRotation = result.Result.HatchRotation;
         cloudRadius = result.Result.CloudRadius;
         cloudInciseDeg = result.Result.CloudInciseDeg;
 
@@ -878,6 +890,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SelectedTextColor.ToSKColor(),
             lineWidth,
             strokeStyle,
+            isHatchEffect,
+            hatchStrokeWitdh,
+            hatchStrokeSpace,
+            hatchRotation,
             cloudRadius,
             cloudInciseDeg
         );
@@ -1025,6 +1041,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                 lineWidth = (int)style.LineThickness;
                 strokeStyle = style.StrokeStyle;
+                isHatchEffect = style.IsHatchEffect;
+                hatchStrokeWitdh = style.HatchStrokeWitdh;
+                hatchStrokeSpace = style.HatchStrokeSpace;
+                hatchRotation = style.HatchRotation;
             }
 
             if (drawingController.DrawMode != DrawMode.None)

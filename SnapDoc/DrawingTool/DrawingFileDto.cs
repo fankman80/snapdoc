@@ -6,6 +6,10 @@ public class DrawingStyleDto
     public string FillColor { get; set; } = "#00000000";
     public float LineThickness { get; set; }
     public string StrokeStyle { get; set; } = "";
+    public bool IsHatchEffect { get; set; }
+    public float HatchStrokeWitdh { get; set; }
+    public float HatchStrokeSpace { get; set; }
+    public float HatchRotation { get; set; }
 }
 
 public class TextStyleDto
@@ -42,6 +46,7 @@ public class PolyDto
     public List<PointDto> Points { get; set; } = [];
     public bool IsClosed { get; set; }
     public bool IsCloud { get; set; }
+    public bool IsHatchEffect { get; set; }
 }
 
 public class FreeDto
@@ -56,6 +61,7 @@ public class RectDto
     public string? Text { get; set; }
     public TextStyleDto? TextStyle { get; set; }
     public bool IsCloud { get; set; }
+    public bool IsHatchEffect { get; set; }
 }
 
 public class OvalDto
@@ -65,6 +71,7 @@ public class OvalDto
     public string? Text { get; set; }
     public TextStyleDto? TextStyle { get; set; }
     public bool IsCloud { get; set; }
+    public bool IsHatchEffect { get; set; }
 }
 
 public class ArrowDto
