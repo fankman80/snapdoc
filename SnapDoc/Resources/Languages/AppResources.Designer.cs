@@ -1357,7 +1357,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Linienbreite ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Konturlinienbreite ähnelt.
         /// </summary>
         internal static string linienbreite {
             get {

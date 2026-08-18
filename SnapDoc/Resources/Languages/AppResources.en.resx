@@ -433,7 +433,7 @@
     <value>Lightness (L)</value>
   </data>
   <data name="linienbreite" xml:space="preserve">
-    <value>Line width</value>
+    <value>Contour line width</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
     <value>Opacity</value>

@@ -24,6 +24,12 @@ public class InteractiveArrowDrawable
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
+
+    // Eigenschaften für den Schraffurmodus
+    public bool IsHatchEffect { get; set; } = false;
+    public float HatchStrokeWitdh { get; set; } = 2f;
+    public float HatchStrokeSpace { get; set; } = 8f;
+    public float HatchRotation { get; set; } = 45f;
     public float AllowedAngleRad
     {
         get => _allowedAngleRad;
@@ -158,7 +164,7 @@ public class InteractiveArrowDrawable
     {
         if (!HasContent) return;
 
-        // 1. Erstelle den Builder
+        // Erstelle den Builder
         var builder = new SKPathBuilder();
 
         // Pfeil-Geometrie berechnen (lokal)
@@ -188,13 +194,27 @@ public class InteractiveArrowDrawable
         builder.Close();
 
         using var path = builder.Detach();
+        float hatchLineWidth = HatchStrokeWitdh * density;
+        float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
+        var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
+        var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
+        var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
+        using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
+
         using var fillPaint = new SKPaint
         {
             Color = FillColor,
             Style = SKPaintStyle.Fill,
+            PathEffect = IsHatchEffect ? hatchEffect : null,
             IsAntialias = true
         };
-        canvas.DrawPath(path, fillPaint);
+
+        canvas.Save();
+        canvas.ClipPath(path, SKClipOperation.Intersect, true);
+        var bounds = path.TightBounds;
+        bounds.Inflate(bounds.Width, bounds.Height);
+        canvas.DrawRect(bounds, fillPaint);
+        canvas.Restore();
 
         if (LineThickness > 0)
         {

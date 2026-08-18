@@ -78,6 +78,7 @@ public class ArrowDto
 {
     public List<PointDto> Points { get; set; } = [];
     public float RotationDeg { get; set; }
+    public bool IsHatchEffect { get; set; }
 }
 
 public record PointDto(float X, float Y);

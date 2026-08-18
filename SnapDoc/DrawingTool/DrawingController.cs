@@ -22,7 +22,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private SKPoint? rectResizeAnchor;
     private SKPoint? ovalResizeAnchor;
     private SKPoint? arrowResizeAnchor;
-
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
@@ -158,6 +157,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         arrow.HandleRadius = safeHandleRadius;
         arrow.PointRadius = safePointRadius;
         arrow.AllowedAngleDeg = rotationAngle;
+        arrow.IsHatchEffect = isHatchEffect;
+        arrow.HatchRotation = hatchRotation;
+        arrow.HatchStrokeWitdh = hatchStrokeWitdh;
+        arrow.HatchStrokeSpace = hatchStrokeSpace;
 
         canvasView?.InvalidateSurface();
     }
@@ -573,6 +576,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             arrow.FillColor = fillColor;
             arrow.LineThickness = lineWidth;
             arrow.StrokeStyle = strokeStyle;
+            arrow.IsHatchEffect = isHatchEffect;
+            arrow.HatchRotation = hatchRotation;
+            arrow.HatchStrokeWitdh = hatchStrokeWitdh;
+            arrow.HatchStrokeSpace = hatchStrokeSpace;
         }
 
         canvasView?.InvalidateSurface();

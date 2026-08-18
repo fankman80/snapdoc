@@ -113,6 +113,7 @@ public static class DrawingMapper
                 ? new ArrowDto
                 {
                     RotationDeg = NormalizeAngleDeg(d.ArrowDrawable.AllowedAngleDeg - initialRotation),
+                    IsHatchEffect = d.ArrowDrawable.IsHatchEffect,
                     Points = [.. d.ArrowDrawable.Points
                         .Select(p => new PointDto(
                             p.X - bounds.Left,
@@ -249,6 +250,7 @@ public static class DrawingMapper
             r.Reset();
 
             r.AllowedAngleDeg = dto.InitialRotation + dto.Arrow.RotationDeg;
+            r.IsHatchEffect = dto.Arrow.IsHatchEffect;
 
             var p0 = new SKPoint(
                 dto.Arrow.Points[0].X + offset.X,
@@ -341,6 +343,10 @@ public static class DrawingMapper
         d.ArrowDrawable.FillColor = fillColor;
         d.ArrowDrawable.LineThickness = s.LineThickness;
         d.ArrowDrawable.StrokeStyle = s.StrokeStyle;
+        d.ArrowDrawable.IsHatchEffect = s.IsHatchEffect;
+        d.ArrowDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.ArrowDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
+        d.ArrowDrawable.HatchRotation = s.HatchRotation;
     }
 
     private static float NormalizeAngleDeg(float deg)

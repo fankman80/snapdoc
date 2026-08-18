@@ -287,9 +287,10 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
             IsDrawn = true
         };
 
+        float halfStroke = (float)LineWidth / 2f;
         rectDrawable.SetFromDrag(
-            new SKPoint(0, 0),
-            new SKPoint(width, height)
+            new SKPoint(halfStroke, halfStroke),
+            new SKPoint(width - halfStroke, height - halfStroke)
         );
 
         rectDrawable.Draw(canvas);
@@ -324,9 +325,10 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
                 IsDrawn = true
             };
 
+            float halfStroke = (float)LineWidth / 2f;
             rectDrawable.SetFromDrag(
-                new SKPoint(0, 0),
-                new SKPoint(width, height)
+                new SKPoint(halfStroke, halfStroke),
+                new SKPoint(width - halfStroke, height - halfStroke)
             );
 
             rectDrawable.Draw(canvas);
@@ -348,6 +350,8 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         HatchStrokeSpace = item.HatchStrokeSpace;
         HatchRotation = item.HatchRotation;
         TemplateText = item.Text;
+
+        TemplatesExpander.IsExpanded = false;
     }
 
     private async void OnTemplateDeleteClicked(object sender, EventArgs e)

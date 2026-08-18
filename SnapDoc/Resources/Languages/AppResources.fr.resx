@@ -433,7 +433,7 @@
     <value>Luminosité (L)</value>
   </data>
   <data name="linienbreite" xml:space="preserve">
-    <value>Largeur de ligne</value>
+    <value>Largeur de ligne de contour</value>
   </data>
   <data name="deckkraft" xml:space="preserve">
     <value>Opacité</value>

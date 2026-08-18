@@ -31,7 +31,9 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="{TemplateBinding CornerRadius}" />
                 </Border.StrokeShape>
-                <toolkit:Expander x:Name="expanderControl" Padding="0">
+                <toolkit:Expander x:Name="expanderControl"
+                                  Padding="0"
+                                  IsExpanded="{Binding IsExpanded, Source={x:Reference thisControl}, Mode=TwoWay}">
                     <toolkit:Expander.Header>
                         <Grid ColumnDefinitions="*, Auto" ColumnSpacing="0" HeightRequest="46" VerticalOptions="Fill">
                             <Label Grid.Column="0"

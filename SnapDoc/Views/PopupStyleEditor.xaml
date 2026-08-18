@@ -19,6 +19,51 @@
           RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout>
+                <controls:BorderedExpander x:Name="TemplatesExpander"
+                                           HeaderText="{x:Static res:AppResources.vorlagen}">
+                    <CollectionView ItemsSource="{Binding Items}"
+                                    SelectionMode="None"
+                                    Margin="0">
+                        <CollectionView.ItemsLayout>
+                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
+                        </CollectionView.ItemsLayout>
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid x:DataType="local:StylePickerItem"
+                                        Grid.ColumnDefinitions="*,Auto"
+                                        HeightRequest="44"
+                                        ColumnSpacing="0">
+
+                                    <Border Grid.Column="0">
+                                        <Image Source="pattern.png" Aspect="Center"/>
+                                    </Border>
+
+                                    <skia:SKCanvasView Grid.Column="0"
+                                                       PaintSurface="OnListItemPaintSurface"
+                                                       IgnorePixelScaling="False"/>
+
+                                    <Button Grid.Column="0"
+                                            Text="{Binding Text}"
+                                            FontSize="14"                                                
+                                            TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
+                                            BackgroundColor="Transparent"
+                                            HorizontalOptions="Fill"
+                                            Clicked="OnTemplateClicked"/>
+
+                                    <Button Grid.Column="1"
+                                            Text="{x:Static local:MaterialIcons.Delete}"
+                                            FontSize="24"
+                                            FontFamily="MaterialOutlined"
+                                            TextColor="{DynamicResource PrimaryDark}"
+                                            BackgroundColor="Transparent"
+                                            Padding="0"
+                                            Clicked="OnTemplateDeleteClicked"/>
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </controls:BorderedExpander>
+
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*" />
@@ -146,8 +191,8 @@
                      LabelText="{x:Static res:AppResources.hatchAngle}"
                      IsRealtime="True"
                      IsRange="False"
-                     Minimum="0"
-                     Maximum="90"
+                     Minimum="-45"
+                     Maximum="45"
                      Step="1"
                      ValueFontSize="12"
                      TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -223,50 +268,6 @@
                         PlaceholderColor="{DynamicResource SecondaryBackground}"
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextChanged="OnStrokeTextChanged"/>
-
-                <controls:BorderedExpander HeaderText="{x:Static res:AppResources.vorlagen}">
-                    <CollectionView ItemsSource="{Binding Items}"
-                                    SelectionMode="None"
-                                    Margin="0">
-                        <CollectionView.ItemsLayout>
-                            <LinearItemsLayout Orientation="Vertical" ItemSpacing="4" />
-                        </CollectionView.ItemsLayout>
-                        <CollectionView.ItemTemplate>
-                            <DataTemplate>
-                                <Grid x:DataType="local:StylePickerItem"
-                                        Grid.ColumnDefinitions="*,Auto"
-                                        HeightRequest="44"
-                                        ColumnSpacing="0">
-
-                                    <Border Grid.Column="0">
-                                        <Image Source="pattern.png" Aspect="Center"/>
-                                    </Border>
-
-                                    <skia:SKCanvasView Grid.Column="0"
-                                                       PaintSurface="OnListItemPaintSurface"
-                                                       IgnorePixelScaling="False"/>
-
-                                    <Button Grid.Column="0"
-                                            Text="{Binding Text}"
-                                            FontSize="14"                                                
-                                            TextColor="{Binding TextColor, Converter={StaticResource HexToColorConverter}}"
-                                            BackgroundColor="Transparent"
-                                            HorizontalOptions="Fill"
-                                            Clicked="OnTemplateClicked"/>
-
-                                    <Button Grid.Column="1"
-                                            Text="{x:Static local:MaterialIcons.Delete}"
-                                            FontSize="24"
-                                            FontFamily="MaterialOutlined"
-                                            TextColor="{DynamicResource PrimaryDark}"
-                                            BackgroundColor="Transparent"
-                                            Padding="0"
-                                            Clicked="OnTemplateDeleteClicked"/>
-                                </Grid>
-                            </DataTemplate>
-                        </CollectionView.ItemTemplate>
-                    </CollectionView>
-                </controls:BorderedExpander>
             </VerticalStackLayout>     
         </ScrollView>
 
