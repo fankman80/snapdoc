@@ -987,4 +987,19 @@
   <data name="hatchFill" xml:space="preserve">
     <value>Schraffurfüllung</value>
   </data>
+    <data name="projektdaten_bearbeiten" xml:space="preserve">
+      <value>Projektdaten bearbeiten</value>
+    </data>
+    <data name="einstellungen_bearbeiten" xml:space="preserve">
+      <value>Einstellungen bearbeiten</value>
+    </data>
+    <data name="icondefinitionen_bearbeiten" xml:space="preserve">
+      <value>Icondefinitionen bearbeiten</value>
+    </data>
+    <data name="kompletter_tile_cache_loeschen" xml:space="preserve">
+      <value>Kompletter Tile-Cache löschen</value>
+    </data>
+    <data name="schraffur_spiegeln" xml:space="preserve">
+      <value>Schraffur spiegeln</value>
+    </data>	
 </root>

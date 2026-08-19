@@ -610,6 +610,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen bearbeiten ähnelt.
+        /// </summary>
+        internal static string einstellungen_bearbeiten {
+            get {
+                return ResourceManager.GetString("einstellungen_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen gespeichert! ähnelt.
         /// </summary>
         internal static string einstellungen_gespeichert {
@@ -1123,6 +1132,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Icondefinitionen bearbeiten ähnelt.
+        /// </summary>
+        internal static string icondefinitionen_bearbeiten {
+            get {
+                return ResourceManager.GetString("icondefinitionen_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Icondefinitionen zurücksetzen ähnelt.
         /// </summary>
         internal static string icondefinitionen_zuruecksetzen {
@@ -1290,6 +1308,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string kml_nicht_gespeichert {
             get {
                 return ResourceManager.GetString("kml_nicht_gespeichert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kompletter Tile-Cache löschen ähnelt.
+        /// </summary>
+        internal static string kompletter_tile_cache_loeschen {
+            get {
+                return ResourceManager.GetString("kompletter_tile_cache_loeschen", resourceCulture);
             }
         }
         
@@ -2041,6 +2068,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektdaten bearbeiten ähnelt.
+        /// </summary>
+        internal static string projektdaten_bearbeiten {
+            get {
+                return ResourceManager.GetString("projektdaten_bearbeiten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekte ähnelt.
         /// </summary>
         internal static string projekte {
@@ -2172,6 +2208,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string saettigung_s {
             get {
                 return ResourceManager.GetString("saettigung_s", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Schraffur spiegeln ähnelt.
+        /// </summary>
+        internal static string schraffur_spiegeln {
+            get {
+                return ResourceManager.GetString("schraffur_spiegeln", resourceCulture);
             }
         }
         

@@ -189,26 +189,27 @@
                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0">
                     <controls:RangeSlider
                         Grid.Column="0"
-                         IsVisible="{Binding IsHatchEffect}"
-                         LabelText="{x:Static res:AppResources.hatchAngle}"
-                         IsRealtime="True"
-                         IsRange="False"
-                         Minimum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?-90:0'}"
-                         Maximum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?0:90'}"
-                         Step="1"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0}°"
-                         LowerValue="{Binding HatchRotation}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                        IsVisible="{Binding IsHatchEffect}"
+                        LabelText="{x:Static res:AppResources.hatchAngle}"
+                        IsRealtime="True"
+                        IsRange="False"
+                        Minimum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?-90:0'}"
+                        Maximum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?0:90'}"
+                        Step="1"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0}°"
+                        LowerValue="{Binding HatchRotation}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                     <Button Grid.Column="1"
+                            IsVisible="{Binding IsHatchEffect}"
                             Padding="0"
                             VerticalOptions="End"
                             BackgroundColor="Transparent"
                             ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Flip}}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.schraffur_spiegeln}"
                             Clicked="FlipRotationAngleClick"/>
                 </Grid>
                 <controls:RangeSlider
@@ -270,14 +271,14 @@
                      MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
                 <controls:BorderedEntry
-                        Text="{Binding StrokeStyle}"
-                        FontSize="{StaticResource AppFontSizeNormal}"
-                        Placeholder="Linienmuster"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextChanged="OnStrokeTextChanged"/>
+                    Text="{Binding StrokeStyle}"
+                    FontSize="{StaticResource AppFontSizeNormal}"
+                    Placeholder="Linienmuster"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextChanged="OnStrokeTextChanged"/>
             </VerticalStackLayout>     
         </ScrollView>
 

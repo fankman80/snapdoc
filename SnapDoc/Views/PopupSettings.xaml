@@ -238,48 +238,7 @@
 
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.erweiterte_einstellungen}">
                     <VerticalStackLayout>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
-                            <Button Grid.Column="0" Grid.Row="0"
-                                    IsVisible="{Binding IsProjectLoaded}"
-                                    Text="{x:Static res:AppResources.projektdaten}"
-                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                                                    
-                                    Clicked="OpenDocEditor"/>
-                            <Button Grid.Column="0" Grid.Row="1"
-                                    Text="{x:Static res:AppResources.app_settings}"
-                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                                                           
-                                    Clicked="OpenPrgEditor"/>
-                            <Button Grid.Column="0" Grid.Row="2"
-                                    Text="{x:Static res:AppResources.icondefinitionen}"
-                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                                                            
-                                    Clicked="OpenIconEditor"/>
-                            <Button Grid.Column="1" Grid.Row="1"
-                                    Padding="0"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
-                                    BackgroundColor="Red"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                        
-                                    ToolTipProperties.Text="{x:Static res:AppResources.programmeinstellungen_zuruecksetzen}"
-                                    Clicked="ResetPrg"/>
-                            <Button Grid.Column="1" Grid.Row="2"
-                                    Padding="0"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
-                                    BackgroundColor="Red"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                        
-                                    ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
-                                    Clicked="ResetIcon"/>
-                        </Grid>
+
                         <controls:RangeSlider
                                 LabelText="{x:Static res:AppResources.aufloesung_vollbildanzeige}"
                                 IsRange="False"
@@ -315,10 +274,56 @@
                                                         ItemsSource="{Binding AppLanguages}"
                                                         SelectedItem="{Binding SelectedAppLanguage}"/>
                             <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
+                        </Grid>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                                <RowDefinition Height="Auto" />
+                            </Grid.RowDefinitions>
+                            <Button Grid.Column="0" Grid.Row="0"
+                                    IsVisible="{Binding IsProjectLoaded}"
+                                    Text="{x:Static res:AppResources.projektdaten}"
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{DynamicResource PrimaryDarkText}"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.projektdaten_bearbeiten}"
+                                    Clicked="OpenDocEditor"/>
+                            <Button Grid.Column="0" Grid.Row="1"
+                                    Text="{x:Static res:AppResources.app_settings}"
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{DynamicResource PrimaryDarkText}"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.einstellungen_bearbeiten}"
+                                    Clicked="OpenPrgEditor"/>
+                            <Button Grid.Column="1" Grid.Row="1"
+                                    Padding="0"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
+                                    BackgroundColor="Red"
+                                    TextColor="{DynamicResource PrimaryDarkText}" 
+                                    ToolTipProperties.Text="{x:Static res:AppResources.programmeinstellungen_zuruecksetzen}"
+                                    Clicked="ResetPrg"/>
+                            <Button Grid.Column="0" Grid.Row="2"
+                                    Text="{x:Static res:AppResources.icondefinitionen}"
+                                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    TextColor="{DynamicResource PrimaryDarkText}"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_bearbeiten}"
+                                    Clicked="OpenIconEditor"/>
+                            <Button Grid.Column="1" Grid.Row="2"
+                                    Padding="0"
+                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
+                                    BackgroundColor="Red"
+                                    TextColor="{DynamicResource PrimaryDarkText}"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
+                                    Clicked="ResetIcon"/>
                             <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
                                     Text="{x:Static res:AppResources.tile_cache_loeschen}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                    TextColor="{DynamicResource PrimaryDarkText}"                                                           
+                                    TextColor="{DynamicResource PrimaryDarkText}"
+                                    ToolTipProperties.Text="{x:Static res:AppResources.kompletter_tile_cache_loeschen}"
                                     Clicked="OnDeleteTileCacheClicked"/>
                         </Grid>
                     </VerticalStackLayout>

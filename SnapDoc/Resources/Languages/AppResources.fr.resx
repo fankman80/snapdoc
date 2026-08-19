@@ -987,4 +987,19 @@
   <data name="hatchFill" xml:space="preserve">
     <value>Remplissage des hachures</value>
   </data>
+	<data name="projektdaten_bearbeiten" xml:space="preserve">
+  <value>Modifier les données du projet</value>
+</data>
+	<data name="einstellungen_bearbeiten" xml:space="preserve">
+  <value>Modifier les paramètres</value>
+</data>
+	<data name="icondefinitionen_bearbeiten" xml:space="preserve">
+  <value>Modifier les définitions d'icônes</value>
+</data>
+	<data name="kompletter_tile_cache_loeschen" xml:space="preserve">
+  <value>Vider entièrement le cache de tuiles</value>
+</data>
+	<data name="schraffur_spiegeln" xml:space="preserve">
+  <value>Mettre les hachures en miroir</value>
+</data>
 </root>

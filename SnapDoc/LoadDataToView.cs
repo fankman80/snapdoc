@@ -76,7 +76,7 @@ public partial class LoadDataToView
 
     public static void ResetData()
     {
-        AppShell.ClearAllPlansFromShell();
+        ClearAllPlansFromShell();
 
         // Reset Datenbank
         GlobalJson.Data.Client_name = null;
@@ -93,5 +93,44 @@ public partial class LoadDataToView
         GlobalJson.Data.CustomPinsPath = null;
         GlobalJson.Data.ProjectPath = null;
         GlobalJson.Data.JsonFile = null;
+    }
+
+    private static void ClearAllPlansFromShell()
+    {
+        if (Shell.Current is not AppShell shell) return;
+
+        var plansToDelete = shell.AllPlanItems.ToList();
+
+        foreach (var plan in plansToDelete)
+        {
+            ShellContent contentToRemove = null;
+            ShellSection parentSection = null;
+
+            foreach (var shellItem in shell.Items)
+            {
+                foreach (var section in shellItem.Items)
+                {
+                    contentToRemove = section.Items.FirstOrDefault(c => c.Route == plan.PlanId);
+                    if (contentToRemove != null)
+                    {
+                        parentSection = section;
+                        break;
+                    }
+                }
+                if (contentToRemove != null) break;
+            }
+
+            if (contentToRemove != null && parentSection != null)
+            {
+                parentSection.Items.Remove(contentToRemove);
+
+                if (parentSection.Items.Count == 0 && parentSection.Parent is ShellItem group)
+                    group.Items.Remove(parentSection);
+            }
+        }
+
+        shell.PlanItems.Clear();
+        shell.AllPlanItems.Clear();
+        shell.ApplyFilterAndSorting();
     }
 }

@@ -987,4 +987,19 @@
   <data name="hatchFill" xml:space="preserve">
     <value>Hatch fill</value>
   </data>
+	<data name="projektdaten_bearbeiten" xml:space="preserve">
+  <value>Edit project data</value>
+</data>
+	<data name="einstellungen_bearbeiten" xml:space="preserve">
+  <value>Edit settings</value>
+</data>
+	<data name="icondefinitionen_bearbeiten" xml:space="preserve">
+  <value>Edit icon definitions</value>
+</data>
+	<data name="kompletter_tile_cache_loeschen" xml:space="preserve">
+  <value>Clear entire tile cache</value>
+</data>
+	<data name="schraffur_spiegeln" xml:space="preserve">
+  <value>Mirror hatch</value>
+</data>
 </root>
