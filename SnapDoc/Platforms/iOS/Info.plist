@@ -44,5 +44,16 @@
 	<string></string>
 	<key>CFBundleDisplayName</key>
 	<string>SnapDoc</string>
+    <key>CFBundleURLTypes</key>
+    <array>
+        <dict>
+            <key>CFBundleURLName</key>
+            <string>Microsoft Authentication</string>
+            <key>CFBundleURLSchemes</key>
+            <array>
+                <string>msal00fdac1d-aa0a-49c1-a238-a46a88f69ce6</string>
+            </array>
+        </dict>
+    </array>
 </dict>
 </plist>
