@@ -114,7 +114,7 @@ public partial class OpenProject : ContentPage
         Helper.HeaderUpdate();  // UI-Aktualisierung
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         LoadJsonFiles();
 
@@ -248,7 +248,7 @@ public partial class OpenProject : ContentPage
                     }
                 }
                 if (repairCount)
-                    GlobalJson.SaveToFile();
+                    SaveManager.NotifyDataChanged();
             }
 
             await Shell.Current.GoToAsync("project_details");
@@ -417,7 +417,7 @@ public partial class OpenProject : ContentPage
                         GlobalJson.Data.CustomPinsPath = "custompins";
 
                         // Save data to file
-                        GlobalJson.SaveToFile();
+                        SaveManager.NotifyDataChanged();
 
                         // Verzeichnis an die neue Stelle verschieben (umbenennen)
                         Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));

@@ -164,7 +164,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         }
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
     }
@@ -180,7 +180,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (Pin.IsCustomPin) return;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
     }
@@ -188,7 +188,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnOkayClick(object sender, EventArgs e)
     {
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, Pin.IsLockPosition));
 
@@ -232,7 +232,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].PinCount -= 1;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private async void ZoomToPinClicked(object sender, EventArgs e)
@@ -269,7 +269,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
 
             string expectedThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
 
@@ -311,7 +311,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
     }
 
@@ -329,7 +329,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
     }
 

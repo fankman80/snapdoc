@@ -205,7 +205,7 @@ public partial class AppShell : Shell
         item.AllowExport = !item.AllowExport;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         // Neu filtern und anzeigen, falls HideInactivePlans aktiv ist
         if (SettingsService.Instance.IsHideInactivePlans)
@@ -241,7 +241,7 @@ public partial class AppShell : Shell
         ApplyFilterAndSorting(); // Filter wieder anwenden
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)

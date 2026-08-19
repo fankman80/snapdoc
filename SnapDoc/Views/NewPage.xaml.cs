@@ -406,7 +406,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private void SetPinClicked(object sender, EventArgs e)
@@ -512,7 +512,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 thisPlan.PinCount += 1;
 
                 // save data to file
-                GlobalJson.SaveToFile();
+                SaveManager.NotifyDataChanged();
 
                 AddPin(currentDateTime);
 
@@ -529,7 +529,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             pinData.PinName = _displayName;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
 
             var pinPath = Path.Combine(
                 Settings.DataDirectory,
@@ -570,7 +570,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         pin.GeoLocation = new GeoLocData(location);
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private void ZoomToPin(string pinId, double? factor = null)
@@ -1075,7 +1075,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         mapPin.IsLockAutoScale = thisPlan.Pins[tappedPin.Id].IsLockAutoScale;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         PlanImage.InvalidateSurface();
     }
@@ -1111,7 +1111,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         PlanImage.InvalidateSurface();
     }
@@ -1142,7 +1142,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             thisPlan.Pins[tappedPin.Id].PinRotation = 0;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
@@ -1171,7 +1171,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnResizeSliderDragCompleted(object sender, EventArgs e)
     {
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         PinEditBorder.IsVisible = false;
         DrawBtn.IsVisible = true;
@@ -1204,7 +1204,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         thisPlan.Pins[tappedPin.Id].PinRotation = snapValue;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         PlanImage.InvalidateSurface();
     }
@@ -1229,7 +1229,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 IsGrayscaleMode = thisPlan.IsGrayscale = !thisPlan.IsGrayscale;
 
                 // save data to file
-                GlobalJson.SaveToFile();
+                SaveManager.NotifyDataChanged();
                 break;
 
             default:
@@ -1265,7 +1265,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 }
 
                 // save data to file
-                GlobalJson.SaveToFile();
+                SaveManager.NotifyDataChanged();
                 break;
         }
     }
@@ -1320,7 +1320,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         GlobalJson.Data.Plans.Remove(planId);
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         // Anzeige neu aufbauen
         shell.ApplyFilterAndSorting();
@@ -1401,7 +1401,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
 
         // Daten speichern
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     static Point RotatePin(Point oldPos, int angle)
@@ -1429,7 +1429,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         thisPlan.Name = Title;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         // Fokus entfernen
         entry.Unfocus();

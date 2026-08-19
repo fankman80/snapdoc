@@ -386,7 +386,7 @@ public partial class ImageViewPage : IQueryAttributable
         }
 
         // save data to file
-        GlobalJson.SaveToFile();  
+        SaveManager.NotifyDataChanged();  
 
         await Shell.Current.GoToAsync($"..");
     }
@@ -535,7 +535,7 @@ public partial class ImageViewPage : IQueryAttributable
             });
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
     }
 
@@ -665,7 +665,7 @@ public partial class ImageViewPage : IQueryAttributable
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
 
         // Cleanup drawing canvas

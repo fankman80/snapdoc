@@ -266,7 +266,7 @@ public partial class LoadPDFPages : ContentPage
             await LoadPDFImages();
             await ProcessFileOrganizationLogic();
 
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
 
             if (Shell.Current is AppShell shell)
                 shell.ApplyFilterAndSorting();

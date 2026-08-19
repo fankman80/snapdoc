@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
 
 namespace SnapDoc.Views;
 
@@ -57,7 +58,7 @@ public partial class ProjectDetails : ContentPage
             GlobalJson.Data.TitleImageSize = imgSize;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
 
             Helper.HeaderUpdate();
         }
@@ -105,7 +106,7 @@ public partial class ProjectDetails : ContentPage
                     GlobalJson.Data.TitleImageSize = new Size(500, 500);
 
                 // save data to file
-                GlobalJson.SaveToFile();
+                SaveManager.NotifyDataChanged();
 
                 Helper.HeaderUpdate();
             }
@@ -154,7 +155,7 @@ public partial class ProjectDetails : ContentPage
         GlobalJson.Data.Plans[planId] = plan;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         // Shell aktualisieren
         var shell = Shell.Current as AppShell;
@@ -185,7 +186,7 @@ public partial class ProjectDetails : ContentPage
         GlobalJson.Data.Creation_date = DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private async void OnImageTapped(object sender, EventArgs e)

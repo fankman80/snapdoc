@@ -108,7 +108,7 @@ public partial class PinList : ContentPage
             GlobalJson.Data.Plans[pinItem.OnPlanId].Pins[pinItem.SelfId].IsAllowExport = pinItem.IsAllowExport;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
     }
 
@@ -151,7 +151,7 @@ public partial class PinList : ContentPage
             item.IsAllowExport = !item.IsAllowExport;
 
             // save data to file
-            GlobalJson.SaveToFile();
+            SaveManager.NotifyDataChanged();
         }
     }
 

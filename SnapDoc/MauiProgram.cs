@@ -3,6 +3,10 @@ using CommunityToolkit.Maui.Storage;
 using Camera.MAUI;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
+using SnapDoc.Views;
+
+using SnapDoc.Services;
+
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
@@ -45,6 +49,8 @@ public static class MauiProgram
                 fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
             });
 
+        builder.Services.AddSingleton<AuthService>();
+        builder.Services.AddTransient<HomeScreen>();
         builder.UseMauiCameraView();
         
 #if IOS || MACCATALYST

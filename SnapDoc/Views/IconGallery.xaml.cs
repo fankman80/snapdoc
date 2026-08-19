@@ -84,7 +84,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         GlobalJson.Data.Plans[PlanId].Pins[PinId].IsCustomIcon = _pressedItem.IsCustomIcon;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
 
         WeakReferenceMessenger.Default.Send(new PinChangedMessage(PinId));
 

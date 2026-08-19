@@ -162,7 +162,7 @@ public partial class FotoGalleryView : ContentPage
         GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport;
 
         // save data to file
-        GlobalJson.SaveToFile();
+        SaveManager.NotifyDataChanged();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
