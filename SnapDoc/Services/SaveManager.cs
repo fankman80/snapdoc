@@ -132,10 +132,6 @@ public static class SaveManager
                             await SaveWithSyncCheckAsync();
                             return; // Aktuellen (fehlgeschlagenen) Durchlauf abbrechen
                         }
-                        
-                        // Zeitstempel des erfolgreichen Uploads merken
-                        if (uploadedItem?.LastModifiedDateTime != null)
-                            _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime.Value;
                     }
                 }
             }
