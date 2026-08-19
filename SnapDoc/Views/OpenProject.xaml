@@ -76,7 +76,7 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:FileItem">
-                        <Grid Style="{StaticResource NoSelectionGridStyle}">
+                        <Grid Style="{StaticResource NoSelectionGridStyle}" ColumnSpacing="8" RowSpacing="4">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="66" />
                                 <ColumnDefinition Width="*" />
@@ -84,32 +84,37 @@
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="25" />
-                                <RowDefinition Height="35" />
+                                <RowDefinition Height="37" />
                             </Grid.RowDefinitions>
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnProjectClicked" />
                             </Grid.GestureRecognizers>
-                            <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="6">
-                                <Label Text="{x:Static local:MaterialIcons.Check_circle}"
-                                       FontFamily="MaterialOutlined"
-                                       FontSize="20"
-                                       VerticalTextAlignment="Center"
-                                       IsVisible="{Binding IsActive}" />
-                                <Label FontSize="14"
-                                       VerticalTextAlignment="Center"
-                                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                       FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                       Text="{Binding FileName}"/>
-                            </HorizontalStackLayout>
+                            <Label Grid.Column="1" Grid.Row="0"
+                                   FontSize="14"
+                                   VerticalTextAlignment="Center"
+                                   MaxLines="1"
+                                   LineBreakMode="TailTruncation"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                                   Text="{Binding FileName}"/>
                             <Label Grid.Column="1" Grid.Row="1"
                                    FontSize="12"
+                                   VerticalTextAlignment="Center"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
                                    Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
-                            <Button Grid.Column="2" Grid.RowSpan="2"
+                            <Label Grid.Column="0" Grid.RowSpan="2" 
+                                   HorizontalTextAlignment="Center"
+                                   VerticalTextAlignment="Center"
+                                   BackgroundColor="#80ffffff"
+                                   IsVisible="{Binding IsActive}"
+                                   Text="{x:Static local:MaterialIcons.Check_circle}"
+                                   FontFamily="MaterialOutlined"
+                                   FontSize="40"/>                            
+                            <Button Grid.Column="3" Grid.RowSpan="2"
                                     Padding="0"
                                     Text="{x:Static local:MaterialIcons.Edit_square}"
                                     FontSize="30"

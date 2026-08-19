@@ -426,6 +426,11 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         StrokeStyle = MultipleSpacesRegex().Replace(filtered, " ");
     }
 
+    private void FlipRotationAngleClick(object sender, EventArgs e)
+    {
+        HatchRotation *= -1;
+    }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
         try { await CloseAsync(new PopupStyleReturn(SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), LineWidth, StrokeStyle, IsHatchEffect, HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, CloudRadius, CloudInciseDeg)); }
