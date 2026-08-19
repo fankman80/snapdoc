@@ -12,6 +12,7 @@ public static class SaveManager
     private static readonly Lock _fileLock = new();
     private static string CloudFileName => GlobalJson.Data?.JsonFile ?? "snapdoc_data.json";
     private static DateTimeOffset _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
+    private static string? _lastKnownETag;
 
     public static void Initialize(string filePath)
     {
@@ -48,9 +49,7 @@ public static class SaveManager
             {
                 DateTime currentDiskTime = File.GetLastWriteTimeUtc(filePath);
                 if (currentDiskTime > _lastKnownWriteTime)
-                {
                     ResolveConflictAndMerge(filePath);
-                }
             }
 
             GlobalJson.SaveToFile();
@@ -71,7 +70,6 @@ public static class SaveManager
                     {
                         await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, targetFolderId);
 
-                        // --- NEU: Konfliktprüfung in der Cloud ---
                         try
                         {
                             var cloudItem = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
@@ -111,16 +109,33 @@ public static class SaveManager
                         byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
                         using var stream = new MemoryStream(byteArray);
 
-                        var uploadedItem = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
-                            .ItemWithPath(CloudFileName)
-                            .Content
-                            .PutAsync(stream);
-
+                        try
+                        {
+                            // Upload mit ETag-Sicherung
+                            var uploadedItem = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
+                                .ItemWithPath(CloudFileName)
+                                .Content
+                                .PutAsync(stream, requestConfig => 
+                                {
+                                   if (!string.IsNullOrEmpty(_lastKnownETag))
+                                       requestConfig.Headers.Add("If-Match", _lastKnownETag);
+                                });
+                            if (uploadedItem != null)
+                            {
+                                _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
+                                _lastKnownETag = uploadedItem.ETag; // Neuen ETag nach unserem erfolgreichen Upload merken
+                            }
+                        }
+                        catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 412 || ex.Error?.Code == "conditionNotMet")
+                        {
+                            Console.WriteLine("Konflikt beim Upload! ETag stimmt nicht mehr überein.");
+                            await SaveWithSyncCheckAsync();
+                            return; // Aktuellen (fehlgeschlagenen) Durchlauf abbrechen
+                        }
+                        
                         // Zeitstempel des erfolgreichen Uploads merken
                         if (uploadedItem?.LastModifiedDateTime != null)
-                        {
                             _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime.Value;
-                        }
                     }
                 }
             }
@@ -133,7 +148,6 @@ public static class SaveManager
 
     public static async Task LoadDataAsync(AuthService authService, string localFilePath)
     {
-        // 1. Zuerst lokal laden, damit wir wissen, wie das Projekt heisst (für den Ordnerpfad)
         GlobalJson.LoadFromFile(localFilePath);
 
         if (authService.IsLoggedIn && authService.GraphClient != null)
@@ -179,6 +193,7 @@ public static class SaveManager
                                 if (cloudItem.LastModifiedDateTime != null)
                                 {
                                     _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
+                                    _lastKnownETag = cloudItem.ETag;
                                 }
                                 return;
                             }
