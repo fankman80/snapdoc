@@ -23,6 +23,14 @@
                    TextColor="LightGray"
                    HorizontalOptions="Center"
                    VerticalOptions="End"/>
+            <Button Text="Login"
+                    IsVisible="False"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="20"
+                    Clicked="OnSharepointClicked"/>
         </Grid>
     </ContentPage.Content>
 </ContentPage>
