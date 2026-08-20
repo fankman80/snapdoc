@@ -7,6 +7,7 @@ namespace SnapDoc.Services;
 public static class SaveManager
 {
     public static AuthService? CurrentAuth { get; set; }
+    public static string? TargetFolderId { get; set; }
     private static CancellationTokenSource? _debounceCts;
     private static DateTime _lastKnownWriteTime;
     private static readonly Lock _fileLock = new();
@@ -36,6 +37,57 @@ public static class SaveManager
                 await SaveWithSyncCheckAsync();
             }
         }, TaskScheduler.Default);
+    }
+
+    /// Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
+    public static async Task<bool> SyncWithExistingFolderAsync(string parentFolderId)
+    {
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
+
+        try
+        {
+            TargetFolderId = parentFolderId;
+            await EnsureProjectSubfoldersAsync(CurrentAuth, (await CurrentAuth.GraphClient.Me.Drive.GetAsync())!.Id!, TargetFolderId);
+            await SaveWithSyncCheckAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Synchronisieren: {ex.Message}");
+            return false;
+        }
+    }
+
+    // Erstellt ein neues Projektverzeichnis inklusive Unterordnern im gewählten Cloud-Ordner und lädt die aktuelle JSON-Datei hoch.
+    public static async Task<bool> CreateAndSyncNewCloudProjectAsync(string parentFolderId)
+    {
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
+
+        try
+        {
+            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
+            if (myDrive?.Id == null) return false;
+
+            string projectName = GlobalJson.Data?.ProjectPath ?? "NeuesProjekt";
+
+            // Erstelle das Projektverzeichnis im ausgewählten Ordner
+            var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, myDrive.Id, parentFolderId, projectName);
+            if (projectFolder?.Id == null) return false;
+
+            TargetFolderId = projectFolder.Id;
+
+            // Erstelle die Unterordner (images, plans, etc.)
+            await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, TargetFolderId);
+
+            // Datei speichern und ersten Upload anstossen
+            await SaveWithSyncCheckAsync();
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Erstellen des Cloud-Projekts: {ex.Message}");
+            return false;
+        }
     }
 
     public static async Task SaveWithSyncCheckAsync()
@@ -307,6 +359,11 @@ public static class SaveManager
                 }
             }
         }
+    }
+
+    public static void ResetCloudSync()
+    {
+        TargetFolderId = null;
     }
 }
 

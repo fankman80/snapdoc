@@ -200,6 +200,9 @@
 		<MauiXaml Update="Controls\RangeSlider.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Controls\CustomRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\CameraView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\CloudPickerPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\FotoGallery.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\NewPage.xaml" Generator="MSBuild:Compile" />

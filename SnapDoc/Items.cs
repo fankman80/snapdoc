@@ -57,6 +57,17 @@ namespace SnapDoc
 
         [ObservableProperty]
         public partial bool IsActive { get; set; }
+
+#pragma warning disable CA1822
+        public string CloudIcon => SaveManager.CurrentAuth != null
+        ? MaterialIcons.Cloud
+        : MaterialIcons.Cloud_off;
+#pragma warning restore CA1822
+
+        public void RefreshCloudIcon()
+        {
+            OnPropertyChanged(nameof(CloudIcon));
+        }
     }
 
     public partial class PinItem : ObservableObject

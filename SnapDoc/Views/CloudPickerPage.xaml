@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:models="clr-namespace:SnapDoc.Models"
+             xmlns:local="clr-namespace:SnapDoc"
+             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+             x:Class="SnapDoc.Views.CloudPickerPage"
+             x:DataType="views:CloudPickerPage" 
+             x:Name="ThisPage"
+             Title="Cloud Verzeichnis waehlen">
+
+    <Shell.TitleView>
+        <HorizontalStackLayout Spacing="0">
+            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   Background="Transparent"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
+        </HorizontalStackLayout>
+    </Shell.TitleView>
+
+    <Grid Margin="16" RowSpacing="12">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Label Grid.Row="0" 
+               Text="Bitte einen Ordner oder eine JSON-Datei waehlen" 
+               VerticalOptions="Center"/>
+
+        <CollectionView Grid.Row="1" 
+                        ItemsSource="{Binding CloudItems}" 
+                        SelectionMode="Single"
+                        SelectionChanged="OnItemSelected">
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="models:CloudItem">
+                    <Grid Padding="10">
+                        <HorizontalStackLayout Spacing="10">
+                            <Label Text="{Binding Icon}" FontFamily="{x:StaticResource AppFontFamily}" VerticalOptions="Center"/>
+                            <Label Text="{Binding DisplayName}" FontFamily="{x:StaticResource AppFontFamily}" VerticalOptions="Center"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+
+        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+            <Button Grid.Column="1" 
+                    Text="Diesen Ordner verwenden" 
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="OnSelectFolderClicked"/>
+        </Grid>
+    </Grid>
+</ContentPage>

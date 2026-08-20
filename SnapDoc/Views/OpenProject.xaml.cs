@@ -19,6 +19,11 @@ public partial class OpenProject : ContentPage
     {
         InitializeComponent();
         BindingContext = new BaseViewModel();
+    }
+
+    protected override void OnAppearing()
+    {
+        base.OnAppearing();
 
         LoadJsonFiles();
     }
@@ -89,6 +94,9 @@ public partial class OpenProject : ContentPage
         }
 
         string filePath = Path.Combine(Settings.DataDirectory, _result, _result + ".json");
+
+        // Cloud-Verknüpfung im SaveManager zurücksetzen
+        SaveManager.ResetCloudSync();
 
         LoadDataToView.ResetData();
 
@@ -211,15 +219,22 @@ public partial class OpenProject : ContentPage
             }
 
             if (item.IsActive)
-                return; // Finally-Block setzt IsBusy automatisch wieder auf false
+                return;
+
+            // Cloud-Verknüpfung im SaveManager zurücksetzen
+            SaveManager.ResetCloudSync();
 
             // Aktives Projekt setzen
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
             {
                 foreach (var f in items)
+                {
                     f.IsActive = false;
+                    f.RefreshCloudIcon();
+                }
 
                 item.IsActive = true;
+                item.RefreshCloudIcon();
             }
 
             SettingsService.Instance.IsProjectLoaded = true;
@@ -452,5 +467,17 @@ public partial class OpenProject : ContentPage
 
             _isProcessing = false;
         }
+    }
+
+    private async void OnCloudPickerClicked(object sender, EventArgs e)
+    {
+        // Pruefen, ob ein aktiver Auth-Service bzw. User vorhanden ist
+        if (SaveManager.CurrentAuth == null)
+        {
+            await Shell.Current.GoToAsync("//homescreen");
+            return;
+        }
+
+        await Navigation.PushAsync(new CloudPickerPage());
     }
 }

@@ -81,6 +81,7 @@
                                 <ColumnDefinition Width="66" />
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="35" />
+                                <ColumnDefinition Width="35" />
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="25" />
@@ -113,7 +114,16 @@
                                    IsVisible="{Binding IsActive}"
                                    Text="{x:Static local:MaterialIcons.Check_circle}"
                                    FontFamily="MaterialOutlined"
-                                   FontSize="40"/>                            
+                                   FontSize="40"/>
+                            <Button Grid.Column="2" Grid.RowSpan="2"
+                                    IsVisible="{Binding IsActive}"
+                                    Padding="0"
+                                    Text="{Binding CloudIcon}"
+                                    FontSize="30"
+                                    FontFamily="MaterialOutlined"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    Clicked="OnCloudPickerClicked"/>
                             <Button Grid.Column="3" Grid.RowSpan="2"
                                     Padding="0"
                                     Text="{x:Static local:MaterialIcons.Edit_square}"

@@ -227,13 +227,7 @@
                 </Grid>
             </Border>
 
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+            <Grid Grid.ColumnDefinitions="Auto, *, Auto, Auto">
                 <Button Grid.Column="0"
                         IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                         Padding="0"
