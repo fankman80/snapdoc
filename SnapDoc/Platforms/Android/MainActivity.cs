@@ -1,7 +1,9 @@
 ﻿using Android.App;
+using Android.Content;
 using Android.Content.PM;
 using Android.OS;
 using Android.Views;
+using Microsoft.Identity.Client;
 
 namespace SnapDoc.Platforms.Android
 {
@@ -25,6 +27,13 @@ namespace SnapDoc.Platforms.Android
                 controller?.AppearanceLightNavigationBars = false;
             }
 #pragma warning restore CA1422
+        }
+
+        protected override void OnActivityResult(int requestCode, Result resultCode, Intent? data)
+        {
+            base.OnActivityResult(requestCode, resultCode, data);
+
+            AuthenticationContinuationHelper.SetAuthenticationContinuationEventArgs(requestCode, resultCode, data);
         }
     }
 }

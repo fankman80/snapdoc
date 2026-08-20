@@ -48,8 +48,11 @@
     <array>
         <dict>
             <key>CFBundleURLName</key>
+			<key>CFBundleTypeRole</key>		
+			<key>CFBundleURLSchemes</key>			
             <string>Microsoft Authentication</string>
-            <key>CFBundleURLSchemes</key>
+			<string>Editor</string>
+			<string>com.ebbe.snapdoc</string>
             <array>
                 <string>msal00fdac1d-aa0a-49c1-a238-a46a88f69ce6</string>
             </array>
