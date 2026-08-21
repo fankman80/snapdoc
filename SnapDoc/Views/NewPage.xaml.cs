@@ -68,6 +68,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         drawingController = new DrawingController(new TransformViewModel());
         thisPlan = GlobalJson.Data.Plans[planId];
+
+        RegisterMessenger();
     }
 
     protected override bool OnBackButtonPressed()
@@ -79,8 +81,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     protected async override void OnAppearing()
     {
         base.OnAppearing();
-
-        RegisterMessenger();
 
         PlanImage.PinTapped += OnPinTapped;
         PlanImage.PinDoubleTapped += OnPinDoubleTapped;
@@ -117,8 +117,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (!_isShowingPopup)
             Cleanup();
-
-        WeakReferenceMessenger.Default.UnregisterAll(this);
     }
 
     private void RegisterMessenger()
@@ -142,6 +140,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 if (pin != null)
                 {
                     pinList.Remove(pin);
+                    thisPlan.PinCount = pinList.Count;
                     PlanImage.InvalidateSurface();
                 }
             });
@@ -294,7 +293,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var pin = CreateMapPin(pinId);
 
         if (pin != null)
+        {
             pinList.Add(pin);
+            thisPlan.PinCount = pinList.Count;
+        }
 
         return pin;
     }
@@ -553,12 +555,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 plan.Pins ??= [];
                 plan.Pins[currentDateTime] = newPinData;
 
-                thisPlan.PinCount += 1;
-
                 // save data to file
                 SaveManager.NotifyDataChanged();
 
                 AddPin(currentDateTime);
+
+                thisPlan.PinCount = plan.Pins.Count;
 
                 _ = UpdatePinLocationAsync(newPinData);
             }

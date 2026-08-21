@@ -229,8 +229,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         var plan = GlobalJson.Data.Plans[PlanId];
         plan.Pins.Remove(pinId);
 
-        GlobalJson.Data.Plans[PlanId].PinCount -= 1;
-
         // save data to file
         SaveManager.NotifyDataChanged();
     }
