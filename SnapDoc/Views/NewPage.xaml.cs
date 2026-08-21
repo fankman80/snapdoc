@@ -234,14 +234,22 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             MainThread.BeginInvokeOnMainThread(() => { ResetTouchState(); });
         });
 
-        WeakReferenceMessenger.Default.Register<PlanRenamedMessage>(this, (r, m) =>
+        WeakReferenceMessenger.Default.Register<PlanDetailsChangedMessage>(this, (r, m) =>
         {
-            var (updatedPlanId, newTitle) = m.Value;
+            var (updatedPlanId, newName, description, isGrayscale, planColor) = m.Value;
             if (updatedPlanId == planId)
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    Title = newTitle;
+                    Title = newName;
+                    thisPlan.Name = newName;
+                    thisPlan.Description = description;
+                    thisPlan.IsGrayscale = isGrayscale;
+                    thisPlan.PlanColor = planColor;
+
+                    IsGrayscaleMode = isGrayscale;
+
+                    PlanImage.InvalidateSurface();
                 });
             }
         });

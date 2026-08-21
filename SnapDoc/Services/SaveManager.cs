@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Graph;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -364,13 +363,15 @@ public static class SaveManager
 
             // Plan-Eigenschaften abgleichen
             bool nameOrExportChanged = localPlan.Name != cloudPlan.Name || localPlan.AllowExport != cloudPlan.AllowExport;
+            bool colorChanged = localPlan.PlanColor != cloudPlan.PlanColor;
+            bool detailsChanged = localPlan.Description != cloudPlan.Description ||
+                                  localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
+                                  colorChanged ||
+                                  nameOrExportChanged;
 
-            if (nameOrExportChanged ||
+            if (detailsChanged ||
                 localPlan.File != cloudPlan.File ||
-                localPlan.Description != cloudPlan.Description ||
-                localPlan.ImageSize != cloudPlan.ImageSize ||
-                localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
-                localPlan.PlanColor != cloudPlan.PlanColor)
+                localPlan.ImageSize != cloudPlan.ImageSize)
             {
                 localPlan.Name = cloudPlan.Name;
                 localPlan.File = cloudPlan.File;
@@ -381,11 +382,8 @@ public static class SaveManager
                 localPlan.AllowExport = cloudPlan.AllowExport;
 
                 // Bei Namens- oder Exportaenderung direkt das UI-Element aktualisieren (ohne Shell-Reload)
-                if (nameOrExportChanged)
+                if (nameOrExportChanged || colorChanged)
                 {
-                    // Nachricht an aktive Views senden
-                    WeakReferenceMessenger.Default.Send(new PlanRenamedMessage((planId, cloudPlan.Name)));
-
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         if (Shell.Current is AppShell appShell)
@@ -395,11 +393,14 @@ public static class SaveManager
                             {
                                 item.Title = cloudPlan.Name;
                                 item.AllowExport = cloudPlan.AllowExport;
+                                item.PlanColor = cloudPlan.PlanColor; 
                             }
                         }
                     });
                 }
-            } // Schliesst "if (nameOrExportChanged || ...)"
+                if (detailsChanged)
+                    WeakReferenceMessenger.Default.Send(new PlanDetailsChangedMessage((planId, cloudPlan.Name, cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
+            }
 
             localPlan.Pins ??= [];
 

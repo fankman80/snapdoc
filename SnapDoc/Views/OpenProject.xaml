@@ -119,10 +119,10 @@
                                    Source="{Binding ImagePath}"
                                    Aspect="AspectFill"/>
                             <Label Grid.Column="0" Grid.RowSpan="2" 
+                                   IsVisible="{Binding IsActive}"
                                    HorizontalTextAlignment="Center"
                                    VerticalTextAlignment="Center"
                                    BackgroundColor="#80ffffff"
-                                   IsVisible="{Binding IsActive}"
                                    Text="{x:Static local:MaterialIcons.Check_circle}"
                                    FontFamily="MaterialOutlined"
                                    FontSize="40"/>
