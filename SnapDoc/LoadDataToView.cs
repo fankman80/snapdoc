@@ -95,7 +95,7 @@ public partial class LoadDataToView
         GlobalJson.Data.JsonFile = null;
     }
 
-    private static void ClearAllPlansFromShell()
+    public static void ClearAllPlansFromShell()
     {
         if (Shell.Current is not AppShell shell) return;
 

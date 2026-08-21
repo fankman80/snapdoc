@@ -77,6 +77,51 @@ public partial class AppShell : Shell
         PropertyChanged += OnAppShellPropertyChanged;
 
         ApplyPlanTemplate();
+
+        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
+        {
+            if (m.Value == RemoteChangeType.PlanListUpdated)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    ReloadPlansFromData();
+                });
+            }
+        });
+
+        ReloadPlansFromData();
+    }
+
+    public void ReloadPlansFromData()
+    {
+        // 1. Alle alten ShellContents (Routen) und PlanItems sauber aus der Shell entfernen
+        LoadDataToView.ClearAllPlansFromShell();
+
+        // 2. Plaene aus GlobalJson neu ueber LoadDataToView aufbauen
+        if (GlobalJson.Data?.Plans != null)
+        {
+            foreach (var plan in GlobalJson.Data.Plans)
+            {
+                LoadDataToView.AddPlan(plan);
+            }
+        }
+
+        // 3. Filter anwenden und Button-Sichtbarkeit aktualisieren
+        ApplyFilterAndSorting();
+        UpdateButtonVisibility();
+
+        // 4. Pruefen, ob der aktuell geoeffnete Plan geloescht wurde
+        string currentRoute = Shell.Current?.CurrentState?.Location?.OriginalString;
+        if (!string.IsNullOrEmpty(currentRoute))
+        {
+            string currentPlanId = currentRoute.TrimStart('/');
+            bool isPlanRoute = currentPlanId.StartsWith("webmap_") || currentPlanId.StartsWith("plan_");
+
+            if (isPlanRoute && (GlobalJson.Data?.Plans == null || !GlobalJson.Data.Plans.ContainsKey(currentPlanId)))
+            {
+                Shell.Current.GoToAsync("//homescreen");
+            }
+        }
     }
 
     private void OnAppShellPropertyChanged(object sender, PropertyChangedEventArgs e)
@@ -142,6 +187,9 @@ public partial class AppShell : Shell
             bool logout = await DisplayAlertAsync("Cloud", "Du bist bereits verbunden. Möchtest du dich abmelden?", "Ja", "Nein");
             if (logout)
             {
+                // Hier das Polling beim Abmelden stoppen
+                SaveManager.StopCloudPolling();
+
                 SaveManager.CurrentAuth = null;
                 SettingsService.Instance.RefreshCloudState();
             }
@@ -154,6 +202,10 @@ public partial class AppShell : Shell
         {
             SaveManager.CurrentAuth = _authService;
             SettingsService.Instance.RefreshCloudState();
+
+            // Hier das Polling nach erfolgreichem Login starten
+            SaveManager.StartCloudPolling();
+
             await DisplayAlertAsync("Erfolg", $"Eingeloggt als: {userName}", "OK");
         }
         else

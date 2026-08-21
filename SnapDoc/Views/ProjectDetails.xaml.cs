@@ -1,7 +1,9 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Mvvm.Messaging;
 using SkiaSharp;
 using SnapDoc.Models;
+using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 
@@ -18,15 +20,27 @@ public partial class ProjectDetails : ContentPage
     {
         base.OnAppearing();
 
-        client_name.Text = GlobalJson.Data.Client_name;
-        object_address.Text = GlobalJson.Data.Object_address;
-        working_title.Text = GlobalJson.Data.Working_title;
-        project_nr.Text = GlobalJson.Data.Project_nr;
-        object_name.Text = GlobalJson.Data.Object_name;
-        project_manager.Text = GlobalJson.Data.Project_manager;
-        creation_date.Text = GlobalJson.Data.Creation_date.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        LoadDataToUI();
+
+        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
+        {
+            if (m.Value == RemoteChangeType.ProjectDetailsUpdated)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    LoadDataToUI();
+                });
+            }
+        });
 
         Helper.HeaderUpdate();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        WeakReferenceMessenger.Default.Unregister<RemoteDataChangedMessage>(this);
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
@@ -187,6 +201,18 @@ public partial class ProjectDetails : ContentPage
 
         // save data to file
         SaveManager.NotifyDataChanged();
+    }
+
+    private void LoadDataToUI()
+    {
+        if (!client_name.IsFocused) client_name.Text = GlobalJson.Data.Client_name;
+        if (!object_address.IsFocused) object_address.Text = GlobalJson.Data.Object_address;
+        if (!working_title.IsFocused) working_title.Text = GlobalJson.Data.Working_title;
+        if (!project_nr.IsFocused) project_nr.Text = GlobalJson.Data.Project_nr;
+        if (!object_name.IsFocused) object_name.Text = GlobalJson.Data.Object_name;
+        if (!project_manager.IsFocused) project_manager.Text = GlobalJson.Data.Project_manager;
+
+        creation_date.Text = GlobalJson.Data.Creation_date.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
     }
 
     private async void OnImageTapped(object sender, EventArgs e)

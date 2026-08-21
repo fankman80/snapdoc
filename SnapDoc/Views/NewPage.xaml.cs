@@ -136,6 +136,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     pin.Icon = null;
                     pin.IconPath = resolvedPath;
                     pin.Anchor = currentAnchor;
+                    pin.RelativeX = (float)pinData.Pos.X;
+                    pin.RelativeY = (float)pinData.Pos.Y;
                     pin.IsLockAutoScale = pinData.IsLockAutoScale;
                     pin.IsLockRotate = pinData.IsLockRotate;
                     pin.Rotation = pinData.IsLockRotate
@@ -150,6 +152,33 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     PlanImage.InvalidateSurface();
                 }
             });
+        });
+
+        WeakReferenceMessenger.Default.Register<PinAddedMessage>(this, (r, m) =>
+        {
+            var (incomingPlanId, pinId) = m.Value;
+
+            // Nur reagieren, wenn wir uns auf dem betroffenen Plan befinden
+            if (incomingPlanId != planId) return;
+
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                // AddPin existiert bereits in deinem Code
+                AddPin(pinId);
+                PlanImage.InvalidateSurface();
+            });
+        });
+
+        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
+        {
+            if (m.Value == RemoteChangeType.PinsUpdated)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    // Pins/Canvas aktualisieren, wenn sich Cloud-Pins geändert haben
+                    PlanImage.InvalidateSurface();
+                });
+            }
         });
 
         WeakReferenceMessenger.Default.Register<ResetTouchesMessage>(this, (r, m) =>

@@ -321,7 +321,7 @@ public partial class OpenProject : ContentPage
             if (item.IsActive)
                 return;
 
-            // Cloud-Verknüpfung im SaveManager zurücksetzen
+            // Cloud-Verknuepfung im SaveManager zuruecksetzen
             SaveManager.ResetCloudSync();
 
             // Aktives Projekt setzen
@@ -340,8 +340,33 @@ public partial class OpenProject : ContentPage
             SettingsService.Instance.IsProjectLoaded = true;
             LoadDataToView.ResetData();
 
-            // Laden der Daten
+            // 1. ZUERST lokales JSON in den Speicher laden
             GlobalJson.LoadFromFile(item.FilePath);
+
+            // 2. Cloud-Pruefung & Sync DURCHFUEHREN (bevor Routen gebaut werden)
+            if (await SaveManager.IsCloudVersionNewerAsync())
+            {
+                bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
+                {
+                    var popup = new PopupDualResponse("In der Cloud existiert eine neuere Version dieses Projekts. Moechten Sie die neuesten Daten jetzt synchronisieren?", "Synchronisieren");
+                    var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+                    return result?.Result == "Ok";
+                });
+
+                if (shouldSync)
+                {
+                    viewModel.BusyText = "Daten werden synchronisiert...";
+                    bool success = await SaveManager.SyncJsonOnlyFromCloudAsync();
+
+                    if (success)
+                    {
+                        // Frisch synchronisiertes JSON neu laden
+                        GlobalJson.LoadFromFile(item.FilePath);
+                    }
+                }
+            }
+
+            // 3. ERST JETZT EINMALIG die UI und Routen aufbauen
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
 
