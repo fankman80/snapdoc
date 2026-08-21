@@ -169,6 +169,29 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
 
+#pragma warning disable CA1822
+    public string GlobalCloudIcon
+    {
+        get
+        {
+            return (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
+                ? MaterialIcons.Cloud_done
+                : MaterialIcons.Cloud_off;
+        }
+    }
+    public string CurrentUserName => SaveManager.CurrentAuth?.CurrentUserName ?? string.Empty;
+    public string CurrentUserEmail => SaveManager.CurrentAuth?.CurrentUserEmail ?? string.Empty;
+    public bool IsCloudLoggedIn => SaveManager.CurrentAuth?.IsLoggedIn == true;
+#pragma warning restore CA1822
+
+    public void RefreshCloudState()
+    {
+        OnPropertyChanged(nameof(GlobalCloudIcon));
+        OnPropertyChanged(nameof(IsCloudLoggedIn));
+        OnPropertyChanged(nameof(CurrentUserName));
+        OnPropertyChanged(nameof(CurrentUserEmail));
+    }
+
     // Lists
     [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
     [

@@ -318,36 +318,44 @@
                     <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="100" />
+                    <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-
-                <Label x:DataType="local:AppShell"
-                       Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="3"
+                
+                <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"
+                       x:DataType="local:AppShell" 
                        BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource SecondaryBackgroundDark}}"
                        Text="{Binding InfoText}" 
                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                        FontSize="11"
                        HorizontalTextAlignment="Center"
-                       VerticalTextAlignment="Center"/>
+                       VerticalTextAlignment="Center"/>     
+                
+                <Button Grid.Row="1" Grid.Column="0"
+                        x:DataType="model:GeolocationViewModel"
+                        BindingContext="{x:Static model:GeolocationViewModel.Instance}"
+                        Padding="0"
+                        Text="{Binding GPSButtonIcon}"
+                        FontFamily="MaterialOutlined"
+                        FontSize="26"                               
+                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        BackgroundColor="Transparent"
+                        Command="{Binding ToggleGPSCommand}"/>
 
-                <HorizontalStackLayout x:DataType="model:GeolocationViewModel" BindingContext="{x:Static model:GeolocationViewModel.Instance}"
-                                       Grid.Row="1" Grid.Column="0" Spacing="0">
-                    <Button Text="{Binding GPSButtonIcon}"
-                            FontFamily="MaterialOutlined"
-                            FontSize="26"                               
-                            Grid.Row="1" Grid.Column="0"
-                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                            BackgroundColor="Transparent"
-                            Command="{Binding ToggleGPSCommand}">
-                    </Button>
-                    <Label Text="GPS"
-                           VerticalTextAlignment="Center"
-                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                </HorizontalStackLayout>
+                <Button Grid.Row="1" Grid.Column="1"
+                        x:DataType="services:SettingsService"
+                        BindingContext="{x:Static services:SettingsService.Instance}"
+                        Padding="0"
+                        Text="{Binding GlobalCloudIcon}"
+                        FontFamily="MaterialOutlined"
+                        FontSize="26"                        
+                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        BackgroundColor="Transparent"                        
+                        Clicked="OnGlobalCloudClicked"/>
 
-                <VerticalStackLayout Grid.Row="1" Grid.Column="1" Spacing="0" VerticalOptions="Center">
+                <VerticalStackLayout Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Spacing="0" VerticalOptions="Center">
                     <Label Text="SnapDoc"
                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                            FontAttributes="Bold"
@@ -360,19 +368,14 @@
                            HorizontalTextAlignment="Center"/>
                 </VerticalStackLayout>
 
-                <ImageButton Grid.Row="1" Grid.Column="2"
-                             Margin="0,0,10,0"
-                             Padding="6"
-                             HorizontalOptions="End"
-                             BackgroundColor="Transparent"
-                             Clicked="OnSettingsClicked">
-                    <ImageButton.Source>
-                        <FontImageSource Glyph="{x:Static local:MaterialIcons.Settings}"
-                                         FontFamily="MaterialOutlined"
-                                         Size="28"
-                                         Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
-                    </ImageButton.Source>
-                </ImageButton>
+                <Button Grid.Row="1" Grid.Column="3"
+                        Padding="0"
+                        Text="{x:Static local:MaterialIcons.Settings}"
+                        FontFamily="MaterialOutlined"
+                        FontSize="26"                               
+                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        BackgroundColor="Transparent"
+                        Clicked="OnSettingsClicked"/>
             </Grid>
         </DataTemplate>
     </Shell.FlyoutFooterTemplate>    

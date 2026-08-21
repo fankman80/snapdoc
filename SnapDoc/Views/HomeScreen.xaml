@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
+             xmlns:views="clr-namespace:SnapDoc.Views"
              x:Class="SnapDoc.Views.HomeScreen"
+             x:DataType="views:HomeScreen"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="#5c5c5c"
              BackgroundColor="#5c5c5c">
@@ -23,26 +26,18 @@
                    TextColor="LightGray"
                    HorizontalOptions="Center"
                    VerticalOptions="End"/>
-
-            <VerticalStackLayout HorizontalOptions="End" VerticalOptions="Start" Margin="20" Spacing="10">
-                <Button Text="Logout"
-                        IsVisible="{Binding IsLoggedIn}"
-                        WidthRequest="100"                        
-                        BackgroundColor="Red"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        HorizontalOptions="End"
-                        Clicked="OnLogoutClicked"/>
-                <Button Text="Login"
-                        IsVisible="{Binding NotLoggedIn}"
-                        WidthRequest="100"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        HorizontalOptions="End"
-                        Clicked="OnSharepointClicked"/>
-                <Label IsVisible="{Binding IsLoggedIn}" Text="{Binding CurrentUserName}" TextColor="LightGray" HorizontalOptions="End" />
-                <Label IsVisible="{Binding IsLoggedIn}" Text="{Binding CurrentUserEmail}" TextColor="LightGray" HorizontalOptions="End" />
+            <VerticalStackLayout
+                    BindingContext="{x:Static services:SettingsService.Instance}"
+                    x:DataType="services:SettingsService"
+                    IsVisible="{Binding IsCloudLoggedIn}"
+                    HorizontalOptions="End"
+                    VerticalOptions="Start"
+                    Margin="20"
+                    Spacing="10">
+                <Label Text="Angemeldet als:" TextColor="LightGray" HorizontalOptions="End" />
+                <Label Text="{Binding CurrentUserName}" TextColor="LightGray" HorizontalOptions="End" />
+                <Label Text="{Binding CurrentUserEmail}" TextColor="LightGray" HorizontalOptions="End" />
             </VerticalStackLayout>
-
         </Grid>
     </ContentPage.Content>
 </ContentPage>

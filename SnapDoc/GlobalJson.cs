@@ -43,6 +43,24 @@ public static class GlobalJson
         _userData = JsonSerializer.Deserialize<JsonDataModel>(json, options);
     }
 
+    public static JsonDataModel ReadFromFile(string filePath)
+    {
+        try
+        {
+            if (File.Exists(filePath))
+            {
+                string json = File.ReadAllText(filePath);
+                return JsonSerializer.Deserialize<JsonDataModel>(json, GetOptions());
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Lesen der Datei: {ex.Message}");
+        }
+
+        return null;
+    }
+
     public static void SaveToFile()
     {
         if (string.IsNullOrEmpty(_filePath))

@@ -39,7 +39,8 @@ public static class SaveManager
         }, TaskScheduler.Default);
     }
 
-    /// Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
+    // Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
+    // Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
     public static async Task<bool> SyncWithExistingFolderAsync(string parentFolderId)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
@@ -47,8 +48,28 @@ public static class SaveManager
         try
         {
             TargetFolderId = parentFolderId;
-            await EnsureProjectSubfoldersAsync(CurrentAuth, (await CurrentAuth.GraphClient.Me.Drive.GetAsync())!.Id!, TargetFolderId);
+            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync(); // Drive laden
+            string driveId = myDrive!.Id!;
+
+            await EnsureProjectSubfoldersAsync(CurrentAuth, driveId, TargetFolderId);
+
+            // FEHLENDE IDs ZUWEISEN:
+            if (GlobalJson.Data != null)
+            {
+                GlobalJson.Data.CloudDriveId = driveId;
+                GlobalJson.Data.CloudFolderId = TargetFolderId;
+            }
+
             await SaveWithSyncCheckAsync();
+
+            // NEU: Lokales Projektverzeichnis ebenfalls rekursiv hochladen
+            string localJsonPath = GlobalJson.GetFilePath();
+            string? localProjectDir = Path.GetDirectoryName(localJsonPath);
+            if (!string.IsNullOrEmpty(localProjectDir))
+            {
+                await UploadDirectoryRecursiveAsync(driveId, TargetFolderId, localProjectDir);
+            }
+
             return true;
         }
         catch (Exception ex)
@@ -75,12 +96,25 @@ public static class SaveManager
             if (projectFolder?.Id == null) return false;
 
             TargetFolderId = projectFolder.Id;
-
-            // Erstelle die Unterordner (images, plans, etc.)
             await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, TargetFolderId);
 
-            // Datei speichern und ersten Upload anstossen
+            if (GlobalJson.Data != null)
+            {
+                GlobalJson.Data.CloudDriveId = myDrive.Id;
+                GlobalJson.Data.CloudFolderId = TargetFolderId;
+            }
+
+            // 1. JSON speichern
             await SaveWithSyncCheckAsync();
+
+            // 2. NEU: Alle lokalen Mediendateien (Bilder, Pläne etc.) in die Cloud hochladen
+            string localJsonPath = GlobalJson.GetFilePath();
+            string? localProjectDir = Path.GetDirectoryName(localJsonPath);
+            if (!string.IsNullOrEmpty(localProjectDir))
+            {
+                await UploadDirectoryRecursiveAsync(myDrive.Id, TargetFolderId, localProjectDir);
+            }
+
             return true;
         }
         catch (Exception ex)
@@ -110,81 +144,71 @@ public static class SaveManager
 
         if (CurrentAuth != null && CurrentAuth.IsLoggedIn && CurrentAuth.GraphClient != null)
         {
+            // FIX: Verhindert ungewollte Uploads. Nur synchronisieren, wenn explizit verknüpft!
+            if (GlobalJson.Data == null ||
+                string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
+                string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId))
+            {
+                return;
+            }
+
             try
             {
-                var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
-                if (myDrive != null && !string.IsNullOrEmpty(myDrive.Id))
+                string driveId = GlobalJson.Data.CloudDriveId;
+                string targetFolderId = GlobalJson.Data.CloudFolderId;
+                try
                 {
-                    string projectName = GlobalJson.Data?.ProjectPath ?? "DefaultProject";
-                    string? targetFolderId = await EnsureCloudFolderStructureAsync(CurrentAuth, myDrive.Id, projectName);
+                    var cloudItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                        .ItemWithPath(CloudFileName)
+                        .GetAsync();
 
-                    if (!string.IsNullOrEmpty(targetFolderId))
+                    if (cloudItem?.LastModifiedDateTime != null && cloudItem.LastModifiedDateTime > _lastKnownCloudSyncTime)
                     {
-                        await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, targetFolderId);
+                        // Jemand anderes hat die Datei verändert! Herunterladen und mergen.
+                        var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                            .ItemWithPath(CloudFileName)
+                            .Content
+                            .GetAsync();
 
-                        try
+                        if (cloudStream != null)
                         {
-                            var cloudItem = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
-                                .ItemWithPath(CloudFileName)
-                                .GetAsync();
-
-                            if (cloudItem?.LastModifiedDateTime != null && cloudItem.LastModifiedDateTime > _lastKnownCloudSyncTime)
+                            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
+                            if (cloudData != null)
                             {
-                                // Jemand anderes hat die Datei verändert! Herunterladen und mergen.
-                                var cloudStream = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
-                                    .ItemWithPath(CloudFileName)
-                                    .Content
-                                    .GetAsync();
-
-                                if (cloudStream != null)
-                                {
-                                    var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
-                                    if (cloudData != null)
-                                    {
-                                        if (GlobalJson.Data == null)
-                                            GlobalJson.Data = cloudData;
-                                        else
-                                            MergeModels(GlobalJson.Data, cloudData);
-
-                                        GlobalJson.SaveToFile(); // Lokal speichern mit den neuen Daten
-                                        _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
-                                    }
-                                }
+                                MergeModels(GlobalJson.Data, cloudData);
+                                GlobalJson.SaveToFile();
+                                _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
                             }
-                        }
-                        catch (Microsoft.Graph.Models.ODataErrors.ODataError)
-                        {
-                            // Datei existiert noch nicht in der Cloud (404 Not Found), das ist ok für den ersten Upload.
-                        }
-
-                        string json = GlobalJson.ToJson();
-                        byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
-                        using var stream = new MemoryStream(byteArray);
-
-                        try
-                        {
-                            // Upload mit ETag-Sicherung
-                            var uploadedItem = await CurrentAuth.GraphClient.Drives[myDrive.Id].Items[targetFolderId]
-                                .ItemWithPath(CloudFileName)
-                                .Content
-                                .PutAsync(stream, requestConfig => 
-                                {
-                                   if (!string.IsNullOrEmpty(_lastKnownETag))
-                                       requestConfig.Headers.Add("If-Match", _lastKnownETag);
-                                });
-                            if (uploadedItem != null)
-                            {
-                                _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
-                                _lastKnownETag = uploadedItem.ETag; // Neuen ETag nach unserem erfolgreichen Upload merken
-                            }
-                        }
-                        catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 412 || ex.Error?.Code == "conditionNotMet")
-                        {
-                            Console.WriteLine("Konflikt beim Upload! ETag stimmt nicht mehr überein.");
-                            await SaveWithSyncCheckAsync();
-                            return; // Aktuellen (fehlgeschlagenen) Durchlauf abbrechen
                         }
                     }
+                }
+                catch (Microsoft.Graph.Models.ODataErrors.ODataError) { /* Existiert nicht */ }
+
+                string json = GlobalJson.ToJson();
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
+                using var stream = new MemoryStream(byteArray);
+
+                try
+                {
+                    var uploadedItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                        .ItemWithPath(CloudFileName)
+                        .Content
+                        .PutAsync(stream, requestConfig =>
+                        {
+                            if (!string.IsNullOrEmpty(_lastKnownETag))
+                                requestConfig.Headers.Add("If-Match", _lastKnownETag);
+                        });
+
+                    if (uploadedItem != null)
+                    {
+                        _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
+                        _lastKnownETag = uploadedItem.ETag;
+                    }
+                }
+                catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 412 || ex.Error?.Code == "conditionNotMet")
+                {
+                    Console.WriteLine("Konflikt beim Upload! ETag stimmt nicht mehr überein.");
+                    await SaveWithSyncCheckAsync();
                 }
             }
             catch (Exception ex)
@@ -361,10 +385,178 @@ public static class SaveManager
         }
     }
 
+    // Verknüpft das aktuelle Projekt mit einem SharePoint/OneDrive-Ordner und speichert die IDs in der JSON.
+    public static async Task LinkProjectToCloudAsync(string driveId, string folderId)
+    {
+        if (GlobalJson.Data == null) return;
+
+        GlobalJson.Data.CloudDriveId = driveId;
+        GlobalJson.Data.CloudFolderId = folderId;
+
+        await SaveWithSyncCheckAsync();
+    }
+
+    // Durchsucht den gesamten SharePoint/OneDrive des Nutzers nach SnapDoc-Projekten.
+    public static async Task<List<RemoteProjectDto>> SearchRemoteProjectsAsync()
+    {
+        var results = new List<RemoteProjectDto>();
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return results;
+
+        try
+        {
+            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
+            if (myDrive?.Id == null) return results;
+
+            // Sucht nach allen *.json Dateien im Laufwerk
+            var searchResponse = await CurrentAuth.GraphClient.Drives[myDrive.Id]
+                .SearchWithQ(".json")
+                .GetAsSearchWithQGetResponseAsync();
+
+            if (searchResponse?.Value == null) return results;
+
+            foreach (var item in searchResponse.Value)
+            {
+                // Nur JSONs mit Name und gültigem Elternelement berücksichtigen
+                if (!string.IsNullOrEmpty(item.Name) && item.ParentReference?.Id != null)
+                {
+                    results.Add(new RemoteProjectDto
+                    {
+                        FileName = item.Name,
+                        DriveId = item.ParentReference.DriveId ?? myDrive.Id,
+                        FolderId = item.ParentReference.Id,
+                        LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
+                    });
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler bei der Cloud-Suche: {ex.Message}");
+        }
+
+        return results;
+    }
+
+    // Lädt eine ausgewählte Cloud-Projekt-JSON herunter, baut die lokale Ordnerstruktur auf und speichert die Verknüpfungs-IDs in der JSON.
+    public static async Task<bool> DownloadRemoteProjectAsync(RemoteProjectDto remoteProject)
+    {
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
+
+        try
+        {
+            string projectName = Path.GetFileNameWithoutExtension(remoteProject.FileName);
+            string localProjectDir = Path.Combine(Settings.DataDirectory, projectName);
+
+            // Lokale Ordnerstruktur vorbereiten
+            Directory.CreateDirectory(localProjectDir);
+            Directory.CreateDirectory(Path.Combine(localProjectDir, "images"));
+            Directory.CreateDirectory(Path.Combine(localProjectDir, "images", "originals"));
+            Directory.CreateDirectory(Path.Combine(localProjectDir, "plans"));
+            Directory.CreateDirectory(Path.Combine(localProjectDir, "plans", "thumbnails"));
+            Directory.CreateDirectory(Path.Combine(localProjectDir, "thumbnails"));
+
+            // Rekursive Funktion zum Herunterladen aller Cloud-Inhalte
+            async static Task DownloadFolderRecursiveAsync(string driveId, string cloudFolderId, string localDir)
+            {
+                var children = await CurrentAuth.GraphClient.Drives[driveId].Items[cloudFolderId].Children.GetAsync();
+                if (children?.Value == null) return;
+
+                foreach (var item in children.Value)
+                {
+                    if (item.Folder != null)
+                    {
+                        string subLocalDir = Path.Combine(localDir, item.Name!);
+                        Directory.CreateDirectory(subLocalDir);
+                        await DownloadFolderRecursiveAsync(driveId, item.Id!, subLocalDir);
+                    }
+                    else if (item.File != null)
+                    {
+                        string localFilePath = Path.Combine(localDir, item.Name!);
+                        using var contentStream = await CurrentAuth.GraphClient.Drives[driveId].Items[item.Id!].Content.GetAsync();
+                        if (contentStream != null)
+                        {
+                            using var fileStream = File.Create(localFilePath);
+                            await contentStream.CopyToAsync(fileStream);
+                        }
+                    }
+                }
+            }
+
+            // Starte den Download des gesamten Cloud-Projektordners
+            await DownloadFolderRecursiveAsync(remoteProject.DriveId, remoteProject.FolderId, localProjectDir);
+
+            // JSON-Verknüpfung aktualisieren
+            string localJsonPath = Path.Combine(localProjectDir, remoteProject.FileName);
+            var projectData = GlobalJson.ReadFromFile(localJsonPath);
+            if (projectData != null)
+            {
+                projectData.CloudDriveId = remoteProject.DriveId;
+                projectData.CloudFolderId = remoteProject.FolderId;
+                projectData.ProjectPath = projectName;
+                projectData.JsonFile = remoteProject.FileName;
+
+                string updatedJson = JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                File.WriteAllText(localJsonPath, updatedJson);
+            }
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Herunterladen des Projekts: {ex.Message}");
+            return false;
+        }
+    }
+
+    private static async Task UploadDirectoryRecursiveAsync(string driveId, string rootFolderId, string localDirPath)
+    {
+        if (CurrentAuth?.GraphClient == null || !Directory.Exists(localDirPath)) return;
+
+        // 1. Alle Dateien im aktuellen lokalen Verzeichnis hochladen
+        foreach (var filePath in Directory.GetFiles(localDirPath))
+        {
+            string fileName = Path.GetFileName(filePath);
+            // Die JSON selbst wird separat über SaveWithSyncCheckAsync gehandhabt
+            if (fileName.Equals(CloudFileName, StringComparison.OrdinalIgnoreCase)) continue;
+
+            try
+            {
+                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
+                await CurrentAuth.GraphClient.Drives[driveId].Items[rootFolderId]
+                    .ItemWithPath(fileName)
+                    .Content
+                    .PutAsync(fileStream);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim Hochladen der Datei {fileName}: {ex.Message}");
+            }
+        }
+
+        // 2. Alle Unterordner durchgehen und rekursiv verarbeiten
+        foreach (var subDirPath in Directory.GetDirectories(localDirPath))
+        {
+            string subFolderName = Path.GetFileName(subDirPath);
+
+            // Entsprechenden Unterordner in der Cloud finden oder erstellen
+            var cloudSubFolder = await GetOrCreateFolderAsync(CurrentAuth, driveId, rootFolderId, subFolderName);
+            if (cloudSubFolder?.Id != null)
+            {
+                await UploadDirectoryRecursiveAsync(driveId, cloudSubFolder.Id, subDirPath);
+            }
+        }
+    }
+
     public static void ResetCloudSync()
     {
         TargetFolderId = null;
     }
 }
 
-
+public class RemoteProjectDto
+{
+    public string FileName { get; set; } = string.Empty;
+    public string DriveId { get; set; } = string.Empty;
+    public string FolderId { get; set; } = string.Empty;
+    public DateTimeOffset LastModified { get; set; }
+}

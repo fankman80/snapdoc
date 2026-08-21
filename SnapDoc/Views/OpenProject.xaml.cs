@@ -66,6 +66,106 @@ public partial class OpenProject : ContentPage
 
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
+        // Hintergrundprüfung für lokale Projekte
+        if (SaveManager.CurrentAuth?.IsLoggedIn == true)
+        {
+            _ = Task.Run(async () =>
+            {
+                // 1. Hole einmalig alle Cloud-Projekte (viel schneller als Einzelabfragen)
+                var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
+
+                foreach (var item in foundFiles)
+                {
+                    // 2. Prüfe, ob das lokale Projekt in der Cloud existiert
+                    string expectedJsonName = item.FileName + ".json";
+                    var matchingRemote = remoteProjects.FirstOrDefault(rp =>
+                        rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
+
+                    if (matchingRemote != null)
+                    {
+                        item.HasCloudSync = true;
+                        MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
+
+                        // 3. Ergänze fehlende Cloud-IDs lokal für künftige automatische Uploads
+                        var projectData = GlobalJson.ReadFromFile(item.FilePath);
+                        if (projectData != null && string.IsNullOrEmpty(projectData.CloudDriveId))
+                        {
+                            projectData.CloudDriveId = matchingRemote.DriveId;
+                            projectData.CloudFolderId = matchingRemote.FolderId;
+
+                            string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                            File.WriteAllText(item.FilePath, updatedJson);
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
+    {
+        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
+        {
+            await DisplayAlertAsync("Info", "Bitte zuerst anmelden", "OK");
+            return;
+        }
+
+        var viewModel = BindingContext as BaseViewModel;
+        try
+        {
+            if (viewModel != null)
+            {
+                viewModel.BusyText = "Projekte werden gesucht...";
+                viewModel.IsBusy = true;
+                await Task.Delay(100);
+            }
+
+            var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
+
+            viewModel?.IsBusy = false; // Suche beendet, Ladeanzeige vorübergehend aus
+
+            if (remoteProjects.Count == 0)
+            {
+                await DisplayAlertAsync("", "Keine Projekte in der Cloud gefunden.", "OK");
+                return;
+            }
+
+            var popup = new PopupCloudProjects(remoteProjects);
+            var result = await this.ShowPopupAsync<RemoteProjectDto>(popup, Settings.PopupOptions);
+            if (result?.Result == null) return; // Abgebrochen
+
+            // Selected Project verarbeiten
+            var selectedProject = result.Result;
+
+            if (viewModel != null)
+            {
+                viewModel.BusyText = "Projekt wird heruntergeladen...";
+                viewModel.IsBusy = true;
+                await Task.Delay(100);
+            }
+
+            // 1. Projekt-JSON und Ordner aus der Cloud herunterladen
+            bool success = await SaveManager.DownloadRemoteProjectAsync(selectedProject);
+
+            if (success)
+            {
+                // 2. Ansicht neu laden (das neue Projekt erscheint jetzt in der Liste mit Sync-Icon)
+                LoadJsonFiles();
+                await DisplayAlertAsync("", "Projekt erfolgreich heruntergeladen.", "OK");
+            }
+            else
+            {
+                await DisplayAlertAsync("", "Fehler beim Herunterladen des Projekts.", "OK");
+            }
+        }
+        catch (Exception ex)
+        {
+            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+        }
+        finally
+        {
+            viewModel?.IsBusy = false;
+        }
     }
 
     private async void OnNewClicked(object sender, EventArgs e)
@@ -471,11 +571,35 @@ public partial class OpenProject : ContentPage
 
     private async void OnCloudPickerClicked(object sender, EventArgs e)
     {
-        // Pruefen, ob ein aktiver Auth-Service bzw. User vorhanden ist
-        if (SaveManager.CurrentAuth == null)
+        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await Shell.Current.GoToAsync("//homescreen");
+            await DisplayAlertAsync("", "Bitte melden Sie sich zuerst an.", "OK");
             return;
+        }
+
+        var button = sender as Button;
+        if (button?.BindingContext is not FileItem item) return;
+
+        // Lade das Projekt temporär in den Speicher, falls es noch nicht aktiv ist
+        if (!item.IsActive)
+        {
+            if (FileListView.ItemsSource is IEnumerable<FileItem> items)
+            {
+                foreach (var f in items)
+                {
+                    f.IsActive = false;
+                    f.RefreshCloudIcon();
+                }
+            }
+
+            item.IsActive = true;
+            item.RefreshCloudIcon();
+
+            SettingsService.Instance.IsProjectLoaded = true;
+            LoadDataToView.ResetData();
+            GlobalJson.LoadFromFile(item.FilePath);
+            LoadDataToView.LoadData(new FileResult(item.FilePath));
+            Helper.HeaderUpdate();
         }
 
         await Navigation.PushAsync(new CloudPickerPage());

@@ -6,6 +6,9 @@ namespace SnapDoc.Models;
 
 public class JsonDataModel
 {
+    public string ProjectId { get; set; } = Guid.NewGuid().ToString();
+    public string CloudDriveId { get; set; }
+    public string CloudFolderId { get; set; }
     public string Client_name { get; set; }
     public string Object_address { get; set; }
     public string Working_title { get; set; }

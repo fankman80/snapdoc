@@ -1,17 +1,19 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Mvvm.Messaging;
+using Microsoft.Graph.Models;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
-using CommunityToolkit.Mvvm.Messaging;
 
 namespace SnapDoc;
 
 public partial class AppShell : Shell
 {
+    private readonly AuthService _authService = new();
     public ObservableCollection<PlanItem> AllPlanItems { get; set; }
     public ObservableCollection<PlanItem> PlanItems { get; set; }
 
@@ -131,6 +133,33 @@ public partial class AppShell : Shell
     {
         var popup = new PopupSettings();
         await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+    }
+
+    private async void OnGlobalCloudClicked(object sender, EventArgs e)
+    {
+        if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
+        {
+            bool logout = await DisplayAlertAsync("Cloud", "Du bist bereits verbunden. Möchtest du dich abmelden?", "Ja", "Nein");
+            if (logout)
+            {
+                SaveManager.CurrentAuth = null;
+                SettingsService.Instance.RefreshCloudState();
+            }
+            return;
+        }
+
+        var (success, userName, _) = await _authService.LoginAndFetchUserAsync();
+
+        if (success)
+        {
+            SaveManager.CurrentAuth = _authService;
+            SettingsService.Instance.RefreshCloudState();
+            await DisplayAlertAsync("Erfolg", $"Eingeloggt als: {userName}", "OK");
+        }
+        else
+        {
+            await DisplayAlertAsync("Fehler", $"Login fehlgeschlagen: {userName}", "OK");
+        }
     }
 
     private void OnTitleClicked(object sender, EventArgs e)

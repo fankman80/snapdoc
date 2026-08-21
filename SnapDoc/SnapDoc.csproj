@@ -113,9 +113,9 @@
 		<PackageReference Include="Mapsui.Maui" Version="5.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Graph" Version="6.5.0" />
-		<PackageReference Include="Microsoft.Identity.Client" Version="4.87.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.90" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.90" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.88.0" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.100" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.100" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
 		<PackageReference Include="Sentry.Maui" Version="6.9.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
@@ -207,6 +207,9 @@
 		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\NewPage.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupCloudProjects.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupLoupeSettings.xaml">

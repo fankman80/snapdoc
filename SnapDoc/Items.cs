@@ -3,8 +3,6 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using SnapDoc.Models;
 using SnapDoc.Services;
-using System.ComponentModel;
-using System.Runtime.CompilerServices;
 using static SnapDoc.Helper;
 
 namespace SnapDoc
@@ -56,13 +54,22 @@ namespace SnapDoc
         public required string ThumbnailPath { get; set; }
 
         [ObservableProperty]
+        [NotifyPropertyChangedFor(nameof(CloudIcon))]
+        public partial bool HasCloudSync { get; set; }
+
+        [ObservableProperty]
         public partial bool IsActive { get; set; }
 
-#pragma warning disable CA1822
-        public string CloudIcon => SaveManager.CurrentAuth != null
-        ? MaterialIcons.Cloud
-        : MaterialIcons.Cloud_off;
-#pragma warning restore CA1822
+        public string CloudIcon
+        {
+            get
+            {
+                if (HasCloudSync)
+                    return MaterialIcons.Cloud;
+                else
+                    return MaterialIcons.Sync;
+            }
+        }
 
         public void RefreshCloudIcon()
         {
