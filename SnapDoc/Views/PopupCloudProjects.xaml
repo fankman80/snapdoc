@@ -35,7 +35,7 @@
                                FontAttributes="Bold"
                                LineBreakMode="TailTruncation" />
                         <Label Grid.Row="1"
-                               Text="{Binding LastModified, StringFormat='{0:dd.MM.yyyy HH:mm}'}"
+                               Text="{Binding LastModified, StringFormat='{0:dd.MM.yyyy | HH:mm}'}"
                                FontSize="11"
                                Opacity="0.7" />
                     </Grid>
