@@ -94,23 +94,21 @@ public partial class AppShell : Shell
 
     public void ReloadPlansFromData()
     {
-        // 1. Alle alten ShellContents (Routen) und PlanItems sauber aus der Shell entfernen
+        // Alle alten ShellContents (Routen) und PlanItems sauber aus der Shell entfernen
         LoadDataToView.ClearAllPlansFromShell();
 
-        // 2. Plaene aus GlobalJson neu ueber LoadDataToView aufbauen
+        // Plaene aus GlobalJson neu ueber LoadDataToView aufbauen
         if (GlobalJson.Data?.Plans != null)
         {
             foreach (var plan in GlobalJson.Data.Plans)
-            {
                 LoadDataToView.AddPlan(plan);
-            }
         }
 
-        // 3. Filter anwenden und Button-Sichtbarkeit aktualisieren
+        // Filter anwenden und Button-Sichtbarkeit aktualisieren
         ApplyFilterAndSorting();
         UpdateButtonVisibility();
 
-        // 4. Pruefen, ob der aktuell geoeffnete Plan geloescht wurde
+        // Pruefen, ob der aktuell geoeffnete Plan geloescht wurde
         string currentRoute = Shell.Current?.CurrentState?.Location?.OriginalString;
         if (!string.IsNullOrEmpty(currentRoute))
         {
@@ -118,9 +116,7 @@ public partial class AppShell : Shell
             bool isPlanRoute = currentPlanId.StartsWith("webmap_") || currentPlanId.StartsWith("plan_");
 
             if (isPlanRoute && (GlobalJson.Data?.Plans == null || !GlobalJson.Data.Plans.ContainsKey(currentPlanId)))
-            {
                 Shell.Current.GoToAsync("//homescreen");
-            }
         }
     }
 
@@ -184,7 +180,7 @@ public partial class AppShell : Shell
     {
         if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
         {
-            bool logout = await DisplayAlertAsync("Cloud", "Du bist bereits verbunden. Möchtest du dich abmelden?", "Ja", "Nein");
+            bool logout = await DisplayAlertAsync("Cloud", AppResources.bereits_verbunden_abmelden, AppResources.ja, AppResources.nein);
             if (logout)
             {
                 // Hier das Polling beim Abmelden stoppen
@@ -206,11 +202,11 @@ public partial class AppShell : Shell
             // Hier das Polling nach erfolgreichem Login starten
             SaveManager.StartCloudPolling();
 
-            await DisplayAlertAsync("Erfolg", $"Eingeloggt als: {userName}", "OK");
+            await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.eingeloggt_als}: {userName}", AppResources.ok);
         }
         else
         {
-            await DisplayAlertAsync("Fehler", $"Login fehlgeschlagen: {userName}", "OK");
+            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.login_fehlgeschlagen}: {userName}", AppResources.ok);
         }
     }
 

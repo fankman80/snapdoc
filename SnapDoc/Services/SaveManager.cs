@@ -1,4 +1,5 @@
-﻿using CommunityToolkit.Mvvm.Messaging;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Graph;
 using SnapDoc.Messages;
 using SnapDoc.Models;
@@ -29,7 +30,11 @@ public static class SaveManager
 
     public static void NotifyDataChanged(int delayMilliseconds = 2000)
     {
+        // Vorherige Instanz abbrechen und entsorgen
         _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+
+        // Neue Instanz anlegen
         _debounceCts = new CancellationTokenSource();
         var token = _debounceCts.Token;
 
@@ -300,13 +305,40 @@ public static class SaveManager
 
     public static void MergeModels(JsonDataModel local, JsonDataModel cloud)
     {
-        if (cloud.Plans == null) return;
+        if (cloud == null) return;
+
+        // Projektdetails vergleichen und uebertragen
+        bool projectDetailsChanged = false;
+        if (local.Client_name != cloud.Client_name ||
+            local.Working_title != cloud.Working_title ||
+            local.Object_address != cloud.Object_address ||
+            local.Project_nr != cloud.Project_nr ||
+            local.Object_name != cloud.Object_name ||
+            local.Project_manager != cloud.Project_manager ||
+            local.Creation_date != cloud.Creation_date)
+        {
+            local.Client_name = cloud.Client_name;
+            local.Working_title = cloud.Working_title;
+            local.Object_address = cloud.Object_address;
+            local.Project_nr = cloud.Project_nr;
+            local.Object_name = cloud.Object_name;
+            local.Project_manager = cloud.Project_manager;
+            local.Creation_date = cloud.Creation_date;
+
+            projectDetailsChanged = true;
+        }
+
+        if (cloud.Plans == null)
+        {
+            if (projectDetailsChanged)
+                WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.ProjectDetailsUpdated));
+            return;
+        }
+
         local.Plans ??= [];
+        bool planStructureChanged = false; // Nur fuer Hinzufuegen/Loeschen von Plaenen
 
-        // Flag, um am Ende zu entscheiden, ob das UI neu geladen werden muss
-        bool planListChanged = false;
-
-        // Gelöschte Pläne finden (in lokal, aber nicht mehr in cloud)
+        // Geloeschte Plaene entfernen (Strukturaenderung)
         var deletedPlanIds = local.Plans.Keys.Except(cloud.Plans.Keys).ToList();
         if (deletedPlanIds.Count > 0)
         {
@@ -314,7 +346,7 @@ public static class SaveManager
             {
                 local.Plans.Remove(deletedId);
             }
-            planListChanged = true;
+            planStructureChanged = true;
         }
 
         foreach (var cloudPlanKp in cloud.Plans)
@@ -322,28 +354,56 @@ public static class SaveManager
             var planId = cloudPlanKp.Key;
             var cloudPlan = cloudPlanKp.Value;
 
-            // Neue Pläne finden
+            // Neue Plaene hinzufuegen (Strukturaenderung)
             if (!local.Plans.TryGetValue(planId, out Plan? localPlan))
             {
-                localPlan = cloudPlan;
-                local.Plans.Add(planId, localPlan);
-                planListChanged = true; // Neuer Plan gefunden
+                local.Plans.Add(planId, cloudPlan);
+                planStructureChanged = true;
                 continue;
             }
 
-            // Geänderte Plan-Eigenschaften prüfen (z. B. Titel, AllowExport)
-            if (localPlan.Name != cloudPlan.Name || localPlan.AllowExport != cloudPlan.AllowExport)
+            // Plan-Eigenschaften abgleichen
+            bool nameOrExportChanged = localPlan.Name != cloudPlan.Name || localPlan.AllowExport != cloudPlan.AllowExport;
+
+            if (nameOrExportChanged ||
+                localPlan.File != cloudPlan.File ||
+                localPlan.Description != cloudPlan.Description ||
+                localPlan.ImageSize != cloudPlan.ImageSize ||
+                localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
+                localPlan.PlanColor != cloudPlan.PlanColor)
             {
                 localPlan.Name = cloudPlan.Name;
+                localPlan.File = cloudPlan.File;
+                localPlan.Description = cloudPlan.Description;
+                localPlan.ImageSize = cloudPlan.ImageSize;
+                localPlan.IsGrayscale = cloudPlan.IsGrayscale;
+                localPlan.PlanColor = cloudPlan.PlanColor;
                 localPlan.AllowExport = cloudPlan.AllowExport;
-                // ... weitere Plan-Eigenschaften übertragen, falls vorhanden
 
-                planListChanged = true;
-            }
+                // Bei Namens- oder Exportaenderung direkt das UI-Element aktualisieren (ohne Shell-Reload)
+                if (nameOrExportChanged)
+                {
+                    // Nachricht an aktive Views senden
+                    WeakReferenceMessenger.Default.Send(new PlanRenamedMessage((planId, cloudPlan.Name)));
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (Shell.Current is AppShell appShell)
+                        {
+                            var item = appShell.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+                            if (item != null)
+                            {
+                                item.Title = cloudPlan.Name;
+                                item.AllowExport = cloudPlan.AllowExport;
+                            }
+                        }
+                    });
+                }
+            } // Schliesst "if (nameOrExportChanged || ...)"
 
             localPlan.Pins ??= [];
 
-            // Gelöschte Pins finden (in lokal, aber nicht in cloud)
+            // Geloeschte Pins entfernen
             var deletedPinIds = localPlan.Pins.Keys.Except(cloudPlan.Pins?.Keys ?? Enumerable.Empty<string>()).ToList();
             foreach (var deletedId in deletedPinIds)
             {
@@ -351,7 +411,7 @@ public static class SaveManager
                 WeakReferenceMessenger.Default.Send(new PinDeletedMessage(deletedId));
             }
 
-            // Geänderte oder neue Pins
+            // Neue oder geaenderte Pins verarbeiten
             if (cloudPlan.Pins != null)
             {
                 foreach (var cloudPinKp in cloudPlan.Pins)
@@ -361,35 +421,56 @@ public static class SaveManager
 
                     if (!localPlan.Pins.TryGetValue(pinId, out Pin? localPin))
                     {
-                        // Neuer Pin aus der Cloud
                         localPlan.Pins.Add(pinId, cloudPin);
                         WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
                     }
                     else
                     {
-                        bool hasChanged = false;
+                        // Visuelle Eigenschaften pruefen (loest Canvas-Redraw aus)
+                        bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
+                                            localPin.PinRotation != cloudPin.PinRotation ||
+                                            localPin.PinIcon != cloudPin.PinIcon ||
+                                            localPin.PinColor != cloudPin.PinColor;
 
-                        // Hier alle Eigenschaften prüfen, die das UI beeinflussen
-                        if (localPin.Pos != cloudPin.Pos || localPin.PinRotation != cloudPin.PinRotation || localPin.PinIcon != cloudPin.PinIcon)
-                        {
-                            localPin.Pos = cloudPin.Pos;
-                            localPin.PinRotation = cloudPin.PinRotation;
-                            localPin.PinIcon = cloudPin.PinIcon;
-                            // ... weitere Eigenschaften übertragen
-                            hasChanged = true;
-                        }
+                        // ALLE Daten synchronisieren
+                        localPin.Anchor = cloudPin.Anchor;
+                        localPin.DateTime = cloudPin.DateTime;
+                        localPin.IsWebMapPin = cloudPin.IsWebMapPin;
+                        localPin.IsCustomPin = cloudPin.IsCustomPin;
+                        localPin.Pos = cloudPin.Pos;
+                        localPin.PinPriority = cloudPin.PinPriority;
+                        localPin.Fotos = cloudPin.Fotos;
+                        localPin.GeoLocation = cloudPin.GeoLocation;
+                        localPin.IsAllowExport = cloudPin.IsAllowExport;
+                        localPin.IsLockAutoScale = cloudPin.IsLockAutoScale;
+                        localPin.IsLockPosition = cloudPin.IsLockPosition;
+                        localPin.IsLockRotate = cloudPin.IsLockRotate;
+                        localPin.OnPlanId = cloudPin.OnPlanId;
+                        localPin.PinColor = cloudPin.PinColor;
+                        localPin.PinIcon = cloudPin.PinIcon;
+                        localPin.PinName = cloudPin.PinName;
+                        localPin.PinDesc = cloudPin.PinDesc;
+                        localPin.Size = cloudPin.Size;
+                        localPin.SelfId = cloudPin.SelfId;
+                        localPin.PinScale = cloudPin.PinScale;
+                        localPin.PinLocation = cloudPin.PinLocation;
+                        localPin.PinRotation = cloudPin.PinRotation;
 
-                        if (hasChanged)
+                        if (uiNeedsRedraw)
                         {
                             WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
                         }
                     }
                 }
             }
-        }
+        } // Schliesst "foreach (var cloudPlanKp in cloud.Plans)"
 
-        // Benachrichtigung feuern, falls sich an den Plänen etwas geändert hat
-        if (planListChanged)
+        // UI-Benachrichtigungen feuern
+        if (projectDetailsChanged)
+            WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.ProjectDetailsUpdated));
+
+        // Nur bei echter Strukturaenderung (Plaene hinzugefuegt oder geloescht) ein Shell-Reload ausloesen
+        if (planStructureChanged)
             WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.PlanListUpdated));
     }
 

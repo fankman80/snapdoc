@@ -68,15 +68,68 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         drawingController = new DrawingController(new TransformViewModel());
         thisPlan = GlobalJson.Data.Plans[planId];
+    }
 
+    protected override bool OnBackButtonPressed()
+    {
+        // Zurück-Taste ignorieren
+        return true;
+    }
+
+    protected async override void OnAppearing()
+    {
+        base.OnAppearing();
+
+        RegisterMessenger();
+
+        PlanImage.PinTapped += OnPinTapped;
+        PlanImage.PinDoubleTapped += OnPinDoubleTapped;
+        PlanImage.CanvasTapped += OnCanvasTapped;
+        PlanImage.CanvasLongPressed += OnCanvasLongPressed;
+        PlanImage.PinMoved += OnPinMoved;
+
+        if (isFirstLoad)
+        {
+            await AddPlan();
+            isFirstLoad = false;
+
+            if (pinZoom != null)
+                ZoomToPin(pinZoom);
+            else
+                ImageFit(null, null);
+        }
+        else if (pinZoom != null)
+            ZoomToPin(pinZoom);
+
+        var appShell = Shell.Current as AppShell;
+        appShell?.HighlightCurrentPlan(planId);
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+
+        PlanImage.PinTapped -= OnPinTapped;
+        PlanImage.PinDoubleTapped -= OnPinDoubleTapped;
+        PlanImage.CanvasTapped -= OnCanvasTapped;
+        PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
+        PlanImage.PinMoved -= OnPinMoved;
+
+        if (!_isShowingPopup)
+            Cleanup();
+
+        WeakReferenceMessenger.Default.UnregisterAll(this);
+    }
+
+    private void RegisterMessenger()
+    {
         WeakReferenceMessenger.Default.Register<PinPropertyChangedMessage>(this, (r, m) =>
         {
             var (pinId, isLockPosition) = m.Value;
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 var pin = pinList.FirstOrDefault(p => p.Id == pinId);
-                if (pin != null)
-                    pin?.IsLockPosition = isLockPosition;
+                pin?.IsLockPosition = isLockPosition;
             });
         });
 
@@ -157,13 +210,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         WeakReferenceMessenger.Default.Register<PinAddedMessage>(this, (r, m) =>
         {
             var (incomingPlanId, pinId) = m.Value;
-
-            // Nur reagieren, wenn wir uns auf dem betroffenen Plan befinden
             if (incomingPlanId != planId) return;
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
-                // AddPin existiert bereits in deinem Code
                 AddPin(pinId);
                 PlanImage.InvalidateSurface();
             });
@@ -175,7 +225,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
-                    // Pins/Canvas aktualisieren, wenn sich Cloud-Pins geändert haben
                     PlanImage.InvalidateSurface();
                 });
             }
@@ -185,52 +234,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             MainThread.BeginInvokeOnMainThread(() => { ResetTouchState(); });
         });
-    }
 
-    protected override bool OnBackButtonPressed()
-    {
-        // Zurück-Taste ignorieren
-        return true;
-    }
-
-    protected async override void OnAppearing()
-    {
-        base.OnAppearing();
-
-        PlanImage.PinTapped += OnPinTapped;
-        PlanImage.PinDoubleTapped += OnPinDoubleTapped;
-        PlanImage.CanvasTapped += OnCanvasTapped;
-        PlanImage.CanvasLongPressed += OnCanvasLongPressed;
-        PlanImage.PinMoved += OnPinMoved;
-
-        if (isFirstLoad)
+        WeakReferenceMessenger.Default.Register<PlanRenamedMessage>(this, (r, m) =>
         {
-            await AddPlan();
-            isFirstLoad = false;
-
-            if (pinZoom != null)
-                ZoomToPin(pinZoom);
-            else
-                ImageFit(null, null);
-        }
-        else if (pinZoom != null)
-            ZoomToPin(pinZoom);
-
-        var appShell = Shell.Current as AppShell;
-        appShell?.HighlightCurrentPlan(planId);
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-
-        PlanImage.PinTapped -= OnPinTapped;
-        PlanImage.PinDoubleTapped -= OnPinDoubleTapped;
-        PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
-        PlanImage.PinMoved -= OnPinMoved;
-
-        if (!_isShowingPopup)
-            Cleanup();
+            var (updatedPlanId, newTitle) = m.Value;
+            if (updatedPlanId == planId)
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Title = newTitle;
+                });
+            }
+        });
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)

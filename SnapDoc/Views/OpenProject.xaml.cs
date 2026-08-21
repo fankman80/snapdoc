@@ -106,7 +106,7 @@ public partial class OpenProject : ContentPage
     {
         if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await DisplayAlertAsync("Info", "Bitte zuerst anmelden", "OK");
+            await DisplayAlertAsync(AppResources.info, AppResources.bitte_zuerst_anmelden, AppResources.ok);
             return;
         }
 
@@ -115,7 +115,7 @@ public partial class OpenProject : ContentPage
         {
             if (viewModel != null)
             {
-                viewModel.BusyText = "Projekte werden gesucht...";
+                viewModel.BusyText = AppResources.projekte_werden_gesucht;
                 viewModel.IsBusy = true;
                 await Task.Delay(100);
             }
@@ -126,7 +126,7 @@ public partial class OpenProject : ContentPage
 
             if (remoteProjects.Count == 0)
             {
-                await DisplayAlertAsync("", "Keine Projekte in der Cloud gefunden.", "OK");
+                await DisplayAlertAsync(AppResources.info, AppResources.keine_projekte_in_cloud_gefunden, AppResources.ok);
                 return;
             }
 
@@ -139,7 +139,7 @@ public partial class OpenProject : ContentPage
 
             if (viewModel != null)
             {
-                viewModel.BusyText = "Projekt wird heruntergeladen...";
+                viewModel.BusyText = AppResources.projekt_wird_heruntergeladen;
                 viewModel.IsBusy = true;
                 await Task.Delay(100);
             }
@@ -151,16 +151,16 @@ public partial class OpenProject : ContentPage
             {
                 // 2. Ansicht neu laden (das neue Projekt erscheint jetzt in der Liste mit Sync-Icon)
                 LoadJsonFiles();
-                await DisplayAlertAsync("", "Projekt erfolgreich heruntergeladen.", "OK");
+                await DisplayAlertAsync(AppResources.info, AppResources.projekt_erfolgreich_heruntergeladen, AppResources.ok);
             }
             else
             {
-                await DisplayAlertAsync("", "Fehler beim Herunterladen des Projekts.", "OK");
+                await DisplayAlertAsync(AppResources.fehler, AppResources.fehler_beim_herunterladen_des_projekts, AppResources.ok);
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Fehler", ex.Message, "OK");
+            await DisplayAlertAsync(AppResources.fehler, ex.Message, AppResources.ok);
         }
         finally
         {
@@ -340,10 +340,10 @@ public partial class OpenProject : ContentPage
             SettingsService.Instance.IsProjectLoaded = true;
             LoadDataToView.ResetData();
 
-            // 1. ZUERST lokales JSON in den Speicher laden
+            // ZUERST lokales JSON in den Speicher laden
             GlobalJson.LoadFromFile(item.FilePath);
 
-            // 2. Cloud-Pruefung & Sync DURCHFUEHREN (bevor Routen gebaut werden)
+            // Cloud-Pruefung & Sync DURCHFUEHREN (bevor Routen gebaut werden)
             if (await SaveManager.IsCloudVersionNewerAsync())
             {
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
@@ -366,7 +366,7 @@ public partial class OpenProject : ContentPage
                 }
             }
 
-            // 3. ERST JETZT EINMALIG die UI und Routen aufbauen
+            // ERST JETZT EINMALIG die UI und Routen aufbauen
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
 
@@ -563,8 +563,8 @@ public partial class OpenProject : ContentPage
                         Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));
 
                         // Json verschieben (umbenennen)
-                        Directory.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
-                                        Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
+                        File.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
+                                  Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
 
                         GlobalJson.UpdateFilePath(newFilePath);
 
@@ -598,7 +598,7 @@ public partial class OpenProject : ContentPage
     {
         if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await DisplayAlertAsync("", "Bitte melden Sie sich zuerst an.", "OK");
+            await DisplayAlertAsync(AppResources.info, AppResources.bitte_zuerst_anmelden, AppResources.ok);
             return;
         }
 

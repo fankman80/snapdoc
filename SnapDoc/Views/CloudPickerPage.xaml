@@ -4,13 +4,14 @@
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:models="clr-namespace:SnapDoc.Models"
              xmlns:local="clr-namespace:SnapDoc"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
              x:Name="ThisPage"
-             Title="Cloud Verzeichnis waehlen">
+             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
@@ -32,7 +33,7 @@
         </Grid.RowDefinitions>
 
         <Label Grid.Row="0" 
-               Text="Bitte einen Ordner oder eine JSON-Datei waehlen" 
+               Text="{x:Static res:AppResources.bitte_ordner_oder_json_datei_waehlen}" 
                VerticalOptions="Center"/>
 
         <CollectionView Grid.Row="1" 

@@ -1002,4 +1002,73 @@
 	<data name="schraffur_spiegeln" xml:space="preserve">
   <value>Mettre les hachures en miroir</value>
 </data>
+	<data name="ja" xml:space="preserve">
+  <value>Oui</value>
+</data>
+	<data name="nein" xml:space="preserve">
+  <value>Non</value>
+</data>
+	<data name="bereits_verbunden_abmelden" xml:space="preserve">
+  <value>Vous êtes déjà connecté. Souhaitez-vous vous déconnecter ?</value>
+</data>
+	<data name="eingeloggt_als" xml:space="preserve">
+  <value>Connecté en tant que</value>
+</data>
+	<data name="login_fehlgeschlagen" xml:space="preserve">
+  <value>Échec de la connexion</value>
+</data>
+	<data name="konnte_onedrive_nicht_laden" xml:space="preserve">
+  <value>Impossible de charger OneDrive</value>
+</data>
+	<data name="ordnerinhalt_konnte_nicht_geladen_werden" xml:space="preserve">
+  <value>Impossible de charger le contenu du dossier</value>
+</data>
+	<data name="cloud_verzeichnis_waehlen" xml:space="preserve">
+  <value>Sélectionner le répertoire cloud</value>
+</data>
+	<data name="bitte_ordner_oder_json_datei_waehlen" xml:space="preserve">
+  <value>Veuillez sélectionner un dossier ou un fichier JSON</value>
+</data>
+	<data name="herunterladen" xml:space="preserve">
+  <value>Télécharger</value>
+</data>
+	<data name="synchronisierung_konnte_nicht_gestartet_werden" xml:space="preserve">
+  <value>La synchronisation n'a pas pu être démarrée.</value>
+</data>
+	<data name="projekt_wird_synchronisiert_mit" xml:space="preserve">
+  <value>Le projet est en cours de synchronisation avec</value>
+</data>
+	<data name="erfolg" xml:space="preserve">
+  <value>Succès</value>
+</data>
+	<data name="entspricht_nicht_aktuell_geladenem_projekt" xml:space="preserve">
+  <value>ne correspond pas au projet actuellement chargé</value>
+</data>
+	<data name="neues_projektverzeichnis_cloud_erstellt" xml:space="preserve">
+  <value>Nouveau répertoire de projet créé dans le cloud et lié.</value>
+</data>
+	<data name="projektverzeichnis_cloud_konnte_nicht_erstellt_werden" xml:space="preserve">
+      <value>Le répertoire du projet n'a pas pu être créé dans le cloud.</value>
+    </data>
+	    <data name="bitte_zuerst_anmelden" xml:space="preserve">
+      <value>Veuillez d'abord vous connecter.</value>
+    </data>
+	    <data name="projekte_werden_gesucht" xml:space="preserve">
+      <value>Recherche de projets en cours...</value>
+    </data>
+	    <data name="keine_projekte_in_cloud_gefunden" xml:space="preserve">
+      <value>Aucun projet trouvé dans le cloud.</value>
+    </data>
+	    <data name="projekt_erfolgreich_heruntergeladen" xml:space="preserve">
+      <value>Projet téléchargé avec succès.</value>
+    </data>
+	    <data name="fehler_beim_herunterladen_des_projekts" xml:space="preserve">
+      <value>Erreur lors du téléchargement du projet.</value>
+    </data>
+	    <data name="info" xml:space="preserve">
+      <value>Info</value>
+    </data>
+	    <data name="projekt_wird_heruntergeladen" xml:space="preserve">
+      <value>Téléchargement du projet en cours...</value>
+    </data>
 </root>

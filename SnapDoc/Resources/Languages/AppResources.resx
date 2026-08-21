@@ -1002,4 +1002,73 @@
 	    <data name="schraffur_spiegeln" xml:space="preserve">
         <value>Schraffur spiegeln</value>
     </data>
+	<data name="ja" xml:space="preserve">
+        <value>Ja</value>
+    </data>
+	    <data name="nein" xml:space="preserve">
+      <value>Nein</value>
+    </data>
+	    <data name="bereits_verbunden_abmelden" xml:space="preserve">
+      <value>Du bist bereits verbunden. Möchtest du dich abmelden?</value>
+    </data>
+	    <data name="eingeloggt_als" xml:space="preserve">
+      <value>Eingeloggt als</value>
+    </data>
+	    <data name="login_fehlgeschlagen" xml:space="preserve">
+      <value>Login fehlgeschlagen</value>
+    </data>
+	    <data name="konnte_onedrive_nicht_laden" xml:space="preserve">
+      <value>Konnte OneDrive nicht laden</value>
+    </data>
+	    <data name="ordnerinhalt_konnte_nicht_geladen_werden" xml:space="preserve">
+      <value>Ordnerinhalt konnte nicht geladen werden</value>
+    </data>
+	    <data name="cloud_verzeichnis_waehlen" xml:space="preserve">
+      <value>Cloud-Verzeichnis wählen</value>
+    </data>
+	    <data name="bitte_ordner_oder_json_datei_waehlen" xml:space="preserve">
+      <value>Bitte einen Ordner oder eine JSON-Datei wählen</value>
+    </data>
+	    <data name="herunterladen" xml:space="preserve">
+      <value>Herunterladen</value>
+    </data>
+	    <data name="synchronisierung_konnte_nicht_gestartet_werden" xml:space="preserve">
+      <value>Synchronisierung konnte nicht gestartet werden.</value>
+    </data>
+	    <data name="projekt_wird_synchronisiert_mit" xml:space="preserve">
+      <value>Das Projekt wird nun synchronisiert mit</value>
+    </data>
+	    <data name="erfolg" xml:space="preserve">
+      <value>Erfolg</value>
+    </data>
+	    <data name="entspricht_nicht_aktuell_geladenem_projekt" xml:space="preserve">
+      <value>entspricht nicht dem aktuell geladenen Projekt</value>
+    </data>
+	    <data name="neues_projektverzeichnis_cloud_erstellt" xml:space="preserve">
+      <value>Neues Projektverzeichnis in der Cloud erstellt und verknüpft.</value>
+    </data>
+	    <data name="projektverzeichnis_cloud_konnte_nicht_erstellt_werden" xml:space="preserve">
+      <value>Projektverzeichnis konnte in der Cloud nicht erstellt werden.</value>
+    </data>
+	<data name="bitte_zuerst_anmelden" xml:space="preserve">
+      <value>Bitte melden Sie sich zuerst an.</value>
+    </data>
+	    <data name="projekte_werden_gesucht" xml:space="preserve">
+      <value>Projekte werden gesucht...</value>
+    </data>
+	    <data name="keine_projekte_in_cloud_gefunden" xml:space="preserve">
+      <value>Keine Projekte in der Cloud gefunden.</value>
+    </data>
+	    <data name="projekt_erfolgreich_heruntergeladen" xml:space="preserve">
+      <value>Projekt erfolgreich heruntergeladen.</value>
+    </data>
+	    <data name="fehler_beim_herunterladen_des_projekts" xml:space="preserve">
+      <value>Fehler beim Herunterladen des Projekts.</value>
+    </data>
+	    <data name="info" xml:space="preserve">
+      <value>Info</value>
+    </data>
+	    <data name="projekt_wird_heruntergeladen" xml:space="preserve">
+      <value>Projekt wird heruntergeladen...</value>
+    </data>
 </root>

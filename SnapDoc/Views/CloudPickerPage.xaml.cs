@@ -1,4 +1,5 @@
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -41,7 +42,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Fehler", $"Konnte OneDrive nicht laden: {ex.Message}", "OK");
+            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.konnte_onedrive_nicht_laden}: {ex.Message}", AppResources.ok);
         }
     }
 
@@ -96,7 +97,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync("Fehler", $"Ordnerinhalt konnte nicht geladen werden: {ex.Message}", "OK");
+            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}", AppResources.ok);
         }
     }
 
@@ -132,19 +133,18 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
                         if (success)
                         {
-                            await DisplayAlertAsync("Erfolg", $"Das Projekt wird nun mit '{selectedItem.Name}' synchronisiert.", "OK");
+                            await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.projekt_wird_synchronisiert_mit}: '{selectedItem.Name}'", AppResources.ok);
                             await Navigation.PopAsync();
                         }
                         else
                         {
-                            await DisplayAlertAsync("Fehler", "Synchronisierung konnte nicht gestartet werden.", "OK");
+                            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.synchronisierung_konnte_nicht_gestartet_werden}", AppResources.ok);
                         }
                     }
                 }
                 else
                 {
-                    await DisplayAlertAsync("Name weicht ab",
-                        $"Die Datei '{selectedItem.Name}' entspricht nicht dem aktuell geladenen Projekt ('{activeJsonFile}').", "OK");
+                    await DisplayAlertAsync(AppResources.fehler, $"'{selectedItem.Name}' {AppResources.entspricht_nicht_aktuell_geladenem_projekt} ('{activeJsonFile}').", AppResources.ok);
                 }
             }
         }
@@ -171,12 +171,12 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
             if (success)
             {
-                await DisplayAlertAsync("Erfolg", "Neues Projektverzeichnis in der Cloud erstellt und verknüpft.", "OK");
+                await DisplayAlertAsync(AppResources.erfolg, AppResources.neues_projektverzeichnis_cloud_erstellt, AppResources.ok);
                 await Navigation.PopAsync();
             }
             else
             {
-                await DisplayAlertAsync("Fehler", "Projektverzeichnis konnte in der Cloud nicht erstellt werden.", "OK");
+                await DisplayAlertAsync(AppResources.fehler, AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.ok);
             }
         }
     }

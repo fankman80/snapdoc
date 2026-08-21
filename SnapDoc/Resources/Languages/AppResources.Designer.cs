@@ -313,6 +313,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Du bist bereits verbunden. Möchtest du dich abmelden? ähnelt.
+        /// </summary>
+        internal static string bereits_verbunden_abmelden {
+            get {
+                return ResourceManager.GetString("bereits_verbunden_abmelden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bericht exportieren ähnelt.
         /// </summary>
         internal static string bericht_exportieren {
@@ -403,6 +412,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte einen Ordner oder eine JSON-Datei wählen ähnelt.
+        /// </summary>
+        internal static string bitte_ordner_oder_json_datei_waehlen {
+            get {
+                return ResourceManager.GetString("bitte_ordner_oder_json_datei_waehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte wähle ein Bild aus... ähnelt.
         /// </summary>
         internal static string bitte_waehle_bild {
@@ -430,11 +448,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte melden Sie sich zuerst an. ähnelt.
+        /// </summary>
+        internal static string bitte_zuerst_anmelden {
+            get {
+                return ResourceManager.GetString("bitte_zuerst_anmelden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Blau (B) ähnelt.
         /// </summary>
         internal static string blau_b {
             get {
                 return ResourceManager.GetString("blau_b", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Cloud-Verzeichnis wählen ähnelt.
+        /// </summary>
+        internal static string cloud_verzeichnis_waehlen {
+            get {
+                return ResourceManager.GetString("cloud_verzeichnis_waehlen", resourceCulture);
             }
         }
         
@@ -610,6 +646,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Eingeloggt als ähnelt.
+        /// </summary>
+        internal static string eingeloggt_als {
+            get {
+                return ResourceManager.GetString("eingeloggt_als", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen bearbeiten ähnelt.
         /// </summary>
         internal static string einstellungen_bearbeiten {
@@ -642,6 +687,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string empfehlung {
             get {
                 return ResourceManager.GetString("empfehlung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die entspricht nicht dem aktuell geladenen Projekt ähnelt.
+        /// </summary>
+        internal static string entspricht_nicht_aktuell_geladenem_projekt {
+            get {
+                return ResourceManager.GetString("entspricht_nicht_aktuell_geladenem_projekt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Erfolg ähnelt.
+        /// </summary>
+        internal static string erfolg {
+            get {
+                return ResourceManager.GetString("erfolg", resourceCulture);
             }
         }
         
@@ -813,6 +876,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string fehler {
             get {
                 return ResourceManager.GetString("fehler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Fehler beim Herunterladen des Projekts. ähnelt.
+        /// </summary>
+        internal static string fehler_beim_herunterladen_des_projekts {
+            get {
+                return ResourceManager.GetString("fehler_beim_herunterladen_des_projekts", resourceCulture);
             }
         }
         
@@ -1087,6 +1159,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Herunterladen ähnelt.
+        /// </summary>
+        internal static string herunterladen {
+            get {
+                return ResourceManager.GetString("herunterladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Heute ähnelt.
         /// </summary>
         internal static string heute {
@@ -1168,11 +1249,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Info ähnelt.
+        /// </summary>
+        internal static string info {
+            get {
+                return ResourceManager.GetString("info", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ungültiger Projektname. Bitte verwenden Sie keine Sonderzeichen. ähnelt.
         /// </summary>
         internal static string invalid_project_name {
             get {
                 return ResourceManager.GetString("invalid_project_name", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ja ähnelt.
+        /// </summary>
+        internal static string ja {
+            get {
+                return ResourceManager.GetString("ja", resourceCulture);
             }
         }
         
@@ -1249,6 +1348,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine Projekte in der Cloud gefunden. ähnelt.
+        /// </summary>
+        internal static string keine_projekte_in_cloud_gefunden {
+            get {
+                return ResourceManager.GetString("keine_projekte_in_cloud_gefunden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Klicken, um die Vermessung zu starten ähnelt.
         /// </summary>
         internal static string klicken_start_vermessung {
@@ -1317,6 +1425,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string kompletter_tile_cache_loeschen {
             get {
                 return ResourceManager.GetString("kompletter_tile_cache_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Konnte OneDrive nicht laden ähnelt.
+        /// </summary>
+        internal static string konnte_onedrive_nicht_laden {
+            get {
+                return ResourceManager.GetString("konnte_onedrive_nicht_laden", resourceCulture);
             }
         }
         
@@ -1407,6 +1524,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string loesen {
             get {
                 return ResourceManager.GetString("loesen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Login fehlgeschlagen ähnelt.
+        /// </summary>
+        internal static string login_fehlgeschlagen {
+            get {
+                return ResourceManager.GetString("login_fehlgeschlagen", resourceCulture);
             }
         }
         
@@ -1546,6 +1672,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Nein ähnelt.
+        /// </summary>
+        internal static string nein {
+            get {
+                return ResourceManager.GetString("nein", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Neu setzen ähnelt.
         /// </summary>
         internal static string neu_setzen {
@@ -1600,6 +1735,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Neues Projektverzeichnis in der Cloud erstellt und verknüpft. ähnelt.
+        /// </summary>
+        internal static string neues_projektverzeichnis_cloud_erstellt {
+            get {
+                return ResourceManager.GetString("neues_projektverzeichnis_cloud_erstellt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Objektbezeichnung ähnelt.
         /// </summary>
         internal static string objektbezeichnung {
@@ -1623,6 +1767,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string online_map_requirement_hint {
             get {
                 return ResourceManager.GetString("online_map_requirement_hint", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ordnerinhalt konnte nicht geladen werden ähnelt.
+        /// </summary>
+        internal static string ordnerinhalt_konnte_nicht_geladen_werden {
+            get {
+                return ResourceManager.GetString("ordnerinhalt_konnte_nicht_geladen_werden", resourceCulture);
             }
         }
         
@@ -2014,6 +2167,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt erfolgreich heruntergeladen. ähnelt.
+        /// </summary>
+        internal static string projekt_erfolgreich_heruntergeladen {
+            get {
+                return ResourceManager.GetString("projekt_erfolgreich_heruntergeladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt löschen ähnelt.
         /// </summary>
         internal static string projekt_loeschen {
@@ -2041,11 +2203,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird heruntergeladen... ähnelt.
+        /// </summary>
+        internal static string projekt_wird_heruntergeladen {
+            get {
+                return ResourceManager.GetString("projekt_wird_heruntergeladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird importiert... ähnelt.
         /// </summary>
         internal static string projekt_wird_importiert {
             get {
                 return ResourceManager.GetString("projekt_wird_importiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Projekt wird nun synchronisiert mit ähnelt.
+        /// </summary>
+        internal static string projekt_wird_synchronisiert_mit {
+            get {
+                return ResourceManager.GetString("projekt_wird_synchronisiert_mit", resourceCulture);
             }
         }
         
@@ -2086,6 +2266,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekte werden gesucht... ähnelt.
+        /// </summary>
+        internal static string projekte_werden_gesucht {
+            get {
+                return ResourceManager.GetString("projekte_werden_gesucht", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projektleitung ähnelt.
         /// </summary>
         internal static string projektleitung {
@@ -2118,6 +2307,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string projektverwaltung {
             get {
                 return ResourceManager.GetString("projektverwaltung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektverzeichnis konnte in der Cloud nicht erstellt werden. ähnelt.
+        /// </summary>
+        internal static string projektverzeichnis_cloud_konnte_nicht_erstellt_werden {
+            get {
+                return ResourceManager.GetString("projektverzeichnis_cloud_konnte_nicht_erstellt_werden", resourceCulture);
             }
         }
         
@@ -2352,6 +2550,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string swisstopo_karten_pins {
             get {
                 return ResourceManager.GetString("swisstopo_karten_pins", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Synchronisierung konnte nicht gestartet werden. ähnelt.
+        /// </summary>
+        internal static string synchronisierung_konnte_nicht_gestartet_werden {
+            get {
+                return ResourceManager.GetString("synchronisierung_konnte_nicht_gestartet_werden", resourceCulture);
             }
         }
         

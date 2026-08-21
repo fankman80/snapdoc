@@ -54,7 +54,7 @@
                     Clicked="OnCancelClicked" />
             <Button Grid.Column="1"
                     x:Name="downloadButton"
-                    Text="Herunterladen"
+                    Text="{x:Static res:AppResources.herunterladen}"
                     IsEnabled="False"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
