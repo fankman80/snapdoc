@@ -101,7 +101,6 @@ public partial class OneDrivePickerPage : ContentPage
         PickerWebView.Source = fileUri;
     }
 
-    // Navigated wird nicht mehr benötigt, da das JS über window.onload selbst startet
     // Wir fangen nur noch die Navigation nach draussen ab
     private async void OnWebViewNavigating(object sender, WebNavigatingEventArgs e)
     {

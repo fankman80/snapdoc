@@ -120,6 +120,11 @@ public partial class FotoGalleryView : ContentPage
 
             try
             {
+                var fileName = Path.GetFileName(item.ImagePath);
+
+                if (!File.Exists(item.ImagePath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
+
                 if (File.Exists(item.ImagePath))
                 {
                     var bytes = File.ReadAllBytes(item.ImagePath);

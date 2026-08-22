@@ -812,6 +812,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
         drawingController.SaveToFile(dataPath);
 
+        // Dateien fuer den Cloud-Sync beim SaveManager registrieren
+        SaveManager.NotifyDataChanged([
+            (pngPath, GlobalJson.Data.CustomPinsPath),
+            (dataPath, GlobalJson.Data.CustomPinsPath)
+        ]);
+
         float centerX = (float)(drawingView.Width * Settings.DisplayDensity) / 2f;
         float centerY = (float)(drawingView.Height * Settings.DisplayDensity) / 2f;
         float panDx = centerX - PlanImage.CurrentPan.X;

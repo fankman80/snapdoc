@@ -126,6 +126,20 @@ public class CapturePicture
                         }
 
                         if (finalBitmap != originalBitmap) finalBitmap.Dispose();
+
+                        // Verwende den relativen Zielordner fuer SaveManager
+                        var filesToSync = new List<(string filePath, string targetFolder)>
+                        {
+                            (resultPath, GlobalJson.Data.ImagePath)
+                        };
+
+                        if (thumbnailPath != null)
+                        {
+                            string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
+                            filesToSync.Add((thumbFilePath, GlobalJson.Data.ThumbnailPath));
+                        }
+
+                        SaveManager.NotifyDataChanged(filesToSync);
                     }
                     catch (Exception ex)
                     {

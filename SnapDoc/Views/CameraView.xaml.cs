@@ -1,7 +1,6 @@
 using Camera.MAUI;
 using SnapDoc.Services;
 using System.Diagnostics;
-using System.Collections.ObjectModel;
 
 namespace SnapDoc.Views;
 
@@ -212,8 +211,6 @@ public partial class CameraView : ContentPage
             }
         }
     }
-
-    // --- Events ---
 
     private async void OnCaptureClicked(object sender, EventArgs e)
     {

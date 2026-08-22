@@ -88,7 +88,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         Fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
             .Select(img => new FotoItem
-            {
+        {
                 ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
                 OnPlanId = this.PlanId,
                 OnPinId = this.PinId,
@@ -96,14 +96,33 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 DateTime = img.Value.DateTime
             }.Initialize())
             .ToObservableCollection();
-    }
+        }
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
         if (sender is not Image tappedImage) return;
         if (tappedImage.BindingContext is not FotoItem fotoItem) return;
-        var filePath = fotoItem.ImagePath;
-        var fileName = Path.GetFileName(filePath);
+
+        var fileName = Path.GetFileName(fotoItem.ImagePath);
+        string expectedFullPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+
+        // Pruefen, ob das Originalbild bereits lokal existiert
+        if (!File.Exists(expectedFullPath))
+        {
+            // Blockierende Ladeanzeige (einfacher Fallback über den Page-Title, falls du keinen Loading-Popup hast)
+            string originalTitle = this.Title;
+            this.Title = "Lade Foto herunter...";
+
+            bool success = await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+
+            this.Title = originalTitle;
+
+            if (!success)
+            {
+                await DisplayAlertAsync("Netzwerkfehler", "Das Originalbild konnte nicht heruntergeladen werden.", "OK");
+                return; // Navigation abbrechen, da kein Bild existiert
+            }
+        }
 
         await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={PlanId}&pinId={PinId}&gotoBtn=false");
     }
@@ -243,7 +262,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (Pin.IsWebMapPin)
             await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
         else
-            await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}?pinZoom={PinId}");
+            await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}&pinZoom={PinId}");
     }
 
     private async void TakeFoto(object sender, EventArgs e)
@@ -266,27 +285,22 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
 
-            // save data to file
-            SaveManager.NotifyDataChanged();
+            string originalPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, path.FileName);
+            string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
 
-            string expectedThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
+            SaveManager.NotifyDataChanged();
 
             var newItem = new FotoItem
             {
-                ImagePath = expectedThumbPath,
+                ImagePath = thumbPath, // Verwende direkt thumbPath
                 OnPlanId = this.PlanId,
                 OnPinId = this.PinId,
                 AllowExport = true,
                 DateTime = DateTime.Now
             }.Initialize();
 
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                Fotos.Add(newItem);
-
-                await Task.Yield();
-                this.ForceLayout();
-            });
+            Fotos.Add(newItem);
+            this.ForceLayout();
         }
         catch (Exception ex)
         {
@@ -296,14 +310,27 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnReorderCompleted(object sender, EventArgs e)
     {
-        if ((sender as CollectionView).ItemsSource is ObservableCollection<FotoItem> reorderedItems)
+        if (sender is CollectionView { ItemsSource: ObservableCollection<FotoItem> reorderedItems })
         {
-            var newFotosDict = reorderedItems
-                .ToDictionary(img => Path.GetFileName(img.ImagePath), img => new Foto
+            var currentFotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
+
+            var newFotosDict = reorderedItems.ToDictionary(
+                img => Path.GetFileName(img.ImagePath),
+                img =>
                 {
-                    File = Path.GetFileName(Path.GetFileName(img.ImagePath)),
-                    AllowExport = img.AllowExport,
-                    DateTime = img.DateTime
+                    var fileName = Path.GetFileName(img.ImagePath);
+                    if (currentFotos.TryGetValue(fileName, out var existingFoto))
+                    {
+                        existingFoto.AllowExport = img.AllowExport;
+                        return existingFoto;
+                    }
+
+                    return new Foto
+                    {
+                        File = fileName,
+                        AllowExport = img.AllowExport,
+                        DateTime = img.DateTime
+                    };
                 });
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
@@ -315,16 +342,13 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-
-        FotoItem item = (FotoItem)button.BindingContext;
-
-        if (item != null)
+        if (sender is Button { BindingContext: FotoItem item })
         {
             item.AllowExport = !item.AllowExport;
 
             var fileName = Path.GetFileName(item.ImagePath);
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[fileName].AllowExport;
+            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.TryGetValue(fileName, out var foto))
+                foto.AllowExport = item.AllowExport;
 
             // save data to file
             SaveManager.NotifyDataChanged();

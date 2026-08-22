@@ -154,22 +154,29 @@ public partial class ImageViewPage : IQueryAttributable
                 this.Title = formattedDate;
             }
 
-            if (File.Exists(imgPath))
+            // Asynchrones Laden mit Cloud-Download-Fallback
+            Dispatcher.Dispatch(async () =>
             {
-                var bytes = File.ReadAllBytes(imgPath);
+                if (!File.Exists(imgPath) && ImgSource != "showTitle")
+                    await SaveManager.DownloadMediaOnDemandAsync(ImgSource, isThumbnail: false);
 
-                using (var ms = new MemoryStream(bytes))
-                using (var codec = SKCodec.Create(ms))
+                if (File.Exists(imgPath))
                 {
-                    if (codec != null)
-                    {
-                        FotoContainer.WidthRequest = codec.Info.Width;
-                        FotoContainer.HeightRequest = codec.Info.Height;
-                    }
-                }
+                    var bytes = await File.ReadAllBytesAsync(imgPath);
 
-                FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-            }
+                    using (var ms = new MemoryStream(bytes))
+                    using (var codec = SKCodec.Create(ms))
+                    {
+                        if (codec != null)
+                        {
+                            FotoContainer.WidthRequest = codec.Info.Width;
+                            FotoContainer.HeightRequest = codec.Info.Height;
+                        }
+                    }
+
+                    FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+                }
+            });
         }
         if (query.TryGetValue("gotoBtn", out var value5))
             IsGotoPinBtnVisible = bool.TryParse(value5?.ToString(), out var result) && result;
@@ -664,8 +671,11 @@ public partial class ImageViewPage : IQueryAttributable
             }
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
 
-            // save data to file
-            SaveManager.NotifyDataChanged();
+            // Geaenderte Foto- und Thumbnail-Dateien fuer den Sync registrieren
+            SaveManager.NotifyDataChanged([
+                (imgPath, GlobalJson.Data.ImagePath),
+                (thumbPath, GlobalJson.Data.ThumbnailPath)
+            ]);
         }
 
         // Cleanup drawing canvas
@@ -812,6 +822,9 @@ public partial class ImageViewPage : IQueryAttributable
                 string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
 
                 Title = target.DateTime.ToString("d") + " / " + target.DateTime.ToString("HH:mm");
+
+                if (!File.Exists(imgPath))
+                    await SaveManager.DownloadMediaOnDemandAsync(ImgSource, isThumbnail: false);
 
                 if (File.Exists(imgPath))
                 {
