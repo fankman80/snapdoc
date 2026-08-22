@@ -792,7 +792,6 @@ public static class SaveManager
                 if (File.Exists(localFilePath))
                 {
                     DateTime localDiskTime = File.GetLastWriteTimeUtc(localFilePath);
-                    // Wenn die Cloud-Datei neuer ist als unsere lokale Datei
                     return cloudItem.LastModifiedDateTime > localDiskTime;
                 }
             }
@@ -821,7 +820,7 @@ public static class SaveManager
             string targetFolderId = GlobalJson.Data.CloudFolderId;
             string filePath = GlobalJson.GetFilePath();
 
-            // 1. Nur die JSON-Datei abrufen
+            // Nur die JSON-Datei abrufen
             var cloudItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
                 .ItemWithPath(CloudFileName)
                 .GetAsync();
@@ -836,7 +835,7 @@ public static class SaveManager
                 var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
                 if (cloudData != null)
                 {
-                    // 2. Daten lokal zusammenführen
+                    // Daten lokal zusammenführen
                     MergeModels(GlobalJson.Data, cloudData);
                     GlobalJson.SaveToFile();
 
@@ -847,7 +846,7 @@ public static class SaveManager
                         _lastKnownETag = cloudItem.ETag;
                     }
 
-                    // 3. Nur Dateien herunterladen, die lokal fehlen
+                    // Nur Dateien herunterladen, die lokal fehlen
                     await DownloadMissingProjectFilesAsync(driveId, targetFolderId);
 
                     return true;
@@ -882,9 +881,7 @@ public static class SaveManager
 
                 // Datei existiert lokal nicht? Genau diese Datei gezielt laden!
                 if (!File.Exists(localPath))
-                {
                     await DownloadSpecificFileAsync(driveId, rootFolderId, $"plans/{plan.File}", localPath);
-                }
             }
         }
     }
@@ -936,7 +933,6 @@ public static class SaveManager
         }, token);
     }
 
-    // Stoppt das Polling (z. B. wenn das Projekt geschlossen wird)
     public static void StopCloudPolling()
     {
         _pollingCts?.Cancel();
@@ -956,7 +952,7 @@ public static class SaveManager
             string driveId = GlobalJson.Data.CloudDriveId;
             string targetFolderId = GlobalJson.Data.CloudFolderId;
 
-            // 1. Nur Metadaten abrufen (abgefragtes Objekt enthält den ETag, verbraucht kaum Datenvolumen)
+            // Nur Metadaten abrufen (abgefragtes Objekt enthält den ETag, verbraucht kaum Datenvolumen)
             var cloudItem = await CurrentAuth.GraphClient.Drives[driveId]
                 .Items[targetFolderId]
                 .ItemWithPath(CloudFileName)
@@ -971,12 +967,10 @@ public static class SaveManager
                     return;
                 }
 
-                // 2. Prüfen, ob sich der ETag verändert hat
+                // Prüfen, ob sich der ETag verändert hat
                 if (cloudItem.ETag != _lastKnownETag)
                 {
                     _lastKnownETag = cloudItem.ETag;
-
-                    // Neue Daten herunterladen und lokal mergen (eure bestehende Methode)
                     await SyncJsonOnlyFromCloudAsync();
                 }
             }

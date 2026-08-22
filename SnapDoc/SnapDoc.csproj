@@ -206,6 +206,9 @@
 		<MauiXaml Update="Views\FotoGallery.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\NewPage.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\OneDrivePickerPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupCloudProjects.xaml">
 		  <Generator>MSBuild:Compile</Generator>

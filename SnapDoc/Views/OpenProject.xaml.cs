@@ -66,36 +66,66 @@ public partial class OpenProject : ContentPage
 
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
+
         // Hintergrundprüfung für lokale Projekte
         if (SaveManager.CurrentAuth?.IsLoggedIn == true)
         {
             _ = Task.Run(async () =>
             {
-                // 1. Hole einmalig alle Cloud-Projekte (viel schneller als Einzelabfragen)
+                // 1. Hole einmalig alle Cloud-Projekte (schneller als Einzelabfragen)
                 var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
 
                 foreach (var item in foundFiles)
                 {
-                    // 2. Prüfe, ob das lokale Projekt in der Cloud existiert
-                    string expectedJsonName = item.FileName + ".json";
-                    var matchingRemote = remoteProjects.FirstOrDefault(rp =>
-                        rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
+                    // 2. Lokales JSON auslesen, um an die Cloud-IDs zu kommen
+                    var projectData = GlobalJson.ReadFromFile(item.FilePath);
+                    if (projectData == null) continue;
 
-                    if (matchingRemote != null)
+                    bool hasValidCloudLink = false;
+
+                    // FALL A: Das Projekt hat bereits eine Cloud-Verknüpfung (ID) gespeichert
+                    if (!string.IsNullOrEmpty(projectData.CloudFolderId))
                     {
-                        item.HasCloudSync = true;
-                        MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
+                        // Prüfen, ob exakt dieser Ordner online noch existiert
+                        var matchingById = remoteProjects.FirstOrDefault(rp => rp.FolderId == projectData.CloudFolderId);
 
-                        // 3. Ergänze fehlende Cloud-IDs lokal für künftige automatische Uploads
-                        var projectData = GlobalJson.ReadFromFile(item.FilePath);
-                        if (projectData != null && string.IsNullOrEmpty(projectData.CloudDriveId))
+                        if (matchingById != null)
                         {
-                            projectData.CloudDriveId = matchingRemote.DriveId;
-                            projectData.CloudFolderId = matchingRemote.FolderId;
+                            hasValidCloudLink = true;
+                        }
+                        else
+                        {
+                            // Optional: Die Cloud-IDs lokal entfernen, falls das Projekt online gelöscht wurde
+                            // projectData.CloudDriveId = null;
+                            // projectData.CloudFolderId = null;
+                            // -> Müsste dann wieder gespeichert werden
+                        }
+                    }
+                    // FALL B: Legacy-Fallback für Projekte, die noch keine IDs haben (Namensabgleich beim ersten Mal)
+                    else
+                    {
+                        string expectedJsonName = item.FileName + ".json";
+                        var matchingByName = remoteProjects.FirstOrDefault(rp =>
+                            rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
+
+                        if (matchingByName != null)
+                        {
+                            hasValidCloudLink = true;
+
+                            // 3. Ergänze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
+                            projectData.CloudDriveId = matchingByName.DriveId;
+                            projectData.CloudFolderId = matchingByName.FolderId;
 
                             string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
                             File.WriteAllText(item.FilePath, updatedJson);
                         }
+                    }
+
+                    // 4. UI aktualisieren, wenn ein gültiger Cloud-Link besteht
+                    if (hasValidCloudLink)
+                    {
+                        item.HasCloudSync = true;
+                        MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
                     }
                 }
             });
@@ -628,5 +658,8 @@ public partial class OpenProject : ContentPage
         }
 
         await Navigation.PushAsync(new CloudPickerPage());
+
+        //if (SaveManager.CurrentAuth?.GraphClient == null) return;
+        //await Navigation.PushAsync(new OneDrivePickerPage(SaveManager.CurrentAuth?.GraphClient.ToString()));
     }
 }

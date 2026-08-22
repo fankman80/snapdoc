@@ -17,8 +17,7 @@ public class AuthService
 
     public AuthService()
     {
-        var builder = PublicClientApplicationBuilder.Create(ClientId)
-            .WithAuthority(Authority);
+        var builder = PublicClientApplicationBuilder.Create(ClientId).WithAuthority(Authority);
 
 #if WINDOWS
         builder = builder.WithRedirectUri("http://localhost");

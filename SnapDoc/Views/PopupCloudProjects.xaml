@@ -9,7 +9,7 @@
                x:TypeArguments="services:RemoteProjectDto"
                x:Class="SnapDoc.Views.PopupCloudProjects">
 
-    <Grid Padding="12"
+    <Grid Padding="6"
           WidthRequest="320"
           RowDefinitions="Auto, *, Auto"
           RowSpacing="10">
