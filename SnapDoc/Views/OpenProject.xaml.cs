@@ -658,8 +658,5 @@ public partial class OpenProject : ContentPage
         }
 
         await Navigation.PushAsync(new CloudPickerPage());
-
-        //if (SaveManager.CurrentAuth?.GraphClient == null) return;
-        //await Navigation.PushAsync(new OneDrivePickerPage(SaveManager.CurrentAuth?.GraphClient.ToString()));
     }
 }
