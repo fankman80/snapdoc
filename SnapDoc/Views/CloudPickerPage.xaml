@@ -11,7 +11,7 @@
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}"
+             Title="{Binding HeaderTitle}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
@@ -33,29 +33,91 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
-        <Label Grid.Row="0" 
-               Text="{x:Static res:AppResources.bitte_ordner_oder_json_datei_waehlen}" 
-               VerticalOptions="Center"/>
+        <!-- Dynamic Header Card -->
+        <Border Grid.Row="0"
+                Padding="12,10"
+                StrokeShape="RoundRectangle 8"
+                Stroke="Transparent"
+                BackgroundColor="{AppThemeBinding Light=#10000000, Dark=#15FFFFFF}">
+            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
+                <Label FontFamily="MaterialOutlined"
+                       Text="{x:Static local:MaterialIcons.Info}"
+                       FontSize="22"
+                       TextColor="{DynamicResource Primary}"
+                       VerticalOptions="Center" />
+                <Label Text="{Binding HeaderSubtitle}"
+                       FontSize="13"
+                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                       VerticalOptions="Center"
+                       LineBreakMode="WordWrap"/>
+            </HorizontalStackLayout>
+        </Border>
 
+        <!-- Modern List View -->
         <CollectionView Grid.Row="1" 
                         ItemsSource="{Binding CloudItems}" 
                         SelectionMode="Single"
                         SelectionChanged="OnItemSelected">
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="models:CloudItem">
-                    <Grid Padding="10">
-                        <HorizontalStackLayout Spacing="10">
-                            <Label Text="{Binding Icon}" FontFamily="{x:StaticResource AppFontFamily}" VerticalOptions="Center"/>
-                            <Label Text="{Binding DisplayName}" FontFamily="{x:StaticResource AppFontFamily}" VerticalOptions="Center"/>
-                        </HorizontalStackLayout>
-                    </Grid>
+                    <Border StrokeShape="RoundRectangle 8"
+                            Stroke="Transparent"
+                            BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}"
+                            Padding="12,10"
+                            Margin="0,0,0,6">
+                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
+                            <!-- Dynamic Icon -->
+                            <Label Grid.Column="0"
+                                   FontFamily="MaterialOutlined"
+                                   FontSize="24"
+                                   TextColor="{DynamicResource Primary}"
+                                   VerticalOptions="Center">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsFolder}" Value="True">
+                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Folder}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsFolder}" Value="False">
+                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Description}" />
+                                    </DataTrigger>
+                                    <DataTrigger TargetType="Label" Binding="{Binding Id}" Value="..">
+                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Folder_zip}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+
+                            <!-- Name -->
+                            <Label Grid.Column="1"
+                                   Text="{Binding Name}"
+                                   FontSize="15"
+                                   FontAttributes="Bold"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   VerticalOptions="Center"
+                                   LineBreakMode="TailTruncation" />
+
+                            <!-- Chevron indicator for Folders -->
+                            <Label Grid.Column="2"
+                                   FontFamily="MaterialOutlined"
+                                   Text="{x:Static local:MaterialIcons.Edit_square}"
+                                   FontSize="20"
+                                   TextColor="Gray"
+                                   VerticalOptions="Center"
+                                   IsVisible="{Binding IsFolder}" />
+                        </Grid>
+                    </Border>
                 </DataTemplate>
             </CollectionView.ItemTemplate>
         </CollectionView>
 
-        <Grid Grid.Row="2" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+        <!-- Bottom Action Bar (Only visible in SelectFolder Mode) -->
+        <Grid Grid.Row="2" 
+              IsVisible="{Binding IsFolderMode}"
+              ColumnDefinitions="*, Auto" 
+              ColumnSpacing="10">
             <Button Grid.Column="1" 
                     Text="Diesen Ordner verwenden" 
+                    HeightRequest="44"
+                    CornerRadius="8"
+                    FontAttributes="Bold"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnSelectFolderClicked"/>
