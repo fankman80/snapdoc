@@ -23,34 +23,37 @@ public class Helper
         SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name ?? "";
         SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name ?? "";
 
-        if (string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) || string.IsNullOrEmpty(GlobalJson.Data.TitleImage))
-        {
-            SettingsService.Instance.FlyoutHeaderImage = "";
-            SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
-        }
-        else
-        {
-            if (GlobalJson.Data.TitleImage == "banner_thumbnail.png")
-            {
-                SettingsService.Instance.FlyoutHeaderImage = "";
-                SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
-            }
-            else
-            {
-                SettingsService.Instance.FlyoutHeaderImage = Path.Combine(
-                    Settings.DataDirectory ?? "",
-                    GlobalJson.Data.ProjectPath ?? "",
-                    GlobalJson.Data.ImagePath ?? "",
-                    GlobalJson.Data.TitleImage ?? ""
-                );
+        // Pruefen, ob grundsaetzlich Pfad und Bildname vorhanden sind
+        bool hasValidData = !string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) && 
+                            !string.IsNullOrEmpty(GlobalJson.Data.TitleImage) &&
+                            GlobalJson.Data.TitleImage != "banner_thumbnail.png";
 
-                SettingsService.Instance.FlyoutHeaderImageThumb = Path.Combine(
-                    Settings.DataDirectory ?? "",
-                    GlobalJson.Data.ProjectPath ?? "",
-                    GlobalJson.Data.TitleImage ?? ""
-                );
+        if (hasValidData)
+        {
+            string expectedImagePath = Path.Combine(
+                Settings.DataDirectory ?? "",
+                GlobalJson.Data.ProjectPath ?? "",
+                GlobalJson.Data.ImagePath ?? "",
+                GlobalJson.Data.TitleImage ?? ""
+            );
+
+            string expectedThumbPath = Path.Combine(
+                Settings.DataDirectory ?? "",
+                GlobalJson.Data.ProjectPath ?? "",
+                GlobalJson.Data.TitleImage ?? ""
+            );
+
+            // Zusaetzlicher Check: Existiert die Datei tatsaechlich auf der Festplatte?
+            if (File.Exists(expectedThumbPath))
+            {
+                SettingsService.Instance.FlyoutHeaderImage = expectedImagePath;
+                SettingsService.Instance.FlyoutHeaderImageThumb = expectedThumbPath;
+                
+                return; // Alles okay, Methode hier beenden
             }
         }
+        SettingsService.Instance.FlyoutHeaderImage = "";
+        SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
     }
 
     public static void PackDirectory(string sourceDirectory, string destinationZipFile)
