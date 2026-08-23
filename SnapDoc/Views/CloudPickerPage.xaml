@@ -11,7 +11,8 @@
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}">
+             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}"
+             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
