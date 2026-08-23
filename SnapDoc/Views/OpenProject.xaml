@@ -73,83 +73,83 @@
         </Grid>
     </Shell.TitleView>
 
-    <Grid>
-        <Grid Margin="10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-            <CollectionView x:Name="FileListView" Grid.Row="0"
-                            SelectionMode="None"
-                            ItemsUpdatingScrollMode="KeepItemsInView">
-                <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
-                </CollectionView.ItemsLayout>
-                <CollectionView.ItemTemplate>
-                    <DataTemplate x:DataType="local:FileItem">
-                        <Grid Style="{StaticResource NoSelectionGridStyle}" ColumnSpacing="8" RowSpacing="4">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="66" />
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="35" />
-                                <ColumnDefinition Width="35" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="25" />
-                                <RowDefinition Height="37" />
-                            </Grid.RowDefinitions>
-                            <Grid.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="OnProjectClicked" />
-                            </Grid.GestureRecognizers>
-                            <Label Grid.Column="1" Grid.Row="0"
-                                   FontSize="14"
-                                   VerticalTextAlignment="Center"
-                                   MaxLines="1"
-                                   LineBreakMode="TailTruncation"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                   Text="{Binding FileName}"/>
-                            <Label Grid.Column="1" Grid.Row="1"
-                                   FontSize="12"
-                                   VerticalTextAlignment="Center"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                   Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
-                            <Image Grid.Column="0" Grid.RowSpan="2"
-                                   Source="{Binding ImagePath}"
-                                   Aspect="AspectFill"/>
-                            <Label Grid.Column="0" Grid.RowSpan="2" 
-                                   IsVisible="{Binding IsActive}"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalTextAlignment="Center"
-                                   BackgroundColor="#80ffffff"
-                                   Text="{x:Static local:MaterialIcons.Check_circle}"
-                                   FontFamily="MaterialOutlined"
-                                   FontSize="40"/>
-                            <Button Grid.Column="2" Grid.RowSpan="2"
-                                    IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn}"
-                                    Padding="0"
-                                    Text="{Binding CloudIcon}"
-                                    FontSize="30"
-                                    FontFamily="MaterialOutlined"
-                                    BackgroundColor="Transparent"
-                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    Clicked="OnCloudPickerClicked"/>
-                            <Button Grid.Column="3" Grid.RowSpan="2"
-                                    Padding="0"
-                                    Text="{x:Static local:MaterialIcons.Edit_square}"
-                                    FontSize="30"
-                                    FontFamily="MaterialOutlined"
-                                    BackgroundColor="Transparent"
-                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                    Clicked="OnEditClicked"/>
-                        </Grid>
-                    </DataTemplate>
-                </CollectionView.ItemTemplate>
-            </CollectionView>
-            <Label Grid.Row="1"
-                   x:Name="ProjectCounterLabel"
-                   FontSize="12"/>
-        </Grid>
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        
+        <CollectionView x:Name="FileListView" Grid.Row="0"
+                        SelectionMode="None"
+                        ItemsUpdatingScrollMode="KeepItemsInView">
+            <CollectionView.ItemsLayout>
+                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
+            </CollectionView.ItemsLayout>
+            <CollectionView.ItemTemplate>
+                <DataTemplate x:DataType="local:FileItem">
+                    <Grid Style="{StaticResource NoSelectionGridStyle}" ColumnSpacing="8" RowSpacing="4">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="66" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="35" />
+                            <ColumnDefinition Width="35" />
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="25" />
+                            <RowDefinition Height="37" />
+                        </Grid.RowDefinitions>
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnProjectClicked" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="1" Grid.Row="0"
+                               FontSize="14"
+                               VerticalTextAlignment="Center"
+                               MaxLines="1"
+                               LineBreakMode="TailTruncation"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                               FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                               Text="{Binding FileName}"/>
+                        <Label Grid.Column="1" Grid.Row="1"
+                               FontSize="12"
+                               VerticalTextAlignment="Center"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                               FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                               Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
+                        <Image Grid.Column="0" Grid.RowSpan="2"
+                               Source="{Binding ImagePath}"
+                               Aspect="AspectFill"/>
+                        <Label Grid.Column="0" Grid.RowSpan="2" 
+                               IsVisible="{Binding IsActive}"
+                               HorizontalTextAlignment="Center"
+                               VerticalTextAlignment="Center"
+                               BackgroundColor="#80ffffff"
+                               Text="{x:Static local:MaterialIcons.Check_circle}"
+                               FontFamily="MaterialOutlined"
+                               FontSize="40"/>
+                        <Button Grid.Column="2" Grid.RowSpan="2"
+                                IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn}"
+                                Padding="0"
+                                Text="{Binding CloudIcon}"
+                                FontSize="30"
+                                FontFamily="MaterialOutlined"
+                                BackgroundColor="Transparent"
+                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                Clicked="OnCloudPickerClicked"/>
+                        <Button Grid.Column="3" Grid.RowSpan="2"
+                                Padding="0"
+                                Text="{x:Static local:MaterialIcons.Edit_square}"
+                                FontSize="30"
+                                FontFamily="MaterialOutlined"
+                                BackgroundColor="Transparent"
+                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                Clicked="OnEditClicked"/>
+                    </Grid>
+                </DataTemplate>
+            </CollectionView.ItemTemplate>
+        </CollectionView>
+        
+        <Label Grid.Row="1"
+               x:Name="ProjectCounterLabel"
+               FontSize="12"/>
     </Grid>
 </ContentPage>
