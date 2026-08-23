@@ -340,27 +340,29 @@ public partial class OpenProject : ContentPage
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
         // Sperre prüfen: Wenn bereits ein Projekt geladen wird, Klick ignorieren!
-        if (_isProcessing) return;
+        if (_isProcessing)
+            return;
 
         var layout = sender as BindableObject;
-        if (layout?.BindingContext is not FileItem item) return;
-        if (BindingContext is not BaseViewModel viewModel) return;
+        if (layout?.BindingContext is not FileItem item)
+            return;
 
-        // Sperre aktivieren: Damit kein zweiter Klick während des Ladens möglich ist
+        if (BindingContext is not BaseViewModel viewModel)
+            return;
+
+        // Wenn das Projekt bereits aktiv ist, nichts tun.
+        if (item.IsActive)
+            return;
+
+        // Sperre aktivieren
         _isProcessing = true;
+
+        // Overlay anzeigen
+        await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
 
         try
         {
-            // Ladeanzeige aktivieren
-            viewModel.BusyText = AppResources.projekt_wird_geladen;
-            viewModel.IsBusy = true;
-
             await Task.Delay(150);
-
-            // Wenn das Projekt bereits aktiv ist, können wir abbrechen.
-            // Die finally-Schleife hebt die Sperre am Ende automatisch wieder auf.
-            if (item.IsActive)
-                return;
 
             SaveManager.ResetCloudSync();
 
@@ -385,15 +387,23 @@ public partial class OpenProject : ContentPage
             {
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    var popup = new PopupDualResponse("In der Cloud existiert eine neuere Version dieses Projekts. Möchten Sie die neuesten Daten jetzt synchronisieren?", "Synchronisieren");
-                    var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+                    var popup = new PopupDualResponse(
+                        "In der Cloud existiert eine neuere Version dieses Projekts. Möchten Sie die neuesten Daten jetzt synchronisieren?",
+                        "Synchronisieren");
+
+                    var result = await this.ShowPopupAsync<string>(
+                        popup,
+                        Settings.PopupOptions);
+
                     return result?.Result == "Ok";
                 });
 
                 if (shouldSync)
                 {
-                    viewModel.BusyText = "Daten werden synchronisiert...";
-                    bool success = await SaveManager.SyncJsonOnlyFromCloudAsync();
+                    await BusyService.SetMessageAsync("Daten werden synchronisiert...");
+
+                    bool success =
+                        await SaveManager.SyncJsonOnlyFromCloudAsync();
 
                     if (success)
                         GlobalJson.LoadFromFile(item.FilePath);
@@ -406,12 +416,16 @@ public partial class OpenProject : ContentPage
             if (GlobalJson.Data.Plans != null)
             {
                 var repairCount = false;
+
                 foreach (var plan in GlobalJson.Data.Plans)
                 {
                     var i = 0;
+
                     if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+                    {
                         foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
                             i++;
+                    }
 
                     if (GlobalJson.Data.Plans[plan.Key].PinCount != i)
                     {
@@ -419,24 +433,32 @@ public partial class OpenProject : ContentPage
                         repairCount = true;
                     }
                 }
+
                 if (repairCount)
                     SaveManager.NotifyDataChanged();
             }
+
+            // Overlay vor dem Shell-Seitenwechsel schließen.
+            await BusyService.HideAsync();
 
             await Shell.Current.GoToAsync("project_details");
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex.Message}");
+            System.Diagnostics.Debug.WriteLine(
+                $"Cloud Sync oder Lade-Fehler: {ex}");
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                await Shell.Current.DisplayAlertAsync("Fehler beim Laden", "Das Projekt konnte aufgrund eines Problems nicht geladen werden.", "OK");
+                await Shell.Current.DisplayAlertAsync(
+                    "Fehler beim Laden",
+                    "Das Projekt konnte aufgrund eines Problems nicht geladen werden.",
+                    "OK");
             });
         }
         finally
         {
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
             _isProcessing = false;
         }
     }

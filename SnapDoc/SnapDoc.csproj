@@ -191,6 +191,9 @@
 		<MauiXaml Update="Controls\BorderedExpander.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Controls\BusyOverlayPage.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Controls\CalendarView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
