@@ -1,17 +1,35 @@
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using System.Collections.ObservableServices;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
 namespace SnapDoc.Views;
 
+public enum CloudPickerMode
+{
+    SelectFolder,
+    SelectJsonFile
+}
+
 public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 {
     private string _currentDriveId = string.Empty;
     private readonly Stack<string> _folderHistory = new();
+    private readonly CloudPickerMode _mode;
+
+    public CloudPickerMode Mode => _mode;
+    public bool IsFolderMode => _mode == CloudPickerMode.SelectFolder;
+    public bool IsJsonMode => _mode == CloudPickerMode.SelectJsonFile;
+
+    public string HeaderTitle => IsFolderMode 
+        ? AppResources.cloud_verzeichnis_waehlen 
+        : AppResources.projektdatei_importieren;
+
+    public string HeaderSubtitle => IsFolderMode
+        ? "Waehle den Ordner aus, in dem das neue Projekt gespeichert werden soll."
+        : "Waehle die .json-Projektdatei aus, die synchronisiert werden soll.";
 
     private bool _isBusy;
     public bool IsBusy
@@ -47,8 +65,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     public ObservableCollection<CloudItem> CloudItems { get; set; } = [];
     public bool CanGoBack => _folderHistory.Count > 1;
 
-    public CloudPickerPage()
+    public CloudPickerPage(CloudPickerMode mode = CloudPickerMode.SelectFolder)
     {
+        _mode = mode;
         InitializeComponent();
         BindingContext = this;
     }
@@ -95,7 +114,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            // Neuen Ordner in die Historie legen
             if (_folderHistory.Count == 0 || _folderHistory.Peek() != folderId)
             {
                 _folderHistory.Push(folderId);
@@ -125,14 +143,18 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             {
                 foreach (var item in children.Value)
                 {
-                    // Zeige nur Ordner oder .json Dateien
-                    if (item.Folder != null || (item.File != null && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true))
+                    bool isFolder = item.Folder != null;
+                    bool isJson = item.File != null && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true;
+
+                    // Ordner-Modus: Zeige nur Ordner an
+                    // JSON-Modus: Zeige Ordner (zum Navigieren) UND .json-Dateien an
+                    if (isFolder || (IsJsonMode && isJson))
                     {
                         CloudItems.Add(new CloudItem
                         {
                             Id = item.Id ?? string.Empty,
                             Name = item.Name ?? "Unbekannt",
-                            IsFolder = item.Folder != null
+                            IsFolder = isFolder
                         });
                     }
                 }
@@ -154,7 +176,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             ((CollectionView)sender).SelectedItem = null;
 
-            // Pruefen, ob der ".." Zurueck-Eintrag geklickt wurde
             if (selectedItem.Id == "..")
             {
                 OnBackClicked(sender, e);
@@ -165,9 +186,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             {
                 await LoadFolderContentAsync(selectedItem.Id);
             }
-            else
+            else if (IsJsonMode)
             {
-                // Pruefe, ob der Dateiname exakt der geladenen GlobalJson entspricht
                 string? activeJsonFile = GlobalJson.Data?.JsonFile;
 
                 if (!string.IsNullOrEmpty(activeJsonFile) &&
@@ -220,7 +240,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
     private async void OnSelectFolderClicked(object sender, EventArgs e)
     {
-        if (_folderHistory.Count > 0)
+        if (IsFolderMode && _folderHistory.Count > 0)
         {
             string currentFolderId = _folderHistory.Peek();
 
@@ -229,7 +249,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
             try
             {
-                // Erstelle neues Projektverzeichnis im ausgewaehlten Ordner
                 bool success = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
 
                 if (success)
