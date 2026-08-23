@@ -481,14 +481,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SaveManager.NotifyDataChanged();
     }
 
-    private async Task SetPinClicked(object sender, EventArgs e)
+    private async void SetPinClicked(object sender, EventArgs e)
     {
         if (SettingsService.Instance.PinPlaceMode == 0)
         {
             Point centerFactor = PlanImage.GetPlanFactorAtControlCenter();
             await SetPin(new Point(centerFactor.X, centerFactor.Y));
         }
-
 
         if (SettingsService.Instance.PinPlaceMode == 1)
         {
