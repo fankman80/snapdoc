@@ -339,22 +339,18 @@ public partial class OpenProject : ContentPage
 
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
-        // SPERRE PRÜFEN: Wenn bereits ein Projekt geladen wird, Klick ignorieren!
+        // Sperre prüfen: Wenn bereits ein Projekt geladen wird, Klick ignorieren!
         if (_isProcessing) return;
 
         var layout = sender as BindableObject;
         if (layout?.BindingContext is not FileItem item) return;
         if (BindingContext is not BaseViewModel viewModel) return;
 
-        // PERRE AKTIVIEREN: Damit kein zweiter Klick während des Ladens möglich ist
+        // Sperre aktivieren: Damit kein zweiter Klick während des Ladens möglich ist
         _isProcessing = true;
 
         try
         {
-#if ANDROID || IOS
-            Shell.Current.FlyoutIsPresented = false;
-#endif
-
             // Ladeanzeige aktivieren
             viewModel.BusyText = AppResources.projekt_wird_geladen;
             viewModel.IsBusy = true;
