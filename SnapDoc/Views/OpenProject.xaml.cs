@@ -642,7 +642,13 @@ public partial class OpenProject : ContentPage
         var button = sender as Button;
         if (button?.BindingContext is not FileItem item) return;
 
-        // Lade das Projekt temporär in den Speicher, falls es noch nicht aktiv ist
+        // Wenn das Projekt bereits in der Cloud liegt, Click ignorieren
+        if (item.CloudIcon == MaterialIcons.Cloud || item.CloudIcon == MaterialIcons.Cloud_done)
+        {
+            return;
+        }
+
+        // Lade das Projekt temporaer in den Speicher, falls es noch nicht aktiv ist
         if (!item.IsActive)
         {
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
@@ -664,6 +670,12 @@ public partial class OpenProject : ContentPage
             Helper.HeaderUpdate();
         }
 
-        await Navigation.PushAsync(new CloudPickerPage());
+        // Nach dem Refresh erneut pruefen, ob das Projekt eventuell schon synchronisiert ist
+        if (item.CloudIcon == MaterialIcons.Cloud || item.CloudIcon == MaterialIcons.Cloud_done)
+        {
+            return;
+        }
+
+        await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectFolder));
     }
 }
