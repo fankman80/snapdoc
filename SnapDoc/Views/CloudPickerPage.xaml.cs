@@ -1,6 +1,7 @@
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using System.Collections.ObservableServices;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -11,6 +12,38 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 {
     private string _currentDriveId = string.Empty;
     private readonly Stack<string> _folderHistory = new();
+
+    private bool _isBusy;
+    public bool IsBusy
+    {
+        get => _isBusy;
+        set
+        {
+            if (_isBusy != value)
+            {
+                _isBusy = value;
+                OnPropertyChanged();
+                OnPropertyChanged(nameof(IsNotBusy));
+            }
+        }
+    }
+
+    public bool IsNotBusy => !IsBusy;
+
+    private string _busyText = string.Empty;
+    public string BusyText
+    {
+        get => _busyText;
+        set
+        {
+            if (_busyText != value)
+            {
+                _busyText = value;
+                OnPropertyChanged();
+            }
+        }
+    }
+
     public ObservableCollection<CloudItem> CloudItems { get; set; } = [];
     public bool CanGoBack => _folderHistory.Count > 1;
 
@@ -30,6 +63,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         if (SaveManager.CurrentAuth?.GraphClient == null) return;
 
+        IsBusy = true;
+        BusyText = AppResources.projekte_werden_gesucht;
+
         try
         {
             var myDrive = await SaveManager.CurrentAuth.GraphClient.Me.Drive.GetAsync();
@@ -44,11 +80,18 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             await DisplayAlertAsync(AppResources.fehler, $"{AppResources.konnte_onedrive_nicht_laden}: {ex.Message}", AppResources.ok);
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async Task LoadFolderContentAsync(string folderId)
     {
         if (SaveManager.CurrentAuth?.GraphClient == null) return;
+
+        IsBusy = true;
+        BusyText = AppResources.projekte_werden_gesucht;
 
         try
         {
@@ -99,6 +142,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             await DisplayAlertAsync(AppResources.fehler, $"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}", AppResources.ok);
         }
+        finally
+        {
+            IsBusy = false;
+        }
     }
 
     private async void OnItemSelected(object sender, SelectionChangedEventArgs e)
@@ -107,7 +154,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             ((CollectionView)sender).SelectedItem = null;
 
-            // Prüfen, ob der ".." Zurück-Eintrag geklickt wurde
+            // Pruefen, ob der ".." Zurueck-Eintrag geklickt wurde
             if (selectedItem.Id == "..")
             {
                 OnBackClicked(sender, e);
@@ -120,7 +167,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             }
             else
             {
-                // Prüfe, ob der Dateiname exakt der geladenen GlobalJson entspricht
+                // Pruefe, ob der Dateiname exakt der geladenen GlobalJson entspricht
                 string? activeJsonFile = GlobalJson.Data?.JsonFile;
 
                 if (!string.IsNullOrEmpty(activeJsonFile) &&
@@ -129,16 +176,27 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                     if (_folderHistory.Count > 0)
                     {
                         string currentFolderId = _folderHistory.Peek();
-                        bool success = await SaveManager.SyncWithExistingFolderAsync(currentFolderId);
 
-                        if (success)
+                        IsBusy = true;
+                        BusyText = AppResources.projekte_werden_gesucht;
+
+                        try
                         {
-                            await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.projekt_wird_synchronisiert_mit}: '{selectedItem.Name}'", AppResources.ok);
-                            await Navigation.PopAsync();
+                            bool success = await SaveManager.SyncWithExistingFolderAsync(currentFolderId);
+
+                            if (success)
+                            {
+                                await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.projekt_wird_synchronisiert_mit}: '{selectedItem.Name}'", AppResources.ok);
+                                await Navigation.PopAsync();
+                            }
+                            else
+                            {
+                                await DisplayAlertAsync(AppResources.fehler, $"{AppResources.synchronisierung_konnte_nicht_gestartet_werden}", AppResources.ok);
+                            }
                         }
-                        else
+                        finally
                         {
-                            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.synchronisierung_konnte_nicht_gestartet_werden}", AppResources.ok);
+                            IsBusy = false;
                         }
                     }
                 }
@@ -166,17 +224,27 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             string currentFolderId = _folderHistory.Peek();
 
-            // Erstelle neues Projektverzeichnis im ausgewählten Ordner
-            bool success = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
+            IsBusy = true;
+            BusyText = AppResources.projekte_werden_gesucht;
 
-            if (success)
+            try
             {
-                await DisplayAlertAsync(AppResources.erfolg, AppResources.neues_projektverzeichnis_cloud_erstellt, AppResources.ok);
-                await Navigation.PopAsync();
+                // Erstelle neues Projektverzeichnis im ausgewaehlten Ordner
+                bool success = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
+
+                if (success)
+                {
+                    await DisplayAlertAsync(AppResources.erfolg, AppResources.neues_projektverzeichnis_cloud_erstellt, AppResources.ok);
+                    await Navigation.PopAsync();
+                }
+                else
+                {
+                    await DisplayAlertAsync(AppResources.fehler, AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.ok);
+                }
             }
-            else
+            finally
             {
-                await DisplayAlertAsync(AppResources.fehler, AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.ok);
+                IsBusy = false;
             }
         }
     }
