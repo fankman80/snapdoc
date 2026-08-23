@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
              xmlns:models="clr-namespace:SnapDoc.Models"
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
@@ -11,12 +12,23 @@
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
              x:Name="ThisPage"
-             Title="{Binding HeaderTitle}"
+             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}"
              ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
 
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
+                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+                            IsVisible="{Binding IsNotBusy}" />
+    </Shell.BackButtonBehavior>
+
     <Shell.TitleView>
-        <HorizontalStackLayout Spacing="0">
+        <HorizontalStackLayout x:DataType="viewmodels:BaseViewModel"
+                               BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
+                               IsVisible="{Binding IsNotBusy}"
+                               Spacing="0">
             <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   LineBreakMode="WordWrap"
+                   MaxLines="2"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
@@ -45,7 +57,8 @@
                        FontSize="22"
                        TextColor="{DynamicResource Primary}"
                        VerticalOptions="Center" />
-                <Label Text="{Binding HeaderSubtitle}"
+                <Label x:DataType="views:CloudPickerPage"
+                       Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
                        FontSize="13"
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                        VerticalOptions="Center"
@@ -54,8 +67,9 @@
         </Border>
 
         <!-- Modern List View -->
-        <CollectionView Grid.Row="1" 
-                        ItemsSource="{Binding CloudItems}" 
+        <CollectionView Grid.Row="1"
+                        x:DataType="views:CloudPickerPage"
+                        ItemsSource="{Binding CloudItems, Source={x:Reference Name=ThisPage}}"
                         SelectionMode="Single"
                         SelectionChanged="OnItemSelected">
             <CollectionView.ItemTemplate>
@@ -87,9 +101,7 @@
 
                             <!-- Name -->
                             <Label Grid.Column="1"
-                                   Text="{Binding Name}"
-                                   FontSize="15"
-                                   FontAttributes="Bold"
+                                   Text="{Binding Name, Source={x:Reference Name=ThisPage}}"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    VerticalOptions="Center"
                                    LineBreakMode="TailTruncation" />
@@ -101,7 +113,7 @@
                                    FontSize="20"
                                    TextColor="Gray"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding IsFolder}" />
+                                   IsVisible="{Binding IsFolder, Source={x:Reference Name=ThisPage}}" />
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -110,14 +122,12 @@
 
         <!-- Bottom Action Bar (Only visible in SelectFolder Mode) -->
         <Grid Grid.Row="2" 
-              IsVisible="{Binding IsFolderMode}"
+              x:DataType="views:CloudPickerPage"
+              IsVisible="{Binding IsFolderMode, Source={x:Reference Name=ThisPage}}"
               ColumnDefinitions="*, Auto" 
               ColumnSpacing="10">
             <Button Grid.Column="1" 
-                    Text="Diesen Ordner verwenden" 
-                    HeightRequest="44"
-                    CornerRadius="8"
-                    FontAttributes="Bold"
+                    Text="hier hochladen" 
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnSelectFolderClicked"/>

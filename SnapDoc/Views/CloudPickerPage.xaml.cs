@@ -1,6 +1,7 @@
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.ViewModels;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -31,37 +32,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         ? "Waehle den Ordner aus, in dem das neue Projekt gespeichert werden soll."
         : "Waehle die .json-Projektdatei aus, die synchronisiert werden soll.";
 
-    private bool _isBusy;
-    public bool IsBusy
-    {
-        get => _isBusy;
-        set
-        {
-            if (_isBusy != value)
-            {
-                _isBusy = value;
-                OnPropertyChanged();
-                OnPropertyChanged(nameof(IsNotBusy));
-            }
-        }
-    }
-
-    public bool IsNotBusy => !IsBusy;
-
-    private string _busyText = string.Empty;
-    public string BusyText
-    {
-        get => _busyText;
-        set
-        {
-            if (_busyText != value)
-            {
-                _busyText = value;
-                OnPropertyChanged();
-            }
-        }
-    }
-
     public ObservableCollection<CloudItem> CloudItems { get; set; } = [];
     public bool CanGoBack => _folderHistory.Count > 1;
 
@@ -69,7 +39,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         _mode = mode;
         InitializeComponent();
-        BindingContext = this;
+        BindingContext = new BaseViewModel();
     }
 
     protected override async void OnAppearing()
@@ -81,12 +51,19 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private async Task LoadRootFolderAsync()
     {
         if (SaveManager.CurrentAuth?.GraphClient == null) return;
-
-        IsBusy = true;
-        BusyText = AppResources.projekte_werden_gesucht;
+  
+        var viewModel = BindingContext as BaseViewModel;
 
         try
         {
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.projekte_werden_gesucht;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
+
             var myDrive = await SaveManager.CurrentAuth.GraphClient.Me.Drive.GetAsync();
             if (myDrive != null && !string.IsNullOrEmpty(myDrive.Id))
             {
@@ -101,7 +78,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         finally
         {
-            IsBusy = false;
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
         }
     }
 
@@ -109,11 +87,17 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         if (SaveManager.CurrentAuth?.GraphClient == null) return;
 
-        IsBusy = true;
-        BusyText = AppResources.projekte_werden_gesucht;
+        var viewModel = BindingContext as BaseViewModel;
 
         try
         {
+            // Ladeanzeige aktivieren
+            if (viewModel != null)
+            {
+                viewModel.BusyText = AppResources.projekte_werden_gesucht;
+                viewModel.IsBusy = true;
+                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+            }
             if (_folderHistory.Count == 0 || _folderHistory.Peek() != folderId)
             {
                 _folderHistory.Push(folderId);
@@ -166,7 +150,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         finally
         {
-            IsBusy = false;
+            // Ladeanzeige deaktivieren
+            viewModel?.IsBusy = false;
         }
     }
 
@@ -197,26 +182,29 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                     {
                         string currentFolderId = _folderHistory.Peek();
 
-                        IsBusy = true;
-                        BusyText = AppResources.projekte_werden_gesucht;
+                        var viewModel = BindingContext as BaseViewModel;
 
                         try
                         {
+                            // Ladeanzeige aktivieren
+                            if (viewModel != null)
+                            {
+                                viewModel.BusyText = "Projekt wird synchronisiert...";
+                                viewModel.IsBusy = true;
+                                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+                            }
+
                             bool success = await SaveManager.SyncWithExistingFolderAsync(currentFolderId);
 
                             if (success)
-                            {
-                                await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.projekt_wird_synchronisiert_mit}: '{selectedItem.Name}'", AppResources.ok);
                                 await Navigation.PopAsync();
-                            }
                             else
-                            {
                                 await DisplayAlertAsync(AppResources.fehler, $"{AppResources.synchronisierung_konnte_nicht_gestartet_werden}", AppResources.ok);
-                            }
                         }
                         finally
                         {
-                            IsBusy = false;
+                            // Ladeanzeige deaktivieren
+                            viewModel?.IsBusy = false;
                         }
                     }
                 }
@@ -244,26 +232,29 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             string currentFolderId = _folderHistory.Peek();
 
-            IsBusy = true;
-            BusyText = AppResources.projekte_werden_gesucht;
+            var viewModel = BindingContext as BaseViewModel;
 
             try
             {
+                // Ladeanzeige aktivieren
+                if (viewModel != null)
+                {
+                    viewModel.BusyText = "Projekt wird hochgeladen...";
+                    viewModel.IsBusy = true;
+                    await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
+                }
+
                 bool success = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
 
                 if (success)
-                {
-                    await DisplayAlertAsync(AppResources.erfolg, AppResources.neues_projektverzeichnis_cloud_erstellt, AppResources.ok);
                     await Navigation.PopAsync();
-                }
                 else
-                {
                     await DisplayAlertAsync(AppResources.fehler, AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.ok);
-                }
             }
             finally
             {
-                IsBusy = false;
+                // Ladeanzeige deaktivieren
+                viewModel?.IsBusy = false;
             }
         }
     }

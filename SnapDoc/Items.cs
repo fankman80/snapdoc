@@ -67,7 +67,7 @@ namespace SnapDoc
                 if (HasCloudSync)
                     return MaterialIcons.Cloud;
                 else
-                    return MaterialIcons.Sync;
+                    return MaterialIcons.Cloud_upload;
             }
         }
 
