@@ -67,26 +67,26 @@ public partial class OpenProject : ContentPage
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
 
-        // Hintergrundprüfung für lokale Projekte
+        // Hintergrundpruefung fuer lokale Projekte
         if (SaveManager.CurrentAuth?.IsLoggedIn == true)
         {
             _ = Task.Run(async () =>
             {
-                // 1. Hole einmalig alle Cloud-Projekte (schneller als Einzelabfragen)
+                // Hole einmalig alle Cloud-Projekte (schneller als Einzelabfragen)
                 var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
 
                 foreach (var item in foundFiles)
                 {
-                    // 2. Lokales JSON auslesen, um an die Cloud-IDs zu kommen
+                    // Lokales JSON auslesen, um an die Cloud-IDs zu kommen
                     var projectData = GlobalJson.ReadFromFile(item.FilePath);
                     if (projectData == null) continue;
 
                     bool hasValidCloudLink = false;
 
-                    // FALL A: Das Projekt hat bereits eine Cloud-Verknüpfung (ID) gespeichert
+                    // FALL A: Das Projekt hat bereits eine Cloud-Verknuepfung (ID) gespeichert
                     if (!string.IsNullOrEmpty(projectData.CloudFolderId))
                     {
-                        // Prüfen, ob exakt dieser Ordner online noch existiert
+                        // Pruefen, ob exakt dieser Ordner online noch existiert
                         var matchingById = remoteProjects.FirstOrDefault(rp => rp.FolderId == projectData.CloudFolderId);
 
                         if (matchingById != null)
@@ -95,13 +95,18 @@ public partial class OpenProject : ContentPage
                         }
                         else
                         {
-                            // Optional: Die Cloud-IDs lokal entfernen, falls das Projekt online gelöscht wurde
-                            // projectData.CloudDriveId = null;
-                            // projectData.CloudFolderId = null;
-                            // -> Müsste dann wieder gespeichert werden
+                            // Die Cloud-IDs lokal entfernen, da das Projekt online geloescht wurde
+                            projectData.CloudDriveId = null;
+                            projectData.CloudFolderId = null;
+
+                            string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                            File.WriteAllText(item.FilePath, updatedJson);
+
+                            item.HasCloudSync = false;
+                            MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
                         }
                     }
-                    // FALL B: Legacy-Fallback für Projekte, die noch keine IDs haben (Namensabgleich beim ersten Mal)
+                    // FALL B: Legacy-Fallback fuer Projekte, die noch keine IDs haben (Namensabgleich beim ersten Mal)
                     else
                     {
                         string expectedJsonName = item.FileName + ".json";
@@ -112,7 +117,7 @@ public partial class OpenProject : ContentPage
                         {
                             hasValidCloudLink = true;
 
-                            // 3. Ergänze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
+                            // 3. Ergaenze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
                             projectData.CloudDriveId = matchingByName.DriveId;
                             projectData.CloudFolderId = matchingByName.FolderId;
 
@@ -121,7 +126,7 @@ public partial class OpenProject : ContentPage
                         }
                     }
 
-                    // 4. UI aktualisieren, wenn ein gültiger Cloud-Link besteht
+                    // UI aktualisieren, wenn ein gueltiger Cloud-Link besteht
                     if (hasValidCloudLink)
                     {
                         item.HasCloudSync = true;
@@ -334,26 +339,35 @@ public partial class OpenProject : ContentPage
 
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
+        // SPERRE PRÜFEN: Wenn bereits ein Projekt geladen wird, Klick ignorieren!
+        if (_isProcessing) return;
+
         var layout = sender as BindableObject;
         if (layout?.BindingContext is not FileItem item) return;
         if (BindingContext is not BaseViewModel viewModel) return;
 
+        // PERRE AKTIVIEREN: Damit kein zweiter Klick während des Ladens möglich ist
+        _isProcessing = true;
+
         try
         {
+#if ANDROID || IOS
+            Shell.Current.FlyoutIsPresented = false;
+#endif
+
             // Ladeanzeige aktivieren
             viewModel.BusyText = AppResources.projekt_wird_geladen;
             viewModel.IsBusy = true;
-            
-            // Wichtig: Kurz warten, damit WinUI/Android den UI-Thread aktualisieren kann
-            await Task.Delay(50); 
 
+            await Task.Delay(150);
+
+            // Wenn das Projekt bereits aktiv ist, können wir abbrechen.
+            // Die finally-Schleife hebt die Sperre am Ende automatisch wieder auf.
             if (item.IsActive)
                 return;
 
-            // Cloud-Verknuepfung im SaveManager zuruecksetzen
             SaveManager.ResetCloudSync();
 
-            // Aktives Projekt setzen
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
             {
                 foreach (var f in items)
@@ -369,15 +383,13 @@ public partial class OpenProject : ContentPage
             SettingsService.Instance.IsProjectLoaded = true;
             LoadDataToView.ResetData();
 
-            // ZUERST lokales JSON in den Speicher laden
             GlobalJson.LoadFromFile(item.FilePath);
 
-            // Cloud-Pruefung & Sync DURCHFUEHREN (bevor Routen gebaut werden)
             if (await SaveManager.IsCloudVersionNewerAsync())
             {
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    var popup = new PopupDualResponse("In der Cloud existiert eine neuere Version dieses Projekts. Moechten Sie die neuesten Daten jetzt synchronisieren?", "Synchronisieren");
+                    var popup = new PopupDualResponse("In der Cloud existiert eine neuere Version dieses Projekts. Möchten Sie die neuesten Daten jetzt synchronisieren?", "Synchronisieren");
                     var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
                     return result?.Result == "Ok";
                 });
@@ -388,18 +400,13 @@ public partial class OpenProject : ContentPage
                     bool success = await SaveManager.SyncJsonOnlyFromCloudAsync();
 
                     if (success)
-                    {
-                        // Frisch synchronisiertes JSON neu laden
                         GlobalJson.LoadFromFile(item.FilePath);
-                    }
                 }
             }
 
-            // ERST JETZT EINMALIG die UI und Routen aufbauen
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
 
-            // Repair-Check
             if (GlobalJson.Data.Plans != null)
             {
                 var repairCount = false;
@@ -420,30 +427,21 @@ public partial class OpenProject : ContentPage
                     SaveManager.NotifyDataChanged();
             }
 
-            // Flyout VOR der Navigation schliessen, um Deadlocks/UI-Fehler zu vermeiden
-#if ANDROID || IOS
-            Shell.Current.FlyoutIsPresented = false;
-#endif
-
             await Shell.Current.GoToAsync("project_details");
         }
         catch (Exception ex)
         {
-            // Wenn in der Cloud-Kommunikation ein Fehler auftritt, fangen wir ihn hier ab
             System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex.Message}");
-            
+
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                await Shell.Current.DisplayAlert("Fehler beim Laden", "Das Projekt konnte aufgrund eines Problems nicht geladen werden.", "OK");
+                await Shell.Current.DisplayAlertAsync("Fehler beim Laden", "Das Projekt konnte aufgrund eines Problems nicht geladen werden.", "OK");
             });
         }
         finally
         {
-            // Ladeanzeige deaktivieren
-            if (viewModel != null)
-            {
-                viewModel.IsBusy = false;
-            }
+            viewModel?.IsBusy = false;
+            _isProcessing = false;
         }
     }
 
