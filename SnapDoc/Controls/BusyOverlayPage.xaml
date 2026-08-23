@@ -9,7 +9,7 @@
         <!-- Abdunklung der gesamten aktuellen Seite -->
         <BoxView
             BackgroundColor="Black"
-            Opacity="0.7" />
+            Opacity="0.8" />
 
         <!-- Zentrale Busy-Box -->
         <Border
