@@ -341,12 +341,11 @@ public partial class OpenProject : ContentPage
         try
         {
             // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.projekt_wird_geladen;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            viewModel.BusyText = AppResources.projekt_wird_geladen;
+            viewModel.IsBusy = true;
+            
+            // Wichtig: Kurz warten, damit WinUI/Android den UI-Thread aktualisieren kann
+            await Task.Delay(50); 
 
             if (item.IsActive)
                 return;
@@ -421,16 +420,30 @@ public partial class OpenProject : ContentPage
                     SaveManager.NotifyDataChanged();
             }
 
-            await Shell.Current.GoToAsync("project_details");
-
+            // Flyout VOR der Navigation schliessen, um Deadlocks/UI-Fehler zu vermeiden
 #if ANDROID || IOS
             Shell.Current.FlyoutIsPresented = false;
 #endif
+
+            await Shell.Current.GoToAsync("project_details");
+        }
+        catch (Exception ex)
+        {
+            // Wenn in der Cloud-Kommunikation ein Fehler auftritt, fangen wir ihn hier ab
+            System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex.Message}");
+            
+            await MainThread.InvokeOnMainThreadAsync(async () =>
+            {
+                await Shell.Current.DisplayAlert("Fehler beim Laden", "Das Projekt konnte aufgrund eines Problems nicht geladen werden.", "OK");
+            });
         }
         finally
         {
             // Ladeanzeige deaktivieren
-            viewModel?.IsBusy = false;
+            if (viewModel != null)
+            {
+                viewModel.IsBusy = false;
+            }
         }
     }
 
