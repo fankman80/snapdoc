@@ -55,7 +55,10 @@ public partial class FotoGalleryView : ContentPage
     {
         base.OnDisappearing();
 
-        _imageLoadingCts?.Cancel(); // Ladevorgang stoppen
+        _imageLoadingCts?.Cancel();
+        _imageLoadingCts?.Dispose();
+        _imageLoadingCts = null;
+
         SizeChanged -= OnSizeChanged;
     }
 
@@ -122,16 +125,24 @@ public partial class FotoGalleryView : ContentPage
             {
                 var fileName = Path.GetFileName(item.ImagePath);
 
+                // Fehlende Dateien vom Server nachladen
                 if (!File.Exists(item.ImagePath))
                     await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
+
+                // Pruefen, ob waehrend des Downloads die Galerie verlassen wurde
+                if (token.IsCancellationRequested) break;
 
                 if (File.Exists(item.ImagePath))
                 {
                     var bytes = File.ReadAllBytes(item.ImagePath);
 
+                    if (token.IsCancellationRequested) break;
+
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
+                        // Nur aktualisieren, wenn der Vorgang nicht abgebrochen wurde
+                        if (!token.IsCancellationRequested)
+                            item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
                     });
                 }
             }

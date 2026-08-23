@@ -4,10 +4,10 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
 using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Text.Json;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -16,6 +16,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
     private string PlanId;
     private string PinId;
+    private CancellationTokenSource _imageLoadingCts;
 
     private ObservableCollection<FotoItem> fotos = [];
     public ObservableCollection<FotoItem> Fotos
@@ -72,6 +73,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
         base.OnDisappearing();
         
         SizeChanged -= OnSizeChanged;
+
+        _imageLoadingCts?.Cancel();
+        _imageLoadingCts?.Dispose();
+        _imageLoadingCts = null;
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -86,17 +91,72 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void FotoLoader()
     {
-        Fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos
+        // Laufende Ladevorgänge abbrechen
+        _imageLoadingCts?.Cancel();
+        _imageLoadingCts = new CancellationTokenSource();
+        var token = _imageLoadingCts.Token;
+
+        var fotoItems = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Values
+            .Where(img => img != null && !string.IsNullOrWhiteSpace(img.File))
             .Select(img => new FotoItem
-        {
-                ImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, img.Value.File),
+            {
+                ImagePath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ThumbnailPath,
+                    img.File),
                 OnPlanId = this.PlanId,
                 OnPinId = this.PinId,
-                AllowExport = img.Value.AllowExport,
-                DateTime = img.Value.DateTime
+                AllowExport = img.AllowExport,
+                DateTime = img.DateTime
             }.Initialize())
-            .ToObservableCollection();
+            .ToList();
+
+        Fotos = fotoItems.ToObservableCollection();
+
+        // Startet das Nachladen und Generieren der Bild-Streams im Hintergrund
+        Task.Run(() => LoadImagesInBackgroundAsync(fotoItems, token), token);
+    }
+
+    private static async Task LoadImagesInBackgroundAsync(IEnumerable<FotoItem> itemsToLoad, CancellationToken token)
+    {
+        foreach (var item in itemsToLoad)
+        {
+            if (token.IsCancellationRequested) break;
+
+            try
+            {
+                var fileName = Path.GetFileName(item.ImagePath);
+
+                // Fehlende Dateien vom Server nachladen
+                if (!File.Exists(item.ImagePath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
+
+                // Pruefen, ob waehrend des Downloads die Seite verlassen wurde
+                if (token.IsCancellationRequested) break;
+
+                if (File.Exists(item.ImagePath))
+                {
+                    var bytes = File.ReadAllBytes(item.ImagePath);
+
+                    if (token.IsCancellationRequested) break;
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        // Nur aktualisieren, wenn der Vorgang nicht abgebrochen wurde
+                        if (!token.IsCancellationRequested)
+                            item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"LazyLoad Error: {ex.Message}");
+            }
+
+            await Task.Delay(10, token);
         }
+    }
 
     private async void OnImageTapped(object sender, EventArgs e)
     {

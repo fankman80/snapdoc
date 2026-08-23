@@ -211,9 +211,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             var (incomingPlanId, pinId) = m.Value;
             if (incomingPlanId != planId) return;
 
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
-                AddPin(pinId);
+                await AddPin(pinId);
                 PlanImage.InvalidateSurface();
             });
         });
@@ -255,7 +255,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         });
     }
 
-    public void ApplyQueryAttributes(IDictionary<string, object> query)
+    public async void ApplyQueryAttributes(IDictionary<string, object> query)
     {
         if (query.TryGetValue("pinZoom", out object value1))
             pinZoom = value1 as string;
@@ -267,7 +267,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             if (!isFirstLoad)
             {
-                AddPin(pinId);
+                await AddPin(pinId);
                 PlanImage.InvalidateSurface();
             }
         }
@@ -279,7 +279,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage?.ResetTouchState();
     }
 
-    private Task AddPlan()
+    private async Task<Task> AddPlan()
     {
         PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
 
@@ -289,16 +289,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (thisPlan.Pins != null)
             foreach (var pinId in thisPlan.Pins.Keys)
-                AddPin(pinId);
+                await AddPin(pinId);
 
         PlanImage.Pins = pinList;
 
         return Task.CompletedTask;
     }
 
-    private MapPin AddPin(string pinId)
+    private async Task<MapPin> AddPin(string pinId)
     {
-        var pin = CreateMapPin(pinId);
+        var pin = await CreateMapPinAsync(pinId);
 
         if (pin != null)
         {
@@ -309,7 +309,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         return pin;
     }
 
-    private MapPin CreateMapPin(string pinId)
+    private async Task<MapPin> CreateMapPinAsync(string pinId)
     {
         if (!thisPlan.Pins.TryGetValue(pinId, out var pinData))
             return null;
@@ -325,6 +325,22 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 GlobalJson.Data.ProjectPath,
                 GlobalJson.Data.CustomPinsPath,
                 pinIcon);
+
+            // 1. Icon-Datei herunterladen
+            if (!File.Exists(resolvedPath))
+                await SaveManager.DownloadMediaOnDemandAsync(pinIcon, GlobalJson.Data.CustomPinsPath);
+
+            // 2. Zuordnen der .data-Datei ueber Path.ChangeExtension
+            string dataFileName = Path.ChangeExtension(pinIcon, ".data");
+            string dataLocalPath = Path.Combine(
+                Settings.DataDirectory,
+                GlobalJson.Data.ProjectPath,
+                GlobalJson.Data.CustomPinsPath,
+                dataFileName);
+
+            // .data-Datei nachladen, falls sie lokal fehlt
+            if (!File.Exists(dataLocalPath))
+                await SaveManager.DownloadMediaOnDemandAsync(dataFileName, GlobalJson.Data.CustomPinsPath);
         }
         else if (pinData.IsCustomIcon)
         {
@@ -345,7 +361,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             }
         }
         else
+        {
             resolvedPath = pinIcon;
+        }
 
         return new MapPin
         {
@@ -419,14 +437,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private void OnCanvasTapped(object sender, SKPoint e)
+    private async void OnCanvasTapped(object sender, SKPoint e)
     {
         if (SettingsService.Instance.PinPlaceMode == 1 && isPinSet)
         {
             PlanImage.PinCreationMode = PinCreationMode.SingleTap;
 
             Point relativePoint = PlanImage.GetRelativeFactorFromScreenPoint(e, clamp: true);
-            SetPin(relativePoint);
+            await SetPin(relativePoint);
 
             PlanImage.PinCreationMode = PinCreationMode.LongPress;
 
@@ -436,12 +454,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         }
     }
 
-    private void OnCanvasLongPressed(object sender, SKPoint e)
+    private async void OnCanvasLongPressed(object sender, SKPoint e)
     {
         if (SettingsService.Instance.PinPlaceMode == 2)
         {
             Point relativePoint = PlanImage.GetRelativeFactorFromScreenPoint(e, clamp: true);
-            SetPin(relativePoint);
+            await SetPin(relativePoint);
         }
     }
 
@@ -463,12 +481,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SaveManager.NotifyDataChanged();
     }
 
-    private void SetPinClicked(object sender, EventArgs e)
+    private async Task SetPinClicked(object sender, EventArgs e)
     {
         if (SettingsService.Instance.PinPlaceMode == 0)
         {
             Point centerFactor = PlanImage.GetPlanFactorAtControlCenter();
-            SetPin(new Point(centerFactor.X, centerFactor.Y));
+            await SetPin(new Point(centerFactor.X, centerFactor.Y));
         }
 
 
@@ -487,7 +505,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         isPinSet = false;
     }
 
-    private void SetPin(Point _pos,
+    private async Task SetPin(Point _pos,
                         string customName = null,
                         int customPinSizeWidth = 0,
                         int customPinSizeHeight = 0,
@@ -566,7 +584,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 // save data to file
                 SaveManager.NotifyDataChanged();
 
-                AddPin(currentDateTime);
+                await AddPin(currentDateTime);
 
                 thisPlan.PinCount = plan.Pins.Count;
 
@@ -835,7 +853,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         double oy = (fy / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Height;
         Point relativePos = new(centerFactorX + ox, centerFactorY + oy);
 
-        SetPin(
+        await SetPin(
             relativePos,
             pngFileName,
             (int)imageRect.Width,
@@ -1456,7 +1474,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 if (thisPlan.Pins[pinId].IsLockRotate)
                     thisPlan.Pins[pinId].PinRotation = (thisPlan.Pins[pinId].PinRotation + angle) % 360;
 
-                AddPin(pinId);
+                await AddPin(pinId);
             }
         }
 

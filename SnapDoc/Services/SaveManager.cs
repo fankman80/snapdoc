@@ -29,39 +29,48 @@ public static class SaveManager
         }
     }
 
-    // 1. Standard-Aufruf ohne Dateien (nur JSON sync)
+    // Standard-Aufruf ohne Dateien (nur JSON sync)
     public static void NotifyDataChanged(int delayMilliseconds = 2000)
     {
         NotifyDataChanged([], delayMilliseconds);
     }
 
-    // 2. Komfort-Überladung für eine einzelne Datei
+    // Komfort-Überladung für eine einzelne Datei
     public static void NotifyDataChanged(string localFilePath, string subFolder, int delayMilliseconds = 2000)
     {
         NotifyDataChanged([(localFilePath, subFolder)], delayMilliseconds);
     }
 
-    // 3. Hauptmethode für mehrere Dateien gleichzeitig
+    // Hauptmethode für mehrere Dateien gleichzeitig
     public static void NotifyDataChanged(IEnumerable<(string LocalFilePath, string SubFolder)> files, int delayMilliseconds = 2000)
     {
-        // Dateien in die Warteschlange einreihen
         foreach (var (localFilePath, subFolder) in files)
         {
             if (!string.IsNullOrEmpty(localFilePath))
                 _pendingUploadQueue.TryAdd((localFilePath, subFolder), 0);
         }
 
-        // Debounce-Timer wie bisher zurücksetzen
         _debounceCts?.Cancel();
         _debounceCts?.Dispose();
         _debounceCts = new CancellationTokenSource();
         var token = _debounceCts.Token;
 
-        Task.Delay(delayMilliseconds, token).ContinueWith(async task =>
+        _ = Task.Run(async () =>
         {
-            if (!task.IsCanceled)
-                await SaveWithSyncCheckAsync();
-        }, TaskScheduler.Default);
+            try
+            {
+                await Task.Delay(delayMilliseconds, token);
+                if (!token.IsCancellationRequested)
+                {
+                    await SaveWithSyncCheckAsync();
+                }
+            }
+            catch (OperationCanceledException) { /* Debounce abgebrochen */ }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fehler beim verzoegerten Speichern: {ex.Message}");
+            }
+        }, token);
     }
 
     // Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
@@ -199,9 +208,12 @@ public static class SaveManager
                             var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
                             if (cloudData != null)
                             {
-                                MergeModels(GlobalJson.Data, cloudData);
-                                GlobalJson.SaveToFile();
-                                _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                lock (_fileLock)
+                                {
+                                    MergeModels(GlobalJson.Data, cloudData);
+                                    GlobalJson.SaveToFile();
+                                    _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                }
                             }
                         }
                     }
@@ -564,11 +576,12 @@ public static class SaveManager
     {
         string[] subfolders = [
             "images",
-            "images/originals",
-            "plans",
-            "plans/thumbnails",
-            "thumbnails"
-            ];
+        "images/originals",
+        "plans",
+        "plans/thumbnails",
+        "thumbnails",
+        GlobalJson.Data?.CustomPinsPath ?? "custompins"
+        ];
 
         foreach (var subfolder in subfolders)
         {
@@ -1015,7 +1028,8 @@ public static class SaveManager
     }
 
     // Laedt ein spezifisches Foto (Thumbnail oder Original) bedarfsgesteuert herunter
-    public static async Task<bool> DownloadMediaOnDemandAsync(string fileName, bool isThumbnail)
+    // Generische Methode für beliebige Unterordner (z.B. CustomPinsPath, ImagePath, ThumbnailPath)
+    public static async Task<bool> DownloadMediaOnDemandAsync(string fileName, string subFolder)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
 
@@ -1029,17 +1043,14 @@ public static class SaveManager
             string driveId = GlobalJson.Data.CloudDriveId;
             string rootFolderId = GlobalJson.Data.CloudFolderId;
 
-            // Pfad waehlen: Entweder Thumbnails oder Originalbilder
-            string subFolder = isThumbnail ? GlobalJson.Data.ThumbnailPath : GlobalJson.Data.ImagePath;
-
-            // Cloud-Pfade erzwingen Vorwaertsslashes
+            // Cloud-Pfade erzwingen Vorwaerts-Slashes
             string relativeCloudPath = $"{subFolder}/{fileName}".Replace("\\", "/");
 
             string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
             if (string.IsNullOrEmpty(projectDir)) return false;
             string localDestinationPath = Path.Combine(projectDir, subFolder, fileName);
 
-            // Abbruch, falls das Bild bereits existiert
+            // Abbruch, falls die Datei bereits lokal existiert
             if (File.Exists(localDestinationPath)) return true;
 
             var fileStream = await CurrentAuth.GraphClient.Drives[driveId].Items[rootFolderId]
@@ -1052,6 +1063,7 @@ public static class SaveManager
                 string? targetDir = Path.GetDirectoryName(localDestinationPath);
                 if (!string.IsNullOrEmpty(targetDir))
                     Directory.CreateDirectory(targetDir);
+
                 using var localFile = File.Create(localDestinationPath);
                 await fileStream.CopyToAsync(localFile);
                 return true;
@@ -1059,10 +1071,20 @@ public static class SaveManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Bedarfs-Download fehlgeschlagen für {fileName}: {ex.Message}");
+            Console.WriteLine($"Bedarfs-Download fehlgeschlagen fuer {fileName} in {subFolder}: {ex.Message}");
         }
 
         return false;
+    }
+
+    // Ueberladung fuer Abwaertskompatibilitaet mit bestehendem Foto/Thumbnail-Code
+    public static Task<bool> DownloadMediaOnDemandAsync(string fileName, bool isThumbnail)
+    {
+        string subFolder = isThumbnail
+            ? (GlobalJson.Data?.ThumbnailPath ?? "thumbnails")
+            : (GlobalJson.Data?.ImagePath ?? "images");
+
+        return DownloadMediaOnDemandAsync(fileName, subFolder);
     }
 
     public static void ResetCloudSync()
