@@ -199,7 +199,7 @@ public partial class AppShell : Shell
             SettingsService.Instance.RefreshCloudState();
 
             // Hier das Polling nach erfolgreichem Login starten
-            SaveManager.StartCloudPolling();
+            SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
 
             await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.eingeloggt_als}: {userName}", AppResources.ok);
         }

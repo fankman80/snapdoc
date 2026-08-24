@@ -168,6 +168,8 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = true;
     [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
+    [ObservableProperty] public partial int CloudPollingIntervall { get; set; } = 15;
+    [ObservableProperty] public partial int ParallelDownloads { get; set; } = 12;
 
 #pragma warning disable CA1822
     public string GlobalCloudIcon
@@ -403,6 +405,8 @@ public partial class SettingsService : ObservableObject
             MaxZoomLevel = MaxZoomLevel,
             LoupeRadius = LoupeRadius,
             LoupeZoomFactor = LoupeZoomFactor
+            CloudPollingIntervall = CloudPollingIntervall,
+            ParallelDownloads = ParallelDownloads
         };
         File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
     }
@@ -495,6 +499,8 @@ public partial class SettingsService : ObservableObject
             MaxZoomLevel = settings.MaxZoomLevel ?? defaultSettings.MaxZoomLevel;
             LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
             LoupeZoomFactor = settings.LoupeZoomFactor ?? defaultSettings.LoupeZoomFactor;
+            CloudPollingIntervall = settings.CloudPollingIntervall ?? defaultSettings.CloudPollingIntervall;
+            ParallelDownloads = settings.ParallelDownloads ?? defaultSettings.ParallelDownloads;
         }
         catch (Exception ex)
         {
@@ -571,5 +577,7 @@ public partial class SettingsService : ObservableObject
         MaxZoomLevel = defaultSettings.MaxZoomLevel;
         LoupeRadius = defaultSettings.LoupeRadius;
         LoupeZoomFactor = defaultSettings.LoupeZoomFactor;
+        CloudPollingIntervall = defaultSettings.CloudPollingIntervall;
+        ParallelDownloads = defaultSettings.ParallelDownloads;
     }
 }

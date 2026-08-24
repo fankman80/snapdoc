@@ -438,7 +438,7 @@ public static class SaveManager
                             {
                                 item.Title = cloudPlan.Name;
                                 item.AllowExport = cloudPlan.AllowExport;
-                                item.PlanColor = cloudPlan.PlanColor; 
+                                item.PlanColor = cloudPlan.PlanColor;
                             }
                         }
                     });
@@ -654,54 +654,69 @@ public static class SaveManager
     // Lädt eine ausgewählte Cloud-Projekt-JSON herunter, baut die lokale Ordnerstruktur auf und speichert die Verknüpfungs-IDs in der JSON.
     public static async Task<bool> DownloadRemoteProjectAsync(RemoteProjectDto remoteProject)
     {
-        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
+            return false;
 
         try
         {
             string projectName = Path.GetFileNameWithoutExtension(remoteProject.FileName);
             string localProjectDir = Path.Combine(Settings.DataDirectory, projectName);
 
-            // Lokale Ordnerstruktur vorbereiten
             Directory.CreateDirectory(localProjectDir);
-            Directory.CreateDirectory(Path.Combine(localProjectDir, "images"));
-            Directory.CreateDirectory(Path.Combine(localProjectDir, "images", "originals"));
-            Directory.CreateDirectory(Path.Combine(localProjectDir, "plans"));
-            Directory.CreateDirectory(Path.Combine(localProjectDir, "plans", "thumbnails"));
-            Directory.CreateDirectory(Path.Combine(localProjectDir, "thumbnails"));
 
-            // Rekursive Funktion zum Herunterladen aller Cloud-Inhalte
-            async static Task DownloadFolderRecursiveAsync(string driveId, string cloudFolderId, string localDir)
+            // Alle Dateien des Cloud-Projekts sammeln
+            var files = await GetAllCloudFilesAsync(
+                remoteProject.DriveId,
+                remoteProject.FolderId);
+
+            Console.WriteLine($"Gefundene Dateien: {files.Count}");
+
+            // Maximal 6 Downloads gleichzeitig
+            using var semaphore = new SemaphoreSlim(SettingsService.Instance.ParallelDownloads);
+
+            var downloadTasks = files.Select(async file =>
             {
-                var response = await CurrentAuth?.GraphClient?.Drives[driveId].Items[cloudFolderId].Children.GetAsync()!;
-                if (response?.Value == null) return;
+                await semaphore.WaitAsync();
 
-                foreach (var item in response.Value)
+                try
                 {
-                    if (item.Folder != null)
-                    {
-                        string subLocalDir = Path.Combine(localDir, item.Name!);
-                        Directory.CreateDirectory(subLocalDir);
-                        await DownloadFolderRecursiveAsync(driveId, item.Id!, subLocalDir);
-                    }
-                    else if (item.File != null)
-                    {
-                        string localFilePath = Path.Combine(localDir, item.Name!);
-                        using var contentStream = await CurrentAuth.GraphClient.Drives[driveId].Items[item.Id!].Content.GetAsync();
-                        if (contentStream != null)
-                        {
-                            using var fileStream = File.Create(localFilePath);
-                            await contentStream.CopyToAsync(fileStream);
-                        }
-                    }
-                }
-            }
+                    string relativePath = file.RelativePath;
 
-            // Starte den Download des gesamten Cloud-Projektordners
-            await DownloadFolderRecursiveAsync(remoteProject.DriveId, remoteProject.FolderId, localProjectDir);
+                    string localFilePath = Path.Combine(
+                        localProjectDir,
+                        relativePath.Replace("/", Path.DirectorySeparatorChar.ToString()));
+
+                    string? directory = Path.GetDirectoryName(localFilePath);
+
+                    if (!string.IsNullOrEmpty(directory))
+                        Directory.CreateDirectory(directory);
+
+                    await DownloadCloudFileAsync(
+                        remoteProject.DriveId,
+                        file.Id,
+                        localFilePath);
+
+                    Console.WriteLine($"Download fertig: {relativePath}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(
+                        $"Fehler beim Download von {file.RelativePath}: {ex.Message}");
+                }
+                finally
+                {
+                    semaphore.Release();
+                }
+            });
+
+            await Task.WhenAll(downloadTasks);
 
             // JSON-Verknüpfung aktualisieren
-            string localJsonPath = Path.Combine(localProjectDir, remoteProject.FileName);
+            string localJsonPath =
+                Path.Combine(localProjectDir, remoteProject.FileName);
+
             var projectData = GlobalJson.ReadFromFile(localJsonPath);
+
             if (projectData != null)
             {
                 projectData.CloudDriveId = remoteProject.DriveId;
@@ -709,7 +724,11 @@ public static class SaveManager
                 projectData.ProjectPath = projectName;
                 projectData.JsonFile = remoteProject.FileName;
 
-                string updatedJson = JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                string updatedJson =
+                    JsonSerializer.Serialize(
+                        projectData,
+                        GlobalJson.GetOptions());
+
                 File.WriteAllText(localJsonPath, updatedJson);
             }
 
@@ -717,9 +736,114 @@ public static class SaveManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fehler beim Herunterladen des Projekts: {ex.Message}");
+            Console.WriteLine(
+                $"Fehler beim Herunterladen des Projekts: {ex.Message}");
+
             return false;
         }
+    }
+
+    private static async Task<List<CloudDownloadFile>> GetAllCloudFilesAsync(
+    string driveId,
+    string rootFolderId)
+    {
+        var result = new List<CloudDownloadFile>();
+
+        await CollectCloudFilesRecursiveAsync(
+            driveId,
+            rootFolderId,
+            "",
+            result);
+
+        return result;
+    }
+
+
+    private static async Task CollectCloudFilesRecursiveAsync(string driveId, string folderId, string relativePath, List<CloudDownloadFile> result)
+    {
+        if (CurrentAuth?.GraphClient == null)
+            return;
+
+        var response =
+            await CurrentAuth.GraphClient
+                .Drives[driveId]
+                .Items[folderId]
+                .Children
+                .GetAsync(config =>
+                {
+                    config.QueryParameters.Select =
+                        ["id", "name", "folder", "file"];
+                });
+
+        if (response?.Value == null)
+            return;
+
+        foreach (var item in response.Value)
+        {
+            if (string.IsNullOrEmpty(item.Id) ||
+                string.IsNullOrEmpty(item.Name))
+                continue;
+
+            if (item.Folder != null)
+            {
+                string newRelativePath =
+                    string.IsNullOrEmpty(relativePath)
+                        ? item.Name
+                        : $"{relativePath}/{item.Name}";
+
+                await CollectCloudFilesRecursiveAsync(
+                    driveId,
+                    item.Id,
+                    newRelativePath,
+                    result);
+            }
+            else if (item.File != null)
+            {
+                string filePath =
+                    string.IsNullOrEmpty(relativePath)
+                        ? item.Name
+                        : $"{relativePath}/{item.Name}";
+
+                result.Add(new CloudDownloadFile
+                {
+                    Id = item.Id,
+                    RelativePath = filePath
+                });
+            }
+        }
+    }
+
+    private static async Task DownloadCloudFileAsync(string driveId, string fileId, string localFilePath)
+    {
+        if (CurrentAuth?.GraphClient == null)
+            return;
+
+        using var contentStream =
+            await CurrentAuth.GraphClient
+                .Drives[driveId]
+                .Items[fileId]
+                .Content
+                .GetAsync();
+
+        if (contentStream == null)
+            return;
+
+        string? directory =
+            Path.GetDirectoryName(localFilePath);
+
+        if (!string.IsNullOrEmpty(directory))
+            Directory.CreateDirectory(directory);
+
+        await using var fileStream =
+            new FileStream(
+                localFilePath,
+                FileMode.Create,
+                FileAccess.Write,
+                FileShare.None,
+                bufferSize: 64 * 1024,
+                useAsync: true);
+
+        await contentStream.CopyToAsync(fileStream);
     }
 
     private static async Task UploadDirectoryRecursiveAsync(string driveId, string rootFolderId, string localDirPath)
@@ -954,7 +1078,7 @@ public static class SaveManager
         }
     }
 
-    public static void StartCloudPolling(int intervalSeconds = 15)
+    public static void StartCloudPolling(int intervalSeconds = 12)
     {
         StopCloudPolling(); // Eventuell laufenden Timer stoppen
 
@@ -1099,4 +1223,10 @@ public class RemoteProjectDto
     public string DriveId { get; set; } = string.Empty;
     public string FolderId { get; set; } = string.Empty;
     public DateTimeOffset LastModified { get; set; }
+}
+
+public class CloudDownloadFile
+{
+    public string Id { get; set; } = string.Empty;
+    public string RelativePath { get; set; } = string.Empty;
 }
