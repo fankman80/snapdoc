@@ -101,7 +101,6 @@ public partial class OpenProject : ContentPage
                             File.WriteAllText(item.FilePath, updatedJson);
 
                             item.HasCloudSync = false;
-                            MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
                         }
                     }
                     // FALL B: Legacy-Fallback fuer Projekte, die noch keine IDs haben (Namensabgleich beim ersten Mal)
@@ -123,13 +122,8 @@ public partial class OpenProject : ContentPage
                             File.WriteAllText(item.FilePath, updatedJson);
                         }
                     }
-
-                    // UI aktualisieren, wenn ein gueltiger Cloud-Link besteht
-                    if (hasValidCloudLink)
-                    {
-                        item.HasCloudSync = true;
-                        MainThread.BeginInvokeOnMainThread(() => item.RefreshCloudIcon());
-                    }
+                    // Automatische Aktualisierung der XAML
+                    item.HasCloudSync = hasValidCloudLink;
                 }
             });
         }
@@ -389,11 +383,9 @@ public partial class OpenProject : ContentPage
                 foreach (var f in items)
                 {
                     f.IsActive = false;
-                    f.RefreshCloudIcon();
                 }
 
                 item.IsActive = true;
-                item.RefreshCloudIcon();
             }
 
             SettingsService.Instance.IsProjectLoaded = true;
@@ -609,6 +601,44 @@ public partial class OpenProject : ContentPage
                     }
                     break;
 
+                case "Upload":
+                    if (SaveManager.CurrentAuth == null ||
+                        !SaveManager.CurrentAuth.IsLoggedIn)
+                    {
+                        await DisplayAlertAsync(
+                            AppResources.info,
+                            AppResources.bitte_zuerst_anmelden,
+                            AppResources.ok);
+
+                        return;
+                    }
+
+                    if (item.HasCloudSync)
+                        return;
+
+                    if (!item.IsActive)
+                    {
+                        if (FileListView.ItemsSource is IEnumerable<FileItem> items)
+                        {
+                            foreach (var f in items)
+                                f.IsActive = false;
+                        }
+
+                        item.IsActive = true;
+
+                        SettingsService.Instance.IsProjectLoaded = true;
+
+                        LoadDataToView.ResetData();
+                        GlobalJson.LoadFromFile(item.FilePath);
+                        LoadDataToView.LoadData(new FileResult(item.FilePath));
+                        Helper.HeaderUpdate();
+                    }
+
+                    await BusyService.HideAsync();
+                    await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectFolder));
+
+                    break;
+
                 case null:
                     break;
 
@@ -657,49 +687,8 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            // Ladeanzeige deaktivieren
             await BusyService.HideAsync();
-
             _isProcessing = false;
         }
-    }
-
-    private async void OnCloudPickerClicked(object sender, EventArgs e)
-    {
-        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
-        {
-            await DisplayAlertAsync(AppResources.info, AppResources.bitte_zuerst_anmelden, AppResources.ok);
-            return;
-        }
-
-        var button = sender as Button;
-        if (button?.BindingContext is not FileItem item) return;
-
-        if (item.HasCloudSync)
-            return;
-
-        // Lade das Projekt temporär in den Speicher, falls es noch nicht aktiv ist
-        if (!item.IsActive)
-        {
-            if (FileListView.ItemsSource is IEnumerable<FileItem> items)
-            {
-                foreach (var f in items)
-                {
-                    f.IsActive = false;
-                    f.RefreshCloudIcon();
-                }
-            }
-
-            item.IsActive = true;
-            item.RefreshCloudIcon();
-
-            SettingsService.Instance.IsProjectLoaded = true;
-            LoadDataToView.ResetData();
-            GlobalJson.LoadFromFile(item.FilePath);
-            LoadDataToView.LoadData(new FileResult(item.FilePath));
-            Helper.HeaderUpdate();
-        }
-
-        await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectFolder));
     }
 }

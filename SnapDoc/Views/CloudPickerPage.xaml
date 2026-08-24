@@ -17,8 +17,6 @@
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
             <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
-                   LineBreakMode="WordWrap"
-                   MaxLines="2"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
@@ -41,19 +39,20 @@
                 StrokeShape="RoundRectangle 8"
                 Stroke="Transparent"
                 BackgroundColor="{AppThemeBinding Light=#10000000, Dark=#15FFFFFF}">
-            <HorizontalStackLayout Spacing="10" VerticalOptions="Center">
-                <Label FontFamily="MaterialOutlined"
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                       FontFamily="MaterialOutlined"
                        Text="{x:Static local:MaterialIcons.Info}"
-                       FontSize="22"
+                       FontSize="24"
                        TextColor="{DynamicResource Primary}"
                        VerticalOptions="Center" />
-                <Label x:DataType="views:CloudPickerPage"
+                <Label Grid.Column="1"
+                       x:DataType="views:CloudPickerPage"
                        Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
-                       FontSize="13"
                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                        VerticalOptions="Center"
                        LineBreakMode="WordWrap"/>
-            </HorizontalStackLayout>
+            </Grid>
         </Border>
 
         <!-- Modern List View -->
@@ -72,26 +71,15 @@
                         <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
                             <!-- Dynamic Icon -->
                             <Label Grid.Column="0"
+                                   Text="{Binding Icon}"
                                    FontFamily="MaterialOutlined"
                                    FontSize="24"
                                    TextColor="{DynamicResource Primary}"
-                                   VerticalOptions="Center">
-                                <Label.Triggers>
-                                    <DataTrigger TargetType="Label" Binding="{Binding IsFolder}" Value="True">
-                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Folder}" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Label" Binding="{Binding IsFolder}" Value="False">
-                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Description}" />
-                                    </DataTrigger>
-                                    <DataTrigger TargetType="Label" Binding="{Binding Id}" Value="..">
-                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Folder_zip}" />
-                                    </DataTrigger>
-                                </Label.Triggers>
-                            </Label>
+                                   VerticalOptions="Center"/>
 
                             <!-- Name -->
                             <Label Grid.Column="1"
-                                   Text="{Binding Name, Source={x:Reference Name=ThisPage}}"
+                                   Text="{Binding Name}"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                    VerticalOptions="Center"
                                    LineBreakMode="TailTruncation" />
@@ -99,11 +87,11 @@
                             <!-- Chevron indicator for Folders -->
                             <Label Grid.Column="2"
                                    FontFamily="MaterialOutlined"
-                                   Text="{x:Static local:MaterialIcons.Edit_square}"
-                                   FontSize="20"
+                                   Text="{x:Static local:MaterialIcons.Chevron_right}"
+                                   FontSize="22"
                                    TextColor="Gray"
                                    VerticalOptions="Center"
-                                   IsVisible="{Binding IsFolder, Source={x:Reference Name=ThisPage}}" />
+                                   IsVisible="{Binding ShowChevron}" />
                         </Grid>
                     </Border>
                 </DataTemplate>
@@ -117,7 +105,7 @@
               ColumnDefinitions="*, Auto" 
               ColumnSpacing="10">
             <Button Grid.Column="1" 
-                    Text="hier hochladen" 
+                    Text="Projekt hier speichern" 
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnSelectFolderClicked"/>

@@ -54,27 +54,10 @@ namespace SnapDoc
         public required string ThumbnailPath { get; set; }
 
         [ObservableProperty]
-        [NotifyPropertyChangedFor(nameof(CloudIcon))]
         public partial bool HasCloudSync { get; set; }
 
         [ObservableProperty]
         public partial bool IsActive { get; set; }
-
-        public string CloudIcon
-        {
-            get
-            {
-                if (HasCloudSync)
-                    return MaterialIcons.Cloud;
-                else
-                    return MaterialIcons.Cloud_upload;
-            }
-        }
-
-        public void RefreshCloudIcon()
-        {
-            OnPropertyChanged(nameof(CloudIcon));
-        }
     }
 
     public partial class PinItem : ObservableObject

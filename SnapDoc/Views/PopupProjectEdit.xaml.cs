@@ -1,6 +1,7 @@
 #nullable disable
 using CommunityToolkit.Maui.Views;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
 
 namespace SnapDoc.Views;
 
@@ -44,6 +45,12 @@ public partial class PopupProjectEdit : Popup<string>
     private async void OnOpenFolderClicked(object sender, EventArgs e)
     {
         try { await CloseAsync("Folder"); }
+        catch (InvalidOperationException) { }
+    }
+
+    private async void OnCloudPickerClicked(object sender, EventArgs e)
+    {
+        try { await CloseAsync("Upload"); }
         catch (InvalidOperationException) { }
     }
 }
