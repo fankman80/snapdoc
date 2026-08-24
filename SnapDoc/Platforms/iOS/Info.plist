@@ -1,62 +1,81 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+    "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+
 <plist version="1.0">
 <dict>
-	<key>LSRequiresIPhoneOS</key>
-	<true/>
-	<key>UIDeviceFamily</key>
-	<array>
-		<integer>1</integer>
-		<integer>2</integer>
-	</array>
-	<key>UIRequiredDeviceCapabilities</key>
-	<array>
-		<string>arm64</string>
-	</array>
-	<key>UISupportedInterfaceOrientations</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>UISupportedInterfaceOrientations~ipad</key>
-	<array>
-		<string>UIInterfaceOrientationPortrait</string>
-		<string>UIInterfaceOrientationPortraitUpsideDown</string>
-		<string>UIInterfaceOrientationLandscapeLeft</string>
-		<string>UIInterfaceOrientationLandscapeRight</string>
-	</array>
-	<key>XSAppIconAssets</key>
-	<string>Assets.xcassets/appicon.appiconset</string>
-	<key>CFBundleShortVersionString</key>
-	<string>2.5.0</string>
-	<key>NSCameraUsageDescription</key>
-	<string>SnapDoc benötigt Zugriff auf die Kamera, um Dokumente zu fotografieren und zu scannen.</string>
-	<key>NSPhotoLibraryUsageDescription</key>
-	<string>SnapDoc benötigt Zugriff auf die Fotogalerie, um aufgenommene Dokumente zu speichern oder zu importieren.</string>
-	<key>NSPhotoLibraryAddUsageDescription</key>
-	<string>SnapDoc benötigt die Erlaubnis, Bilder in deiner Galerie zu speichern.</string>
-	<key>NSLocationWhenInUseUsageDescription</key>
-	<string>SnapDoc nutzt deinen Standort, um Fotos auf der Karte zu verorten.</string>
-	<key>ITSAppUsesNonExemptEncryption</key>
-	<false/>
-	<key>CFBundleIdentifier</key>
-	<string></string>
-	<key>CFBundleDisplayName</key>
-	<string>SnapDoc</string>
+
+    <key>LSRequiresIPhoneOS</key>
+    <true/>
+
+    <key>UIDeviceFamily</key>
+    <array>
+        <integer>1</integer>
+        <integer>2</integer>
+    </array>
+
+    <key>UIRequiredDeviceCapabilities</key>
+    <array>
+        <string>arm64</string>
+    </array>
+
+    <key>UISupportedInterfaceOrientations</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <key>UISupportedInterfaceOrientations~ipad</key>
+    <array>
+        <string>UIInterfaceOrientationPortrait</string>
+        <string>UIInterfaceOrientationPortraitUpsideDown</string>
+        <string>UIInterfaceOrientationLandscapeLeft</string>
+        <string>UIInterfaceOrientationLandscapeRight</string>
+    </array>
+
+    <key>XSAppIconAssets</key>
+    <string>Assets.xcassets/appicon.appiconset</string>
+
+    <key>CFBundleShortVersionString</key>
+    <string>2.5.0</string>
+
+    <key>NSCameraUsageDescription</key>
+    <string>SnapDoc benötigt Zugriff auf die Kamera, um Dokumente zu fotografieren und zu scannen.</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>SnapDoc benötigt Zugriff auf die Fotogalerie, um aufgenommene Dokumente zu speichern oder zu importieren.</string>
+
+    <key>NSPhotoLibraryAddUsageDescription</key>
+    <string>SnapDoc benötigt die Erlaubnis, Bilder in deiner Galerie zu speichern.</string>
+
+    <key>NSLocationWhenInUseUsageDescription</key>
+    <string>SnapDoc nutzt deinen Standort, um Fotos auf der Karte zu verorten.</string>
+
+    <key>ITSAppUsesNonExemptEncryption</key>
+    <false/>
+
+    <key>CFBundleIdentifier</key>
+    <string></string>
+
+    <key>CFBundleDisplayName</key>
+    <string>SnapDoc</string>
+
     <key>CFBundleURLTypes</key>
     <array>
         <dict>
             <key>CFBundleURLName</key>
-			<key>CFBundleTypeRole</key>		
-			<key>CFBundleURLSchemes</key>			
             <string>Microsoft Authentication</string>
-			<string>Editor</string>
-			<string>com.ebbe.snapdoc</string>
+
+            <key>CFBundleTypeRole</key>
+            <string>Editor</string>
+
+            <key>CFBundleURLSchemes</key>
             <array>
                 <string>msal00fdac1d-aa0a-49c1-a238-a46a88f69ce6</string>
             </array>
         </dict>
     </array>
+
 </dict>
 </plist>
