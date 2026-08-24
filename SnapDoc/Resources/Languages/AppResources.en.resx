@@ -987,88 +987,118 @@
   <data name="hatchFill" xml:space="preserve">
     <value>Hatch fill</value>
   </data>
-	<data name="projektdaten_bearbeiten" xml:space="preserve">
-  <value>Edit project data</value>
-    </data>
-	    <data name="einstellungen_bearbeiten" xml:space="preserve">
-      <value>Edit settings</value>
-    </data>
-	    <data name="icondefinitionen_bearbeiten" xml:space="preserve">
-      <value>Edit icon definitions</value>
-    </data>
-	    <data name="kompletter_tile_cache_loeschen" xml:space="preserve">
-      <value>Clear entire tile cache</value>
-    </data>
-	    <data name="schraffur_spiegeln" xml:space="preserve">
-      <value>Mirror hatch</value>
-    </data>
-	    <data name="ja" xml:space="preserve">
-      <value>Yes</value>
-    </data>
-	    <data name="nein" xml:space="preserve">
-      <value>No</value>
-    </data>
-	    <data name="bereits_verbunden_abmelden" xml:space="preserve">
-      <value>You are already connected. Do you want to log out?</value>
-    </data>
-	    <data name="eingeloggt_als" xml:space="preserve">
-      <value>Logged in as</value>
-    </data>
-	    <data name="login_fehlgeschlagen" xml:space="preserve">
-      <value>Login failed</value>
-    </data>
-	    <data name="konnte_onedrive_nicht_laden" xml:space="preserve">
-      <value>Could not load OneDrive</value>
-    </data>
-	    <data name="ordnerinhalt_konnte_nicht_geladen_werden" xml:space="preserve">
-      <value>Could not load folder contents</value>
-    </data>
-	    <data name="cloud_verzeichnis_waehlen" xml:space="preserve">
-      <value>Select cloud directory</value>
-    </data>
-	    <data name="bitte_ordner_oder_json_datei_waehlen" xml:space="preserve">
-      <value>Please select a folder or a JSON file</value>
-    </data>
-	    <data name="herunterladen" xml:space="preserve">
-      <value>Download</value>
-    </data>
-	    <data name="synchronisierung_konnte_nicht_gestartet_werden" xml:space="preserve">
-      <value>Synchronization could not be started.</value>
-    </data>
-	    <data name="projekt_wird_synchronisiert_mit" xml:space="preserve">
-      <value>The project is now being synchronized with</value>
-    </data>
-	    <data name="erfolg" xml:space="preserve">
-      <value>Success</value>
-    </data>
-	    <data name="entspricht_nicht_aktuell_geladenem_projekt" xml:space="preserve">
-      <value>does not match the currently loaded project</value>
-    </data>
-	    <data name="neues_projektverzeichnis_cloud_erstellt" xml:space="preserve">
-      <value>New project directory created in the cloud and linked.</value>
-    </data>
-	    <data name="projektverzeichnis_cloud_konnte_nicht_erstellt_werden" xml:space="preserve">
-      <value>Project directory could not be created in the cloud.</value>
-    </data>
-	<data name="bitte_zuerst_anmelden" xml:space="preserve">
-      <value>Please log in first.</value>
-    </data>
-	    <data name="projekte_werden_gesucht" xml:space="preserve">
-      <value>Searching for projects...</value>
-    </data>
-	    <data name="keine_projekte_in_cloud_gefunden" xml:space="preserve">
-      <value>No projects found in the cloud.</value>
-    </data>
-	    <data name="projekt_erfolgreich_heruntergeladen" xml:space="preserve">
-      <value>Project downloaded successfully.</value>
-    </data>
-	    <data name="fehler_beim_herunterladen_des_projekts" xml:space="preserve">
-      <value>Error downloading the project.</value>
-    </data>
-	    <data name="info" xml:space="preserve">
-      <value>Info</value>
-    </data>
-	    <data name="projekt_wird_heruntergeladen" xml:space="preserve">
-      <value>Downloading project...</value>
-    </data>
+  <data name="projektdaten_bearbeiten" xml:space="preserve">
+    <value>Edit project data</value>
+  </data>
+  <data name="einstellungen_bearbeiten" xml:space="preserve">
+    <value>Edit settings</value>
+  </data>
+  <data name="icondefinitionen_bearbeiten" xml:space="preserve">
+    <value>Edit icon definitions</value>
+  </data>
+  <data name="kompletter_tile_cache_loeschen" xml:space="preserve">
+    <value>Clear entire tile cache</value>
+  </data>
+  <data name="schraffur_spiegeln" xml:space="preserve">
+    <value>Mirror hatch</value>
+  </data>
+  <data name="ja" xml:space="preserve">
+    <value>Yes</value>
+  </data>
+  <data name="nein" xml:space="preserve">
+    <value>No</value>
+  </data>
+  <data name="bereits_verbunden_abmelden" xml:space="preserve">
+    <value>You are already connected. Do you want to log out?</value>
+  </data>
+  <data name="eingeloggt_als" xml:space="preserve">
+    <value>Logged in as</value>
+  </data>
+  <data name="login_fehlgeschlagen" xml:space="preserve">
+    <value>Login failed</value>
+  </data>
+  <data name="konnte_onedrive_nicht_laden" xml:space="preserve">
+    <value>Could not load OneDrive</value>
+  </data>
+  <data name="ordnerinhalt_konnte_nicht_geladen_werden" xml:space="preserve">
+    <value>Could not load folder contents</value>
+  </data>
+  <data name="cloud_verzeichnis_waehlen" xml:space="preserve">
+    <value>Select cloud directory</value>
+  </data>
+  <data name="bitte_ordner_oder_json_datei_waehlen" xml:space="preserve">
+    <value>Please select a folder or a JSON file</value>
+  </data>
+  <data name="herunterladen" xml:space="preserve">
+    <value>Download</value>
+  </data>
+  <data name="synchronisierung_konnte_nicht_gestartet_werden" xml:space="preserve">
+    <value>Synchronization could not be started.</value>
+  </data>
+  <data name="projekt_wird_synchronisiert_mit" xml:space="preserve">
+    <value>The project is now being synchronized with</value>
+  </data>
+  <data name="erfolg" xml:space="preserve">
+    <value>Successful</value>
+  </data>
+  <data name="entspricht_nicht_aktuell_geladenem_projekt" xml:space="preserve">
+    <value>does not match the currently loaded project</value>
+  </data>
+  <data name="neues_projektverzeichnis_cloud_erstellt" xml:space="preserve">
+    <value>New project directory created in the cloud and linked.</value>
+  </data>
+  <data name="projektverzeichnis_cloud_konnte_nicht_erstellt_werden" xml:space="preserve">
+    <value>Project directory could not be created in the cloud.</value>
+  </data>
+  <data name="bitte_zuerst_anmelden" xml:space="preserve">
+    <value>Please log in first.</value>
+  </data>
+  <data name="projekte_werden_gesucht" xml:space="preserve">
+    <value>Searching for projects...</value>
+  </data>
+  <data name="keine_projekte_in_cloud_gefunden" xml:space="preserve">
+    <value>No projects found in the cloud.</value>
+  </data>
+  <data name="projekt_erfolgreich_heruntergeladen" xml:space="preserve">
+    <value>Project downloaded successfully.</value>
+  </data>
+  <data name="fehler_beim_herunterladen_des_projekts" xml:space="preserve">
+    <value>Error downloading the project.</value>
+  </data>
+  <data name="info" xml:space="preserve">
+    <value>Info</value>
+  </data>
+  <data name="projekt_wird_heruntergeladen" xml:space="preserve">
+    <value>Downloading project...</value>
+  </data>
+  <data name="abmelden" xml:space="preserve">
+    <value>Log out</value>
+  </data>
+  <data name="neuere_version_cloud_synchronisieren" xml:space="preserve">
+    <value>A newer version of this project exists in the cloud. Do you want to synchronize the latest data now?</value>
+  </data>
+  <data name="synchronisieren" xml:space="preserve">
+    <value>Synchronize</value>
+  </data>
+  <data name="daten_werden_synchronisiert" xml:space="preserve">
+    <value>Synchronizing data...</value>
+  </data>
+  <data name="projekt_konnte_nicht_geladen_werden" xml:space="preserve">
+    <value>The project could not be loaded due to a problem.</value>
+  </data>
+  <data name="keine_plaene_vorhanden_importieren" xml:space="preserve">
+    <value>There are no plans yet. First, import one or more PDF pages in the project management.</value>
+  </data>
+  <data name="projekt_wird_synchronisiert" xml:space="preserve">
+    <value>Synchronizing project...</value>
+  </data>
+  <data name="verzeichnis_wird_geladen" xml:space="preserve">
+    <value>Loading directory...</value>
+  </data>
+  <data name="projekt_wird_hochgeladen" xml:space="preserve">
+    <value>Uploading project...</value>
+  </data>
+  <data name="angemeldet" xml:space="preserve">
+    <value>Logged in</value>
+  </data>
 </root>

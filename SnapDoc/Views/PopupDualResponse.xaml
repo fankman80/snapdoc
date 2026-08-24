@@ -10,12 +10,14 @@
 
     <Grid Padding="6"
           WidthRequest="320">
-        <VerticalStackLayout>
-            <Label
-                HorizontalOptions="Start"
-                x:Name="titleText"
-                Text=""/>
-            <Grid ColumnDefinitions="*, *">
+        <VerticalStackLayout Spacing="8">
+            <Label x:Name="titleHeader"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Start"/>
+            <Line x:Name="headerLine" Stroke="{AppThemeBinding Light={DynamicResource PrimaryBackgroundDark}, Dark={DynamicResource PrimaryBackground}}" X2="500" />
+            <Label x:Name="titleText"
+                   HorizontalOptions="Start"/>
+            <Grid ColumnDefinitions="*, *" Margin="0,8,0,0">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"

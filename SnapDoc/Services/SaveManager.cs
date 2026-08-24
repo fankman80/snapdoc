@@ -576,10 +576,10 @@ public static class SaveManager
     {
         string[] subfolders = [
             "images",
-        "images/originals",
-        "plans",
-        "plans/thumbnails",
-        "thumbnails",
+            "images/originals",
+            "plans",
+            "plans/thumbnails",
+            "thumbnails",
         GlobalJson.Data?.CustomPinsPath ?? "custompins"
         ];
 
@@ -614,19 +614,22 @@ public static class SaveManager
     public static async Task<List<RemoteProjectDto>> SearchRemoteProjectsAsync()
     {
         var results = new List<RemoteProjectDto>();
-        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return results;
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
+            return results;
 
         try
         {
             var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
-            if (myDrive?.Id == null) return results;
+            if (myDrive?.Id == null)
+                return results;
 
             // Sucht nach allen *.json Dateien im Laufwerk
             var searchResponse = await CurrentAuth.GraphClient.Drives[myDrive.Id]
                 .SearchWithQ(".json")
                 .GetAsSearchWithQGetResponseAsync();
 
-            if (searchResponse?.Value == null) return results;
+            if (searchResponse?.Value == null)
+                return results;
 
             foreach (var item in searchResponse.Value)
             {
@@ -665,13 +668,10 @@ public static class SaveManager
             Directory.CreateDirectory(localProjectDir);
 
             // Alle Dateien des Cloud-Projekts sammeln
-            var files = await GetAllCloudFilesAsync(
-                remoteProject.DriveId,
-                remoteProject.FolderId);
+            var files = await GetAllCloudFilesAsync(remoteProject.DriveId, remoteProject.FolderId);
 
             Console.WriteLine($"Gefundene Dateien: {files.Count}");
 
-            // Maximal 6 Downloads gleichzeitig
             using var semaphore = new SemaphoreSlim(SettingsService.Instance.ParallelDownloads);
 
             var downloadTasks = files.Select(async file =>
@@ -700,8 +700,7 @@ public static class SaveManager
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine(
-                        $"Fehler beim Download von {file.RelativePath}: {ex.Message}");
+                    Console.WriteLine($"Fehler beim Download von {file.RelativePath}: {ex.Message}");
                 }
                 finally
                 {
@@ -724,10 +723,7 @@ public static class SaveManager
                 projectData.ProjectPath = projectName;
                 projectData.JsonFile = remoteProject.FileName;
 
-                string updatedJson =
-                    JsonSerializer.Serialize(
-                        projectData,
-                        GlobalJson.GetOptions());
+                string updatedJson = JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
 
                 File.WriteAllText(localJsonPath, updatedJson);
             }
@@ -736,29 +732,26 @@ public static class SaveManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine(
-                $"Fehler beim Herunterladen des Projekts: {ex.Message}");
+            Console.WriteLine($"Fehler beim Herunterladen des Projekts: {ex.Message}");
 
             return false;
         }
     }
 
+    // Rekursiv alle Dateien eines Cloud-Ordners sammeln, inklusive Unterordnern.
     private static async Task<List<CloudDownloadFile>> GetAllCloudFilesAsync(
     string driveId,
     string rootFolderId)
     {
         var result = new List<CloudDownloadFile>();
 
-        await CollectCloudFilesRecursiveAsync(
-            driveId,
-            rootFolderId,
-            "",
-            result);
+        await CollectCloudFilesRecursiveAsync(driveId, rootFolderId, "", result);
 
         return result;
     }
 
 
+    // Rekursive Hilfsmethode, die alle Dateien eines Cloud-Ordners sammelt.
     private static async Task CollectCloudFilesRecursiveAsync(string driveId, string folderId, string relativePath, List<CloudDownloadFile> result)
     {
         if (CurrentAuth?.GraphClient == null)
@@ -771,8 +764,7 @@ public static class SaveManager
                 .Children
                 .GetAsync(config =>
                 {
-                    config.QueryParameters.Select =
-                        ["id", "name", "folder", "file"];
+                    config.QueryParameters.Select = ["id", "name", "folder", "file"];
                 });
 
         if (response?.Value == null)
@@ -780,8 +772,7 @@ public static class SaveManager
 
         foreach (var item in response.Value)
         {
-            if (string.IsNullOrEmpty(item.Id) ||
-                string.IsNullOrEmpty(item.Name))
+            if (string.IsNullOrEmpty(item.Id) || string.IsNullOrEmpty(item.Name))
                 continue;
 
             if (item.Folder != null)
@@ -800,9 +791,7 @@ public static class SaveManager
             else if (item.File != null)
             {
                 string filePath =
-                    string.IsNullOrEmpty(relativePath)
-                        ? item.Name
-                        : $"{relativePath}/{item.Name}";
+                    string.IsNullOrEmpty(relativePath) ? item.Name : $"{relativePath}/{item.Name}";
 
                 result.Add(new CloudDownloadFile
                 {
@@ -813,6 +802,7 @@ public static class SaveManager
         }
     }
 
+    // Lädt eine einzelne Datei aus der Cloud herunter und speichert sie lokal.
     private static async Task DownloadCloudFileAsync(string driveId, string fileId, string localFilePath)
     {
         if (CurrentAuth?.GraphClient == null)
@@ -828,8 +818,7 @@ public static class SaveManager
         if (contentStream == null)
             return;
 
-        string? directory =
-            Path.GetDirectoryName(localFilePath);
+        string? directory = Path.GetDirectoryName(localFilePath);
 
         if (!string.IsNullOrEmpty(directory))
             Directory.CreateDirectory(directory);
@@ -846,42 +835,136 @@ public static class SaveManager
         await contentStream.CopyToAsync(fileStream);
     }
 
+    // Lädt alle Dateien eines lokalen Projektverzeichnisses rekursiv in den entsprechenden Cloud-Ordner hoch.
     private static async Task UploadDirectoryRecursiveAsync(string driveId, string rootFolderId, string localDirPath)
     {
-        if (CurrentAuth?.GraphClient == null || !Directory.Exists(localDirPath)) return;
+        if (CurrentAuth?.GraphClient == null || !Directory.Exists(localDirPath))
+            return;
 
-        // Alle Dateien im aktuellen lokalen Verzeichnis hochladen
-        foreach (var filePath in Directory.GetFiles(localDirPath))
+        // Alle Dateien des Projekts zuerst sammeln
+        var files = new List<(string FilePath, string RelativePath)>();
+
+        CollectLocalFiles(
+            localDirPath,
+            localDirPath,
+            files);
+
+        Console.WriteLine($"Gefundene Dateien zum Upload: {files.Count}");
+
+        using var semaphore = new SemaphoreSlim(SettingsService.Instance.ParallelUploads);
+
+        var uploadTasks = files.Select(async file =>
         {
-            string fileName = Path.GetFileName(filePath);
-            // Die JSON selbst wird separat über SaveWithSyncCheckAsync gehandhabt
-            if (fileName.Equals(CloudFileName, StringComparison.OrdinalIgnoreCase)) continue;
+            await semaphore.WaitAsync();
 
             try
             {
-                using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
-                await CurrentAuth.GraphClient.Drives[driveId].Items[rootFolderId]
-                    .ItemWithPath(fileName)
-                    .Content
-                    .PutAsync(fileStream);
+                string relativePath = file.RelativePath;
+
+                // Cloud-Pfad mit / erzwingen
+                string cloudPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
+
+                await UploadFileAsync(
+                    driveId,
+                    rootFolderId,
+                    file.FilePath,
+                    cloudPath);
+
+                Console.WriteLine($"Upload fertig: {relativePath}");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Fehler beim Hochladen der Datei {fileName}: {ex.Message}");
+                Console.WriteLine($"Fehler beim Upload von {file.RelativePath}: {ex.Message}");
             }
+            finally
+            {
+                semaphore.Release();
+            }
+        });
+
+        await Task.WhenAll(uploadTasks);
+    }
+
+    // Lädt eine einzelne lokale Datei in den entsprechenden Cloud-Unterordner hoch.
+    private static async Task UploadFileAsync(string driveId, string rootFolderId, string localFilePath, string relativeCloudPath)
+    {
+        if (CurrentAuth?.GraphClient == null)
+            return;
+
+        string[] parts = relativeCloudPath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        if (parts.Length == 0) return;
+
+        string fileName = parts[^1];
+
+        string currentFolderId = rootFolderId;
+
+        // Unterordner durchlaufen/erstellen
+        for (int i = 0; i < parts.Length - 1; i++)
+        {
+            string folderName = parts[i];
+
+            var folder =
+                await GetOrCreateFolderAsync(
+                    CurrentAuth,
+                    driveId,
+                    currentFolderId,
+                    folderName);
+
+            if (folder?.Id == null)
+            {
+                Console.WriteLine($"Konnte Cloud-Ordner nicht erstellen: {folderName}");
+                return;
+            }
+
+            currentFolderId = folder.Id;
         }
 
-        // Alle Unterordner durchgehen und rekursiv verarbeiten
-        foreach (var subDirPath in Directory.GetDirectories(localDirPath))
-        {
-            string subFolderName = Path.GetFileName(subDirPath);
+        // Datei hochladen
+        await using var fileStream =
+            new FileStream(
+                localFilePath,
+                FileMode.Open,
+                FileAccess.Read,
+                FileShare.Read,
+                bufferSize: 64 * 1024,
+                useAsync: true);
 
-            // Entsprechenden Unterordner in der Cloud finden oder erstellen
-            var cloudSubFolder = await GetOrCreateFolderAsync(CurrentAuth, driveId, rootFolderId, subFolderName);
-            if (cloudSubFolder?.Id != null)
-            {
-                await UploadDirectoryRecursiveAsync(driveId, cloudSubFolder.Id, subDirPath);
-            }
+        await CurrentAuth.GraphClient
+            .Drives[driveId]
+            .Items[currentFolderId]
+            .ItemWithPath(fileName)
+            .Content
+            .PutAsync(fileStream);
+    }
+
+    private static void CollectLocalFiles(
+    string rootDirectory,
+    string currentDirectory,
+    List<(string FilePath, string RelativePath)> files)
+    {
+        foreach (var filePath in Directory.GetFiles(currentDirectory))
+        {
+            string fileName = Path.GetFileName(filePath);
+
+            // JSON wird separat über SaveWithSyncCheckAsync hochgeladen
+            if (fileName.Equals(CloudFileName, StringComparison.OrdinalIgnoreCase))
+                continue;
+
+            string relativePath =
+                Path.GetRelativePath(
+                    rootDirectory,
+                    filePath);
+
+            files.Add((filePath, relativePath));
+        }
+
+        foreach (var directory in Directory.GetDirectories(currentDirectory))
+        {
+            CollectLocalFiles(
+                rootDirectory,
+                directory,
+                files);
         }
     }
 

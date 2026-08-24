@@ -66,6 +66,7 @@ internal class SettingsModel
     public float? LoupeRadius { get; set; } // Radius der Lupe in Pixeln
     public float? LoupeZoomFactor { get; set; } // Zoomfaktor der Lupe
     public int? ParallelDownloads { get; set; } // Anzahl paralleler Downloads
+    public int? ParallelUploads { get; set; } // Anzahl paralleler Uploads
     public int? CloudPollingIntervall { get; set; } // Intervall für die Cloud-Abfrage in Sekunden
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)

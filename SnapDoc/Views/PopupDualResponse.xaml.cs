@@ -11,13 +11,20 @@ public partial class PopupDualResponse : Popup<string>
     private IDispatcherTimer timer;
     private bool _isClosing = false;
 
-    public PopupDualResponse(string title, string okText = null, string cancelText = null, bool alert = false)
+    public PopupDualResponse(string title, string header = "", string okText = null, string cancelText = null, bool alert = false)
 	{
 		InitializeComponent();
         titleText.Text = title;
+        titleHeader.Text = header;
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         OkText = okText;
+
+        if (string.IsNullOrEmpty(header))
+        {
+            titleHeader.IsVisible = false;
+            headerLine.IsVisible = false;
+        }
 
         if (alert)
             StartTimer();

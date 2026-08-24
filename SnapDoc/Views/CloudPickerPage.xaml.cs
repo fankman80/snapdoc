@@ -1,3 +1,4 @@
+using CommunityToolkit.Maui.Extensions;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -74,10 +75,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                $"{AppResources.konnte_onedrive_nicht_laden}: {ex.Message}",
-                AppResources.ok);
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.konnte_onedrive_nicht_laden}: {ex.Message}", AppResources.fehler), Settings.PopupOptions);
         }
     }
 
@@ -142,10 +140,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                $"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}",
-                AppResources.ok);
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}", AppResources.fehler), Settings.PopupOptions);
         }
     }
 
@@ -169,7 +164,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         {
             try
             {
-                await BusyService.ShowAsync("Verzeichnis wird geladen...");
+                await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
 
                 await LoadFolderContentAsync(selectedItem.Id);
             }
@@ -189,11 +184,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         if (string.IsNullOrEmpty(activeJsonFile))
         {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                AppResources.kein_projekt_geladen,
-                AppResources.ok);
-
+            await this.ShowPopupAsync(new PopupAlert(AppResources.kein_projekt_geladen, AppResources.fehler), Settings.PopupOptions);
             return;
         }
 
@@ -202,13 +193,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 activeJsonFile,
                 StringComparison.OrdinalIgnoreCase))
         {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                $"'{selectedItem.Name}' " +
+            await this.ShowPopupAsync(new PopupAlert($"'{selectedItem.Name}' " +
                 $"{AppResources.entspricht_nicht_aktuell_geladenem_projekt} " +
-                $"('{activeJsonFile}').",
-                AppResources.ok);
-
+                $"('{activeJsonFile}').", AppResources.fehler), Settings.PopupOptions);
             return;
         }
 
@@ -220,22 +207,15 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            await BusyService.ShowAsync("Projekt wird synchronisiert...");
+            await BusyService.ShowAsync(AppResources.projekt_wird_synchronisiert);
 
             bool success =
                 await SaveManager.SyncWithExistingFolderAsync(currentFolderId);
 
             if (success)
-            {
                 await Navigation.PopAsync();
-            }
             else
-            {
-                await DisplayAlertAsync(
-                    AppResources.fehler,
-                    AppResources.synchronisierung_konnte_nicht_gestartet_werden,
-                    AppResources.ok);
-            }
+                await this.ShowPopupAsync(new PopupAlert(AppResources.synchronisierung_konnte_nicht_gestartet_werden, AppResources.fehler), Settings.PopupOptions);
         }
         finally
         {
@@ -254,7 +234,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            await BusyService.ShowAsync("Verzeichnis wird geladen...");
+            await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
 
             await LoadFolderContentAsync(previousFolderId);
         }
@@ -274,17 +254,14 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            await BusyService.ShowAsync("Projekt wird hochgeladen...");
+            await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
 
             success =
                 await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                ex.Message,
-                AppResources.ok);
+            await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
         }
         finally
         {
@@ -293,17 +270,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
 
         if (success)
-        {
-            // Jetzt ist die CloudPickerPage wieder bedienbar/geschlossen
             await Navigation.PopAsync();
-        }
         else
-        {
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden,
-                AppResources.ok);
-        }
+            await this.ShowPopupAsync(new PopupAlert(AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.fehler), Settings.PopupOptions);
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;

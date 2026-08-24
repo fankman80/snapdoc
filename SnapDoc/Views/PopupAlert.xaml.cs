@@ -6,10 +6,18 @@ namespace SnapDoc.Views;
 
 public partial class PopupAlert : Popup
 {
-    public PopupAlert(string title, string okText = null)
+    public PopupAlert(string title, string header = "", string okText = null)
 	{
 		InitializeComponent();
         titleText.Text = title;
+        titleHeader.Text = header;
+
+        if (string.IsNullOrEmpty(header))
+        {
+            titleHeader.IsVisible = false;
+            headerLine.IsVisible = false;
+        }
+
         okButtonText.Text = okText ?? AppResources.ok;
     }
 

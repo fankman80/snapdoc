@@ -34,7 +34,7 @@
                     VerticalOptions="Start"
                     Margin="20"
                     Spacing="10">
-                <Label Text="Angemeldet als:" TextColor="LightGray" HorizontalOptions="End" />
+                <Label Text="Angemeldet als:" FontAttributes="Bold" TextColor="LightGray" HorizontalOptions="End" />
                 <Label Text="{Binding CurrentUserName}" TextColor="LightGray" HorizontalOptions="End" />
                 <Label Text="{Binding CurrentUserEmail}" TextColor="LightGray" HorizontalOptions="End" />
             </VerticalStackLayout>

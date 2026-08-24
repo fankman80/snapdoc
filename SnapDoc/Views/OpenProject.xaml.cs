@@ -131,14 +131,9 @@ public partial class OpenProject : ContentPage
 
     private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
     {
-        if (SaveManager.CurrentAuth == null ||
-            !SaveManager.CurrentAuth.IsLoggedIn)
+        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await DisplayAlertAsync(
-                AppResources.info,
-                AppResources.bitte_zuerst_anmelden,
-                AppResources.ok);
-
+            await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
             return;
         }
 
@@ -147,24 +142,19 @@ public partial class OpenProject : ContentPage
             // Ladeanzeige aktivieren
             await BusyService.ShowAsync(AppResources.projekte_werden_gesucht);
 
-            // 1. Projekte aus der Cloud suchen
-            var remoteProjects =
-                await SaveManager.SearchRemoteProjectsAsync();
+            // Projekte aus der Cloud suchen
+            var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
 
             await BusyService.HideAsync();
 
-            // 2. Prüfen, ob Projekte vorhanden sind
+            // Prüfen, ob Projekte vorhanden sind
             if (remoteProjects.Count == 0)
             {
-                await DisplayAlertAsync(
-                    AppResources.info,
-                    AppResources.keine_projekte_in_cloud_gefunden,
-                    AppResources.ok);
-
+                await this.ShowPopupAsync(new PopupAlert(AppResources.keine_projekte_in_cloud_gefunden, AppResources.info), Settings.PopupOptions);
                 return;
             }
 
-            // 3. Projekt auswählen lassen
+            // Projekt auswählen lassen
             var popup = new PopupCloudProjects(remoteProjects);
 
             var result =
@@ -175,47 +165,32 @@ public partial class OpenProject : ContentPage
             if (result?.Result == null)
                 return;
 
-            // 4. Gewähltes Projekt herunterladen
+            // Gewähltes Projekt herunterladen
             var selectedProject = result.Result;
 
             // Ladeanzeige aktivieren
             await BusyService.ShowAsync(AppResources.projekt_wird_heruntergeladen);
 
-            bool success =
-                await SaveManager.DownloadRemoteProjectAsync(
-                    selectedProject);
+            bool success = await SaveManager.DownloadRemoteProjectAsync(selectedProject);
 
-            // 5. Ergebnis verarbeiten
+            // Ergebnis verarbeiten
             if (success)
             {
                 LoadJsonFiles();
 
                 await BusyService.HideAsync();
-
-                await DisplayAlertAsync(
-                    AppResources.info,
-                    AppResources.projekt_erfolgreich_heruntergeladen,
-                    AppResources.ok);
+                await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_erfolgreich_heruntergeladen), Settings.PopupOptions);
             }
             else
             {
                 await BusyService.HideAsync();
-
-                await DisplayAlertAsync(
-                    AppResources.fehler,
-                    AppResources.fehler_beim_herunterladen_des_projekts,
-                    AppResources.ok);
+                await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
             }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Fehler beim Cloud-Download: {ex}");
-
-            await DisplayAlertAsync(
-                AppResources.fehler,
-                ex.Message,
-                AppResources.ok);
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Cloud-Download: {ex}");
+            await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
         }
         finally
         {
@@ -397,20 +372,15 @@ public partial class OpenProject : ContentPage
             {
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
-                    var popup = new PopupDualResponse(
-                        "In der Cloud existiert eine neuere Version dieses Projekts. Möchten Sie die neuesten Daten jetzt synchronisieren?",
-                        "Synchronisieren");
-
-                    var result = await this.ShowPopupAsync<string>(
-                        popup,
-                        Settings.PopupOptions);
+                    var popup = new PopupDualResponse(AppResources.neuere_version_cloud_synchronisieren, AppResources.synchronisieren);
+                    var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
                     return result?.Result == "Ok";
                 });
 
                 if (shouldSync)
                 {
-                    await BusyService.SetMessageAsync("Daten werden synchronisiert...");
+                    await BusyService.SetMessageAsync(AppResources.daten_werden_synchronisiert);
 
                     bool success =
                         await SaveManager.SyncJsonOnlyFromCloudAsync();
@@ -455,15 +425,11 @@ public partial class OpenProject : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Cloud Sync oder Lade-Fehler: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex}");
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
-                await Shell.Current.DisplayAlertAsync(
-                    "Fehler beim Laden",
-                    "Das Projekt konnte aufgrund eines Problems nicht geladen werden.",
-                    "OK");
+                await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_konnte_nicht_geladen_werden, AppResources.fehler), Settings.PopupOptions);
             });
         }
         finally
@@ -605,11 +571,7 @@ public partial class OpenProject : ContentPage
                     if (SaveManager.CurrentAuth == null ||
                         !SaveManager.CurrentAuth.IsLoggedIn)
                     {
-                        await DisplayAlertAsync(
-                            AppResources.info,
-                            AppResources.bitte_zuerst_anmelden,
-                            AppResources.ok);
-
+                        await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
                         return;
                     }
 

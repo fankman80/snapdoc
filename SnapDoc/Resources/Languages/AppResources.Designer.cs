@@ -70,6 +70,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Abmelden ähnelt.
+        /// </summary>
+        internal static string abmelden {
+            get {
+                return ResourceManager.GetString("abmelden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Adresse ähnelt.
         /// </summary>
         internal static string adresse {
@@ -129,6 +138,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string an_ort_duplizieren {
             get {
                 return ResourceManager.GetString("an_ort_duplizieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Angemeldet ähnelt.
+        /// </summary>
+        internal static string angemeldet {
+            get {
+                return ResourceManager.GetString("angemeldet", resourceCulture);
             }
         }
         
@@ -493,6 +511,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Daten werden synchronisiert... ähnelt.
+        /// </summary>
+        internal static string daten_werden_synchronisiert {
+            get {
+                return ResourceManager.GetString("daten_werden_synchronisiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Datum ähnelt.
         /// </summary>
         internal static string datum {
@@ -700,7 +727,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Erfolg ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Erfolgreich ähnelt.
         /// </summary>
         internal static string erfolg {
             get {
@@ -1348,6 +1375,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Es sind noch keine Pläne vorhanden. Importieren Sie zuerst eine oder mehrere PDF-Seiten in der Projektverwaltung. ähnelt.
+        /// </summary>
+        internal static string keine_plaene_vorhanden_importieren {
+            get {
+                return ResourceManager.GetString("keine_plaene_vorhanden_importieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Keine Projekte in der Cloud gefunden. ähnelt.
         /// </summary>
         internal static string keine_projekte_in_cloud_gefunden {
@@ -1695,6 +1731,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string neue_vorlage_hochladen {
             get {
                 return ResourceManager.GetString("neue_vorlage_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die In der Cloud existiert eine neuere Version dieses Projekts. Möchten Sie die neuesten Daten jetzt synchronisieren? ähnelt.
+        /// </summary>
+        internal static string neuere_version_cloud_synchronisieren {
+            get {
+                return ResourceManager.GetString("neuere_version_cloud_synchronisieren", resourceCulture);
             }
         }
         
@@ -2176,6 +2221,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Projekt konnte aufgrund eines Problems nicht geladen werden. ähnelt.
+        /// </summary>
+        internal static string projekt_konnte_nicht_geladen_werden {
+            get {
+                return ResourceManager.GetString("projekt_konnte_nicht_geladen_werden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt löschen ähnelt.
         /// </summary>
         internal static string projekt_loeschen {
@@ -2212,11 +2266,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird hochgeladen... ähnelt.
+        /// </summary>
+        internal static string projekt_wird_hochgeladen {
+            get {
+                return ResourceManager.GetString("projekt_wird_hochgeladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird importiert... ähnelt.
         /// </summary>
         internal static string projekt_wird_importiert {
             get {
                 return ResourceManager.GetString("projekt_wird_importiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt wird synchronisiert... ähnelt.
+        /// </summary>
+        internal static string projekt_wird_synchronisiert {
+            get {
+                return ResourceManager.GetString("projekt_wird_synchronisiert", resourceCulture);
             }
         }
         
@@ -2554,6 +2626,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Synchronisieren ähnelt.
+        /// </summary>
+        internal static string synchronisieren {
+            get {
+                return ResourceManager.GetString("synchronisieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Synchronisierung konnte nicht gestartet werden. ähnelt.
         /// </summary>
         internal static string synchronisierung_konnte_nicht_gestartet_werden {
@@ -2694,6 +2775,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string verzeichnis_oeffnen {
             get {
                 return ResourceManager.GetString("verzeichnis_oeffnen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verzeichnis wird geladen... ähnelt.
+        /// </summary>
+        internal static string verzeichnis_wird_geladen {
+            get {
+                return ResourceManager.GetString("verzeichnis_wird_geladen", resourceCulture);
             }
         }
         

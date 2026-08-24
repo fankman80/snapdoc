@@ -9,12 +9,16 @@
 
     <Grid Padding="6"
           WidthRequest="320">
-        <VerticalStackLayout>
-            <Label x:Name="titleText"
-                   Text=""
+        <VerticalStackLayout Spacing="8">
+            <Label x:Name="titleHeader"
+                   FontAttributes="Bold"
                    HorizontalOptions="Start"/>
-            <Grid ColumnDefinitions="*, *">
+            <Line x:Name="headerLine" Stroke="SlateGray" X2="500" />
+            <Label x:Name="titleText"
+                   HorizontalOptions="Start"/>
+            <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">
                 <Button Grid.Column="1"
+                        MinimumWidthRequest="100"
                         x:Name="okButtonText"
                         Text="{x:Static res:AppResources.ok}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

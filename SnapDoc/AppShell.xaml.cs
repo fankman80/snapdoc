@@ -1,5 +1,7 @@
 ﻿#nullable disable
+using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
@@ -179,8 +181,10 @@ public partial class AppShell : Shell
     {
         if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
         {
-            bool logout = await DisplayAlertAsync("Cloud", AppResources.bereits_verbunden_abmelden, AppResources.ja, AppResources.nein);
-            if (logout)
+            var popup = new PopupDualResponse(AppResources.bereits_verbunden_abmelden, AppResources.abmelden);
+            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+            if (result != null)
             {
                 // Hier das Polling beim Abmelden stoppen
                 SaveManager.StopCloudPolling();
@@ -201,11 +205,11 @@ public partial class AppShell : Shell
             // Hier das Polling nach erfolgreichem Login starten
             SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
 
-            await DisplayAlertAsync(AppResources.erfolg, $"{AppResources.eingeloggt_als}: {userName}", AppResources.ok);
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.eingeloggt_als}: {userName}", AppResources.angemeldet), Settings.PopupOptions);
         }
         else
         {
-            await DisplayAlertAsync(AppResources.fehler, $"{AppResources.login_fehlgeschlagen}: {userName}", AppResources.ok);
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}: {userName}", AppResources.fehler), Settings.PopupOptions);
         }
     }
 

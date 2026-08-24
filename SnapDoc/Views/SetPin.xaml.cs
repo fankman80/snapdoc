@@ -179,8 +179,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
             if (!success)
             {
-                await DisplayAlertAsync("Netzwerkfehler", "Das Originalbild konnte nicht heruntergeladen werden.", "OK");
-                return; // Navigation abbrechen, da kein Bild existiert
+                await this.ShowPopupAsync(new PopupAlert("Das Originalbild konnte nicht heruntergeladen werden.", "Netzwerkfehler"), Settings.PopupOptions);
+                return;
             }
         }
 
