@@ -11,18 +11,14 @@
              x:Class="SnapDoc.Views.LoadPDFPages"
              x:DataType="views:LoadPDFPages"  
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.plaene_hinzufuegen}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
+             Title="{x:Static res:AppResources.plaene_hinzufuegen}">
 
     <Shell.BackButtonBehavior>
         <BackButtonBehavior IsVisible="False" />
     </Shell.BackButtonBehavior>
 
     <Shell.TitleView>
-        <Grid x:DataType="viewmodels:BaseViewModel"
-              BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-              IsVisible="{Binding IsNotBusy}"
-              ColumnDefinitions="Auto,*,Auto"
+        <Grid ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Button Grid.Column="0"

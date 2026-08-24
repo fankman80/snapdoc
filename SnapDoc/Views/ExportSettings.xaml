@@ -13,20 +13,10 @@
              x:Class="SnapDoc.Views.ExportSettings"
              x:DataType="views:ExportSettings" 
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.bericht_exportieren}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
-
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
-                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                            IsVisible="{Binding IsNotBusy}" />
-    </Shell.BackButtonBehavior>
+             Title="{x:Static res:AppResources.bericht_exportieren}">
 
     <Shell.TitleView>
-        <HorizontalStackLayout x:DataType="viewmodels:BaseViewModel"
-                               BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                               IsVisible="{Binding IsNotBusy}"
-                               Spacing="0">
+        <HorizontalStackLayout Spacing="0">
             <Label x:DataType="views:ExportSettings"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"

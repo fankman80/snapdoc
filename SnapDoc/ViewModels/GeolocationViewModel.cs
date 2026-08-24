@@ -6,7 +6,7 @@ using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.ViewModels;
 
-public partial class GeolocationViewModel : BaseViewModel
+public partial class GeolocationViewModel : CommunityToolkit.Mvvm.ComponentModel.ObservableObject
 {
     public static GeolocationViewModel Instance { get; } = new GeolocationViewModel();
     private readonly string notAvailable = "not available";
@@ -310,10 +310,9 @@ public partial class GeolocationViewModel : BaseViewModel
             $"Time: {location.Timestamp:T}";
     }
 
-    public override void OnDisappearing()
+    public void OnDisappearing()
     {
         cts?.Cancel();
-        base.OnDisappearing();
     }
 
     public async Task<Location> TryGetLocationAsync()

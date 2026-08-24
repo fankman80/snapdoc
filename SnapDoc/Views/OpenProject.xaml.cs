@@ -4,7 +4,6 @@ using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using SnapDoc.ViewModels;
 
 #if WINDOWS
 using System.Diagnostics;
@@ -18,7 +17,6 @@ public partial class OpenProject : ContentPage
     public OpenProject()
     {
         InitializeComponent();
-        BindingContext = new BaseViewModel();
     }
 
     protected override void OnAppearing()
@@ -139,67 +137,95 @@ public partial class OpenProject : ContentPage
 
     private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
     {
-        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
+        if (SaveManager.CurrentAuth == null ||
+            !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await DisplayAlertAsync(AppResources.info, AppResources.bitte_zuerst_anmelden, AppResources.ok);
+            await DisplayAlertAsync(
+                AppResources.info,
+                AppResources.bitte_zuerst_anmelden,
+                AppResources.ok);
+
             return;
         }
 
-        var viewModel = BindingContext as BaseViewModel;
         try
         {
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.projekte_werden_gesucht;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            // Ladeanzeige aktivieren
+            await BusyService.ShowAsync(AppResources.projekte_werden_gesucht);
 
-            var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
+            // 1. Projekte aus der Cloud suchen
+            var remoteProjects =
+                await SaveManager.SearchRemoteProjectsAsync();
 
-            viewModel?.IsBusy = false; // Suche beendet, Ladeanzeige vorübergehend aus
+            await BusyService.HideAsync();
 
+            // 2. Prüfen, ob Projekte vorhanden sind
             if (remoteProjects.Count == 0)
             {
-                await DisplayAlertAsync(AppResources.info, AppResources.keine_projekte_in_cloud_gefunden, AppResources.ok);
+                await DisplayAlertAsync(
+                    AppResources.info,
+                    AppResources.keine_projekte_in_cloud_gefunden,
+                    AppResources.ok);
+
                 return;
             }
 
+            // 3. Projekt auswählen lassen
             var popup = new PopupCloudProjects(remoteProjects);
-            var result = await this.ShowPopupAsync<RemoteProjectDto>(popup, Settings.PopupOptions);
-            if (result?.Result == null) return; // Abgebrochen
 
-            // Selected Project verarbeiten
+            var result =
+                await this.ShowPopupAsync<RemoteProjectDto>(
+                    popup,
+                    Settings.PopupOptions);
+
+            if (result?.Result == null)
+                return;
+
+            // 4. Gewähltes Projekt herunterladen
             var selectedProject = result.Result;
 
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.projekt_wird_heruntergeladen;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            // Ladeanzeige aktivieren
+            await BusyService.ShowAsync(AppResources.projekt_wird_heruntergeladen);
 
-            // 1. Projekt-JSON und Ordner aus der Cloud herunterladen
-            bool success = await SaveManager.DownloadRemoteProjectAsync(selectedProject);
+            bool success =
+                await SaveManager.DownloadRemoteProjectAsync(
+                    selectedProject);
 
+            // 5. Ergebnis verarbeiten
             if (success)
             {
-                // 2. Ansicht neu laden (das neue Projekt erscheint jetzt in der Liste mit Sync-Icon)
                 LoadJsonFiles();
-                await DisplayAlertAsync(AppResources.info, AppResources.projekt_erfolgreich_heruntergeladen, AppResources.ok);
+
+                await BusyService.HideAsync();
+
+                await DisplayAlertAsync(
+                    AppResources.info,
+                    AppResources.projekt_erfolgreich_heruntergeladen,
+                    AppResources.ok);
             }
             else
             {
-                await DisplayAlertAsync(AppResources.fehler, AppResources.fehler_beim_herunterladen_des_projekts, AppResources.ok);
+                await BusyService.HideAsync();
+
+                await DisplayAlertAsync(
+                    AppResources.fehler,
+                    AppResources.fehler_beim_herunterladen_des_projekts,
+                    AppResources.ok);
             }
         }
         catch (Exception ex)
         {
-            await DisplayAlertAsync(AppResources.fehler, ex.Message, AppResources.ok);
+            System.Diagnostics.Debug.WriteLine(
+                $"Fehler beim Cloud-Download: {ex}");
+
+            await DisplayAlertAsync(
+                AppResources.fehler,
+                ex.Message,
+                AppResources.ok);
         }
         finally
         {
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
     }
 
@@ -284,7 +310,6 @@ public partial class OpenProject : ContentPage
 
     private async void OnUploadClicked(object sender, EventArgs e)
     {
-        var viewModel = BindingContext as BaseViewModel;
         try
         {
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
@@ -294,12 +319,8 @@ public partial class OpenProject : ContentPage
 
             if (fileResult == null) return;
 
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.projekt_wird_importiert;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            // Ladeanzeige aktivieren
+            await BusyService.ShowAsync(AppResources.projekt_wird_importiert);
 
             var targetDirectory = Settings.DataDirectory;
 
@@ -333,7 +354,7 @@ public partial class OpenProject : ContentPage
         }
         finally
         {
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
     }
 
@@ -347,9 +368,6 @@ public partial class OpenProject : ContentPage
         if (layout?.BindingContext is not FileItem item)
             return;
 
-        if (BindingContext is not BaseViewModel viewModel)
-            return;
-
         // Wenn das Projekt bereits aktiv ist, nichts tun.
         if (item.IsActive)
             return;
@@ -357,8 +375,8 @@ public partial class OpenProject : ContentPage
         // Sperre aktivieren
         _isProcessing = true;
 
-        // Overlay anzeigen
-        await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
+        // Ladeanzeige aktivieren
+        await BusyService.ShowAsync(AppResources.projekt_wird_geladen);        
 
         try
         {
@@ -468,8 +486,6 @@ public partial class OpenProject : ContentPage
         if (_isProcessing) return;
         _isProcessing = true;
 
-        var viewModel = BindingContext as BaseViewModel;
-
         try
         {
             var button = sender as Button;
@@ -551,12 +567,7 @@ public partial class OpenProject : ContentPage
                         try
                         {
                             // Ladeanzeige aktivieren
-                            if (viewModel != null)
-                            {
-                                viewModel.BusyText = AppResources.daten_werden_komprimiert;
-                                viewModel.IsBusy = true;
-                                await Task.Delay(100);
-                            }
+                            await BusyService.ShowAsync(AppResources.daten_werden_komprimiert);
 
                             // Hintergrundoperation
                             await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
@@ -564,7 +575,7 @@ public partial class OpenProject : ContentPage
                         finally
                         {
                             // Ladeanzeige deaktivieren
-                            viewModel?.IsBusy = false;
+                            await BusyService.HideAsync();
 
                             await Task.Delay(100);
                         }
@@ -647,7 +658,7 @@ public partial class OpenProject : ContentPage
         finally
         {
             // Ladeanzeige deaktivieren
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
 
             _isProcessing = false;
         }

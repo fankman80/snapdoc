@@ -77,7 +77,6 @@ public partial class MapView : IQueryAttributable
     public MapView(string _planId = "")
     {
         InitializeComponent();
-        BindingContext = new BaseViewModel();
         planId = _planId;
 
         _widgetColor = new Color((int)(hexColor.Red * 255), (int)(hexColor.Green * 255), (int)(hexColor.Blue * 255));
@@ -247,16 +246,10 @@ public partial class MapView : IQueryAttributable
 
     private async Task UpdateUiFromQueryAsync()
     {
-        var viewModel = BindingContext as BaseViewModel;
-
-        async Task ShowBusyIfNeeded()
+        async static Task ShowBusyIfNeeded()
         {
-            if (viewModel != null && !viewModel.IsBusy)
-            {
-                viewModel.BusyText = AppResources.suche_standort;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
-            }
+            // Ladeanzeige aktivieren
+            await BusyService.ShowAsync(AppResources.suche_standort);
         }
 
         try
@@ -316,6 +309,8 @@ public partial class MapView : IQueryAttributable
                 map.Navigator.CenterOnAndZoomTo(sphericalMercatorCoordinate, map.Navigator.Resolutions[targetZoom]);
                 MapControl.RefreshGraphics();
             }
+            // Ladeanzeige schliessen
+            await BusyService.HideAsync();
         }
         catch (Exception ex)
         {
@@ -324,7 +319,7 @@ public partial class MapView : IQueryAttributable
         finally
         {
             // Ladeanzeige schliessen
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
     }
 
@@ -336,17 +331,10 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        var viewModel = BindingContext as BaseViewModel;
-
         try
         {
             // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.suche_standort;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
-            }
+            await BusyService.ShowAsync(AppResources.suche_standort);
 
             // Suche starten (hier wartet der Code)
             var location = await geoViewModel.TryGetLocationAsync();
@@ -378,6 +366,9 @@ public partial class MapView : IQueryAttributable
 
             var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
             map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
+
+            // Ladeanzeige schliessen
+            await BusyService.HideAsync();
         }
         catch (Exception ex)
         {
@@ -386,7 +377,7 @@ public partial class MapView : IQueryAttributable
         finally
         {
             // Ladeanzeige schliessen
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
     }
 
@@ -695,17 +686,10 @@ public partial class MapView : IQueryAttributable
             return;
         }
 
-        var viewModel = BindingContext as BaseViewModel;
-
         try
         {
             // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.suche_standort;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
-            }
+            await BusyService.ShowAsync(AppResources.suche_standort);
 
             var location = await geoViewModel.TryGetLocationAsync();
 
@@ -754,6 +738,9 @@ public partial class MapView : IQueryAttributable
 
                 AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
             }
+
+            // Ladeanzeige schliessen
+            await BusyService.HideAsync();
         }
         catch (Exception ex)
         {
@@ -762,7 +749,7 @@ public partial class MapView : IQueryAttributable
         finally
         {
             // Ladeanzeige schliessen
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
     }
 

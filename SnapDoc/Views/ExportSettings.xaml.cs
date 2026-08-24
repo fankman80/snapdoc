@@ -4,7 +4,6 @@ using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using SnapDoc.ViewModels;
 
 namespace SnapDoc.Views;
 
@@ -17,7 +16,6 @@ public partial class ExportSettings : ContentPage
     public ExportSettings()
     {
         InitializeComponent();
-        BindingContext = new BaseViewModel();
     }
     
     protected override void OnAppearing()
@@ -41,136 +39,195 @@ public partial class ExportSettings : ContentPage
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
-            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+            var popup = new PopupAlert(
+                AppResources.exportvorlage_waehlen_oder_importieren);
+
+            await this.ShowPopupAsync<string>(
+                popup,
+                Settings.PopupOptions);
+
             return;
         }
 
-        var viewModel = BindingContext as BaseViewModel;
+        string outputPath = Path.Combine(
+            Settings.DataDirectory,
+            GlobalJson.Data.ProjectPath,
+            GlobalJson.Data.ProjectPath + ".docx");
 
-        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
+        string templatePath = Path.Combine(
+            Settings.DataDirectory,
+            "templates",
+            SettingsService.Instance.SelectedTemplate);
 
         try
         {
-            // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.bericht_wird_geteilt;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay anzuzeigen
-            }
+            // Bericht erstellen
+            await BusyService.ShowAsync(AppResources.bericht_wird_geteilt);
 
-            // Bericht im Hintergrund generieren
             await Task.Run(async () =>
             {
-                await ExportReport.DocX(templatePath, outputPath);
+                await ExportReport.DocX(
+                    templatePath,
+                    outputPath);
             });
+
+            // Ladeanzeige deaktivieren
+            await BusyService.HideAsync();
+
+            // Datei teilen
+            bool isShared = false;
+
+            try
+            {
+                await ShareFileAsync(outputPath);
+                isShared = true;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine(
+                    $"Fehler beim Teilen des Berichts: {ex}");
+            }
+            finally
+            {
+                // Temporäre DOCX-Datei immer löschen
+                if (File.Exists(outputPath))
+                    File.Delete(outputPath);
+            }
+
+            // Zur vorherigen Seite zurück
+            await Shell.Current.GoToAsync("..");
+
+            // Ergebnis anzeigen
+
+            if (isShared)
+            {
+                _ = SnackbarExtensions.ShowSafeAsync(
+                    AppResources.bericht_wurde_geteilt,
+                    includeDelay: true);
+            }
+            else
+            {
+                _ = SnackbarExtensions.ShowSafeAsync(
+                    AppResources.bericht_wurde_nicht_geteilt,
+                    includeDelay: true);
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return;
+            System.Diagnostics.Debug.WriteLine(
+                $"Fehler beim Erstellen des Berichts: {ex}");
+
+            await SnackbarExtensions.ShowSafeAsync(
+                AppResources.bericht_wurde_nicht_geteilt,
+                includeDelay: true);
         }
         finally
         {
             // Ladeanzeige deaktivieren
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
-
-        bool isShared = false;
-
-        try
-        {
-            await ShareFileAsync(outputPath);
-            isShared = true;
-        }
-        catch
-        {
-            isShared = false;
-        }
-        finally
-        {
-            // Temporäre Datei aufräumen
-            if (File.Exists(outputPath))
-                File.Delete(outputPath);
-        }
-
-        await Shell.Current.GoToAsync("..");
-
-        if (isShared)
-            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
-        else
-            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
     }
 
     private async void OnSaveClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
-            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+            var popup = new PopupAlert(
+                AppResources.exportvorlage_waehlen_oder_importieren);
+
+            await this.ShowPopupAsync<string>(
+                popup,
+                Settings.PopupOptions);
+
             return;
         }
 
-        var viewModel = BindingContext as BaseViewModel;
+        string outputPath = Path.Combine(
+            Settings.DataDirectory,
+            GlobalJson.Data.ProjectPath,
+            GlobalJson.Data.ProjectPath + ".docx");
 
-        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".docx");
-        string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
+        string templatePath = Path.Combine(
+            Settings.DataDirectory,
+            "templates",
+            SettingsService.Instance.SelectedTemplate);
 
         try
         {
-            // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.bericht_wird_gespeichert;
-                viewModel.IsBusy = true;
-                await Task.Delay(100); // Gibt dem UI-Thread Zeit, das Overlay zu zeichnen
-            }
+            // Bericht erstellen
+            await BusyService.ShowAsync(AppResources.bericht_wird_gespeichert);
 
-            // Bericht im Hintergrund generieren
             await Task.Run(async () =>
             {
-                await ExportReport.DocX(templatePath, outputPath);
+                await ExportReport.DocX(
+                    templatePath,
+                    outputPath);
             });
+
+            // Ladeanzeige deaktivieren
+            await BusyService.HideAsync();
+
+
+            // Datei speichern
+            bool isSaved = false;
+
+            if (File.Exists(outputPath))
+            {
+                try
+                {
+                    using var saveStream = File.Open(
+                        outputPath,
+                        FileMode.Open);
+
+                    var fileSaveResult =
+                        await FileSaver.Default.SaveAsync(
+                            GlobalJson.Data.ProjectPath + ".docx",
+                            saveStream);
+
+                    isSaved = fileSaveResult.IsSuccessful;
+                }
+                catch (Exception ex)
+                {
+                    System.Diagnostics.Debug.WriteLine(
+                        $"Fehler beim Speichern: {ex}");
+                }
+                finally
+                {
+                    if (File.Exists(outputPath))
+                        File.Delete(outputPath);
+                }
+            }
+
+
+            await Shell.Current.GoToAsync("..");
+
+            if (isSaved)
+            {
+                _ = SnackbarExtensions.ShowSafeAsync(
+                    AppResources.bericht_wurde_gespeichert,
+                    includeDelay: true);
+            }
+            else
+            {
+                _ = SnackbarExtensions.ShowSafeAsync(
+                    AppResources.bericht_wurde_nicht_gespeichert,
+                    includeDelay: true);
+            }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            return;
+            System.Diagnostics.Debug.WriteLine(
+                $"Fehler beim Erstellen des Berichts: {ex}");
+
+            await SnackbarExtensions.ShowSafeAsync(
+                AppResources.bericht_wurde_nicht_gespeichert,
+                includeDelay: true);
         }
         finally
         {
             // Ladeanzeige deaktivieren
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
         }
-
-        bool isSaved = false;
-
-        if (File.Exists(outputPath))
-        {
-            try
-            {
-                using var saveStream = File.Open(outputPath, FileMode.Open);
-                var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".docx", saveStream);
-                isSaved = fileSaveResult.IsSuccessful;
-            }
-            catch (Exception)
-            {
-                return;
-            }
-            finally
-            {
-                // Temporaere Datei nach dem Speichern loeschen
-                if (File.Exists(outputPath))
-                    File.Delete(outputPath);
-            }
-        }
-
-        await Shell.Current.GoToAsync("..");
-
-        if (isSaved)
-            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
-        else
-            _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
     }
 
     private static async Task ShareFileAsync(string filePath)

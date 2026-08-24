@@ -40,11 +40,10 @@
                     TextColor="White"
                     FontSize="18"
                     HorizontalTextAlignment="Center"
-                    HorizontalOptions="Center" />
+                    HorizontalOptions="Center"
+                    LineBreakMode="WordWrap"/>
 
             </VerticalStackLayout>
-
         </Border>
-
     </Grid>
 </ContentPage>

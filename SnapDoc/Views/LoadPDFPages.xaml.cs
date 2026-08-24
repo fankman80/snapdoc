@@ -4,7 +4,6 @@ using SnapDoc.Controls;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using SnapDoc.ViewModels;
 
 namespace SnapDoc.Views;
 
@@ -27,7 +26,6 @@ public partial class LoadPDFPages : ContentPage
     public LoadPDFPages()
     {
         InitializeComponent();
-        BindingContext = new BaseViewModel();
         btnRows.Text = Settings.TableRowIcon;
     }
 
@@ -56,8 +54,6 @@ public partial class LoadPDFPages : ContentPage
         if (_isProcessing) return;
         _isProcessing = true;
 
-        var viewModel = BindingContext as BaseViewModel;
-
         try
         {
             // Cache leeren
@@ -78,12 +74,7 @@ public partial class LoadPDFPages : ContentPage
             }
 
             // Ladeanzeige aktivieren
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.lade_pdf_seiten;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            await BusyService.ShowAsync(AppResources.lade_pdf_seiten);
 
             string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
             List<PdfItem> pdfImages = [];
@@ -114,6 +105,7 @@ public partial class LoadPDFPages : ContentPage
 
                         for (int i = 0; i < nativeDoc.PageCount; i++)
                         {
+                            await BusyService.SetMessageAsync($"PDF {fileIndex + 1}, Seite {i + 1} wird verarbeitet...");
                             string imgBaseName = $"pdf_{importId}_{fileIndex}_page_{i}";
                             string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                             string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
@@ -207,7 +199,7 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            viewModel?.IsBusy = false;
+            await BusyService.HideAsync();
             _isProcessing = false;
         }
     }
@@ -249,21 +241,19 @@ public partial class LoadPDFPages : ContentPage
 
     private async void AddPdfImages()
     {
-        if (_isProcessing) return;
-        _isProcessing = true;
+        if (_isProcessing)
+            return;
 
-        var viewModel = BindingContext as BaseViewModel;
+        _isProcessing = true;
 
         try
         {
-            if (viewModel != null)
-            {
-                viewModel.BusyText = AppResources.pdf_wird_konvertiert;
-                viewModel.IsBusy = true;
-                await Task.Delay(100);
-            }
+            // BusyOverlay anzeigen
+            await BusyService.ShowAsync(
+                AppResources.pdf_wird_konvertiert);
 
             await LoadPDFImages();
+
             await ProcessFileOrganizationLogic();
 
             SaveManager.NotifyDataChanged();
@@ -271,15 +261,22 @@ public partial class LoadPDFPages : ContentPage
             if (Shell.Current is AppShell shell)
                 shell.ApplyFilterAndSorting();
 
+            // BusyOverlay schließen
+            await BusyService.HideAsync();
+
             await Shell.Current.GoToAsync("project_details");
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync($"PDF-Error: {ex.Message}", includeDelay: true);
+            await SnackbarExtensions.ShowSafeAsync(
+                $"PDF-Error: {ex.Message}",
+                includeDelay: true);
         }
         finally
         {
-            viewModel?.IsBusy = false;
+            // BusyOverlay schließen
+            await BusyService.HideAsync();
+
             _isProcessing = false;
         }
     }

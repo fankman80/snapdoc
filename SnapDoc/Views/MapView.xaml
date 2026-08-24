@@ -14,20 +14,10 @@
              x:Class="SnapDoc.Views.MapView"
              x:DataType="views:MapView"
              x:Name="ThisPage"
-             Title="{Binding Title}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
+             Title="{Binding Title}">
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
-                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                            IsVisible="{Binding IsNotBusy}" />
-    </Shell.BackButtonBehavior>
-    
     <Shell.TitleView>
-        <Grid x:DataType="viewmodels:BaseViewModel"
-              BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-              IsVisible="{Binding IsNotBusy}"
-              ColumnDefinitions="*,Auto,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <local:BorderlessEntry Grid.Column="0"

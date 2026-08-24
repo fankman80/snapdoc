@@ -12,20 +12,10 @@
              x:Class="SnapDoc.Views.OpenProject"
              x:DataType="views:OpenProject"             
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.projektliste}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
-
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
-                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                            IsVisible="{Binding IsNotBusy}" />
-    </Shell.BackButtonBehavior>
+             Title="{x:Static res:AppResources.projektliste}">
 
     <Shell.TitleView>
-        <Grid x:DataType="viewmodels:BaseViewModel"
-              BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-              IsVisible="{Binding IsNotBusy}"
-              ColumnDefinitions="*,Auto,Auto,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
@@ -38,7 +28,7 @@
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
             <Button Grid.Column="1"
-                    IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn}"
+                    IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn, x:DataType=services:SettingsService}"
                     Text="{x:Static local:MaterialIcons.Cloud_download}"
                     FontSize="24"
                     Padding="0"
@@ -127,7 +117,7 @@
                                FontFamily="MaterialOutlined"
                                FontSize="40"/>
                         <Button Grid.Column="2" Grid.RowSpan="2"
-                                IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn}"
+                                IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn, x:DataType=services:SettingsService}"
                                 Padding="0"
                                 Text="{Binding CloudIcon}"
                                 FontSize="30"

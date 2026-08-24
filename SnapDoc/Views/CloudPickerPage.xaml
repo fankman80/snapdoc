@@ -12,20 +12,10 @@
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
              x:Name="ThisPage"
-             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}"
-             ControlTemplate="{StaticResource BasePageWithLoadingTemplate}">
-
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior x:DataType="viewmodels:BaseViewModel"
-                            BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                            IsVisible="{Binding IsNotBusy}" />
-    </Shell.BackButtonBehavior>
+             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}">
 
     <Shell.TitleView>
-        <HorizontalStackLayout x:DataType="viewmodels:BaseViewModel"
-                               BindingContext="{Binding BindingContext, Source={x:Reference Name=ThisPage}}"
-                               IsVisible="{Binding IsNotBusy}"
-                               Spacing="0">
+        <HorizontalStackLayout Spacing="0">
             <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    LineBreakMode="WordWrap"
                    MaxLines="2"
