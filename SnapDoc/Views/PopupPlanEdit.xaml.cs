@@ -44,8 +44,8 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
     private async void OnDeleteClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
 
         try { await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
         catch (InvalidOperationException) { }

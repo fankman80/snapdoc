@@ -4,7 +4,7 @@ using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
-public partial class PopupDualResponse : Popup<string>
+public partial class PopupDualResponse : Popup<DualPopupResult>
 {
     private int countdown = 5;
     private readonly string OkText;
@@ -12,8 +12,8 @@ public partial class PopupDualResponse : Popup<string>
     private bool _isClosing = false;
 
     public PopupDualResponse(string title, string header = "", string okText = null, string cancelText = null, bool alert = false)
-	{
-		InitializeComponent();
+    {
+        InitializeComponent();
         titleText.Text = title;
         titleHeader.Text = header;
         okButtonText.Text = okText ?? AppResources.ok;
@@ -29,6 +29,7 @@ public partial class PopupDualResponse : Popup<string>
         if (alert)
             StartTimer();
     }
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
         if (_isClosing) return;
@@ -36,8 +37,8 @@ public partial class PopupDualResponse : Popup<string>
 
         StopTimer();
 
-        try { await CloseAsync("Ok"); }
-        catch (InvalidOperationException) {}
+        try { await CloseAsync(DualPopupResult.Ok); }
+        catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
@@ -47,7 +48,7 @@ public partial class PopupDualResponse : Popup<string>
 
         StopTimer();
 
-        try { await CloseAsync(null); }
+        try { await CloseAsync(DualPopupResult.Cancel); }
         catch (InvalidOperationException) { }
     }
 

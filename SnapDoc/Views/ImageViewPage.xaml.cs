@@ -360,8 +360,8 @@ public partial class ImageViewPage : IQueryAttributable
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_dieses_bild_wirklich_loeschen);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
 
         if (ImgSource == "showTitle")
         {

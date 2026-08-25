@@ -283,8 +283,8 @@ public partial class ExportSettings : ContentPage
     private async void OnDeleteDocument(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
 
         if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {

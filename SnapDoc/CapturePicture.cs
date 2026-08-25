@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -17,10 +18,7 @@ public class CapturePicture
 
         if (cameraStatus != PermissionStatus.Granted)
         {
-            await Shell.Current.DisplayAlertAsync(
-                AppResources.berechtigung_fehlt,
-                AppResources.berechtigung_kamera_dateien_info,
-                AppResources.ok);
+            await Shell.Current.CurrentPage.ShowPopupAsync(new PopupAlert(AppResources.berechtigung_kamera_dateien_info, AppResources.berechtigung_fehlt), Settings.PopupOptions);
             return (null, new Size(0, 0));
         }
 

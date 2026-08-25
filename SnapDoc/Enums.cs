@@ -24,4 +24,10 @@ namespace SnapDoc
         Bold = 1 << 0,
         Italic = 1 << 1
     }
+
+    public enum DualPopupResult
+    {
+        Cancel,
+        Ok
+    }
 }

@@ -190,8 +190,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnDeleteClick(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_pin_wirklich_loeschen);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
 
         DeletePinData(PinId);
         WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));

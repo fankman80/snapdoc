@@ -3,9 +3,10 @@
                xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
                xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
                xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               xmlns:root="clr-namespace:SnapDoc"
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
-               x:TypeArguments="x:String"
+               x:TypeArguments="root:DualPopupResult"
                x:Class="SnapDoc.Views.PopupDualResponse">
 
     <Grid Padding="6"

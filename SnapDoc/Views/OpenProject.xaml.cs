@@ -304,9 +304,9 @@ public partial class OpenProject : ContentPage
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     var popup = new PopupDualResponse(AppResources.neuere_version_cloud_synchronisieren, AppResources.synchronisieren);
-                    var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+                    var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
-                    return result?.Result == "Ok";
+                    return result?.Result == DualPopupResult.Ok;
                 });
 
                 if (shouldSync)
@@ -395,9 +395,9 @@ public partial class OpenProject : ContentPage
                     await Task.Delay(200);
 
                     var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-                    var result1 = await this.ShowPopupAsync<string>(popup1, Settings.PopupOptions);
+                    var result1 = await this.ShowPopupAsync<DualPopupResult>(popup1, Settings.PopupOptions);
 
-                    if (result1.Result == "Ok")
+                    if (result1.Result is DualPopupResult.Ok)
                     {
                         string fullPath = item.FilePath;
                         if (string.IsNullOrEmpty(fullPath)) return;
@@ -451,9 +451,9 @@ public partial class OpenProject : ContentPage
                     await Task.Delay(200);
 
                     var popup2 = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
-                    var result2 = await this.ShowPopupAsync<string>(popup2, Settings.PopupOptions);
+                    var result2 = await this.ShowPopupAsync<DualPopupResult>(popup2, Settings.PopupOptions);
 
-                    if (result2.Result == "Ok")
+                    if (result2.Result is DualPopupResult.Ok)
                     {
                         string sourceDirectory = Path.GetDirectoryName(item.FilePath);
                         string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");

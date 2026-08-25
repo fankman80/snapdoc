@@ -65,9 +65,9 @@ public partial class PopupSettings : Popup, IQueryAttributable
     private async void ResetPrg(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.standardeinstellungen_laden);
-        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
-        if (result.Result != null)
+        if (result.Result is DualPopupResult.Ok)
         {
             var filePath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
             if (File.Exists(filePath))
@@ -91,9 +91,9 @@ public partial class PopupSettings : Popup, IQueryAttributable
     private async void ResetIcon(object sender, EventArgs e)
     {
         var popup = new PopupDualResponse(AppResources.standardeinstellungen_laden);
-        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
-        if (result.Result != null)
+        if (result.Result is DualPopupResult.Ok)
         {
             var filePath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
             if (File.Exists(filePath))

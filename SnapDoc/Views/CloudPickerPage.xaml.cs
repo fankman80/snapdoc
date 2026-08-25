@@ -212,8 +212,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         // Bestätigung
         string projectName = Path.GetFileNameWithoutExtension(project.FileName);
         var popup = new PopupDualResponse(string.Format(AppResources.projekt_wirklich_herunterladen, projectName), AppResources.info);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
 
         try
         {

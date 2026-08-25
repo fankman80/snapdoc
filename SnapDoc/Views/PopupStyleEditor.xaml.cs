@@ -360,8 +360,8 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         StylePickerItem item = (StylePickerItem)button.BindingContext;
 
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
-        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result.Result != null)
+        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result.Result is DualPopupResult.Ok)
         {
             Items.Remove(item);
             SettingsService.Instance.StyleTemplateItems = [.. Items];

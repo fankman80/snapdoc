@@ -1,8 +1,10 @@
 ﻿#nullable disable
+using CommunityToolkit.Maui.Extensions;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Views;
 using System.ComponentModel;
 using System.Windows.Input;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.ViewModels;
 
@@ -90,10 +92,7 @@ public partial class GeolocationViewModel : CommunityToolkit.Mvvm.ComponentModel
             status = await Permissions.RequestAsync<Permissions.LocationWhenInUse>();
             if (status != PermissionStatus.Granted)
             {
-                await Shell.Current.DisplayAlertAsync(
-                    AppResources.gps_deaktiviert,
-                    AppResources.standort_berechtigung_fehlt,
-                    AppResources.ok);
+                await Shell.Current.CurrentPage.ShowPopupAsync(new PopupAlert(AppResources.standort_berechtigung_fehlt, AppResources.gps_deaktiviert), Settings.PopupOptions);
                 return;
             }
         }
@@ -101,21 +100,18 @@ public partial class GeolocationViewModel : CommunityToolkit.Mvvm.ComponentModel
         // System-GPS prüfen
         if (!await GeolocationViewModel.IsSystemGpsEnabledAsync())
         {
-            bool openSettings = await Shell.Current.DisplayAlertAsync(
-                AppResources.gps_deaktiviert,
-                AppResources.gps_system_einschalten_aufforderung,
-                AppResources.einstellungen_oeffnen,
-                AppResources.abbrechen);
+            var popup = new PopupDualResponse(AppResources.gps_system_einschalten_aufforderung, AppResources.gps_deaktiviert, AppResources.einstellungen_oeffnen, AppResources.abbrechen);
+            var result = await Shell.Current.CurrentPage.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
 #if ANDROID
-            if (openSettings)
+            if (result.Result is DualPopupResult.Ok)
             {
                 var intent = new Android.Content.Intent(Android.Provider.Settings.ActionLocationSourceSettings);
                 intent.AddFlags(Android.Content.ActivityFlags.NewTask);
                 Android.App.Application.Context.StartActivity(intent);
             }
 #elif IOS
-            if (openSettings)
+            if (result.Result == DualPopupResult.Ok)
             {
                 var url = new Foundation.NSUrl(UIKit.UIApplication.OpenSettingsUrlString);
                 if (UIKit.UIApplication.SharedApplication.CanOpenUrl(url))
@@ -278,10 +274,7 @@ public partial class GeolocationViewModel : CommunityToolkit.Mvvm.ComponentModel
 
         MainThread.BeginInvokeOnMainThread(async () =>
         {
-            await Shell.Current.DisplayAlertAsync(
-                AppResources.gps_deaktiviert,
-                AppResources.gps_system_einschalten_aufforderung,
-                AppResources.ok);
+            await Shell.Current.CurrentPage.ShowPopupAsync(new PopupAlert(AppResources.gps_system_einschalten_aufforderung, AppResources.gps_deaktiviert), Settings.PopupOptions);
         });
     }
 

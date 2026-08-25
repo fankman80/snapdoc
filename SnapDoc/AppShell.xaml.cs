@@ -180,8 +180,8 @@ public partial class AppShell : Shell
         if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
         {
             var popup = new PopupDualResponse(AppResources.bereits_verbunden_abmelden, AppResources.abmelden);
-            var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-            if (result?.Result == null) return;
+            var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+            if (result?.Result is not DualPopupResult.Ok) return;
 
             // Hier das Polling beim Abmelden stoppen
             SaveManager.StopCloudPolling();
