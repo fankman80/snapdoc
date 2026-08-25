@@ -276,39 +276,47 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void DeletePinData(string pinId)
     {
-        // delete all images
-        foreach (var del_image in GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos)
-        {
-            string file;
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
-            if (File.Exists(file))
-                File.Delete(file);
+        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) ||
+            !plan.Pins.TryGetValue(pinId, out var pinToDelete))
+            return;
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[pinId].Fotos[del_image.Key].File);
-            if (File.Exists(file))
-                File.Delete(file);
+        // Foto-Dateien loeschen (lokal + Cloud)
+        foreach (var foto in pinToDelete.Fotos.Values)
+        {
+            string fileName = foto.File;
+            if (string.IsNullOrEmpty(fileName)) continue;
+
+            string imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+            if (File.Exists(imagePath)) File.Delete(imagePath);
+
+            string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
+            if (File.Exists(thumbPath)) File.Delete(thumbPath);
+
+            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
+            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
         }
 
-        // remove custom pin image
-        if (GlobalJson.Data.Plans[PlanId].Pins[pinId].IsCustomPin)
+        // CustomPin-Grafiken loeschen (lokal + Cloud)
+        if (pinToDelete.IsCustomPin && !string.IsNullOrEmpty(pinToDelete.PinIcon))
         {
-            var filename = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon) + ".png";
-            string path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filename);
+            string baseName = Path.GetFileNameWithoutExtension(pinToDelete.PinIcon);
+            string filenamePng = baseName + ".png";
+            string filenameData = baseName + ".data";
 
-            if (File.Exists(path))
-                File.Delete(path);
+            string pathPng = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filenamePng);
+            if (File.Exists(pathPng)) File.Delete(pathPng);
 
-            filename = Path.GetFileNameWithoutExtension(GlobalJson.Data.Plans[PlanId].Pins[pinId].PinIcon) + ".data";
-            path = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filename);
-            if (File.Exists(path))
-                File.Delete(path);
+            string pathData = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filenameData);
+            if (File.Exists(pathData)) File.Delete(pathData);
+
+            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{filenamePng}");
+            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{filenameData}");
         }
 
-        // remove pin from database
-        var plan = GlobalJson.Data.Plans[PlanId];
+        // Pin aus Datenmodell entfernen
         plan.Pins.Remove(pinId);
 
-        // save data to file
+        // Speicher-Event ausloesen
         SaveManager.NotifyDataChanged();
     }
 

@@ -149,7 +149,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         WeakReferenceMessenger.Default.Register<PinChangedMessage>(this, (r, m) =>
         {
             var pinId = m.Value;
-            MainThread.BeginInvokeOnMainThread(() =>
+            MainThread.BeginInvokeOnMainThread(async () =>
             {
                 var pin = pinList.FirstOrDefault(p => p.Id == pinId);
                 if (pin != null && thisPlan.Pins.TryGetValue(pinId, out var pinData))
@@ -160,11 +160,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                     if (pinData.IsCustomPin)
                     {
-                        resolvedPath = Path.Combine(
-                            Settings.DataDirectory,
-                            GlobalJson.Data.ProjectPath,
-                            GlobalJson.Data.CustomPinsPath,
-                            pinIcon);
+                        resolvedPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
+
+                        // NEU: Pruefen und herunterladen, falls lokal nicht vorhanden
+                        if (!File.Exists(resolvedPath))
+                        {
+                            await SaveManager.DownloadMediaOnDemandAsync(pinIcon, GlobalJson.Data.CustomPinsPath);
+                            string dataFileName = Path.ChangeExtension(pinIcon, ".data");
+                            await SaveManager.DownloadMediaOnDemandAsync(dataFileName, GlobalJson.Data.CustomPinsPath);
+                        }
                     }
                     else if (pinData.IsCustomIcon)
                     {
@@ -817,11 +821,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         bool isOverwrite = false;
         string oldPngPath = null;
         string oldDataPath = null;
+        string oldFileName = null;
 
         if (tappedPin != null && plan.Pins.TryGetValue(tappedPin.Id, out var oldPin))
         {
             isOverwrite = true;
-            var oldFileName = Path.GetFileName(oldPin.PinIcon);
+            oldFileName = Path.GetFileName(oldPin.PinIcon);
             oldPngPath = Path.Combine(customPinPath, oldFileName);
             oldDataPath = Path.Combine(customPinPath, Path.ChangeExtension(oldFileName, ".data"));
         }
@@ -870,13 +875,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             {
                 if (!string.IsNullOrEmpty(oldPngPath) && File.Exists(oldPngPath)) File.Delete(oldPngPath);
                 if (!string.IsNullOrEmpty(oldDataPath) && File.Exists(oldDataPath)) File.Delete(oldDataPath);
+
+                // Cloud Cleanup
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{oldFileName}");
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{Path.ChangeExtension(oldFileName, ".data")}");
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
             }
         }
-
         Cleanup();
     }
 
@@ -1354,28 +1362,26 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         await Shell.Current.GoToAsync("//homescreen");
 
         // Shell-Navigation entfernen
-        var shellContent = shell
-            .FindByName<ShellContent>(planId);
-
+        var shellContent = shell.FindByName<ShellContent>(planId);
         if (shellContent?.Parent is ShellSection section)
             section.Items.Remove(shellContent);
 
         // Masterliste bereinigen
-        var masterItem = shell.AllPlanItems
-            .FirstOrDefault(p => p.PlanId == planId);
-
+        var masterItem = shell.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
         if (masterItem != null)
             shell.AllPlanItems.Remove(masterItem);
 
         if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
-        // JSON + Files löschen
-        plan = thisPlan;
-
+        // JSON + Files loeschen
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
-        // lösche Plan-Tiles aus dem Cache-Ordner
+        // Cloud Cleanup
+        _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.PlanPath}/{plan.File}");
+        _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
+
+        // Plan-Tiles aus dem Cache-Ordner loeschen
         string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
         if (Directory.Exists(cacheDir))
         {
@@ -1396,7 +1402,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         GlobalJson.Data.Plans.Remove(planId);
 
-        // save data to file
+        // Speicher-Event ausloesen
         SaveManager.NotifyDataChanged();
 
         // Anzeige neu aufbauen

@@ -1118,23 +1118,43 @@ public static class SaveManager
     private static async Task DownloadMissingProjectFilesAsync(string driveId, string rootFolderId)
     {
         if (CurrentAuth?.GraphClient == null || GlobalJson.Data == null) return;
-
         string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
         if (string.IsNullOrEmpty(projectDir)) return;
 
-        // Beispiel für Pläne: Durchlaufe alle im JSON eingetragenen Pfade
         if (GlobalJson.Data.Plans != null)
         {
             foreach (var planPair in GlobalJson.Data.Plans)
             {
                 var plan = planPair.Value;
-                if (string.IsNullOrEmpty(plan.File)) continue;
 
-                string localPath = Path.Combine(projectDir, "plans", plan.File);
+                // Plaene pruefen (bestehende Logik)
+                if (!string.IsNullOrEmpty(plan.File))
+                {
+                    string localPath = Path.Combine(projectDir, "plans", plan.File);
+                    if (!File.Exists(localPath))
+                        await DownloadSpecificFileAsync(driveId, rootFolderId, $"plans/{plan.File}", localPath);
+                }
 
-                // Datei existiert lokal nicht? Genau diese Datei gezielt laden!
-                if (!File.Exists(localPath))
-                    await DownloadSpecificFileAsync(driveId, rootFolderId, $"plans/{plan.File}", localPath);
+                // CustomPins innerhalb des Plans pruefen
+                if (plan.Pins != null)
+                {
+                    foreach (var pinPair in plan.Pins)
+                    {
+                        var pin = pinPair.Value;
+                        if (pin.IsCustomPin && !string.IsNullOrEmpty(pin.PinIcon))
+                        {
+                            string localPinPath = Path.Combine(projectDir, GlobalJson.Data.CustomPinsPath, pin.PinIcon);
+                            if (!File.Exists(localPinPath))
+                            {
+                                await DownloadSpecificFileAsync(driveId, rootFolderId, $"{GlobalJson.Data.CustomPinsPath}/{pin.PinIcon}", localPinPath);
+
+                                string dataFile = Path.ChangeExtension(pin.PinIcon, ".data");
+                                string localDataPath = Path.Combine(projectDir, GlobalJson.Data.CustomPinsPath, dataFile);
+                                await DownloadSpecificFileAsync(driveId, rootFolderId, $"{GlobalJson.Data.CustomPinsPath}/{dataFile}", localDataPath);
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -1158,6 +1178,31 @@ public static class SaveManager
         catch (Exception ex)
         {
             Console.WriteLine($"Fehler beim Nachladen der Datei {relativeCloudPath}: {ex.Message}");
+        }
+    }
+
+    public static async Task DeleteCloudFileAsync(string relativeCloudPath)
+    {
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return;
+        if (GlobalJson.Data == null || string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) || string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId)) return;
+
+        try
+        {
+            string cloudPath = relativeCloudPath.Replace("\\", "/");
+            await CurrentAuth.GraphClient.Drives[GlobalJson.Data.CloudDriveId]
+                .Items[GlobalJson.Data.CloudFolderId]
+                .ItemWithPath(cloudPath)
+                .DeleteAsync();
+
+            Console.WriteLine($"Erfolgreich in der Cloud geloescht: {cloudPath}");
+        }
+        catch (Microsoft.Graph.Models.ODataErrors.ODataError)
+        {
+            /* Datei war in der Cloud bereits nicht mehr vorhanden */
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Loeschen der Cloud-Datei {relativeCloudPath}: {ex.Message}");
         }
     }
 

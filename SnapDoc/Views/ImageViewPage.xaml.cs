@@ -32,10 +32,10 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
-    private bool isHatchEffect = false;
-    private float hatchStrokeWitdh = 2f;
-    private float hatchStrokeSpace = 8f;
-    private float hatchRotation = 45f;
+    private readonly bool isHatchEffect = false;
+    private readonly float hatchStrokeWitdh = 2f;
+    private readonly float hatchStrokeSpace = 8f;
+    private readonly float hatchRotation = 45f;
     private int lineWidth = 8;
     private string strokeStyle = "";
     private float cloudRadius = 60;
@@ -365,35 +365,60 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (ImgSource == "showTitle")
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
-            if (File.Exists(file))
-                File.Delete(file);
+            string oldTitleImage = GlobalJson.Data.TitleImage;
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage);
-            if (File.Exists(file))
-                File.Delete(file);
+            if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
+            {
+                string file1 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+                if (File.Exists(file1))
+                    File.Delete(file1);
+
+                string file2 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                if (File.Exists(file2))
+                    File.Delete(file2);
+
+                // Cloud Cleanup
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
+                _ = SaveManager.DeleteCloudFileAsync($"{oldTitleImage}");
+            }
 
             GlobalJson.Data.TitleImage = "banner_thumbnail.png";
         }
         else
         {
-            string file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file))
-                File.Delete(file);
+            if (GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) &&
+                plan.Pins.TryGetValue(PinId, out var pin) &&
+                pin.Fotos.TryGetValue(ImgSource, out var fotoToDelete))
+            {
+                string fileName = fotoToDelete.File;
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file))
-                File.Delete(file);
+                if (!string.IsNullOrEmpty(fileName))
+                {
+                    // Lokales Loeschen
+                    string fileOriginal = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", fileName);
+                    if (File.Exists(fileOriginal))
+                        File.Delete(fileOriginal);
 
-            file = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File);
-            if (File.Exists(file))
-                File.Delete(file);
+                    string fileImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+                    if (File.Exists(fileImage))
+                        File.Delete(fileImage);
 
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Remove(ImgSource);
+                    string fileThumb = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
+                    if (File.Exists(fileThumb))
+                        File.Delete(fileThumb);
+
+                    // Cloud Cleanup
+                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/originals/{fileName}");
+                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
+                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
+                }
+
+                pin.Fotos.Remove(ImgSource);
+            }
         }
 
-        // save data to file
-        SaveManager.NotifyDataChanged();  
+        // Daten lokal speichern und Sync-Trigger ausloesen
+        SaveManager.NotifyDataChanged();
 
         await Shell.Current.GoToAsync($"..");
     }
