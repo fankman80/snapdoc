@@ -84,8 +84,7 @@ public partial class ExportSettings : ContentPage
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Fehler beim Teilen des Berichts: {ex}");
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Teilen des Berichts: {ex}");
             }
             finally
             {
@@ -98,28 +97,15 @@ public partial class ExportSettings : ContentPage
             await Shell.Current.GoToAsync("..");
 
             // Ergebnis anzeigen
-
             if (isShared)
-            {
-                _ = SnackbarExtensions.ShowSafeAsync(
-                    AppResources.bericht_wurde_geteilt,
-                    includeDelay: true);
-            }
+                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
             else
-            {
-                _ = SnackbarExtensions.ShowSafeAsync(
-                    AppResources.bericht_wurde_nicht_geteilt,
-                    includeDelay: true);
-            }
+                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Fehler beim Erstellen des Berichts: {ex}");
-
-            await SnackbarExtensions.ShowSafeAsync(
-                AppResources.bericht_wurde_nicht_geteilt,
-                includeDelay: true);
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen des Berichts: {ex}");
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
         }
         finally
         {
@@ -202,26 +188,14 @@ public partial class ExportSettings : ContentPage
             await Shell.Current.GoToAsync("..");
 
             if (isSaved)
-            {
-                _ = SnackbarExtensions.ShowSafeAsync(
-                    AppResources.bericht_wurde_gespeichert,
-                    includeDelay: true);
-            }
+                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
             else
-            {
-                _ = SnackbarExtensions.ShowSafeAsync(
-                    AppResources.bericht_wurde_nicht_gespeichert,
-                    includeDelay: true);
-            }
+                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Fehler beim Erstellen des Berichts: {ex}");
-
-            await SnackbarExtensions.ShowSafeAsync(
-                AppResources.bericht_wurde_nicht_gespeichert,
-                includeDelay: true);
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen des Berichts: {ex}");
+            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
         }
         finally
         {

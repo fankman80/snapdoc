@@ -268,9 +268,7 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync(
-                $"PDF-Error: {ex.Message}",
-                includeDelay: true);
+            await SnackbarExtensions.ShowSafeAsync($"PDF-Error: {ex.Message}", includeDelay: true);
         }
         finally
         {

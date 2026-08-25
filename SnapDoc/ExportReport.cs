@@ -562,6 +562,10 @@ public partial class ExportReport
             outputFileStream.Close();
             outputFileStream.Dispose();
         }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Report-Export: {ex.Message}");
+        }
         finally
         {
             if (Directory.Exists(Settings.CacheDirectory))
@@ -1236,7 +1240,21 @@ public partial class ExportReport
             Directory.CreateDirectory(Path.Combine(destinationPath, "customicons"));
         }
 
-        File.Copy(sourceFilePath, destinationFilePath, true);
+        if (File.Exists(sourceFilePath))
+            File.Copy(sourceFilePath, destinationFilePath, true);
+        else
+        {
+            string defaultIcon = SettingsService.Instance.DefaultPinIcon;
+            string fallbackSource = Path.Combine(destinationPath, defaultIcon);
+
+            // Nur aus Resources entpacken, wenn es noch nicht im Cache liegt
+            if (!File.Exists(fallbackSource))
+                _ = MauiResourceLoader.CopyAppPackageFileAsync(destinationPath, defaultIcon).Result;
+
+            // Falls das Ziel z.B. "customicons/fehlt.png" war, kopieren wir das Fallback-Icon dorthin
+            if (File.Exists(fallbackSource) && destinationFilePath != fallbackSource)
+                File.Copy(fallbackSource, destinationFilePath, true);
+        }
     }
 
     private static async Task PreProcessAllImagesAsync(JsonDataModel data, CancellationToken ct)

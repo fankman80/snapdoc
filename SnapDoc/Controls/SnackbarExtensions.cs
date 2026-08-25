@@ -1,13 +1,17 @@
-﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Extensions;
-using SnapDoc.Resources.Languages;
-using SnapDoc.Views;
+﻿using SnapDoc.Resources.Languages;
+
+#if WINDOWS
+using Microsoft.Windows.AppNotifications;
+using Microsoft.Windows.AppNotifications.Builder;
+#else
+using CommunityToolkit.Maui.Alerts;
+#endif
 
 namespace SnapDoc.Controls;
 
 public static class SnackbarExtensions
 {
-    public static async Task ShowSafeAsync(string message, string actionButtonText = "", bool includeDelay = false)
+    public static async Task ShowSafeAsync(string message, string title = "", string actionButtonText = "", bool includeDelay = false)
     {
         if (string.IsNullOrEmpty(actionButtonText))
             actionButtonText = AppResources.ok;
@@ -19,30 +23,25 @@ public static class SnackbarExtensions
         {
             try
             {
-                // Plattform-Verzweigung fuer Windows
-                if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+#if WINDOWS
+                // Statischer Aufruf direkt über den Typnamen "AppNotificationManager"
+                if (AppNotificationManager.IsSupported())
                 {
-                    // Veralteten MainPage-Zugriff vermeiden und Fenster sicher abfragen
-                    Page? activePage = Shell.Current?.CurrentPage
-                        ?? Application.Current?.Windows.FirstOrDefault()?.Page;
+                    var xml = new AppNotificationBuilder()
+                        .AddText(title)
+                        .AddText(message)
+                        .BuildNotification();
 
-                    if (activePage != null)
-                    {
-                        await activePage.ShowPopupAsync(
-                            new PopupAlert(message, string.Empty, actionButtonText),
-                            Settings.PopupOptions
-                        );
-                    }
+                    AppNotificationManager.Default.Show(xml);
                 }
-                else
-                {
-                    await Snackbar.Make(
-                        message: message,
-                        actionButtonText: actionButtonText,
-                        duration: TimeSpan.FromSeconds(3),
-                        visualOptions: Settings.SnackBarOptions
-                    ).Show();
-                }
+#else
+                await Snackbar.Make(
+                    message: message,
+                    actionButtonText: actionButtonText,
+                    duration: TimeSpan.FromSeconds(3),
+                    visualOptions: Settings.SnackBarOptions
+                ).Show();
+#endif
             }
             catch (Exception ex)
             {

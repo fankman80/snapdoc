@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
+using SnapDoc.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -192,7 +193,7 @@ public partial class AppShell : Shell
             return;
         }
 
-        var (success, userName, _) = await _authService.LoginAndFetchUserAsync();
+        var (success, userName, userEmail) = await _authService.LoginAndFetchUserAsync();
 
         if (success)
         {
@@ -202,11 +203,11 @@ public partial class AppShell : Shell
             // Hier das Polling nach erfolgreichem Login starten
             SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
 
-            await this.ShowPopupAsync(new PopupAlert($"{AppResources.eingeloggt_als}: {userName}", AppResources.angemeldet), Settings.PopupOptions);
+            await SnackbarExtensions.ShowSafeAsync($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", includeDelay: true);
         }
         else
         {
-            await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}: {userName}", AppResources.fehler), Settings.PopupOptions);
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}:\n{userName}\n{userEmail}", AppResources.fehler), Settings.PopupOptions);
         }
     }
 
@@ -243,8 +244,7 @@ public partial class AppShell : Shell
                                                         parameter == "mapview" ||
                                                         parameter == "fotogallery"))
                 {
-                    var popup = new PopupAlert("Es sind noch keine Pläne vorhanden. Importieren zuerst eine oder mehrere PDF-Seiten in der Projektverwaltung.");
-                    await this.ShowPopupAsync(popup, Settings.PopupOptions);
+                    await this.ShowPopupAsync(new PopupAlert(AppResources.keine_plaene_vorhanden_importieren, AppResources.hinweis), Settings.PopupOptions);
                     return;
                 }
 

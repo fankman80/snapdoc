@@ -198,12 +198,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         // RemoteProjectDto vorhanden?
         if (selectedItem.RemoteProject == null)
         {
-            await this.ShowPopupAsync(
-                new PopupAlert(
-                    AppResources.fehler_beim_herunterladen_des_projekts,
-                    AppResources.fehler),
-                Settings.PopupOptions);
-
+            await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
             return;
         }
 
@@ -301,12 +296,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         if (SaveManager.CurrentAuth == null ||
             !SaveManager.CurrentAuth.IsLoggedIn)
         {
-            await this.ShowPopupAsync(
-                new PopupAlert(
-                    AppResources.bitte_zuerst_anmelden,
-                    AppResources.info),
-                Settings.PopupOptions);
-
+            await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
             return;
         }
 
@@ -322,12 +312,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
             if (remoteProjects.Count == 0)
             {
-                await this.ShowPopupAsync(
-                    new PopupAlert(
-                        AppResources.keine_projekte_in_cloud_gefunden,
-                        AppResources.info),
-                    Settings.PopupOptions);
-
+                await this.ShowPopupAsync(new PopupAlert(AppResources.keine_projekte_in_cloud_gefunden, AppResources.info), Settings.PopupOptions);
                 return;
             }
 
