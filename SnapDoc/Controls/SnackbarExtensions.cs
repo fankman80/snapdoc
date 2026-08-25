@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Maui.Alerts;
-using CommunityToolkit.Maui.Core;
+using CommunityToolkit.Maui.Extensions;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Views;
 
 namespace SnapDoc.Controls;
 
@@ -18,12 +19,30 @@ public static class SnackbarExtensions
         {
             try
             {
-                await Snackbar.Make(
-                    message: message,
-                    actionButtonText: actionButtonText,
-                    duration: TimeSpan.FromSeconds(3),
-                    visualOptions: Settings.SnackBarOptions
-                ).Show();
+                // Plattform-Verzweigung fuer Windows
+                if (DeviceInfo.Current.Platform == DevicePlatform.WinUI)
+                {
+                    // Veralteten MainPage-Zugriff vermeiden und Fenster sicher abfragen
+                    Page? activePage = Shell.Current?.CurrentPage
+                        ?? Application.Current?.Windows.FirstOrDefault()?.Page;
+
+                    if (activePage != null)
+                    {
+                        await activePage.ShowPopupAsync(
+                            new PopupAlert(message, string.Empty, actionButtonText),
+                            Settings.PopupOptions
+                        );
+                    }
+                }
+                else
+                {
+                    await Snackbar.Make(
+                        message: message,
+                        actionButtonText: actionButtonText,
+                        duration: TimeSpan.FromSeconds(3),
+                        visualOptions: Settings.SnackBarOptions
+                    ).Show();
+                }
             }
             catch (Exception ex)
             {

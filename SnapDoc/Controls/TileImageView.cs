@@ -1549,6 +1549,48 @@ public partial class TileImageView : ContentView
                 return SKBitmap.Decode(readStream);
             }
         }
+#elif WINDOWS
+        string fileNameOnly = Path.GetFileName(iconPath);
+        string nameWithoutExt = Path.GetFileNameWithoutExtension(fileNameOnly);
+        string ext = Path.GetExtension(fileNameOnly);
+        string baseDir = AppContext.BaseDirectory;
+
+            string[] searchDirs = [
+                Path.Combine(baseDir, "Assets", "pins"),
+                Path.Combine(baseDir, "Assets"),
+                baseDir
+                ];
+
+            foreach (var dir in searchDirs)
+        {
+            if (!Directory.Exists(dir)) continue;
+
+            // 1. Suche nach exaktem Dateinamen
+            string targetPath = Path.Combine(dir, fileNameOnly);
+
+            // 2. Direkter Scale-100 Check (ohne Directory.GetFiles Scan)
+            if (!File.Exists(targetPath))
+            {
+                targetPath = Path.Combine(dir, $"{nameWithoutExt}.scale-100{ext}");
+            }
+
+            // 3. Fallback: Nur falls scale-100 nicht existiert, das Verzeichnis durchsuchen
+            if (!File.Exists(targetPath))
+            {
+                var matches = Directory.GetFiles(dir, $"{nameWithoutExt}.scale-*{ext}");
+                targetPath = matches.FirstOrDefault();
+            }
+
+            if (!string.IsNullOrEmpty(targetPath) && File.Exists(targetPath))
+            {
+                try
+                {
+                    using var stream = File.OpenRead(targetPath);
+                    return SKBitmap.Decode(stream);
+                }
+                catch { /* Ignorieren */ }
+            }
+        }
 #else
         using var stream = FileSystem.OpenAppPackageFileAsync(iconPath).GetAwaiter().GetResult();
         using var targetStream = File.Create(targetCachePath);

@@ -187,293 +187,297 @@ public partial class ExportReport
                     {
                         // Die Template-Zeile finden (diejenige, die die Platzhalter enthält)
                         List<(int, int, int, string)> columnList = SearchTableColumns(table, placeholders);
-                        if (columnList.Count == 0)  return;// Keine Spalten mit Platzhaltern gefunden
-                        int templateRowIndex = columnList[0].Item1;
-                        TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
 
-                        var pinCounter = 1;
-
-                        // Cache für Platzhalter-Daten erstellen, um wiederholte Berechnungen zu vermeiden
-                        Dictionary<string, ImagePlaceholderData> placeholderDataCache = columnList
-                            .Select(c => c.Item4)
-                            .Distinct()
-                            .ToDictionary(k => k, k => GetPlaceholderData(k));
-
-                        int columnCount = table.Elements<TableRow>().FirstOrDefault()?.Elements<TableCell>().Count() ?? 0;
-                        var templateCells = templateRow.Elements<TableCell>().ToList();
-
-                        foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
+                        // Tabelle nur befüllen wenn Platzhalter gefunden wurden
+                        if (columnList.Count > 0) 
                         {
-                            var currentPlan = GlobalJson.Data.Plans[plan.Key];
-                            if (currentPlan.Pins != null && currentPlan.AllowExport)
+                            int templateRowIndex = columnList[0].Item1;
+                            TableRow templateRow = table.Elements<TableRow>().ElementAt(templateRowIndex);
+
+                            var pinCounter = 1;
+
+                            // Cache für Platzhalter-Daten erstellen, um wiederholte Berechnungen zu vermeiden
+                            Dictionary<string, ImagePlaceholderData> placeholderDataCache = columnList
+                                .Select(c => c.Item4)
+                                .Distinct()
+                                .ToDictionary(k => k, k => GetPlaceholderData(k));
+
+                            int columnCount = table.Elements<TableRow>().FirstOrDefault()?.Elements<TableCell>().Count() ?? 0;
+                            var templateCells = templateRow.Elements<TableCell>().ToList();
+
+                            foreach (KeyValuePair<string, Plan> plan in GlobalJson.Data.Plans)
                             {
-                                foreach (KeyValuePair<string, Pin> pin in currentPlan.Pins)
+                                var currentPlan = GlobalJson.Data.Plans[plan.Key];
+                                if (currentPlan.Pins != null && currentPlan.AllowExport)
                                 {
-                                    var currentPin = currentPlan.Pins[pin.Key];
-                                    if (currentPin.IsAllowExport)
+                                    foreach (KeyValuePair<string, Pin> pin in currentPlan.Pins)
                                     {
-                                        TableRow newRow = new();
-
-                                        // Formatierung der Template-Zeile kopieren
-                                        if (templateRow?.TableRowProperties != null)
-                                            newRow.AppendChild(templateRow.TableRowProperties.CloneNode(true));
-
-                                        for (int column = 0; column < columnCount; column++)
+                                        var currentPin = currentPlan.Pins[pin.Key];
+                                        if (currentPin.IsAllowExport)
                                         {
-                                            var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
-                                            TableCell newTableCell = new();
-                                            Paragraph newParagraph = new();
+                                            TableRow newRow = new();
 
-                                            var templateCell = templateCells.ElementAtOrDefault(column);
-                                            if (templateCell?.TableCellProperties != null)
-                                                newTableCell.AppendChild(templateCell.TableCellProperties.CloneNode(true));
+                                            // Formatierung der Template-Zeile kopieren
+                                            if (templateRow?.TableRowProperties != null)
+                                                newRow.AppendChild(templateRow.TableRowProperties.CloneNode(true));
 
-                                            var templatePPr = templateCell?.Descendants<ParagraphProperties>().FirstOrDefault();
-                                            if (templatePPr != null)
-                                                newParagraph.ParagraphProperties = (ParagraphProperties)templatePPr.CloneNode(true);
-
-                                            if (_columnPlaceholders.Count > 0)
+                                            for (int column = 0; column < columnCount; column++)
                                             {
-                                                foreach ((int, int, int, string) ph in _columnPlaceholders)
+                                                var _columnPlaceholders = columnList.FindAll(item => item.Item2 == column);
+                                                TableCell newTableCell = new();
+                                                Paragraph newParagraph = new();
+
+                                                var templateCell = templateCells.ElementAtOrDefault(column);
+                                                if (templateCell?.TableCellProperties != null)
+                                                    newTableCell.AppendChild(templateCell.TableCellProperties.CloneNode(true));
+
+                                                var templatePPr = templateCell?.Descendants<ParagraphProperties>().FirstOrDefault();
+                                                if (templatePPr != null)
+                                                    newParagraph.ParagraphProperties = (ParagraphProperties)templatePPr.CloneNode(true);
+
+                                                if (_columnPlaceholders.Count > 0)
                                                 {
-                                                    void AddText(string text, bool lineBreak = true)
+                                                    foreach ((int, int, int, string) ph in _columnPlaceholders)
                                                     {
-                                                        if (!string.IsNullOrEmpty(text))
+                                                        void AddText(string text, bool lineBreak = true)
                                                         {
-                                                            newParagraph.Append(new Run(new Text(text)));
-                                                            if (lineBreak)
-                                                                newParagraph.Append(new Run(new Break()));   // Zeilenumbruch nur nach Text
-                                                        }
-                                                    }
-
-                                                    switch (ph.Item4)
-                                                    {
-                                                        case "${pin_nr}":
-                                                            string tag = $"Pos_{pinCounter}";
-                                                            string xpath = $"/positions/pos[@id='{pinCounter}']";
-                                                            newParagraph.Append(CreateBoundSDTRun(tag, xpath, pinCounter.ToString()));
-                                                            newParagraph.Append(new Run(new Break()));
-                                                            break;
-
-                                                        case "${pin_planName}":
-                                                            AddText(currentPlan.Name);
-                                                            break;
-
-                                                        case string s when s.StartsWith("${pin_posIcon"):
-                                                            if (!currentPin.IsCustomPin)
+                                                            if (!string.IsNullOrEmpty(text))
                                                             {
-                                                                var posData = placeholderDataCache[s];
-                                                                SizeF exportSize = posData?.Size ?? new SizeF(14, 14);
-                                                                string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
-                                                                string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
-
-                                                                if (FastFileExists(pinImage, existingFiles))
-                                                                {
-                                                                    var pinImgElement = GetImageElement(mainPart, pinImage, exportSize, new Point(0, 0), 0, "inline", imageRelationshipIds);
-                                                                    if (pinImgElement != null)
-                                                                        newParagraph.Append(new Run(pinImgElement));
-                                                                }
-                                                                newParagraph.Append(new Run(new Break()));
+                                                                newParagraph.Append(new Run(new Text(text)));
+                                                                if (lineBreak)
+                                                                    newParagraph.Append(new Run(new Break()));   // Zeilenumbruch nur nach Text
                                                             }
-                                                            break;
+                                                        }
 
-                                                        case string s when s.StartsWith("${pin_posImage"):
-                                                            if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
-                                                            {
-                                                                var posData = placeholderDataCache[s];
-                                                                SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
-                                                                string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
-                                                                string backgroundImagePath = null;
-                                                                OXML.Drawing.SourceRectangle crop = null;
+                                                        switch (ph.Item4)
+                                                        {
+                                                            case "${pin_nr}":
+                                                                string tag = $"Pos_{pinCounter}";
+                                                                string xpath = $"/positions/pos[@id='{pinCounter}']";
+                                                                newParagraph.Append(CreateBoundSDTRun(tag, xpath, pinCounter.ToString()));
+                                                                newParagraph.Append(new Run(new Break()));
+                                                                break;
 
-                                                                if (currentPin.IsWebMapPin)
+                                                            case "${pin_planName}":
+                                                                AddText(currentPlan.Name);
+                                                                break;
+
+                                                            case string s when s.StartsWith("${pin_posIcon"):
+                                                                if (!currentPin.IsCustomPin)
                                                                 {
-                                                                    // Suche in den Fotos nach dem MAP_IMG
-                                                                    var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
-                                                                    if (mapImage != null)
-                                                                        backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, mapImage.File);
-                                                                }
-                                                                else
-                                                                {
-                                                                    string originalBgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
-                                                                    string cachedBgPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
+                                                                    var posData = placeholderDataCache[s];
+                                                                    SizeF exportSize = posData?.Size ?? new SizeF(14, 14);
+                                                                    string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                    string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
 
-                                                                    if (SettingsService.Instance.MaxPlanExportSize > 0 && FastFileExists(cachedBgPath, existingFiles))
-                                                                        backgroundImagePath = cachedBgPath;
-                                                                    else
-                                                                        backgroundImagePath = originalBgPath;
-
-                                                                    var planSize = currentPlan.ImageSize;
-                                                                    double factorX = (1.0 / planSize.Width * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
-                                                                    double factorY = (1.0 / planSize.Height * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
-
-                                                                    crop = new OXML.Drawing.SourceRectangle
-                                                                    {
-                                                                        Left = (int)((currentPin.Pos.X - factorX) * 100000),
-                                                                        Top = (int)((currentPin.Pos.Y - factorY) * 100000),
-                                                                        Right = (int)((1 - currentPin.Pos.X - factorX) * 100000),
-                                                                        Bottom = (int)((1 - currentPin.Pos.Y - factorY) * 100000),
-                                                                    };
-                                                                }
-
-                                                                // Zeichnen, falls ein gültiges Hintergrundbild gefunden wurde
-                                                                if (!string.IsNullOrEmpty(backgroundImagePath) && FastFileExists(backgroundImagePath, existingFiles))
-                                                                {
-
-                                                                    Size scaledPinSize;
-                                                                    if (currentPin.IsLockAutoScale || currentPin.IsCustomPin)
-                                                                    {
-                                                                        scaledPinSize = new Size
-                                                                        {
-                                                                            Width = currentPin.Size.Width * exportSize.Width / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale,
-                                                                            Height = currentPin.Size.Height * exportSize.Height / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale
-                                                                        };
-                                                                    }
-                                                                    else
-                                                                        scaledPinSize = ScaleToFit(currentPin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
-
-                                                                    PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
-
-                                                                    // Hintergrundbild einfügen
-                                                                    var planImgElement = GetImageElement(mainPart, backgroundImagePath, exportSize, new Point(0, 0), 0, "anchor", imageRelationshipIds, crop, currentPlan.IsGrayscale);
-                                                                    if (planImgElement != null)
-                                                                        newParagraph.Append(new Run(planImgElement));
-
-                                                                    // Pin-Icon oben drauf setzen
                                                                     if (FastFileExists(pinImage, existingFiles))
                                                                     {
-                                                                        var pinImgElement = GetImageElement(mainPart, pinImage, scaledPinSize, posOnPlan, (float)currentPin.PinRotation, "anchor", imageRelationshipIds);
+                                                                        var pinImgElement = GetImageElement(mainPart, pinImage, exportSize, new Point(0, 0), 0, "inline", imageRelationshipIds);
                                                                         if (pinImgElement != null)
                                                                             newParagraph.Append(new Run(pinImgElement));
                                                                     }
                                                                     newParagraph.Append(new Run(new Break()));
                                                                 }
-                                                            }
-                                                            break;
+                                                                break;
 
-                                                        case string s when s.StartsWith("${pin_fotoList"):
-                                                            if (SettingsService.Instance.IsImageExport)
-                                                            {
-                                                                var posData = placeholderDataCache[s];
-                                                                SizeF exportSize = posData?.Size ?? new SizeF(40, 40);
-                                                                var pinFotos = currentPin.Fotos.Values;
-                                                                foreach (var img in pinFotos)
+                                                            case string s when s.StartsWith("${pin_posImage"):
+                                                                if (SettingsService.Instance.IsPosImageExport && !currentPin.IsCustomPin)
                                                                 {
-                                                                    if (!img.AllowExport)
-                                                                        continue;
+                                                                    var posData = placeholderDataCache[s];
+                                                                    SizeF exportSize = posData?.Size ?? new SizeF(25, 25);
+                                                                    string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
+                                                                    string backgroundImagePath = null;
+                                                                    OXML.Drawing.SourceRectangle crop = null;
 
-                                                                    if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
-                                                                        continue;
-
-                                                                    string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
-                                                                    string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
-
-                                                                    if (SettingsService.Instance.MaxFotoExportSize > 0 && FastFileExists(cachedPath, existingFiles))
-                                                                        imgPath = cachedPath;
-                                                                    else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
-                                                                        imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
-
-                                                                    if (FastFileExists(imgPath, existingFiles))
+                                                                    if (currentPin.IsWebMapPin)
                                                                     {
-                                                                        SizeF scaledSize = ScaleToFit(img.ImageSize, exportSize);
-                                                                        var imageElement = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline", imageRelationshipIds);
-                                                                        if (imageElement != null)
+                                                                        // Suche in den Fotos nach dem MAP_IMG
+                                                                        var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+                                                                        if (mapImage != null)
+                                                                            backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, mapImage.File);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        string originalBgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                        string cachedBgPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
+
+                                                                        if (SettingsService.Instance.MaxPlanExportSize > 0 && FastFileExists(cachedBgPath, existingFiles))
+                                                                            backgroundImagePath = cachedBgPath;
+                                                                        else
+                                                                            backgroundImagePath = originalBgPath;
+
+                                                                        var planSize = currentPlan.ImageSize;
+                                                                        double factorX = (1.0 / planSize.Width * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
+                                                                        double factorY = (1.0 / planSize.Height * SettingsService.Instance.PinPosCropExportSize * 10) / 2.0;
+
+                                                                        crop = new OXML.Drawing.SourceRectangle
                                                                         {
-                                                                            Run imgRun = new(imageElement);
-                                                                            imgRun.AppendChild(new Text(" ") { Space = SpaceProcessingModeValues.Preserve });
-                                                                            newParagraph.Append(imgRun);
+                                                                            Left = (int)((currentPin.Pos.X - factorX) * 100000),
+                                                                            Top = (int)((currentPin.Pos.Y - factorY) * 100000),
+                                                                            Right = (int)((1 - currentPin.Pos.X - factorX) * 100000),
+                                                                            Bottom = (int)((1 - currentPin.Pos.Y - factorY) * 100000),
+                                                                        };
+                                                                    }
+
+                                                                    // Zeichnen, falls ein gültiges Hintergrundbild gefunden wurde
+                                                                    if (!string.IsNullOrEmpty(backgroundImagePath) && FastFileExists(backgroundImagePath, existingFiles))
+                                                                    {
+
+                                                                        Size scaledPinSize;
+                                                                        if (currentPin.IsLockAutoScale || currentPin.IsCustomPin)
+                                                                        {
+                                                                            scaledPinSize = new Size
+                                                                            {
+                                                                                Width = currentPin.Size.Width * exportSize.Width / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale,
+                                                                                Height = currentPin.Size.Height * exportSize.Height / (SettingsService.Instance.PinPosCropExportSize * 10) * currentPin.PinScale
+                                                                            };
+                                                                        }
+                                                                        else
+                                                                            scaledPinSize = ScaleToFit(currentPin.Size, new Size(SettingsService.Instance.PinExportSize, SettingsService.Instance.PinExportSize));
+
+                                                                        PointF posOnPlan = PivotRecalc(new Point(0.5, 0.5), (float)currentPin.PinRotation, currentPin.Anchor, scaledPinSize, exportSize);
+
+                                                                        // Hintergrundbild einfügen
+                                                                        var planImgElement = GetImageElement(mainPart, backgroundImagePath, exportSize, new Point(0, 0), 0, "anchor", imageRelationshipIds, crop, currentPlan.IsGrayscale);
+                                                                        if (planImgElement != null)
+                                                                            newParagraph.Append(new Run(planImgElement));
+
+                                                                        // Pin-Icon oben drauf setzen
+                                                                        if (FastFileExists(pinImage, existingFiles))
+                                                                        {
+                                                                            var pinImgElement = GetImageElement(mainPart, pinImage, scaledPinSize, posOnPlan, (float)currentPin.PinRotation, "anchor", imageRelationshipIds);
+                                                                            if (pinImgElement != null)
+                                                                                newParagraph.Append(new Run(pinImgElement));
+                                                                        }
+                                                                        newParagraph.Append(new Run(new Break()));
+                                                                    }
+                                                                }
+                                                                break;
+
+                                                            case string s when s.StartsWith("${pin_fotoList"):
+                                                                if (SettingsService.Instance.IsImageExport)
+                                                                {
+                                                                    var posData = placeholderDataCache[s];
+                                                                    SizeF exportSize = posData?.Size ?? new SizeF(40, 40);
+                                                                    var pinFotos = currentPin.Fotos.Values;
+                                                                    foreach (var img in pinFotos)
+                                                                    {
+                                                                        if (!img.AllowExport)
+                                                                            continue;
+
+                                                                        if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
+                                                                            continue;
+
+                                                                        string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
+                                                                        string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
+
+                                                                        if (SettingsService.Instance.MaxFotoExportSize > 0 && FastFileExists(cachedPath, existingFiles))
+                                                                            imgPath = cachedPath;
+                                                                        else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
+                                                                            imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
+
+                                                                        if (FastFileExists(imgPath, existingFiles))
+                                                                        {
+                                                                            SizeF scaledSize = ScaleToFit(img.ImageSize, exportSize);
+                                                                            var imageElement = GetImageElement(mainPart, imgPath, scaledSize, new Point(0, 0), 0, "inline", imageRelationshipIds);
+                                                                            if (imageElement != null)
+                                                                            {
+                                                                                Run imgRun = new(imageElement);
+                                                                                imgRun.AppendChild(new Text(" ") { Space = SpaceProcessingModeValues.Preserve });
+                                                                                newParagraph.Append(imgRun);
+                                                                            }
                                                                         }
                                                                     }
                                                                 }
-                                                            }
-                                                            break;
+                                                                break;
 
-                                                        case "${pin_name}":
-                                                            AddText(currentPin.PinName);
-                                                            break;
+                                                            case "${pin_name}":
+                                                                AddText(currentPin.PinName);
+                                                                break;
 
-                                                        case "${pin_desc}":
-                                                            AddText(currentPin.PinDesc.Replace("\r\n", "\n").Replace("\r", "\n"));
-                                                            break;
+                                                            case "${pin_desc}":
+                                                                AddText(currentPin.PinDesc.Replace("\r\n", "\n").Replace("\r", "\n"));
+                                                                break;
 
-                                                        case "${pin_location}":
-                                                            AddText(currentPin.PinLocation);
-                                                            break;
+                                                            case "${pin_location}":
+                                                                AddText(currentPin.PinLocation);
+                                                                break;
 
-                                                        case "${pin_priority}":
-                                                            if (currentPin.PinPriority != 0)
-                                                            {
-                                                                string fillColor = SettingsService.Instance.PriorityItems[currentPin.PinPriority].Color;
-                                                                newTableCell.TableCellProperties ??= new TableCellProperties();
-
-                                                                Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
-                                                                if (shading == null)
+                                                            case "${pin_priority}":
+                                                                if (currentPin.PinPriority != 0)
                                                                 {
-                                                                    shading = new Shading();
-                                                                    newTableCell.TableCellProperties.AppendChild(shading);
+                                                                    string fillColor = SettingsService.Instance.PriorityItems[currentPin.PinPriority].Color;
+                                                                    newTableCell.TableCellProperties ??= new TableCellProperties();
+
+                                                                    Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
+                                                                    if (shading == null)
+                                                                    {
+                                                                        shading = new Shading();
+                                                                        newTableCell.TableCellProperties.AppendChild(shading);
+                                                                    }
+
+                                                                    shading.Fill = fillColor.Replace("#", "");
+                                                                    shading.Val = ShadingPatternValues.Clear;
                                                                 }
 
-                                                                shading.Fill = fillColor.Replace("#", "");
-                                                                shading.Val = ShadingPatternValues.Clear;
-                                                            }
+                                                                var priorityIndex = currentPin.PinPriority;
+                                                                var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
+                                                                AddText(prio_item?.Key ?? "");
+                                                                break;
 
-                                                            var priorityIndex = currentPin.PinPriority;
-                                                            var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
-                                                            AddText(prio_item?.Key ?? "");
-                                                            break;
+                                                            case "${pin_geolocWGS84}":
+                                                                if (currentPin.GeoLocation != null)
+                                                                    AddText(currentPin.GeoLocation.WGS84.ToString());
+                                                                break;
 
-                                                        case "${pin_geolocWGS84}":
-                                                            if (currentPin.GeoLocation != null)
-                                                                AddText(currentPin.GeoLocation.WGS84.ToString());
-                                                            break;
+                                                            case "${pin_geolocCH1903}":
+                                                                if (currentPin.GeoLocation != null)
+                                                                    AddText(currentPin.GeoLocation.CH1903.ToString());
+                                                                break;
 
-                                                        case "${pin_geolocCH1903}":
-                                                            if (currentPin.GeoLocation != null)
-                                                                AddText(currentPin.GeoLocation.CH1903.ToString());
-                                                            break;
+                                                            case string s when s.StartsWith("${pin_captureDate"):
+                                                                if (currentPin.DateTime != DateTime.MinValue)
+                                                                {
+                                                                    var match = PinDateTimeRegex().Match(ph.Item4);
+                                                                    string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
 
-                                                        case string s when s.StartsWith("${pin_captureDate"):
-                                                            if (currentPin.DateTime != DateTime.MinValue)
-                                                            {
-                                                                var match = PinDateTimeRegex().Match(ph.Item4);
-                                                                string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
+                                                                    string dateText = format != null
+                                                                        ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
+                                                                        : currentPin.DateTime.ToShortDateString(); // Fallback auf Standard-Datum
 
-                                                                string dateText = format != null
-                                                                    ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
-                                                                    : currentPin.DateTime.ToShortDateString(); // Fallback auf Standard-Datum
+                                                                    AddText(dateText);
+                                                                }
+                                                                break;
 
-                                                                AddText(dateText);
-                                                            }
-                                                            break;
+                                                            case string s when s.StartsWith("${pin_captureTime"):
+                                                                if (currentPin.DateTime != DateTime.MinValue)
+                                                                {
+                                                                    var match = PinDateTimeRegex().Match(ph.Item4);
+                                                                    string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
 
-                                                        case string s when s.StartsWith("${pin_captureTime"):
-                                                            if (currentPin.DateTime != DateTime.MinValue)
-                                                            {
-                                                                var match = PinDateTimeRegex().Match(ph.Item4);
-                                                                string format = (match.Success && match.Groups["format"].Success) ? match.Groups["format"].Value : null;
+                                                                    string timeText = format != null
+                                                                        ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
+                                                                        : currentPin.DateTime.ToShortTimeString(); // Fallback auf Standard-Uhrzeit
 
-                                                                string timeText = format != null
-                                                                    ? currentPin.DateTime.ToString(format, new System.Globalization.CultureInfo("de-CH"))
-                                                                    : currentPin.DateTime.ToShortTimeString(); // Fallback auf Standard-Uhrzeit
-
-                                                                AddText(timeText);
-                                                            }
-                                                            break;
+                                                                    AddText(timeText);
+                                                                }
+                                                                break;
+                                                        }
                                                     }
                                                 }
+                                                newTableCell.Append(newParagraph);
+                                                newRow.Append(newTableCell);
                                             }
-                                            newTableCell.Append(newParagraph);
-                                            newRow.Append(newTableCell);
+                                            table.Append(newRow);
+                                            pinCounter++;
                                         }
-                                        table.Append(newRow);
-                                        pinCounter++;
                                     }
                                 }
                             }
+                            // Die ursprüngliche Template-Zeile jetzt entfernen
+                            if (templateRow != null && templateRow.Parent != null)
+                                templateRow.Remove();
                         }
-                        // Die ursprüngliche Template-Zeile jetzt entfernen
-                        if (templateRow != null && templateRow.Parent != null)
-                            templateRow.Remove();
                     }
 
                     // Add Plan-Indexes & Plan-Images & Title-Image
