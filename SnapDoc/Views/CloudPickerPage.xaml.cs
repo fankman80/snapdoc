@@ -39,6 +39,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     public CloudPickerPage(CloudPickerMode mode = CloudPickerMode.SelectFolder)
     {
         _mode = mode;
+
         InitializeComponent();
     }
 
@@ -98,8 +99,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 .Children
                 .GetAsync(config =>
                 {
+                    // lastModifiedDateTime hinzugefügt
                     config.QueryParameters.Select =
-                        ["id", "name", "folder", "file"];
+                        ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference"];
                 });
 
             CloudItems.Clear();
@@ -119,21 +121,31 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 foreach (var item in children.Value)
                 {
                     bool isFolder = item.Folder != null;
-
-                    bool isJson =
-                        item.File != null &&
-                        item.Name?.EndsWith(
-                            ".json",
-                            StringComparison.OrdinalIgnoreCase) == true;
+                    bool isJson = item.File != null && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true;
 
                     if (isFolder || (IsJsonMode && isJson))
                     {
-                        CloudItems.Add(new CloudItem
+                        var cloudItem = new CloudItem
                         {
                             Id = item.Id ?? string.Empty,
                             Name = item.Name ?? "Unbekannt",
-                            IsFolder = isFolder
-                        });
+                            IsFolder = isFolder,
+                            LastModified = item.LastModifiedDateTime // Datum übernehmen
+                        };
+
+                        // Wenn es eine Json ist, das RemoteProject erstellen
+                        if (isJson)
+                        {
+                            cloudItem.RemoteProject = new RemoteProjectDto
+                            {
+                                DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
+                                FolderId = item.ParentReference?.Id ?? folderId,
+                                FileName = item.Name ?? string.Empty,
+                                LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
+                            };
+                        }
+
+                        CloudItems.Add(cloudItem);
                     }
                 }
             }
@@ -146,8 +158,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
     private async void OnItemSelected(object sender, SelectionChangedEventArgs e)
     {
-        if (e.CurrentSelection.Count == 0 ||
-            e.CurrentSelection[0] is not CloudItem selectedItem)
+        if (e.CurrentSelection.Count == 0 || e.CurrentSelection[0] is not CloudItem selectedItem)
             return;
 
         ((CollectionView)sender).SelectedItem = null;
@@ -180,46 +191,56 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         if (!IsJsonMode)
             return;
 
-        string? activeJsonFile = GlobalJson.Data?.JsonFile;
+        // JSON-Datei?
+        if (!selectedItem.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
+            return;
 
-        if (string.IsNullOrEmpty(activeJsonFile))
+        // RemoteProjectDto vorhanden?
+        if (selectedItem.RemoteProject == null)
         {
-            await this.ShowPopupAsync(new PopupAlert(AppResources.kein_projekt_geladen, AppResources.fehler), Settings.PopupOptions);
+            await this.ShowPopupAsync(
+                new PopupAlert(
+                    AppResources.fehler_beim_herunterladen_des_projekts,
+                    AppResources.fehler),
+                Settings.PopupOptions);
+
             return;
         }
 
-        // Prüfen, ob die ausgewählte JSON-Datei zum aktuellen Projekt gehört
-        if (!selectedItem.Name.Equals(
-                activeJsonFile,
-                StringComparison.OrdinalIgnoreCase))
-        {
-            await this.ShowPopupAsync(new PopupAlert($"'{selectedItem.Name}' " +
-                $"{AppResources.entspricht_nicht_aktuell_geladenem_projekt} " +
-                $"('{activeJsonFile}').", AppResources.fehler), Settings.PopupOptions);
-            return;
-        }
+        var project = selectedItem.RemoteProject;
 
-        // Aktuellen Cloud-Ordner synchronisieren
-        if (_folderHistory.Count == 0)
-            return;
-
-        string currentFolderId = _folderHistory.Peek();
+        // Bestätigung
+        string projectName = Path.GetFileNameWithoutExtension(project.FileName);
+        var popup = new PopupDualResponse(string.Format(AppResources.projekt_wirklich_herunterladen, projectName), AppResources.info);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
 
         try
         {
-            await BusyService.ShowAsync(AppResources.projekt_wird_synchronisiert);
+            await BusyService.ShowAsync(AppResources.projekt_wird_heruntergeladen);
 
-            bool success =
-                await SaveManager.SyncWithExistingFolderAsync(currentFolderId);
+            bool success = await SaveManager.DownloadRemoteProjectAsync(project);
 
             if (success)
+            {
+                await BusyService.HideAsync();
+                await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_erfolgreich_heruntergeladen, AppResources.info), Settings.PopupOptions);
+
+                // Picker verlassen
                 await Navigation.PopAsync();
+            }
             else
-                await this.ShowPopupAsync(new PopupAlert(AppResources.synchronisierung_konnte_nicht_gestartet_werden, AppResources.fehler), Settings.PopupOptions);
+            {
+                await BusyService.HideAsync();
+                await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
+            }
         }
-        finally
+        catch (Exception ex)
         {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Herunterladen des Projekts: {ex}");
+
             await BusyService.HideAsync();
+            await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
         }
     }
 
@@ -273,6 +294,88 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             await Navigation.PopAsync();
         else
             await this.ShowPopupAsync(new PopupAlert(AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.fehler), Settings.PopupOptions);
+    }
+
+    private async void OnSearchProjectsClicked(object sender, EventArgs e)
+    {
+        if (SaveManager.CurrentAuth == null ||
+            !SaveManager.CurrentAuth.IsLoggedIn)
+        {
+            await this.ShowPopupAsync(
+                new PopupAlert(
+                    AppResources.bitte_zuerst_anmelden,
+                    AppResources.info),
+                Settings.PopupOptions);
+
+            return;
+        }
+
+        try
+        {
+            await BusyService.ShowAsync(
+                AppResources.projekte_werden_gesucht);
+
+            var remoteProjects =
+                await SaveManager.SearchRemoteProjectsAsync();
+
+            await BusyService.HideAsync();
+
+            if (remoteProjects.Count == 0)
+            {
+                await this.ShowPopupAsync(
+                    new PopupAlert(
+                        AppResources.keine_projekte_in_cloud_gefunden,
+                        AppResources.info),
+                    Settings.PopupOptions);
+
+                return;
+            }
+
+            var popup = new PopupCloudProjects(remoteProjects);
+            var result = await this.ShowPopupAsync<RemoteProjectDto>(popup, Settings.PopupOptions);
+
+            if (result?.Result == null)
+                return;
+
+            await NavigateToProjectAsync(result.Result);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler bei der Cloud-Suche: {ex}");
+            await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
+        }
+        finally
+        {
+            await BusyService.HideAsync();
+        }
+    }
+
+    private async Task NavigateToProjectAsync(RemoteProjectDto project)
+    {
+        if (SaveManager.CurrentAuth?.GraphClient == null)
+            return;
+
+        try
+        {
+            await BusyService.ShowAsync(AppResources.projektordner_wird_geoeffnet);
+
+            _currentDriveId = project.DriveId;
+            _folderHistory.Clear();
+
+            // Root als Ausgangspunkt merken
+            _folderHistory.Push("root");
+
+            // Projektordner laden
+            await LoadFolderContentAsync(project.FolderId);
+        }
+        catch (Exception ex)
+        {
+            await this.ShowPopupAsync(new PopupAlert($"{AppResources.projektordner_konnte_nicht_geoeffnet_werden}:\n{ex.Message}", AppResources.fehler), Settings.PopupOptions);
+        }
+        finally
+        {
+            await BusyService.HideAsync();
+        }
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;

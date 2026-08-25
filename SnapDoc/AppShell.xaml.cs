@@ -1,7 +1,5 @@
 ﻿#nullable disable
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
@@ -183,15 +181,14 @@ public partial class AppShell : Shell
         {
             var popup = new PopupDualResponse(AppResources.bereits_verbunden_abmelden, AppResources.abmelden);
             var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+            if (result?.Result == null) return;
 
-            if (result != null)
-            {
-                // Hier das Polling beim Abmelden stoppen
-                SaveManager.StopCloudPolling();
+            // Hier das Polling beim Abmelden stoppen
+            SaveManager.StopCloudPolling();
 
-                SaveManager.CurrentAuth = null;
-                SettingsService.Instance.RefreshCloudState();
-            }
+            SaveManager.CurrentAuth = null;
+            SettingsService.Instance.RefreshCloudState();
+
             return;
         }
 

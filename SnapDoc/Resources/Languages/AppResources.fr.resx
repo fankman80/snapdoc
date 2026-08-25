@@ -1101,4 +1101,25 @@
   <data name="angemeldet" xml:space="preserve">
     <value>Connecté</value>
   </data>
+  <data name="suche_nach_projekten" xml:space="preserve">
+    <value>Recherche de projets</value>
+  </data>
+  <data name="projektordner_wird_geoeffnet" xml:space="preserve">
+    <value>Ouverture du dossier du projet en cours...</value>
+  </data>
+  <data name="projektordner_konnte_nicht_geoeffnet_werden" xml:space="preserve">
+    <value>Le dossier du projet n'a pas pu être ouvert</value>
+  </data>
+  <data name="projekt_wirklich_herunterladen" xml:space="preserve">
+    <value>Voulez-vous vraiment télécharger le projet "{0}" ?</value>
+  </data>
+  <data name="von_sharepoint_oder_onedrive_herunterladen" xml:space="preserve">
+    <value>Télécharger depuis SharePoint ou OneDrive</value>
+  </data>
+  <data name="auf_sharepoint_oder_onedrive_hochladen" xml:space="preserve">
+    <value>Téléverser sur SharePoint ou OneDrive</value>
+  </data>
+  <data name="als_zip_exportieren" xml:space="preserve">
+    <value>Exporter au format ZIP</value>
+  </data>
 </root>

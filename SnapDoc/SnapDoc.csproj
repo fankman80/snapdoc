@@ -6,7 +6,7 @@
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.5.0</ApplicationDisplayVersion>
 		<Version>2.5.0</Version>
-		<ApplicationVersion>84</ApplicationVersion>
+		<ApplicationVersion>85</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>

@@ -114,7 +114,7 @@ public partial class OpenProject : ContentPage
                         {
                             hasValidCloudLink = true;
 
-                            // 3. Ergaenze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
+                            // Ergaenze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
                             projectData.CloudDriveId = matchingByName.DriveId;
                             projectData.CloudFolderId = matchingByName.FolderId;
 
@@ -126,75 +126,6 @@ public partial class OpenProject : ContentPage
                     item.HasCloudSync = hasValidCloudLink;
                 }
             });
-        }
-    }
-
-    private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
-    {
-        if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
-        {
-            await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
-            return;
-        }
-
-        try
-        {
-            // Ladeanzeige aktivieren
-            await BusyService.ShowAsync(AppResources.projekte_werden_gesucht);
-
-            // Projekte aus der Cloud suchen
-            var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
-
-            await BusyService.HideAsync();
-
-            // Prüfen, ob Projekte vorhanden sind
-            if (remoteProjects.Count == 0)
-            {
-                await this.ShowPopupAsync(new PopupAlert(AppResources.keine_projekte_in_cloud_gefunden, AppResources.info), Settings.PopupOptions);
-                return;
-            }
-
-            // Projekt auswählen lassen
-            var popup = new PopupCloudProjects(remoteProjects);
-
-            var result =
-                await this.ShowPopupAsync<RemoteProjectDto>(
-                    popup,
-                    Settings.PopupOptions);
-
-            if (result?.Result == null)
-                return;
-
-            // Gewähltes Projekt herunterladen
-            var selectedProject = result.Result;
-
-            // Ladeanzeige aktivieren
-            await BusyService.ShowAsync(AppResources.projekt_wird_heruntergeladen);
-
-            bool success = await SaveManager.DownloadRemoteProjectAsync(selectedProject);
-
-            // Ergebnis verarbeiten
-            if (success)
-            {
-                LoadJsonFiles();
-
-                await BusyService.HideAsync();
-                await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_erfolgreich_heruntergeladen), Settings.PopupOptions);
-            }
-            else
-            {
-                await BusyService.HideAsync();
-                await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim Cloud-Download: {ex}");
-            await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
-        }
-        finally
-        {
-            await BusyService.HideAsync();
         }
     }
 
@@ -437,6 +368,11 @@ public partial class OpenProject : ContentPage
             await BusyService.HideAsync();
             _isProcessing = false;
         }
+    }
+
+    private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
+    {
+        await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectJsonFile));
     }
 
     private async void OnEditClicked(object sender, EventArgs e)

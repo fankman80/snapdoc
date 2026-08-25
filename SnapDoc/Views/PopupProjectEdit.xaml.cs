@@ -1,7 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Views;
 using SnapDoc.Resources.Languages;
-using SnapDoc.Services;
 
 namespace SnapDoc.Views;
 

@@ -13,7 +13,7 @@
             <Label x:Name="titleHeader"
                    FontAttributes="Bold"
                    HorizontalOptions="Start"/>
-            <Line x:Name="headerLine" Stroke="SlateGray" X2="500" />
+            <Line x:Name="headerLine" Stroke="{AppThemeBinding Light=LightSlateGray, Dark=LightGray}" X2="500" />
             <Label x:Name="titleText"
                    HorizontalOptions="Start"/>
             <Grid ColumnDefinitions="*, Auto" Margin="0,8,0,0">

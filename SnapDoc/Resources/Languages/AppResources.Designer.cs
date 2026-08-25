@@ -133,6 +133,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Als Zip exportieren ähnelt.
+        /// </summary>
+        internal static string als_zip_exportieren {
+            get {
+                return ResourceManager.GetString("als_zip_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die An Ort duplizieren ähnelt.
         /// </summary>
         internal static string an_ort_duplizieren {
@@ -228,6 +237,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string auf_pin_zentrieren {
             get {
                 return ResourceManager.GetString("auf_pin_zentrieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf SharePoint oder OneDrive hochladen ähnelt.
+        /// </summary>
+        internal static string auf_sharepoint_oder_onedrive_hochladen {
+            get {
+                return ResourceManager.GetString("auf_sharepoint_oder_onedrive_hochladen", resourceCulture);
             }
         }
         
@@ -2302,6 +2320,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt „{0}“ wirklich herunterladen? ähnelt.
+        /// </summary>
+        internal static string projekt_wirklich_herunterladen {
+            get {
+                return ResourceManager.GetString("projekt_wirklich_herunterladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projektdatei importieren ähnelt.
         /// </summary>
         internal static string projektdatei_importieren {
@@ -2370,6 +2397,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string projektnummer {
             get {
                 return ResourceManager.GetString("projektnummer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektordner konnte nicht geöffnet werden ähnelt.
+        /// </summary>
+        internal static string projektordner_konnte_nicht_geoeffnet_werden {
+            get {
+                return ResourceManager.GetString("projektordner_konnte_nicht_geoeffnet_werden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektordner wird geöffnet... ähnelt.
+        /// </summary>
+        internal static string projektordner_wird_geoeffnet {
+            get {
+                return ResourceManager.GetString("projektordner_wird_geoeffnet", resourceCulture);
             }
         }
         
@@ -2599,6 +2644,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Suche nach Projekten ähnelt.
+        /// </summary>
+        internal static string suche_nach_projekten {
+            get {
+                return ResourceManager.GetString("suche_nach_projekten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Suche Standort... ähnelt.
         /// </summary>
         internal static string suche_standort {
@@ -2784,6 +2838,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string verzeichnis_wird_geladen {
             get {
                 return ResourceManager.GetString("verzeichnis_wird_geladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Von SharePoint oder OneDrive herunterladen ähnelt.
+        /// </summary>
+        internal static string von_sharepoint_oder_onedrive_herunterladen {
+            get {
+                return ResourceManager.GetString("von_sharepoint_oder_onedrive_herunterladen", resourceCulture);
             }
         }
         

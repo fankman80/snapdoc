@@ -34,26 +34,41 @@
         </Grid.RowDefinitions>
 
         <!-- Dynamic Header Card -->
-        <Border Grid.Row="0"
-                Padding="12,10"
-                StrokeShape="RoundRectangle 8"
-                Stroke="Transparent"
-                BackgroundColor="{AppThemeBinding Light=#10000000, Dark=#15FFFFFF}">
-            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                <Label Grid.Column="0"
-                       FontFamily="MaterialOutlined"
-                       Text="{x:Static local:MaterialIcons.Info}"
-                       FontSize="24"
-                       TextColor="{DynamicResource Primary}"
-                       VerticalOptions="Center" />
-                <Label Grid.Column="1"
-                       x:DataType="views:CloudPickerPage"
-                       Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
-                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                       VerticalOptions="Center"
-                       LineBreakMode="WordWrap"/>
-            </Grid>
-        </Border>
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+            <Border Grid.Column="0"
+                    Padding="12,10"
+                    StrokeShape="RoundRectangle 8"
+                    Stroke="Transparent"
+                    BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label Grid.Column="0"
+                           FontFamily="MaterialOutlined"
+                           Text="{x:Static local:MaterialIcons.Info}"
+                           FontSize="24"
+                           TextColor="{DynamicResource Primary}"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="1"
+                           x:DataType="views:CloudPickerPage"
+                           Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
+                           TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                           VerticalOptions="Center"
+                           LineBreakMode="WordWrap"/>
+                </Grid>
+            </Border>
+
+            <Button Grid.Column="1"
+                    IsVisible="{Binding IsJsonMode, Source={x:Reference Name=ThisPage}}"
+                    Text="{x:Static local:MaterialIcons.Document_search}"
+                    FontSize="34"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.suche_nach_projekten}"
+                    Clicked="OnSearchProjectsClicked"/>
+        </Grid>
 
         <!-- Modern List View -->
         <CollectionView Grid.Row="1"
@@ -66,30 +81,34 @@
                     <Border StrokeShape="RoundRectangle 8"
                             Stroke="Transparent"
                             BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}"
-                            Padding="12,10"
-                            Margin="0,0,0,6">
+                            Padding="12,8">
                         <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
                             <!-- Dynamic Icon -->
                             <Label Grid.Column="0"
                                    Text="{Binding Icon}"
                                    FontFamily="MaterialOutlined"
-                                   FontSize="24"
+                                   FontSize="28"
                                    TextColor="{DynamicResource Primary}"
                                    VerticalOptions="Center"/>
-
                             <!-- Name -->
-                            <Label Grid.Column="1"
-                                   Text="{Binding Name}"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                   VerticalOptions="Center"
-                                   LineBreakMode="TailTruncation" />
+                            <VerticalStackLayout Grid.Column="1"
+                                                 Spacing="2"
+                                                 VerticalOptions="Center">
+                                <Label Text="{Binding Name}"
+                                       TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                       LineBreakMode="TailTruncation" />
+                                <Label Text="{Binding LastModifiedText}"
+                                       IsVisible="{Binding IsFolder, Converter={StaticResource InvertedBoolConverter}}"
+                                       TextColor="{AppThemeBinding Light=LightSlateGray, Dark=LightGray}"
+                                       FontSize="12" />
+                            </VerticalStackLayout>
 
                             <!-- Chevron indicator for Folders -->
                             <Label Grid.Column="2"
                                    FontFamily="MaterialOutlined"
                                    Text="{x:Static local:MaterialIcons.Chevron_right}"
                                    FontSize="22"
-                                   TextColor="Gray"
+                                   TextColor="LightSlateGray"
                                    VerticalOptions="Center"
                                    IsVisible="{Binding ShowChevron}" />
                         </Grid>
@@ -104,6 +123,7 @@
               IsVisible="{Binding IsFolderMode, Source={x:Reference Name=ThisPage}}"
               ColumnDefinitions="*, Auto" 
               ColumnSpacing="10">
+
             <Button Grid.Column="1" 
                     Text="Projekt hier speichern" 
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
