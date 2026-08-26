@@ -289,7 +289,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
+            await BusyService.ShowAsync(AppResources.projekt_wird_hochgeladen);
 
             success =
                 await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
