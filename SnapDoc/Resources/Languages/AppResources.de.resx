@@ -1134,4 +1134,7 @@
   <data name="keine_projekte_gefunden" xml:space="preserve">
     <value>Keine Projekte gefunden.</value>
   </data>
+  <data name="in_cloud_hochladen" xml:space="preserve">
+    <value>Auf SharePoint hochladen</value>
+  </data>
 </root>

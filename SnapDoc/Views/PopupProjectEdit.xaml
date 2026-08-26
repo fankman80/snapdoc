@@ -39,9 +39,9 @@
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Folder_open}}"
                     Clicked="OnOpenFolderClicked"/>
 
-            <Button Padding="0"
-                    IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn, x:DataType=services:SettingsService}"
-                    Text="Auf SharePoint hochladen"
+            <Button x:Name="UploadButton"
+                    Padding="0"
+                    Text="{x:Static res:AppResources.in_cloud_hochladen}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Cloud_upload}}"

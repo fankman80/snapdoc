@@ -1267,6 +1267,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf SharePoint hochladen ähnelt.
+        /// </summary>
+        internal static string in_cloud_hochladen {
+            get {
+                return ResourceManager.GetString("in_cloud_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die inaktive Fotos ausblenden ähnelt.
         /// </summary>
         internal static string inaktive_fotos_ausblenden {

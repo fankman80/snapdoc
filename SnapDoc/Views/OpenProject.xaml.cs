@@ -386,7 +386,7 @@ public partial class OpenProject : ContentPage
             var button = sender as Button;
             if (button?.BindingContext is not FileItem item) return;
 
-            var _popup = new PopupProjectEdit(entry: item.FileName);
+            var _popup = new PopupProjectEdit(entry: item.FileName, isActive: item.IsActive);
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
             if (_result == null || string.IsNullOrEmpty(_result.Result)) return;
 

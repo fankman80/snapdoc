@@ -1,25 +1,29 @@
 #nullable disable
 using CommunityToolkit.Maui.Views;
 using SnapDoc.Resources.Languages;
+using SnapDoc.Services;
 
 namespace SnapDoc.Views;
 
 public partial class PopupProjectEdit : Popup<string>
 {
     private readonly string _entry;
-    public PopupProjectEdit(string entry, string okText = null, string cancelText = null)
+
+    public PopupProjectEdit(string entry, bool isActive = false, string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         text_entry.Text = entry;
 
-        _entry = entry; 
+        _entry = entry;
+
+        UploadButton.IsVisible = SettingsService.Instance.IsCloudLoggedIn && isActive;
     }
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(_entry!=text_entry.Text?text_entry.Text:null); }
+        try { await CloseAsync(_entry != text_entry.Text ? text_entry.Text : null); }
         catch (InvalidOperationException) { }
     }
 
