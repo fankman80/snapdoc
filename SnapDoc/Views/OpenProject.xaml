@@ -91,23 +91,17 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnProjectClicked" />
                         </Grid.GestureRecognizers>
-                        <HorizontalStackLayout Grid.Column="1" Grid.Row="0" Spacing="4">
-                            <Label IsVisible="{Binding HasCloudSync}"
-                                   HorizontalTextAlignment="Center"
-                                   VerticalTextAlignment="Center"                               
-                                   Padding="0"
-                                   Text="{x:Static local:MaterialIcons.Cloud}"
-                                   FontSize="22"                                 
-                                   FontFamily="MaterialOutlined"
-                                   BackgroundColor="Transparent"
-                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>
-                            <Label VerticalTextAlignment="Center"
-                                   MaxLines="1"
-                                   LineBreakMode="TailTruncation"
-                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                   Text="{Binding FileName}"/>
-                        </HorizontalStackLayout>
+                        <BoxView Grid.ColumnSpan="3" Grid.RowSpan="2"
+                                 Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                 Opacity="0.15"
+                                 IsVisible="{Binding IsActive}" />
+                        <Label Grid.Column="1" Grid.Row="0"
+                               VerticalTextAlignment="Center"
+                               MaxLines="1"
+                               LineBreakMode="TailTruncation"
+                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                               FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                               Text="{Binding FileName}"/>
                         <Label Grid.Column="1" Grid.Row="1"
                                FontSize="12"
                                VerticalTextAlignment="Center"
@@ -117,16 +111,17 @@
                         <Image Grid.Column="0" Grid.RowSpan="2"
                                Source="{Binding ImagePath}"
                                Aspect="AspectFill"/>
-                        <Label Grid.Column="0" Grid.RowSpan="2" 
-                               IsVisible="{Binding IsActive}"
-                               HorizontalTextAlignment="Center"
-                               VerticalTextAlignment="Center"
-                               BackgroundColor="#80ffffff"
-                               Text="{x:Static local:MaterialIcons.Check_circle}"
+                        <Label Grid.Column="0" Grid.RowSpan="2"
+                               IsVisible="{Binding HasCloudSync}"
+                               HorizontalOptions="Start"
+                               VerticalOptions="Start"
+                               Text="{x:Static local:MaterialIcons.Cloud}"
+                               FontSize="22"
                                FontFamily="MaterialOutlined"
-                               FontSize="40"/>
+                               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+                               TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>                        
                         <Button Grid.Column="2" Grid.RowSpan="2"
-                                Padding="0"
+                                Padding="0,0,16,0"
                                 Text="{x:Static local:MaterialIcons.Edit_square}"
                                 FontSize="30"
                                 FontFamily="MaterialOutlined"
