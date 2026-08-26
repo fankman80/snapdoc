@@ -2374,6 +2374,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projektdatei importieren ähnelt.
+        /// </summary>
+        internal static string projektdatei_importieren {
+            get {
+                return ResourceManager.GetString("projektdatei_importieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projektdaten ähnelt.
         /// </summary>
         internal static string projektdaten {

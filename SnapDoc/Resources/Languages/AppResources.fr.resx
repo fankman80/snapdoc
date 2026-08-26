@@ -1137,4 +1137,7 @@
   <data name="in_cloud_hochladen" xml:space="preserve">
     <value>Téléverser sur SharePoint</value>
   </data>
+  <data name="projektdatei_importieren" xml:space="preserve">
+    <value>Importer le fichier projet</value>
+  </data>
 </root>

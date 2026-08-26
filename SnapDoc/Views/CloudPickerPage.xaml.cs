@@ -8,12 +8,6 @@ using System.Runtime.CompilerServices;
 
 namespace SnapDoc.Views;
 
-public enum CloudPickerMode
-{
-    SelectFolder,
-    SelectJsonFile
-}
-
 [QueryProperty(nameof(ModeParam), "mode")]
 public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 {

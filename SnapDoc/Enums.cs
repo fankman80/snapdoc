@@ -30,4 +30,10 @@ namespace SnapDoc
         Cancel,
         Ok
     }
+
+    public enum CloudPickerMode
+    {
+        SelectFolder,
+        SelectJsonFile
+    }
 }
