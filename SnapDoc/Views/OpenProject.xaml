@@ -78,11 +78,14 @@
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:FileItem">
-                    <Grid Style="{StaticResource NoSelectionGridStyle}" ColumnSpacing="8" RowSpacing="4">
+                    <Grid Style="{StaticResource NoSelectionGridStyle}"
+                                ColumnSpacing="8"
+                                RowSpacing="4"
+                                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="66" />
                             <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="35" />
+                            <ColumnDefinition Width="48" />
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="25" />
@@ -121,7 +124,9 @@
                                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>                        
                         <Button Grid.Column="2" Grid.RowSpan="2"
-                                Padding="0,0,16,0"
+                                Padding="0"
+                                HorizontalOptions="Center"
+                                VerticalOptions="Center"
                                 Text="{x:Static local:MaterialIcons.Edit_square}"
                                 FontSize="30"
                                 FontFamily="MaterialOutlined"
