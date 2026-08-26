@@ -30,7 +30,7 @@ public partial class OpenProject : ContentPage
     {
         string rootDirectory = Settings.DataDirectory;
 
-        // 1. SCHRITT: Lokale Dateien UND vorhandene Bilder direkt beim Einlesen auflösen
+        // Lokale Dateien UND vorhandene Bilder direkt beim Einlesen auflösen
         var foundFiles = await Task.Run(() =>
         {
             List<FileItem> items = [];
@@ -89,11 +89,10 @@ public partial class OpenProject : ContentPage
             return items.OrderByDescending(f => f.FileDate).ToList();
         });
 
-        // Vorhandene lokale Bilder sind JETZT SOFORT sichtbar
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
 
-        // 2. SCHRITT: Cloud-Abgleiche und Bedarfs-Downloads
+        // Cloud-Abgleiche und Bedarfs-Downloads
         _ = Task.Run(async () =>
         {
             bool isLoggedIn = SaveManager.CurrentAuth?.IsLoggedIn == true;
@@ -135,7 +134,7 @@ public partial class OpenProject : ContentPage
                             );
                         }
 
-                        // B. Vorschaubild aus dem Hauptordner herunterladen
+                        // Vorschaubild aus dem Hauptordner herunterladen
                         if (!File.Exists(fullThumbPath))
                         {
                             bool downloaded = await SaveManager.DownloadMediaOnDemandAsync(
