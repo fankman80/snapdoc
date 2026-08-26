@@ -8,6 +8,16 @@ public static class BusyService
 
     public static bool IsShowing => _overlay != null;
 
+    public static async Task UpdateProgressAsync(int current, int total, string? currentFileName = null)
+    {
+        var overlay = _overlay;
+        if (overlay == null) return;
+
+        await MainThread.InvokeOnMainThreadAsync(() =>
+        {
+            overlay.UpdateProgress(current, total, currentFileName);
+        });
+    }
 
     public static async Task ShowAsync(string? message = null)
     {

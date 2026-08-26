@@ -673,6 +673,8 @@ public static class SaveManager
             Console.WriteLine($"Gefundene Dateien: {files.Count}");
 
             using var semaphore = new SemaphoreSlim(SettingsService.Instance.ParallelDownloads);
+            int completedFiles = 0;
+            int totalFiles = files.Count;
 
             var downloadTasks = files.Select(async file =>
             {
@@ -695,6 +697,9 @@ public static class SaveManager
                         remoteProject.DriveId,
                         file.Id,
                         localFilePath);
+
+                    int done = Interlocked.Increment(ref completedFiles);
+                    await BusyService.UpdateProgressAsync(done, totalFiles, Path.GetFileName(relativePath));
 
                     Console.WriteLine($"Download fertig: {relativePath}");
                 }
@@ -841,15 +846,17 @@ public static class SaveManager
         if (CurrentAuth?.GraphClient == null || !Directory.Exists(localDirPath))
             return;
 
-        // Alle Dateien des Projekts zuerst sammeln
+        // Alle Dateien des Projekts sammeln
         var files = new List<(string FilePath, string RelativePath)>();
+        CollectLocalFiles(localDirPath, localDirPath, files);
 
-        CollectLocalFiles(
-            localDirPath,
-            localDirPath,
-            files);
+        int totalFiles = files.Count;
+        int completedFiles = 0;
 
-        Console.WriteLine($"Gefundene Dateien zum Upload: {files.Count}");
+        if (totalFiles == 0) return;
+
+        // Initialen Fortschritt auf 0 setzen
+        await BusyService.UpdateProgressAsync(0, totalFiles);
 
         using var semaphore = new SemaphoreSlim(SettingsService.Instance.ParallelUploads);
 
@@ -860,8 +867,6 @@ public static class SaveManager
             try
             {
                 string relativePath = file.RelativePath;
-
-                // Cloud-Pfad mit / erzwingen
                 string cloudPath = relativePath.Replace(Path.DirectorySeparatorChar, '/');
 
                 await UploadFileAsync(
@@ -870,7 +875,9 @@ public static class SaveManager
                     file.FilePath,
                     cloudPath);
 
-                Console.WriteLine($"Upload fertig: {relativePath}");
+                // Zähler erhöhen und UI informieren
+                int done = Interlocked.Increment(ref completedFiles);
+                await BusyService.UpdateProgressAsync(done, totalFiles, Path.GetFileName(relativePath));
             }
             catch (Exception ex)
             {

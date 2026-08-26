@@ -43,6 +43,30 @@
                     HorizontalOptions="Center"
                     LineBreakMode="WordWrap"/>
 
+                <ProgressBar
+                    x:Name="ProgressBar"
+                    Progress="0"
+                    ProgressColor="#00A4EF"
+                    WidthRequest="220"
+                    IsVisible="False"
+                    HorizontalOptions="Center" />
+
+                <Label
+                    x:Name="ProgressDetailsLabel"
+                    TextColor="LightGray"
+                    FontSize="14"
+                    IsVisible="False"
+                    HorizontalTextAlignment="Center"
+                    HorizontalOptions="Center" />
+
+                <Label
+                    x:Name="CurrentFileLabel"
+                    TextColor="LightGray"
+                    FontSize="14"
+                    IsVisible="False"
+                    HorizontalTextAlignment="Center"
+                    HorizontalOptions="Center" />
+
             </VerticalStackLayout>
         </Border>
     </Grid>

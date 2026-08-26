@@ -72,7 +72,7 @@
         
         <CollectionView x:Name="FileListView" Grid.Row="0"
                         SelectionMode="None"
-                        ItemsUpdatingScrollMode="KeepItemsInView">
+                        ItemsUpdatingScrollMode="KeepScrollOffset">
             <CollectionView.ItemsLayout>
                 <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
             </CollectionView.ItemsLayout>
@@ -91,7 +91,7 @@
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnProjectClicked" />
                         </Grid.GestureRecognizers>
-                        <BoxView Grid.ColumnSpan="3" Grid.RowSpan="2"
+                        <BoxView Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="2"
                                  Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                  Opacity="0.15"
                                  IsVisible="{Binding IsActive}" />
@@ -116,7 +116,7 @@
                                HorizontalOptions="Start"
                                VerticalOptions="Start"
                                Text="{x:Static local:MaterialIcons.Cloud}"
-                               FontSize="22"
+                               FontSize="24"
                                FontFamily="MaterialOutlined"
                                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"/>                        
