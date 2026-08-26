@@ -372,7 +372,8 @@ public partial class OpenProject : ContentPage
 
     private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
     {
-        await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectJsonFile));
+
+        await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectJsonFile");
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
@@ -504,8 +505,7 @@ public partial class OpenProject : ContentPage
                     break;
 
                 case "Upload":
-                    if (SaveManager.CurrentAuth == null ||
-                        !SaveManager.CurrentAuth.IsLoggedIn)
+                    if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
                     {
                         await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
                         return;
@@ -532,9 +532,7 @@ public partial class OpenProject : ContentPage
                         Helper.HeaderUpdate();
                     }
 
-                    await BusyService.HideAsync();
-                    await Navigation.PushAsync(new CloudPickerPage(CloudPickerMode.SelectFolder));
-
+                    await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
                     break;
 
                 case null:

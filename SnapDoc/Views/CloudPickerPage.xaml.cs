@@ -14,33 +14,51 @@ public enum CloudPickerMode
     SelectJsonFile
 }
 
+[QueryProperty(nameof(ModeParam), "mode")]
 public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 {
     private string _currentDriveId = string.Empty;
-    private readonly Stack<string> _folderHistory = new();
-    private readonly CloudPickerMode _mode;
+    private CloudPickerMode _mode = CloudPickerMode.SelectFolder;
     private bool _isInitialized;
 
+    public string ModeParam
+    {
+        set
+        {
+            if (Enum.TryParse<CloudPickerMode>(value, out var parsedMode))
+            {
+                _mode = parsedMode;
+                Title = IsFolderMode ? AppResources.projekt_upload : AppResources.projekt_download;
+
+                OnPropertyChanged(nameof(Title));
+                OnPropertyChanged(nameof(Mode));
+                OnPropertyChanged(nameof(IsFolderMode));
+                OnPropertyChanged(nameof(IsJsonMode));
+                OnPropertyChanged(nameof(HeaderSubtitle));
+            }
+        }
+    }
+
+    public bool IsListEmpty => CloudItems == null || CloudItems.Count == 0;
     public CloudPickerMode Mode => _mode;
     public bool IsFolderMode => _mode == CloudPickerMode.SelectFolder;
     public bool IsJsonMode => _mode == CloudPickerMode.SelectJsonFile;
-
-    public string HeaderTitle => IsFolderMode 
-        ? AppResources.cloud_verzeichnis_waehlen 
-        : AppResources.projektdatei_importieren;
-
+    public ObservableCollection<BreadcrumbItem> Breadcrumbs { get; set; } = [];
     public string HeaderSubtitle => IsFolderMode
-        ? "Wähle den Ordner aus, in dem das neue Projekt gespeichert werden soll."
-        : "Wähle die .json-Projektdatei aus, die synchronisiert werden soll.";
+        ? AppResources.ordner_auswaehlen_projekt_speichern
+        : AppResources.projektdatei_auswaehlen_zum_synchronisieren;
 
     public ObservableCollection<CloudItem> CloudItems { get; set; } = [];
-    public bool CanGoBack => _folderHistory.Count > 1;
 
-    public CloudPickerPage(CloudPickerMode mode = CloudPickerMode.SelectFolder)
+    public CloudPickerPage()
     {
-        _mode = mode;
-
         InitializeComponent();
+
+        Title = IsFolderMode
+                    ? AppResources.projekt_upload
+                    : AppResources.projekt_download;
+
+        BindingContext = this;
     }
 
     protected override async void OnAppearing()
@@ -52,6 +70,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         _isInitialized = true;
 
+        Title = IsFolderMode
+            ? AppResources.projekt_upload
+            : AppResources.projekt_download;
+
         await LoadRootFolderAsync();
     }
 
@@ -59,17 +81,19 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         if (SaveManager.CurrentAuth?.GraphClient == null)
             return;
-
         try
         {
-            var myDrive =
-                await SaveManager.CurrentAuth.GraphClient.Me.Drive.GetAsync();
-
-            if (myDrive != null &&
-                !string.IsNullOrEmpty(myDrive.Id))
+            var myDrive = await SaveManager.CurrentAuth.GraphClient.Me.Drive.GetAsync();
+            if (myDrive != null && !string.IsNullOrEmpty(myDrive.Id))
             {
                 _currentDriveId = myDrive.Id;
-                _folderHistory.Clear();
+
+                string rootName = !string.IsNullOrWhiteSpace(myDrive.Name)
+                    ? myDrive.Name
+                    : "Cloud";
+
+                Breadcrumbs.Clear();
+                Breadcrumbs.Add(new BreadcrumbItem { Id = "root", Name = rootName, IsLast = true });
 
                 await LoadFolderContentAsync("root");
             }
@@ -87,12 +111,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         try
         {
-            if (_folderHistory.Count == 0 || _folderHistory.Peek() != folderId)
-            {
-                _folderHistory.Push(folderId);
-                OnPropertyChanged(nameof(CanGoBack));
-            }
-
             var children = await SaveManager.CurrentAuth.GraphClient
                 .Drives[_currentDriveId]
                 .Items[folderId]
@@ -105,16 +123,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 });
 
             CloudItems.Clear();
-
-            if (CanGoBack)
-            {
-                CloudItems.Add(new CloudItem
-                {
-                    Id = "..",
-                    Name = "..",
-                    IsFolder = true
-                });
-            }
 
             if (children?.Value != null)
             {
@@ -149,6 +157,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                     }
                 }
             }
+            OnPropertyChanged(nameof(IsListEmpty));
         }
         catch (Exception ex)
         {
@@ -163,19 +172,20 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         ((CollectionView)sender).SelectedItem = null;
 
-        // "Zurück"-Eintrag
-        if (selectedItem.Id == "..")
-        {
-            await GoBackAsync();
-            return;
-        }
-
         // Ordner öffnen
         if (selectedItem.IsFolder)
         {
             try
             {
                 await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
+
+                // Breadcrumb aktualisieren
+                if (Breadcrumbs.Count > 0)
+                    Breadcrumbs.Last().IsLast = false;
+
+                Breadcrumbs.Add(new BreadcrumbItem { Id = selectedItem.Id, Name = selectedItem.Name, IsLast = true });
+
+                ScrollBreadcrumbsToRight();
 
                 await LoadFolderContentAsync(selectedItem.Id);
             }
@@ -239,20 +249,29 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async Task GoBackAsync()
+    private async void OnBreadcrumbTapped(object sender, TappedEventArgs e)
     {
-        if (!CanGoBack)
-            return;
+        var tappedItem = e.Parameter as BreadcrumbItem ?? (sender as Element)?.BindingContext as BreadcrumbItem;
 
-        _folderHistory.Pop();
+        if (tappedItem == null) return;
 
-        string previousFolderId = _folderHistory.Peek();
+        if (tappedItem.IsLast) return;
+
+        int targetIndex = Breadcrumbs.IndexOf(tappedItem);
+        if (targetIndex == -1) return;
+
+        while (Breadcrumbs.Count > targetIndex + 1)
+        {
+            Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
+        }
+        Breadcrumbs.Last().IsLast = true;
 
         try
         {
             await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
+            await LoadFolderContentAsync(tappedItem.Id);
 
-            await LoadFolderContentAsync(previousFolderId);
+            ScrollBreadcrumbsToRight();
         }
         finally
         {
@@ -262,10 +281,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
     private async void OnSelectFolderClicked(object sender, EventArgs e)
     {
-        if (!IsFolderMode || _folderHistory.Count == 0)
+        if (!IsFolderMode || Breadcrumbs.Count == 0)
             return;
 
-        string currentFolderId = _folderHistory.Peek();
+        string currentFolderId = Breadcrumbs.Last().Id;
         bool success = false;
 
         try
@@ -345,10 +364,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             await BusyService.ShowAsync(AppResources.projektordner_wird_geoeffnet);
 
             _currentDriveId = project.DriveId;
-            _folderHistory.Clear();
-
-            // Root als Ausgangspunkt merken
-            _folderHistory.Push("root");
 
             // Projektordner laden
             await LoadFolderContentAsync(project.FolderId);
@@ -363,9 +378,51 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
+    private async void ScrollBreadcrumbsToRight()
+    {
+        await Task.Delay(50);
+
+        MainThread.BeginInvokeOnMainThread(async () =>
+        {
+            try
+            {
+                double contentWidth = BreadcrumbScrollView.ContentSize.Width;
+                double viewportWidth = BreadcrumbScrollView.Width;
+
+                if (contentWidth > viewportWidth)
+                {
+                    await BreadcrumbScrollView.ScrollToAsync(contentWidth - viewportWidth, 0, true);
+                }
+            }
+            catch
+            {
+                // Fallback falls die Viewport-Berechnung beim ersten Laden hakt
+            }
+        });
+    }
+
     public new event PropertyChangedEventHandler? PropertyChanged;
     protected new void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
     }
+}
+
+public partial class BreadcrumbItem : INotifyPropertyChanged
+{
+    private bool _isLast;
+    public string Id { get; set; } = string.Empty;
+    public string Name { get; set; } = string.Empty;
+
+    public bool IsLast
+    {
+        get => _isLast;
+        set
+        {
+            _isLast = value;
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(nameof(IsLast)));
+        }
+    }
+
+    public event PropertyChangedEventHandler? PropertyChanged;
 }

@@ -18,7 +18,7 @@
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
-                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   Text="{Binding Title, Source={x:Reference ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"

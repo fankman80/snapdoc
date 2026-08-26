@@ -65,6 +65,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
         Routing.RegisterRoute("cameraView", typeof(CameraView));
         Routing.RegisterRoute("generalmapview", typeof(MapView));
+        Routing.RegisterRoute("cloudPickerPage", typeof(CloudPickerPage));
 
         AllPlanItems = [];
         PlanItems = [];

@@ -8,15 +8,13 @@
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.CloudPickerPage"
              x:DataType="views:CloudPickerPage" 
-             x:Name="ThisPage"
-             Title="{x:Static res:AppResources.cloud_verzeichnis_waehlen}">
+             x:Name="ThisPage">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">
-            <Label Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+            <Label Text="{Binding Title, Source={x:Reference ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    Background="Transparent"
                    BackgroundColor="Transparent"
@@ -29,12 +27,13 @@
     <Grid Margin="16" RowSpacing="12">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
 
         <!-- Dynamic Header Card -->
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="10">
+        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="0">
             <Border Grid.Column="0"
                     Padding="12,10"
                     StrokeShape="RoundRectangle 8"
@@ -50,6 +49,7 @@
                     <Label Grid.Column="1"
                            x:DataType="views:CloudPickerPage"
                            Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
+                           FontSize="12"
                            TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                            VerticalOptions="Center"
                            LineBreakMode="WordWrap"/>
@@ -61,6 +61,7 @@
                     Text="{x:Static local:MaterialIcons.Document_search}"
                     FontSize="34"
                     Padding="0"
+                    Margin="10,0,0,0"
                     TextColor="{DynamicResource PrimaryDark}"
                     Background="Transparent"
                     FontFamily="MaterialOutlined"
@@ -70,8 +71,57 @@
                     Clicked="OnSearchProjectsClicked"/>
         </Grid>
 
+        <!-- Breadcrumb-Navigation -->
+        <Border Grid.Row="1"
+                Padding="0"
+                Stroke="Transparent"
+                BackgroundColor="Transparent"
+                VerticalOptions="Center">
+            <ScrollView x:Name="BreadcrumbScrollView"
+                        Orientation="Horizontal" 
+                        HorizontalScrollBarVisibility="Never">
+                <HorizontalStackLayout BindableLayout.ItemsSource="{Binding Breadcrumbs, Source={x:Reference Name=ThisPage}}" 
+                                       Spacing="0" 
+                                       VerticalOptions="Center">
+                    <BindableLayout.ItemTemplate>
+                        <DataTemplate x:DataType="views:BreadcrumbItem">
+                            <Border StrokeShape="RoundRectangle 4"
+                                    Stroke="Transparent"
+                                    BackgroundColor="Transparent">
+                                <Border.GestureRecognizers>
+                                    <TapGestureRecognizer Tapped="OnBreadcrumbTapped" CommandParameter="{Binding .}" />
+                                </Border.GestureRecognizers>
+
+                                <HorizontalStackLayout Spacing="4" VerticalOptions="Center">
+                                    <Label Text="{Binding Name}" 
+                                           TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                           FontSize="16"
+                                           VerticalOptions="Center">
+                                        <Label.Triggers>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsLast}" Value="True">
+                                                <Setter Property="FontAttributes" Value="Bold" />
+                                            </DataTrigger>
+                                            <DataTrigger TargetType="Label" Binding="{Binding IsLast}" Value="False">
+                                                <Setter Property="FontAttributes" Value="None" />
+                                            </DataTrigger>
+                                        </Label.Triggers>
+                                    </Label>
+                                    <Label Text="{x:Static local:MaterialIcons.Chevron_right}" 
+                                           FontFamily="MaterialOutlined" 
+                                           IsVisible="{Binding IsLast, Converter={StaticResource InvertedBoolConverter}}" 
+                                           TextColor="LightSlateGray" 
+                                           FontSize="20"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </Border>
+                        </DataTemplate>
+                    </BindableLayout.ItemTemplate>
+                </HorizontalStackLayout>
+            </ScrollView>
+        </Border>
+
         <!-- Modern List View -->
-        <CollectionView Grid.Row="1"
+        <CollectionView Grid.Row="2"
                         x:DataType="views:CloudPickerPage"
                         ItemsSource="{Binding CloudItems, Source={x:Reference Name=ThisPage}}"
                         SelectionMode="Single"
@@ -117,8 +167,26 @@
             </CollectionView.ItemTemplate>
         </CollectionView>
 
+        <!-- Empty State -->
+        <VerticalStackLayout Grid.Row="2"
+                             InputTransparent="True"
+                             IsVisible="{Binding IsListEmpty, Source={x:Reference Name=ThisPage}}"
+                             HorizontalOptions="Center" 
+                             VerticalOptions="Center" 
+                             Spacing="12">
+            <Label FontFamily="MaterialOutlined" 
+                   Text="{x:Static local:MaterialIcons.Folder_off}" 
+                   FontSize="60" 
+                   TextColor="LightSlateGray" 
+                   HorizontalOptions="Center" />
+            <Label Text="{x:Static res:AppResources.keine_projekte_gefunden}"
+                   TextColor="LightSlateGray" 
+                   FontSize="16" 
+                   HorizontalOptions="Center" />
+        </VerticalStackLayout>
+
         <!-- Bottom Action Bar (Only visible in SelectFolder Mode) -->
-        <Grid Grid.Row="2" 
+        <Grid Grid.Row="3" 
               x:DataType="views:CloudPickerPage"
               IsVisible="{Binding IsFolderMode, Source={x:Reference Name=ThisPage}}"
               ColumnDefinitions="*, Auto" 

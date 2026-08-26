@@ -502,15 +502,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Cloud-Verzeichnis wählen ähnelt.
-        /// </summary>
-        internal static string cloud_verzeichnis_waehlen {
-            get {
-                return ResourceManager.GetString("cloud_verzeichnis_waehlen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Die Datei konnte nicht importiert werden. ähnelt.
         /// </summary>
         internal static string datei_konnte_nicht_importiert_werden {
@@ -1402,6 +1393,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine Projekte gefunden. ähnelt.
+        /// </summary>
+        internal static string keine_projekte_gefunden {
+            get {
+                return ResourceManager.GetString("keine_projekte_gefunden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Keine Projekte in der Cloud gefunden. ähnelt.
         /// </summary>
         internal static string keine_projekte_in_cloud_gefunden {
@@ -1834,6 +1834,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ordner auswählen, in dem das Projekt gespeichert werden soll. ähnelt.
+        /// </summary>
+        internal static string ordner_auswaehlen_projekt_speichern {
+            get {
+                return ResourceManager.GetString("ordner_auswaehlen_projekt_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ordnerinhalt konnte nicht geladen werden ähnelt.
         /// </summary>
         internal static string ordnerinhalt_konnte_nicht_geladen_werden {
@@ -2230,6 +2239,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt-Download ähnelt.
+        /// </summary>
+        internal static string projekt_download {
+            get {
+                return ResourceManager.GetString("projekt_download", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Projekt erfolgreich heruntergeladen. ähnelt.
         /// </summary>
         internal static string projekt_erfolgreich_heruntergeladen {
@@ -2262,6 +2280,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string projekt_titel {
             get {
                 return ResourceManager.GetString("projekt_titel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt-Upload ähnelt.
+        /// </summary>
+        internal static string projekt_upload {
+            get {
+                return ResourceManager.GetString("projekt_upload", resourceCulture);
             }
         }
         
@@ -2329,11 +2356,11 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Projektdatei importieren ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die JSON-Projektdatei zum Synchronisieren auswählen. ähnelt.
         /// </summary>
-        internal static string projektdatei_importieren {
+        internal static string projektdatei_auswaehlen_zum_synchronisieren {
             get {
-                return ResourceManager.GetString("projektdatei_importieren", resourceCulture);
+                return ResourceManager.GetString("projektdatei_auswaehlen_zum_synchronisieren", resourceCulture);
             }
         }
         
@@ -2802,6 +2829,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string validieren {
             get {
                 return ResourceManager.GetString("validieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verfügbare Projekte: ähnelt.
+        /// </summary>
+        internal static string verfuegbare_projekte {
+            get {
+                return ResourceManager.GetString("verfuegbare_projekte", resourceCulture);
             }
         }
         

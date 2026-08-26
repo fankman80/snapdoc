@@ -22,7 +22,7 @@
               VerticalOptions="Center">
             <local:BorderlessEntry Grid.Column="0"
                    x:DataType="views:MapView"
-                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   Text="{Binding Title, Source={x:Reference ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    FontFamily="{x:StaticResource AppFontFamily}"
                    Placeholder="{x:Static res:AppResources.titel_eingeben}"

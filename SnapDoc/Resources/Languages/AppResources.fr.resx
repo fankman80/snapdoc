@@ -255,9 +255,6 @@
   <data name="position_sperren" xml:space="preserve">
     <value>Verrouiller la position</value>
   </data>
-  <data name="projektdatei_importieren" xml:space="preserve">
-    <value>Importer le fichier projet</value>
-  </data>
   <data name="projektleitung" xml:space="preserve">
     <value>Direction de projet</value>
   </data>
@@ -1023,8 +1020,8 @@
   <data name="ordnerinhalt_konnte_nicht_geladen_werden" xml:space="preserve">
     <value>Impossible de charger le contenu du dossier</value>
   </data>
-  <data name="cloud_verzeichnis_waehlen" xml:space="preserve">
-    <value>Sélectionner le répertoire cloud</value>
+  <data name="projekt_download" xml:space="preserve">
+    <value>Téléchargement du projet</value>
   </data>
   <data name="bitte_ordner_oder_json_datei_waehlen" xml:space="preserve">
     <value>Veuillez sélectionner un dossier ou un fichier JSON</value>
@@ -1121,5 +1118,20 @@
   </data>
   <data name="als_zip_exportieren" xml:space="preserve">
     <value>Exporter au format ZIP</value>
+  </data>
+  <data name="projekt_upload" xml:space="preserve">
+    <value>Téléversement du projet</value>
+  </data>
+  <data name="verfuegbare_projekte" xml:space="preserve">
+    <value>Projets disponibles:</value>
+  </data>
+  <data name="ordner_auswaehlen_projekt_speichern" xml:space="preserve">
+    <value>Sélectionner le dossier dans lequel le projet doit être enregistré.</value>
+  </data>
+  <data name="projektdatei_auswaehlen_zum_synchronisieren" xml:space="preserve">
+    <value>Sélectionner le fichier de projet JSON à synchroniser.</value>
+  </data>
+  <data name="keine_projekte_gefunden" xml:space="preserve">
+    <value>Aucun projet trouvé.</value>
   </data>
 </root>

@@ -16,7 +16,7 @@
 
         <!-- Header -->
         <Label Grid.Row="0"
-               Text="Projekte in der Cloud"
+               Text="{x:Static res:AppResources.verfuegbare_projekte}"
                FontAttributes="Bold"
                HorizontalOptions="Start" />
 
