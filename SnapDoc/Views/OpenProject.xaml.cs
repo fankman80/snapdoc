@@ -30,6 +30,7 @@ public partial class OpenProject : ContentPage
     {
         string rootDirectory = Settings.DataDirectory;
 
+        // 1. SCHRITT: Lokale Dateien UND vorhandene Bilder direkt beim Einlesen auflösen
         var foundFiles = await Task.Run(() =>
         {
             List<FileItem> items = [];
@@ -44,16 +45,42 @@ public partial class OpenProject : ContentPage
                 foreach (var file in files)
                 {
                     string projectDir = Path.GetDirectoryName(file);
-                    string thumbImg = Directory.EnumerateFiles(projectDir, "title_*.jpg").FirstOrDefault()
-                                     ?? "banner_thumbnail.png";
+                    string thumbPath = "banner_thumbnail.png";
+
+                    try
+                    {
+                        var projectData = GlobalJson.ReadFromFile(file);
+                        if (projectData != null)
+                        {
+                            string titleImgName = !string.IsNullOrEmpty(projectData.TitleImage)
+                                ? projectData.TitleImage
+                                : "banner_thumbnail.png";
+
+                            string fullThumbPath = Path.Combine(projectDir, titleImgName);
+
+                            if (File.Exists(fullThumbPath))
+                            {
+                                thumbPath = fullThumbPath;
+                            }
+                            else
+                            {
+                                var fallbackThumb = Directory.EnumerateFiles(projectDir, "title_*.jpg").FirstOrDefault();
+                                if (!string.IsNullOrEmpty(fallbackThumb) && File.Exists(fallbackThumb))
+                                {
+                                    thumbPath = fallbackThumb;
+                                }
+                            }
+                        }
+                    }
+                    catch { /* Fehler beim Lesen einzelner Dateien abfangen */ }
 
                     items.Add(new FileItem
                     {
                         FileName = Path.GetFileNameWithoutExtension(file),
                         FilePath = file,
                         FileDate = File.GetLastWriteTime(file),
-                        ImagePath = thumbImg,
-                        ThumbnailPath = thumbImg,
+                        ImagePath = thumbPath,
+                        ThumbnailPath = thumbPath,
                         IsActive = file == activeFilePath
                     });
                 }
@@ -62,71 +89,128 @@ public partial class OpenProject : ContentPage
             return items.OrderByDescending(f => f.FileDate).ToList();
         });
 
+        // Vorhandene lokale Bilder sind JETZT SOFORT sichtbar
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
 
-        // Hintergrundpruefung fuer lokale Projekte
-        if (SaveManager.CurrentAuth?.IsLoggedIn == true)
+        // 2. SCHRITT: Cloud-Abgleiche und Bedarfs-Downloads
+        _ = Task.Run(async () =>
         {
-            _ = Task.Run(async () =>
+            bool isLoggedIn = SaveManager.CurrentAuth?.IsLoggedIn == true;
+            if (!isLoggedIn) return;
+
+            try
             {
-                // Hole einmalig alle Cloud-Projekte (schneller als Einzelabfragen)
                 var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
 
                 foreach (var item in foundFiles)
                 {
-                    // Lokales JSON auslesen, um an die Cloud-IDs zu kommen
                     var projectData = GlobalJson.ReadFromFile(item.FilePath);
                     if (projectData == null) continue;
 
-                    bool hasValidCloudLink = false;
+                    string projectDir = Path.GetDirectoryName(item.FilePath);
+                    string titleImgName = !string.IsNullOrEmpty(projectData.TitleImage)
+                        ? projectData.TitleImage
+                        : "banner_thumbnail.png";
 
-                    // FALL A: Das Projekt hat bereits eine Cloud-Verknuepfung (ID) gespeichert
+                    string fullThumbPath = Path.Combine(projectDir, titleImgName);
+
+                    string imageSubFolder = !string.IsNullOrEmpty(projectData.ImagePath)
+                        ? projectData.ImagePath
+                        : "images";
+                    string localOriginalImagePath = Path.Combine(projectDir, imageSubFolder, titleImgName);
+
+                    // Cloud-Downloads ausführen
                     if (!string.IsNullOrEmpty(projectData.CloudFolderId))
                     {
-                        // Pruefen, ob exakt dieser Ordner online noch existiert
-                        var matchingById = remoteProjects.FirstOrDefault(rp => rp.FolderId == projectData.CloudFolderId);
-
-                        if (matchingById != null)
+                        // A. Original-Bild aus dem Images-Unterordner herunterladen
+                        if (!File.Exists(localOriginalImagePath))
                         {
-                            hasValidCloudLink = true;
+                            await SaveManager.DownloadMediaOnDemandAsync(
+                                fileName: titleImgName,
+                                subFolder: imageSubFolder,
+                                driveId: projectData.CloudDriveId,
+                                folderId: projectData.CloudFolderId,
+                                projectDir: projectDir
+                            );
+                        }
+
+                        // B. Vorschaubild aus dem Hauptordner herunterladen
+                        if (!File.Exists(fullThumbPath))
+                        {
+                            bool downloaded = await SaveManager.DownloadMediaOnDemandAsync(
+                                fileName: titleImgName,
+                                subFolder: "",
+                                driveId: projectData.CloudDriveId,
+                                folderId: projectData.CloudFolderId,
+                                projectDir: projectDir
+                            );
+
+                            if (downloaded && File.Exists(fullThumbPath))
+                            {
+                                MainThread.BeginInvokeOnMainThread(() =>
+                                {
+                                    item.ImagePath = null;
+                                    item.ThumbnailPath = null;
+
+                                    item.ImagePath = fullThumbPath;
+                                    item.ThumbnailPath = fullThumbPath;
+                                });
+                            }
+                        }
+                    }
+
+                    // Cloud-Sync Status überprüfen
+                    if (remoteProjects != null)
+                    {
+                        bool hasValidCloudLink = false;
+
+                        if (!string.IsNullOrEmpty(projectData.CloudFolderId))
+                        {
+                            var matchingById = remoteProjects.FirstOrDefault(rp => rp.FolderId == projectData.CloudFolderId);
+                            if (matchingById != null)
+                            {
+                                hasValidCloudLink = true;
+                            }
+                            else
+                            {
+                                projectData.CloudDriveId = null;
+                                projectData.CloudFolderId = null;
+
+                                string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                                File.WriteAllText(item.FilePath, updatedJson);
+                            }
                         }
                         else
                         {
-                            // Die Cloud-IDs lokal entfernen, da das Projekt online geloescht wurde
-                            projectData.CloudDriveId = null;
-                            projectData.CloudFolderId = null;
+                            string expectedJsonName = item.FileName + ".json";
+                            var matchingByName = remoteProjects.FirstOrDefault(rp =>
+                                rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
 
-                            string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
-                            File.WriteAllText(item.FilePath, updatedJson);
+                            if (matchingByName != null)
+                            {
+                                hasValidCloudLink = true;
 
-                            item.HasCloudSync = false;
+                                projectData.CloudDriveId = matchingByName.DriveId;
+                                projectData.CloudFolderId = matchingByName.FolderId;
+
+                                string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
+                                File.WriteAllText(item.FilePath, updatedJson);
+                            }
                         }
-                    }
-                    // FALL B: Legacy-Fallback fuer Projekte, die noch keine IDs haben (Namensabgleich beim ersten Mal)
-                    else
-                    {
-                        string expectedJsonName = item.FileName + ".json";
-                        var matchingByName = remoteProjects.FirstOrDefault(rp =>
-                            rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
 
-                        if (matchingByName != null)
+                        MainThread.BeginInvokeOnMainThread(() =>
                         {
-                            hasValidCloudLink = true;
-
-                            // Ergaenze fehlende Cloud-IDs lokal, damit ab sofort Fall A greift
-                            projectData.CloudDriveId = matchingByName.DriveId;
-                            projectData.CloudFolderId = matchingByName.FolderId;
-
-                            string updatedJson = System.Text.Json.JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
-                            File.WriteAllText(item.FilePath, updatedJson);
-                        }
+                            item.HasCloudSync = hasValidCloudLink;
+                        });
                     }
-                    // Automatische Aktualisierung der XAML
-                    item.HasCloudSync = hasValidCloudLink;
                 }
-            });
-        }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Cloud-Sync fehlgeschlagen: {ex.Message}");
+            }
+        });
     }
 
     private async void OnNewClicked(object sender, EventArgs e)

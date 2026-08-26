@@ -1279,33 +1279,38 @@ public static class SaveManager
         }
     }
 
-    // Laedt ein spezifisches Foto (Thumbnail oder Original) bedarfsgesteuert herunter
-    // Generische Methode für beliebige Unterordner (z.B. CustomPinsPath, ImagePath, ThumbnailPath)
-    public static async Task<bool> DownloadMediaOnDemandAsync(string fileName, string subFolder)
+    // Laedt ein spezifisches Foto oder Bild bedarfsgesteuert herunter
+    // Unterstuetzt optionale explizite Pfade/IDs fuer ungeladene Projekte aus der Liste
+    public static async Task<bool> DownloadMediaOnDemandAsync(string fileName, string subFolder = "", string? driveId = null, string? folderId = null, string? projectDir = null)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
 
-        if (GlobalJson.Data == null ||
-            string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
-            string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId))
+        // Nutze explizit uebergebene Werte oder Fallback auf das aktuell geladene GlobalJson
+        string? effectiveDriveId = driveId ?? GlobalJson.Data?.CloudDriveId;
+        string? effectiveFolderId = folderId ?? GlobalJson.Data?.CloudFolderId;
+        string? effectiveProjectDir = projectDir ?? Path.GetDirectoryName(GlobalJson.GetFilePath());
+
+        if (string.IsNullOrEmpty(effectiveDriveId) ||
+            string.IsNullOrEmpty(effectiveFolderId) ||
+            string.IsNullOrEmpty(effectiveProjectDir))
             return false;
 
         try
         {
-            string driveId = GlobalJson.Data.CloudDriveId;
-            string rootFolderId = GlobalJson.Data.CloudFolderId;
+            // Cloud-Pfad zusammensetzen
+            string relativeCloudPath = string.IsNullOrWhiteSpace(subFolder)
+                ? fileName
+                : $"{subFolder.Trim('/', '\\')}/{fileName}".Replace("\\", "/");
 
-            // Cloud-Pfade erzwingen Vorwaerts-Slashes
-            string relativeCloudPath = $"{subFolder}/{fileName}".Replace("\\", "/");
-
-            string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
-            if (string.IsNullOrEmpty(projectDir)) return false;
-            string localDestinationPath = Path.Combine(projectDir, subFolder, fileName);
+            // Lokalen Zielpfad aufbauen
+            string localDestinationPath = string.IsNullOrWhiteSpace(subFolder)
+                ? Path.Combine(effectiveProjectDir, fileName)
+                : Path.Combine(effectiveProjectDir, subFolder, fileName);
 
             // Abbruch, falls die Datei bereits lokal existiert
             if (File.Exists(localDestinationPath)) return true;
 
-            var fileStream = await CurrentAuth.GraphClient.Drives[driveId].Items[rootFolderId]
+            var fileStream = await CurrentAuth.GraphClient.Drives[effectiveDriveId].Items[effectiveFolderId]
                 .ItemWithPath(relativeCloudPath)
                 .Content
                 .GetAsync();
@@ -1323,7 +1328,7 @@ public static class SaveManager
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Bedarfs-Download fehlgeschlagen fuer {fileName} in {subFolder}: {ex.Message}");
+            Console.WriteLine($"Bedarfs-Download fehlgeschlagen fuer {fileName} in '{subFolder}': {ex.Message}");
         }
 
         return false;
