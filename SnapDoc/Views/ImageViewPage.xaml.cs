@@ -369,19 +369,18 @@ public partial class ImageViewPage : IQueryAttributable
 
             if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
             {
-                string file1 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+                string file1 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                 if (File.Exists(file1))
                     File.Delete(file1);
 
-                string file2 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                string file2 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
                 if (File.Exists(file2))
                     File.Delete(file2);
 
                 // Cloud Cleanup
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{oldTitleImage}");
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
-                _ = SaveManager.DeleteCloudFileAsync($"{oldTitleImage}");
             }
-
             GlobalJson.Data.TitleImage = "banner_thumbnail.png";
         }
         else
@@ -412,7 +411,6 @@ public partial class ImageViewPage : IQueryAttributable
                     _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
                     _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
                 }
-
                 pin.Fotos.Remove(ImgSource);
             }
         }
