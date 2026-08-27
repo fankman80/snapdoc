@@ -1650,59 +1650,87 @@ public class MapPin
     public Point Anchor { get; set; } = new Point(0.5, 0.5);
 }
 
-public class LruCache<TKey, TValue>(int capacity) where TValue : IDisposable
+public class LruCache<TKey, TValue> where TKey : notnull
 {
-    private readonly Dictionary<TKey, LinkedListNode<(TKey Key, TValue Value)>> _cache = [];
-    private readonly LinkedList<(TKey Key, TValue Value)> _list = new();
+    private readonly Lock _lock = new();
+    private readonly Dictionary<TKey, LinkedListNode<CacheEntry>> _cache = [];
+    private readonly LinkedList<CacheEntry> _list = [];
+    private readonly int _capacity;
 
-    public bool TryGetValue(TKey key, out TValue value)
+    private readonly record struct CacheEntry(TKey Key, TValue Value);
+
+    public LruCache(int capacity)
     {
-        if (_cache.TryGetValue(key, out var node))
-        {
-            _list.Remove(node);
-            _list.AddFirst(node);
-            value = node.Value.Value;
-            return true;
-        }
-        value = default;
-        return false;
+        ArgumentOutOfRangeException.ThrowIfNegativeOrZero(capacity);
+        _capacity = capacity;
     }
 
     public TValue this[TKey key]
     {
-        set
+        get => TryGetValue(key, out var value) ? value : throw new KeyNotFoundException($"Der Schluessel '{key}' wurde nicht gefunden.");
+        set => Add(key, value);
+    }
+
+    public bool TryGetValue(TKey key, out TValue value)
+    {
+        lock (_lock)
+        {
+            if (_cache.TryGetValue(key, out var node))
+            {
+                value = node.Value.Value;
+                _list.Remove(node);
+                _list.AddFirst(node);
+                return true;
+            }
+
+            value = default!;
+            return false;
+        }
+    }
+
+    public void Add(TKey key, TValue value)
+    {
+        lock (_lock)
         {
             if (_cache.TryGetValue(key, out var existingNode))
             {
                 _list.Remove(existingNode);
-                existingNode.Value.Value?.Dispose();
                 _cache.Remove(key);
             }
-
-            if (_cache.Count >= capacity)
+            else if (_cache.Count >= _capacity && _list.Last is not null)
             {
-                var last = _list.Last;
-                if (last != null)
-                {
-                    last.Value.Value?.Dispose();
-                    _cache.Remove(last.Value.Key);
-                    _list.RemoveLast();
-                }
+                var lastNode = _list.Last;
+                _cache.Remove(lastNode.Value.Key);
+                _list.RemoveLast();
             }
 
-            var newNode = new LinkedListNode<(TKey, TValue)>((key, value));
-            _list.AddFirst(newNode);
+            var entry = new CacheEntry(key, value);
+            var newNode = _list.AddFirst(entry);
             _cache[key] = newNode;
+        }
+    }
+
+    public bool Remove(TKey key)
+    {
+        lock (_lock)
+        {
+            if (!_cache.Remove(key, out var node))
+            {
+                return false;
+            }
+
+            _list.Remove(node);
+            return true;
         }
     }
 
     public void Clear()
     {
-        foreach (var (_, value) in _list)
-            value?.Dispose();
-
-        _list.Clear();
-        _cache.Clear();
+        lock (_lock)
+        {
+            _cache.Clear();
+            _list.Clear();
+        }
     }
 }
 
