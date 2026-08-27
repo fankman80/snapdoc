@@ -35,38 +35,9 @@ public partial class ProjectDetails : ContentPage
 
         WeakReferenceMessenger.Default.Register<TitleImageChangedMessage>(this, (r, m) =>
         {
-            MainThread.BeginInvokeOnMainThread(async () =>
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                if (string.IsNullOrEmpty(m.Value) || GlobalJson.Data == null) return;
-
-                string fileName = m.Value;
-
-                // 1. Thumbnail pruefen und ggf. nachladen
-                string thumbPath = Path.Combine(
-                    Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
-                    GlobalJson.Data.ThumbnailPath,
-                    fileName);
-
-                if (!File.Exists(thumbPath))
-                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
-
-                // 2. Originalbild pruefen und ggf. nachladen
-                string originalPath = Path.Combine(
-                    Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
-                    GlobalJson.Data.ImagePath,
-                    fileName);
-
-                if (!File.Exists(originalPath))
-                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
-
-                // Header und UI-Anzeige aktualisieren
-                if (File.Exists(thumbPath) || File.Exists(originalPath))
-                {
-                    Helper.HeaderUpdate();
-                    LoadDataToUI();
-                }
+                LoadDataToUI();
             });
         });
 
@@ -103,7 +74,7 @@ public partial class ProjectDetails : ContentPage
 
         (FileResult result, Size imgSize) = await CapturePicture.Capture(
             Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
-            GlobalJson.Data.ProjectPath,
+            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath),
             thumbFileName);
 
         if (result != null)
@@ -111,15 +82,15 @@ public partial class ProjectDetails : ContentPage
             // 2. Alte Dateien lokal UND aus der Cloud loeschen
             if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
             {
-                var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                 var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
 
                 if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
                 if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
 
                 // Cloud-Loeschung anstossen
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{oldTitleImage}");
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
-                _ = SaveManager.DeleteCloudFileAsync(oldTitleImage);
             }
 
             // 3. JSON aktualisieren
@@ -152,7 +123,7 @@ public partial class ProjectDetails : ContentPage
                 string sourceFilePath = fileResult.FullPath;
                 var codec = SKCodec.Create(fileResult.FullPath);
                 var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
-                var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, thumbFileName);
+                var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
 
                 if (File.Exists(destinationPath))
                     File.Delete(destinationPath);
@@ -169,15 +140,15 @@ public partial class ProjectDetails : ContentPage
                 // 2. Alte Dateien lokal UND in der Cloud loeschen
                 if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
                 {
-                    var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                    var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                     var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
 
                     if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
                     if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
 
                     // Cloud-Loeschung anstossen
+                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{oldTitleImage}");
                     _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
-                    _ = SaveManager.DeleteCloudFileAsync(oldTitleImage);
                 }
 
                 // 3. JSON aktualisieren
@@ -191,7 +162,7 @@ public partial class ProjectDetails : ContentPage
                 // 4. JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
                 SaveManager.NotifyDataChanged([
                     (destinationPath, GlobalJson.Data.ImagePath), // Originalbild im Images-Ordner
-                    (destinationThumbPath, "")                   // Thumbnail im Root-Ordner
+                    (destinationThumbPath, GlobalJson.Data.ThumbnailPath) // Thumbnailbild im Thumbnails-Ordner
                 ]);
 
                 Helper.HeaderUpdate();

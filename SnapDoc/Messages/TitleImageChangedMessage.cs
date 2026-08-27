@@ -2,9 +2,14 @@
 
 namespace SnapDoc.Messages;
 
-public class TitleImageChangedMessage : ValueChangedMessage<string>
+public class TitleImageChangedMessage
 {
-    public TitleImageChangedMessage(string newFileName) : base(newFileName)
+    public string OldFileName { get; }
+    public string NewFileName { get; }
+
+    public TitleImageChangedMessage(string oldFileName, string newFileName)
     {
+        OldFileName = oldFileName;
+        NewFileName = newFileName;
     }
 }

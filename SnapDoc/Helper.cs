@@ -23,8 +23,8 @@ public class Helper
         SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name ?? "";
         SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name ?? "";
 
-        // Pruefen, ob grundsaetzlich Pfad und Bildname vorhanden sind
-        bool hasValidData = !string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) && 
+        // Prüfen, ob grundsätzlich Pfad und Bildname vorhanden sind
+        bool hasValidData = !string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) &&
                             !string.IsNullOrEmpty(GlobalJson.Data.TitleImage) &&
                             GlobalJson.Data.TitleImage != "banner_thumbnail.png";
 
@@ -40,18 +40,20 @@ public class Helper
             string expectedThumbPath = Path.Combine(
                 Settings.DataDirectory ?? "",
                 GlobalJson.Data.ProjectPath ?? "",
+                GlobalJson.Data.ThumbnailPath ?? "", // Korrigiert!
                 GlobalJson.Data.TitleImage ?? ""
             );
 
-            // Zusaetzlicher Check: Existiert die Datei tatsaechlich auf der Festplatte?
+            // Zusätzlicher Check: Existiert das Thumbnail auf der Festplatte?
             if (File.Exists(expectedThumbPath))
             {
                 SettingsService.Instance.FlyoutHeaderImage = expectedImagePath;
                 SettingsService.Instance.FlyoutHeaderImageThumb = expectedThumbPath;
-                
+
                 return; // Alles okay, Methode hier beenden
             }
         }
+
         SettingsService.Instance.FlyoutHeaderImage = "";
         SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
     }

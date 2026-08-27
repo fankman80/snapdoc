@@ -56,20 +56,15 @@ public partial class OpenProject : ContentPage
                                 ? projectData.TitleImage
                                 : "banner_thumbnail.png";
 
-                            string fullThumbPath = Path.Combine(projectDir, titleImgName);
+                            string thumbSubFolder = !string.IsNullOrEmpty(projectData.ThumbnailPath)
+                                ? projectData.ThumbnailPath
+                                : "thumbnails";
+
+                            // Suche im thumbnails/-Ordner
+                            string fullThumbPath = Path.Combine(projectDir, thumbSubFolder, titleImgName);
 
                             if (File.Exists(fullThumbPath))
-                            {
                                 thumbPath = fullThumbPath;
-                            }
-                            else
-                            {
-                                var fallbackThumb = Directory.EnumerateFiles(projectDir, "title_*.jpg").FirstOrDefault();
-                                if (!string.IsNullOrEmpty(fallbackThumb) && File.Exists(fallbackThumb))
-                                {
-                                    thumbPath = fallbackThumb;
-                                }
-                            }
                         }
                     }
                     catch { /* Fehler beim Lesen einzelner Dateien abfangen */ }

@@ -379,20 +379,18 @@ public static class SaveManager
 
         if (titleImageChanged)
         {
-            local.TitleImage = cloud.TitleImage;
-            local.TitleImageSize = cloud.TitleImageSize; // falls in deinem Modell vorhanden
+            // 1. Alten Dateinamen sichern, BEVOR das Modell überschrieben wird
+            string oldImage = GlobalJson.Data.TitleImage;
+            string newImage = cloud.TitleImage;
 
-            // Bilddatei aus der Cloud nachladen & UI informieren
-            _ = Task.Run(async () =>
+            // 2. Speicher im Modell aktualisieren
+            local.TitleImage = newImage;
+            local.TitleImageSize = cloud.TitleImageSize;
+
+            // 3. Messenger informieren (AppShell löscht alt, lädt neu & aktualisiert UI)
+            _ = Task.Run(() =>
             {
-                if (!string.IsNullOrEmpty(cloud.TitleImage))
-                {
-                    // Laedt die Datei herunter, falls sie lokal noch nicht existiert
-                    await DownloadMediaOnDemandAsync(cloud.TitleImage, subFolder: "");
-                }
-
-                // UI-Messager benachrichtigen
-                WeakReferenceMessenger.Default.Send(new TitleImageChangedMessage(cloud.TitleImage));
+                WeakReferenceMessenger.Default.Send(new TitleImageChangedMessage(oldImage, newImage));
             });
         }
 
