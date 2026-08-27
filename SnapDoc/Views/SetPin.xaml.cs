@@ -128,11 +128,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
             {
                 var fileName = Path.GetFileName(item.ImagePath);
 
-                // Fehlende Dateien vom Server nachladen
+                // 1. Thumbnail nachladen (fuer schnelle UI-Anzeige)
                 if (!File.Exists(item.ImagePath))
                     await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
 
-                // Pruefen, ob waehrend des Downloads die Seite verlassen wurde
                 if (token.IsCancellationRequested) break;
 
                 if (File.Exists(item.ImagePath))
@@ -143,11 +142,20 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
-                        // Nur aktualisieren, wenn der Vorgang nicht abgebrochen wurde
                         if (!token.IsCancellationRequested)
                             item.DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
                     });
                 }
+
+                // 2. Originalbild im Hintergrund nachladen (fuer Offline-Verfuegbarkeit)
+                string originalImagePath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ImagePath,
+                    fileName);
+
+                if (!File.Exists(originalImagePath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
             }
             catch (Exception ex)
             {

@@ -271,6 +271,8 @@ public static class SaveManager
 
     public static async Task LoadDataAsync(AuthService authService, string localFilePath)
     {
+        ResetCloudSync();
+
         GlobalJson.LoadFromFile(localFilePath);
 
         if (authService.IsLoggedIn && authService.GraphClient != null)
@@ -351,6 +353,8 @@ public static class SaveManager
     {
         if (cloud == null) return;
 
+        bool titleImageChanged = local.TitleImage != cloud.TitleImage;
+
         // Projektdetails vergleichen und uebertragen
         bool projectDetailsChanged = false;
         if (local.Client_name != cloud.Client_name ||
@@ -359,7 +363,8 @@ public static class SaveManager
             local.Project_nr != cloud.Project_nr ||
             local.Object_name != cloud.Object_name ||
             local.Project_manager != cloud.Project_manager ||
-            local.Creation_date != cloud.Creation_date)
+            local.Creation_date != cloud.Creation_date ||
+            titleImageChanged) // <-- Hier ergaenzt
         {
             local.Client_name = cloud.Client_name;
             local.Working_title = cloud.Working_title;
@@ -370,6 +375,25 @@ public static class SaveManager
             local.Creation_date = cloud.Creation_date;
 
             projectDetailsChanged = true;
+        }
+
+        if (titleImageChanged)
+        {
+            local.TitleImage = cloud.TitleImage;
+            local.TitleImageSize = cloud.TitleImageSize; // falls in deinem Modell vorhanden
+
+            // Bilddatei aus der Cloud nachladen & UI informieren
+            _ = Task.Run(async () =>
+            {
+                if (!string.IsNullOrEmpty(cloud.TitleImage))
+                {
+                    // Laedt die Datei herunter, falls sie lokal noch nicht existiert
+                    await DownloadMediaOnDemandAsync(cloud.TitleImage, subFolder: "");
+                }
+
+                // UI-Messager benachrichtigen
+                WeakReferenceMessenger.Default.Send(new TitleImageChangedMessage(cloud.TitleImage));
+            });
         }
 
         if (cloud.Plans == null)
@@ -474,9 +498,12 @@ public static class SaveManager
                     {
                         // Visuelle Eigenschaften pruefen (loest Canvas-Redraw aus)
                         bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
-                                            localPin.PinRotation != cloudPin.PinRotation ||
-                                            localPin.PinIcon != cloudPin.PinIcon ||
-                                            localPin.PinColor != cloudPin.PinColor;
+                                             localPin.PinRotation != cloudPin.PinRotation ||
+                                             localPin.PinIcon != cloudPin.PinIcon ||
+                                             localPin.PinColor != cloudPin.PinColor ||
+                                             localPin.PinScale != cloudPin.PinScale ||
+                                             localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
+                                             localPin.IsLockRotate != cloudPin.IsLockRotate;
 
                         // ALLE Daten synchronisieren
                         localPin.Anchor = cloudPin.Anchor;
@@ -1354,6 +1381,15 @@ public static class SaveManager
     public static void ResetCloudSync()
     {
         TargetFolderId = null;
+        _lastKnownETag = null;
+        _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
+
+        // Laufende Speicher-Debounces des vorherigen Projekts abbrechen
+        _debounceCts?.Cancel();
+        _debounceCts?.Dispose();
+        _debounceCts = null;
+
+        _pendingUploadQueue.Clear();
     }
 }
 

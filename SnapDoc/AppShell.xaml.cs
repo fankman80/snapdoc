@@ -90,6 +90,40 @@ public partial class AppShell : Shell
             }
         });
 
+        WeakReferenceMessenger.Default.Register<TitleImageChangedMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                if (string.IsNullOrEmpty(m.Value) || GlobalJson.Data == null) return;
+
+                string fileName = m.Value;
+
+                // 1. Thumbnail pruefen & nachladen
+                string thumbPath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ThumbnailPath,
+                    fileName);
+
+                if (!File.Exists(thumbPath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
+
+                // 2. Originalbild pruefen & nachladen
+                string originalPath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ImagePath,
+                    fileName);
+
+                if (!File.Exists(originalPath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+
+                // Header im AppShell-Flyout aktualisieren
+                if (File.Exists(thumbPath) || File.Exists(originalPath))
+                    Helper.HeaderUpdate();
+            });
+        });
+
         ReloadPlansFromData();
     }
 

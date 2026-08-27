@@ -162,7 +162,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     {
                         resolvedPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
 
-                        // NEU: Pruefen und herunterladen, falls lokal nicht vorhanden
+                        // Pruefen und herunterladen, falls lokal nicht vorhanden
                         if (!File.Exists(resolvedPath))
                         {
                             await SaveManager.DownloadMediaOnDemandAsync(pinIcon, GlobalJson.Data.CustomPinsPath);

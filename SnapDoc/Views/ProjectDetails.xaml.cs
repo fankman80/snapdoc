@@ -33,6 +33,43 @@ public partial class ProjectDetails : ContentPage
             }
         });
 
+        WeakReferenceMessenger.Default.Register<TitleImageChangedMessage>(this, (r, m) =>
+        {
+            MainThread.BeginInvokeOnMainThread(async () =>
+            {
+                if (string.IsNullOrEmpty(m.Value) || GlobalJson.Data == null) return;
+
+                string fileName = m.Value;
+
+                // 1. Thumbnail pruefen und ggf. nachladen
+                string thumbPath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ThumbnailPath,
+                    fileName);
+
+                if (!File.Exists(thumbPath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
+
+                // 2. Originalbild pruefen und ggf. nachladen
+                string originalPath = Path.Combine(
+                    Settings.DataDirectory,
+                    GlobalJson.Data.ProjectPath,
+                    GlobalJson.Data.ImagePath,
+                    fileName);
+
+                if (!File.Exists(originalPath))
+                    await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+
+                // Header und UI-Anzeige aktualisieren
+                if (File.Exists(thumbPath) || File.Exists(originalPath))
+                {
+                    Helper.HeaderUpdate();
+                    LoadDataToUI();
+                }
+            });
+        });
+
         Helper.HeaderUpdate();
     }
 
@@ -41,6 +78,8 @@ public partial class ProjectDetails : ContentPage
         base.OnDisappearing();
 
         WeakReferenceMessenger.Default.Unregister<RemoteDataChangedMessage>(this);
+
+        WeakReferenceMessenger.Default.Unregister<TitleImageChangedMessage>(this);
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
@@ -58,20 +97,36 @@ public partial class ProjectDetails : ContentPage
 
     public async void OnTitleCaptureClicked(object sender, EventArgs e)
     {
+        // 1. Alten Dateinamen vor der Kameraaufnahme sichern
+        string oldTitleImage = GlobalJson.Data.TitleImage;
         string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 
-        (FileResult result, Size imgSize) = await CapturePicture.Capture(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath), GlobalJson.Data.ProjectPath, thumbFileName);
+        (FileResult result, Size imgSize) = await CapturePicture.Capture(
+            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
+            GlobalJson.Data.ProjectPath,
+            thumbFileName);
+
         if (result != null)
         {
-            if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
-                File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
-            if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
-                File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
-            
+            // 2. Alte Dateien lokal UND aus der Cloud loeschen
+            if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
+            {
+                var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+
+                if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
+                if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
+
+                // Cloud-Loeschung anstossen
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
+                _ = SaveManager.DeleteCloudFileAsync(oldTitleImage);
+            }
+
+            // 3. JSON aktualisieren
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
 
-            // save data to file
+            // 4. JSON-Aenderungen in der Cloud aktualisieren
             SaveManager.NotifyDataChanged();
 
             Helper.HeaderUpdate();
@@ -90,6 +145,9 @@ public partial class ProjectDetails : ContentPage
 
             if (fileResult != null)
             {
+                // 1. Alten Dateinamen vor dem Ueberschreiben merken
+                string oldTitleImage = GlobalJson.Data.TitleImage;
+
                 string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
                 string sourceFilePath = fileResult.FullPath;
                 var codec = SKCodec.Create(fileResult.FullPath);
@@ -108,10 +166,21 @@ public partial class ProjectDetails : ContentPage
                 }
                 await Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
-                if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage))) // delete old Thumbnail
-                    File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.TitleImage));
-                if (File.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage))) // delete old Title Image
-                    File.Delete(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage));
+                // 2. Alte Dateien lokal UND in der Cloud loeschen
+                if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
+                {
+                    var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, oldTitleImage);
+                    var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+
+                    if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
+                    if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
+
+                    // Cloud-Loeschung anstossen
+                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
+                    _ = SaveManager.DeleteCloudFileAsync(oldTitleImage);
+                }
+
+                // 3. JSON aktualisieren
                 GlobalJson.Data.TitleImage = thumbFileName;
 
                 if (codec != null)
@@ -119,15 +188,18 @@ public partial class ProjectDetails : ContentPage
                 else
                     GlobalJson.Data.TitleImageSize = new Size(500, 500);
 
-                // save data to file
-                SaveManager.NotifyDataChanged();
+                // 4. JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
+                SaveManager.NotifyDataChanged([
+                    (destinationPath, GlobalJson.Data.ImagePath), // Originalbild im Images-Ordner
+                    (destinationThumbPath, "")                   // Thumbnail im Root-Ordner
+                ]);
 
                 Helper.HeaderUpdate();
             }
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"Fehler beim Auswählen der Datei: {ex.Message}");
+            Console.WriteLine($"Fehler beim Auswaehlen der Datei: {ex.Message}");
         }
     }
 

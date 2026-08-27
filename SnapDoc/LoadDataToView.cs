@@ -120,12 +120,16 @@ public partial class LoadDataToView
                 if (contentToRemove != null) break;
             }
 
-            if (contentToRemove != null && parentSection != null)
+            if (contentToRemove != null && parentSection?.Items != null)
             {
                 parentSection.Items.Remove(contentToRemove);
 
-                if (parentSection.Items.Count == 0 && parentSection.Parent is ShellItem group)
+                if (parentSection.Items.Count == 0
+                    && parentSection.Parent is ShellItem group
+                    && group.Items != null)
+                {
                     group.Items.Remove(parentSection);
+                }
             }
         }
 
