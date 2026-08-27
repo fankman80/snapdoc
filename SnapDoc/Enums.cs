@@ -36,4 +36,11 @@ namespace SnapDoc
         SelectFolder,
         SelectJsonFile
     }
+
+    public enum RemoteChangeType
+    {
+        ProjectDetailsUpdated,
+        PlanListUpdated,
+        PinsUpdated
+    }
 }
