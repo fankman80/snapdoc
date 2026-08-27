@@ -236,6 +236,8 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
     {
         InitializeComponent();
 
+        BindingContext = this;
+
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         LineWidth = lineWidth;
@@ -252,8 +254,6 @@ public partial class PopupStyleEditor : Popup<PopupStyleReturn>, INotifyProperty
         SelectedBorderColor = Color.FromArgb(borderColor);
         SelectedFillColor = Color.FromArgb(fillColor);
         SelectedTextColor = Color.FromArgb(textColor);
-
-        BindingContext = this;
     }
 
     private void OnPreviewPaintSurface(object sender, SKPaintSurfaceEventArgs e)
