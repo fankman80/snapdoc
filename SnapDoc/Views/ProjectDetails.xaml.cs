@@ -38,6 +38,7 @@ public partial class ProjectDetails : ContentPage
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 LoadDataToUI();
+                Helper.HeaderUpdate();
             });
         });
 
@@ -75,7 +76,7 @@ public partial class ProjectDetails : ContentPage
         (FileResult result, Size imgSize) = await CapturePicture.Capture(
             Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
             Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath),
-            thumbFileName);
+            thumbFileName, true, true);
 
         if (result != null)
         {
@@ -88,7 +89,6 @@ public partial class ProjectDetails : ContentPage
                 if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
                 if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
 
-                // Cloud-Loeschung anstossen
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{oldTitleImage}");
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
             }
@@ -97,8 +97,12 @@ public partial class ProjectDetails : ContentPage
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
 
-            // 4. JSON-Aenderungen in der Cloud aktualisieren
-            SaveManager.NotifyDataChanged();
+            // Absolute Pfade der neuen Dateien ermitteln
+            var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
+            var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
+
+            // 4. JSON-Aenderungen UND die 2 neuen Bilddateien an SaveManager uebergeben
+            SaveManager.NotifyDataChanged([(destinationPath, GlobalJson.Data.ImagePath), (destinationThumbPath, GlobalJson.Data.ThumbnailPath)]);
 
             Helper.HeaderUpdate();
         }
@@ -121,7 +125,7 @@ public partial class ProjectDetails : ContentPage
 
                 string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
                 string sourceFilePath = fileResult.FullPath;
-                var codec = SKCodec.Create(fileResult.FullPath);
+
                 var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
                 var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
 
@@ -154,10 +158,14 @@ public partial class ProjectDetails : ContentPage
                 // 3. JSON aktualisieren
                 GlobalJson.Data.TitleImage = thumbFileName;
 
-                if (codec != null)
-                    GlobalJson.Data.TitleImageSize = new Size(codec.Info.Size.Width, codec.Info.Size.Height);
-                else
-                    GlobalJson.Data.TitleImageSize = new Size(500, 500);
+                // Codec in einem using-Block kapseln, um Memory Leaks zu verhindern
+                using (var codec = SKCodec.Create(sourceFilePath))
+                {
+                    if (codec != null)
+                        GlobalJson.Data.TitleImageSize = new Size(codec.Info.Size.Width, codec.Info.Size.Height);
+                    else
+                        GlobalJson.Data.TitleImageSize = new Size(500, 500);
+                }
 
                 // 4. JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
                 SaveManager.NotifyDataChanged([

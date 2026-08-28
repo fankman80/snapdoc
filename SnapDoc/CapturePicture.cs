@@ -9,7 +9,7 @@ namespace SnapDoc;
 
 public class CapturePicture
 {
-    public static async Task<(FileResult, Size)> Capture(string filepath, string thumbnailPath = null, string customFilename = null)
+    public static async Task<(FileResult, Size)> Capture(string filepath, string thumbnailPath = null, string customFilename = null, bool waitForProcessing = false, bool skipNotify = false)
     {
         var cameraStatus = await Permissions.CheckStatusAsync<Permissions.Camera>();
 
@@ -95,7 +95,8 @@ public class CapturePicture
                 }
 
                 string threadSafeTempPath = safeTempPath;
-                _ = Task.Run(() =>
+
+                var processTask = Task.Run(() =>
                 {
                     try
                     {
@@ -125,19 +126,20 @@ public class CapturePicture
 
                         if (finalBitmap != originalBitmap) finalBitmap.Dispose();
 
-                        // Verwende den relativen Zielordner fuer SaveManager
-                        var filesToSync = new List<(string filePath, string targetFolder)>
+                        if (!skipNotify)
                         {
-                            (resultPath, GlobalJson.Data.ImagePath)
-                        };
+                            var filesToSync = new List<(string filePath, string targetFolder)>
+                            {
+                                (resultPath, GlobalJson.Data.ImagePath)
+                            };
 
-                        if (thumbnailPath != null)
-                        {
-                            string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
-                            filesToSync.Add((thumbFilePath, GlobalJson.Data.ThumbnailPath));
+                            if (thumbnailPath != null)
+                            {
+                                string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
+                                filesToSync.Add((thumbFilePath, GlobalJson.Data.ThumbnailPath));
+                            }
+                            SaveManager.NotifyDataChanged(filesToSync);
                         }
-
-                        SaveManager.NotifyDataChanged(filesToSync);
                     }
                     catch (Exception ex)
                     {
@@ -149,6 +151,9 @@ public class CapturePicture
                             try { File.Delete(threadSafeTempPath); } catch { }
                     }
                 });
+
+                if (waitForProcessing)
+                    await processTask;
             }
             else
             {
