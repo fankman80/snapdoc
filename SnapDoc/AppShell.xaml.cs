@@ -94,57 +94,19 @@ public partial class AppShell : Shell
         {
             MainThread.BeginInvokeOnMainThread(async () =>
             {
-                if (string.IsNullOrEmpty(m.NewFileName) || GlobalJson.Data == null) return;
+                if (GlobalJson.Data == null)
+                    return;
 
-                string oldFileName = m.OldFileName;
-                string newFileName = m.NewFileName;
+                string projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
 
-                // 1. Alte lokale Dateien loeschen, wenn sich der Name geaendert hat
-                if (!string.IsNullOrEmpty(oldFileName) &&
-                    oldFileName != newFileName &&
-                    oldFileName != "banner_thumbnail.png")
-                {
-                    string oldThumbPath = Path.Combine(
-                        Settings.DataDirectory,
-                        GlobalJson.Data.ProjectPath,
-                        GlobalJson.Data.ThumbnailPath,
-                        oldFileName);
+                if (string.IsNullOrEmpty(projectDir))
+                    return;
 
-                    string oldImagePath = Path.Combine(
-                        Settings.DataDirectory,
-                        GlobalJson.Data.ProjectPath,
-                        GlobalJson.Data.ImagePath,
-                        oldFileName);
+                await Helper.UpdateProjectTitleImageAsync(GlobalJson.Data, projectDir, m.OldFileName, m.NewFileName);
 
-                    if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
-                    if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
-                }
-
-                // 2. Neues Thumbnail pruefen & nachladen
-                string thumbPath = Path.Combine(
-                    Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
-                    GlobalJson.Data.ThumbnailPath,
-                    newFileName);
-
-                if (!File.Exists(thumbPath))
-                    await SaveManager.DownloadMediaOnDemandAsync(newFileName, isThumbnail: true);
-
-                // 3. Neues Originalbild pruefen & nachladen
-                string originalPath = Path.Combine(
-                    Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
-                    GlobalJson.Data.ImagePath,
-                    newFileName);
-
-                if (!File.Exists(originalPath))
-                    await SaveManager.DownloadMediaOnDemandAsync(newFileName, isThumbnail: false);
-
-                // Flyout-Header global aktualisieren
                 Helper.HeaderUpdate();
             });
         });
-
         ReloadPlansFromData();
     }
 

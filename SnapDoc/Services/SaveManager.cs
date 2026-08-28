@@ -1376,6 +1376,45 @@ public static class SaveManager
         return DownloadMediaOnDemandAsync(fileName, subFolder);
     }
 
+    public static async Task<JsonDataModel?> GetRemoteProjectDataAsync(
+    string driveId,
+    string folderId,
+    string jsonFileName)
+    {
+        if (CurrentAuth?.GraphClient == null ||
+            !CurrentAuth.IsLoggedIn ||
+            string.IsNullOrWhiteSpace(driveId) ||
+            string.IsNullOrWhiteSpace(folderId) ||
+            string.IsNullOrWhiteSpace(jsonFileName))
+        {
+            return null;
+        }
+
+        try
+        {
+            using var stream = await CurrentAuth.GraphClient
+                .Drives[driveId]
+                .Items[folderId]
+                .ItemWithPath(jsonFileName)
+                .Content
+                .GetAsync();
+
+            if (stream == null)
+                return null;
+
+            return await JsonSerializer.DeserializeAsync<JsonDataModel>(
+                stream,
+                GlobalJson.GetOptions());
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(
+                $"Cloud-JSON konnte nicht gelesen werden ({jsonFileName}): {ex.Message}");
+
+            return null;
+        }
+    }
+
     public static void ResetCloudSync()
     {
         TargetFolderId = null;

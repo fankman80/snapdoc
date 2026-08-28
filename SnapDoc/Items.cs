@@ -50,12 +50,12 @@ namespace SnapDoc
         public required string FileName { get; set; }
         public required string FilePath { get; set; }
         public required DateTime FileDate { get; set; }
-        public required string ImagePath { get; set; }
-        public required string ThumbnailPath { get; set; }
-
+        [ObservableProperty]
+        public partial string ImagePath { get; set; }
+        [ObservableProperty]
+        public partial string ThumbnailPath { get; set; }
         [ObservableProperty]
         public partial bool HasCloudSync { get; set; }
-
         [ObservableProperty]
         public partial bool IsActive { get; set; }
     }

@@ -101,7 +101,7 @@
                                     FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
                                     Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
-                                    Source="{Binding ImagePath}"
+                                    Source="{Binding ThumbnailPath}"
                                     Aspect="AspectFill"/>      
                             <Border Grid.Column="0" Grid.RowSpan="2"
                                     IsVisible="{Binding HasCloudSync}"

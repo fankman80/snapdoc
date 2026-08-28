@@ -7,6 +7,10 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
+using System.Diagnostics;
+using SnapDoc.Models;
+
+
 
 #if ANDROID
 using Microsoft.Maui.Graphics;
@@ -530,6 +534,96 @@ public class Helper
         catch (Exception) { }
 
         return null;
+    }
+
+    public static async Task<bool> UpdateProjectTitleImageAsync(
+        JsonDataModel projectData,
+        string projectDir,
+        string oldFileName,
+        string newFileName)
+    {
+        if (projectData == null ||
+            string.IsNullOrWhiteSpace(projectDir) ||
+            string.IsNullOrWhiteSpace(newFileName) ||
+            string.IsNullOrWhiteSpace(projectData.CloudDriveId) ||
+            string.IsNullOrWhiteSpace(projectData.CloudFolderId))
+        {
+            return false;
+        }
+
+        string thumbnailFolder =
+            !string.IsNullOrWhiteSpace(projectData.ThumbnailPath)
+                ? projectData.ThumbnailPath
+                : "thumbnails";
+
+        string imageFolder =
+            !string.IsNullOrWhiteSpace(projectData.ImagePath)
+                ? projectData.ImagePath
+                : "images";
+
+        // 1. Alte Dateien löschen
+        if (!string.IsNullOrWhiteSpace(oldFileName) &&
+            !oldFileName.Equals(
+                newFileName,
+                StringComparison.OrdinalIgnoreCase) &&
+            !oldFileName.Equals(
+                "banner_thumbnail.png",
+                StringComparison.OrdinalIgnoreCase))
+        {
+            string oldThumbPath = Path.Combine(projectDir, thumbnailFolder, oldFileName);
+            string oldImagePath = Path.Combine(projectDir, imageFolder, oldFileName);
+
+            try
+            {
+                if (File.Exists(oldThumbPath))
+                    File.Delete(oldThumbPath);
+
+                if (File.Exists(oldImagePath))
+                    File.Delete(oldImagePath);
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Alte Titelbilder konnten nicht gelöscht werden: {ex.Message}");
+            }
+        }
+
+        // 2. Neue Pfade
+        string newThumbPath = Path.Combine(projectDir, thumbnailFolder, newFileName);
+        string newImagePath = Path.Combine(projectDir, imageFolder, newFileName);
+
+        // 3. Thumbnail herunterladen
+        bool thumbnailExists = File.Exists(newThumbPath);
+
+        if (!thumbnailExists)
+        {
+            thumbnailExists =
+                await SaveManager.DownloadMediaOnDemandAsync(
+                    fileName: newFileName,
+                    subFolder: thumbnailFolder,
+                    driveId: projectData.CloudDriveId,
+                    folderId: projectData.CloudFolderId,
+                    projectDir: projectDir);
+
+            thumbnailExists = File.Exists(newThumbPath);
+        }
+
+        // 4. Original herunterladen
+        bool imageExists = File.Exists(newImagePath);
+
+        if (!imageExists)
+        {
+            imageExists =
+                await SaveManager.DownloadMediaOnDemandAsync(
+                    fileName: newFileName,
+                    subFolder: imageFolder,
+                    driveId: projectData.CloudDriveId,
+                    folderId: projectData.CloudFolderId,
+                    projectDir: projectDir);
+
+            imageExists = File.Exists(newImagePath);
+        }
+
+        return thumbnailExists && imageExists;
     }
 }
 
