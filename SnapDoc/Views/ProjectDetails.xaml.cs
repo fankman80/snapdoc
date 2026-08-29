@@ -96,6 +96,7 @@ public partial class ProjectDetails : ContentPage
             // 3. JSON aktualisieren
             GlobalJson.Data.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
+            GlobalJson.SaveToFile();
 
             // Absolute Pfade der neuen Dateien ermitteln
             var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
@@ -166,7 +167,9 @@ public partial class ProjectDetails : ContentPage
                     else
                         GlobalJson.Data.TitleImageSize = new Size(500, 500);
                 }
-
+                
+                GlobalJson.SaveToFile();
+                
                 // 4. JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
                 SaveManager.NotifyDataChanged([
                     (destinationPath, GlobalJson.Data.ImagePath), // Originalbild im Images-Ordner
