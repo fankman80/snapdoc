@@ -160,7 +160,17 @@ public static class SaveManager
     public static async Task SaveWithSyncCheckAsync()
     {
         string filePath = GlobalJson.GetFilePath();
-        if (string.IsNullOrEmpty(filePath)) return;
+        if (string.IsNullOrEmpty(filePath))
+            return;
+
+        var activeData = GlobalJson.Data;
+        if (activeData == null || string.IsNullOrEmpty(activeData.CloudDriveId) || string.IsNullOrEmpty(activeData.CloudFolderId))
+            return;
+
+        string driveId = activeData.CloudDriveId;
+        string targetFolderId = activeData.CloudFolderId;
+        string activeCloudFileName = activeData.JsonFile ?? "snapdoc_data.json";
+        string frozenJsonPayload = GlobalJson.ToJson();
 
         lock (_fileLock)
         {
@@ -175,22 +185,12 @@ public static class SaveManager
 
         if (CurrentAuth != null && CurrentAuth.IsLoggedIn && CurrentAuth.GraphClient != null)
         {
-            // Verhindert ungewollte Uploads. Nur synchronisieren, wenn explizit verknüpft!
-            if (GlobalJson.Data == null ||
-                string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
-                string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId))
-            {
-                return;
-            }
-
             try
             {
-                string driveId = GlobalJson.Data.CloudDriveId;
-                string targetFolderId = GlobalJson.Data.CloudFolderId;
                 try
                 {
                     var cloudItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                        .ItemWithPath(CloudFileName)
+                        .ItemWithPath(activeCloudFileName)
                         .GetAsync();
 
                     bool baselineNeverEstablished = _lastKnownCloudSyncTime == DateTimeOffset.MinValue;
@@ -204,11 +204,8 @@ public static class SaveManager
                         }
                         else
                         {
-                            // Echter Konflikt: Wir hatten schon eine gueltige Baseline und die
-                            // Cloud-Datei ist seitdem neu -> jemand anderes hat sie veraendert.
-                            // Herunterladen und mergen.
                             var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                                .ItemWithPath(CloudFileName)
+                                .ItemWithPath(activeCloudFileName)
                                 .Content
                                 .GetAsync();
 
@@ -219,9 +216,14 @@ public static class SaveManager
                                 {
                                     lock (_fileLock)
                                     {
-                                        MergeModels(GlobalJson.Data, cloudData);
-                                        GlobalJson.SaveToFile();
-                                        _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                        // SICHERHEITSCHECK: Nur Mergen, wenn das Projekt noch dasselbe ist
+                                        if (GlobalJson.GetFilePath() == filePath)
+                                        {
+                                            MergeModels(GlobalJson.Data, cloudData);
+                                            GlobalJson.SaveToFile();
+                                            _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                            frozenJsonPayload = GlobalJson.ToJson();
+                                        }
                                     }
                                 }
                             }
@@ -230,21 +232,19 @@ public static class SaveManager
                 }
                 catch (Microsoft.Graph.Models.ODataErrors.ODataError) { /* Existiert nicht */ }
 
-                string json = GlobalJson.ToJson();
-                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(json);
+                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(frozenJsonPayload);
                 using var stream = new MemoryStream(byteArray);
 
                 try
                 {
                     var uploadedItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                        .ItemWithPath(CloudFileName)
+                        .ItemWithPath(activeCloudFileName)
                         .Content
                         .PutAsync(stream, requestConfig =>
                         {
                             if (!string.IsNullOrEmpty(_lastKnownETag))
                                 requestConfig.Headers.Add("If-Match", _lastKnownETag);
                         });
-
                     if (uploadedItem != null)
                     {
                         _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
