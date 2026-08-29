@@ -105,7 +105,6 @@ public partial class LoadPDFPages : ContentPage
 
                         for (int i = 0; i < nativeDoc.PageCount; i++)
                         {
-                            await BusyService.SetMessageAsync($"PDF {fileIndex + 1}, Seite {i + 1} wird verarbeitet...");
                             string imgBaseName = $"pdf_{importId}_{fileIndex}_page_{i}";
                             string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                             string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
@@ -281,11 +280,15 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task LoadPDFImages()
     {
-        // Nur die Elemente filtern, die wirklich aus einem PDF gerendert werden muessen (PdfPath != null)
-        var groups = fileListView.ItemsSource.Cast<PdfItem>()
+        var itemsToProcess = fileListView.ItemsSource.Cast<PdfItem>()
                         .Where(x => x.IsChecked && !string.IsNullOrEmpty(x.PdfPath))
-                        .GroupBy(x => x.PdfPath)
                         .ToList();
+
+        int totalPages = itemsToProcess.Count;
+        int processedPages = 0;
+
+        // Nur die Elemente filtern, die wirklich aus einem PDF gerendert werden muessen (PdfPath != null)
+        var groups = itemsToProcess.GroupBy(x => x.PdfPath).ToList();
 
         await Parallel.ForEachAsync(groups, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, async (group, cancellationToken) =>
         {
@@ -294,6 +297,9 @@ public partial class LoadPDFPages : ContentPage
 
             foreach (var item in group)
             {
+                int current = Interlocked.Increment(ref processedPages);
+                await BusyService.SetMessageAsync(string.Format(AppResources.pdf_seite_wird_generiert, current, totalPages));
+
                 string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
                 var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
                 item.FinalWidth = width;

@@ -1140,4 +1140,13 @@
   <data name="projektdatei_importieren" xml:space="preserve">
     <value>Projektdatei importieren</value>
   </data>
+  <data name="pdf_seite_wird_generiert" xml:space="preserve">
+    <value>PDF-Seite {0} von {1} wird generiert...</value>
+  </data>
+  <data name="dateien_fortschritt" xml:space="preserve">
+    <value>{0} von {1} Dateien ({2:P0})</value>
+  </data>
+  <data name="bitte_warten" xml:space="preserve">
+    <value>Bitte warten...</value>
+  </data>
 </root>

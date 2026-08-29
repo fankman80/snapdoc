@@ -1,3 +1,5 @@
+using SnapDoc.Resources.Languages;
+
 namespace SnapDoc.Controls;
 
 public partial class BusyOverlayPage : ContentPage
@@ -7,14 +9,14 @@ public partial class BusyOverlayPage : ContentPage
         InitializeComponent();
 
         MessageLabel.Text = string.IsNullOrWhiteSpace(message)
-            ? "Bitte warten..."
+            ? AppResources.bitte_warten
             : message;
     }
 
     public void SetMessage(string? message)
     {
         MessageLabel.Text = string.IsNullOrWhiteSpace(message)
-            ? "Bitte warten..."
+            ? AppResources.bitte_warten
             : message;
     }
 
@@ -27,7 +29,7 @@ public partial class BusyOverlayPage : ContentPage
         {
             double percent = (double)current / total;
             ProgressBar.Progress = percent;
-            ProgressDetailsLabel.Text = $"{current} von {total} Dateien ({percent:P0})";
+            ProgressDetailsLabel.Text = string.Format(AppResources.dateien_fortschritt, current, total, percent);
 
             if (!string.IsNullOrWhiteSpace(currentFileName))
             {

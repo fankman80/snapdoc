@@ -484,6 +484,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte warten... ähnelt.
+        /// </summary>
+        internal static string bitte_warten {
+            get {
+                return ResourceManager.GetString("bitte_warten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte melden Sie sich zuerst an. ähnelt.
         /// </summary>
         internal static string bitte_zuerst_anmelden {
@@ -507,6 +516,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string datei_konnte_nicht_importiert_werden {
             get {
                 return ResourceManager.GetString("datei_konnte_nicht_importiert_werden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die {0} von {1} Dateien ({2:P0}) ähnelt.
+        /// </summary>
+        internal static string dateien_fortschritt {
+            get {
+                return ResourceManager.GetString("dateien_fortschritt", resourceCulture);
             }
         }
         
@@ -1875,6 +1893,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string pdf_dateien_auswaehlen {
             get {
                 return ResourceManager.GetString("pdf_dateien_auswaehlen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die PDF-Seite {0} von {1} wird generiert... ähnelt.
+        /// </summary>
+        internal static string pdf_seite_wird_generiert {
+            get {
+                return ResourceManager.GetString("pdf_seite_wird_generiert", resourceCulture);
             }
         }
         

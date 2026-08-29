@@ -646,7 +646,7 @@ public static class SaveManager
     }
 
     // Durchsucht den gesamten SharePoint/OneDrive des Nutzers nach SnapDoc-Projekten.
-    public static async Task<List<RemoteProjectDto>> SearchRemoteProjectsAsync()
+    public static async Task<List<RemoteProjectDto>> SearchRemoteProjectsAsync(CancellationToken cancellationToken = default)
     {
         var results = new List<RemoteProjectDto>();
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
@@ -654,14 +654,15 @@ public static class SaveManager
 
         try
         {
-            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
+            // Token an GetAsync übergeben
+            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync(cancellationToken: cancellationToken);
             if (myDrive?.Id == null)
                 return results;
 
-            // Sucht nach allen *.json Dateien im Laufwerk
+            // Sucht nach allen *.json Dateien im Laufwerk und Token übergeben
             var searchResponse = await CurrentAuth.GraphClient.Drives[myDrive.Id]
                 .SearchWithQ(".json")
-                .GetAsSearchWithQGetResponseAsync();
+                .GetAsSearchWithQGetResponseAsync(cancellationToken: cancellationToken);
 
             if (searchResponse?.Value == null)
                 return results;
@@ -680,6 +681,10 @@ public static class SaveManager
                     });
                 }
             }
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine("Cloud-Suche wurde durch den Benutzer abgebrochen.");
         }
         catch (Exception ex)
         {
@@ -1322,8 +1327,13 @@ public static class SaveManager
     }
 
     // Laedt ein spezifisches Foto oder Bild bedarfsgesteuert herunter
-    // Unterstuetzt optionale explizite Pfade/IDs fuer ungeladene Projekte aus der Liste
-    public static async Task<bool> DownloadMediaOnDemandAsync(string fileName, string subFolder = "", string? driveId = null, string? folderId = null, string? projectDir = null)
+    public static async Task<bool> DownloadMediaOnDemandAsync(
+            string fileName,
+            string subFolder = "",
+            string? driveId = null,
+            string? folderId = null,
+            string? projectDir = null,
+            CancellationToken cancellationToken = default) // Token hinzugefügt
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
 
@@ -1352,10 +1362,11 @@ public static class SaveManager
             // Abbruch, falls die Datei bereits lokal existiert
             if (File.Exists(localDestinationPath)) return true;
 
+            // Token an die Graph API übergeben
             var fileStream = await CurrentAuth.GraphClient.Drives[effectiveDriveId].Items[effectiveFolderId]
                 .ItemWithPath(relativeCloudPath)
                 .Content
-                .GetAsync();
+                .GetAsync(cancellationToken: cancellationToken);
 
             if (fileStream != null)
             {
@@ -1364,9 +1375,17 @@ public static class SaveManager
                     Directory.CreateDirectory(targetDir);
 
                 using var localFile = File.Create(localDestinationPath);
-                await fileStream.CopyToAsync(localFile);
+
+                // Token an den Kopiervorgang übergeben
+                await fileStream.CopyToAsync(localFile, cancellationToken);
                 return true;
             }
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"Download für {fileName} wurde durch den Benutzer abgebrochen.");
+            // Optional: Unvollständige lokale Datei löschen, falls der Stream mittendrin abgebrochen wurde
+            return false;
         }
         catch (Exception ex)
         {
@@ -1387,9 +1406,10 @@ public static class SaveManager
     }
 
     public static async Task<JsonDataModel?> GetRemoteProjectDataAsync(
-    string driveId,
-    string folderId,
-    string jsonFileName)
+            string driveId,
+            string folderId,
+            string jsonFileName,
+            CancellationToken cancellationToken = default) // Token hinzugefügt
     {
         if (CurrentAuth?.GraphClient == null ||
             !CurrentAuth.IsLoggedIn ||
@@ -1402,19 +1422,27 @@ public static class SaveManager
 
         try
         {
+            // Token an die Graph API übergeben
             using var stream = await CurrentAuth.GraphClient
                 .Drives[driveId]
                 .Items[folderId]
                 .ItemWithPath(jsonFileName)
                 .Content
-                .GetAsync();
+                .GetAsync(cancellationToken: cancellationToken);
 
             if (stream == null)
                 return null;
 
+            // Token an den JSON-Deserialisierer übergeben
             return await JsonSerializer.DeserializeAsync<JsonDataModel>(
                 stream,
-                GlobalJson.GetOptions());
+                GlobalJson.GetOptions(),
+                cancellationToken);
+        }
+        catch (OperationCanceledException)
+        {
+            Console.WriteLine($"Abruf der JSON-Datei ({jsonFileName}) wurde abgebrochen.");
+            return null;
         }
         catch (Exception ex)
         {

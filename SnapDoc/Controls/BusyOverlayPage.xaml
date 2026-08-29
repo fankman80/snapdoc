@@ -36,7 +36,6 @@
                 <!-- Text -->
                 <Label
                     x:Name="MessageLabel"
-                    Text="Bitte warten..."
                     TextColor="White"
                     FontSize="18"
                     HorizontalTextAlignment="Center"
