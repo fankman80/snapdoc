@@ -10,8 +10,6 @@ using System.Xml.Linq;
 using System.Diagnostics;
 using SnapDoc.Models;
 
-
-
 #if ANDROID
 using Microsoft.Maui.Graphics;
 using System.IO;
@@ -537,11 +535,10 @@ public class Helper
     }
 
     public static async Task<bool> UpdateProjectTitleImageAsync(
-                JsonDataModel projectData,
-                string projectDir,
-                string oldFileName,
-                string newFileName,
-                CancellationToken cancellationToken = default)
+        JsonDataModel projectData,
+        string projectDir,
+        string oldFileName,
+        string newFileName)
     {
         if (projectData == null ||
             string.IsNullOrWhiteSpace(projectDir) ||
@@ -564,8 +561,12 @@ public class Helper
 
         // 1. Alte Dateien löschen
         if (!string.IsNullOrWhiteSpace(oldFileName) &&
-            !oldFileName.Equals(newFileName, StringComparison.OrdinalIgnoreCase) &&
-            !oldFileName.Equals("banner_thumbnail.png", StringComparison.OrdinalIgnoreCase))
+            !oldFileName.Equals(
+                newFileName,
+                StringComparison.OrdinalIgnoreCase) &&
+            !oldFileName.Equals(
+                "banner_thumbnail.png",
+                StringComparison.OrdinalIgnoreCase))
         {
             string oldThumbPath = Path.Combine(projectDir, thumbnailFolder, oldFileName);
             string oldImagePath = Path.Combine(projectDir, imageFolder, oldFileName);
@@ -593,14 +594,13 @@ public class Helper
 
         if (!thumbnailExists)
         {
-            // Die nutzlose Zuweisung an "thumbnailExists" wurde hier entfernt.
-            await SaveManager.DownloadMediaOnDemandAsync(
-                fileName: newFileName,
-                subFolder: thumbnailFolder,
-                driveId: projectData.CloudDriveId,
-                folderId: projectData.CloudFolderId,
-                projectDir: projectDir,
-                cancellationToken: cancellationToken);
+            thumbnailExists =
+                await SaveManager.DownloadMediaOnDemandAsync(
+                    fileName: newFileName,
+                    subFolder: thumbnailFolder,
+                    driveId: projectData.CloudDriveId,
+                    folderId: projectData.CloudFolderId,
+                    projectDir: projectDir);
 
             thumbnailExists = File.Exists(newThumbPath);
         }
@@ -610,14 +610,13 @@ public class Helper
 
         if (!imageExists)
         {
-            // Die nutzlose Zuweisung an "imageExists" wurde hier entfernt.
-            await SaveManager.DownloadMediaOnDemandAsync(
-                fileName: newFileName,
-                subFolder: imageFolder,
-                driveId: projectData.CloudDriveId,
-                folderId: projectData.CloudFolderId,
-                projectDir: projectDir,
-                cancellationToken: cancellationToken);
+            imageExists =
+                await SaveManager.DownloadMediaOnDemandAsync(
+                    fileName: newFileName,
+                    subFolder: imageFolder,
+                    driveId: projectData.CloudDriveId,
+                    folderId: projectData.CloudFolderId,
+                    projectDir: projectDir);
 
             imageExists = File.Exists(newImagePath);
         }
