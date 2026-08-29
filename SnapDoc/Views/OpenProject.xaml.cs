@@ -1,4 +1,4 @@
-﻿#nullable disable
+﻿﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
@@ -14,7 +14,6 @@ namespace SnapDoc.Views;
 public partial class OpenProject : ContentPage
 {
     private bool _isProcessing = false;
-    private CancellationTokenSource _syncCancellationTokenSource;
 
     public OpenProject()
     {
@@ -24,32 +23,12 @@ public partial class OpenProject : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+
         LoadJsonFiles();
-    }
-
-    protected override void OnDisappearing()
-    {
-        base.OnDisappearing();
-        // Abbrechen, wenn die Seite verlassen wird
-        CancelPendingCloudSync();
-    }
-
-    private void CancelPendingCloudSync()
-    {
-        if (_syncCancellationTokenSource != null)
-        {
-            _syncCancellationTokenSource.Cancel();
-            _syncCancellationTokenSource.Dispose();
-            _syncCancellationTokenSource = null;
-        }
     }
 
     private async void LoadJsonFiles()
     {
-        CancelPendingCloudSync();
-        _syncCancellationTokenSource = new CancellationTokenSource();
-        var cancellationToken = _syncCancellationTokenSource.Token;
-
         string rootDirectory = Settings.DataDirectory;
 
         // 1. Lokale JSON-Dateien einlesen
@@ -61,13 +40,14 @@ public partial class OpenProject : ContentPage
             {
                 var files = Directory.EnumerateFiles(rootDirectory, "*.json", SearchOption.AllDirectories);
                 string activeFilePath = GlobalJson.Data?.JsonFile != null
-                    ? Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)
+                    ? Path.Combine(
+                        Settings.DataDirectory,
+                        GlobalJson.Data.ProjectPath,
+                        GlobalJson.Data.JsonFile)
                     : null;
 
                 foreach (var file in files)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
                     string projectDir = Path.GetDirectoryName(file);
                     string thumbPath = "banner_thumbnail.png";
 
@@ -75,17 +55,23 @@ public partial class OpenProject : ContentPage
                     {
                         var projectData = GlobalJson.ReadFromFile(file);
 
-                        if (projectData != null && !string.IsNullOrWhiteSpace(projectDir))
+                        if (projectData != null &&
+                            !string.IsNullOrWhiteSpace(projectDir))
                         {
-                            string titleImageName = !string.IsNullOrWhiteSpace(projectData.TitleImage)
+                            string titleImageName =
+                                !string.IsNullOrWhiteSpace(projectData.TitleImage)
                                     ? projectData.TitleImage
                                     : "banner_thumbnail.png";
 
-                            string thumbnailFolder = !string.IsNullOrWhiteSpace(projectData.ThumbnailPath)
+                            string thumbnailFolder =
+                                !string.IsNullOrWhiteSpace(projectData.ThumbnailPath)
                                     ? projectData.ThumbnailPath
                                     : "thumbnails";
 
-                            string fullThumbPath = Path.Combine(projectDir, thumbnailFolder, titleImageName);
+                            string fullThumbPath = Path.Combine(
+                                projectDir,
+                                thumbnailFolder,
+                                titleImageName);
 
                             if (File.Exists(fullThumbPath))
                                 thumbPath = fullThumbPath;
@@ -107,22 +93,19 @@ public partial class OpenProject : ContentPage
                     });
                 }
             }
-            catch (OperationCanceledException)
-            {
-                // Abbruch ignorieren, leere/teilweise Liste wird unten abgefangen
-            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Fehler beim Einlesen der Projekte: {ex.Message}");
             }
 
-            return items.OrderByDescending(f => f.FileDate).ToList();
-        }, cancellationToken);
-
-        if (cancellationToken.IsCancellationRequested) return;
+            return items
+                .OrderByDescending(f => f.FileDate)
+                .ToList();
+        });
 
         // 2. CollectionView sofort anzeigen
         FileListView.ItemsSource = foundFiles;
+
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
 
         // 3. Cloud-Abgleich im Hintergrund
@@ -133,24 +116,27 @@ public partial class OpenProject : ContentPage
 
             try
             {
-                // Token an Netzwerk-Methode durchreichen
-                var remoteProjects = await SaveManager.SearchRemoteProjectsAsync(cancellationToken);
+                var remoteProjects =
+                    await SaveManager.SearchRemoteProjectsAsync();
 
                 if (remoteProjects == null)
                     return;
 
                 foreach (var item in foundFiles)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
                     try
                     {
                         var localData = GlobalJson.ReadFromFile(item.FilePath);
-                        if (localData == null) continue;
+
+                        if (localData == null)
+                            continue;
 
                         string projectDir = Path.GetDirectoryName(item.FilePath);
-                        if (string.IsNullOrWhiteSpace(projectDir)) continue;
 
+                        if (string.IsNullOrWhiteSpace(projectDir))
+                            continue;
+
+                        // 3.1 Passendes Cloud-Projekt suchen
                         RemoteProjectDto remoteProject = null;
 
                         if (!string.IsNullOrWhiteSpace(localData.CloudFolderId))
@@ -159,10 +145,14 @@ public partial class OpenProject : ContentPage
                         if (remoteProject == null)
                         {
                             string expectedJsonName = item.FileName + ".json";
+
                             remoteProject = remoteProjects.FirstOrDefault(
-                                rp => rp.FileName.Equals(expectedJsonName, StringComparison.OrdinalIgnoreCase));
+                                            rp => rp.FileName.Equals(
+                                            expectedJsonName,
+                                            StringComparison.OrdinalIgnoreCase));
                         }
 
+                        // 3.2 Keine Cloud-Verknüpfung
                         if (remoteProject == null)
                         {
                             if (!string.IsNullOrWhiteSpace(localData.CloudFolderId))
@@ -170,18 +160,22 @@ public partial class OpenProject : ContentPage
                                 localData.CloudDriveId = null;
                                 localData.CloudFolderId = null;
 
-                                string json = System.Text.Json.JsonSerializer.Serialize(localData, GlobalJson.GetOptions());
+                                string json = System.Text.Json.JsonSerializer.Serialize(
+                                            localData,
+                                            GlobalJson.GetOptions());
+
                                 File.WriteAllText(item.FilePath, json);
                             }
 
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                if (!cancellationToken.IsCancellationRequested)
-                                    item.HasCloudSync = false;
+                                item.HasCloudSync = false;
                             });
+
                             continue;
                         }
 
+                        // 3.3 Cloud-Verknüpfung aktualisieren
                         bool cloudLinkChanged = localData.CloudDriveId != remoteProject.DriveId ||
                                                 localData.CloudFolderId != remoteProject.FolderId;
 
@@ -190,79 +184,121 @@ public partial class OpenProject : ContentPage
                             localData.CloudDriveId = remoteProject.DriveId;
                             localData.CloudFolderId = remoteProject.FolderId;
 
-                            string json = System.Text.Json.JsonSerializer.Serialize(localData, GlobalJson.GetOptions());
+                            string json = System.Text.Json.JsonSerializer.Serialize(
+                                          localData,
+                                          GlobalJson.GetOptions());
+
                             File.WriteAllText(item.FilePath, json);
                         }
 
-                        // Token an Netzwerk-Methode durchreichen
+                        // 3.4 Cloud-JSON lesen
                         var remoteData = await SaveManager.GetRemoteProjectDataAsync(
-                                remoteProject.DriveId,
-                                remoteProject.FolderId,
-                                remoteProject.FileName,
-                                cancellationToken);
+                                         remoteProject.DriveId,
+                                         remoteProject.FolderId,
+                                         remoteProject.FileName);
 
                         if (remoteData != null)
                         {
-                            string localTitleImage = !string.IsNullOrWhiteSpace(localData.TitleImage) ? localData.TitleImage : "banner_thumbnail.png";
-                            string remoteTitleImage = !string.IsNullOrWhiteSpace(remoteData.TitleImage) ? remoteData.TitleImage : "banner_thumbnail.png";
+                            string localTitleImage = !string.IsNullOrWhiteSpace(localData.TitleImage)
+                                    ? localData.TitleImage
+                                    : "banner_thumbnail.png";
 
-                            bool titleImageChanged = !localTitleImage.Equals(remoteTitleImage, StringComparison.OrdinalIgnoreCase);
+                            string remoteTitleImage = !string.IsNullOrWhiteSpace(remoteData.TitleImage)
+                                    ? remoteData.TitleImage
+                                    : "banner_thumbnail.png";
+
+                            // 3.5 Titelbild geändert?
+                            bool titleImageChanged = !localTitleImage.Equals(
+                                    remoteTitleImage,
+                                    StringComparison.OrdinalIgnoreCase);
 
                             if (titleImageChanged)
                             {
-                                System.Diagnostics.Debug.WriteLine($"TitleImage geändert: {item.FileName}: {localTitleImage} -> {remoteTitleImage}");
+                                System.Diagnostics.Debug.WriteLine($"TitleImage geändert: " + $"{item.FileName}: " + $"{localTitleImage} -> {remoteTitleImage}");
 
-                                // Token durchreichen
                                 bool downloaded = await Helper.UpdateProjectTitleImageAsync(
-                                        localData, projectDir, localTitleImage, remoteTitleImage, cancellationToken);
+                                        localData,
+                                        projectDir,
+                                        localTitleImage,
+                                        remoteTitleImage);
 
                                 if (downloaded)
                                 {
+                                    // Lokale JSON auf den Cloud-Stand bringen
                                     localData.TitleImage = remoteTitleImage;
                                     localData.TitleImageSize = remoteData.TitleImageSize;
-                                    string json = System.Text.Json.JsonSerializer.Serialize(localData, GlobalJson.GetOptions());
+
+                                    string json = System.Text.Json.JsonSerializer.Serialize(
+                                            localData,
+                                            GlobalJson.GetOptions());
+
                                     File.WriteAllText(item.FilePath, json);
                                 }
                             }
                             else
                             {
-                                string thumbnailFolder = !string.IsNullOrWhiteSpace(localData.ThumbnailPath) ? localData.ThumbnailPath : "thumbnails";
-                                string imageFolder = !string.IsNullOrWhiteSpace(localData.ImagePath) ? localData.ImagePath : "images";
+                                // 3.6 Name gleich, aber Dateien fehlen?
+                                string thumbnailFolder = !string.IsNullOrWhiteSpace(
+                                        localData.ThumbnailPath)
+                                        ? localData.ThumbnailPath
+                                        : "thumbnails";
 
-                                string thumbPath = Path.Combine(projectDir, thumbnailFolder, remoteTitleImage);
-                                string imagePath = Path.Combine(projectDir, imageFolder, remoteTitleImage);
+                                string imageFolder = !string.IsNullOrWhiteSpace(
+                                        localData.ImagePath)
+                                        ? localData.ImagePath
+                                        : "images";
 
-                                // Token durchreichen
+                                string thumbPath = Path.Combine(
+                                        projectDir,
+                                        thumbnailFolder,
+                                        remoteTitleImage);
+
+                                string imagePath = Path.Combine(
+                                        projectDir,
+                                        imageFolder,
+                                        remoteTitleImage);
+
                                 if (!File.Exists(thumbPath))
                                 {
                                     await SaveManager.DownloadMediaOnDemandAsync(
-                                        fileName: remoteTitleImage, subFolder: thumbnailFolder,
-                                        driveId: remoteProject.DriveId, folderId: remoteProject.FolderId,
-                                        projectDir: projectDir, cancellationToken);
+                                        fileName: remoteTitleImage,
+                                        subFolder: thumbnailFolder,
+                                        driveId: remoteProject.DriveId,
+                                        folderId: remoteProject.FolderId,
+                                        projectDir: projectDir);
                                 }
 
                                 if (!File.Exists(imagePath))
                                 {
                                     await SaveManager.DownloadMediaOnDemandAsync(
-                                        fileName: remoteTitleImage, subFolder: imageFolder,
-                                        driveId: remoteProject.DriveId, folderId: remoteProject.FolderId,
-                                        projectDir: projectDir, cancellationToken);
+                                        fileName: remoteTitleImage,
+                                        subFolder: imageFolder,
+                                        driveId: remoteProject.DriveId,
+                                        folderId: remoteProject.FolderId,
+                                        projectDir: projectDir);
                                 }
                             }
 
-                            string finalThumbnailFolder = !string.IsNullOrWhiteSpace(localData.ThumbnailPath) ? localData.ThumbnailPath : "thumbnails";
+                            // 3.7 CollectionView aktualisieren (nur bei tatsächlicher Änderung)
+                            string finalThumbnailFolder = !string.IsNullOrWhiteSpace(
+                                    localData.ThumbnailPath)
+                                    ? localData.ThumbnailPath
+                                    : "thumbnails";
+
                             string finalThumbPath = Path.Combine(projectDir, finalThumbnailFolder, remoteTitleImage);
 
                             if (File.Exists(finalThumbPath))
                             {
+                                // Prüfen, ob sich der Pfad überhaupt geändert hat, um unnötiges Neuladen (Blinken) zu verhindern
                                 if (!string.Equals(item.ThumbnailPath, finalThumbPath, StringComparison.OrdinalIgnoreCase))
                                 {
                                     MainThread.BeginInvokeOnMainThread(async () =>
                                     {
-                                        if (cancellationToken.IsCancellationRequested) return;
                                         item.ImagePath = null;
                                         item.ThumbnailPath = null;
-                                        await Task.Delay(50, cancellationToken);
+
+                                        await Task.Delay(50);
+
                                         item.ImagePath = finalThumbPath;
                                         item.ThumbnailPath = finalThumbPath;
                                     });
@@ -270,16 +306,11 @@ public partial class OpenProject : ContentPage
                             }
                         }
 
+                        // 3.8 Cloud-Sync-Status aktualisieren
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
-                            if (!cancellationToken.IsCancellationRequested)
-                                item.HasCloudSync = true;
+                            item.HasCloudSync = true;
                         });
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        // Wird von äusserem Block gefangen
-                        throw;
                     }
                     catch (Exception ex)
                     {
@@ -287,23 +318,22 @@ public partial class OpenProject : ContentPage
                     }
                 }
             }
-            catch (OperationCanceledException)
-            {
-                System.Diagnostics.Debug.WriteLine("Cloud-Sync wurde regulär abgebrochen.");
-            }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Cloud-Sync fehlgeschlagen: {ex}");
             }
-        }, cancellationToken);
+        });
     }
 
     private async void OnNewClicked(object sender, EventArgs e)
     {
-        var popup = new PopupEntry(desc: AppResources.neues_projekt_eroeffnen, title: AppResources.plan_name, okText: AppResources.erstellen);
+        var popup = new PopupEntry(desc: AppResources.neues_projekt_eroeffnen,
+                                   title: AppResources.plan_name,
+                                   okText: AppResources.erstellen);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result?.Result == null) return;
 
+        // Eingabe säubern
         string sanitizedName = OpenProject.SanitizeFileName(result.Result);
         if (string.IsNullOrWhiteSpace(sanitizedName))
         {
@@ -311,6 +341,7 @@ public partial class OpenProject : ContentPage
             return;
         }
 
+        // Prüfe, ob die Datei existiert und hänge fortlaufend eine Nummer an
         int counter = 1;
         string _result = sanitizedName;
         while (Directory.Exists(Path.Combine(Settings.DataDirectory, _result)))
@@ -321,7 +352,9 @@ public partial class OpenProject : ContentPage
 
         string filePath = Path.Combine(Settings.DataDirectory, _result, _result + ".json");
 
+        // Cloud-Verknüpfung im SaveManager zurücksetzen
         SaveManager.ResetCloudSync();
+
         LoadDataToView.ResetData();
 
         GlobalJson.CreateNewFile(filePath);
@@ -343,9 +376,11 @@ public partial class OpenProject : ContentPage
         SettingsService.Instance.IsProjectLoaded = true;
         GlobalJson.LoadFromFile(filePath);
         LoadDataToView.LoadData(new FileResult(filePath));
-        Helper.HeaderUpdate();
+        Helper.HeaderUpdate();  // UI-Aktualisierung
 
+        // save data to file
         SaveManager.NotifyDataChanged();
+
         LoadJsonFiles();
 
         await Shell.Current.GoToAsync("project_details");
@@ -356,13 +391,15 @@ public partial class OpenProject : ContentPage
 
     private static string SanitizeFileName(string fileName)
     {
-        if (string.IsNullOrWhiteSpace(fileName)) return string.Empty;
+        if (string.IsNullOrWhiteSpace(fileName))
+            return string.Empty;
 
         var invalidChars = Path.GetInvalidFileNameChars();
         string cleanName = string.Concat(fileName.Split(invalidChars, StringSplitOptions.RemoveEmptyEntries)).Trim();
         cleanName = cleanName.Replace("/", "_").Replace("\\", "_").Replace("$", "").Replace("{", "").Replace("}", "");
 
-        if (cleanName.Length > 100) cleanName = cleanName[..100];
+        if (cleanName.Length > 100)
+            cleanName = cleanName[..100];
 
         return cleanName;
     }
@@ -371,9 +408,15 @@ public partial class OpenProject : ContentPage
     {
         try
         {
-            var fileResult = await FilePicker.Default.PickAsync(new PickOptions { PickerTitle = AppResources.bitte_waehle_zip });
-            if (fileResult == null) return;
+            var fileResult = await FilePicker.Default.PickAsync(new PickOptions
+            {
+                PickerTitle = AppResources.bitte_waehle_zip
+            });
 
+            if (fileResult == null)
+                return;
+
+            // Ladeanzeige aktivieren
             await BusyService.ShowAsync(AppResources.projekt_wird_importiert);
 
             var targetDirectory = Settings.DataDirectory;
@@ -381,6 +424,7 @@ public partial class OpenProject : ContentPage
             await Task.Run(async () =>
             {
                 string tempZipPath = Path.Combine(FileSystem.CacheDirectory, fileResult.FileName);
+
                 try
                 {
                     using (var stream = await fileResult.OpenReadAsync())
@@ -388,11 +432,13 @@ public partial class OpenProject : ContentPage
                     {
                         await stream.CopyToAsync(localStream);
                     }
+
                     Helper.UnpackDirectory(tempZipPath, targetDirectory);
                 }
                 finally
                 {
-                    if (File.Exists(tempZipPath)) File.Delete(tempZipPath);
+                    if (File.Exists(tempZipPath))
+                        File.Delete(tempZipPath);
                 }
             });
 
@@ -411,14 +457,22 @@ public partial class OpenProject : ContentPage
 
     private async void OnProjectClicked(object sender, TappedEventArgs e)
     {
-        if (_isProcessing) return;
-
-        var layout = sender as BindableObject;
-        if (layout?.BindingContext is not FileItem item || item.IsActive)
+        // Sperre prüfen: Wenn bereits ein Projekt geladen wird, Klick ignorieren!
+        if (_isProcessing)
             return;
 
+        var layout = sender as BindableObject;
+        if (layout?.BindingContext is not FileItem item)
+            return;
+
+        // Wenn das Projekt bereits aktiv ist, nichts tun.
+        if (item.IsActive)
+            return;
+
+        // Sperre aktivieren
         _isProcessing = true;
-        CancelPendingCloudSync();
+
+        // Ladeanzeige aktivieren
         await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
 
         try
@@ -429,7 +483,11 @@ public partial class OpenProject : ContentPage
 
             if (FileListView.ItemsSource is IEnumerable<FileItem> items)
             {
-                foreach (var f in items) f.IsActive = false;
+                foreach (var f in items)
+                {
+                    f.IsActive = false;
+                }
+
                 item.IsActive = true;
             }
 
@@ -445,14 +503,18 @@ public partial class OpenProject : ContentPage
                 {
                     var popup = new PopupDualResponse(AppResources.neuere_version_cloud_synchronisieren, AppResources.synchronisieren);
                     var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+
                     return result?.Result == DualPopupResult.Ok;
                 });
 
                 if (shouldSync)
                 {
                     await BusyService.SetMessageAsync(AppResources.daten_werden_synchronisiert);
+
                     bool success = await SaveManager.SyncJsonOnlyFromCloudAsync();
-                    if (success) GlobalJson.LoadFromFile(item.FilePath);
+
+                    if (success)
+                        GlobalJson.LoadFromFile(item.FilePath);
                 }
             }
 
@@ -462,12 +524,14 @@ public partial class OpenProject : ContentPage
             if (GlobalJson.Data.Plans != null)
             {
                 var repairCount = false;
+
                 foreach (var plan in GlobalJson.Data.Plans)
                 {
                     var i = 0;
                     if (GlobalJson.Data.Plans[plan.Key].Pins != null)
                     {
-                        foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins) i++;
+                        foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                            i++;
                     }
 
                     if (GlobalJson.Data.Plans[plan.Key].PinCount != i)
@@ -477,16 +541,19 @@ public partial class OpenProject : ContentPage
                     }
                 }
 
-                if (repairCount) SaveManager.NotifyDataChanged();
+                if (repairCount)
+                    SaveManager.NotifyDataChanged();
             }
 
-            // Overlay vor dem Shell-Seitenwechsel schliessen.
+            // Overlay vor dem Shell-Seitenwechsel schließen.
             await BusyService.HideAsync();
+
             await Shell.Current.GoToAsync("project_details");
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex}");
+
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
                 await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_konnte_nicht_geladen_werden, AppResources.fehler), Settings.PopupOptions);
@@ -501,22 +568,26 @@ public partial class OpenProject : ContentPage
 
     private async void OnDownloadFromCloudClicked(object sender, EventArgs e)
     {
+
         await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectJsonFile");
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
     {
-        if (_isProcessing) return;
+        if (_isProcessing)
+            return;
         _isProcessing = true;
 
         try
         {
             var button = sender as Button;
-            if (button?.BindingContext is not FileItem item) return;
+            if (button?.BindingContext is not FileItem item)
+                return;
 
             var _popup = new PopupProjectEdit(entry: item.FileName, isActive: item.IsActive);
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
-            if (_result == null || string.IsNullOrEmpty(_result.Result)) return;
+            if (_result == null || string.IsNullOrEmpty(_result.Result))
+                return;
 
             switch (_result.Result)
             {
@@ -537,9 +608,11 @@ public partial class OpenProject : ContentPage
                         bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
                                                  fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
 
+                        // Lösche das Projektverzeichnis und alle enthaltenen Dateien
                         if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
                             Directory.Delete(projectDirectoryPath, true);
 
+                        // Lösche Plan-Tiles aus dem Cache-Ordner
                         string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
                         if (Directory.Exists(cacheDir) && GlobalJson.Data?.Plans != null)
                         {
@@ -551,13 +624,17 @@ public partial class OpenProject : ContentPage
 
                                 foreach (var dir in matchingDirectories)
                                 {
-                                    try { Directory.Delete(dir, true); }
+                                    try
+                                    {
+                                        Directory.Delete(dir, true);
+                                    }
                                     catch (IOException) { }
                                     catch (UnauthorizedAccessException) { }
                                 }
                             }
                         }
 
+                        // Wenn das gelöschte Projekt das aktuell geladene Projekt ist, zurück zum Homescreen navigieren und Daten zurücksetzen
                         if (isCurrentProject)
                         {
                             await Shell.Current.GoToAsync("//homescreen");
@@ -583,12 +660,17 @@ public partial class OpenProject : ContentPage
 
                         try
                         {
+                            // Ladeanzeige aktivieren
                             await BusyService.ShowAsync(AppResources.daten_werden_komprimiert);
+
+                            // Hintergrundoperation
                             await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
                         }
                         finally
                         {
+                            // Ladeanzeige deaktivieren
                             await BusyService.HideAsync();
+
                             await Task.Delay(100);
                         }
 
@@ -628,16 +710,19 @@ public partial class OpenProject : ContentPage
                         return;
                     }
 
-                    if (item.HasCloudSync) return;
+                    if (item.HasCloudSync)
+                        return;
 
                     if (!item.IsActive)
                     {
                         if (FileListView.ItemsSource is IEnumerable<FileItem> items)
                         {
-                            foreach (var f in items) f.IsActive = false;
+                            foreach (var f in items)
+                                f.IsActive = false;
                         }
 
                         item.IsActive = true;
+
                         SettingsService.Instance.IsProjectLoaded = true;
 
                         LoadDataToView.ResetData();
@@ -666,9 +751,13 @@ public partial class OpenProject : ContentPage
                         GlobalJson.Data.ThumbnailPath = "thumbnails";
                         GlobalJson.Data.CustomPinsPath = "custompins";
 
+                        // Save data to file
                         SaveManager.NotifyDataChanged();
+
+                        // Verzeichnis an die neue Stelle verschieben (umbenennen)
                         Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));
 
+                        // Json verschieben (umbenennen)
                         File.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
                                   Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
 
@@ -676,10 +765,11 @@ public partial class OpenProject : ContentPage
 
                         if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)))
                         {
+                            // Daten laden und verarbeiten (nicht UI-bezogen)
                             LoadDataToView.ResetData();
                             GlobalJson.LoadFromFile(newFilePath);
                             LoadDataToView.LoadData(new FileResult(newFilePath));
-                            Helper.HeaderUpdate();
+                            Helper.HeaderUpdate();  // UI-Aktualisierung
                         }
                         LoadJsonFiles();
                     }
