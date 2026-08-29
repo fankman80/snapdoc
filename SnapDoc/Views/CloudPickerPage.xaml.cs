@@ -279,14 +279,31 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             return;
 
         string currentFolderId = Breadcrumbs.Last().Id;
-        bool success = false;
+
+        // Nur isSuccess wird ganz am Ende der Methode noch benötigt
+        bool isSuccess = false;
 
         try
         {
             await BusyService.ShowAsync(AppResources.projekt_wird_hochgeladen);
 
-            success =
-                await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
+            // Die Methode gibt die Werte direkt in die neu erstellten Variablen success, driveId und folderId
+            var (success, driveId, folderId) = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
+
+            // Den Status für die spätere Navigation speichern
+            isSuccess = success;
+
+            if (isSuccess && !string.IsNullOrEmpty(folderId))
+            {
+                // 1. Lokale Daten im RAM aktualisieren (direkte Nutzung der Tuple-Variablen)
+                GlobalJson.Data.CloudDriveId = driveId;
+                GlobalJson.Data.CloudFolderId = folderId;
+
+                // 2. Lokale JSON direkt speichern
+                string json = System.Text.Json.JsonSerializer.Serialize(GlobalJson.Data, GlobalJson.GetOptions());
+                string filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile);
+                File.WriteAllText(filePath, json);
+            }
         }
         catch (Exception ex)
         {
@@ -294,11 +311,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
         finally
         {
-            // Overlay zuerst schließen
             await BusyService.HideAsync();
         }
 
-        if (success)
+        if (isSuccess)
             await Navigation.PopAsync();
         else
             await this.ShowPopupAsync(new PopupAlert(AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.fehler), Settings.PopupOptions);

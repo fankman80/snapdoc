@@ -283,9 +283,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage?.ResetTouchState();
     }
 
-    private async Task<Task> AddPlan()
+    private async Task AddPlan()
     {
-        PlanImageSource = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        var planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+
+        if (!File.Exists(planImagePath))
+            await SaveManager.DownloadMediaOnDemandAsync(thisPlan.File, GlobalJson.Data.PlanPath);
+
+        PlanImageSource = planImagePath;
 
         IsGrayscaleMode = thisPlan.IsGrayscale;
 
@@ -296,8 +301,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 await AddPin(pinId);
 
         PlanImage.Pins = pinList;
-
-        return Task.CompletedTask;
     }
 
     private async Task<MapPin> AddPin(string pinId)

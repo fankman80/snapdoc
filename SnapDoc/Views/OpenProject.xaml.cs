@@ -152,24 +152,13 @@ public partial class OpenProject : ContentPage
                                             StringComparison.OrdinalIgnoreCase));
                         }
 
-                        // 3.2 Keine Cloud-Verknüpfung
+                        // 3.2 Keine Cloud-Verknüpfung gefunden
                         if (remoteProject == null)
                         {
-                            if (!string.IsNullOrWhiteSpace(localData.CloudFolderId))
-                            {
-                                localData.CloudDriveId = null;
-                                localData.CloudFolderId = null;
-
-                                string json = System.Text.Json.JsonSerializer.Serialize(
-                                            localData,
-                                            GlobalJson.GetOptions());
-
-                                File.WriteAllText(item.FilePath, json);
-                            }
-
                             MainThread.BeginInvokeOnMainThread(() =>
                             {
-                                item.HasCloudSync = false;
+                                // Wenn eine ID existiert, zeigen wir das Wolkensymbol trotzdem an
+                                item.HasCloudSync = !string.IsNullOrWhiteSpace(localData.CloudFolderId);
                             });
 
                             continue;

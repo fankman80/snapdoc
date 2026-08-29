@@ -113,20 +113,23 @@ public static class SaveManager
     }
 
     // Erstellt ein neues Projektverzeichnis inklusive Unterordnern im gewählten Cloud-Ordner und lädt die aktuelle JSON-Datei hoch.
-    public static async Task<bool> CreateAndSyncNewCloudProjectAsync(string parentFolderId)
+    public static async Task<(bool IsSuccess, string? DriveId, string? FolderId)> CreateAndSyncNewCloudProjectAsync(string parentFolderId)
     {
-        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
+            return (false, null, null);
 
         try
         {
             var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
-            if (myDrive?.Id == null) return false;
+            if (myDrive?.Id == null)
+                return (false, null, null);
 
             string projectName = GlobalJson.Data?.ProjectPath ?? "NeuesProjekt";
 
             // Erstelle das Projektverzeichnis im ausgewählten Ordner
             var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, myDrive.Id, parentFolderId, projectName);
-            if (projectFolder?.Id == null) return false;
+            if (projectFolder?.Id == null)
+                return (false, null, null);
 
             TargetFolderId = projectFolder.Id;
             await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, TargetFolderId);
@@ -140,7 +143,7 @@ public static class SaveManager
             // 1. JSON speichern
             await SaveWithSyncCheckAsync();
 
-            // 2. NEU: Alle lokalen Mediendateien (Bilder, Pläne etc.) in die Cloud hochladen
+            // 2. Alle lokalen Mediendateien (Bilder, Pläne etc.) in die Cloud hochladen
             string localJsonPath = GlobalJson.GetFilePath();
             string? localProjectDir = Path.GetDirectoryName(localJsonPath);
             if (!string.IsNullOrEmpty(localProjectDir))
@@ -148,12 +151,13 @@ public static class SaveManager
                 await UploadDirectoryRecursiveAsync(myDrive.Id, TargetFolderId, localProjectDir);
             }
 
-            return true;
+            // Erfolgreicher Abschluss mit Rückgabe der neuen IDs
+            return (true, myDrive.Id, TargetFolderId);
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Fehler beim Erstellen des Cloud-Projekts: {ex.Message}");
-            return false;
+            return (false, null, null);
         }
     }
 
@@ -414,6 +418,9 @@ public static class SaveManager
         local.Plans ??= [];
         bool planStructureChanged = false; // Nur fuer Hinzufuegen/Loeschen von Plaenen
 
+        // Prüfen, ob sich die reine Reihenfolge der Pläne geändert hat
+        bool planOrderChanged = !local.Plans.Keys.SequenceEqual(cloud.Plans.Keys);
+
         // Geloeschte Plaene entfernen (Strukturaenderung)
         var deletedPlanIds = local.Plans.Keys.Except(cloud.Plans.Keys).ToList();
         if (deletedPlanIds.Count > 0)
@@ -544,7 +551,20 @@ public static class SaveManager
                     }
                 }
             }
-        } // Schliesst "foreach (var cloudPlanKp in cloud.Plans)"
+        }
+
+        // Wenn sich die Reihenfolge geändert hat, lokales Dictionary neu aufbauen
+        if (planOrderChanged)
+        {
+            var orderedDictionary = new Dictionary<string, Plan>();
+            foreach (var cloudKey in cloud.Plans.Keys)
+            {
+                if (local.Plans.TryGetValue(cloudKey, out Plan? plan))
+                    orderedDictionary.Add(cloudKey, plan);
+            }
+            local.Plans = orderedDictionary;
+            planStructureChanged = true; // Dies löst das Neuladen des Flyouts aus
+        }
 
         // UI-Benachrichtigungen feuern
         if (projectDetailsChanged)
