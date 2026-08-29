@@ -164,20 +164,18 @@ public static class SaveManager
 
         lock (_fileLock)
         {
-            if (File.Exists(filePath))
+            if (_lastKnownWriteTime != default && File.Exists(filePath))
             {
                 DateTime currentDiskTime = File.GetLastWriteTimeUtc(filePath);
                 if (currentDiskTime > _lastKnownWriteTime)
                     ResolveConflictAndMerge(filePath);
             }
-
-            GlobalJson.SaveToFile();
-            _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+            _lastKnownWriteTime = File.Exists(filePath) ? File.GetLastWriteTimeUtc(filePath) : DateTime.UtcNow;
         }
 
         if (CurrentAuth != null && CurrentAuth.IsLoggedIn && CurrentAuth.GraphClient != null)
         {
-            // FIX: Verhindert ungewollte Uploads. Nur synchronisieren, wenn explizit verknüpft!
+            // Verhindert ungewollte Uploads. Nur synchronisieren, wenn explizit verknüpft!
             if (GlobalJson.Data == null ||
                 string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
                 string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId))
@@ -195,24 +193,36 @@ public static class SaveManager
                         .ItemWithPath(CloudFileName)
                         .GetAsync();
 
+                    bool baselineNeverEstablished = _lastKnownCloudSyncTime == DateTimeOffset.MinValue;
+
                     if (cloudItem?.LastModifiedDateTime != null && cloudItem.LastModifiedDateTime > _lastKnownCloudSyncTime)
                     {
-                        // Jemand anderes hat die Datei verändert! Herunterladen und mergen.
-                        var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                            .ItemWithPath(CloudFileName)
-                            .Content
-                            .GetAsync();
-
-                        if (cloudStream != null)
+                        if (baselineNeverEstablished)
                         {
-                            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
-                            if (cloudData != null)
+                            _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
+                            _lastKnownETag = cloudItem.ETag;
+                        }
+                        else
+                        {
+                            // Echter Konflikt: Wir hatten schon eine gueltige Baseline und die
+                            // Cloud-Datei ist seitdem neu -> jemand anderes hat sie veraendert.
+                            // Herunterladen und mergen.
+                            var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                                .ItemWithPath(CloudFileName)
+                                .Content
+                                .GetAsync();
+
+                            if (cloudStream != null)
                             {
-                                lock (_fileLock)
+                                var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
+                                if (cloudData != null)
                                 {
-                                    MergeModels(GlobalJson.Data, cloudData);
-                                    GlobalJson.SaveToFile();
-                                    _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                    lock (_fileLock)
+                                    {
+                                        MergeModels(GlobalJson.Data, cloudData);
+                                        GlobalJson.SaveToFile();
+                                        _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                    }
                                 }
                             }
                         }

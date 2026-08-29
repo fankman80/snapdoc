@@ -508,6 +508,7 @@ public partial class OpenProject : ContentPage
             LoadDataToView.ResetData();
 
             GlobalJson.LoadFromFile(item.FilePath);
+            SaveManager.Initialize(item.FilePath);
 
             if (await SaveManager.IsCloudVersionNewerAsync())
             {
