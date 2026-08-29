@@ -562,8 +562,12 @@ public class Helper
 
         // 1. Alte Dateien löschen
         if (!string.IsNullOrWhiteSpace(oldFileName) &&
-            !oldFileName.Equals(newFileName, StringComparison.OrdinalIgnoreCase) &&
-            !oldFileName.Equals("banner_thumbnail.png", StringComparison.OrdinalIgnoreCase))
+            !oldFileName.Equals(
+                newFileName,
+                StringComparison.OrdinalIgnoreCase) &&
+            !oldFileName.Equals(
+                "banner_thumbnail.png",
+                StringComparison.OrdinalIgnoreCase))
         {
             string oldThumbPath = Path.Combine(projectDir, thumbnailFolder, oldFileName);
             string oldImagePath = Path.Combine(projectDir, imageFolder, oldFileName);
