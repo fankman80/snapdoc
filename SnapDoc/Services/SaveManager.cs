@@ -164,107 +164,129 @@ public static class SaveManager
     public static async Task SaveWithSyncCheckAsync()
     {
         string filePath = GlobalJson.GetFilePath();
+
         if (string.IsNullOrEmpty(filePath))
             return;
 
         var activeData = GlobalJson.Data;
-        if (activeData == null || string.IsNullOrEmpty(activeData.CloudDriveId) || string.IsNullOrEmpty(activeData.CloudFolderId))
+
+        if (activeData == null)
             return;
 
-        string driveId = activeData.CloudDriveId;
-        string targetFolderId = activeData.CloudFolderId;
-        string activeCloudFileName = activeData.JsonFile ?? "snapdoc_data.json";
-        string frozenJsonPayload = GlobalJson.ToJson();
-
+        // 1. IMMER lokal speichern
         lock (_fileLock)
         {
             if (_lastKnownWriteTime != default && File.Exists(filePath))
             {
                 DateTime currentDiskTime = File.GetLastWriteTimeUtc(filePath);
+
                 if (currentDiskTime > _lastKnownWriteTime)
                     ResolveConflictAndMerge(filePath);
             }
-            _lastKnownWriteTime = File.Exists(filePath) ? File.GetLastWriteTimeUtc(filePath) : DateTime.UtcNow;
+
+            GlobalJson.SaveToFile();
+
+            _lastKnownWriteTime = File.Exists(filePath)
+                ? File.GetLastWriteTimeUtc(filePath)
+                : DateTime.UtcNow;
         }
 
-        if (CurrentAuth != null && CurrentAuth.IsLoggedIn && CurrentAuth.GraphClient != null)
+        // 2. Keine Cloud-Verknüpfung? Dann war das lokale Speichern bereits erfolgreich.
+        if (string.IsNullOrEmpty(activeData.CloudDriveId) ||
+            string.IsNullOrEmpty(activeData.CloudFolderId))
+        {
+            return;
+        }
+
+        // 3. Nicht eingeloggt / offline? Lokal wurde bereits gespeichert.
+        if (CurrentAuth?.GraphClient == null ||
+            !CurrentAuth.IsLoggedIn)
+        {
+            return;
+        }
+
+        string driveId = activeData.CloudDriveId;
+        string targetFolderId = activeData.CloudFolderId;
+        string activeCloudFileName = activeData.JsonFile ?? "snapdoc_data.json";
+
+        string frozenJsonPayload = GlobalJson.ToJson();
+
+        // 4. Ab hier Cloud-Synchronisation
+        try
         {
             try
             {
-                try
+                var cloudItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                    .ItemWithPath(activeCloudFileName)
+                    .GetAsync();
+
+                bool baselineNeverEstablished = _lastKnownCloudSyncTime == DateTimeOffset.MinValue;
+
+                if (cloudItem?.LastModifiedDateTime != null && cloudItem.LastModifiedDateTime > _lastKnownCloudSyncTime)
                 {
-                    var cloudItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                        .ItemWithPath(activeCloudFileName)
-                        .GetAsync();
-
-                    bool baselineNeverEstablished = _lastKnownCloudSyncTime == DateTimeOffset.MinValue;
-
-                    if (cloudItem?.LastModifiedDateTime != null && cloudItem.LastModifiedDateTime > _lastKnownCloudSyncTime)
+                    if (baselineNeverEstablished)
                     {
-                        if (baselineNeverEstablished)
-                        {
-                            _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
-                            _lastKnownETag = cloudItem.ETag;
-                        }
-                        else
-                        {
-                            var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                                .ItemWithPath(activeCloudFileName)
-                                .Content
-                                .GetAsync();
+                        _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
+                        _lastKnownETag = cloudItem.ETag;
+                    }
+                    else
+                    {
+                        var cloudStream = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                            .ItemWithPath(activeCloudFileName)
+                            .Content
+                            .GetAsync();
 
-                            if (cloudStream != null)
+                        if (cloudStream != null)
+                        {
+                            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
+                            if (cloudData != null)
                             {
-                                var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
-                                if (cloudData != null)
+                                lock (_fileLock)
                                 {
-                                    lock (_fileLock)
+                                    // SICHERHEITSCHECK: Nur Mergen, wenn das Projekt noch dasselbe ist
+                                    if (GlobalJson.GetFilePath() == filePath)
                                     {
-                                        // SICHERHEITSCHECK: Nur Mergen, wenn das Projekt noch dasselbe ist
-                                        if (GlobalJson.GetFilePath() == filePath)
-                                        {
-                                            MergeModels(GlobalJson.Data, cloudData);
-                                            GlobalJson.SaveToFile();
-                                            _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
-                                            frozenJsonPayload = GlobalJson.ToJson();
-                                        }
+                                        MergeModels(GlobalJson.Data, cloudData);
+                                        GlobalJson.SaveToFile();
+                                        _lastKnownWriteTime = File.GetLastWriteTimeUtc(filePath);
+                                        frozenJsonPayload = GlobalJson.ToJson();
                                     }
                                 }
                             }
                         }
                     }
                 }
-                catch (Microsoft.Graph.Models.ODataErrors.ODataError) { /* Existiert nicht */ }
-
-                byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(frozenJsonPayload);
-                using var stream = new MemoryStream(byteArray);
-
-                try
-                {
-                    var uploadedItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
-                        .ItemWithPath(activeCloudFileName)
-                        .Content
-                        .PutAsync(stream, requestConfig =>
-                        {
-                            if (!string.IsNullOrEmpty(_lastKnownETag))
-                                requestConfig.Headers.Add("If-Match", _lastKnownETag);
-                        });
-                    if (uploadedItem != null)
-                    {
-                        _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
-                        _lastKnownETag = uploadedItem.ETag;
-                    }
-                }
-                catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 412 || ex.Error?.Code == "conditionNotMet")
-                {
-                    Console.WriteLine("Konflikt beim Upload! ETag stimmt nicht mehr überein.");
-                    await SaveWithSyncCheckAsync();
-                }
             }
-            catch (Exception ex)
+            catch (Microsoft.Graph.Models.ODataErrors.ODataError) { /* Existiert nicht */ }
+
+            byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(frozenJsonPayload);
+            using var stream = new MemoryStream(byteArray);
+
+            try
             {
-                Console.WriteLine($"Cloud-Upload fehlgeschlagen: {ex.Message}");
+                var uploadedItem = await CurrentAuth.GraphClient.Drives[driveId].Items[targetFolderId]
+                    .ItemWithPath(activeCloudFileName)
+                    .Content
+                    .PutAsync(stream, requestConfig =>
+                    {
+                        if (!string.IsNullOrEmpty(_lastKnownETag))
+                            requestConfig.Headers.Add("If-Match", _lastKnownETag);
+                    });
+                if (uploadedItem != null)
+                {
+                    _lastKnownCloudSyncTime = uploadedItem.LastModifiedDateTime ?? DateTimeOffset.UtcNow;
+                    _lastKnownETag = uploadedItem.ETag;
+                }
             }
+            catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 412 || ex.Error?.Code == "conditionNotMet")
+            {
+                Console.WriteLine("Konflikt beim Upload! ETag stimmt nicht mehr überein.");
+                await SaveWithSyncCheckAsync();
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Cloud-Upload fehlgeschlagen: {ex.Message}");
         }
 
         // Nach dem JSON-Sync alle angesammelten Dateien im Hintergrund abarbeiten
