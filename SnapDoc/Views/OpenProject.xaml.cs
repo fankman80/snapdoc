@@ -488,6 +488,9 @@ public partial class OpenProject : ContentPage
 
             if (await SaveManager.IsCloudVersionNewerAsync())
             {
+                // Ladebildschirm pausieren, damit das Popup bedient werden kann
+                await BusyService.HideAsync();
+
                 bool shouldSync = await MainThread.InvokeOnMainThreadAsync(async () =>
                 {
                     var popup = new PopupDualResponse(AppResources.neuere_version_cloud_synchronisieren, AppResources.synchronisieren);
@@ -498,14 +501,21 @@ public partial class OpenProject : ContentPage
 
                 if (shouldSync)
                 {
-                    await BusyService.SetMessageAsync(AppResources.daten_werden_synchronisiert);
+                    // Ladebildschirm für den Sync wieder aktivieren
+                    await BusyService.ShowAsync(AppResources.daten_werden_synchronisiert);
 
                     bool success = await SaveManager.SyncJsonOnlyFromCloudAsync();
 
                     if (success)
                         GlobalJson.LoadFromFile(item.FilePath);
                 }
+                else
+                {
+                    // Ladebildschirm für den restlichen lokalen Ladevorgang wiederherstellen
+                    await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
+                }
             }
+
 
             LoadDataToView.LoadData(new FileResult(item.FilePath));
             Helper.HeaderUpdate();
