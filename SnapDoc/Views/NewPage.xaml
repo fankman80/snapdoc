@@ -217,7 +217,7 @@
                     IsVisible="{Binding IsButtonActuallyVisible}"
                     Margin="0,0,20,20"
                     ZIndex="10000"
-                    Rotation="30"
+                    Rotation="38"
                     Text="{x:Static local:MaterialIcons.Keep}"  
                     Style="{StaticResource ToolButtonStyle}"
                     AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
