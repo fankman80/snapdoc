@@ -29,10 +29,13 @@ public class AuthService
         builder = builder
             .WithRedirectUri("https://login.microsoftonline.com/common/oauth2/nativeclient")
             .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows));
+#elif IOS
+        builder = builder
+            .WithRedirectUri($"msal{ClientId}://auth")
+            .WithIosKeychainSecurityGroup("com.microsoft.adalcache");
 #else
         builder = builder.WithRedirectUri($"msal{ClientId}://auth");
 #endif
-
         _pca = builder.Build();
     }
 
