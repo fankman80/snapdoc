@@ -77,7 +77,7 @@ public class AuthService
         catch (MsalClientException ex) when (ex.ErrorCode == "authentication_canceled")
         {
             // Der User hat den Vorgang absichtlich abgebrochen.
-            return (false, DualPopupResult.Cancel, string.Empty);
+            return (false, nameof(DualPopupResult.Cancel), string.Empty);
         }
         catch (Exception ex)
         {

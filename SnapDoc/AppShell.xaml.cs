@@ -223,7 +223,7 @@ public partial class AppShell : Shell
 
             await SnackbarExtensions.ShowSafeAsync($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", includeDelay: true);
         }
-        else if (userName != DualPopupResult.Cancel)
+        else if (userName != nameof(DualPopupResult.Cancel))
         {
             // Wird nur bei echten Fehlern ausgeführt, nicht beim Abbruch durch den Nutzer
             await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}:\n{userName}\n{userEmail}", AppResources.fehler), Settings.PopupOptions);
