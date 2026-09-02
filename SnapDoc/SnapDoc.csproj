@@ -75,7 +75,6 @@
 		<ApplicationIconScaling>true</ApplicationIconScaling>
 		<PackageIcon>appicon.png</PackageIcon>
 		<UserSecretsId>26b2a0b7-a7b6-4a99-8b47-0e34092c765d</UserSecretsId>
-		<WindowsPackageType>None</WindowsPackageType>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -100,6 +99,7 @@
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
+        <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.88.0" />
     </ItemGroup>
 
 	<ItemGroup>
@@ -114,7 +114,6 @@
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.11" />
 		<PackageReference Include="Microsoft.Graph" Version="6.5.0" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.88.0" />
-		<PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.88.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.100" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.100" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.11" />
