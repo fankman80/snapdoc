@@ -1,6 +1,10 @@
-﻿using Microsoft.Identity.Client;
-using Microsoft.Graph;
+﻿using Microsoft.Graph;
+using Microsoft.Identity.Client;
 using Microsoft.Kiota.Abstractions.Authentication;
+
+#if WINDOWS
+using Microsoft.Identity.Client.Broker;
+#endif
 
 namespace SnapDoc.Services;
 
@@ -10,6 +14,7 @@ public class AuthService
     private const string Authority = "https://login.microsoftonline.com/common";
     private readonly string[] _scopes = ["User.Read", "Files.ReadWrite.All"];
     private readonly IPublicClientApplication _pca;
+
     public bool IsLoggedIn => GraphClient != null;
     public GraphServiceClient? GraphClient { get; private set; }
     public string CurrentUserName { get; private set; } = string.Empty;
@@ -17,10 +22,13 @@ public class AuthService
 
     public AuthService()
     {
-        var builder = PublicClientApplicationBuilder.Create(ClientId).WithAuthority(Authority);
+        var builder = PublicClientApplicationBuilder.Create(ClientId)
+            .WithAuthority(Authority);
 
 #if WINDOWS
-        builder = builder.WithRedirectUri("http://localhost");
+        builder = builder
+            .WithRedirectUri("https://login.microsoftonline.com/common/oauth2/nativeclient")
+            .WithBroker(new BrokerOptions(BrokerOptions.OperatingSystems.Windows));
 #else
         builder = builder.WithRedirectUri($"msal{ClientId}://auth");
 #endif
@@ -33,8 +41,11 @@ public class AuthService
         try
         {
             var builder = _pca.AcquireTokenInteractive(_scopes);
+
 #if ANDROID
             builder = builder.WithParentActivityOrWindow(Platform.CurrentActivity);
+#elif IOS
+            builder = builder.WithParentActivityOrWindow(Platform.GetCurrentUIViewController());
 #elif WINDOWS
             var windows = Application.Current?.Windows;
             if (windows != null && windows.Count > 0)
@@ -47,6 +58,7 @@ public class AuthService
                 }
             }
 #endif
+
             AuthenticationResult authResult = await builder.ExecuteAsync();
 
             var tokenProvider = new TokenProvider(authResult.AccessToken);
