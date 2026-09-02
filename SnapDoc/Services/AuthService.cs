@@ -74,9 +74,15 @@ public class AuthService
 
             return (true, CurrentUserName, CurrentUserEmail);
         }
+        catch (MsalClientException ex) when (ex.ErrorCode == "authentication_canceled")
+        {
+            // Der User hat den Vorgang absichtlich abgebrochen.
+            return (false, "CANCELED", string.Empty);
+        }
         catch (Exception ex)
         {
-            return (false, ex.Message, ex.Message);
+            // Echte Fehler weiterhin zurückgeben
+            return (false, ex.Message, ex.Message); 
         }
     }
 }
