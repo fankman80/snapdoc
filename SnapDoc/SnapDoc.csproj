@@ -229,9 +229,6 @@
 		<SentryProject>snapdoc_maui</SentryProject>
 		<SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
 		<SentryUploadPdb>true</SentryUploadPdb>
-
-		<!-- Symbol-Upload nur im Release-Build aktivieren, um lokale Debug-Builds nicht zu blockieren -->
-		<SentryUploadSymbols Condition="'$(Configuration)' == 'Release'">true</SentryUploadSymbols>
-		<SentryUploadSymbols Condition="'$(Configuration)' == 'Debug'">false</SentryUploadSymbols>
+		<SentryUploadSymbols Condition="'$(Configuration)' == 'Release' and $(TargetFramework.Contains('-ios'))">true</SentryUploadSymbols>
 	</PropertyGroup>
 </Project>
