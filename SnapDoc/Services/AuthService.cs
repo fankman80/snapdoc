@@ -1,6 +1,7 @@
 ﻿using Microsoft.Graph;
 using Microsoft.Identity.Client;
 using Microsoft.Kiota.Abstractions.Authentication;
+using SnapDoc.Resources.Languages;
 
 #if WINDOWS
 using Microsoft.Identity.Client.Broker;
@@ -61,18 +62,17 @@ public class AuthService
                 }
             }
 #endif
-
             AuthenticationResult authResult = await builder.ExecuteAsync();
 
-            var tokenProvider = new TokenProvider(authResult.AccessToken);
+            // Provider instanziieren, der MSAL-Cache nutzt
+            var tokenProvider = new MsalAccessTokenProvider(_pca, _scopes);
             var authProvider = new BaseBearerTokenAuthenticationProvider(tokenProvider);
 
+            // GraphClient bleibt dauerhaft gueltig
             GraphClient = new GraphServiceClient(authProvider);
 
-            // Abruf des Benutzerprofils (inklusive Mail und UserPrincipalName)
             var me = await GraphClient.Me.GetAsync();
-
-            CurrentUserName = me?.DisplayName ?? "Unbekannter Nutzer";
+            CurrentUserName = me?.DisplayName ?? AppResources.unbekannter_nutzer;
             CurrentUserEmail = me?.Mail ?? me?.UserPrincipalName ?? string.Empty;
 
             return (true, CurrentUserName, CurrentUserEmail);

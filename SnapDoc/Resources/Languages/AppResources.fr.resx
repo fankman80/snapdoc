@@ -1149,4 +1149,7 @@
   <data name="bitte_warten" xml:space="preserve">
     <value>Veuillez patienter...</value>
   </data>
+  <data name="unbekannter_nutzer" xml:space="preserve">
+    <value>Utilisateur inconnu</value>
+  </data>
 </root>

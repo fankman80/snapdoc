@@ -2869,6 +2869,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Unbekannter Nutzer ähnelt.
+        /// </summary>
+        internal static string unbekannter_nutzer {
+            get {
+                return ResourceManager.GetString("unbekannter_nutzer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Validieren ähnelt.
         /// </summary>
         internal static string validieren {
