@@ -15,7 +15,7 @@ public static class SaveManager
     private static CancellationTokenSource? _debounceCts;
     private static DateTime _lastKnownWriteTime;
     private static readonly Lock _fileLock = new();
-    private static string CloudFileName => GlobalJson.Data?.JsonFile ?? "snapdoc_data.json";
+    private static string CloudFileName => SettingsService.Instance.DefaultJson;
     private static DateTimeOffset _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
     private static string? _lastKnownETag;
 
@@ -124,10 +124,24 @@ public static class SaveManager
             if (myDrive?.Id == null)
                 return (false, null, null);
 
-            string projectName = GlobalJson.Data?.ProjectPath ?? "NeuesProjekt";
+            // Pfad und Projektnamen aus dem lokalen Ordner auslesen
+            string localFilePath = GlobalJson.GetFilePath();
+            string? localProjectDir = Path.GetDirectoryName(localFilePath);
 
-            // Erstelle das Projektverzeichnis im ausgewählten Ordner
-            var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, myDrive.Id, parentFolderId, projectName);
+            // Projektnamen bevorzugt aus Object_name lesen, sonst Ordnername, sonst Fallback
+            string projectName = !string.IsNullOrWhiteSpace(GlobalJson.Data?.Object_name)
+                ? GlobalJson.Data.Object_name
+                : (!string.IsNullOrEmpty(localProjectDir) ? Path.GetFileName(localProjectDir) : "Projekt");
+
+            // Ungueltige Zeichen fuer Cloud-Ordnerbereinigung entfernen
+            string sanitizedProjectName = string.Join("_", projectName.Split(Path.GetInvalidFileNameChars()));
+
+            // Ordnernamen fuer die Cloud mit Datum zusammensetzen
+            string cloudFolderName = $"{DateTime.Now:yyMMdd}_{sanitizedProjectName}";
+
+            // Projektverzeichnis in der Cloud erstellen
+            var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, myDrive.Id, parentFolderId, cloudFolderName);
+
             if (projectFolder?.Id == null)
                 return (false, null, null);
 
@@ -138,20 +152,17 @@ public static class SaveManager
             {
                 GlobalJson.Data.CloudDriveId = myDrive.Id;
                 GlobalJson.Data.CloudFolderId = TargetFolderId;
+                GlobalJson.SaveToFile();
             }
 
-            // 1. JSON speichern
+            // JSON speichern
             await SaveWithSyncCheckAsync();
 
-            // 2. Alle lokalen Mediendateien (Bilder, Pläne etc.) in die Cloud hochladen
-            string localJsonPath = GlobalJson.GetFilePath();
-            string? localProjectDir = Path.GetDirectoryName(localJsonPath);
+            // Alle lokalen Mediendateien (Bilder, Plaene etc.) in die Cloud hochladen
             if (!string.IsNullOrEmpty(localProjectDir))
-            {
                 await UploadDirectoryRecursiveAsync(myDrive.Id, TargetFolderId, localProjectDir);
-            }
 
-            // Erfolgreicher Abschluss mit Rückgabe der neuen IDs
+            // Erfolgreicher Abschluss mit Rueckgabe der neuen IDs
             return (true, myDrive.Id, TargetFolderId);
         }
         catch (Exception ex)
@@ -192,23 +203,16 @@ public static class SaveManager
         }
 
         // 2. Keine Cloud-Verknüpfung? Dann war das lokale Speichern bereits erfolgreich.
-        if (string.IsNullOrEmpty(activeData.CloudDriveId) ||
-            string.IsNullOrEmpty(activeData.CloudFolderId))
-        {
+        if (string.IsNullOrEmpty(activeData.CloudDriveId) || string.IsNullOrEmpty(activeData.CloudFolderId))
             return;
-        }
 
         // 3. Nicht eingeloggt / offline? Lokal wurde bereits gespeichert.
-        if (CurrentAuth?.GraphClient == null ||
-            !CurrentAuth.IsLoggedIn)
-        {
+        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
             return;
-        }
 
         string driveId = activeData.CloudDriveId;
         string targetFolderId = activeData.CloudFolderId;
-        string activeCloudFileName = activeData.JsonFile ?? "snapdoc_data.json";
-
+        string activeCloudFileName = CloudFileName;
         string frozenJsonPayload = GlobalJson.ToJson();
 
         // 4. Ab hier Cloud-Synchronisation
@@ -319,8 +323,17 @@ public static class SaveManager
 
                 if (myDrive != null && !string.IsNullOrEmpty(myDrive.Id))
                 {
-                    string projectName = GlobalJson.Data?.ProjectPath ?? "DefaultProject";
-                    string? targetFolderId = await EnsureCloudFolderStructureAsync(authService, myDrive.Id, projectName);
+                    string? projectDirectory = Path.GetDirectoryName(localFilePath);
+
+                    // Prioritaet auf Object_name, danach Ordnername, sonst Fallback
+                    string projectName = !string.IsNullOrWhiteSpace(GlobalJson.Data?.Object_name)
+                        ? GlobalJson.Data.Object_name
+                        : (!string.IsNullOrEmpty(projectDirectory) ? Path.GetFileName(projectDirectory) : "DefaultProject");
+
+                    // Ungueltige Zeichen fuer Ordnerpfade in OneDrive/SharePoint entfernen
+                    string sanitizedProjectName = string.Join("_", projectName.Split(Path.GetInvalidFileNameChars()));
+
+                    string? targetFolderId = await EnsureCloudFolderStructureAsync(authService, myDrive.Id, sanitizedProjectName);
 
                     if (!string.IsNullOrEmpty(targetFolderId))
                     {
@@ -700,9 +713,9 @@ public static class SaveManager
             if (myDrive?.Id == null)
                 return results;
 
-            // Sucht nach allen *.json Dateien im Laufwerk
+            // Nur nach snapdoc_data.json suchen
             var searchResponse = await CurrentAuth.GraphClient.Drives[myDrive.Id]
-                .SearchWithQ(".json")
+                .SearchWithQ(CloudFileName)
                 .GetAsSearchWithQGetResponseAsync();
 
             if (searchResponse?.Value == null)
@@ -739,8 +752,14 @@ public static class SaveManager
 
         try
         {
-            string projectName = Path.GetFileNameWithoutExtension(remoteProject.FileName);
-            string localProjectDir = Path.Combine(Settings.DataDirectory, projectName);
+            var remoteData = await GetRemoteProjectDataAsync(remoteProject.DriveId, remoteProject.FolderId, remoteProject.FileName);
+            string projectName = !string.IsNullOrWhiteSpace(remoteData?.Object_name)
+                ? remoteData.Object_name
+                : "Unbenanntes_Projekt";
+
+            // Ungueltige Zeichen aus dem Ordnernamen entfernen
+            string sanitizedDirName = string.Join("_", projectName.Split(Path.GetInvalidFileNameChars()));
+            string localProjectDir = Path.Combine(Settings.DataDirectory, sanitizedDirName);
 
             Directory.CreateDirectory(localProjectDir);
 
@@ -802,8 +821,6 @@ public static class SaveManager
             {
                 projectData.CloudDriveId = remoteProject.DriveId;
                 projectData.CloudFolderId = remoteProject.FolderId;
-                projectData.ProjectPath = projectName;
-                projectData.JsonFile = remoteProject.FileName;
 
                 string updatedJson = JsonSerializer.Serialize(projectData, GlobalJson.GetOptions());
 

@@ -407,7 +407,7 @@ public partial class MapView : IQueryAttributable
 
     private async void KmlExportClicked(object sender, EventArgs e)
     {
-        string outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ProjectPath + ".kml");
+        string outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.Instance.ProjectPath + ".kml");
 
         List<(double Latitude, double Longitude, string Name, DateTime Time, string Desc)> coordinates = [];
         foreach (var plan in GlobalJson.Data.Plans)
@@ -431,7 +431,7 @@ public partial class MapView : IQueryAttributable
         KmlGenerator.GenerateKml(outputPath, coordinates);
 
         var saveStream = File.Open(outputPath, FileMode.Open);
-        var fileSaveResult = await FileSaver.Default.SaveAsync(GlobalJson.Data.ProjectPath + ".kml", saveStream);
+        var fileSaveResult = await FileSaver.Default.SaveAsync(SettingsService.Instance.ProjectPath + ".kml", saveStream);
         if (fileSaveResult.IsSuccessful)
             await SnackbarExtensions.ShowSafeAsync(AppResources.kml_gespeichert, includeDelay: true);
         else
@@ -474,8 +474,8 @@ public partial class MapView : IQueryAttributable
                 if (imageBytes == null || imageBytes.Length == 0) return;
 
                 string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
-                string folderPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath);
-                string thumbFolderPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath);
+                string folderPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath);
+                string thumbFolderPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath);
                 string filepath = Path.Combine(folderPath, filename);
                 string thumbPath = Path.Combine(thumbFolderPath, filename);
 
@@ -922,9 +922,9 @@ public partial class MapView : IQueryAttributable
         // JSON + Files löschen
         plan = GlobalJson.Data.Plans[planId];
 
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         GlobalJson.Data.Plans.Remove(planId);
 

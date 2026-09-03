@@ -51,8 +51,8 @@ public partial class ExportSettings : ContentPage
 
         string outputPath = Path.Combine(
             Settings.DataDirectory,
-            GlobalJson.Data.ProjectPath,
-            GlobalJson.Data.ProjectPath + ".docx");
+            SettingsService.Instance.ProjectPath,
+            SettingsService.Instance.ProjectPath + ".docx");
 
         string templatePath = Path.Combine(
             Settings.DataDirectory,
@@ -130,8 +130,8 @@ public partial class ExportSettings : ContentPage
 
         string outputPath = Path.Combine(
             Settings.DataDirectory,
-            GlobalJson.Data.ProjectPath,
-            GlobalJson.Data.ProjectPath + ".docx");
+            SettingsService.Instance.ProjectPath,
+            SettingsService.Instance.ProjectPath + ".docx");
 
         string templatePath = Path.Combine(
             Settings.DataDirectory,
@@ -167,7 +167,7 @@ public partial class ExportSettings : ContentPage
 
                     var fileSaveResult =
                         await FileSaver.Default.SaveAsync(
-                            GlobalJson.Data.ProjectPath + ".docx",
+                            SettingsService.Instance.ProjectPath + ".docx",
                             saveStream);
 
                     isSaved = fileSaveResult.IsSuccessful;

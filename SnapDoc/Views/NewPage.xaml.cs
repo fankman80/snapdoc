@@ -160,7 +160,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
                     if (pinData.IsCustomPin)
                     {
-                        resolvedPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
+                        resolvedPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
 
                         // Pruefen und herunterladen, falls lokal nicht vorhanden
                         if (!File.Exists(resolvedPath))
@@ -285,7 +285,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task AddPlan()
     {
-        var planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        var planImagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
 
         if (!File.Exists(planImagePath))
             await SaveManager.DownloadMediaOnDemandAsync(thisPlan.File, GlobalJson.Data.PlanPath);
@@ -329,7 +329,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             resolvedPath = Path.Combine(
                 Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
+                SettingsService.Instance.ProjectPath,
                 GlobalJson.Data.CustomPinsPath,
                 pinIcon);
 
@@ -341,7 +341,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             string dataFileName = Path.ChangeExtension(pinIcon, ".data");
             string dataLocalPath = Path.Combine(
                 Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
+                SettingsService.Instance.ProjectPath,
                 GlobalJson.Data.CustomPinsPath,
                 dataFileName);
 
@@ -611,7 +611,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             var pinPath = Path.Combine(
                 Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
+                SettingsService.Instance.ProjectPath,
                 GlobalJson.Data.CustomPinsPath,
                 _newPin);
 
@@ -811,7 +811,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var plan = thisPlan;
         var customPinPath = Path.Combine(
             Settings.DataDirectory,
-            GlobalJson.Data.ProjectPath,
+            SettingsService.Instance.ProjectPath,
             GlobalJson.Data.CustomPinsPath);
 
         Directory.CreateDirectory(customPinPath);
@@ -1080,7 +1080,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (!thisPlan.Pins[tappedPin.Id].IsCustomPin) return;
 
         var file = Path.GetFileNameWithoutExtension(thisPlan.Pins[tappedPin.Id].PinIcon) + ".data";
-        var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
+        var filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
 
         if (File.Exists(filePath))
         {
@@ -1377,8 +1377,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
         // JSON + Files loeschen
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
+        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
         // Cloud Cleanup
         _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.PlanPath}/{plan.File}");
@@ -1420,8 +1420,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void PlanRotate(int angle)
     {
-        var imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-        var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thisPlan.File);
+        var imagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
+        var thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thisPlan.File);
         var imagefile = Path.GetFileNameWithoutExtension(imagePath);
 
         if (imagefile.EndsWith("_r"))
@@ -1431,8 +1431,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         imagefile += Path.GetExtension(imagePath);
 
         // Ziel-Pfade definieren
-        var outputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, imagefile);
-        var thumbOutputPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", imagefile);
+        var outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, imagefile);
+        var thumbOutputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", imagefile);
 
         Helper.RotateImageFile(imagePath, outputPath, angle);
         Helper.RotateImageFile(thumbPath, thumbOutputPath, angle);
@@ -1454,7 +1454,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             var newThumbPath = Path.Combine(
                 Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
+                SettingsService.Instance.ProjectPath,
                 GlobalJson.Data.PlanPath,
                 "thumbnails",
                 imagefile);

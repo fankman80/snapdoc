@@ -91,6 +91,7 @@ public static class GlobalJson
                 _filePath = filePath; // Speichere den Dateipfad
                 string json = File.ReadAllText(filePath);
                 FromJson(json); // Deserialisiere mit den Optionen
+                SettingsService.Instance.ProjectPath = Directory.GetParent(filePath)?.Name;
             }
             else
             {

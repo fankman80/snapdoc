@@ -7,9 +7,7 @@ using System.Globalization;
 using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
-using System.Diagnostics;
 using SnapDoc.Models;
-
 
 #if ANDROID
 using Microsoft.Maui.Graphics;
@@ -27,7 +25,7 @@ public class Helper
         SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name ?? "";
 
         // Prüfen, ob grundsätzlich Pfad und Bildname vorhanden sind
-        bool hasValidData = !string.IsNullOrEmpty(GlobalJson.Data.ProjectPath) &&
+        bool hasValidData = !string.IsNullOrEmpty(SettingsService.Instance.ProjectPath) &&
                             !string.IsNullOrEmpty(GlobalJson.Data.TitleImage) &&
                             GlobalJson.Data.TitleImage != "banner_thumbnail.png";
 
@@ -35,15 +33,15 @@ public class Helper
         {
             string expectedImagePath = Path.Combine(
                 Settings.DataDirectory ?? "",
-                GlobalJson.Data.ProjectPath ?? "",
+                SettingsService.Instance.ProjectPath ?? "",
                 GlobalJson.Data.ImagePath ?? "",
                 GlobalJson.Data.TitleImage ?? ""
             );
 
             string expectedThumbPath = Path.Combine(
                 Settings.DataDirectory ?? "",
-                GlobalJson.Data.ProjectPath ?? "",
-                GlobalJson.Data.ThumbnailPath ?? "", // Korrigiert!
+                SettingsService.Instance.ProjectPath ?? "",
+                GlobalJson.Data.ThumbnailPath ?? "",
                 GlobalJson.Data.TitleImage ?? ""
             );
 

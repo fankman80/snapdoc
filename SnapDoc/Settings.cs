@@ -5,7 +5,6 @@ using CommunityToolkit.Maui.Core;
 public static class Settings
 {
     public static string AppCopyright { get; set; } = "Emch+Berger AG Bern | 2026";
-
     public static double DisplayDensity { get; set; } = 1;
 
     // Icondefinitionen
@@ -35,9 +34,7 @@ public static class Settings
     public static double OsBaseScale { get => osBaseScale; set => osBaseScale = value; }
     public static string DataDirectory { get => dataDirectory; set => dataDirectory = value; }
     public static List<IconItem> IconData { get; set; } = [];
-
     public static readonly string CacheDirectory = Path.Combine(FileSystem.CacheDirectory, "AppCache");
-
     public static readonly string TemplateDirectory = Path.Combine(dataDirectory, "templates");
 
     public static readonly List<MapViewItem> SwissTopoLayers = [

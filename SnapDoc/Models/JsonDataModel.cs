@@ -21,8 +21,6 @@ public class JsonDataModel
     public string ImagePath { get; set; }
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
-    public string ProjectPath { get; set; }
-    public string JsonFile { get; set; }
     public string TitleImage { get; set; }
     public Size TitleImageSize { get; set; }
 }

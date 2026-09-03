@@ -87,12 +87,27 @@ public static class MauiResourceLoader
             if (File.Exists(targetPath))
                 File.Delete(targetPath);
 
-            using var input = await GetAppPackageFileStreamAsync(fileName);
+            var ext = Path.GetExtension(fileName);
+            var nameWithoutExt = Path.GetFileNameWithoutExtension(fileName);
+
+            // 1. Versuch: Exakter Dateiname
+            Stream input = await GetAppPackageFileStreamAsync(fileName);
+
+            // 2. Versuch: Direkter Scale-100 Check (falls der erste fehlgeschlagen ist)
+            if (input == null && !fileName.Contains(".scale-100", StringComparison.OrdinalIgnoreCase))
+            {
+                var scaleFileName = $"{nameWithoutExt}.scale-100{ext}";
+                input = await GetAppPackageFileStreamAsync(scaleFileName);
+            }
+
             if (input == null)
                 return false;
 
-            using var output = File.Create(targetPath);
-            await input.CopyToAsync(output);
+            using (input)
+            {
+                using var output = File.Create(targetPath);
+                await input.CopyToAsync(output);
+            }
             return true;
         }
         catch (Exception ex)

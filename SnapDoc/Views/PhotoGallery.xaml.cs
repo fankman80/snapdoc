@@ -94,7 +94,7 @@ public partial class FotoGalleryView : ContentPage
                     {
                         ImagePath = SafeCombine(
                             Settings.DataDirectory,
-                            GlobalJson.Data.ProjectPath,
+                            SettingsService.Instance.ProjectPath,
                             GlobalJson.Data.ThumbnailPath,
                             foto.File),
                         DateTime = foto.DateTime,

@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using SnapDoc.Services;
 using SnapDoc.Views;
 
 namespace SnapDoc;
@@ -65,7 +66,7 @@ public partial class LoadDataToView
         {
             item.Thumbnail = Path.Combine(
                 Settings.DataDirectory,
-                GlobalJson.Data.ProjectPath,
+                SettingsService.Instance.ProjectPath,
                 GlobalJson.Data.PlanPath,
                 "thumbnails",
                 plan.Value.File);
@@ -91,50 +92,71 @@ public partial class LoadDataToView
         GlobalJson.Data.ImagePath = null;
         GlobalJson.Data.ThumbnailPath = null;
         GlobalJson.Data.CustomPinsPath = null;
-        GlobalJson.Data.ProjectPath = null;
-        GlobalJson.Data.JsonFile = null;
     }
 
     public static void ClearAllPlansFromShell()
     {
-        if (Shell.Current is not AppShell shell) return;
+        if (Shell.Current is not AppShell shell)
+            return;
 
-        var plansToDelete = shell.AllPlanItems.ToList();
-
-        foreach (var plan in plansToDelete)
+        MainThread.BeginInvokeOnMainThread(() =>
         {
-            ShellContent contentToRemove = null;
-            ShellSection parentSection = null;
-
-            foreach (var shellItem in shell.Items)
+            try
             {
-                foreach (var section in shellItem.Items)
+                var planIds = shell.AllPlanItems
+                    .Where(p => p?.PlanId != null)
+                    .Select(p => p.PlanId)
+                    .ToHashSet();
+
+                for (int i = shell.Items.Count - 1; i >= 0; i--)
                 {
-                    contentToRemove = section.Items.FirstOrDefault(c => c.Route == plan.PlanId);
-                    if (contentToRemove != null)
+                    var shellItem = shell.Items[i];
+                    if (shellItem?.Items == null) continue;
+
+                    for (int j = shellItem.Items.Count - 1; j >= 0; j--)
                     {
-                        parentSection = section;
-                        break;
+                        var section = shellItem.Items[j];
+                        if (section?.Items == null) continue;
+
+                        for (int k = section.Items.Count - 1; k >= 0; k--)
+                        {
+                            var content = section.Items[k];
+
+                            // Pruefen, ob dieser Content zu den Plaenen gehoert
+                            if (content?.Route != null && planIds.Contains(content.Route))
+                            {
+                                try
+                                {
+                                    section.Items.RemoveAt(k);
+                                }
+                                catch (Exception)
+                                {
+                                    // Faengt MAUI-interne Fehler lautlos ab
+                                }
+                            }
+                        }
+
+                        // Wenn die Sektion leer ist, ebenfalls ueber Index entfernen
+                        if (section.Items.Count == 0)
+                        {
+                            try
+                            {
+                                shellItem.Items.RemoveAt(j);
+                            }
+                            catch { }
+                        }
                     }
                 }
-                if (contentToRemove != null) break;
-            }
 
-            if (contentToRemove != null && parentSection?.Items != null)
+                // Daten im Shell-Modell komplett leeren
+                shell.PlanItems.Clear();
+                shell.AllPlanItems.Clear();
+                shell.ApplyFilterAndSorting();
+            }
+            catch (Exception ex)
             {
-                parentSection.Items.Remove(contentToRemove);
-
-                if (parentSection.Items.Count == 0
-                    && parentSection.Parent is ShellItem group
-                    && group.Items != null)
-                {
-                    group.Items.Remove(parentSection);
-                }
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Leeren der Shell-Plaene: {ex.Message}");
             }
-        }
-
-        shell.PlanItems.Clear();
-        shell.AllPlanItems.Clear();
-        shell.ApplyFilterAndSorting();
+        });
     }
 }

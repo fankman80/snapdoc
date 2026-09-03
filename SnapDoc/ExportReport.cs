@@ -41,7 +41,7 @@ public partial class ExportReport
 
             // Dateisuche im Hintergrund parallel zu den Bild-Vorbereitungen laufen lassen
             var existingFilesTask = Task.Run(() => new HashSet<string>(
-                Directory.GetFiles(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath), "*.*", SearchOption.AllDirectories),
+                Directory.GetFiles(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath), "*.*", SearchOption.AllDirectories),
                 StringComparer.OrdinalIgnoreCase
             ));
 
@@ -90,7 +90,7 @@ public partial class ExportReport
             List<string> uniquePinIcons = GetUniquePinIcons(GlobalJson.Data);
             foreach (string icon in uniquePinIcons)
                 if (icon.Contains("custompin_", StringComparison.OrdinalIgnoreCase)) //check if icon is a custompin
-                    CopyImageToDirectory(Settings.CacheDirectory, Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
+                    CopyImageToDirectory(Settings.CacheDirectory, Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath), icon);
                 else if (icon.Contains("customicons", StringComparison.OrdinalIgnoreCase)) //check if icon is a customicon
                     CopyImageToDirectory(Settings.CacheDirectory, "customicons", Path.GetFileName(icon));
                 else
@@ -267,7 +267,7 @@ public partial class ExportReport
                                                                 {
                                                                     var posData = placeholderDataCache[s];
                                                                     SizeF exportSize = posData?.Size ?? new SizeF(14, 14);
-                                                                    string planPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                    string planPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
                                                                     string pinImage = Path.Combine(Settings.CacheDirectory, currentPin.PinIcon);
 
                                                                     if (FastFileExists(pinImage, existingFiles))
@@ -294,11 +294,11 @@ public partial class ExportReport
                                                                         // Suche in den Fotos nach dem MAP_IMG
                                                                         var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
                                                                         if (mapImage != null)
-                                                                            backgroundImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, mapImage.File);
+                                                                            backgroundImagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, mapImage.File);
                                                                     }
                                                                     else
                                                                     {
-                                                                        string originalBgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+                                                                        string originalBgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
                                                                         string cachedBgPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
 
                                                                         if (SettingsService.Instance.MaxPlanExportSize > 0 && FastFileExists(cachedBgPath, existingFiles))
@@ -368,13 +368,13 @@ public partial class ExportReport
                                                                         if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
                                                                             continue;
 
-                                                                        string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, img.File);
+                                                                        string imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, img.File);
                                                                         string cachedPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
                                                                         if (SettingsService.Instance.MaxFotoExportSize > 0 && FastFileExists(cachedPath, existingFiles))
                                                                             imgPath = cachedPath;
                                                                         else if (!SettingsService.Instance.IsFotoOverlayExport && img.HasOverlay)
-                                                                            imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
+                                                                            imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", img.File);
 
                                                                         if (FastFileExists(imgPath, existingFiles))
                                                                         {
@@ -508,7 +508,7 @@ public partial class ExportReport
                                 {
                                     SizeF exportSize = posData.Size; // Nutzt die Zahlen aus dem Regex
                                     SizeF scaledSize = ScaleToFit(GlobalJson.Data.TitleImageSize, exportSize);
-                                    string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+                                    string imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
 
                                     if (FastFileExists(imgPath, existingFiles))
                                     {
@@ -637,7 +637,7 @@ public partial class ExportReport
 
             Paragraph imagePara = new();
             Run imgRun = new();
-            string planImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
+            string planImagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, currentPlan.File);
             string cachedPlanPath = Path.Combine(Settings.CacheDirectory, currentPlan.File);
 
             if (SettingsService.Instance.MaxPlanExportSize > 0 && FastFileExists(cachedPlanPath, existingFiles))
@@ -1277,9 +1277,9 @@ public partial class ExportReport
                     if (img.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase))
                         continue;
 
-                    string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, img.File);
+                    string sourcePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, data.ImagePath, img.File);
                     if (!isOverlayExport && img.HasOverlay)
-                        sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.ImagePath, "originals", img.File);
+                        sourcePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, data.ImagePath, "originals", img.File);
 
                     string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(img.File));
 
@@ -1314,7 +1314,7 @@ public partial class ExportReport
         {
             if (string.IsNullOrEmpty(plan.File)) continue;
 
-            string sourcePath = Path.Combine(Settings.DataDirectory, data.ProjectPath, data.PlanPath, plan.File);
+            string sourcePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, data.PlanPath, plan.File);
             string targetPath = Path.Combine(Settings.CacheDirectory, Path.GetFileName(plan.File));
 
             if (!File.Exists(targetPath))

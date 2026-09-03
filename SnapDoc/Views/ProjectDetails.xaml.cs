@@ -74,8 +74,8 @@ public partial class ProjectDetails : ContentPage
         string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 
         (FileResult result, Size imgSize) = await CapturePicture.Capture(
-            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
-            Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath),
+            Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath),
+            Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath),
             thumbFileName, true, true);
 
         if (result != null)
@@ -83,8 +83,8 @@ public partial class ProjectDetails : ContentPage
             // 2. Alte Dateien lokal UND aus der Cloud loeschen
             if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
             {
-                var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
-                var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+                var oldThumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
+                var oldImagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
 
                 if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
                 if (File.Exists(oldImagePath)) File.Delete(oldImagePath);
@@ -99,8 +99,8 @@ public partial class ProjectDetails : ContentPage
             GlobalJson.SaveToFile();
 
             // Absolute Pfade der neuen Dateien ermitteln
-            var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
-            var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
+            var destinationPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
+            var destinationThumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
 
             // 4. JSON-Aenderungen UND die 2 neuen Bilddateien an SaveManager uebergeben
             SaveManager.NotifyDataChanged([(destinationPath, GlobalJson.Data.ImagePath), (destinationThumbPath, GlobalJson.Data.ThumbnailPath)]);
@@ -127,8 +127,8 @@ public partial class ProjectDetails : ContentPage
                 string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
                 string sourceFilePath = fileResult.FullPath;
 
-                var destinationPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
-                var destinationThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
+                var destinationPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, thumbFileName);
+                var destinationThumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, thumbFileName);
 
                 if (File.Exists(destinationPath))
                     File.Delete(destinationPath);
@@ -145,8 +145,8 @@ public partial class ProjectDetails : ContentPage
                 // 2. Alte Dateien lokal UND in der Cloud loeschen
                 if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
                 {
-                    var oldThumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
-                    var oldImagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+                    var oldThumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
+                    var oldImagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
 
                     if (File.Exists(oldThumbPath)) File.Delete(oldThumbPath);
                     if (File.Exists(oldImagePath)) File.Delete(oldImagePath);

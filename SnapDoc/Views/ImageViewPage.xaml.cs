@@ -142,13 +142,13 @@ public partial class ImageViewPage : IQueryAttributable
             string imgPath;
             if (ImgSource == "showTitle")
             {
-                imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
+                imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
                 this.Title = "Titelbild";
                 DrawBtn.IsVisible = false;
             }
             else
             {
-                imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
+                imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
                 var dateTime = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].DateTime;
                 string formattedDate = dateTime.ToString("d") + " / " + dateTime.ToString("HH:mm");
                 this.Title = formattedDate;
@@ -369,11 +369,11 @@ public partial class ImageViewPage : IQueryAttributable
 
             if (!string.IsNullOrEmpty(oldTitleImage) && oldTitleImage != "banner_thumbnail.png")
             {
-                string file1 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
+                string file1 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                 if (File.Exists(file1))
                     File.Delete(file1);
 
-                string file2 = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
+                string file2 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
                 if (File.Exists(file2))
                     File.Delete(file2);
 
@@ -396,15 +396,15 @@ public partial class ImageViewPage : IQueryAttributable
                 if (!string.IsNullOrEmpty(fileName))
                 {
                     // Lokales Loeschen
-                    string fileOriginal = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", fileName);
+                    string fileOriginal = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", fileName);
                     if (File.Exists(fileOriginal))
                         File.Delete(fileOriginal);
 
-                    string fileImage = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+                    string fileImage = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
                     if (File.Exists(fileImage))
                         File.Delete(fileImage);
 
-                    string fileThumb = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
+                    string fileThumb = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
                     if (File.Exists(fileThumb))
                         File.Delete(fileThumb);
 
@@ -559,7 +559,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
         {
             isCleared = true;
-            var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            var imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
 
             FotoContainer.Source = ImageSource.FromStream(() =>
             {
@@ -652,9 +652,9 @@ public partial class ImageViewPage : IQueryAttributable
     {
         if (drawingView != null && !drawingController.IsEmpty() || isCleared == true)
         {
-            var imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
-            var origPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-            var thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, ImgSource);
+            var imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
+            var origPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
+            var thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, ImgSource);
 
             if (isCleared)
             {
@@ -670,8 +670,8 @@ public partial class ImageViewPage : IQueryAttributable
             }
             else
             {
-                if (!Directory.Exists(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
-                    Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
+                if (!Directory.Exists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
+                    Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
 
                 if (!File.Exists(origPath))
                     File.Copy(imgPath, origPath);
@@ -844,7 +844,7 @@ public partial class ImageViewPage : IQueryAttributable
                 PinId = target.PinId;
                 ImgSource = target.FotoKey;
 
-                string imgPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
+                string imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
 
                 Title = target.DateTime.ToString("d") + " / " + target.DateTime.ToString("HH:mm");
 

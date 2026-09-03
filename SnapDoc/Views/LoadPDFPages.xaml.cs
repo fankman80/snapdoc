@@ -312,7 +312,7 @@ public partial class LoadPDFPages : ContentPage
     {
         await Task.Run(() =>
         {
-            string imageDirectory = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.PlanPath);
+            string imageDirectory = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
             Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
             var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();

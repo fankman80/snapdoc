@@ -22,7 +22,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
             if (value as string == "Prg")
                 SettingsService.Instance.LoadSettings();
             if (value as string == "Doc")
-                GlobalJson.LoadFromFile(Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile));
+                GlobalJson.LoadFromFile(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.Instance.DefaultJson));
             if (value as string == "Icon")
             {
                 // Icon-Daten einlesen
@@ -50,7 +50,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
 
     private async void OpenDocEditor(object sender, EventArgs e)
     {
-        var filePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile);
+        var filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.Instance.DefaultJson);
         if (File.Exists(filePath))
             await Shell.Current.GoToAsync($"xmleditor?file={filePath}&fileMode=W&fileType=Doc");
     }

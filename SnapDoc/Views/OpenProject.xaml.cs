@@ -39,39 +39,58 @@ public partial class OpenProject : ContentPage
             try
             {
                 var files = Directory.EnumerateFiles(rootDirectory, "*.json", SearchOption.AllDirectories);
-                string activeFilePath = GlobalJson.Data?.JsonFile != null
-                    ? Path.Combine(
-                        Settings.DataDirectory,
-                        GlobalJson.Data.ProjectPath,
-                        GlobalJson.Data.JsonFile)
-                    : null;
-
+                string activeFilePath = !string.IsNullOrWhiteSpace(SettingsService.Instance?.ProjectPath)
+                            ? Path.Combine(
+                                Settings.DataDirectory,
+                                SettingsService.Instance.ProjectPath,
+                                SettingsService.Instance.DefaultJson)
+                            : null;
                 foreach (var file in files)
                 {
-                    string projectDir = Path.GetDirectoryName(file);
+                    string currentFilePath = file;
+                    string projectDir = Path.GetDirectoryName(currentFilePath);
                     string thumbPath = "banner_thumbnail.png";
+                    string projectName = Path.GetFileNameWithoutExtension(currentFilePath); // Fallback
 
                     try
                     {
-                        var projectData = GlobalJson.ReadFromFile(file);
+                        // 1. Datei einlesen, um zu pruefen, ob es wirklich ein Projekt ist
+                        var projectData = GlobalJson.ReadFromFile(currentFilePath);
 
-                        if (projectData != null &&
-                            !string.IsNullOrWhiteSpace(projectDir))
+                        if (projectData != null && !string.IsNullOrWhiteSpace(projectDir))
                         {
-                            string titleImageName =
-                                !string.IsNullOrWhiteSpace(projectData.TitleImage)
-                                    ? projectData.TitleImage
-                                    : "banner_thumbnail.png";
+                            // 2. Umbenennungs-Logik: Pruefen ob der Name vom Standard abweicht
+                            string currentFileName = Path.GetFileName(currentFilePath);
 
-                            string thumbnailFolder =
-                                !string.IsNullOrWhiteSpace(projectData.ThumbnailPath)
-                                    ? projectData.ThumbnailPath
-                                    : "thumbnails";
+                            if (!currentFileName.Equals(SettingsService.Instance.DefaultJson, StringComparison.OrdinalIgnoreCase))
+                            {
+                                string newFilePath = Path.Combine(projectDir, SettingsService.Instance.DefaultJson);
 
-                            string fullThumbPath = Path.Combine(
-                                projectDir,
-                                thumbnailFolder,
-                                titleImageName);
+                                // Nur umbenennen, falls am Ziel nicht schon eine Datei liegt
+                                if (!File.Exists(newFilePath))
+                                {
+                                    File.Move(currentFilePath, newFilePath);
+                                    currentFilePath = newFilePath; // Ab hier den neuen Pfad nutzen!
+                                }
+                            }
+
+                            // Object_name aus der JSON als Anzeigename nutzen
+                            if (!string.IsNullOrWhiteSpace(projectData.Object_name))
+                            {
+                                projectName = projectData.Object_name;
+                            }
+                            else
+                            {
+                                projectName = Path.GetFileName(projectDir); // Zweiter Fallback
+                            }
+
+                            string titleImageName = !string.IsNullOrWhiteSpace(projectData.TitleImage)
+                                ? projectData.TitleImage : "banner_thumbnail.png";
+
+                            string thumbnailFolder = !string.IsNullOrWhiteSpace(projectData.ThumbnailPath)
+                                ? projectData.ThumbnailPath : "thumbnails";
+
+                            string fullThumbPath = Path.Combine(projectDir, thumbnailFolder, titleImageName);
 
                             if (File.Exists(fullThumbPath))
                                 thumbPath = fullThumbPath;
@@ -84,12 +103,12 @@ public partial class OpenProject : ContentPage
 
                     items.Add(new FileItem
                     {
-                        FileName = Path.GetFileNameWithoutExtension(file),
-                        FilePath = file,
-                        FileDate = File.GetLastWriteTime(file),
+                        FileName = projectName,
+                        FilePath = currentFilePath,
+                        FileDate = File.GetLastWriteTime(currentFilePath),
                         ImagePath = thumbPath,
                         ThumbnailPath = thumbPath,
-                        IsActive = file == activeFilePath
+                        IsActive = currentFilePath == activeFilePath
                     });
                 }
             }
@@ -142,26 +161,61 @@ public partial class OpenProject : ContentPage
                         if (!string.IsNullOrWhiteSpace(localData.CloudFolderId))
                             remoteProject = remoteProjects.FirstOrDefault(rp => rp.FolderId == localData.CloudFolderId);
 
+                        // 3.2 Keine Cloud-Verknuepfung ueber die globale Index-Suche gefunden
                         if (remoteProject == null)
                         {
-                            string expectedJsonName = item.FileName + ".json";
+                            bool existsInCloud = false;
 
-                            remoteProject = remoteProjects.FirstOrDefault(
-                                            rp => rp.FileName.Equals(
-                                            expectedJsonName,
-                                            StringComparison.OrdinalIgnoreCase));
-                        }
-
-                        // 3.2 Keine Cloud-Verknüpfung gefunden
-                        if (remoteProject == null)
-                        {
-                            MainThread.BeginInvokeOnMainThread(() =>
+                            // Direktpruefung per ID: Schuetzt vor Index-Verzoegerungen bei neuen Projekten
+                            if (!string.IsNullOrWhiteSpace(localData.CloudDriveId) && !string.IsNullOrWhiteSpace(localData.CloudFolderId))
                             {
-                                // Wenn eine ID existiert, zeigen wir das Wolkensymbol trotzdem an
-                                item.HasCloudSync = !string.IsNullOrWhiteSpace(localData.CloudFolderId);
-                            });
+                                try
+                                {
+                                    var folderCheck = await SaveManager.CurrentAuth.GraphClient
+                                        .Drives[localData.CloudDriveId]
+                                        .Items[localData.CloudFolderId]
+                                        .GetAsync();
 
-                            continue;
+                                    if (folderCheck != null)
+                                    {
+                                        existsInCloud = true;
+                                        remoteProject = new RemoteProjectDto
+                                        {
+                                            DriveId = localData.CloudDriveId,
+                                            FolderId = localData.CloudFolderId,
+                                            FileName = "snapdoc_data.json"
+                                        };
+                                    }
+                                }
+                                catch
+                                {
+                                    // Ordner existiert in der Cloud nicht mehr (404 / NotFound)
+                                    existsInCloud = false;
+                                }
+                            }
+
+                            if (!existsInCloud)
+                            {
+                                // Projekt existiert wirklich nicht mehr in der Cloud -> Verwaiste IDs lokal loeschen
+                                if (!string.IsNullOrEmpty(localData.CloudDriveId) || !string.IsNullOrEmpty(localData.CloudFolderId))
+                                {
+                                    localData.CloudDriveId = null;
+                                    localData.CloudFolderId = null;
+
+                                    string updatedJson = System.Text.Json.JsonSerializer.Serialize(
+                                        localData,
+                                        GlobalJson.GetOptions());
+
+                                    File.WriteAllText(item.FilePath, updatedJson);
+                                }
+
+                                MainThread.BeginInvokeOnMainThread(() =>
+                                {
+                                    item.HasCloudSync = false;
+                                });
+
+                                continue;
+                            }
                         }
 
                         // 3.3 Cloud-Verknüpfung aktualisieren
@@ -339,11 +393,9 @@ public partial class OpenProject : ContentPage
             counter++;
         }
 
-        string filePath = Path.Combine(Settings.DataDirectory, _result, _result + ".json");
+        string filePath = Path.Combine(Settings.DataDirectory, _result, SettingsService.Instance.DefaultJson);
 
-        // Cloud-Verknüpfung im SaveManager zurücksetzen
         SaveManager.ResetCloudSync();
-
         LoadDataToView.ResetData();
 
         GlobalJson.CreateNewFile(filePath);
@@ -351,11 +403,9 @@ public partial class OpenProject : ContentPage
         GlobalJson.Data.Object_address = "";
         GlobalJson.Data.Working_title = "";
         GlobalJson.Data.Project_nr = "";
-        GlobalJson.Data.Object_name = "";
+        GlobalJson.Data.Object_name = result.Result;
         GlobalJson.Data.Creation_date = DateTime.Now;
         GlobalJson.Data.Project_manager = "";
-        GlobalJson.Data.ProjectPath = _result;
-        GlobalJson.Data.JsonFile = _result + ".json";
         GlobalJson.Data.PlanPath = "plans";
         GlobalJson.Data.ImagePath = "images";
         GlobalJson.Data.ThumbnailPath = "thumbnails";
@@ -603,9 +653,8 @@ public partial class OpenProject : ContentPage
 
                         string projectDirectoryPath = Path.GetDirectoryName(fullPath);
                         string fileName = Path.GetFileName(fullPath);
-                        string currentActiveJson = GlobalJson.Data?.JsonFile;
                         bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
-                                                 fileName.Equals(currentActiveJson, StringComparison.OrdinalIgnoreCase);
+                                                 fileName.Equals(SettingsService.Instance.DefaultJson, StringComparison.OrdinalIgnoreCase);
 
                         // Lösche das Projektverzeichnis und alle enthaltenen Dateien
                         if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
@@ -712,23 +761,20 @@ public partial class OpenProject : ContentPage
                     if (item.HasCloudSync)
                         return;
 
-                    if (!item.IsActive)
+                    if (FileListView.ItemsSource is IEnumerable<FileItem> items)
                     {
-                        if (FileListView.ItemsSource is IEnumerable<FileItem> items)
-                        {
-                            foreach (var f in items)
-                                f.IsActive = false;
-                        }
-
-                        item.IsActive = true;
-
-                        SettingsService.Instance.IsProjectLoaded = true;
-
-                        LoadDataToView.ResetData();
-                        GlobalJson.LoadFromFile(item.FilePath);
-                        LoadDataToView.LoadData(new FileResult(item.FilePath));
-                        Helper.HeaderUpdate();
+                        foreach (var f in items)
+                            f.IsActive = false;
                     }
+
+                    item.IsActive = true;
+                    SettingsService.Instance.IsProjectLoaded = true;
+
+                    LoadDataToView.ResetData();
+                    GlobalJson.LoadFromFile(item.FilePath);
+                    SaveManager.Initialize(item.FilePath);
+                    LoadDataToView.LoadData(new FileResult(item.FilePath));
+                    Helper.HeaderUpdate();
 
                     await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
                     break;
@@ -737,39 +783,24 @@ public partial class OpenProject : ContentPage
                     break;
 
                 default:
-                    if (Directory.Exists(Path.GetDirectoryName(item.FilePath)))
+                    var currentFilePath = item.FilePath;
+                    if (File.Exists(currentFilePath))
                     {
-                        var newFilePath = Path.Combine(Settings.DataDirectory, _result.Result, _result.Result + ".json");
-                        var oldFilePath = item.FilePath;
+                        GlobalJson.LoadFromFile(currentFilePath);
+                        GlobalJson.Data.Object_name = _result.Result;
+                        GlobalJson.SaveToFile();
 
-                        GlobalJson.LoadFromFile(oldFilePath);
-                        GlobalJson.Data.ProjectPath = _result.Result;
-                        GlobalJson.Data.JsonFile = _result.Result + ".json";
-                        GlobalJson.Data.PlanPath = "plans";
-                        GlobalJson.Data.ImagePath = "images";
-                        GlobalJson.Data.ThumbnailPath = "thumbnails";
-                        GlobalJson.Data.CustomPinsPath = "custompins";
-
-                        // Save data to file
                         SaveManager.NotifyDataChanged();
 
-                        // Verzeichnis an die neue Stelle verschieben (umbenennen)
-                        Directory.Move(Path.GetDirectoryName(oldFilePath), Path.GetDirectoryName(newFilePath));
-
-                        // Json verschieben (umbenennen)
-                        File.Move(Path.Combine(Path.GetDirectoryName(newFilePath), item.FileName + ".json"),
-                                  Path.Combine(Path.GetDirectoryName(newFilePath), _result.Result + ".json"));
-
-                        GlobalJson.UpdateFilePath(newFilePath);
-
-                        if (item.FileName == Path.GetFileName(Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.JsonFile)))
+                        // Wenn das umbenannte Projekt gerade aktiv ist, Header aktualisieren
+                        if (item.IsActive)
                         {
-                            // Daten laden und verarbeiten (nicht UI-bezogen)
                             LoadDataToView.ResetData();
-                            GlobalJson.LoadFromFile(newFilePath);
-                            LoadDataToView.LoadData(new FileResult(newFilePath));
-                            Helper.HeaderUpdate();  // UI-Aktualisierung
+                            GlobalJson.LoadFromFile(currentFilePath);
+                            LoadDataToView.LoadData(new FileResult(currentFilePath));
+                            Helper.HeaderUpdate();
                         }
+
                         LoadJsonFiles();
                     }
                     break;

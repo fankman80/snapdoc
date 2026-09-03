@@ -102,7 +102,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             {
                 ImagePath = Path.Combine(
                     Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
+                    SettingsService.Instance.ProjectPath,
                     GlobalJson.Data.ThumbnailPath,
                     img.File),
                 OnPlanId = this.PlanId,
@@ -150,7 +150,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 // 2. Originalbild im Hintergrund nachladen (fuer Offline-Verfuegbarkeit)
                 string originalImagePath = Path.Combine(
                     Settings.DataDirectory,
-                    GlobalJson.Data.ProjectPath,
+                    SettingsService.Instance.ProjectPath,
                     GlobalJson.Data.ImagePath,
                     fileName);
 
@@ -172,7 +172,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (tappedImage.BindingContext is not FotoItem fotoItem) return;
 
         var fileName = Path.GetFileName(fotoItem.ImagePath);
-        string expectedFullPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+        string expectedFullPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
 
         // Pruefen, ob das Originalbild bereits lokal existiert
         if (!File.Exists(expectedFullPath))
@@ -294,10 +294,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
             string fileName = foto.File;
             if (string.IsNullOrEmpty(fileName)) continue;
 
-            string imagePath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+            string imagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
             if (File.Exists(imagePath)) File.Delete(imagePath);
 
-            string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
+            string thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
             if (File.Exists(thumbPath)) File.Delete(thumbPath);
 
             _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
@@ -311,10 +311,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
             string filenamePng = baseName + ".png";
             string filenameData = baseName + ".data";
 
-            string pathPng = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filenamePng);
+            string pathPng = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, filenamePng);
             if (File.Exists(pathPng)) File.Delete(pathPng);
 
-            string pathData = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.CustomPinsPath, filenameData);
+            string pathData = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, filenameData);
             if (File.Exists(pathData)) File.Delete(pathData);
 
             _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{filenamePng}");
@@ -346,8 +346,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         try
         {
             (FileResult path, Size imgSize) = await CapturePicture.Capture(
-                Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath),
-                Path.Combine(GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath));
+                Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath),
+                Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath));
 
             if (path == null) return;
 
@@ -361,8 +361,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
 
-            string originalPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ImagePath, path.FileName);
-            string thumbPath = Path.Combine(Settings.DataDirectory, GlobalJson.Data.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
+            string originalPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, path.FileName);
+            string thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
 
             SaveManager.NotifyDataChanged();
 
