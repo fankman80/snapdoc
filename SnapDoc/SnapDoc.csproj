@@ -227,7 +227,11 @@
 		<SentryOrg>fankman-dev</SentryOrg>
 		<SentryProject>snapdoc_maui</SentryProject>
 		<SentryAuthToken>$(SENTRY_AUTH_TOKEN)</SentryAuthToken>
-		<SentryUploadPdb>true</SentryUploadPdb>
-		<SentryUploadSymbols Condition="'$(Configuration)' == 'Release' and $(TargetFramework.Contains('-ios'))">true</SentryUploadSymbols>
+
+		<!-- PDBs nur hochladen, wenn ein Token in der Umgebung gesetzt ist -->
+		<SentryUploadPdb Condition="'$(SENTRY_AUTH_TOKEN)' != ''">true</SentryUploadPdb>
+
+		<!-- iOS Symbole ebenso absichern -->
+		<SentryUploadSymbols Condition="'$(Configuration)' == 'Release' and $(TargetFramework.Contains('-ios')) and '$(SENTRY_AUTH_TOKEN)' != ''">true</SentryUploadSymbols>
 	</PropertyGroup>
 </Project>

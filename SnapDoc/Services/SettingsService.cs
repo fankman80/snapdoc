@@ -100,8 +100,8 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
     [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
     [ObservableProperty] public partial string LastPinId { get; set; }
-    [ObservableProperty] public partial string FlyoutHeaderTitle { get; set; } = "by Emch+Berger AG Bern";
-    [ObservableProperty] public partial string FlyoutHeaderDesc { get; set; } = "SnapDoc";
+    [ObservableProperty] public partial string FlyoutHeaderTitle { get; set; } = "SnapDoc";
+    [ObservableProperty] public partial string FlyoutHeaderDesc { get; set; } = "by Emch+Berger AG Bern";
     [ObservableProperty] public partial string FlyoutHeaderImageThumb { get; set; } = "banner_thumbnail.png";
     [ObservableProperty] public partial string FlyoutHeaderImage { get; set; } = "";
     [ObservableProperty] public partial bool IconGalleryGridView { get; set; } = false;
