@@ -45,13 +45,13 @@ public class Helper
                 GlobalJson.Data.TitleImage ?? ""
             );
 
-            // Zusätzlicher Check: Existiert das Thumbnail auf der Festplatte?
+            // Existiert das Thumbnail auf der Festplatte?
             if (File.Exists(expectedThumbPath))
             {
                 SettingsService.Instance.FlyoutHeaderImage = expectedImagePath;
                 SettingsService.Instance.FlyoutHeaderImageThumb = expectedThumbPath;
 
-                return; // Alles okay, Methode hier beenden
+                return;
             }
         }
 
