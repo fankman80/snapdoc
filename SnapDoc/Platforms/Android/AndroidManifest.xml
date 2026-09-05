@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.5.0" android:versionCode="511">
+<manifest xmlns:android="http://schemas.android.com/apk/res/android" android:versionName="2.5.0" android:versionCode="512">
 	<!-- Berechtigungen -->
 	<!-- Package Visibility für Kamera -->
 	<queries>

@@ -9,38 +9,6 @@ using System.Diagnostics;
 
 namespace SnapDoc.Controls;
 
-// =====================================================================================
-//  TileImageView - ueberarbeitete Fassung
-//
-//  Umgesetzte Aenderungen gegenueber der Ursprungsversion (Nummerierung wie im Review):
-//
-//  Stufe 1 - Bugs
-//   A1  Pin-Culling ueber rotationsinvarianten Bounding-Radius statt Mittelpunkt + 50 px
-//   A2  _isGenerating wird tatsaechlich auf true gesetzt
-//   C1  Kein Use-after-Dispose mehr: pin.Icon wird nicht mehr aus dem Cache befuellt
-//   A4  LruCache disposed SKBitmaps bei Evict, Ueberschreiben und Clear
-//   C2  IDisposable + vollstaendiges Unsubscribe aller Event-Handler
-//
-//  Stufe 2 - FPS
-//   B2  Exakte Viewport-Bounding-Box aus der invertierten TotalMatrix (statt Diagonalkreis)
-//   A3  Keine Directory.Exists()/Path.Combine-Aufrufe mehr im Renderloop
-//   B1  Cache-Kapazitaet wird dynamisch auf >= 2x sichtbare Kacheln angehoben
-//   C4  InvalidateSurface wird auf Frame-Rate zusammengefasst (RequestRender)
-//   C6  Settings- und BindableProperty-Zugriffe aus den Schleifen gezogen
-//
-//  Stufe 3 - Architektur
-//   A6/B3  Tile-Loader mit Semaphore, LIFO-Queue und Generationszaehler
-//   A5/B1  Stable-Zoom: alter Layer bleibt Basis, neuer Layer wird darueber eingeblendet;
-//          grobe Pyramidenstufen werden permanent im RAM gehalten
-//   A7/B5  DrawMapAndPins(canvas, deviceClip) - die Lupe cullt auf ihren eigenen
-//          Ausschnitt und waehlt die Pyramidenstufe anhand ihrer effektiven Skalierung
-//   C3     Datei-I/O in ProcessNewImageAsync komplett vom UI-Thread genommen,
-//          Fertigstellung ueber Marker-Datei statt rekursivem GetFiles-Scan
-//   B6     Pyramidengenerierung mit skaliertem SKCodec-Decode (kein Vollbild im RAM)
-//   C5     _sortedPins wird pro Frame hoechstens einmal neu sortiert
-//   C7     0,5-px-Ueberlappung der Kacheln gegen Nahtartefakte
-// =====================================================================================
-
 public partial class TileImageView : ContentView, IDisposable
 {
     // ---------------------------------------------------------------------------------
@@ -85,6 +53,16 @@ public partial class TileImageView : ContentView, IDisposable
 
     private string _computedTileFolder = string.Empty;
 
+    /// <summary>Diagnose: FPS-Anzeige oben rechts.</summary>
+    private bool _showFps = false;
+    private readonly double[] _frameTimes = new double[60];
+    private int _frameTimeIndex = 0;
+    private long _lastFrameTicks = 0;
+    private float _fpsValue = 0f;
+    private SKFont _fpsFont;
+    private SKPaint _fpsTextPaint;
+    private SKPaint _fpsBackPaint;
+
     // ---------------------------------------------------------------------------------
     //  Felder - Kachel-Cache und Loader
     // ---------------------------------------------------------------------------------
@@ -121,7 +99,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private bool _renderPending = false;
     private SKColor _placeholderSKColor = Colors.LightGray.ToSKColor();
-    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
 
     // ---------------------------------------------------------------------------------
     //  Felder - Eingabe
@@ -281,6 +259,23 @@ public partial class TileImageView : ContentView, IDisposable
                 control.RequestRender();
             });
 
+    public static readonly BindableProperty ShowFpsCounterProperty =
+        BindableProperty.Create(nameof(ShowFpsCounter), typeof(bool), typeof(TileImageView), false,
+        propertyChanged: (bindable, o, n) =>
+        {
+            var control = (TileImageView)bindable;
+            control._showFps = (bool)n;
+            control._lastFrameTicks = 0;
+            Array.Clear(control._frameTimes);
+            control.InvalidateView();
+        });
+
+    public bool ShowFpsCounter
+    {
+        get => (bool)GetValue(ShowFpsCounterProperty);
+        set => SetValue(ShowFpsCounterProperty, value);
+    }
+
     public static readonly BindableProperty PinCreationModeProperty =
         BindableProperty.Create(nameof(PinCreationMode), typeof(PinCreationMode), typeof(TileImageView), PinCreationMode.LongPress);
 
@@ -430,7 +425,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private static void GetLevelTileCounts(int zoom, int maxZoom, int tileSize, SKSize imageSize, out int tilesX, out int tilesY)
     {
-        double zoomScale = Math.Pow(0.5, maxZoom - zoom);
+        double zoomScale = 1.0 / (1 << (maxZoom - zoom));
         double levelWidth = imageSize.Width * zoomScale;
         double levelHeight = imageSize.Height * zoomScale;
 
@@ -484,9 +479,9 @@ public partial class TileImageView : ContentView, IDisposable
             var request = _tileQueue[last];
             _tileQueue.RemoveAt(last);
 
-            // Veraltete Anfrage: verwerfen. Ist die Kachel weiterhin sichtbar,
-            // fordert der naechste Frame sie erneut an.
-            if (request.Generation != _renderGeneration)
+            // Nur deutlich veraltete Anfragen verwerfen. Ein exakter Vergleich wuerde bei
+            // hoher Touch-Sampling-Rate jede Kachel verwerfen, bevor sie geladen ist.
+            if (unchecked(_renderGeneration - request.Generation) > 8)
             {
                 _pendingTiles.Remove(request.Key);
                 continue;
@@ -508,9 +503,20 @@ public partial class TileImageView : ContentView, IDisposable
                 await _tileLoadSemaphore.WaitAsync().ConfigureAwait(false);
                 try
                 {
-                    // A3: Kein File.Exists() vorab - der Fehlerfall wird abgefangen.
                     using var stream = File.OpenRead(request.Path);
-                    decoded = SKBitmap.Decode(stream);
+                    using var codec = SKCodec.Create(stream);
+
+                    if (codec != null)
+                    {
+                        var info = new SKImageInfo(codec.Info.Width, codec.Info.Height,
+                        SKColorType.Bgra8888, SKAlphaType.Opaque);
+                        var bmp = new SKBitmap(info);
+
+                        if (codec.GetPixels(info, bmp.GetPixels()) == SKCodecResult.Success)
+                            decoded = bmp;
+                        else
+                            bmp.Dispose();
+                    }
                 }
                 catch (FileNotFoundException) { /* Kachel (noch) nicht erzeugt */ }
                 catch (DirectoryNotFoundException) { /* Level (noch) nicht erzeugt */ }
@@ -744,6 +750,9 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (_draggedPin != null && SettingsService.Instance.IsLoupeEnabled)
             DrawMagnifyingGlass(canvas);
+
+        if (_showFps)
+            DrawFpsCounter(canvas, canvasWidth);
     }
 
     /// <summary>
@@ -829,7 +838,7 @@ public partial class TileImageView : ContentView, IDisposable
             return;   // Pyramide noch nicht begonnen - es gibt schlicht nichts zu zeichnen
         }
 
-        int desiredZoom = Math.Clamp(maxZoom + (int)Math.Floor(Math.Log2(effScale)), 0, maxAvailableZoom);
+        int desiredZoom = Math.Clamp(maxZoom + (int)Math.Ceiling(Math.Log2(effScale)), 0, maxAvailableZoom); //.Floor ist schneller aber unscharf
 
         // ---- A5: Stable-Zoom ------------------------------------------------------------
         // Beim Hineinzoomen bleibt der bisherige Layer die Basis, bis der neue vollstaendig
@@ -858,10 +867,8 @@ public partial class TileImageView : ContentView, IDisposable
         // ---- Ziel-Layer daruebersetzen, sobald einzelne Kacheln da sind -----------------
         if (desiredZoom != baseZoom)
         {
-            bool targetComplete = DrawTileLayer(
-                canvas, desiredZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
+            bool targetComplete = IsLayerComplete(desiredZoom, maxZoom, tileSize, imageSize, view);
 
-            // Atomarer Wechsel, sobald der Ziel-Layer lueckenlos ist.
             if (isPrimaryPass && targetComplete)
             {
                 _displayZoom = desiredZoom;
@@ -872,6 +879,39 @@ public partial class TileImageView : ContentView, IDisposable
         DrawPins(canvas, imageSize, view);
 
         canvas.Restore();
+    }
+
+    /// <summary>
+    /// Prueft ohne zu zeichnen, ob alle sichtbaren Kacheln dieser Stufe im RAM liegen,
+    /// und fordert fehlende an. Billiger als ein zweiter Zeichendurchlauf.
+    /// </summary>
+    private bool IsLayerComplete(int zoom, int maxZoom, int tileSize, SKSize imageSize, SKRect view)
+    {
+        float tileSpan = tileSize * (1 << (maxZoom - zoom));
+        GetLevelTileCounts(zoom, maxZoom, tileSize, imageSize, out int tilesX, out int tilesY);
+
+        int minX = Math.Clamp((int)Math.Floor(view.Left / tileSpan), 0, tilesX - 1);
+        int maxX = Math.Clamp((int)Math.Ceiling(view.Right / tileSpan), 0, tilesX - 1);
+        int minY = Math.Clamp((int)Math.Floor(view.Top / tileSpan), 0, tilesY - 1);
+        int maxY = Math.Clamp((int)Math.Ceiling(view.Bottom / tileSpan), 0, tilesY - 1);
+
+        bool complete = true;
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            for (int y = minY; y <= maxY; y++)
+            {
+                var key = new TileKey(zoom, x, y);
+                if (TryGetTile(key, out _)) continue;
+
+                complete = false;
+
+                if (!_pendingTiles.Contains(key))
+                    RequestTile(key, Path.Combine(_computedTileFolder, zoom.ToString(), x.ToString(), $"{y}.jpg"));
+            }
+        }
+
+        return complete;
     }
 
     /// <summary>B2: Bounding-Box der vier transformierten Rechteck-Ecken.</summary>
@@ -905,7 +945,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private static int CountVisibleTiles(int zoom, int maxZoom, int tileSize, SKSize imageSize, SKRect view)
     {
-        float tileSpan = tileSize * (float)Math.Pow(2, maxZoom - zoom);
+        float tileSpan = tileSize * (1 << (maxZoom - zoom));
         GetLevelTileCounts(zoom, maxZoom, tileSize, imageSize, out int tilesX, out int tilesY);
 
         int minX = Math.Clamp((int)Math.Floor(view.Left / tileSpan), 0, tilesX - 1);
@@ -931,7 +971,7 @@ public partial class TileImageView : ContentView, IDisposable
         float effScale,
         bool allowFallback)
     {
-        float tileSpan = tileSize * (float)Math.Pow(2, maxZoom - zoom);
+        float tileSpan = tileSize * (1 << (maxZoom - zoom));
         GetLevelTileCounts(zoom, maxZoom, tileSize, imageSize, out int tilesX, out int tilesY);
 
         int minX = Math.Clamp((int)Math.Floor(view.Left / tileSpan), 0, tilesX - 1);
@@ -1361,7 +1401,7 @@ public partial class TileImageView : ContentView, IDisposable
 
                 _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
                 _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
-                _scale = newScale;
+                _scale = float.IsFinite(newScale) ? MathF.Max(newScale, 1e-6f) : _scale;
             }
 
             _oldFingerDistance = newDistance;
@@ -2177,7 +2217,7 @@ public partial class TileImageView : ContentView, IDisposable
         {
             token.ThrowIfCancellationRequested();
 
-            double scale = Math.Pow(0.5, maxZoomLevels - zoom);
+            double scale = 1.0 / (1 << (maxZoomLevels - zoom));
             int levelWidth = Math.Max(1, (int)(origWidth * scale));
             int levelHeight = Math.Max(1, (int)(origHeight * scale));
 
@@ -2288,7 +2328,7 @@ public partial class TileImageView : ContentView, IDisposable
             targetHeight / (float)fullHeight);
 
         SKSizeI supported = codec.GetScaledDimensions(Math.Clamp(desired, 0.0001f, 1f));
-        var info = new SKImageInfo(supported.Width, supported.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+        var info = new SKImageInfo(supported.Width, supported.Height, SKColorType.Bgra8888, SKAlphaType.Opaque);
 
         var decoded = new SKBitmap(info);
 
@@ -2301,13 +2341,91 @@ public partial class TileImageView : ContentView, IDisposable
         if (decoded.Width == targetWidth && decoded.Height == targetHeight)
             return decoded;
 
-        var resized = decoded.Resize(new SKImageInfo(targetWidth, targetHeight), LinearSampling);
+        var resized = decoded.Resize(new SKImageInfo(targetWidth, targetHeight, SKColorType.Bgra8888, SKAlphaType.Opaque), LinearSampling);
 
         if (resized == null)
             return decoded;   // Zwischenbild weiterverwenden, nicht freigeben
 
         decoded.Dispose();
         return resized;
+    }
+
+    private void DrawFpsCounter(SKCanvas canvas, float canvasWidth)
+    {
+        long now = Stopwatch.GetTimestamp();
+
+        if (_lastFrameTicks != 0)
+        {
+            double ms = (now - _lastFrameTicks) * 1000.0 / Stopwatch.Frequency;
+
+            // Ausreisser verwerfen: nach einer Ruhephase ist der Abstand beliebig gross.
+            if (ms < 500)
+            {
+                _frameTimes[_frameTimeIndex] = ms;
+                _frameTimeIndex = (_frameTimeIndex + 1) % _frameTimes.Length;
+
+                double sum = 0;
+                int count = 0;
+
+                foreach (double t in _frameTimes)
+                {
+                    if (t <= 0) continue;
+                    sum += t;
+                    count++;
+                }
+
+                if (count > 0 && sum > 0)
+                    _fpsValue = (float)(count * 1000.0 / sum);
+            }
+        }
+
+        _lastFrameTicks = now;
+
+        float density = (float)Settings.DisplayDensity;
+
+        if (_fpsFont == null)
+        {
+            _fpsFont = new SKFont(SKTypeface.Default, 12f * density);
+            _fpsTextPaint = new SKPaint { Color = SKColors.Lime, IsAntialias = true };
+            _fpsBackPaint = new SKPaint { Color = SKColors.Black.WithAlpha(120), IsAntialias = true };
+        }
+
+        string[] lines =
+            [
+                $"{_fpsValue:0.0} FPS",
+                $"Zoom: {_displayZoom}",
+                $"Tiles: {_tileCache.Count + _permanentTiles.Count}",
+                $"Queue: {_tileQueue.Count}"
+            ];
+
+        float margin = 8f * density;
+        float pad = 5f * density;
+        float textWidth = lines.Max(l => _fpsFont.MeasureText(l));
+        float lineHeight = _fpsFont.Size * 1.2f;
+        float boxHeight = lines.Length * lineHeight + 2 * pad;
+
+        var box = new SKRect(
+        canvasWidth - margin - textWidth - 2 * pad,
+        margin,
+        canvasWidth - margin,
+        margin + boxHeight);
+
+        canvas.DrawRoundRect(box, 4f * density, 4f * density, _fpsBackPaint);
+
+        float y = box.Top + pad + _fpsFont.Size;
+
+        foreach (var line in lines)
+        {
+            canvas.DrawText(
+            line,
+            box.Left + pad,
+            y,
+            SKTextAlign.Left,
+            _fpsFont,
+            _fpsTextPaint);
+
+            y += lineHeight;
+        }
     }
 
     // ---------------------------------------------------------------------------------
@@ -2394,6 +2512,10 @@ public partial class TileImageView : ContentView, IDisposable
         _tapCts?.Cancel();
         _tapCts?.Dispose();
         _tapCts = null;
+
+        _fpsFont?.Dispose();
+        _fpsTextPaint?.Dispose();
+        _fpsBackPaint?.Dispose();
 
         // --- Nativen Speicher freigeben ----------------------------------------------
         ClearCache();

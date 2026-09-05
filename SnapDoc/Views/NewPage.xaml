@@ -61,12 +61,13 @@
     <Grid>
         <AbsoluteLayout x:Name="PlanView" IsClippedToBounds="True">
             <controls:TileImageView x:Name="PlanImage"
-                  IsRotationLocked="{Binding IsPlanRotateLocked, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
-                  SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
-                  IsGrayscaleEnabled="{Binding IsGrayscaleMode, Source={x:Reference Name=ThisPage}}"
-                  PlaceholderColor="DimGrey"                                    
-                  AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
-                  AbsoluteLayout.LayoutFlags="All"/>
+                                    ShowFpsCounter="{Binding ShowFpsCounter, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
+                                    IsRotationLocked="{Binding IsPlanRotateLocked, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
+                                    SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
+                                    IsGrayscaleEnabled="{Binding IsGrayscaleMode, Source={x:Reference Name=ThisPage}}"
+                                    PlaceholderColor="DimGrey"                                    
+                                    AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
+                                    AbsoluteLayout.LayoutFlags="All"/>
 
             <Grid x:Name="PinEditBorder"
                   IsVisible="False"

@@ -168,6 +168,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int MaxTileCache { get; set; } = 100;
     [ObservableProperty] public partial int TileSize { get; set; } = 1024;
     [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
+    [ObservableProperty] public partial bool ShowFpsCounter { get; set; } = false;
     [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = true;
     [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
@@ -408,6 +409,7 @@ public partial class SettingsService : ObservableObject
             TileSize = TileSize,
             IsLoupeEnabled = IsLoupeEnabled,
             MaxZoomLevel = MaxZoomLevel,
+            ShowFpsCounter = ShowFpsCounter,
             LoupeRadius = LoupeRadius,
             LoupeZoomFactor = LoupeZoomFactor,
             CloudPollingIntervall = CloudPollingIntervall,
@@ -504,6 +506,7 @@ public partial class SettingsService : ObservableObject
             TileSize = settings.TileSize ?? defaultSettings.TileSize;
             IsLoupeEnabled = settings.IsLoupeEnabled ?? defaultSettings.IsLoupeEnabled;
             MaxZoomLevel = settings.MaxZoomLevel ?? defaultSettings.MaxZoomLevel;
+            ShowFpsCounter = settings.ShowFpsCounter ?? defaultSettings.ShowFpsCounter;
             LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
             LoupeZoomFactor = settings.LoupeZoomFactor ?? defaultSettings.LoupeZoomFactor;
             CloudPollingIntervall = settings.CloudPollingIntervall ?? defaultSettings.CloudPollingIntervall;
@@ -584,6 +587,7 @@ public partial class SettingsService : ObservableObject
         TileSize = defaultSettings.TileSize;
         IsLoupeEnabled = defaultSettings.IsLoupeEnabled;
         MaxZoomLevel = defaultSettings.MaxZoomLevel;
+        ShowFpsCounter = defaultSettings.ShowFpsCounter;
         LoupeRadius = defaultSettings.LoupeRadius;
         LoupeZoomFactor = defaultSettings.LoupeZoomFactor;
         CloudPollingIntervall = defaultSettings.CloudPollingIntervall;

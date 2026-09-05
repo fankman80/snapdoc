@@ -63,6 +63,7 @@ internal class SettingsModel
     public int? MaxTileCache { get; set; } // Maximale Anzahl der zwischengespeicherten Kartenkacheln
     public int? TileSize { get; set; } // Größe der Kartenkacheln
     public int? MaxZoomLevel { get; set; } // Anzahl der LOD-Stufen für die Kartenkacheln
+    public bool? ShowFpsCounter { get; set; } // FPS-Zähler in der Kartenansicht anzeigen
     public bool? IsLoupeEnabled { get; set; } // Lupe aktivieren/deaktivieren
     public float? LoupeRadius { get; set; } // Radius der Lupe in Pixeln
     public float? LoupeZoomFactor { get; set; } // Zoomfaktor der Lupe
