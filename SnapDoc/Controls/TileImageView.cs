@@ -856,12 +856,12 @@ public partial class TileImageView : ContentView, IDisposable
         DrawTileLayer(canvas, baseZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: true);
 
         // ---- Ziel-Layer daruebersetzen, sobald einzelne Kacheln da sind -----------------
-        bool targetComplete = true;
         if (desiredZoom != baseZoom)
         {
-            targetComplete = DrawTileLayer(canvas, desiredZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
+            bool targetComplete = DrawTileLayer(
+                canvas, desiredZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
 
-            // Atomarer Wechsel, sobald der Ziel-Layer luecken los ist.
+            // Atomarer Wechsel, sobald der Ziel-Layer lueckenlos ist.
             if (isPrimaryPass && targetComplete)
             {
                 _displayZoom = desiredZoom;
