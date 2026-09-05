@@ -1,62 +1,183 @@
 ﻿#nullable disable
+
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using System.Collections.Specialized;
+using System.Diagnostics;
 
 namespace SnapDoc.Controls;
 
-public partial class TileImageView : ContentView
+// =====================================================================================
+//  TileImageView - ueberarbeitete Fassung
+//
+//  Umgesetzte Aenderungen gegenueber der Ursprungsversion (Nummerierung wie im Review):
+//
+//  Stufe 1 - Bugs
+//   A1  Pin-Culling ueber rotationsinvarianten Bounding-Radius statt Mittelpunkt + 50 px
+//   A2  _isGenerating wird tatsaechlich auf true gesetzt
+//   C1  Kein Use-after-Dispose mehr: pin.Icon wird nicht mehr aus dem Cache befuellt
+//   A4  LruCache disposed SKBitmaps bei Evict, Ueberschreiben und Clear
+//   C2  IDisposable + vollstaendiges Unsubscribe aller Event-Handler
+//
+//  Stufe 2 - FPS
+//   B2  Exakte Viewport-Bounding-Box aus der invertierten TotalMatrix (statt Diagonalkreis)
+//   A3  Keine Directory.Exists()/Path.Combine-Aufrufe mehr im Renderloop
+//   B1  Cache-Kapazitaet wird dynamisch auf >= 2x sichtbare Kacheln angehoben
+//   C4  InvalidateSurface wird auf Frame-Rate zusammengefasst (RequestRender)
+//   C6  Settings- und BindableProperty-Zugriffe aus den Schleifen gezogen
+//
+//  Stufe 3 - Architektur
+//   A6/B3  Tile-Loader mit Semaphore, LIFO-Queue und Generationszaehler
+//   A5/B1  Stable-Zoom: alter Layer bleibt Basis, neuer Layer wird darueber eingeblendet;
+//          grobe Pyramidenstufen werden permanent im RAM gehalten
+//   A7/B5  DrawMapAndPins(canvas, deviceClip) - die Lupe cullt auf ihren eigenen
+//          Ausschnitt und waehlt die Pyramidenstufe anhand ihrer effektiven Skalierung
+//   C3     Datei-I/O in ProcessNewImageAsync komplett vom UI-Thread genommen,
+//          Fertigstellung ueber Marker-Datei statt rekursivem GetFiles-Scan
+//   B6     Pyramidengenerierung mit skaliertem SKCodec-Decode (kein Vollbild im RAM)
+//   C5     _sortedPins wird pro Frame hoechstens einmal neu sortiert
+//   C7     0,5-px-Ueberlappung der Kacheln gegen Nahtartefakte
+// =====================================================================================
+
+public partial class TileImageView : ContentView, IDisposable
 {
+    // ---------------------------------------------------------------------------------
+    //  Konstanten
+    // ---------------------------------------------------------------------------------
+
+    private const float ClickThreshold = 15f;
+    private const float DoubleTapDistanceThreshold = 40f;
+    private const int DoubleTapTimeoutMs = 300;
+    private const int LongPressTimeoutMs = 600;
+
+    /// <summary>Maximal gleichzeitig laufende JPEG-Decodes (B3).</summary>
+    private const int MaxConcurrentTileLoads = 4;
+
+    /// <summary>Obergrenze der Warteschlange; aeltere Anfragen werden verworfen (B3).</summary>
+    private const int MaxQueuedTileRequests = 96;
+
+    /// <summary>Pyramidenstufen mit hoechstens so vielen Kacheln bleiben dauerhaft im RAM (B1).</summary>
+    private const int PermanentTileBudget = 64;
+
+    /// <summary>Zusammenfassung mehrerer Touch-Events zu einem Frame in ms (C4).</summary>
+    private const int RenderCoalesceMs = 8;
+
+    /// <summary>Name der Marker-Datei fuer eine vollstaendig erzeugte Pyramide (C3).</summary>
+    private const string PyramidCompleteMarker = ".complete";
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Ansicht
+    // ---------------------------------------------------------------------------------
+
     private readonly SKGLView _canvasView;
     private readonly ActivityIndicator _loadingIndicator;
     private readonly Grid _layoutGrid;
+
     private float _scale = 1.0f;
     private float _panX = 0f;
     private float _panY = 0f;
-    private bool _isGenerating = false;
     private float _rotationDegrees = 0f;
+
+    private bool _isGenerating = false;
+    private bool _disposed = false;
+
     private string _computedTileFolder = string.Empty;
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Kachel-Cache und Loader
+    // ---------------------------------------------------------------------------------
+
     private readonly LruCache<TileKey, SKBitmap> _tileCache = new(SettingsService.Instance.MaxTileCache);
+
+    /// <summary>Grobe Pyramidenstufen, die nie evicted werden - garantiert einen zeichenbaren Fallback (B1).</summary>
+    private readonly Dictionary<TileKey, SKBitmap> _permanentTiles = [];
+
+    /// <summary>Kacheln, die angefordert oder gerade in Bearbeitung sind.</summary>
+    private readonly HashSet<TileKey> _pendingTiles = [];
+
+    /// <summary>LIFO-Warteschlange: die zuletzt angeforderte Kachel ist die aktuell sichtbare (B3).</summary>
+    private readonly List<TileRequest> _tileQueue = [];
+
+    private readonly SemaphoreSlim _tileLoadSemaphore = new(MaxConcurrentTileLoads, MaxConcurrentTileLoads);
+    private int _activeTileLoads = 0;
+
+    /// <summary>Wird bei jeder Transformationsaenderung erhoeht; veraltete Ladeauftraege werden verworfen (B3).</summary>
+    private int _renderGeneration = 0;
+
+    /// <summary>Hoechste bereits auf Platte erzeugte Pyramidenstufe (-1 = noch keine).</summary>
+    private int _maxGeneratedLevel = -1;
+
+    /// <summary>Aktuell dargestellter Layer (Stable-Zoom, A5). -1 = noch nicht initialisiert.</summary>
+    private int _displayZoom = -1;
+
+    /// <summary>Pro Pyramidenstufe: wird sie permanent gehalten? Einmal berechnet.</summary>
+    private bool[] _isPermanentLevel = [];
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Rendering-Steuerung
+    // ---------------------------------------------------------------------------------
+
+    private bool _renderPending = false;
+    private SKColor _placeholderSKColor = Colors.LightGray.ToSKColor();
+    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Eingabe
+    // ---------------------------------------------------------------------------------
+
     private readonly Dictionary<long, SKPoint> _activeTouches = [];
     private float _oldFingerDistance = 0f;
     private float _oldFingerAngle = 0f;
-    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+
     private SKPoint _touchStartPoint;
-    private const float ClickThreshold = 15f;
-    private bool _hasDraggedPin = false;
+    private SKPoint _lastTouchPoint;
     private DateTime _touchStartTime;
+    private bool _hasDraggedPin = false;
+
     private MapPin _draggedPin = null;
+    private float _originalPinX;
+    private float _originalPinY;
+
     private string _pendingPinId = null;
     private double? _pendingZoomFactor = null;
     private bool _pendingImageFit = false;
-    private float _originalPinX;
-    private float _originalPinY;
+
     private CancellationTokenSource _cts;
     private CancellationTokenSource _longPressCts;
     private CancellationTokenSource _tapCts;
-    private readonly HashSet<TileKey> _loadingTiles = [];
+
     private DateTime _lastTapTime = DateTime.MinValue;
     private SKPoint _lastTapLocation = SKPoint.Empty;
     private bool _isDoubleTapAction = false;
     private bool _isLongPressActive = false;
-    private const float DoubleTapDistanceThreshold = 40f;
-    private const int DoubleTapTimeoutMs = 300;
-    private const int LongPressTimeoutMs = 600;
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Pins
+    // ---------------------------------------------------------------------------------
+
     private readonly Dictionary<string, SKBitmap> _pinIconCache = [];
-    private List<MapPin> _sortedPins = [];
-    private SKPoint _lastTouchPoint;
     private readonly HashSet<string> _loadingPinPaths = [];
+    private List<MapPin> _sortedPins = [];
+    private bool _pinsNeedSort = false;
+    private INotifyCollectionChanged _observedPins = null;
+
+    // ---------------------------------------------------------------------------------
+    //  Felder - Lupe
+    // ---------------------------------------------------------------------------------
+
     private readonly SKPaint _loupeShadowPaint;
     private readonly float _loupeRadius = 150f;
     private float _cachedLoupeRadius = -1f;
     private SKPath _cachedLoupePath;
     private SKShader _cachedInnerShadowShader;
     private SKShader _cachedGlareShader;
+
     private static readonly SKPaint GrayscalePaint = new()
     {
-        ColorFilter = SKColorFilter.CreateColorMatrix([
+        ColorFilter = SKColorFilter.CreateColorMatrix(
+        [
             0.2126f, 0.7152f, 0.0722f, 0, 0,
             0.2126f, 0.7152f, 0.0722f, 0, 0,
             0.2126f, 0.7152f, 0.0722f, 0, 0,
@@ -92,9 +213,14 @@ public partial class TileImageView : ContentView
     };
 
 #if WINDOWS
+    private Microsoft.UI.Xaml.UIElement _winView = null;
     private bool _isRightMouseRotating = false;
     private float _lastMouseRotationAngle = 0f;
 #endif
+
+    // ---------------------------------------------------------------------------------
+    //  BindableProperties
+    // ---------------------------------------------------------------------------------
 
     public static readonly BindableProperty SourceImagePathProperty =
         BindableProperty.Create(nameof(SourceImagePath), typeof(string), typeof(TileImageView), default(string),
@@ -112,7 +238,7 @@ public partial class TileImageView : ContentView
                 if ((int)o != (int)n && !string.IsNullOrEmpty(control.SourceImagePath))
                     await control.ProcessNewImageAsync(control.SourceImagePath);
                 else
-                    control._canvasView?.InvalidateSurface();
+                    control.InvalidateView();
             });
 
     public static readonly BindableProperty IsRotationLockedProperty =
@@ -126,51 +252,47 @@ public partial class TileImageView : ContentView
 
     public static readonly BindableProperty IsGrayscaleEnabledProperty =
         BindableProperty.Create(nameof(IsGrayscaleEnabled), typeof(bool), typeof(TileImageView), false,
-            propertyChanged: (bindable, oldValue, newValue) =>
-            {
-                var control = (TileImageView)bindable;
-                control._canvasView?.InvalidateSurface();
-            });
+            propertyChanged: (bindable, oldValue, newValue) => ((TileImageView)bindable).RequestRender());
 
     public static readonly BindableProperty CurrentRotationProperty =
-        BindableProperty.Create(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f, defaultBindingMode: BindingMode.TwoWay,
-            propertyChanged: OnCurrentRotationChanged);
+        BindableProperty.Create(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f,
+            defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnCurrentRotationChanged);
 
     public static readonly BindableProperty MaxZoomLevelProperty =
         BindableProperty.Create(nameof(MaxZoomLevel), typeof(int), typeof(TileImageView), SettingsService.Instance.MaxZoomLevel,
-            propertyChanged: (bindable, o, n) => ((TileImageView)bindable)._canvasView.InvalidateSurface());
+            propertyChanged: (bindable, o, n) =>
+            {
+                var control = (TileImageView)bindable;
+                control.RebuildLevelMetadata();
+                control.InvalidateView();
+            });
 
     public static readonly BindableProperty PinsProperty =
         BindableProperty.Create(nameof(Pins), typeof(IEnumerable<MapPin>), typeof(TileImageView), default(IEnumerable<MapPin>),
             propertyChanged: OnPinsChanged);
 
+    // C6: Farbe wird gecacht, statt sie in jedem Frame zu konvertieren.
     public static readonly BindableProperty PlaceholderColorProperty =
-        BindableProperty.Create( nameof(PlaceholderColor), typeof(Color), typeof(TileImageView), Colors.LightGray);
+        BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(TileImageView), Colors.LightGray,
+            propertyChanged: (bindable, o, n) =>
+            {
+                var control = (TileImageView)bindable;
+                control._placeholderSKColor = ((Color)n ?? Colors.LightGray).ToSKColor();
+                control.RequestRender();
+            });
 
     public static readonly BindableProperty PinCreationModeProperty =
-        BindableProperty.Create( nameof(PinCreationMode), typeof(PinCreationMode), typeof(TileImageView), PinCreationMode.LongPress);
+        BindableProperty.Create(nameof(PinCreationMode), typeof(PinCreationMode), typeof(TileImageView), PinCreationMode.LongPress);
 
-    private static void OnPinsChanged(BindableObject bindable, object oldValue, object newValue)
-    {
-        var control = (TileImageView)bindable;
+    private static readonly BindablePropertyKey OriginalImageSizePropertyKey =
+        BindableProperty.CreateReadOnly(nameof(OriginalImageSize), typeof(SKSize), typeof(TileImageView), SKSize.Empty);
 
-        if (oldValue is INotifyCollectionChanged oldCollection)
-            oldCollection.CollectionChanged -= control.OnPinsCollectionChanged;
+    private static readonly BindablePropertyKey CurrentScalePropertyKey =
+        BindableProperty.CreateReadOnly(nameof(CurrentScale), typeof(float), typeof(TileImageView), 1.0f);
 
-        if (newValue is INotifyCollectionChanged newCollection)
-            newCollection.CollectionChanged += control.OnPinsCollectionChanged;
+    private static readonly BindablePropertyKey CurrentPanPropertyKey =
+        BindableProperty.CreateReadOnly(nameof(CurrentPan), typeof(SKPoint), typeof(TileImageView), SKPoint.Empty);
 
-        control.UpdateSortedPins();
-
-        if (newValue is IEnumerable<MapPin> newPins)
-            _ = control.PreloadPinBitmapsAsync(newPins);
-
-        control._canvasView?.InvalidateSurface();
-    }
-
-    private static readonly BindablePropertyKey OriginalImageSizePropertyKey = BindableProperty.CreateReadOnly(nameof(OriginalImageSize), typeof(SKSize), typeof(TileImageView), SKSize.Empty);
-    private static readonly BindablePropertyKey CurrentScalePropertyKey = BindableProperty.CreateReadOnly(nameof(CurrentScale), typeof(float), typeof(TileImageView), 1.0f);
-    private static readonly BindablePropertyKey CurrentPanPropertyKey = BindableProperty.CreateReadOnly(nameof(CurrentPan), typeof(SKPoint), typeof(TileImageView), SKPoint.Empty);
     public static readonly BindableProperty OriginalImageSizeProperty = OriginalImageSizePropertyKey.BindableProperty;
     public static readonly BindableProperty CurrentScaleProperty = CurrentScalePropertyKey.BindableProperty;
     public static readonly BindableProperty CurrentPanProperty = CurrentPanPropertyKey.BindableProperty;
@@ -195,10 +317,15 @@ public partial class TileImageView : ContentView
     public event EventHandler<SKPoint> CanvasDoubleTapped;
     public event EventHandler<SKPoint> CanvasLongPressed;
 
+    // ---------------------------------------------------------------------------------
+    //  Konstruktor
+    // ---------------------------------------------------------------------------------
+
     public TileImageView()
     {
         BackgroundColor = Colors.White;
         _layoutGrid = [];
+
         _canvasView = new SKGLView
         {
             EnableTouchEvents = true,
@@ -219,16 +346,8 @@ public partial class TileImageView : ContentView
         };
 
 #if WINDOWS
-        this.Loaded += (s, e) =>
-        {
-            if (_canvasView.Handler?.PlatformView is Microsoft.UI.Xaml.UIElement winView)
-            {
-                winView.PointerWheelChanged += OnWinViewPointerWheelChanged;
-                winView.PointerPressed += OnWinViewPointerPressed;
-                winView.PointerMoved += OnWinViewPointerMoved;
-                winView.PointerReleased += OnWinViewPointerReleased;
-            }
-        };
+        Loaded += OnLoadedWindows;
+        Unloaded += OnUnloadedWindows;
 #endif
 
         _loadingIndicator = new ActivityIndicator
@@ -245,7 +364,211 @@ public partial class TileImageView : ContentView
         _layoutGrid.Children.Add(_canvasView);
         _layoutGrid.Children.Add(_loadingIndicator);
         Content = _layoutGrid;
+
+        RebuildLevelMetadata();
     }
+
+    // ---------------------------------------------------------------------------------
+    //  C4 - Render-Anforderungen zusammenfassen
+    // ---------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Fordert einen Frame an. Mehrere Aufrufe innerhalb eines Frames werden zu einem
+    /// einzigen InvalidateSurface() zusammengefasst (C4).
+    /// </summary>
+    private void RequestRender()
+    {
+        if (_disposed || _renderPending || _canvasView == null) return;
+
+        _renderPending = true;
+        _canvasView.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(RenderCoalesceMs), () =>
+        {
+            _renderPending = false;
+            if (!_disposed)
+                _canvasView?.InvalidateSurface();
+        });
+    }
+
+    /// <summary>
+    /// Wie <see cref="RequestRender"/>, markiert zusaetzlich alle laufenden Ladeauftraege
+    /// als veraltet, weil sich die Ansicht geaendert hat (B3).
+    /// </summary>
+    private void InvalidateView()
+    {
+        unchecked { _renderGeneration++; }
+        RequestRender();
+    }
+
+    /// <summary>Erzwingt sofortiges Neuzeichnen (oeffentliche API, unveraendert im Verhalten).</summary>
+    public void InvalidateSurface() => _canvasView?.InvalidateSurface();
+
+    // ---------------------------------------------------------------------------------
+    //  Pyramiden-Metadaten (A3 / B1)
+    // ---------------------------------------------------------------------------------
+
+    /// <summary>
+    /// Berechnet einmalig je Pyramidenstufe, ob sie permanent im RAM gehalten wird.
+    /// Damit entfaellt jede Dateisystem-Pruefung im Renderloop (A3) und der Fallback
+    /// findet garantiert immer eine zeichenbare Kachel (B1).
+    /// </summary>
+    private void RebuildLevelMetadata()
+    {
+        int maxZoom = MaxZoomLevel;
+        _isPermanentLevel = new bool[Math.Max(1, maxZoom + 1)];
+
+        var size = OriginalImageSize;
+        if (size.IsEmpty) return;
+
+        int tileSize = Math.Max(1, TileSize);
+
+        for (int zoom = 0; zoom <= maxZoom; zoom++)
+        {
+            GetLevelTileCounts(zoom, maxZoom, tileSize, size, out int tilesX, out int tilesY);
+            _isPermanentLevel[zoom] = (long)tilesX * tilesY <= PermanentTileBudget;
+        }
+    }
+
+    private static void GetLevelTileCounts(int zoom, int maxZoom, int tileSize, SKSize imageSize, out int tilesX, out int tilesY)
+    {
+        double zoomScale = Math.Pow(0.5, maxZoom - zoom);
+        double levelWidth = imageSize.Width * zoomScale;
+        double levelHeight = imageSize.Height * zoomScale;
+
+        tilesX = Math.Max(1, (int)Math.Ceiling(levelWidth / tileSize));
+        tilesY = Math.Max(1, (int)Math.Ceiling(levelHeight / tileSize));
+    }
+
+    private bool IsPermanentLevel(int zoom)
+        => zoom >= 0 && zoom < _isPermanentLevel.Length && _isPermanentLevel[zoom];
+
+    /// <summary>Sucht eine Kachel zuerst im permanenten, dann im LRU-Cache.</summary>
+    private bool TryGetTile(TileKey key, out SKBitmap bitmap)
+    {
+        if (_permanentTiles.TryGetValue(key, out bitmap))
+            return true;
+
+        return _tileCache.TryGetValue(key, out bitmap);
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  B3 - Tile-Loader mit Semaphore, LIFO und Generationszaehler
+    // ---------------------------------------------------------------------------------
+
+    private readonly record struct TileRequest(TileKey Key, string Path, int Generation);
+
+    /// <summary>Stellt eine Kachel in die Warteschlange. Wird ausschliesslich vom UI-Thread aufgerufen.</summary>
+    private void RequestTile(TileKey key, string path)
+    {
+        if (_disposed) return;
+        if (!_pendingTiles.Add(key)) return;
+
+        _tileQueue.Add(new TileRequest(key, path, _renderGeneration));
+
+        // Aelteste (unterste) Anfragen verwerfen - sie sind mit hoher Wahrscheinlichkeit
+        // nicht mehr sichtbar.
+        while (_tileQueue.Count > MaxQueuedTileRequests)
+        {
+            var dropped = _tileQueue[0];
+            _tileQueue.RemoveAt(0);
+            _pendingTiles.Remove(dropped.Key);
+        }
+
+        PumpTileQueue();
+    }
+
+    private void PumpTileQueue()
+    {
+        while (!_disposed && _activeTileLoads < MaxConcurrentTileLoads && _tileQueue.Count > 0)
+        {
+            int last = _tileQueue.Count - 1;
+            var request = _tileQueue[last];
+            _tileQueue.RemoveAt(last);
+
+            // Veraltete Anfrage: verwerfen. Ist die Kachel weiterhin sichtbar,
+            // fordert der naechste Frame sie erneut an.
+            if (request.Generation != _renderGeneration)
+            {
+                _pendingTiles.Remove(request.Key);
+                continue;
+            }
+
+            _activeTileLoads++;
+            StartTileLoad(request);
+        }
+    }
+
+    private void StartTileLoad(TileRequest request)
+    {
+        _ = Task.Run(async () =>
+        {
+            SKBitmap decoded = null;
+
+            try
+            {
+                await _tileLoadSemaphore.WaitAsync().ConfigureAwait(false);
+                try
+                {
+                    // A3: Kein File.Exists() vorab - der Fehlerfall wird abgefangen.
+                    using var stream = File.OpenRead(request.Path);
+                    decoded = SKBitmap.Decode(stream);
+                }
+                catch (FileNotFoundException) { /* Kachel (noch) nicht erzeugt */ }
+                catch (DirectoryNotFoundException) { /* Level (noch) nicht erzeugt */ }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Fehler beim Kachelladen: {ex.Message}");
+                }
+                finally
+                {
+                    _tileLoadSemaphore.Release();
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fehler im Tile-Loader: {ex.Message}");
+            }
+
+            MainThread.BeginInvokeOnMainThread(() => OnTileLoaded(request, decoded));
+        });
+    }
+
+    private void OnTileLoaded(TileRequest request, SKBitmap decoded)
+    {
+        _activeTileLoads = Math.Max(0, _activeTileLoads - 1);
+        _pendingTiles.Remove(request.Key);
+
+        // A4/C2: Verworfene Bitmaps muessen freigegeben werden, sonst leckt nativer Speicher.
+        if (_disposed)
+        {
+            decoded?.Dispose();
+            return;
+        }
+
+        if (decoded != null)
+        {
+            if (IsPermanentLevel(request.Key.Zoom))
+            {
+                if (!_permanentTiles.TryAdd(request.Key, decoded))
+                    decoded.Dispose();
+            }
+            else if (_tileCache.ContainsKey(request.Key))
+            {
+                decoded.Dispose();
+            }
+            else
+            {
+                _tileCache[request.Key] = decoded;
+            }
+
+            RequestRender();
+        }
+
+        PumpTileQueue();
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Navigation
+    // ---------------------------------------------------------------------------------
 
     public void ZoomToPin(string pinId, double? factor = null)
     {
@@ -280,7 +603,8 @@ public partial class TileImageView : ContentView
         CurrentScale = _scale;
         CurrentPan = new SKPoint(_panX, _panY);
         CurrentRotation = _rotationDegrees;
-        _canvasView.InvalidateSurface();
+
+        InvalidateView();
     }
 
     public void HandleMouseZoom(SKPoint mouseLocation, float delta)
@@ -295,7 +619,6 @@ public partial class TileImageView : ContentView
         if (Math.Abs(newScale - oldScale) < 0.001f) return;
 
         Point relativePoint = GetRelativeFactorFromScreenPoint(mouseLocation);
-
         _scale = newScale;
 
         float imagePixelX = (float)relativePoint.X * OriginalImageSize.Width;
@@ -303,7 +626,6 @@ public partial class TileImageView : ContentView
 
         SKMatrix matrix = SKMatrix.CreateRotationDegrees(_rotationDegrees);
         matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
-
         SKPoint transformedPoint = matrix.MapPoint(imagePixelX, imagePixelY);
 
         _panX = mouseLocation.X - transformedPoint.X;
@@ -312,7 +634,7 @@ public partial class TileImageView : ContentView
         CurrentScale = _scale;
         CurrentPan = new SKPoint(_panX, _panY);
 
-        _canvasView.InvalidateSurface();
+        InvalidateView();
     }
 
     public Point GetPlanFactorAtControlCenter()
@@ -320,8 +642,8 @@ public partial class TileImageView : ContentView
         if (OriginalImageSize == SKSize.Empty || _canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
             return new Point(0, 0);
 
-        float centerX = (float)_canvasView.CanvasSize.Width / 2f;
-        float centerY = (float)_canvasView.CanvasSize.Height / 2f;
+        float centerX = _canvasView.CanvasSize.Width / 2f;
+        float centerY = _canvasView.CanvasSize.Height / 2f;
 
         return GetRelativeFactorFromScreenPoint(new SKPoint(centerX, centerY), clamp: true);
     }
@@ -331,9 +653,7 @@ public partial class TileImageView : ContentView
         if (OriginalImageSize == SKSize.Empty)
             return new Point(0, 0);
 
-        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
-        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+        SKMatrix matrix = BuildMapMatrix();
 
         if (!matrix.TryInvert(out SKMatrix inverseMatrix))
             return new Point(0, 0);
@@ -373,325 +693,394 @@ public partial class TileImageView : ContentView
         CurrentScale = _scale;
         CurrentPan = new SKPoint(_panX, _panY);
         CurrentRotation = _rotationDegrees;
-        _canvasView.InvalidateSurface();
+
+        InvalidateView();
     }
 
-    public void InvalidateSurface()
+    private SKMatrix BuildMapMatrix()
     {
-        _canvasView?.InvalidateSurface();
+        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
+        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
+        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+        return matrix;
     }
-
-#if WINDOWS
-    private void OnWinViewPointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
-
-        var pointerPoint = e.GetCurrentPoint((Microsoft.UI.Xaml.UIElement)sender);
-        var position = pointerPoint.Position;
-        int delta = pointerPoint.Properties.MouseWheelDelta;
-
-        float density = (float)Settings.DisplayDensity;
-        SKPoint mousePos = new ((float)position.X * density, (float)position.Y * density);
-
-        HandleMouseZoom(mousePos, delta);
-        e.Handled = true;
-    }
-
-    private void OnWinViewPointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        var winView = (Microsoft.UI.Xaml.UIElement)sender;
-        var pointerPoint = e.GetCurrentPoint(winView);
-    
-        if (pointerPoint.Properties.IsRightButtonPressed)
-        {
-            if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
-
-            _isRightMouseRotating = true;
-        
-            float density = (float)Settings.DisplayDensity;
-            SKPoint mousePos = new((float)pointerPoint.Position.X * density, (float)pointerPoint.Position.Y * density);
-        
-            float centerX = (float)_canvasView.CanvasSize.Width / 2f;
-            float centerY = (float)_canvasView.CanvasSize.Height / 2f;
-        
-            _lastMouseRotationAngle = (float)Math.Atan2(mousePos.Y - centerY, mousePos.X - centerX);
-        
-            winView.CapturePointer(e.Pointer);
-            e.Handled = true;
-        }
-    }
-
-    private void OnWinViewPointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (IsRotationLocked || !_isRightMouseRotating || OriginalImageSize == SKSize.Empty || _isGenerating) return;
-
-        var winView = (Microsoft.UI.Xaml.UIElement)sender;
-        var pointerPoint = e.GetCurrentPoint(winView);
-    
-            float density = (float)Settings.DisplayDensity;
-        SKPoint mousePos = new((float)pointerPoint.Position.X * density, (float)pointerPoint.Position.Y * density);
-
-        float centerX = (float)_canvasView.CanvasSize.Width / 2f;
-        float centerY = (float)_canvasView.CanvasSize.Height / 2f;
-   
-        float currentAngle = (float)Math.Atan2(mousePos.Y - centerY, mousePos.X - centerX);
-        float angleDiff = currentAngle - _lastMouseRotationAngle;
-    
-        if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
-        if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
-
-        if (Math.Abs(angleDiff) > 0.001f)
-        {
-            float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
-            _rotationDegrees += rotationDiffDegrees;
-
-            float cos = (float)Math.Cos(angleDiff);
-            float sin = (float)Math.Sin(angleDiff);
-            float dx = _panX - centerX;
-            float dy = _panY - centerY;
-
-            _panX = centerX + (dx * cos - dy * sin);
-            _panY = centerY + (dx * sin + dy * cos);
-
-            _lastMouseRotationAngle = currentAngle;
-
-            CurrentRotation = _rotationDegrees;
-            CurrentPan = new SKPoint(_panX, _panY);
-
-            _canvasView.InvalidateSurface();
-        }
-        e.Handled = true;
-    }
-
-    private void OnWinViewPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
-    {
-        if (_isRightMouseRotating)
-        {
-            _isRightMouseRotating = false;
-            var winView = (Microsoft.UI.Xaml.UIElement)sender;
-            winView.ReleasePointerCapture(e.Pointer);
-            e.Handled = true;
-        }
-    }
-#endif
 
     private float GetMinScale()
     {
         if (OriginalImageSize.IsEmpty || _canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
             return 0.001f;
 
-        // Skalierung, bei der das gesamte Bild komplett in den Canvas passt
         float fitScale = Math.Min(
             _canvasView.CanvasSize.Width / OriginalImageSize.Width,
             _canvasView.CanvasSize.Height / OriginalImageSize.Height
         );
 
-        // Erlaube z. B. bis zu 50% von fitScale herauszuzoomen (maximal aber 0.1f)
         return Math.Min(0.1f, fitScale * 0.5f);
     }
+
+    // ---------------------------------------------------------------------------------
+    //  Rendering
+    // ---------------------------------------------------------------------------------
 
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
-        canvas.Clear(PlaceholderColor.ToSKColor());
+        canvas.Clear(_placeholderSKColor);   // C6: vorkonvertierte Farbe
 
-        DrawMapAndPins(canvas);
+        // C5: hoechstens eine Sortierung pro Frame
+        if (_pinsNeedSort)
+        {
+            _pinsNeedSort = false;
+            UpdateSortedPins();
+        }
 
-        // Wenn ein Pin gezogen wird, Lupe darüber zeichnen
+        if (HandlePendingViewportActions()) return;
+
+        float canvasWidth = _canvasView.CanvasSize.Width;
+        float canvasHeight = _canvasView.CanvasSize.Height;
+        var fullClip = new SKRect(0, 0, canvasWidth, canvasHeight);
+
+        DrawMapAndPins(canvas, fullClip, isPrimaryPass: true);
+
         if (_draggedPin != null && SettingsService.Instance.IsLoupeEnabled)
             DrawMagnifyingGlass(canvas);
     }
 
-    private void DrawMapAndPins(SKCanvas canvas)
+    /// <summary>
+    /// ImageFit/ZoomToPin, die vor dem ersten Layout angefordert wurden, nachholen.
+    /// Gibt true zurueck, wenn dieser Frame uebersprungen werden soll.
+    /// </summary>
+    private bool HandlePendingViewportActions()
     {
-        if (_pendingImageFit && _canvasView.CanvasSize.Width > 0 && _canvasView.CanvasSize.Height > 0)
+        if (_canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
+            return false;
+
+        if (_pendingImageFit)
         {
             _pendingImageFit = false;
             ImageFit();
-            return;
+            return true;
         }
-        else if (_pendingPinId != null && _canvasView.CanvasSize.Width > 0 && _canvasView.CanvasSize.Height > 0)
+
+        if (_pendingPinId != null)
         {
             string id = _pendingPinId;
             double? factor = _pendingZoomFactor;
             _pendingPinId = null;
             ZoomToPin(id, factor);
-            return;
+            return true;
         }
 
-        if (_isGenerating || string.IsNullOrEmpty(_computedTileFolder) || OriginalImageSize.IsEmpty) return;
+        return false;
+    }
 
-        int currentZoom = MaxZoomLevel + (int)Math.Floor(Math.Log2(_scale));
-        currentZoom = Math.Clamp(currentZoom, 0, MaxZoomLevel);
+    /// <summary>
+    /// Zeichnet Kacheln und Pins.
+    /// </summary>
+    /// <param name="deviceClip">
+    /// Sichtbarer Bereich in Geraetekoordinaten. Fuer den Hauptdurchlauf die gesamte
+    /// Canvas-Flaeche, fuer die Lupe nur deren Kreis-Bounds (A7/B5). Das Culling wird
+    /// ueber die invertierte TotalMatrix exakt daraus abgeleitet (B2).
+    /// </param>
+    /// <param name="isPrimaryPass">
+    /// Nur der Hauptdurchlauf darf den Stable-Zoom-Zustand und die Cache-Kapazitaet aendern.
+    /// </param>
+    private void DrawMapAndPins(SKCanvas canvas, SKRect deviceClip, bool isPrimaryPass)
+    {
+        if (string.IsNullOrEmpty(_computedTileFolder)) return;
+
+        // C6: BindableProperty-Zugriffe einmal pro Frame statt einmal pro Pin/Kachel.
+        SKSize imageSize = OriginalImageSize;
+        if (imageSize.IsEmpty) return;
+
+        int maxZoom = MaxZoomLevel;
+        int tileSize = Math.Max(1, TileSize);
+        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
 
         canvas.Save();
         canvas.Translate(_panX, _panY);
         canvas.RotateDegrees(_rotationDegrees);
         canvas.Scale(_scale);
 
-        float tileScaleFactor = (float)Math.Pow(2, MaxZoomLevel - currentZoom);
-        float currentTileSizeInCanvasSpace = TileSize * tileScaleFactor;
-        double zoomScale = Math.Pow(0.5, MaxZoomLevel - currentZoom);
-        float levelWidth = OriginalImageSize.Width * (float)zoomScale;
-        float levelHeight = OriginalImageSize.Height * (float)zoomScale;
-        int maxTilesX = (int)Math.Ceiling(levelWidth / TileSize);
-        int maxTilesY = (int)Math.Ceiling(levelHeight / TileSize);
-        float canvasWidth = _canvasView.CanvasSize.Width;
-        float canvasHeight = _canvasView.CanvasSize.Height;
-        float viewRadius = (float)Math.Sqrt(canvasWidth * canvasWidth + canvasHeight * canvasHeight) / (2f * _scale);
-        float canvasCenterX = canvasWidth / 2f;
-        float canvasCenterY = canvasHeight / 2f;
-        float dx = canvasCenterX - _panX;
-        float dy = canvasCenterY - _panY;
-        float negRad = -_rotationDegrees * (float)(Math.PI / 180.0);
-        float cosNeg = (float)Math.Cos(negRad);
-        float sinNeg = (float)Math.Sin(negRad);
-        float tileCenterX = (dx * cosNeg - dy * sinNeg) / _scale;
-        float tileCenterY = (dx * sinNeg + dy * cosNeg) / _scale;
-        float viewLeft = tileCenterX - viewRadius;
-        float viewTop = tileCenterY - viewRadius;
-        float viewRight = tileCenterX + viewRadius;
-        float viewBottom = tileCenterY + viewRadius;
-
-        int minX = (int)Math.Floor(viewLeft / currentTileSizeInCanvasSpace);
-        int minY = (int)Math.Floor(viewTop / currentTileSizeInCanvasSpace);
-        int maxX = (int)Math.Ceiling(viewRight / currentTileSizeInCanvasSpace);
-        int maxY = (int)Math.Ceiling(viewBottom / currentTileSizeInCanvasSpace);
-
-        minX = Math.Clamp(minX, 0, Math.Max(0, maxTilesX - 1));
-        minY = Math.Clamp(minY, 0, Math.Max(0, maxTilesY - 1));
-        maxX = Math.Clamp(maxX, 0, Math.Max(0, maxTilesX - 1));
-        maxY = Math.Clamp(maxY, 0, Math.Max(0, maxTilesY - 1));
-
-        string zoomFolder = Path.Combine(_computedTileFolder, currentZoom.ToString());
-        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
-
-        if (Directory.Exists(zoomFolder))
+        // ---- B2: exakte Bounding-Box statt Diagonalkreis --------------------------------
+        SKMatrix total = canvas.TotalMatrix;
+        if (!total.TryInvert(out SKMatrix inverse))
         {
-            for (int x = minX; x <= maxX; x++)
+            canvas.Restore();
+            return;
+        }
+
+        SKRect view = MapRectBounds(inverse, deviceClip);
+
+        // Effektive Skalierung inkl. aller aeusseren Transformationen. Dadurch waehlt
+        // die Lupe die zu ihrer Vergroesserung passende Pyramidenstufe (B5).
+        float effScale = MathF.Sqrt(MathF.Abs(total.ScaleX * total.ScaleY - total.SkewX * total.SkewY));
+        if (effScale <= 0f || float.IsNaN(effScale))
+        {
+            canvas.Restore();
+            return;
+        }
+
+        // ---- Zoomstufe bestimmen --------------------------------------------------------
+        int maxAvailableZoom = _maxGeneratedLevel < 0 ? -1 : Math.Min(maxZoom, _maxGeneratedLevel);
+        if (maxAvailableZoom < 0)
+        {
+            canvas.Restore();
+            return;   // Pyramide noch nicht begonnen - es gibt schlicht nichts zu zeichnen
+        }
+
+        int desiredZoom = Math.Clamp(maxZoom + (int)Math.Floor(Math.Log2(effScale)), 0, maxAvailableZoom);
+
+        // ---- A5: Stable-Zoom ------------------------------------------------------------
+        // Beim Hineinzoomen bleibt der bisherige Layer die Basis, bis der neue vollstaendig
+        // im RAM liegt. Beim Herauszoomen wird sofort umgeschaltet, weil grobe Stufen
+        // ohnehin permanent gehalten werden.
+        int baseZoom;
+        if (isPrimaryPass)
+        {
+            if (_displayZoom < 0 || desiredZoom <= _displayZoom || _displayZoom > maxAvailableZoom)
+                _displayZoom = desiredZoom;
+
+            baseZoom = Math.Clamp(_displayZoom, 0, maxAvailableZoom);
+        }
+        else
+        {
+            baseZoom = desiredZoom;
+        }
+
+        // ---- B1: Cache-Kapazitaet an die sichtbare Kachelmenge anpassen -----------------
+        if (isPrimaryPass)
+            EnsureTileCacheCapacity(baseZoom, desiredZoom, maxZoom, tileSize, imageSize, view);
+
+        // ---- Basis-Layer (mit Parent-Fallback) ------------------------------------------
+        DrawTileLayer(canvas, baseZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: true);
+
+        // ---- Ziel-Layer daruebersetzen, sobald einzelne Kacheln da sind -----------------
+        bool targetComplete = true;
+        if (desiredZoom != baseZoom)
+        {
+            targetComplete = DrawTileLayer(canvas, desiredZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
+
+            // Atomarer Wechsel, sobald der Ziel-Layer luecken los ist.
+            if (isPrimaryPass && targetComplete)
             {
-                string xFolder = Path.Combine(zoomFolder, x.ToString());
-                if (!Directory.Exists(xFolder)) continue;
-
-                for (int y = minY; y <= maxY; y++)
-                {
-                    var cacheKey = new TileKey(currentZoom, x, y);
-                    float posX = x * currentTileSizeInCanvasSpace;
-                    float posY = y * currentTileSizeInCanvasSpace;
-                    var destRect = new SKRect(posX, posY, posX + currentTileSizeInCanvasSpace, posY + currentTileSizeInCanvasSpace);
-
-                    if (!_tileCache.TryGetValue(cacheKey, out var bitmap))
-                    {
-                        if (_loadingTiles.Add(cacheKey))
-                        {
-                            string tilePath = Path.Combine(xFolder, $"{y}.jpg");
-
-                            _ = Task.Run(() =>
-                            {
-                                try
-                                {
-                                    if (File.Exists(tilePath))
-                                    {
-                                        using var stream = File.OpenRead(tilePath);
-                                        var decodedBitmap = SKBitmap.Decode(stream);
-                                        if (decodedBitmap != null)
-                                        {
-                                            MainThread.BeginInvokeOnMainThread(() =>
-                                            {
-                                                _tileCache[cacheKey] = decodedBitmap;
-                                                _canvasView.InvalidateSurface();
-                                            });
-                                        }
-                                    }
-                                }
-                                catch (Exception ex)
-                                {
-                                    System.Diagnostics.Debug.WriteLine($"Fehler beim Kachelladen: {ex.Message}");
-                                }
-                                finally
-                                {
-                                    MainThread.BeginInvokeOnMainThread(() => _loadingTiles.Remove(cacheKey));
-                                }
-                            });
-                        }
-
-                        // Fallback-Logik fuer noch nicht geladene Kacheln
-                        int fallbackZoom = currentZoom - 1;
-                        int fallbackX = x / 2;
-                        int fallbackY = y / 2;
-                        int deltaZoom = 1;
-
-                        while (fallbackZoom >= 0)
-                        {
-                            var fallbackKey = new TileKey(fallbackZoom, fallbackX, fallbackY);
-
-                            if (_tileCache.TryGetValue(fallbackKey, out var fallbackBitmap))
-                            {
-                                int factor = 1 << deltaZoom;
-
-                                float srcWidth = (float)TileSize / factor;
-                                float srcHeight = (float)TileSize / factor;
-
-                                float srcX = (x % factor) * srcWidth;
-                                float srcY = (y % factor) * srcHeight;
-
-                                var srcRect = new SKRect(srcX, srcY, srcX + srcWidth, srcY + srcHeight);
-                                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, paint);
-                                break;
-                            }
-
-                            fallbackZoom--;
-                            fallbackX /= 2;
-                            fallbackY /= 2;
-                            deltaZoom++;
-                        }
-                    }
-                    else
-                        canvas.DrawBitmap(bitmap, destRect, LinearSampling, paint);
-                }
+                _displayZoom = desiredZoom;
+                RequestRender();
             }
         }
 
-        // Pins zeichnenLinearSampling
-        if (Pins != null && OriginalImageSize != SKSize.Empty)
-        {
-            float padding = 50f;
-            float l = viewLeft - padding;
-            float r = viewRight + padding;
-            float t = viewTop - padding;
-            float b = viewBottom + padding;
+        DrawPins(canvas, imageSize, view);
 
-            foreach (var pin in _sortedPins)
-            {
-                SKBitmap pinBitmap = pin.Icon ??= GetOrLoadPinBitmap(pin);
-                if (pinBitmap == null) continue;
-
-                float absoluteX = pin.RelativeX * OriginalImageSize.Width;
-                float absoluteY = pin.RelativeY * OriginalImageSize.Height;
-
-                if (absoluteX < l || absoluteX > r || absoluteY < t || absoluteY > b)
-                    continue;
-
-                canvas.Save();
-                canvas.Translate(absoluteX, absoluteY);
-
-                if (!pin.IsLockRotate)
-                    canvas.RotateDegrees(-_rotationDegrees);
-                else
-                    canvas.RotateDegrees(pin.Rotation);
-
-                float pinScale = GetPinScale(pin);
-                canvas.Scale(pinScale, pinScale);
-
-                float left = -(float)(pin.Anchor.X * pinBitmap.Width);
-                float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
-
-                canvas.DrawBitmap(pinBitmap, left, top, LinearSampling);
-                canvas.Restore();
-            }
-        }
         canvas.Restore();
     }
+
+    /// <summary>B2: Bounding-Box der vier transformierten Rechteck-Ecken.</summary>
+    private static SKRect MapRectBounds(SKMatrix matrix, SKRect rect)
+    {
+        SKPoint c0 = matrix.MapPoint(rect.Left, rect.Top);
+        SKPoint c1 = matrix.MapPoint(rect.Right, rect.Top);
+        SKPoint c2 = matrix.MapPoint(rect.Left, rect.Bottom);
+        SKPoint c3 = matrix.MapPoint(rect.Right, rect.Bottom);
+
+        float left = MathF.Min(MathF.Min(c0.X, c1.X), MathF.Min(c2.X, c3.X));
+        float right = MathF.Max(MathF.Max(c0.X, c1.X), MathF.Max(c2.X, c3.X));
+        float top = MathF.Min(MathF.Min(c0.Y, c1.Y), MathF.Min(c2.Y, c3.Y));
+        float bottom = MathF.Max(MathF.Max(c0.Y, c1.Y), MathF.Max(c2.Y, c3.Y));
+
+        return new SKRect(left, top, right, bottom);
+    }
+
+    private void EnsureTileCacheCapacity(int baseZoom, int desiredZoom, int maxZoom, int tileSize, SKSize imageSize, SKRect view)
+    {
+        int required = CountVisibleTiles(baseZoom, maxZoom, tileSize, imageSize, view);
+
+        if (desiredZoom != baseZoom)
+            required += CountVisibleTiles(desiredZoom, maxZoom, tileSize, imageSize, view);
+
+        // Faktor 2 plus Reserve: verhindert, dass jeder Frame genau die Kacheln evicted,
+        // die der naechste Frame wieder braucht (Cache-Thrashing, B1).
+        int capacity = Math.Max(SettingsService.Instance.MaxTileCache, required * 2 + 16);
+        _tileCache.EnsureCapacity(capacity);
+    }
+
+    private static int CountVisibleTiles(int zoom, int maxZoom, int tileSize, SKSize imageSize, SKRect view)
+    {
+        float tileSpan = tileSize * (float)Math.Pow(2, maxZoom - zoom);
+        GetLevelTileCounts(zoom, maxZoom, tileSize, imageSize, out int tilesX, out int tilesY);
+
+        int minX = Math.Clamp((int)Math.Floor(view.Left / tileSpan), 0, tilesX - 1);
+        int maxX = Math.Clamp((int)Math.Ceiling(view.Right / tileSpan), 0, tilesX - 1);
+        int minY = Math.Clamp((int)Math.Floor(view.Top / tileSpan), 0, tilesY - 1);
+        int maxY = Math.Clamp((int)Math.Ceiling(view.Bottom / tileSpan), 0, tilesY - 1);
+
+        return (maxX - minX + 1) * (maxY - minY + 1);
+    }
+
+    /// <summary>
+    /// Zeichnet eine Pyramidenstufe. Rueckgabe: true, wenn jede sichtbare Kachel aus
+    /// genau dieser Stufe gezeichnet werden konnte.
+    /// </summary>
+    private bool DrawTileLayer(
+        SKCanvas canvas,
+        int zoom,
+        int maxZoom,
+        int tileSize,
+        SKSize imageSize,
+        SKRect view,
+        SKPaint paint,
+        float effScale,
+        bool allowFallback)
+    {
+        float tileSpan = tileSize * (float)Math.Pow(2, maxZoom - zoom);
+        GetLevelTileCounts(zoom, maxZoom, tileSize, imageSize, out int tilesX, out int tilesY);
+
+        int minX = Math.Clamp((int)Math.Floor(view.Left / tileSpan), 0, tilesX - 1);
+        int maxX = Math.Clamp((int)Math.Ceiling(view.Right / tileSpan), 0, tilesX - 1);
+        int minY = Math.Clamp((int)Math.Floor(view.Top / tileSpan), 0, tilesY - 1);
+        int maxY = Math.Clamp((int)Math.Ceiling(view.Bottom / tileSpan), 0, tilesY - 1);
+
+        // C7: knapp ein halbes Geraete-Pixel Ueberlappung gegen 1-px-Naehte.
+        float seam = 0.5f / effScale;
+
+        bool complete = true;
+
+        for (int x = minX; x <= maxX; x++)
+        {
+            float posX = x * tileSpan;
+
+            for (int y = minY; y <= maxY; y++)
+            {
+                float posY = y * tileSpan;
+                var destRect = new SKRect(posX, posY, posX + tileSpan + seam, posY + tileSpan + seam);
+                var key = new TileKey(zoom, x, y);
+
+                if (TryGetTile(key, out var bitmap))
+                {
+                    canvas.DrawBitmap(bitmap, destRect, LinearSampling, paint);
+                    continue;
+                }
+
+                complete = false;
+
+                // A3: Pfad wird nur im Miss-Fall gebaut - kein String-Garbage pro Frame.
+                if (!_pendingTiles.Contains(key))
+                {
+                    string tilePath = Path.Combine(
+                        _computedTileFolder,
+                        zoom.ToString(),
+                        x.ToString(),
+                        $"{y}.jpg");
+
+                    RequestTile(key, tilePath);
+                }
+
+                if (!allowFallback) continue;
+
+                DrawParentFallback(canvas, zoom, x, y, tileSize, destRect, paint);
+            }
+        }
+
+        return complete;
+    }
+
+    /// <summary>
+    /// Zeichnet den passenden Ausschnitt der naechstgroeberen bereits geladenen Kachel.
+    /// Da grobe Stufen permanent gehalten werden, schlaegt das praktisch nie fehl (B1).
+    /// </summary>
+    private void DrawParentFallback(SKCanvas canvas, int zoom, int x, int y, int tileSize, SKRect destRect, SKPaint paint)
+    {
+        int fallbackZoom = zoom - 1;
+        int fallbackX = x / 2;
+        int fallbackY = y / 2;
+        int deltaZoom = 1;
+
+        while (fallbackZoom >= 0)
+        {
+            var fallbackKey = new TileKey(fallbackZoom, fallbackX, fallbackY);
+
+            if (TryGetTile(fallbackKey, out var fallbackBitmap))
+            {
+                int factor = 1 << deltaZoom;
+                float srcSize = (float)tileSize / factor;
+                float srcX = (x % factor) * srcSize;
+                float srcY = (y % factor) * srcSize;
+
+                var srcRect = new SKRect(srcX, srcY, srcX + srcSize, srcY + srcSize);
+                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, paint);
+                return;
+            }
+
+            fallbackZoom--;
+            fallbackX /= 2;
+            fallbackY /= 2;
+            deltaZoom++;
+        }
+    }
+
+    /// <summary>
+    /// Zeichnet die Pins. A1: Culling ueber einen rotationsinvarianten Bounding-Radius,
+    /// der Ankerpunkt, Bitmap-Groesse und Pin-Skalierung beruecksichtigt.
+    /// </summary>
+    private void DrawPins(SKCanvas canvas, SKSize imageSize, SKRect view)
+    {
+        if (_sortedPins.Count == 0) return;
+
+        // C6: Settings einmal pro Frame lesen statt viermal pro Pin.
+        var settings = SettingsService.Instance;
+        double osBaseScale = settings.OsBaseScale;
+        double maxLimit = settings.PinMaxScaleLimit / 100.0;
+        double minLimit = settings.PinMinScaleLimit / 100.0;
+
+        float imgWidth = imageSize.Width;
+        float imgHeight = imageSize.Height;
+        float mapScale = _scale > 0 ? _scale : 1f;
+
+        foreach (var pin in _sortedPins)
+        {
+            // C1: pin.Icon wird NICHT mehr aus dem Cache befuellt. Der Cache bleibt
+            // alleiniger Besitzer seiner Bitmaps, ClearCache() kann sie gefahrlos
+            // disposen. Ein extern gesetztes Icon wird weiterhin respektiert.
+            SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
+            if (pinBitmap == null) continue;
+
+            float absoluteX = pin.RelativeX * imgWidth;
+            float absoluteY = pin.RelativeY * imgHeight;
+
+            float pinScale = GetPinScale(pin, mapScale, osBaseScale, maxLimit, minLimit);
+
+            // A1: groesster Abstand vom Anker zu einer Bitmap-Ecke, in Bildkoordinaten.
+            // MathF.Max deckt alle vier Ecken ab - auch bei unsymmetrischem Anker.
+            float halfW = MathF.Max((float)pin.Anchor.X, 1f - (float)pin.Anchor.X) * pinBitmap.Width * pinScale;
+            float halfH = MathF.Max((float)pin.Anchor.Y, 1f - (float)pin.Anchor.Y) * pinBitmap.Height * pinScale;
+            float radius = MathF.Sqrt(halfW * halfW + halfH * halfH);
+
+            if (absoluteX < view.Left - radius || absoluteX > view.Right + radius ||
+                absoluteY < view.Top - radius || absoluteY > view.Bottom + radius)
+            {
+                continue;
+            }
+
+            canvas.Save();
+            canvas.Translate(absoluteX, absoluteY);
+
+            if (!pin.IsLockRotate)
+                canvas.RotateDegrees(-_rotationDegrees);
+            else
+                canvas.RotateDegrees(pin.Rotation);
+
+            canvas.Scale(pinScale, pinScale);
+
+            float left = -(float)(pin.Anchor.X * pinBitmap.Width);
+            float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
+
+            canvas.DrawBitmap(pinBitmap, left, top, LinearSampling);
+            canvas.Restore();
+        }
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Lupe (A7/B5)
+    // ---------------------------------------------------------------------------------
 
     private void DrawMagnifyingGlass(SKCanvas canvas)
     {
@@ -699,13 +1088,10 @@ public partial class TileImageView : ContentView
 
         float currentLoupeRadius = SettingsService.Instance.LoupeRadius * (float)Settings.DisplayDensity;
 
-        // Shader und Pfade nur neu berechnen, wenn sich der Radius geändert hat
         if (Math.Abs(_cachedLoupeRadius - currentLoupeRadius) > 0.1f)
             UpdateLoupeCache(currentLoupeRadius);
 
-        SKMatrix mapMatrix = SKMatrix.CreateTranslation(_panX, _panY);
-        mapMatrix = mapMatrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-        mapMatrix = mapMatrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+        SKMatrix mapMatrix = BuildMapMatrix();
 
         float pinAbsX = _draggedPin.RelativeX * OriginalImageSize.Width;
         float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
@@ -716,17 +1102,29 @@ public partial class TileImageView : ContentView
         float loupeCenterX = _cachedLoupeRadius + margin;
         float loupeCenterY = _cachedLoupeRadius + margin;
 
+        // A7/B5: Der Lupendurchlauf cullt nur noch auf diesen Ausschnitt statt auf den
+        // gesamten Viewport. Dadurch entfaellt das doppelte Tile- und Pin-Handling.
+        var loupeDeviceClip = new SKRect(
+            loupeCenterX - _cachedLoupeRadius,
+            loupeCenterY - _cachedLoupeRadius,
+            loupeCenterX + _cachedLoupeRadius,
+            loupeCenterY + _cachedLoupeRadius);
+
         canvas.Save();
         canvas.Translate(loupeCenterX, loupeCenterY);
         canvas.ClipPath(_cachedLoupePath, SKClipOperation.Intersect, true);
+
         canvas.Save();
         canvas.Scale(zoomFactor);
         canvas.Translate(-pinScreenPos.X, -pinScreenPos.Y);
-        DrawMapAndPins(canvas);
-        canvas.Restore();
-        canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeInnerShadowPaint);
-        canvas.Save();
 
+        DrawMapAndPins(canvas, loupeDeviceClip, isPrimaryPass: false);
+
+        canvas.Restore();
+
+        canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeInnerShadowPaint);
+
+        canvas.Save();
         float glareRadiusX = _cachedLoupeRadius * 0.85f;
         float glareRadiusY = _cachedLoupeRadius * 0.45f;
         float glareOffsetX = -(_cachedLoupeRadius * 0.15f);
@@ -735,17 +1133,20 @@ public partial class TileImageView : ContentView
         canvas.RotateDegrees(-25f, glareOffsetX, glareOffsetY);
         canvas.DrawOval(glareOffsetX, glareOffsetY, glareRadiusX, glareRadiusY, _loupeGlarePaint);
         canvas.Restore();
+
         canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeBorderPaint);
 
         float crosshairHalfSize = 15 * (float)Settings.DisplayDensity;
         canvas.DrawLine(-crosshairHalfSize, 0, crosshairHalfSize, 0, _loupeCrosshairPaint);
         canvas.DrawLine(0, -crosshairHalfSize, 0, crosshairHalfSize, _loupeCrosshairPaint);
+
         canvas.Restore();
     }
 
     private void UpdateLoupeCache(float newRadius)
     {
         _cachedLoupeRadius = newRadius;
+
         _cachedLoupePath?.Dispose();
         _cachedInnerShadowShader?.Dispose();
         _cachedGlareShader?.Dispose();
@@ -756,8 +1157,9 @@ public partial class TileImageView : ContentView
 
         var shadowColors = new SKColor[] { SKColors.Transparent, SKColors.Transparent, new(0, 0, 0, 130) };
         var shadowPositions = new float[] { 0f, 0.6f, 1f };
+
         _cachedInnerShadowShader = SKShader.CreateRadialGradient(
-            new SKPoint(0, 0), // Zentriert auf 0,0
+            new SKPoint(0, 0),
             newRadius,
             shadowColors,
             shadowPositions,
@@ -779,6 +1181,10 @@ public partial class TileImageView : ContentView
         _loupeGlarePaint.Shader = _cachedGlareShader;
     }
 
+    // ---------------------------------------------------------------------------------
+    //  Eingabe
+    // ---------------------------------------------------------------------------------
+
     private void OnCanvasTouch(object sender, SKTouchEventArgs e)
     {
 #if WINDOWS
@@ -791,255 +1197,19 @@ public partial class TileImageView : ContentView
             return;
         }
 #endif
+
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
-                _isLongPressActive = false;
-
-                _activeTouches[e.Id] = e.Location;
-                if (_activeTouches.Count == 1)
-                {
-                    _touchStartPoint = e.Location;
-                    _touchStartTime = DateTime.UtcNow;
-                    _hasDraggedPin = false;
-                    _isDoubleTapAction = false;
-
-                    _draggedPin = GetPinAtPosition(e.Location);
-
-                    _lastTouchPoint = e.Location;
-
-                    if (_draggedPin != null && _draggedPin.IsLockPosition)
-                        _draggedPin = null;
-
-                    if (_draggedPin != null)
-                    {
-                        _originalPinX = _draggedPin.RelativeX;
-                        _originalPinY = _draggedPin.RelativeY;
-
-                        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
-                        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-                        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
-                    }
-                    else
-                    {
-                        _longPressCts?.Cancel();
-                        _longPressCts = new CancellationTokenSource();
-                        var token = _longPressCts.Token;
-                        var lpLocation = e.Location;
-
-                        _ = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                await Task.Delay(LongPressTimeoutMs, token);
-                                if (!token.IsCancellationRequested)
-                                {
-                                    MainThread.BeginInvokeOnMainThread(() =>
-                                    {
-                                        _isLongPressActive = true;
-                                        CanvasLongPressed?.Invoke(this, lpLocation);
-                                    });
-                                }
-                            }
-                            catch (OperationCanceledException) { }
-                        });
-                    }
-                }
-
-                if (_activeTouches.Count == 2)
-                {
-                    _draggedPin = null;
-                    _longPressCts?.Cancel();
-                    var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
-                    var p0 = _activeTouches[keys[0]];
-                    var p1 = _activeTouches[keys[1]];
-                    _oldFingerDistance = SKPoint.Distance(p0, p1);
-                    _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
-                }
+                HandleTouchPressed(e);
                 break;
 
             case SKTouchAction.Moved:
-                if (_isGenerating) break;
-                if (_isDoubleTapAction) break;
-                if (_isLongPressActive) break;
-                if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
-                    _longPressCts?.Cancel();
-
-                bool shouldInvalidate = false;
-
-                if (_draggedPin != null && _activeTouches.Count == 1)
-                {
-                    if (SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
-                        _hasDraggedPin = true;
-                    UpdateDraggedPinPosition(e.Location);
-                    shouldInvalidate = true;
-                }
-                else if (_activeTouches.Count == 1 && _activeTouches.TryGetValue(e.Id, out SKPoint oldPt))
-                {
-                    _panX += e.Location.X - oldPt.X;
-                    _panY += e.Location.Y - oldPt.Y;
-                    _activeTouches[e.Id] = e.Location;
-                    CurrentPan = new SKPoint(_panX, _panY);
-                    shouldInvalidate = true;
-                }
-                else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
-                {
-                    var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
-                    var oldP0 = _activeTouches[keys[0]];
-                    var oldP1 = _activeTouches[keys[1]];
-                    float oldCenterX = (oldP0.X + oldP1.X) / 2f;
-                    float oldCenterY = (oldP0.Y + oldP1.Y) / 2f;
-
-                    _activeTouches[e.Id] = e.Location;
-
-                    var newP0 = _activeTouches[keys[0]];
-                    var newP1 = _activeTouches[keys[1]];
-                    float newCenterX = (newP0.X + newP1.X) / 2f;
-                    float newCenterY = (newP0.Y + newP1.Y) / 2f;
-
-                    _panX += (newCenterX - oldCenterX);
-                    _panY += (newCenterY - oldCenterY);
-
-                    float newDistance = SKPoint.Distance(newP0, newP1);
-                    if (_oldFingerDistance > 0)
-                    {
-                        float scaleFactor = newDistance / _oldFingerDistance;
-                        float minScale = GetMinScale();
-                        float newScale = Math.Clamp(_scale * scaleFactor, minScale, 16.0f);
-                        float scaleRatio = newScale / _scale;
-                        _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
-                        _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
-                        _scale = newScale;
-                    }
-                    _oldFingerDistance = newDistance;
-
-                    float newAngle = (float)Math.Atan2(newP1.Y - newP0.Y, newP1.X - newP0.X);
-                    if (!IsRotationLocked && _oldFingerAngle != 0f)
-                    {
-                        float angleDiff = newAngle - _oldFingerAngle;
-
-                        if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
-                        if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
-
-                        float rotationDiffDegrees = angleDiff * (180f / (float)Math.PI);
-                        _rotationDegrees += rotationDiffDegrees;
-
-                        double rad = angleDiff;
-                        float cos = (float)Math.Cos(rad);
-                        float sin = (float)Math.Sin(rad);
-                        float dx = _panX - newCenterX;
-                        float dy = _panY - newCenterY;
-
-                        _panX = newCenterX + (dx * cos - dy * sin);
-                        _panY = newCenterY + (dx * sin + dy * cos);
-                    }
-                    _oldFingerAngle = newAngle;
-                    shouldInvalidate = true;
-                }
-
-                if (shouldInvalidate)
-                {
-                    CurrentScale = _scale;
-                    CurrentPan = new SKPoint(_panX, _panY);
-                    CurrentRotation = _rotationDegrees;
-
-                    _canvasView.InvalidateSurface();
-                }
+                HandleTouchMoved(e);
                 break;
 
             case SKTouchAction.Released:
-                _longPressCts?.Cancel();
-
-                if (_isLongPressActive)
-                {
-                    _isLongPressActive = false;
-                    _draggedPin = null;
-                    _activeTouches.Remove(e.Id);
-                    break;
-                }
-
-                bool isInsideThreshold = SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold;
-                bool isQuickTap = (DateTime.UtcNow - _touchStartTime).TotalMilliseconds < 300;
-                bool isTap = isInsideThreshold && !_hasDraggedPin && isQuickTap;
-
-                if (_activeTouches.Count == 1 && isTap)
-                {
-                    var now = DateTime.UtcNow;
-                    double elapsed = (now - _lastTapTime).TotalMilliseconds;
-                    float distance = SKPoint.Distance(_lastTapLocation, e.Location);
-
-                    var currentPin = GetPinAtPosition(e.Location);
-
-                    if (elapsed < DoubleTapTimeoutMs && distance < DoubleTapDistanceThreshold)
-                    {
-                        // Doppelklick-Handling zurücksetzen
-                        _isDoubleTapAction = true;
-                        _tapCts?.Cancel();
-                        _tapCts = null;
-                        _lastTapTime = DateTime.MinValue;
-
-                        if (currentPin != null)
-                            PinDoubleTapped?.Invoke(this, currentPin);
-                        else
-                            CanvasDoubleTapped?.Invoke(this, e.Location);
-                    }
-                    else
-                    {
-                        _isDoubleTapAction = false;
-                        _lastTapTime = now;
-                        _lastTapLocation = e.Location;
-                        _tapCts?.Cancel();
-                        _tapCts = new CancellationTokenSource();
-                        var token = _tapCts.Token;
-                        var tapLocation = e.Location;
-
-                        _ = Task.Run(async () =>
-                        {
-                            try
-                            {
-                                await Task.Delay(250, token);
-
-                                if (!token.IsCancellationRequested)
-                                {
-                                    MainThread.BeginInvokeOnMainThread(() =>
-                                    {
-                                        if (currentPin != null)
-                                            PinTapped?.Invoke(this, currentPin);
-                                        else
-                                        {
-                                            CanvasTapped?.Invoke(this, tapLocation);
-                                            if (PinCreationMode == PinCreationMode.SingleTap)
-                                                CanvasLongPressed?.Invoke(this, tapLocation);
-                                        }
-                                    });
-                                }
-                            }
-                            catch (OperationCanceledException) { }
-                        });
-                    }
-                }
-                else if (_draggedPin != null)
-                {
-                    PinMoved?.Invoke(this, _draggedPin);
-                }
-
-                if (_draggedPin != null)
-                {
-                    if (isTap)
-                    {
-                        _draggedPin.RelativeX = _originalPinX;
-                        _draggedPin.RelativeY = _originalPinY;
-                    }
-                    _draggedPin = null;
-                }
-
-                _activeTouches.Remove(e.Id);
-                if (_activeTouches.Count < 2)
-                {
-                    _oldFingerDistance = 0f;
-                    _oldFingerAngle = 0f;
-                }
-                _canvasView.InvalidateSurface();
+                HandleTouchReleased(e);
                 break;
 
             case SKTouchAction.Cancelled:
@@ -1055,10 +1225,286 @@ public partial class TileImageView : ContentView
                 }
 
                 _activeTouches.Remove(e.Id);
-                _canvasView.InvalidateSurface();
+                RequestRender();
                 break;
         }
+
         e.Handled = true;
+    }
+
+    private void HandleTouchPressed(SKTouchEventArgs e)
+    {
+        _isLongPressActive = false;
+        _activeTouches[e.Id] = e.Location;
+
+        if (_activeTouches.Count == 1)
+        {
+            _touchStartPoint = e.Location;
+            _touchStartTime = DateTime.UtcNow;
+            _hasDraggedPin = false;
+            _isDoubleTapAction = false;
+            _lastTouchPoint = e.Location;
+
+            _draggedPin = GetPinAtPosition(e.Location);
+
+            if (_draggedPin != null && _draggedPin.IsLockPosition)
+                _draggedPin = null;
+
+            if (_draggedPin != null)
+            {
+                _originalPinX = _draggedPin.RelativeX;
+                _originalPinY = _draggedPin.RelativeY;
+            }
+            else
+            {
+                StartLongPressDetection(e.Location);
+            }
+        }
+
+        if (_activeTouches.Count == 2)
+        {
+            _draggedPin = null;
+            _longPressCts?.Cancel();
+
+            var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
+            var p0 = _activeTouches[keys[0]];
+            var p1 = _activeTouches[keys[1]];
+
+            _oldFingerDistance = SKPoint.Distance(p0, p1);
+            _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
+        }
+    }
+
+    private void StartLongPressDetection(SKPoint location)
+    {
+        _longPressCts?.Cancel();
+        _longPressCts?.Dispose();
+        _longPressCts = new CancellationTokenSource();
+
+        var token = _longPressCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(LongPressTimeoutMs, token);
+
+                if (!token.IsCancellationRequested)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (_disposed) return;
+                        _isLongPressActive = true;
+                        CanvasLongPressed?.Invoke(this, location);
+                    });
+                }
+            }
+            catch (OperationCanceledException) { }
+        });
+    }
+
+    private void HandleTouchMoved(SKTouchEventArgs e)
+    {
+        if (_isGenerating) return;
+        if (_isDoubleTapAction) return;
+        if (_isLongPressActive) return;
+
+        if (_activeTouches.Count == 1 && SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
+            _longPressCts?.Cancel();
+
+        bool shouldInvalidate = false;
+
+        if (_draggedPin != null && _activeTouches.Count == 1)
+        {
+            if (SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
+                _hasDraggedPin = true;
+
+            UpdateDraggedPinPosition(e.Location);
+            shouldInvalidate = true;
+        }
+        else if (_activeTouches.Count == 1 && _activeTouches.TryGetValue(e.Id, out SKPoint oldPt))
+        {
+            _panX += e.Location.X - oldPt.X;
+            _panY += e.Location.Y - oldPt.Y;
+            _activeTouches[e.Id] = e.Location;
+            CurrentPan = new SKPoint(_panX, _panY);
+            shouldInvalidate = true;
+        }
+        else if (_activeTouches.Count == 2 && _activeTouches.ContainsKey(e.Id))
+        {
+            var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
+            var oldP0 = _activeTouches[keys[0]];
+            var oldP1 = _activeTouches[keys[1]];
+
+            float oldCenterX = (oldP0.X + oldP1.X) / 2f;
+            float oldCenterY = (oldP0.Y + oldP1.Y) / 2f;
+
+            _activeTouches[e.Id] = e.Location;
+
+            var newP0 = _activeTouches[keys[0]];
+            var newP1 = _activeTouches[keys[1]];
+
+            float newCenterX = (newP0.X + newP1.X) / 2f;
+            float newCenterY = (newP0.Y + newP1.Y) / 2f;
+
+            _panX += newCenterX - oldCenterX;
+            _panY += newCenterY - oldCenterY;
+
+            float newDistance = SKPoint.Distance(newP0, newP1);
+
+            if (_oldFingerDistance > 0)
+            {
+                float scaleFactor = newDistance / _oldFingerDistance;
+                float minScale = GetMinScale();
+                float newScale = Math.Clamp(_scale * scaleFactor, minScale, 16.0f);
+                float scaleRatio = newScale / _scale;
+
+                _panX = newCenterX - (newCenterX - _panX) * scaleRatio;
+                _panY = newCenterY - (newCenterY - _panY) * scaleRatio;
+                _scale = newScale;
+            }
+
+            _oldFingerDistance = newDistance;
+
+            float newAngle = (float)Math.Atan2(newP1.Y - newP0.Y, newP1.X - newP0.X);
+
+            if (!IsRotationLocked && _oldFingerAngle != 0f)
+            {
+                float angleDiff = newAngle - _oldFingerAngle;
+                if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
+                if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
+
+                _rotationDegrees += angleDiff * (180f / (float)Math.PI);
+
+                float cos = (float)Math.Cos(angleDiff);
+                float sin = (float)Math.Sin(angleDiff);
+                float dx = _panX - newCenterX;
+                float dy = _panY - newCenterY;
+
+                _panX = newCenterX + (dx * cos - dy * sin);
+                _panY = newCenterY + (dx * sin + dy * cos);
+            }
+
+            _oldFingerAngle = newAngle;
+            shouldInvalidate = true;
+        }
+
+        if (shouldInvalidate)
+        {
+            CurrentScale = _scale;
+            CurrentPan = new SKPoint(_panX, _panY);
+            CurrentRotation = _rotationDegrees;
+
+            // C4/B3: coalesced Frame + Generationswechsel fuer den Tile-Loader.
+            InvalidateView();
+        }
+    }
+
+    private void HandleTouchReleased(SKTouchEventArgs e)
+    {
+        _longPressCts?.Cancel();
+
+        if (_isLongPressActive)
+        {
+            _isLongPressActive = false;
+            _draggedPin = null;
+            _activeTouches.Remove(e.Id);
+            return;
+        }
+
+        bool isInsideThreshold = SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold;
+        bool isQuickTap = (DateTime.UtcNow - _touchStartTime).TotalMilliseconds < 300;
+        bool isTap = isInsideThreshold && !_hasDraggedPin && isQuickTap;
+
+        if (_activeTouches.Count == 1 && isTap)
+            HandleTap(e.Location);
+        else if (_draggedPin != null)
+            PinMoved?.Invoke(this, _draggedPin);
+
+        if (_draggedPin != null)
+        {
+            if (isTap)
+            {
+                _draggedPin.RelativeX = _originalPinX;
+                _draggedPin.RelativeY = _originalPinY;
+            }
+
+            _draggedPin = null;
+        }
+
+        _activeTouches.Remove(e.Id);
+
+        if (_activeTouches.Count < 2)
+        {
+            _oldFingerDistance = 0f;
+            _oldFingerAngle = 0f;
+        }
+
+        RequestRender();
+    }
+
+    private void HandleTap(SKPoint location)
+    {
+        var now = DateTime.UtcNow;
+        double elapsed = (now - _lastTapTime).TotalMilliseconds;
+        float distance = SKPoint.Distance(_lastTapLocation, location);
+
+        var currentPin = GetPinAtPosition(location);
+
+        if (elapsed < DoubleTapTimeoutMs && distance < DoubleTapDistanceThreshold)
+        {
+            _isDoubleTapAction = true;
+            _tapCts?.Cancel();
+            _tapCts?.Dispose();
+            _tapCts = null;
+            _lastTapTime = DateTime.MinValue;
+
+            if (currentPin != null)
+                PinDoubleTapped?.Invoke(this, currentPin);
+            else
+                CanvasDoubleTapped?.Invoke(this, location);
+
+            return;
+        }
+
+        _isDoubleTapAction = false;
+        _lastTapTime = now;
+        _lastTapLocation = location;
+
+        _tapCts?.Cancel();
+        _tapCts?.Dispose();
+        _tapCts = new CancellationTokenSource();
+
+        var token = _tapCts.Token;
+
+        _ = Task.Run(async () =>
+        {
+            try
+            {
+                await Task.Delay(250, token);
+
+                if (!token.IsCancellationRequested)
+                {
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (_disposed) return;
+
+                        if (currentPin != null)
+                        {
+                            PinTapped?.Invoke(this, currentPin);
+                        }
+                        else
+                        {
+                            CanvasTapped?.Invoke(this, location);
+
+                            if (PinCreationMode == PinCreationMode.SingleTap)
+                                CanvasLongPressed?.Invoke(this, location);
+                        }
+                    });
+                }
+            }
+            catch (OperationCanceledException) { }
+        });
     }
 
     private static void OnCurrentRotationChanged(BindableObject bindable, object oldValue, object newValue)
@@ -1066,135 +1512,189 @@ public partial class TileImageView : ContentView
         var control = (TileImageView)bindable;
         float newRotation = (float)newValue;
 
-        if (Math.Abs(control._rotationDegrees - newRotation) > 0.01f)
+        if (Math.Abs(control._rotationDegrees - newRotation) <= 0.01f) return;
+
+        if (control._canvasView.CanvasSize.Width > 0 && control._canvasView.CanvasSize.Height > 0)
         {
-            if (control._canvasView.CanvasSize.Width > 0 && control._canvasView.CanvasSize.Height > 0)
-            {
-                float centerX = (float)control._canvasView.CanvasSize.Width / 2f;
-                float centerY = (float)control._canvasView.CanvasSize.Height / 2f;
-                float angleDiffDegrees = newRotation - control._rotationDegrees;
-                double rad = angleDiffDegrees * (Math.PI / 180.0);
+            float centerX = control._canvasView.CanvasSize.Width / 2f;
+            float centerY = control._canvasView.CanvasSize.Height / 2f;
 
-                float cos = (float)Math.Cos(rad);
-                float sin = (float)Math.Sin(rad);
-                float dx = control._panX - centerX;
-                float dy = control._panY - centerY;
+            float angleDiffDegrees = newRotation - control._rotationDegrees;
+            double rad = angleDiffDegrees * (Math.PI / 180.0);
 
-                control._panX = centerX + (dx * cos - dy * sin);
-                control._panY = centerY + (dx * sin + dy * cos);
-                control.CurrentPan = new SKPoint(control._panX, control._panY);
-            }
+            float cos = (float)Math.Cos(rad);
+            float sin = (float)Math.Sin(rad);
+            float dx = control._panX - centerX;
+            float dy = control._panY - centerY;
 
-            control._rotationDegrees = newRotation;
-            control._canvasView?.InvalidateSurface();
+            control._panX = centerX + (dx * cos - dy * sin);
+            control._panY = centerY + (dx * sin + dy * cos);
+            control.CurrentPan = new SKPoint(control._panX, control._panY);
         }
+
+        control._rotationDegrees = newRotation;
+        control.InvalidateView();
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Windows-Maussteuerung
+    // ---------------------------------------------------------------------------------
+
+#if WINDOWS
+    private void OnLoadedWindows(object sender, EventArgs e)
+    {
+        if (_canvasView.Handler?.PlatformView is Microsoft.UI.Xaml.UIElement winView)
+        {
+            // C2: Referenz merken, damit spaeter sauber abgemeldet werden kann.
+            _winView = winView;
+            winView.PointerWheelChanged += OnWinViewPointerWheelChanged;
+            winView.PointerPressed += OnWinViewPointerPressed;
+            winView.PointerMoved += OnWinViewPointerMoved;
+            winView.PointerReleased += OnWinViewPointerReleased;
+        }
+    }
+
+    private void OnUnloadedWindows(object sender, EventArgs e) => DetachWindowsHandlers();
+
+    private void DetachWindowsHandlers()
+    {
+        if (_winView == null) return;
+
+        _winView.PointerWheelChanged -= OnWinViewPointerWheelChanged;
+        _winView.PointerPressed -= OnWinViewPointerPressed;
+        _winView.PointerMoved -= OnWinViewPointerMoved;
+        _winView.PointerReleased -= OnWinViewPointerReleased;
+        _winView = null;
+    }
+
+    private void OnWinViewPointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
+
+        var pointerPoint = e.GetCurrentPoint((Microsoft.UI.Xaml.UIElement)sender);
+        var position = pointerPoint.Position;
+        int delta = pointerPoint.Properties.MouseWheelDelta;
+
+        float density = (float)Settings.DisplayDensity;
+        SKPoint mousePos = new((float)position.X * density, (float)position.Y * density);
+
+        HandleMouseZoom(mousePos, delta);
+        e.Handled = true;
+    }
+
+    private void OnWinViewPointerPressed(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        var winView = (Microsoft.UI.Xaml.UIElement)sender;
+        var pointerPoint = e.GetCurrentPoint(winView);
+
+        if (!pointerPoint.Properties.IsRightButtonPressed) return;
+        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
+
+        _isRightMouseRotating = true;
+
+        float density = (float)Settings.DisplayDensity;
+        SKPoint mousePos = new((float)pointerPoint.Position.X * density, (float)pointerPoint.Position.Y * density);
+
+        float centerX = _canvasView.CanvasSize.Width / 2f;
+        float centerY = _canvasView.CanvasSize.Height / 2f;
+
+        _lastMouseRotationAngle = (float)Math.Atan2(mousePos.Y - centerY, mousePos.X - centerX);
+
+        winView.CapturePointer(e.Pointer);
+        e.Handled = true;
+    }
+
+    private void OnWinViewPointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (IsRotationLocked || !_isRightMouseRotating || OriginalImageSize == SKSize.Empty || _isGenerating) return;
+
+        var winView = (Microsoft.UI.Xaml.UIElement)sender;
+        var pointerPoint = e.GetCurrentPoint(winView);
+
+        float density = (float)Settings.DisplayDensity;
+        SKPoint mousePos = new((float)pointerPoint.Position.X * density, (float)pointerPoint.Position.Y * density);
+
+        float centerX = _canvasView.CanvasSize.Width / 2f;
+        float centerY = _canvasView.CanvasSize.Height / 2f;
+
+        float currentAngle = (float)Math.Atan2(mousePos.Y - centerY, mousePos.X - centerX);
+        float angleDiff = currentAngle - _lastMouseRotationAngle;
+
+        if (angleDiff > Math.PI) angleDiff -= (float)(2 * Math.PI);
+        if (angleDiff < -Math.PI) angleDiff += (float)(2 * Math.PI);
+
+        if (Math.Abs(angleDiff) > 0.001f)
+        {
+            _rotationDegrees += angleDiff * (180f / (float)Math.PI);
+
+            float cos = (float)Math.Cos(angleDiff);
+            float sin = (float)Math.Sin(angleDiff);
+            float dx = _panX - centerX;
+            float dy = _panY - centerY;
+
+            _panX = centerX + (dx * cos - dy * sin);
+            _panY = centerY + (dx * sin + dy * cos);
+
+            _lastMouseRotationAngle = currentAngle;
+
+            CurrentRotation = _rotationDegrees;
+            CurrentPan = new SKPoint(_panX, _panY);
+
+            InvalidateView();
+        }
+
+        e.Handled = true;
+    }
+
+    private void OnWinViewPointerReleased(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
+    {
+        if (!_isRightMouseRotating) return;
+
+        _isRightMouseRotating = false;
+        var winView = (Microsoft.UI.Xaml.UIElement)sender;
+        winView.ReleasePointerCapture(e.Pointer);
+        e.Handled = true;
+    }
+#endif
+
+    // ---------------------------------------------------------------------------------
+    //  Pin-Verwaltung
+    // ---------------------------------------------------------------------------------
+
+    private static void OnPinsChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        var control = (TileImageView)bindable;
+
+        // C2: bisherige Collection sauber abmelden (auch ueber _observedPins nachgehalten).
+        control._observedPins?.CollectionChanged -= control.OnPinsCollectionChanged;
+        control._observedPins = null;
+
+        if (oldValue is INotifyCollectionChanged oldCollection)
+            oldCollection.CollectionChanged -= control.OnPinsCollectionChanged;
+
+        if (newValue is INotifyCollectionChanged newCollection)
+        {
+            newCollection.CollectionChanged += control.OnPinsCollectionChanged;
+            control._observedPins = newCollection;
+        }
+
+        control.UpdateSortedPins();
+
+        if (newValue is IEnumerable<MapPin> newPins)
+            _ = control.PreloadPinBitmapsAsync(newPins);
+
+        control.RequestRender();
     }
 
     private void OnPinsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        UpdateSortedPins();
+        // C5: Sortierung nur markieren - ausgefuehrt wird sie einmal pro Frame.
+        _pinsNeedSort = true;
+
         if (e.NewItems != null)
             _ = PreloadPinBitmapsAsync(e.NewItems.OfType<MapPin>());
 
-        _canvasView?.InvalidateSurface();
-    }
-
-    private async Task ProcessNewImageAsync(string imagePath)
-    {
-        _cts?.Cancel();
-        _cts = new CancellationTokenSource();
-        var token = _cts.Token;
-
-        if (string.IsNullOrEmpty(imagePath) || !File.Exists(imagePath))
-        {
-            _computedTileFolder = string.Empty;
-            ClearCache();
-            _canvasView.InvalidateSurface();
-            return;
-        }
-
-        ClearCache();
-
-        try
-        {
-            using (var codec = SKCodec.Create(imagePath))
-            {
-                if (codec != null)
-                    OriginalImageSize = new SKSize(codec.Info.Width, codec.Info.Height);
-            }
-
-            string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-            CleanupOldTileFolders(imagePath, TileSize);
-
-            _computedTileFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{TileSize}");
-            _scale = 1.0f;
-            _panX = 0f;
-            _panY = 0f;
-            _rotationDegrees = 0f;
-            CurrentScale = _scale;
-            CurrentPan = new SKPoint(_panX, _panY);
-            CurrentRotation = _rotationDegrees;
-
-            bool tilesExist = Directory.Exists(_computedTileFolder) &&
-                              Directory.GetFiles(_computedTileFolder, "*.jpg", SearchOption.AllDirectories).Length > 0;
-
-            if (!tilesExist)
-            {
-                _loadingIndicator.IsVisible = true;
-                _loadingIndicator.IsRunning = true;
-
-                await Task.Run(() => GenerateTilePyramidInternal(
-                    imagePath,
-                    _computedTileFolder,
-                    MaxZoomLevel,
-                    TileSize,
-                    PlaceholderColor.ToSKColor(),
-                    token,
-                    () => MainThread.BeginInvokeOnMainThread(() => _canvasView.InvalidateSurface())
-                ), token);
-            }
-        }
-        catch (OperationCanceledException)
-        {
-            return;
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Hintergrundbildes: {ex.Message}");
-        }
-        finally
-        {
-            _loadingIndicator.IsRunning = false;
-            _loadingIndicator.IsVisible = false;
-            _canvasView.IsVisible = true;
-            _isGenerating = false;
-            _canvasView.InvalidateSurface();
-        }
-    }
-
-    private static void CleanupOldTileFolders(string imagePath, int currentTileSize)
-    {
-        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-        string baseFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
-
-        if (!Directory.Exists(baseFolder)) return;
-
-        var allDirs = Directory.GetDirectories(baseFolder, $"{fileNameWithoutExt}_*");
-
-        foreach (var dir in allDirs)
-        {
-            if (!dir.EndsWith($"_{currentTileSize}"))
-            {
-                try
-                {
-                    Directory.Delete(dir, true);
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine($"Fehler beim Loeschen alter Kacheln: {ex.Message}");
-                }
-            }
-        }
+        RequestRender();
     }
 
     private void UpdateSortedPins()
@@ -1205,135 +1705,37 @@ public partial class TileImageView : ContentView
             return;
         }
 
-        _sortedPins = [.. Pins
-        .OrderByDescending(p => p.IsCustomPin)
-        .ThenByDescending(p => p.PinScale)
+        _sortedPins =
+        [
+            .. Pins
+                .OrderByDescending(p => p.IsCustomPin)
+                .ThenByDescending(p => p.PinScale)
         ];
-    }
-
-    private static void GenerateTilePyramidInternal(
-        string sourceImagePath,
-        string outputFolder,
-        int maxZoomLevels,
-        int tileSize,
-        SKColor tileBackgroundColor,
-        CancellationToken token,
-        Action onLevelGenerated = null)
-    {
-        using var codec = SKCodec.Create(sourceImagePath);
-        if (codec == null) return;
-
-        using var originalBitmap = SKBitmap.Decode(codec);
-        if (originalBitmap == null) return;
-
-        int origWidth = originalBitmap.Width;
-        int origHeight = originalBitmap.Height;
-
-        // Parallelitaet drosseln, um Windows-Dateisystem-Engpaesse zu vermeiden
-        var parallelOptions = new ParallelOptions
-        {
-            CancellationToken = token,
-            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1)
-        };
-
-        // Von grob (0) bis detailliert (maxZoomLevels)
-        for (int zoom = 0; zoom <= maxZoomLevels; zoom++)
-        {
-            token.ThrowIfCancellationRequested();
-
-            double scale = Math.Pow(0.5, maxZoomLevels - zoom);
-            int levelWidth = Math.Max(1, (int)(origWidth * scale));
-            int levelHeight = Math.Max(1, (int)(origHeight * scale));
-
-            using var scaledBitmap = (zoom == maxZoomLevels)
-                ? null
-                : originalBitmap.Resize(new SKImageInfo(levelWidth, levelHeight), LinearSampling);
-
-            SKBitmap currentLevelBitmap = scaledBitmap ?? originalBitmap;
-
-            int tilesX = (int)Math.Ceiling((double)currentLevelBitmap.Width / tileSize);
-            int tilesY = (int)Math.Ceiling((double)currentLevelBitmap.Height / tileSize);
-
-            string zoomFolder = Path.Combine(outputFolder, zoom.ToString());
-
-            for (int x = 0; x < tilesX; x++)
-                Directory.CreateDirectory(Path.Combine(zoomFolder, x.ToString()));
-
-            Parallel.For(0, tilesX, parallelOptions, x =>
-            {
-                string xFolder = Path.Combine(zoomFolder, x.ToString());
-
-                for (int y = 0; y < tilesY; y++)
-                {
-                    token.ThrowIfCancellationRequested();
-
-                    string tilePath = Path.Combine(xFolder, $"{y}.jpg");
-                    if (File.Exists(tilePath)) continue;
-
-                    int srcX = x * tileSize;
-                    int srcY = y * tileSize;
-                    int width = Math.Min(tileSize, currentLevelBitmap.Width - srcX);
-                    int height = Math.Min(tileSize, currentLevelBitmap.Height - srcY);
-
-                    if (width <= 0 || height <= 0) continue;
-
-                    var srcRectI = new SKRectI(srcX, srcY, srcX + width, srcY + height);
-
-                    using var subsetBitmap = new SKBitmap();
-                    if (currentLevelBitmap.ExtractSubset(subsetBitmap, srcRectI))
-                    {
-                        SKBitmap tileToSave = subsetBitmap;
-                        bool needsDispose = false;
-
-                        if (width < tileSize || height < tileSize)
-                        {
-                            tileToSave = new SKBitmap(tileSize, tileSize);
-                            using (var canvas = new SKCanvas(tileToSave))
-                            {
-                                canvas.Clear(tileBackgroundColor);
-                                canvas.DrawBitmap(subsetBitmap, 0, 0, LinearSampling);
-                            }
-                            needsDispose = true;
-                        }
-
-                        try
-                        {
-                            using var image = SKImage.FromBitmap(tileToSave);
-                            using var data = image.Encode(SKEncodedImageFormat.Jpeg, 85);
-                            using var stream = File.Create(tilePath);
-                            data.SaveTo(stream);
-                        }
-                        finally
-                        {
-                            if (needsDispose)
-                                tileToSave.Dispose();
-                        }
-                    }
-                }
-            });
-
-            // Event ausloesen, damit die UI die neuen Kacheln sofort anzeigen kann
-            onLevelGenerated?.Invoke();
-        }
     }
 
     private SKBitmap GetOrLoadPinBitmap(MapPin pin)
     {
         if (string.IsNullOrEmpty(pin.IconPath)) return null;
 
-        // Fast-Path: Liegt es im RAM-Cache?
         if (_pinIconCache.TryGetValue(pin.IconPath, out var cachedBitmap))
             return cachedBitmap;
 
-        // Noch nicht da? Asynchrones Laden für diesen Pin anstoßen
         _ = PreloadPinBitmapsAsync([pin]);
-
         return null;
     }
 
     private MapPin GetPinAtPosition(SKPoint touchPoint)
     {
         if (Pins == null || OriginalImageSize == SKSize.Empty) return null;
+
+        var settings = SettingsService.Instance;
+        double osBaseScale = settings.OsBaseScale;
+        double maxLimit = settings.PinMaxScaleLimit / 100.0;
+        double minLimit = settings.PinMinScaleLimit / 100.0;
+        float mapScale = _scale > 0 ? _scale : 1f;
+
+        SKSize imageSize = OriginalImageSize;
+        SKMatrix baseMatrix = BuildMapMatrix();
 
         for (int i = _sortedPins.Count - 1; i >= 0; i--)
         {
@@ -1342,20 +1744,16 @@ public partial class TileImageView : ContentView
             SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
             if (pinBitmap == null) continue;
 
-            SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
-            matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-            matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
+            float absoluteX = pin.RelativeX * imageSize.Width;
+            float absoluteY = pin.RelativeY * imageSize.Height;
 
-            float absoluteX = pin.RelativeX * OriginalImageSize.Width;
-            float absoluteY = pin.RelativeY * OriginalImageSize.Height;
-            matrix = matrix.PreConcat(SKMatrix.CreateTranslation(absoluteX, absoluteY));
+            SKMatrix matrix = baseMatrix.PreConcat(SKMatrix.CreateTranslation(absoluteX, absoluteY));
 
-            if (!pin.IsLockRotate)
-                matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(-_rotationDegrees));
-            else
-                matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(pin.Rotation));
+            matrix = pin.IsLockRotate
+                ? matrix.PreConcat(SKMatrix.CreateRotationDegrees(pin.Rotation))
+                : matrix.PreConcat(SKMatrix.CreateRotationDegrees(-_rotationDegrees));
 
-            float pinScale = GetPinScale(pin);
+            float pinScale = GetPinScale(pin, mapScale, osBaseScale, maxLimit, minLimit);
             matrix = matrix.PreConcat(SKMatrix.CreateScale(pinScale, pinScale));
 
             if (!matrix.TryInvert(out SKMatrix inverseMatrix)) continue;
@@ -1364,66 +1762,58 @@ public partial class TileImageView : ContentView
 
             float left = -(float)(pin.Anchor.X * pinBitmap.Width);
             float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
-            float right = left + pinBitmap.Width;
-            float bottom = top + pinBitmap.Height;
-
-            var localBounds = new SKRect(left, top, right, bottom);
+            var localBounds = new SKRect(left, top, left + pinBitmap.Width, top + pinBitmap.Height);
 
             if (localBounds.Contains(localPoint.X, localPoint.Y))
                 return pin;
         }
+
         return null;
     }
 
-    private float GetPinScale(MapPin pin)
+    /// <summary>
+    /// C6: Die Settings-Werte werden vom Aufrufer einmal pro Frame ermittelt und
+    /// hier nur noch verrechnet.
+    /// </summary>
+    private static float GetPinScale(MapPin pin, float mapScale, double osBaseScale, double maxLimit, double minLimit)
     {
         if (pin.IsCustomPin || pin.IsLockAutoScale)
             return pin.PinScale;
 
-        double currentScale = _scale > 0 ? _scale : 1.0;
-        double dynamicScale = 1.0 / currentScale;
-        double maxLimit = SettingsService.Instance.PinMaxScaleLimit / 100.0;
-        double minLimit = SettingsService.Instance.PinMinScaleLimit / 100.0;
+        double dynamicScale = 1.0 / (mapScale > 0 ? mapScale : 1.0);
 
         if (dynamicScale > maxLimit) dynamicScale = maxLimit;
         if (dynamicScale < minLimit) dynamicScale = minLimit;
 
-        return (float)(SettingsService.Instance.OsBaseScale * dynamicScale * pin.PinScale);
+        return (float)(osBaseScale * dynamicScale * pin.PinScale);
     }
 
     private void UpdateDraggedPinPosition(SKPoint touchPoint)
     {
         if (_draggedPin == null || OriginalImageSize == SKSize.Empty) return;
 
-        SKMatrix matrix = SKMatrix.CreateTranslation(_panX, _panY);
-        matrix = matrix.PreConcat(SKMatrix.CreateRotationDegrees(_rotationDegrees));
-        matrix = matrix.PreConcat(SKMatrix.CreateScale(_scale, _scale));
-
+        SKMatrix matrix = BuildMapMatrix();
         if (!matrix.TryInvert(out SKMatrix inverseMatrix)) return;
 
-        // Berechne die Verschiebung des Fingers im Koordinatensystem des Bildes
         SKPoint currentPlanPoint = inverseMatrix.MapPoint(touchPoint);
         SKPoint previousPlanPoint = inverseMatrix.MapPoint(_lastTouchPoint);
 
         float deltaX = currentPlanPoint.X - previousPlanPoint.X;
         float deltaY = currentPlanPoint.Y - previousPlanPoint.Y;
 
-        // Das Delta direkt auf die aktuellen relativen Koordinaten aufaddieren
         float newRelX = _draggedPin.RelativeX + (deltaX / OriginalImageSize.Width);
         float newRelY = _draggedPin.RelativeY + (deltaY / OriginalImageSize.Height);
 
         _draggedPin.RelativeX = Math.Clamp(newRelX, 0f, 1f);
         _draggedPin.RelativeY = Math.Clamp(newRelY, 0f, 1f);
 
-        // Aktuellen Punkt für das nächste Moved-Event merken
         _lastTouchPoint = touchPoint;
     }
 
     private async Task PreloadPinBitmapsAsync(IEnumerable<MapPin> pins)
     {
-        if (pins == null) return;
+        if (pins == null || _disposed) return;
 
-        // Fehlende Pfade ermitteln
         var missingPaths = pins
             .Select(p => p.IconPath)
             .Where(path => !string.IsNullOrEmpty(path)
@@ -1434,52 +1824,51 @@ public partial class TileImageView : ContentView
 
         if (missingPaths.Count == 0) return;
 
-        // Als "wird geladen" markieren (UI-Thread)
         foreach (var path in missingPaths)
-        {
             _loadingPinPaths.Add(path);
-        }
 
         try
         {
-            // E/A-Zugriff und Dekodierung im Hintergrund-Thread ausführen
             await Task.Run(() =>
             {
                 foreach (var path in missingPaths)
                 {
                     SKBitmap bitmap = null;
+
                     try
                     {
                         bitmap = LoadPinBitmapInternal(path);
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine($"Fehler beim Laden des Pin-Icons '{path}': {ex.Message}");
+                        Debug.WriteLine($"Fehler beim Laden des Pin-Icons '{path}': {ex.Message}");
                     }
 
-                    // Ergebnisse thread-sicher auf dem UI-Thread anwenden & aufräumen
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         _loadingPinPaths.Remove(path);
 
-                        if (bitmap != null)
+                        if (bitmap == null) return;
+
+                        // C1/A4: Doppelt geladene oder nach Dispose eingetroffene
+                        // Bitmaps muessen freigegeben werden.
+                        if (_disposed || !_pinIconCache.TryAdd(path, bitmap))
                         {
-                            _pinIconCache[path] = bitmap;
-                            _canvasView?.InvalidateSurface();
+                            bitmap.Dispose();
+                            return;
                         }
+
+                        RequestRender();
                     });
                 }
             });
         }
         catch
         {
-            // Sicherheitsnetz: Falls Task.Run fehlschlägt, UI-Thread wieder freigeben
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 foreach (var path in missingPaths)
-                {
                     _loadingPinPaths.Remove(path);
-                }
             });
         }
     }
@@ -1525,99 +1914,423 @@ public partial class TileImageView : ContentView
             if (resId != 0)
             {
                 using var resourceStream = context.Resources.OpenRawResource(resId);
-                using var targetStream = File.Create(targetCachePath);
-                resourceStream.CopyTo(targetStream);
-                targetStream.Close();
+                using (var targetStream = File.Create(targetCachePath))
+                {
+                    resourceStream.CopyTo(targetStream);
+                }
 
                 using var readStream = File.OpenRead(targetCachePath);
                 return SKBitmap.Decode(readStream);
             }
 #elif IOS
-        string imageName = Path.GetFileNameWithoutExtension(fileName);
-        using var uiImage = UIKit.UIImage.FromBundle(imageName);
-        if (uiImage != null)
-        {
-            using var nsData = uiImage.AsPNG();
-            if (nsData != null)
+            string imageName = Path.GetFileNameWithoutExtension(fileName);
+            using var uiImage = UIKit.UIImage.FromBundle(imageName);
+
+            if (uiImage != null)
             {
-                using var stream = nsData.AsStream();
-                using var targetStream = File.Create(targetCachePath);
-                stream.CopyTo(targetStream);
-                targetStream.Close();
+                using var nsData = uiImage.AsPNG();
 
-                using var readStream = File.OpenRead(targetCachePath);
-                return SKBitmap.Decode(readStream);
+                if (nsData != null)
+                {
+                    using var stream = nsData.AsStream();
+                    using (var targetStream = File.Create(targetCachePath))
+                    {
+                        stream.CopyTo(targetStream);
+                    }
+
+                    using var readStream = File.OpenRead(targetCachePath);
+                    return SKBitmap.Decode(readStream);
+                }
             }
-        }
 #elif WINDOWS
-        string fileNameOnly = Path.GetFileName(iconPath);
-        string nameWithoutExt = Path.GetFileNameWithoutExtension(fileNameOnly);
-        string ext = Path.GetExtension(fileNameOnly);
-        string baseDir = AppContext.BaseDirectory;
+            string fileNameOnly = Path.GetFileName(iconPath);
+            string nameWithoutExt = Path.GetFileNameWithoutExtension(fileNameOnly);
+            string ext = Path.GetExtension(fileNameOnly);
+            string baseDir = AppContext.BaseDirectory;
 
-            string[] searchDirs = [
+            string[] searchDirs =
+            [
                 Path.Combine(baseDir, "Assets", "pins"),
                 Path.Combine(baseDir, "Assets"),
                 baseDir
-                ];
+            ];
 
             foreach (var dir in searchDirs)
-        {
-            if (!Directory.Exists(dir)) continue;
-
-            // 1. Suche nach exaktem Dateinamen
-            string targetPath = Path.Combine(dir, fileNameOnly);
-
-            // 2. Direkter Scale-100 Check (ohne Directory.GetFiles Scan)
-            if (!File.Exists(targetPath))
             {
-                targetPath = Path.Combine(dir, $"{nameWithoutExt}.scale-100{ext}");
-            }
+                if (!Directory.Exists(dir)) continue;
 
-            // 3. Fallback: Nur falls scale-100 nicht existiert, das Verzeichnis durchsuchen
-            if (!File.Exists(targetPath))
-            {
-                var matches = Directory.GetFiles(dir, $"{nameWithoutExt}.scale-*{ext}");
-                targetPath = matches.FirstOrDefault();
-            }
+                string targetPath = Path.Combine(dir, fileNameOnly);
 
-            if (!string.IsNullOrEmpty(targetPath) && File.Exists(targetPath))
-            {
-                try
+                if (!File.Exists(targetPath))
+                    targetPath = Path.Combine(dir, $"{nameWithoutExt}.scale-100{ext}");
+
+                if (!File.Exists(targetPath))
+                    targetPath = Directory.GetFiles(dir, $"{nameWithoutExt}.scale-*{ext}").FirstOrDefault();
+
+                if (!string.IsNullOrEmpty(targetPath) && File.Exists(targetPath))
                 {
-                    using var stream = File.OpenRead(targetPath);
-                    return SKBitmap.Decode(stream);
+                    try
+                    {
+                        using var stream = File.OpenRead(targetPath);
+                        return SKBitmap.Decode(stream);
+                    }
+                    catch { /* Ignorieren */ }
                 }
-                catch { /* Ignorieren */ }
             }
-        }
 #else
-        using var stream = FileSystem.OpenAppPackageFileAsync(iconPath).GetAwaiter().GetResult();
-        using var targetStream = File.Create(targetCachePath);
-        stream.CopyTo(targetStream);
-        targetStream.Close();
+            using var packageStream = FileSystem.OpenAppPackageFileAsync(iconPath).GetAwaiter().GetResult();
+            using (var targetStream = File.Create(targetCachePath))
+            {
+                packageStream.CopyTo(targetStream);
+            }
 
-        using var readStream = File.OpenRead(targetCachePath);
-        return SKBitmap.Decode(readStream);
+            using var readStream = File.OpenRead(targetCachePath);
+            return SKBitmap.Decode(readStream);
 #endif
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim Extrahieren des Pins: {ex.Message}");
+            Debug.WriteLine($"Fehler beim Extrahieren des Pins: {ex.Message}");
         }
 
         return null;
     }
 
+    // ---------------------------------------------------------------------------------
+    //  Bild laden und Pyramide erzeugen
+    // ---------------------------------------------------------------------------------
+
+    private async Task ProcessNewImageAsync(string imagePath)
+    {
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = new CancellationTokenSource();
+        var token = _cts.Token;
+
+        ClearCache();
+        _displayZoom = -1;
+        _maxGeneratedLevel = -1;
+
+        if (string.IsNullOrEmpty(imagePath))
+        {
+            _computedTileFolder = string.Empty;
+            InvalidateView();
+            return;
+        }
+
+        int tileSize = TileSize;
+        int maxZoomLevel = MaxZoomLevel;
+        SKColor backgroundColor = _placeholderSKColor;
+
+        _isGenerating = true;   // A2: der eigentliche Fix
+        _loadingIndicator.IsVisible = true;
+        _loadingIndicator.IsRunning = true;
+
+        try
+        {
+            // ---- C3: saemtliche Datei-I/O laeuft im Hintergrund ------------------------
+            var prepared = await Task.Run(() =>
+            {
+                if (!File.Exists(imagePath))
+                    return (Valid: false, Size: SKSize.Empty, Folder: string.Empty, TilesExist: false);
+
+                SKSize size = SKSize.Empty;
+                using (var codec = SKCodec.Create(imagePath))
+                {
+                    if (codec != null)
+                        size = new SKSize(codec.Info.Width, codec.Info.Height);
+                }
+
+                if (size.IsEmpty)
+                    return (Valid: false, Size: SKSize.Empty, Folder: string.Empty, TilesExist: false);
+
+                CleanupOldTileFolders(imagePath, tileSize);
+
+                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
+                string folder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{tileSize}");
+
+                // C3: Marker-Datei statt rekursivem GetFiles-Scan ueber zehntausende JPEGs.
+                bool complete = File.Exists(Path.Combine(folder, PyramidCompleteMarker));
+
+                return (Valid: true, Size: size, Folder: folder, TilesExist: complete);
+            }, token);
+
+            token.ThrowIfCancellationRequested();
+
+            if (!prepared.Valid)
+            {
+                _computedTileFolder = string.Empty;
+                OriginalImageSize = SKSize.Empty;
+                return;
+            }
+
+            OriginalImageSize = prepared.Size;
+            _computedTileFolder = prepared.Folder;
+            RebuildLevelMetadata();
+
+            _scale = 1.0f;
+            _panX = 0f;
+            _panY = 0f;
+            _rotationDegrees = 0f;
+
+            CurrentScale = _scale;
+            CurrentPan = new SKPoint(_panX, _panY);
+            CurrentRotation = _rotationDegrees;
+
+            if (prepared.TilesExist)
+            {
+                _maxGeneratedLevel = maxZoomLevel;
+            }
+            else
+            {
+                await Task.Run(() => GenerateTilePyramidInternal(
+                    imagePath,
+                    prepared.Folder,
+                    maxZoomLevel,
+                    tileSize,
+                    backgroundColor,
+                    token,
+                    level => MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        if (_disposed) return;
+                        _maxGeneratedLevel = Math.Max(_maxGeneratedLevel, level);
+                        InvalidateView();   // progressive Anzeige der fertigen Stufen
+                    })
+                ), token);
+
+                _maxGeneratedLevel = maxZoomLevel;
+            }
+        }
+        catch (OperationCanceledException)
+        {
+            return;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler beim Laden des Hintergrundbildes: {ex.Message}");
+        }
+        finally
+        {
+            _loadingIndicator.IsRunning = false;
+            _loadingIndicator.IsVisible = false;
+            _canvasView.IsVisible = true;
+            _isGenerating = false;
+            InvalidateView();
+        }
+    }
+
+    private static void CleanupOldTileFolders(string imagePath, int currentTileSize)
+    {
+        string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
+        string baseFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
+
+        if (!Directory.Exists(baseFolder)) return;
+
+        foreach (var dir in Directory.GetDirectories(baseFolder, $"{fileNameWithoutExt}_*"))
+        {
+            if (dir.EndsWith($"_{currentTileSize}")) continue;
+
+            try
+            {
+                Directory.Delete(dir, true);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Fehler beim Loeschen alter Kacheln: {ex.Message}");
+            }
+        }
+    }
+
+    /// <summary>
+    /// B6: Jede Pyramidenstufe wird direkt aus der Quelldatei mit codec-nativer
+    /// Herunterskalierung dekodiert. Das Vollbild liegt damit nie dauerhaft im Speicher
+    /// (bei einem 20000x15000-Plan waeren das ~1,2 GB RGBA) und es entsteht keine
+    /// akkumulierte Weichzeichnung durch mehrfaches Resize.
+    /// </summary>
+    private static void GenerateTilePyramidInternal(
+        string sourceImagePath,
+        string outputFolder,
+        int maxZoomLevels,
+        int tileSize,
+        SKColor tileBackgroundColor,
+        CancellationToken token,
+        Action<int> onLevelGenerated = null)
+    {
+        int origWidth;
+        int origHeight;
+
+        using (var probe = SKCodec.Create(sourceImagePath))
+        {
+            if (probe == null) return;
+            origWidth = probe.Info.Width;
+            origHeight = probe.Info.Height;
+        }
+
+        var parallelOptions = new ParallelOptions
+        {
+            CancellationToken = token,
+            MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1)
+        };
+
+        // Von grob (0) nach detailliert (maxZoomLevels), damit die UI sofort etwas anzeigen kann.
+        for (int zoom = 0; zoom <= maxZoomLevels; zoom++)
+        {
+            token.ThrowIfCancellationRequested();
+
+            double scale = Math.Pow(0.5, maxZoomLevels - zoom);
+            int levelWidth = Math.Max(1, (int)(origWidth * scale));
+            int levelHeight = Math.Max(1, (int)(origHeight * scale));
+
+            using var levelBitmap = DecodeScaled(sourceImagePath, levelWidth, levelHeight);
+            if (levelBitmap == null) continue;
+
+            int tilesX = (int)Math.Ceiling((double)levelBitmap.Width / tileSize);
+            int tilesY = (int)Math.Ceiling((double)levelBitmap.Height / tileSize);
+
+            string zoomFolder = Path.Combine(outputFolder, zoom.ToString());
+
+            for (int x = 0; x < tilesX; x++)
+                Directory.CreateDirectory(Path.Combine(zoomFolder, x.ToString()));
+
+            Parallel.For(0, tilesX, parallelOptions, x =>
+            {
+                string xFolder = Path.Combine(zoomFolder, x.ToString());
+
+                for (int y = 0; y < tilesY; y++)
+                {
+                    token.ThrowIfCancellationRequested();
+
+                    string tilePath = Path.Combine(xFolder, $"{y}.jpg");
+                    if (File.Exists(tilePath)) continue;
+
+                    int srcX = x * tileSize;
+                    int srcY = y * tileSize;
+                    int width = Math.Min(tileSize, levelBitmap.Width - srcX);
+                    int height = Math.Min(tileSize, levelBitmap.Height - srcY);
+
+                    if (width <= 0 || height <= 0) continue;
+
+                    var srcRectI = new SKRectI(srcX, srcY, srcX + width, srcY + height);
+
+                    using var subsetBitmap = new SKBitmap();
+                    if (!levelBitmap.ExtractSubset(subsetBitmap, srcRectI)) continue;
+
+                    SKBitmap tileToSave = subsetBitmap;
+                    bool needsDispose = false;
+
+                    if (width < tileSize || height < tileSize)
+                    {
+                        tileToSave = new SKBitmap(tileSize, tileSize);
+                        using (var canvas = new SKCanvas(tileToSave))
+                        {
+                            canvas.Clear(tileBackgroundColor);
+                            canvas.DrawBitmap(subsetBitmap, 0, 0, LinearSampling);
+                        }
+                        needsDispose = true;
+                    }
+
+                    try
+                    {
+                        // Erst in eine temporaere Datei schreiben und dann umbenennen,
+                        // damit der Renderloop nie eine halb geschriebene Kachel liest.
+                        string tempPath = tilePath + ".tmp";
+
+                        using (var image = SKImage.FromBitmap(tileToSave))
+                        using (var data = image.Encode(SKEncodedImageFormat.Jpeg, 85))
+                        using (var stream = File.Create(tempPath))
+                        {
+                            data.SaveTo(stream);
+                        }
+
+                        File.Move(tempPath, tilePath, overwrite: true);
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.WriteLine($"Fehler beim Schreiben der Kachel '{tilePath}': {ex.Message}");
+                    }
+                    finally
+                    {
+                        if (needsDispose)
+                            tileToSave.Dispose();
+                    }
+                }
+            });
+
+            onLevelGenerated?.Invoke(zoom);
+        }
+
+        // C3: Marker erst ganz am Ende - so gilt eine abgebrochene Pyramide als unfertig.
+        try
+        {
+            File.WriteAllText(Path.Combine(outputFolder, PyramidCompleteMarker), DateTime.UtcNow.ToString("O"));
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"Fehler beim Schreiben der Marker-Datei: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// B6: Dekodiert das Bild moeglichst nah an der Zielgroesse. JPEG unterstuetzt
+    /// native Sampling-Faktoren (1/2, 1/4, 1/8); der Rest wird einmalig hochwertig
+    /// nachskaliert.
+    /// </summary>
+    private static SKBitmap DecodeScaled(string path, int targetWidth, int targetHeight)
+    {
+        using var codec = SKCodec.Create(path);
+        if (codec == null) return null;
+
+        int fullWidth = codec.Info.Width;
+        int fullHeight = codec.Info.Height;
+
+        float desired = Math.Min(
+            targetWidth / (float)fullWidth,
+            targetHeight / (float)fullHeight);
+
+        SKSizeI supported = codec.GetScaledDimensions(Math.Clamp(desired, 0.0001f, 1f));
+        var info = new SKImageInfo(supported.Width, supported.Height, SKColorType.Bgra8888, SKAlphaType.Premul);
+
+        var decoded = new SKBitmap(info);
+
+        if (codec.GetPixels(info, decoded.GetPixels()) is not (SKCodecResult.Success or SKCodecResult.IncompleteInput))
+        {
+            decoded.Dispose();
+            return null;
+        }
+
+        if (decoded.Width == targetWidth && decoded.Height == targetHeight)
+            return decoded;
+
+        var resized = decoded.Resize(new SKImageInfo(targetWidth, targetHeight), LinearSampling);
+
+        if (resized == null)
+            return decoded;   // Zwischenbild weiterverwenden, nicht freigeben
+
+        decoded.Dispose();
+        return resized;
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Aufraeumen
+    // ---------------------------------------------------------------------------------
+
     private void ClearCache()
     {
-        _tileCache.Clear();
-        _loadingTiles.Clear();
+        _tileCache.Clear();          // A4: disposed jetzt intern
+        _pendingTiles.Clear();
+        _tileQueue.Clear();
+
+        foreach (var bitmap in _permanentTiles.Values)
+            bitmap?.Dispose();
+        _permanentTiles.Clear();
 
         foreach (var bitmap in _pinIconCache.Values)
             bitmap?.Dispose();
-
         _pinIconCache.Clear();
+        _loadingPinPaths.Clear();
+
+        // C1: pin.Icon wurde nie aus dem Cache befuellt - es gibt hier also keine
+        // haengenden Referenzen auf gerade freigegebene Bitmaps mehr.
     }
 
     public void ResetTouchState()
@@ -1628,11 +2341,83 @@ public partial class TileImageView : ContentView
         _isDoubleTapAction = false;
         _oldFingerDistance = 0f;
         _oldFingerAngle = 0f;
+
         _longPressCts?.Cancel();
         _tapCts?.Cancel();
-        _canvasView?.InvalidateSurface();
+
+        RequestRender();
+    }
+
+    /// <summary>
+    /// C2: Ohne dieses Dispose bleiben pro geoeffneter Planseite der komplette
+    /// Kachel-Cache, alle Paints/Shader und saemtliche Event-Abonnements im Speicher.
+    /// Beim Verlassen der Seite aufrufen (z. B. in OnDisappearing).
+    /// </summary>
+    public void Dispose()
+    {
+        Dispose(true);
+        GC.SuppressFinalize(this);
+    }
+
+    protected virtual void Dispose(bool disposing)
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        if (!disposing) return;
+
+        // --- Events abmelden ---------------------------------------------------------
+        if (_canvasView != null)
+        {
+            _canvasView.PaintSurface -= OnPaintSurface;
+            _canvasView.Touch -= OnCanvasTouch;
+        }
+
+        _observedPins?.CollectionChanged -= OnPinsCollectionChanged;
+        _observedPins = null;
+
+#if WINDOWS
+        Loaded -= OnLoadedWindows;
+        Unloaded -= OnUnloadedWindows;
+        DetachWindowsHandlers();
+#endif
+
+        // --- Laufende Arbeiten stoppen -----------------------------------------------
+        _cts?.Cancel();
+        _cts?.Dispose();
+        _cts = null;
+
+        _longPressCts?.Cancel();
+        _longPressCts?.Dispose();
+        _longPressCts = null;
+
+        _tapCts?.Cancel();
+        _tapCts?.Dispose();
+        _tapCts = null;
+
+        // --- Nativen Speicher freigeben ----------------------------------------------
+        ClearCache();
+        _tileCache.Dispose();
+
+        _cachedLoupePath?.Dispose();
+        _cachedInnerShadowShader?.Dispose();
+        _cachedGlareShader?.Dispose();
+
+        _loupeShadowPaint?.Dispose();
+        _loupeBorderPaint?.Dispose();
+        _loupeCrosshairPaint?.Dispose();
+        _loupeInnerShadowPaint?.Dispose();
+        _loupeGlarePaint?.Dispose();
+
+        _tileLoadSemaphore?.Dispose();
+
+        _sortedPins.Clear();
     }
 }
+
+// =====================================================================================
+//  MapPin
+// =====================================================================================
 
 public class MapPin
 {
@@ -1640,7 +2425,14 @@ public class MapPin
     public float RelativeX { get; set; }
     public float RelativeY { get; set; }
     public float Rotation { get; set; }
+
+    /// <summary>
+    /// Optionales, extern gesetztes Icon. Wird vom Control NICHT mehr automatisch aus
+    /// dem internen Cache befuellt (C1) - wer es setzt, besitzt es und muss es selbst
+    /// freigeben.
+    /// </summary>
     public SKBitmap Icon { get; set; }
+
     public string IconPath { get; set; }
     public bool IsLockRotate { get; set; } = false;
     public bool IsLockPosition { get; set; } = false;
@@ -1650,12 +2442,18 @@ public class MapPin
     public Point Anchor { get; set; } = new Point(0.5, 0.5);
 }
 
-public class LruCache<TKey, TValue> where TKey : notnull
+// =====================================================================================
+//  LruCache - A4: gibt verdraengte Werte frei; B1: Kapazitaet zur Laufzeit anpassbar
+// =====================================================================================
+
+public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
 {
     private readonly Lock _lock = new();
     private readonly Dictionary<TKey, LinkedListNode<CacheEntry>> _cache = [];
     private readonly LinkedList<CacheEntry> _list = [];
-    private readonly int _capacity;
+
+    private int _capacity;
+    private bool _disposed;
 
     private readonly record struct CacheEntry(TKey Key, TValue Value);
 
@@ -1665,10 +2463,46 @@ public class LruCache<TKey, TValue> where TKey : notnull
         _capacity = capacity;
     }
 
+    public int Capacity
+    {
+        get { lock (_lock) { return _capacity; } }
+    }
+
+    public int Count
+    {
+        get { lock (_lock) { return _cache.Count; } }
+    }
+
+    /// <summary>
+    /// B1: Hebt die Kapazitaet an, wenn pro Frame mehr Kacheln benoetigt werden, als der
+    /// Cache halten kann. Ohne das verdraengt jeder Frame genau die Kacheln, die der
+    /// naechste Frame wieder braucht (Cache-Thrashing).
+    /// </summary>
+    public void EnsureCapacity(int capacity)
+    {
+        if (capacity <= 0) return;
+
+        lock (_lock)
+        {
+            if (capacity > _capacity)
+                _capacity = capacity;
+        }
+    }
+
     public TValue this[TKey key]
     {
-        get => TryGetValue(key, out var value) ? value : throw new KeyNotFoundException($"Der Schluessel '{key}' wurde nicht gefunden.");
+        get => TryGetValue(key, out var value)
+            ? value
+            : throw new KeyNotFoundException($"Der Schluessel '{key}' wurde nicht gefunden.");
         set => Add(key, value);
+    }
+
+    public bool ContainsKey(TKey key)
+    {
+        lock (_lock)
+        {
+            return _cache.ContainsKey(key);
+        }
     }
 
     public bool TryGetValue(TKey key, out TValue value)
@@ -1690,47 +2524,95 @@ public class LruCache<TKey, TValue> where TKey : notnull
 
     public void Add(TKey key, TValue value)
     {
+        TValue toDispose = default;
+        bool hasDisposable = false;
+
         lock (_lock)
         {
+            // A4: bestehenden Wert freigeben, falls er ersetzt wird.
             if (_cache.TryGetValue(key, out var existingNode))
             {
+                TValue oldValue = existingNode.Value.Value;
                 _list.Remove(existingNode);
                 _cache.Remove(key);
+
+                if (!ReferenceEquals(oldValue, value))
+                {
+                    toDispose = oldValue;
+                    hasDisposable = true;
+                }
             }
-            else if (_cache.Count >= _capacity && _list.Last is not null)
+            else
             {
-                var lastNode = _list.Last;
-                _cache.Remove(lastNode.Value.Key);
-                _list.RemoveLast();
+                // A4: verdraengte Eintraege freigeben - SKBitmap belegt nativen Speicher,
+                // den der GC nicht als Druck wahrnimmt.
+                while (_cache.Count >= _capacity && _list.Last is not null)
+                {
+                    var lastNode = _list.Last;
+                    _cache.Remove(lastNode.Value.Key);
+                    _list.RemoveLast();
+
+                    if (lastNode.Value.Value is IDisposable evicted)
+                        evicted.Dispose();
+                }
             }
 
-            var entry = new CacheEntry(key, value);
-            var newNode = _list.AddFirst(entry);
+            var newNode = _list.AddFirst(new CacheEntry(key, value));
             _cache[key] = newNode;
         }
+
+        if (hasDisposable && toDispose is IDisposable disposable)
+            disposable.Dispose();
     }
 
     public bool Remove(TKey key)
     {
+        TValue removed = default;
+        bool found;
+
         lock (_lock)
         {
-            if (!_cache.Remove(key, out var node))
-            {
-                return false;
-            }
+            found = _cache.Remove(key, out var node);
 
-            _list.Remove(node);
-            return true;
+            if (found)
+            {
+                removed = node.Value.Value;
+                _list.Remove(node);
+            }
         }
+
+        if (found && removed is IDisposable disposable)
+            disposable.Dispose();
+
+        return found;
     }
 
     public void Clear()
     {
+        List<TValue> values;
+
         lock (_lock)
         {
+            values = [.. _list.Select(entry => entry.Value)];
             _cache.Clear();
             _list.Clear();
         }
+
+        // A4: Freigabe ausserhalb des Locks.
+        foreach (var value in values)
+        {
+            if (value is IDisposable disposable)
+                disposable.Dispose();
+        }
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+        _disposed = true;
+
+        Clear();
+        GC.SuppressFinalize(this);
     }
 }
 
