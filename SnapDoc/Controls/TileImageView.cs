@@ -1,5 +1,4 @@
-﻿#nullable disable
-
+#nullable disable
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
@@ -436,6 +435,15 @@ public partial class TileImageView : ContentView, IDisposable
     private bool IsPermanentLevel(int zoom)
         => zoom >= 0 && zoom < _isPermanentLevel.Length && _isPermanentLevel[zoom];
 
+    /// <summary>
+    /// Die View kann transformiert werden, sobald Bildgroesse und Canvasgroesse bekannt sind.
+    /// Alle Pyramidenstufen muessen dafuer noch nicht erzeugt sein.
+    /// </summary>
+    private bool HasValidViewport =>
+        !OriginalImageSize.IsEmpty &&
+        _canvasView.CanvasSize.Width > 0 &&
+        _canvasView.CanvasSize.Height > 0;
+
     /// <summary>Sucht eine Kachel zuerst im permanenten, dann im LRU-Cache.</summary>
     private bool TryGetTile(TileKey key, out SKBitmap bitmap)
     {
@@ -578,44 +586,46 @@ public partial class TileImageView : ContentView, IDisposable
 
     public void ZoomToPin(string pinId, double? factor = null)
     {
-        if (Pins == null || OriginalImageSize == SKSize.Empty) return;
+        if (string.IsNullOrEmpty(pinId)) return;
 
-        if (_canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
-        {
-            _pendingPinId = pinId;
-            _pendingZoomFactor = (float?)factor;
-            _pendingImageFit = false;
-            return;
-        }
+        // Zuerst vormerken: Die Anfrage darf weder bei fehlender Bildgroesse
+        // noch bei spaeter eintreffendem Pins-Binding verloren gehen.
+        _pendingPinId = pinId;
+        _pendingZoomFactor = factor;
+        _pendingImageFit = false;
+
+        if (!HasValidViewport || Pins == null) return;
 
         var pin = Pins.FirstOrDefault(p => p.Id == pinId);
         if (pin == null) return;
 
         _rotationDegrees = 0f;
-        _scale = factor.HasValue ? (float)factor.Value : 1.0f;
+        _scale = factor.HasValue
+            ? Math.Clamp((float)factor.Value, GetMinScale(), 16.0f)
+            : 1.0f;
 
         float pinAbsX = pin.RelativeX * OriginalImageSize.Width;
         float pinAbsY = pin.RelativeY * OriginalImageSize.Height;
-
-        float scaledX = pinAbsX * _scale;
-        float scaledY = pinAbsY * _scale;
-
         float canvasWidth = _canvasView.CanvasSize.Width;
         float canvasHeight = _canvasView.CanvasSize.Height;
 
-        _panX = (canvasWidth / 2f) - scaledX;
-        _panY = (canvasHeight / 2f) - scaledY;
+        _panX = canvasWidth * 0.5f - pinAbsX * _scale;
+        _panY = canvasHeight * 0.5f - pinAbsY * _scale;
 
         CurrentScale = _scale;
         CurrentPan = new SKPoint(_panX, _panY);
         CurrentRotation = _rotationDegrees;
+
+        // Nur nach erfolgreicher Positionierung loeschen.
+        _pendingPinId = null;
+        _pendingZoomFactor = null;
 
         InvalidateView();
     }
 
     public void HandleMouseZoom(SKPoint mouseLocation, float delta)
     {
-        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
+        if (!HasValidViewport) return;
 
         float zoomFactor = delta > 0 ? 1.1f : 0.9f;
         float oldScale = _scale;
@@ -761,8 +771,7 @@ public partial class TileImageView : ContentView, IDisposable
     /// </summary>
     private bool HandlePendingViewportActions()
     {
-        if (_canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
-            return false;
+        if (!HasValidViewport) return false;
 
         if (_pendingImageFit)
         {
@@ -773,11 +782,12 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (_pendingPinId != null)
         {
-            string id = _pendingPinId;
+            string pinId = _pendingPinId;
             double? factor = _pendingZoomFactor;
-            _pendingPinId = null;
-            ZoomToPin(id, factor);
-            return true;
+
+            // ZoomToPin loescht die Anfrage ausschliesslich bei Erfolg.
+            ZoomToPin(pinId, factor);
+            return _pendingPinId == null;
         }
 
         return false;
@@ -1345,7 +1355,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private void HandleTouchMoved(SKTouchEventArgs e)
     {
-        if (_isGenerating) return;
+        if (!HasValidViewport) return;
         if (_isDoubleTapAction) return;
         if (_isLongPressActive) return;
 
@@ -1609,7 +1619,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private void OnWinViewPointerWheelChanged(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
+        if (!HasValidViewport) return;
 
         var pointerPoint = e.GetCurrentPoint((Microsoft.UI.Xaml.UIElement)sender);
         var position = pointerPoint.Position;
@@ -1628,7 +1638,7 @@ public partial class TileImageView : ContentView, IDisposable
         var pointerPoint = e.GetCurrentPoint(winView);
 
         if (!pointerPoint.Properties.IsRightButtonPressed) return;
-        if (OriginalImageSize == SKSize.Empty || _isGenerating) return;
+        if (!HasValidViewport) return;
 
         _isRightMouseRotating = true;
 
@@ -1646,7 +1656,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     private void OnWinViewPointerMoved(object sender, Microsoft.UI.Xaml.Input.PointerRoutedEventArgs e)
     {
-        if (IsRotationLocked || !_isRightMouseRotating || OriginalImageSize == SKSize.Empty || _isGenerating) return;
+        if (IsRotationLocked || !_isRightMouseRotating || !HasValidViewport) return;
 
         var winView = (Microsoft.UI.Xaml.UIElement)sender;
         var pointerPoint = e.GetCurrentPoint(winView);
@@ -1723,7 +1733,10 @@ public partial class TileImageView : ContentView, IDisposable
         if (newValue is IEnumerable<MapPin> newPins)
             _ = control.PreloadPinBitmapsAsync(newPins);
 
-        control.RequestRender();
+        if (control._pendingPinId != null && control.HasValidViewport)
+            control.ZoomToPin(control._pendingPinId, control._pendingZoomFactor);
+        else
+            control.RequestRender();
     }
 
     private void OnPinsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
@@ -1733,6 +1746,12 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (e.NewItems != null)
             _ = PreloadPinBitmapsAsync(e.NewItems.OfType<MapPin>());
+
+        if (_pendingPinId != null && HasValidViewport)
+        {
+            ZoomToPin(_pendingPinId, _pendingZoomFactor);
+            return;
+        }
 
         RequestRender();
     }
@@ -2108,14 +2127,24 @@ public partial class TileImageView : ContentView, IDisposable
             _computedTileFolder = prepared.Folder;
             RebuildLevelMetadata();
 
-            _scale = 1.0f;
-            _panX = 0f;
-            _panY = 0f;
             _rotationDegrees = 0f;
-
-            CurrentScale = _scale;
-            CurrentPan = new SKPoint(_panX, _panY);
             CurrentRotation = _rotationDegrees;
+
+            // Einen vorgemerkten Pin-Zoom oder ImageFit nicht durch 0/0/1 ueberschreiben.
+            if (_pendingPinId == null && !_pendingImageFit)
+            {
+                _scale = 1.0f;
+                _panX = 0f;
+                _panY = 0f;
+                CurrentScale = _scale;
+                CurrentPan = new SKPoint(_panX, _panY);
+            }
+
+            // Bereits jetzt positionieren. Die Pyramide darf noch unscharf/unvollstaendig sein.
+            if (_pendingPinId != null)
+                ZoomToPin(_pendingPinId, _pendingZoomFactor);
+            else
+                RequestRender();
 
             if (prepared.TilesExist)
             {
@@ -2134,7 +2163,11 @@ public partial class TileImageView : ContentView, IDisposable
                     {
                         if (_disposed) return;
                         _maxGeneratedLevel = Math.Max(_maxGeneratedLevel, level);
-                        InvalidateView();   // progressive Anzeige der fertigen Stufen
+
+                        if (_pendingPinId != null && HasValidViewport)
+                            ZoomToPin(_pendingPinId, _pendingZoomFactor);
+                        else
+                            InvalidateView();   // progressive Anzeige der fertigen Stufen
                     })
                 ), token);
 
