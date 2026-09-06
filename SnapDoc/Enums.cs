@@ -43,4 +43,16 @@ namespace SnapDoc
         PlanListUpdated,
         PinsUpdated
     }
+
+    public enum ItemAspect
+    {
+        Original,
+        AspectFit
+    }
+
+    public enum PinCreationMode
+    {
+        LongPress,
+        SingleTap
+    }
 }

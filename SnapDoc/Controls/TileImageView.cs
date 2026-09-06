@@ -13,46 +13,28 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Konstanten
     // ---------------------------------------------------------------------------------
-
     private const float ClickThreshold = 15f;
     private const float DoubleTapDistanceThreshold = 40f;
     private const int DoubleTapTimeoutMs = 300;
     private const int LongPressTimeoutMs = 600;
-
-    /// <summary>Maximal gleichzeitig laufende JPEG-Decodes (B3).</summary>
     private const int MaxConcurrentTileLoads = 4;
-
-    /// <summary>Obergrenze der Warteschlange; aeltere Anfragen werden verworfen (B3).</summary>
     private const int MaxQueuedTileRequests = 96;
-
-    /// <summary>Pyramidenstufen mit hoechstens so vielen Kacheln bleiben dauerhaft im RAM (B1).</summary>
     private const int PermanentTileBudget = 64;
-
-    /// <summary>Zusammenfassung mehrerer Touch-Events zu einem Frame in ms (C4).</summary>
     private const int RenderCoalesceMs = 8;
-
-    /// <summary>Name der Marker-Datei fuer eine vollstaendig erzeugte Pyramide (C3).</summary>
     private const string PyramidCompleteMarker = ".complete";
 
     // ---------------------------------------------------------------------------------
     //  Felder - Ansicht
     // ---------------------------------------------------------------------------------
-
     private readonly SKGLView _canvasView;
     private readonly ActivityIndicator _loadingIndicator;
     private readonly Grid _layoutGrid;
-
     private float _scale = 1.0f;
     private float _panX = 0f;
     private float _panY = 0f;
     private float _rotationDegrees = 0f;
-
-    private bool _isGenerating = false;
     private bool _disposed = false;
-
     private string _computedTileFolder = string.Empty;
-
-    /// <summary>Diagnose: FPS-Anzeige oben rechts.</summary>
     private bool _showFps = false;
     private readonly double[] _frameTimes = new double[60];
     private int _frameTimeIndex = 0;
@@ -65,37 +47,20 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Felder - Kachel-Cache und Loader
     // ---------------------------------------------------------------------------------
-
     private readonly LruCache<TileKey, SKBitmap> _tileCache = new(SettingsService.Instance.MaxTileCache);
-
-    /// <summary>Grobe Pyramidenstufen, die nie evicted werden - garantiert einen zeichenbaren Fallback (B1).</summary>
     private readonly Dictionary<TileKey, SKBitmap> _permanentTiles = [];
-
-    /// <summary>Kacheln, die angefordert oder gerade in Bearbeitung sind.</summary>
     private readonly HashSet<TileKey> _pendingTiles = [];
-
-    /// <summary>LIFO-Warteschlange: die zuletzt angeforderte Kachel ist die aktuell sichtbare (B3).</summary>
     private readonly List<TileRequest> _tileQueue = [];
-
     private readonly SemaphoreSlim _tileLoadSemaphore = new(MaxConcurrentTileLoads, MaxConcurrentTileLoads);
     private int _activeTileLoads = 0;
-
-    /// <summary>Wird bei jeder Transformationsaenderung erhoeht; veraltete Ladeauftraege werden verworfen (B3).</summary>
     private int _renderGeneration = 0;
-
-    /// <summary>Hoechste bereits auf Platte erzeugte Pyramidenstufe (-1 = noch keine).</summary>
     private int _maxGeneratedLevel = -1;
-
-    /// <summary>Aktuell dargestellter Layer (Stable-Zoom, A5). -1 = noch nicht initialisiert.</summary>
     private int _displayZoom = -1;
-
-    /// <summary>Pro Pyramidenstufe: wird sie permanent gehalten? Einmal berechnet.</summary>
     private bool[] _isPermanentLevel = [];
 
     // ---------------------------------------------------------------------------------
     //  Felder - Rendering-Steuerung
     // ---------------------------------------------------------------------------------
-
     private bool _renderPending = false;
     private SKColor _placeholderSKColor = Colors.LightGray.ToSKColor();
     private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
@@ -103,28 +68,22 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Felder - Eingabe
     // ---------------------------------------------------------------------------------
-
     private readonly Dictionary<long, SKPoint> _activeTouches = [];
     private float _oldFingerDistance = 0f;
     private float _oldFingerAngle = 0f;
-
     private SKPoint _touchStartPoint;
     private SKPoint _lastTouchPoint;
     private DateTime _touchStartTime;
     private bool _hasDraggedPin = false;
-
     private MapPin _draggedPin = null;
     private float _originalPinX;
     private float _originalPinY;
-
     private string _pendingPinId = null;
     private double? _pendingZoomFactor = null;
     private bool _pendingImageFit = false;
-
     private CancellationTokenSource _cts;
     private CancellationTokenSource _longPressCts;
     private CancellationTokenSource _tapCts;
-
     private DateTime _lastTapTime = DateTime.MinValue;
     private SKPoint _lastTapLocation = SKPoint.Empty;
     private bool _isDoubleTapAction = false;
@@ -133,7 +92,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Felder - Pins
     // ---------------------------------------------------------------------------------
-
     private readonly Dictionary<string, SKBitmap> _pinIconCache = [];
     private readonly HashSet<string> _loadingPinPaths = [];
     private List<MapPin> _sortedPins = [];
@@ -143,7 +101,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Felder - Lupe
     // ---------------------------------------------------------------------------------
-
     private readonly SKPaint _loupeShadowPaint;
     private readonly float _loupeRadius = 150f;
     private float _cachedLoupeRadius = -1f;
@@ -198,7 +155,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  BindableProperties
     // ---------------------------------------------------------------------------------
-
     public static readonly BindableProperty SourceImagePathProperty =
         BindableProperty.Create(nameof(SourceImagePath), typeof(string), typeof(TileImageView), default(string),
             propertyChanged: async (bindable, oldValue, newValue) =>
@@ -248,7 +204,6 @@ public partial class TileImageView : ContentView, IDisposable
         BindableProperty.Create(nameof(Pins), typeof(IEnumerable<MapPin>), typeof(TileImageView), default(IEnumerable<MapPin>),
             propertyChanged: OnPinsChanged);
 
-    // C6: Farbe wird gecacht, statt sie in jedem Frame zu konvertieren.
     public static readonly BindableProperty PlaceholderColorProperty =
         BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(TileImageView), Colors.LightGray,
             propertyChanged: (bindable, o, n) =>
@@ -314,7 +269,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Konstruktor
     // ---------------------------------------------------------------------------------
-
     public TileImageView()
     {
         BackgroundColor = Colors.White;
@@ -363,13 +317,8 @@ public partial class TileImageView : ContentView, IDisposable
     }
 
     // ---------------------------------------------------------------------------------
-    //  C4 - Render-Anforderungen zusammenfassen
+    //  Render-Anforderungen zusammenfassen
     // ---------------------------------------------------------------------------------
-
-    /// <summary>
-    /// Fordert einen Frame an. Mehrere Aufrufe innerhalb eines Frames werden zu einem
-    /// einzigen InvalidateSurface() zusammengefasst (C4).
-    /// </summary>
     private void RequestRender()
     {
         if (_disposed || _renderPending || _canvasView == null) return;
@@ -383,28 +332,17 @@ public partial class TileImageView : ContentView, IDisposable
         });
     }
 
-    /// <summary>
-    /// Wie <see cref="RequestRender"/>, markiert zusaetzlich alle laufenden Ladeauftraege
-    /// als veraltet, weil sich die Ansicht geaendert hat (B3).
-    /// </summary>
     private void InvalidateView()
     {
         unchecked { _renderGeneration++; }
         RequestRender();
     }
 
-    /// <summary>Erzwingt sofortiges Neuzeichnen (oeffentliche API, unveraendert im Verhalten).</summary>
     public void InvalidateSurface() => _canvasView?.InvalidateSurface();
 
     // ---------------------------------------------------------------------------------
-    //  Pyramiden-Metadaten (A3 / B1)
+    //  Pyramiden-Metadaten
     // ---------------------------------------------------------------------------------
-
-    /// <summary>
-    /// Berechnet einmalig je Pyramidenstufe, ob sie permanent im RAM gehalten wird.
-    /// Damit entfaellt jede Dateisystem-Pruefung im Renderloop (A3) und der Fallback
-    /// findet garantiert immer eine zeichenbare Kachel (B1).
-    /// </summary>
     private void RebuildLevelMetadata()
     {
         int maxZoom = MaxZoomLevel;
@@ -425,26 +363,22 @@ public partial class TileImageView : ContentView, IDisposable
     private static void GetLevelTileCounts(int zoom, int maxZoom, int tileSize, SKSize imageSize, out int tilesX, out int tilesY)
     {
         double zoomScale = 1.0 / (1 << (maxZoom - zoom));
-        double levelWidth = imageSize.Width * zoomScale;
-        double levelHeight = imageSize.Height * zoomScale;
 
-        tilesX = Math.Max(1, (int)Math.Ceiling(levelWidth / tileSize));
-        tilesY = Math.Max(1, (int)Math.Ceiling(levelHeight / tileSize));
+        int levelWidth = Math.Max(1, (int)(imageSize.Width * zoomScale));
+        int levelHeight = Math.Max(1, (int)(imageSize.Height * zoomScale));
+
+        tilesX = Math.Max(1, (int)Math.Ceiling(levelWidth / (double)tileSize));
+        tilesY = Math.Max(1, (int)Math.Ceiling(levelHeight / (double)tileSize));
     }
 
     private bool IsPermanentLevel(int zoom)
         => zoom >= 0 && zoom < _isPermanentLevel.Length && _isPermanentLevel[zoom];
 
-    /// <summary>
-    /// Die View kann transformiert werden, sobald Bildgroesse und Canvasgroesse bekannt sind.
-    /// Alle Pyramidenstufen muessen dafuer noch nicht erzeugt sein.
-    /// </summary>
     private bool HasValidViewport =>
         !OriginalImageSize.IsEmpty &&
         _canvasView.CanvasSize.Width > 0 &&
         _canvasView.CanvasSize.Height > 0;
 
-    /// <summary>Sucht eine Kachel zuerst im permanenten, dann im LRU-Cache.</summary>
     private bool TryGetTile(TileKey key, out SKBitmap bitmap)
     {
         if (_permanentTiles.TryGetValue(key, out bitmap))
@@ -454,12 +388,10 @@ public partial class TileImageView : ContentView, IDisposable
     }
 
     // ---------------------------------------------------------------------------------
-    //  B3 - Tile-Loader mit Semaphore, LIFO und Generationszaehler
+    //  Tile-Loader mit Semaphore, LIFO und Generationszaehler
     // ---------------------------------------------------------------------------------
-
     private readonly record struct TileRequest(TileKey Key, string Path, int Generation);
 
-    /// <summary>Stellt eine Kachel in die Warteschlange. Wird ausschliesslich vom UI-Thread aufgerufen.</summary>
     private void RequestTile(TileKey key, string path)
     {
         if (_disposed) return;
@@ -467,8 +399,6 @@ public partial class TileImageView : ContentView, IDisposable
 
         _tileQueue.Add(new TileRequest(key, path, _renderGeneration));
 
-        // Aelteste (unterste) Anfragen verwerfen - sie sind mit hoher Wahrscheinlichkeit
-        // nicht mehr sichtbar.
         while (_tileQueue.Count > MaxQueuedTileRequests)
         {
             var dropped = _tileQueue[0];
@@ -487,8 +417,6 @@ public partial class TileImageView : ContentView, IDisposable
             var request = _tileQueue[last];
             _tileQueue.RemoveAt(last);
 
-            // Nur deutlich veraltete Anfragen verwerfen. Ein exakter Vergleich wuerde bei
-            // hoher Touch-Sampling-Rate jede Kachel verwerfen, bevor sie geladen ist.
             if (unchecked(_renderGeneration - request.Generation) > 8)
             {
                 _pendingTiles.Remove(request.Key);
@@ -551,7 +479,6 @@ public partial class TileImageView : ContentView, IDisposable
         _activeTileLoads = Math.Max(0, _activeTileLoads - 1);
         _pendingTiles.Remove(request.Key);
 
-        // A4/C2: Verworfene Bitmaps muessen freigegeben werden, sonst leckt nativer Speicher.
         if (_disposed)
         {
             decoded?.Dispose();
@@ -566,13 +493,9 @@ public partial class TileImageView : ContentView, IDisposable
                     decoded.Dispose();
             }
             else if (_tileCache.ContainsKey(request.Key))
-            {
                 decoded.Dispose();
-            }
             else
-            {
                 _tileCache[request.Key] = decoded;
-            }
 
             RequestRender();
         }
@@ -583,13 +506,10 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Navigation
     // ---------------------------------------------------------------------------------
-
     public void ZoomToPin(string pinId, double? factor = null)
     {
         if (string.IsNullOrEmpty(pinId)) return;
 
-        // Zuerst vormerken: Die Anfrage darf weder bei fehlender Bildgroesse
-        // noch bei spaeter eintreffendem Pins-Binding verloren gehen.
         _pendingPinId = pinId;
         _pendingZoomFactor = factor;
         _pendingImageFit = false;
@@ -616,7 +536,6 @@ public partial class TileImageView : ContentView, IDisposable
         CurrentPan = new SKPoint(_panX, _panY);
         CurrentRotation = _rotationDegrees;
 
-        // Nur nach erfolgreicher Positionierung loeschen.
         _pendingPinId = null;
         _pendingZoomFactor = null;
 
@@ -737,13 +656,11 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Rendering
     // ---------------------------------------------------------------------------------
-
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
         var canvas = e.Surface.Canvas;
-        canvas.Clear(_placeholderSKColor);   // C6: vorkonvertierte Farbe
+        canvas.Clear(_placeholderSKColor);
 
-        // C5: hoechstens eine Sortierung pro Frame
         if (_pinsNeedSort)
         {
             _pinsNeedSort = false;
@@ -765,10 +682,6 @@ public partial class TileImageView : ContentView, IDisposable
             DrawFpsCounter(canvas, canvasWidth);
     }
 
-    /// <summary>
-    /// ImageFit/ZoomToPin, die vor dem ersten Layout angefordert wurden, nachholen.
-    /// Gibt true zurueck, wenn dieser Frame uebersprungen werden soll.
-    /// </summary>
     private bool HandlePendingViewportActions()
     {
         if (!HasValidViewport) return false;
@@ -785,7 +698,6 @@ public partial class TileImageView : ContentView, IDisposable
             string pinId = _pendingPinId;
             double? factor = _pendingZoomFactor;
 
-            // ZoomToPin loescht die Anfrage ausschliesslich bei Erfolg.
             ZoomToPin(pinId, factor);
             return _pendingPinId == null;
         }
@@ -793,22 +705,10 @@ public partial class TileImageView : ContentView, IDisposable
         return false;
     }
 
-    /// <summary>
-    /// Zeichnet Kacheln und Pins.
-    /// </summary>
-    /// <param name="deviceClip">
-    /// Sichtbarer Bereich in Geraetekoordinaten. Fuer den Hauptdurchlauf die gesamte
-    /// Canvas-Flaeche, fuer die Lupe nur deren Kreis-Bounds (A7/B5). Das Culling wird
-    /// ueber die invertierte TotalMatrix exakt daraus abgeleitet (B2).
-    /// </param>
-    /// <param name="isPrimaryPass">
-    /// Nur der Hauptdurchlauf darf den Stable-Zoom-Zustand und die Cache-Kapazitaet aendern.
-    /// </param>
     private void DrawMapAndPins(SKCanvas canvas, SKRect deviceClip, bool isPrimaryPass)
     {
         if (string.IsNullOrEmpty(_computedTileFolder)) return;
 
-        // C6: BindableProperty-Zugriffe einmal pro Frame statt einmal pro Pin/Kachel.
         SKSize imageSize = OriginalImageSize;
         if (imageSize.IsEmpty) return;
 
@@ -821,7 +721,6 @@ public partial class TileImageView : ContentView, IDisposable
         canvas.RotateDegrees(_rotationDegrees);
         canvas.Scale(_scale);
 
-        // ---- B2: exakte Bounding-Box statt Diagonalkreis --------------------------------
         SKMatrix total = canvas.TotalMatrix;
         if (!total.TryInvert(out SKMatrix inverse))
         {
@@ -831,8 +730,6 @@ public partial class TileImageView : ContentView, IDisposable
 
         SKRect view = MapRectBounds(inverse, deviceClip);
 
-        // Effektive Skalierung inkl. aller aeusseren Transformationen. Dadurch waehlt
-        // die Lupe die zu ihrer Vergroesserung passende Pyramidenstufe (B5).
         float effScale = MathF.Sqrt(MathF.Abs(total.ScaleX * total.ScaleY - total.SkewX * total.SkewY));
         if (effScale <= 0f || float.IsNaN(effScale))
         {
@@ -840,21 +737,16 @@ public partial class TileImageView : ContentView, IDisposable
             return;
         }
 
-        // ---- Zoomstufe bestimmen --------------------------------------------------------
         int maxAvailableZoom = _maxGeneratedLevel < 0 ? -1 : Math.Min(maxZoom, _maxGeneratedLevel);
         if (maxAvailableZoom < 0)
         {
             canvas.Restore();
-            return;   // Pyramide noch nicht begonnen - es gibt schlicht nichts zu zeichnen
+            return;
         }
 
         int desiredZoom = Math.Clamp(maxZoom + (int)Math.Ceiling(Math.Log2(effScale)), 0, maxAvailableZoom); //.Floor ist schneller aber unscharf
-
-        // ---- A5: Stable-Zoom ------------------------------------------------------------
-        // Beim Hineinzoomen bleibt der bisherige Layer die Basis, bis der neue vollstaendig
-        // im RAM liegt. Beim Herauszoomen wird sofort umgeschaltet, weil grobe Stufen
-        // ohnehin permanent gehalten werden.
         int baseZoom;
+
         if (isPrimaryPass)
         {
             if (_displayZoom < 0 || desiredZoom <= _displayZoom || _displayZoom > maxAvailableZoom)
@@ -867,14 +759,11 @@ public partial class TileImageView : ContentView, IDisposable
             baseZoom = desiredZoom;
         }
 
-        // ---- B1: Cache-Kapazitaet an die sichtbare Kachelmenge anpassen -----------------
         if (isPrimaryPass)
             EnsureTileCacheCapacity(baseZoom, desiredZoom, maxZoom, tileSize, imageSize, view);
 
-        // ---- Basis-Layer (mit Parent-Fallback) ------------------------------------------
         DrawTileLayer(canvas, baseZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: true);
 
-        // ---- Ziel-Layer daruebersetzen, sobald einzelne Kacheln da sind -----------------
         if (desiredZoom != baseZoom)
         {
             bool targetComplete = IsLayerComplete(desiredZoom, maxZoom, tileSize, imageSize, view);
@@ -891,10 +780,6 @@ public partial class TileImageView : ContentView, IDisposable
         canvas.Restore();
     }
 
-    /// <summary>
-    /// Prueft ohne zu zeichnen, ob alle sichtbaren Kacheln dieser Stufe im RAM liegen,
-    /// und fordert fehlende an. Billiger als ein zweiter Zeichendurchlauf.
-    /// </summary>
     private bool IsLayerComplete(int zoom, int maxZoom, int tileSize, SKSize imageSize, SKRect view)
     {
         float tileSpan = tileSize * (1 << (maxZoom - zoom));
@@ -924,7 +809,6 @@ public partial class TileImageView : ContentView, IDisposable
         return complete;
     }
 
-    /// <summary>B2: Bounding-Box der vier transformierten Rechteck-Ecken.</summary>
     private static SKRect MapRectBounds(SKMatrix matrix, SKRect rect)
     {
         SKPoint c0 = matrix.MapPoint(rect.Left, rect.Top);
@@ -947,8 +831,6 @@ public partial class TileImageView : ContentView, IDisposable
         if (desiredZoom != baseZoom)
             required += CountVisibleTiles(desiredZoom, maxZoom, tileSize, imageSize, view);
 
-        // Faktor 2 plus Reserve: verhindert, dass jeder Frame genau die Kacheln evicted,
-        // die der naechste Frame wieder braucht (Cache-Thrashing, B1).
         int capacity = Math.Max(SettingsService.Instance.MaxTileCache, required * 2 + 16);
         _tileCache.EnsureCapacity(capacity);
     }
@@ -966,10 +848,6 @@ public partial class TileImageView : ContentView, IDisposable
         return (maxX - minX + 1) * (maxY - minY + 1);
     }
 
-    /// <summary>
-    /// Zeichnet eine Pyramidenstufe. Rueckgabe: true, wenn jede sichtbare Kachel aus
-    /// genau dieser Stufe gezeichnet werden konnte.
-    /// </summary>
     private bool DrawTileLayer(
         SKCanvas canvas,
         int zoom,
@@ -989,7 +867,6 @@ public partial class TileImageView : ContentView, IDisposable
         int minY = Math.Clamp((int)Math.Floor(view.Top / tileSpan), 0, tilesY - 1);
         int maxY = Math.Clamp((int)Math.Ceiling(view.Bottom / tileSpan), 0, tilesY - 1);
 
-        // C7: knapp ein halbes Geraete-Pixel Ueberlappung gegen 1-px-Naehte.
         float seam = 0.5f / effScale;
 
         bool complete = true;
@@ -1012,7 +889,6 @@ public partial class TileImageView : ContentView, IDisposable
 
                 complete = false;
 
-                // A3: Pfad wird nur im Miss-Fall gebaut - kein String-Garbage pro Frame.
                 if (!_pendingTiles.Contains(key))
                 {
                     string tilePath = Path.Combine(
@@ -1033,10 +909,6 @@ public partial class TileImageView : ContentView, IDisposable
         return complete;
     }
 
-    /// <summary>
-    /// Zeichnet den passenden Ausschnitt der naechstgroeberen bereits geladenen Kachel.
-    /// Da grobe Stufen permanent gehalten werden, schlaegt das praktisch nie fehl (B1).
-    /// </summary>
     private void DrawParentFallback(SKCanvas canvas, int zoom, int x, int y, int tileSize, SKRect destRect, SKPaint paint)
     {
         int fallbackZoom = zoom - 1;
@@ -1067,48 +939,32 @@ public partial class TileImageView : ContentView, IDisposable
         }
     }
 
-    /// <summary>
-    /// Zeichnet die Pins. A1: Culling ueber einen rotationsinvarianten Bounding-Radius,
-    /// der Ankerpunkt, Bitmap-Groesse und Pin-Skalierung beruecksichtigt.
-    /// </summary>
     private void DrawPins(SKCanvas canvas, SKSize imageSize, SKRect view)
     {
         if (_sortedPins.Count == 0) return;
 
-        // C6: Settings einmal pro Frame lesen statt viermal pro Pin.
         var settings = SettingsService.Instance;
         double osBaseScale = settings.OsBaseScale;
         double maxLimit = settings.PinMaxScaleLimit / 100.0;
         double minLimit = settings.PinMinScaleLimit / 100.0;
-
         float imgWidth = imageSize.Width;
         float imgHeight = imageSize.Height;
         float mapScale = _scale > 0 ? _scale : 1f;
 
         foreach (var pin in _sortedPins)
         {
-            // C1: pin.Icon wird NICHT mehr aus dem Cache befuellt. Der Cache bleibt
-            // alleiniger Besitzer seiner Bitmaps, ClearCache() kann sie gefahrlos
-            // disposen. Ein extern gesetztes Icon wird weiterhin respektiert.
             SKBitmap pinBitmap = pin.Icon ?? GetOrLoadPinBitmap(pin);
             if (pinBitmap == null) continue;
 
             float absoluteX = pin.RelativeX * imgWidth;
             float absoluteY = pin.RelativeY * imgHeight;
-
             float pinScale = GetPinScale(pin, mapScale, osBaseScale, maxLimit, minLimit);
-
-            // A1: groesster Abstand vom Anker zu einer Bitmap-Ecke, in Bildkoordinaten.
-            // MathF.Max deckt alle vier Ecken ab - auch bei unsymmetrischem Anker.
             float halfW = MathF.Max((float)pin.Anchor.X, 1f - (float)pin.Anchor.X) * pinBitmap.Width * pinScale;
             float halfH = MathF.Max((float)pin.Anchor.Y, 1f - (float)pin.Anchor.Y) * pinBitmap.Height * pinScale;
             float radius = MathF.Sqrt(halfW * halfW + halfH * halfH);
 
-            if (absoluteX < view.Left - radius || absoluteX > view.Right + radius ||
-                absoluteY < view.Top - radius || absoluteY > view.Bottom + radius)
-            {
+            if (absoluteX < view.Left - radius || absoluteX > view.Right + radius || absoluteY < view.Top - radius || absoluteY > view.Bottom + radius)
                 continue;
-            }
 
             canvas.Save();
             canvas.Translate(absoluteX, absoluteY);
@@ -1129,9 +985,8 @@ public partial class TileImageView : ContentView, IDisposable
     }
 
     // ---------------------------------------------------------------------------------
-    //  Lupe (A7/B5)
+    //  Lupe
     // ---------------------------------------------------------------------------------
-
     private void DrawMagnifyingGlass(SKCanvas canvas)
     {
         if (_draggedPin == null) return;
@@ -1152,8 +1007,6 @@ public partial class TileImageView : ContentView, IDisposable
         float loupeCenterX = _cachedLoupeRadius + margin;
         float loupeCenterY = _cachedLoupeRadius + margin;
 
-        // A7/B5: Der Lupendurchlauf cullt nur noch auf diesen Ausschnitt statt auf den
-        // gesamten Viewport. Dadurch entfaellt das doppelte Tile- und Pin-Handling.
         var loupeDeviceClip = new SKRect(
             loupeCenterX - _cachedLoupeRadius,
             loupeCenterY - _cachedLoupeRadius,
@@ -1234,7 +1087,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Eingabe
     // ---------------------------------------------------------------------------------
-
     private void OnCanvasTouch(object sender, SKTouchEventArgs e)
     {
 #if WINDOWS
@@ -1445,7 +1297,6 @@ public partial class TileImageView : ContentView, IDisposable
             CurrentPan = new SKPoint(_panX, _panY);
             CurrentRotation = _rotationDegrees;
 
-            // C4/B3: coalesced Frame + Generationswechsel fuer den Tile-Loader.
             InvalidateView();
         }
     }
@@ -1589,7 +1440,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Windows-Maussteuerung
     // ---------------------------------------------------------------------------------
-
 #if WINDOWS
     private void OnLoadedWindows(object sender, EventArgs e)
     {
@@ -1715,7 +1565,6 @@ public partial class TileImageView : ContentView, IDisposable
     {
         var control = (TileImageView)bindable;
 
-        // C2: bisherige Collection sauber abmelden (auch ueber _observedPins nachgehalten).
         control._observedPins?.CollectionChanged -= control.OnPinsCollectionChanged;
         control._observedPins = null;
 
@@ -1741,7 +1590,6 @@ public partial class TileImageView : ContentView, IDisposable
 
     private void OnPinsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
     {
-        // C5: Sortierung nur markieren - ausgefuehrt wird sie einmal pro Frame.
         _pinsNeedSort = true;
 
         if (e.NewItems != null)
@@ -1830,10 +1678,6 @@ public partial class TileImageView : ContentView, IDisposable
         return null;
     }
 
-    /// <summary>
-    /// C6: Die Settings-Werte werden vom Aufrufer einmal pro Frame ermittelt und
-    /// hier nur noch verrechnet.
-    /// </summary>
     private static float GetPinScale(MapPin pin, float mapScale, double osBaseScale, double maxLimit, double minLimit)
     {
         if (pin.IsCustomPin || pin.IsLockAutoScale)
@@ -1909,8 +1753,6 @@ public partial class TileImageView : ContentView, IDisposable
 
                         if (bitmap == null) return;
 
-                        // C1/A4: Doppelt geladene oder nach Dispose eingetroffene
-                        // Bitmaps muessen freigegeben werden.
                         if (_disposed || !_pinIconCache.TryAdd(path, bitmap))
                         {
                             bitmap.Dispose();
@@ -2058,7 +1900,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Bild laden und Pyramide erzeugen
     // ---------------------------------------------------------------------------------
-
     private async Task ProcessNewImageAsync(string imagePath)
     {
         _cts?.Cancel();
@@ -2081,13 +1922,11 @@ public partial class TileImageView : ContentView, IDisposable
         int maxZoomLevel = MaxZoomLevel;
         SKColor backgroundColor = _placeholderSKColor;
 
-        _isGenerating = true;   // A2: der eigentliche Fix
         _loadingIndicator.IsVisible = true;
         _loadingIndicator.IsRunning = true;
 
         try
         {
-            // ---- C3: saemtliche Datei-I/O laeuft im Hintergrund ------------------------
             var prepared = await Task.Run(() =>
             {
                 if (!File.Exists(imagePath))
@@ -2107,8 +1946,6 @@ public partial class TileImageView : ContentView, IDisposable
 
                 string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
                 string folder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{tileSize}");
-
-                // C3: Marker-Datei statt rekursivem GetFiles-Scan ueber zehntausende JPEGs.
                 bool complete = File.Exists(Path.Combine(folder, PyramidCompleteMarker));
 
                 return (Valid: true, Size: size, Folder: folder, TilesExist: complete);
@@ -2130,7 +1967,6 @@ public partial class TileImageView : ContentView, IDisposable
             _rotationDegrees = 0f;
             CurrentRotation = _rotationDegrees;
 
-            // Einen vorgemerkten Pin-Zoom oder ImageFit nicht durch 0/0/1 ueberschreiben.
             if (_pendingPinId == null && !_pendingImageFit)
             {
                 _scale = 1.0f;
@@ -2140,7 +1976,6 @@ public partial class TileImageView : ContentView, IDisposable
                 CurrentPan = new SKPoint(_panX, _panY);
             }
 
-            // Bereits jetzt positionieren. Die Pyramide darf noch unscharf/unvollstaendig sein.
             if (_pendingPinId != null)
                 ZoomToPin(_pendingPinId, _pendingZoomFactor);
             else
@@ -2167,11 +2002,9 @@ public partial class TileImageView : ContentView, IDisposable
                         if (_pendingPinId != null && HasValidViewport)
                             ZoomToPin(_pendingPinId, _pendingZoomFactor);
                         else
-                            InvalidateView();   // progressive Anzeige der fertigen Stufen
+                            InvalidateView();
                     })
                 ), token);
-
-                _maxGeneratedLevel = maxZoomLevel;
             }
         }
         catch (OperationCanceledException)
@@ -2187,7 +2020,6 @@ public partial class TileImageView : ContentView, IDisposable
             _loadingIndicator.IsRunning = false;
             _loadingIndicator.IsVisible = false;
             _canvasView.IsVisible = true;
-            _isGenerating = false;
             InvalidateView();
         }
     }
@@ -2214,12 +2046,6 @@ public partial class TileImageView : ContentView, IDisposable
         }
     }
 
-    /// <summary>
-    /// B6: Jede Pyramidenstufe wird direkt aus der Quelldatei mit codec-nativer
-    /// Herunterskalierung dekodiert. Das Vollbild liegt damit nie dauerhaft im Speicher
-    /// (bei einem 20000x15000-Plan waeren das ~1,2 GB RGBA) und es entsteht keine
-    /// akkumulierte Weichzeichnung durch mehrfaches Resize.
-    /// </summary>
     private static void GenerateTilePyramidInternal(
         string sourceImagePath,
         string outputFolder,
@@ -2245,7 +2071,8 @@ public partial class TileImageView : ContentView, IDisposable
             MaxDegreeOfParallelism = Math.Max(1, Environment.ProcessorCount - 1)
         };
 
-        // Von grob (0) nach detailliert (maxZoomLevels), damit die UI sofort etwas anzeigen kann.
+        bool pyramidComplete = true;
+
         for (int zoom = 0; zoom <= maxZoomLevels; zoom++)
         {
             token.ThrowIfCancellationRequested();
@@ -2255,7 +2082,15 @@ public partial class TileImageView : ContentView, IDisposable
             int levelHeight = Math.Max(1, (int)(origHeight * scale));
 
             using var levelBitmap = DecodeScaled(sourceImagePath, levelWidth, levelHeight);
-            if (levelBitmap == null) continue;
+
+            if (levelBitmap == null || levelBitmap.Width != levelWidth || levelBitmap.Height != levelHeight)
+            {
+                Debug.WriteLine($"Pyramide: Stufe {zoom} ({levelWidth}x{levelHeight}) konnte nicht erzeugt werden.");
+                pyramidComplete = false;
+                continue;
+            }
+
+            int levelErrors = 0;
 
             int tilesX = (int)Math.Ceiling((double)levelBitmap.Width / tileSize);
             int tilesY = (int)Math.Ceiling((double)levelBitmap.Height / tileSize);
@@ -2286,7 +2121,11 @@ public partial class TileImageView : ContentView, IDisposable
                     var srcRectI = new SKRectI(srcX, srcY, srcX + width, srcY + height);
 
                     using var subsetBitmap = new SKBitmap();
-                    if (!levelBitmap.ExtractSubset(subsetBitmap, srcRectI)) continue;
+                    if (!levelBitmap.ExtractSubset(subsetBitmap, srcRectI))
+                    {
+                        Interlocked.Exchange(ref levelErrors, 1);
+                        continue;
+                    }
 
                     SKBitmap tileToSave = subsetBitmap;
                     bool needsDispose = false;
@@ -2304,8 +2143,6 @@ public partial class TileImageView : ContentView, IDisposable
 
                     try
                     {
-                        // Erst in eine temporaere Datei schreiben und dann umbenennen,
-                        // damit der Renderloop nie eine halb geschriebene Kachel liest.
                         string tempPath = tilePath + ".tmp";
 
                         using (var image = SKImage.FromBitmap(tileToSave))
@@ -2319,6 +2156,7 @@ public partial class TileImageView : ContentView, IDisposable
                     }
                     catch (Exception ex)
                     {
+                        Interlocked.Exchange(ref levelErrors, 1);
                         Debug.WriteLine($"Fehler beim Schreiben der Kachel '{tilePath}': {ex.Message}");
                     }
                     finally
@@ -2328,11 +2166,18 @@ public partial class TileImageView : ContentView, IDisposable
                     }
                 }
             });
+            if (levelErrors != 0)
+                pyramidComplete = false;
 
             onLevelGenerated?.Invoke(zoom);
         }
 
-        // C3: Marker erst ganz am Ende - so gilt eine abgebrochene Pyramide als unfertig.
+        if (!pyramidComplete)
+        {
+            Debug.WriteLine("Pyramide unvollstaendig - kein .complete-Marker geschrieben.");
+            return;
+        }
+
         try
         {
             File.WriteAllText(Path.Combine(outputFolder, PyramidCompleteMarker), DateTime.UtcNow.ToString("O"));
@@ -2343,44 +2188,75 @@ public partial class TileImageView : ContentView, IDisposable
         }
     }
 
-    /// <summary>
-    /// B6: Dekodiert das Bild moeglichst nah an der Zielgroesse. JPEG unterstuetzt
-    /// native Sampling-Faktoren (1/2, 1/4, 1/8); der Rest wird einmalig hochwertig
-    /// nachskaliert.
-    /// </summary>
     private static SKBitmap DecodeScaled(string path, int targetWidth, int targetHeight)
     {
-        using var codec = SKCodec.Create(path);
-        if (codec == null) return null;
+        SKBitmap decoded = TryDecodeViaCodec(path, targetWidth, targetHeight);
+        decoded ??= TryDecodeFull(path);
 
-        int fullWidth = codec.Info.Width;
-        int fullHeight = codec.Info.Height;
-
-        float desired = Math.Min(
-            targetWidth / (float)fullWidth,
-            targetHeight / (float)fullHeight);
-
-        SKSizeI supported = codec.GetScaledDimensions(Math.Clamp(desired, 0.0001f, 1f));
-        var info = new SKImageInfo(supported.Width, supported.Height, SKColorType.Bgra8888, SKAlphaType.Opaque);
-
-        var decoded = new SKBitmap(info);
-
-        if (codec.GetPixels(info, decoded.GetPixels()) is not (SKCodecResult.Success or SKCodecResult.IncompleteInput))
+        if (decoded == null)
         {
-            decoded.Dispose();
+            Debug.WriteLine($"DecodeScaled: Dekodierung fehlgeschlagen fuer '{path}' ({targetWidth}x{targetHeight}).");
             return null;
         }
 
         if (decoded.Width == targetWidth && decoded.Height == targetHeight)
             return decoded;
 
-        var resized = decoded.Resize(new SKImageInfo(targetWidth, targetHeight, SKColorType.Bgra8888, SKAlphaType.Opaque), LinearSampling);
-
-        if (resized == null)
-            return decoded;   // Zwischenbild weiterverwenden, nicht freigeben
+        var resized = decoded.Resize(
+        new SKImageInfo(targetWidth, targetHeight, SKColorType.Bgra8888, SKAlphaType.Opaque),
+        LinearSampling);
 
         decoded.Dispose();
+
+        if (resized == null)
+            Debug.WriteLine($"DecodeScaled: Resize auf {targetWidth}x{targetHeight} fehlgeschlagen.");
+
         return resized;
+    }
+
+    private static SKBitmap TryDecodeViaCodec(string path, int targetWidth, int targetHeight)
+    {
+        try
+        {
+            using var codec = SKCodec.Create(path);
+            if (codec == null) return null;
+
+            float desired = Math.Min(
+            targetWidth / (float)codec.Info.Width,
+            targetHeight / (float)codec.Info.Height);
+
+            SKSizeI supported = codec.GetScaledDimensions(Math.Clamp(desired, 0.0001f, 1f));
+            if (supported.Width <= 0 || supported.Height <= 0) return null;
+
+            var info = new SKImageInfo(supported.Width, supported.Height, SKColorType.Bgra8888, SKAlphaType.Opaque);
+            var bmp = new SKBitmap(info);
+
+            if (codec.GetPixels(info, bmp.GetPixels()) is not (SKCodecResult.Success or SKCodecResult.IncompleteInput))
+            {
+                bmp.Dispose();
+                return null;
+            }
+            return bmp;
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"TryDecodeViaCodec fehlgeschlagen: {ex.Message}");
+            return null;
+        }
+    }
+
+    private static SKBitmap TryDecodeFull(string path)
+    {
+        try
+        {
+            using var stream = File.OpenRead(path);
+            return SKBitmap.Decode(stream);
+        }
+        catch (Exception ex)
+        {
+            Debug.WriteLine($"TryDecodeFull fehlgeschlagen: {ex.Message}");
+            return null;
+        }
     }
 
     private void DrawFpsCounter(SKCanvas canvas, float canvasWidth)
@@ -2391,7 +2267,6 @@ public partial class TileImageView : ContentView, IDisposable
         {
             double ms = (now - _lastFrameTicks) * 1000.0 / Stopwatch.Frequency;
 
-            // Ausreisser verwerfen: nach einer Ruhephase ist der Abstand beliebig gross.
             if (ms < 500)
             {
                 _frameTimes[_frameTimeIndex] = ms;
@@ -2464,10 +2339,9 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     //  Aufraeumen
     // ---------------------------------------------------------------------------------
-
     private void ClearCache()
     {
-        _tileCache.Clear();          // A4: disposed jetzt intern
+        _tileCache.Clear();
         _pendingTiles.Clear();
         _tileQueue.Clear();
 
@@ -2479,9 +2353,6 @@ public partial class TileImageView : ContentView, IDisposable
             bitmap?.Dispose();
         _pinIconCache.Clear();
         _loadingPinPaths.Clear();
-
-        // C1: pin.Icon wurde nie aus dem Cache befuellt - es gibt hier also keine
-        // haengenden Referenzen auf gerade freigegebene Bitmaps mehr.
     }
 
     public void ResetTouchState()
@@ -2499,11 +2370,6 @@ public partial class TileImageView : ContentView, IDisposable
         RequestRender();
     }
 
-    /// <summary>
-    /// C2: Ohne dieses Dispose bleiben pro geoeffneter Planseite der komplette
-    /// Kachel-Cache, alle Paints/Shader und saemtliche Event-Abonnements im Speicher.
-    /// Beim Verlassen der Seite aufrufen (z. B. in OnDisappearing).
-    /// </summary>
     public void Dispose()
     {
         Dispose(true);
@@ -2517,7 +2383,6 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (!disposing) return;
 
-        // --- Events abmelden ---------------------------------------------------------
         if (_canvasView != null)
         {
             _canvasView.PaintSurface -= OnPaintSurface;
@@ -2533,7 +2398,6 @@ public partial class TileImageView : ContentView, IDisposable
         DetachWindowsHandlers();
 #endif
 
-        // --- Laufende Arbeiten stoppen -----------------------------------------------
         _cts?.Cancel();
         _cts?.Dispose();
         _cts = null;
@@ -2550,7 +2414,6 @@ public partial class TileImageView : ContentView, IDisposable
         _fpsTextPaint?.Dispose();
         _fpsBackPaint?.Dispose();
 
-        // --- Nativen Speicher freigeben ----------------------------------------------
         ClearCache();
         _tileCache.Dispose();
 
@@ -2573,21 +2436,13 @@ public partial class TileImageView : ContentView, IDisposable
 // =====================================================================================
 //  MapPin
 // =====================================================================================
-
 public class MapPin
 {
     public string Id { get; set; }
     public float RelativeX { get; set; }
     public float RelativeY { get; set; }
     public float Rotation { get; set; }
-
-    /// <summary>
-    /// Optionales, extern gesetztes Icon. Wird vom Control NICHT mehr automatisch aus
-    /// dem internen Cache befuellt (C1) - wer es setzt, besitzt es und muss es selbst
-    /// freigeben.
-    /// </summary>
     public SKBitmap Icon { get; set; }
-
     public string IconPath { get; set; }
     public bool IsLockRotate { get; set; } = false;
     public bool IsLockPosition { get; set; } = false;
@@ -2598,18 +2453,15 @@ public class MapPin
 }
 
 // =====================================================================================
-//  LruCache - A4: gibt verdraengte Werte frei; B1: Kapazitaet zur Laufzeit anpassbar
+//  LruCache - Gibt verdraengte Werte, Kapazitaet zur Laufzeit anpassbar
 // =====================================================================================
-
 public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
 {
     private readonly Lock _lock = new();
     private readonly Dictionary<TKey, LinkedListNode<CacheEntry>> _cache = [];
     private readonly LinkedList<CacheEntry> _list = [];
-
     private int _capacity;
     private bool _disposed;
-
     private readonly record struct CacheEntry(TKey Key, TValue Value);
 
     public LruCache(int capacity)
@@ -2628,11 +2480,6 @@ public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
         get { lock (_lock) { return _cache.Count; } }
     }
 
-    /// <summary>
-    /// B1: Hebt die Kapazitaet an, wenn pro Frame mehr Kacheln benoetigt werden, als der
-    /// Cache halten kann. Ohne das verdraengt jeder Frame genau die Kacheln, die der
-    /// naechste Frame wieder braucht (Cache-Thrashing).
-    /// </summary>
     public void EnsureCapacity(int capacity)
     {
         if (capacity <= 0) return;
@@ -2684,7 +2531,6 @@ public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
 
         lock (_lock)
         {
-            // A4: bestehenden Wert freigeben, falls er ersetzt wird.
             if (_cache.TryGetValue(key, out var existingNode))
             {
                 TValue oldValue = existingNode.Value.Value;
@@ -2699,8 +2545,6 @@ public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
             }
             else
             {
-                // A4: verdraengte Eintraege freigeben - SKBitmap belegt nativen Speicher,
-                // den der GC nicht als Druck wahrnimmt.
                 while (_cache.Count >= _capacity && _list.Last is not null)
                 {
                     var lastNode = _list.Last;
@@ -2753,7 +2597,6 @@ public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
             _list.Clear();
         }
 
-        // A4: Freigabe ausserhalb des Locks.
         foreach (var value in values)
         {
             if (value is IDisposable disposable)
@@ -2769,12 +2612,6 @@ public partial class LruCache<TKey, TValue> : IDisposable where TKey : notnull
         Clear();
         GC.SuppressFinalize(this);
     }
-}
-
-public enum PinCreationMode
-{
-    LongPress,
-    SingleTap
 }
 
 public readonly record struct TileKey(int Zoom, int X, int Y);

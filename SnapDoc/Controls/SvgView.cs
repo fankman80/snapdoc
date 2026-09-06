@@ -10,8 +10,6 @@ public partial class SvgView : SKCanvasView
 {
     private readonly SKSvg _svg = new();
 
-    public enum ItemAspect { Original, AspectFit }
-
     // Quelle: Pfad zur SVG in den Resources/Raw
     public static readonly BindableProperty SourceProperty =
         BindableProperty.Create(nameof(Source), typeof(string), typeof(SvgView), null,
