@@ -381,9 +381,7 @@ public partial class ImageViewPage : IQueryAttributable
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{oldTitleImage}");
                 _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{oldTitleImage}");
             }
-            GlobalJson.Data.TitleImage = "banner_thumbnail.png";
-
-            Helper.HeaderUpdate();
+            ProjectItem.Current.TitleImage = "banner_thumbnail.png";
         }
         else
         {

@@ -1321,7 +1321,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 break;
 
             default:
-                (Shell.Current as AppShell).AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
+                ProjectItem.Current.AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
                 Title = result.Result.NameEntry;
 
                 thisPlan.Name = result.Result.NameEntry;
@@ -1370,9 +1370,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             section.Items.Remove(shellContent);
 
         // Masterliste bereinigen
-        var masterItem = shell.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+        var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
         if (masterItem != null)
-            shell.AllPlanItems.Remove(masterItem);
+            ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
         if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
@@ -1409,7 +1409,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SaveManager.NotifyDataChanged();
 
         // Anzeige neu aufbauen
-        shell.ApplyFilterAndSorting();
+        ProjectItem.Current.ApplyFilterAndSorting();
     }
 
     private static void DeleteIfExists(string path)
@@ -1461,11 +1461,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
             if (!string.IsNullOrEmpty(planId))
             {
-                var masterItem = shell.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+                var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
                 masterItem?.Thumbnail = newThumbPath;
             }
 
-            shell.ApplyFilterAndSorting();
+            ProjectItem.Current.ApplyFilterAndSorting();
         }
 
         // Umpositionierung der Pins
@@ -1509,8 +1509,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (sender is not Entry entry) return;
 
         // Titel speichern
-        (Shell.Current as AppShell)
-            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
+        ProjectItem.Current?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         thisPlan.Name = Title;
 

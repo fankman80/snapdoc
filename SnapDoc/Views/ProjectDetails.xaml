@@ -50,23 +50,18 @@
         </Grid>
     </Shell.TitleView>
 
-    <ContentPage.Resources>
-        <ResourceDictionary>
-            <toolkit:MultiConverter x:Key="HeightConverter">
-                <toolkit:IsStringNotNullOrEmptyConverter />
-                <toolkit:MathExpressionConverter />
-            </toolkit:MultiConverter>
-        </ResourceDictionary>
-    </ContentPage.Resources>
-
-    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}" RowSpacing="0">
+    <Grid x:DataType="local:ProjectItem"
+          BindingContext="{x:Static local:ProjectItem.Current}"
+          RowSpacing="0">
         <Grid.RowDefinitions>
-            <RowDefinition Height="{Binding FlyoutHeaderImage, Converter={StaticResource HeightConverter}, ConverterParameter='x==true?100:0'}" />
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <ImageButton Grid.Row="0"
-                     Source="{Binding FlyoutHeaderImage}"
+                     Source="{Binding TitleImageFullSource}"
+                     IsVisible="{Binding HasTitleImage}"
+                     HeightRequest="100"
                      Aspect="AspectFill"
                      HorizontalOptions="Fill"
                      VerticalOptions="Fill"
@@ -81,7 +76,7 @@
             <ScrollView Grid.Row="0" Margin="0,10,0,10">
                 <VerticalStackLayout Spacing="8">
                     <controls:BorderedEntry
-                        x:Name="object_name"
+                        Text="{Binding ObjectName, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.objektbezeichnung}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -89,7 +84,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
                     
                     <controls:BorderedEntry
-                        x:Name="client_name"
+                        Text="{Binding ClientName, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -97,7 +92,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <controls:BorderedEditor
-                        x:Name="object_address"
+                        Text="{Binding ObjectAddress, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.adresse}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -105,7 +100,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <controls:BorderedEntry
-                        x:Name="working_title"
+                        Text="{Binding WorkingTitle, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.projektvorgang}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -113,7 +108,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <controls:BorderedEntry
-                        x:Name="project_nr"
+                        Text="{Binding ProjectNr, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.projektnummer}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -121,7 +116,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <controls:BorderedEntry
-                        x:Name="project_manager"
+                        Text="{Binding ProjectManager, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.projektleitung}"
                         BackgroundColor="Transparent"
                         BorderColor="{DynamicResource SecondaryBackground}"
@@ -129,7 +124,7 @@
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
                     <Button
-                        x:Name="creation_date"
+                        Text="{Binding CreationDateDisplay}"
                         Margin="0,8,0,0"
                         HeightRequest="44"
                         FontSize="{StaticResource AppFontSizeNormal}"

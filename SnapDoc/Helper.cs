@@ -19,46 +19,6 @@ namespace SnapDoc;
 
 public class Helper
 {
-    public static void HeaderUpdate()
-    {
-        SettingsService.Instance.FlyoutHeaderTitle = GlobalJson.Data.Object_name ?? "";
-        SettingsService.Instance.FlyoutHeaderDesc = GlobalJson.Data.Client_name ?? "";
-
-        // Prüfen, ob grundsätzlich Pfad und Bildname vorhanden sind
-        bool hasValidData = !string.IsNullOrEmpty(SettingsService.Instance.ProjectPath) &&
-                            !string.IsNullOrEmpty(GlobalJson.Data.TitleImage) &&
-                            GlobalJson.Data.TitleImage != "banner_thumbnail.png";
-
-        if (hasValidData)
-        {
-            string expectedImagePath = Path.Combine(
-                Settings.DataDirectory ?? "",
-                SettingsService.Instance.ProjectPath ?? "",
-                GlobalJson.Data.ImagePath ?? "",
-                GlobalJson.Data.TitleImage ?? ""
-            );
-
-            string expectedThumbPath = Path.Combine(
-                Settings.DataDirectory ?? "",
-                SettingsService.Instance.ProjectPath ?? "",
-                GlobalJson.Data.ThumbnailPath ?? "",
-                GlobalJson.Data.TitleImage ?? ""
-            );
-
-            // Existiert das Thumbnail auf der Festplatte?
-            if (File.Exists(expectedThumbPath))
-            {
-                SettingsService.Instance.FlyoutHeaderImage = expectedImagePath;
-                SettingsService.Instance.FlyoutHeaderImageThumb = expectedThumbPath;
-
-                return;
-            }
-        }
-
-        SettingsService.Instance.FlyoutHeaderImage = "";
-        SettingsService.Instance.FlyoutHeaderImageThumb = "banner_thumbnail.png";
-    }
-
     public static void PackDirectory(string sourceDirectory, string destinationZipFile)
     {
         if (!Directory.Exists(sourceDirectory))

@@ -5,492 +5,359 @@ using SnapDoc.Models;
 using SnapDoc.Services;
 using static SnapDoc.Helper;
 
-namespace SnapDoc
+namespace SnapDoc;
+
+// =====================================================================
+//  Datei-/Projektlisten
+// =====================================================================
+
+/// <summary>Ein Projekt in der Projektliste (OpenProject).</summary>
+public partial class FileItem : ObservableObject
 {
-    public partial class IconItem(string fileName, string displayName, Point anchorPoint, Size iconSize, bool isRotationLocked, bool isAutoScaleLocked, bool isCustomIcon, SKColor pinColor, double iconScale, string category, bool isDefaultIcon)
+    public required string FileName { get; set; }
+    public required string FilePath { get; set; }
+    public required DateTime FileDate { get; set; }
+
+    [ObservableProperty] public partial string ImagePath { get; set; }
+    [ObservableProperty] public partial string ThumbnailPath { get; set; }
+    [ObservableProperty] public partial bool HasCloudSync { get; set; }
+    [ObservableProperty] public partial bool IsActive { get; set; }
+}
+
+// =====================================================================
+//  Plaene
+// =====================================================================
+
+/// <summary>ViewModel-Wrapper um <see cref="Plan"/> fuer die Planliste im Flyout.</summary>
+public partial class PlanItem : ModelItem<Plan>
+{
+    public PlanItem(Plan plan) : base(plan) { }
+
+    // --- Identitaet -------------------------------------------------
+    public string PlanId { get; set; } = string.Empty;
+    public string PlanRoute { get; set; } = string.Empty;
+    public bool IsWebMapPlan { get; set; }
+
+    [ObservableProperty] public partial string Title { get; set; }
+    [ObservableProperty] public partial bool IsSelected { get; set; }
+    [ObservableProperty] public partial string Thumbnail { get; set; }
+
+    // --- Anzeige ----------------------------------------------------
+    public bool ShowThumbnail => !IsWebMapPlan;
+    public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
+
+    // --- Modellgebundene Werte --------------------------------------
+    public bool AllowExport
     {
-        public string FileName { get; set; } = fileName;
-        public string DisplayName { get; set; } = displayName;
-        public Point AnchorPoint { get; set; } = anchorPoint;
-        public Size IconSize { get; set; } = iconSize;
-        public bool IsRotationLocked { get; set; } = isRotationLocked;
-        public bool IsAutoScaleLocked { get; set; } = isAutoScaleLocked;
-        public bool IsCustomIcon { get; set; } = isCustomIcon;
-        public bool IsCustomPin { get; set; } = false;
-        public SKColor PinColor { get; set; } = pinColor;
-        public double IconScale { get; set; } = iconScale;
-        public string Category { get; set; } = category;
-        public bool IsDefaultIcon { get; set; } = isDefaultIcon;
-        public string DisplayIconPath
+        get => Model.AllowExport;
+        set => SetModel(Model.AllowExport, value, v => Model.AllowExport = v, [nameof(DisplayOpacity)]);
+    }
+
+    public string PlanColor
+    {
+        get => Model.PlanColor;
+        set => SetModel(Model.PlanColor, value, v => Model.PlanColor = v);
+    }
+
+    public int PinCount
+    {
+        get => Model.PinCount;
+        set => SetModel(Model.PinCount, value, v => Model.PinCount = v);
+    }
+
+    protected override void OnModelPropertyChanged(string propertyName)
+    {
+        switch (propertyName)
         {
-            get
+            case nameof(Plan.AllowExport): Notify(nameof(AllowExport), nameof(DisplayOpacity)); break;
+            case nameof(Plan.PlanColor): Notify(nameof(PlanColor)); break;
+            case nameof(Plan.PinCount): Notify(nameof(PinCount)); break;
+        }
+    }
+}
+
+// =====================================================================
+//  Pins
+// =====================================================================
+
+/// <summary>ViewModel-Wrapper um <see cref="Pin"/> fuer Pin-Liste und Detailansicht.</summary>
+public partial class PinItem : ModelItem<Pin>
+{
+    public PinItem(Pin pin) : base(pin)
+    {
+        _isCustomPin = pin.IsCustomPin;
+        _isWebMapPin = pin.IsWebMapPin;
+
+        UpdatePriorityColor();
+    }
+
+    // --- Nur-Lese-Werte aus dem Modell ------------------------------
+    public string SelfId => Model.SelfId;
+    public string OnPlanId => Model.OnPlanId;
+    public DateTime Time => Model.DateTime;
+    public bool HasGeolocation => Model.GeoLocation != null;
+
+    // --- Anzeige ----------------------------------------------------
+    public double DisplayOpacity => IsAllowExport ? 1.0 : 0.3;
+
+    public string DisplayIconPath
+    {
+        get
+        {
+            if (Model.IsCustomIcon)
             {
-                if (IsCustomIcon)
-                {
-                    string fullPath = Path.Combine(Settings.DataDirectory, "customicons", FileName);
+                string fullPath = Path.Combine(Settings.DataDirectory, "customicons", PinIcon);
 
-                    if (!File.Exists(fullPath))
-                    {
-                        // Lade Default-Icon falls CustomIcon nicht existiert
-                        string newPin = SettingsService.Instance.DefaultPinIcon;
-                        var iconItem = IconLookup.Get(newPin);
-                        return iconItem.FileName;
-                    }
-
-                    return fullPath;
-                }
-
-                return FileName;
+                // Default-Icon laden, falls das CustomIcon nicht existiert
+                return File.Exists(fullPath)
+                    ? fullPath
+                    : IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
             }
+
+            return Model.IsCustomPin ? "shapes64.png" : PinIcon;
         }
     }
 
-    public partial class FileItem : ObservableObject
+    public string PlanDisplay
     {
-        public required string FileName { get; set; }
-        public required string FilePath { get; set; }
-        public required DateTime FileDate { get; set; }
-        [ObservableProperty]
-        public partial string ImagePath { get; set; }
-        [ObservableProperty]
-        public partial string ThumbnailPath { get; set; }
-        [ObservableProperty]
-        public partial bool HasCloudSync { get; set; }
-        [ObservableProperty]
-        public partial bool IsActive { get; set; }
-    }
-
-    public partial class PinItem : ObservableObject
-    {
-        private readonly Pin _pin; // direkte Referenz auf das zugrundeliegende Modell
-
-        public PinItem(Pin pin)
+        get
         {
-            _pin = pin ?? throw new ArgumentNullException(nameof(pin));
-            _isCustomPin = _pin.IsCustomPin;
-            _isWebMapPin = _pin.IsWebMapPin;
+            string planName = GlobalJson.Data.Plans[OnPlanId].Name;
 
-            // UI-Update bei Änderungen am Modell
-            _pin.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(Pin.IsAllowExport))
-                {
-                    OnPropertyChanged(nameof(IsAllowExport));
-                    OnPropertyChanged(nameof(DisplayOpacity));
-                }
-            };
-            UpdatePriorityColor();
-        }
-
-        // Grunddaten aus dem Modell
-        public string SelfId => _pin.SelfId;
-        public string OnPlanId => _pin.OnPlanId;
-        public DateTime Time => _pin.DateTime;
-        public double DisplayOpacity => IsAllowExport ? 1.0 : 0.3;
-        public bool HasGeolocation => _pin.GeoLocation != null;
-
-        public string DisplayIconPath
-        {
-            get
-            {
-                if (_pin.IsCustomIcon)
-                {
-                    if (!File.Exists(Path.Combine(Settings.DataDirectory, "customicons", PinIcon)))
-                    {
-                        // Lade Default-Icon falls CustomIcon nicht existiert
-                        string _newPin = SettingsService.Instance.DefaultPinIcon;
-                        var iconItem = IconLookup.Get(_newPin);
-                        return iconItem.FileName;
-                    }
-                    else
-                        return Path.Combine(Settings.DataDirectory, "customicons", PinIcon);
-                }
-                else if (_pin.IsCustomPin)
-                    return "shapes64.png";
-
-                return PinIcon;
-            }
-        }
-
-        public string PinName
-        {
-            get => _pin.PinName;
-            set
-            {
-                if (_pin.PinName != value)
-                {
-                    _pin.PinName = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string PinDesc
-        {
-            get => _pin.PinDesc;
-            set
-            {
-                if (_pin.PinDesc != value)
-                {
-                    _pin.PinDesc = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string PinLocation
-        {
-            get => _pin.PinLocation;
-            set
-            {
-                if (_pin.PinLocation != value)
-                {
-                    _pin.PinLocation = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public string PinIcon
-        {
-            get => _pin.PinIcon;
-            set
-            {
-                if (_pin.PinIcon != value)
-                {
-                    _pin.PinIcon = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool IsAllowExport
-        {
-            get => _pin.IsAllowExport;
-            set
-            {
-                if (_pin.IsAllowExport != value)
-                {
-                    _pin.IsAllowExport = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(DisplayOpacity));
-                }
-            }
-        }
-
-        private bool _isCustomPin;
-        public bool IsCustomPin
-        {
-            get => _isCustomPin;
-            set
-            {
-                if (_isCustomPin != value)
-                {
-                    _isCustomPin = value;
-                    OnPropertyChanged(nameof(IsCustomPin));
-                }
-            }
-        }
-
-        private bool _isWebMapPin;
-        public bool IsWebMapPin
-        {
-            get => _isWebMapPin;
-            set
-            {
-                if (_isWebMapPin != value)
-                {
-                    _isWebMapPin = value;
-                    OnPropertyChanged(nameof(IsWebMapPin));
-                }
-            }
-        }
-
-        public bool IsLockPosition
-        {
-            get => _pin.IsLockPosition;
-            set
-            {
-                if (_pin.IsLockPosition != value)
-                {
-                    _pin.IsLockPosition = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public List<string> PinPriorites { get; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
-
-        public int PinPriority
-        {
-            get => _pin.PinPriority;
-            set
-            {
-                if (_pin.PinPriority != value)
-                {
-                    _pin.PinPriority = value;
-                    OnPropertyChanged();
-                    UpdatePriorityColor();
-                }
-            }
-        }
-
-        private Color _priorityColor;
-        public Color PriorityColor
-        {
-            get => _priorityColor;
-            set
-            {
-                if (_priorityColor != value)
-                {
-                    _priorityColor = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        private void UpdatePriorityColor()
-        {
-            var items = SettingsService.Instance.PriorityItems;
-
-            if (PinPriority > 0 && PinPriority < items.Count)
-            {
-                PriorityColor = Color.FromArgb(items[PinPriority].Color);
-            }
-            else
-            {
-                PriorityColor = Application.Current.RequestedTheme == AppTheme.Dark
-                              ? (Color)Application.Current.Resources["PrimaryDarkText"]
-                              : (Color)Application.Current.Resources["PrimaryText"];
-            }
-        }
-
-        public string PlanDisplay =>
-                string.IsNullOrWhiteSpace(GlobalJson.Data.Plans[OnPlanId].Name) || string.IsNullOrWhiteSpace(PinLocation)
-                    ? GlobalJson.Data.Plans[OnPlanId].Name + PinLocation
-                    : $"{GlobalJson.Data.Plans[OnPlanId].Name}  /  {PinLocation}";
-    }
-
-    public class ColorPickerReturn(string colorHex, byte fillOpacity)
-    {
-        public string ColorHex { get; set; } = colorHex;
-
-        public byte FillOpacity { get; set; } = fillOpacity;
-    }
-
-    public class PopupStyleReturn(string borderColorHex, string fillColorHex, string textColorHex, int width, string strokeStyle, bool isHatchEffect, float hatchStrokeWitdh, float hatchStrokeSpace, float hatchRotation, float cloudRadius, float cloudInciseDeg)
-    {
-        public string BorderColorHex { get; set; } = borderColorHex;
-        public string FillColorHex { get; set; } = fillColorHex;
-        public string TextColorHex { get; set; } = textColorHex;
-        public int PenWidth { get; set; } = width;
-        public string StrokeStyle { get; set; } = strokeStyle;
-        public bool IsHatchEffect { get; set; } = isHatchEffect;
-        public float HatchStrokeWitdh { get; set; } = hatchStrokeWitdh;
-        public float HatchStrokeSpace { get; set; } = hatchStrokeSpace;
-        public float HatchRotation { get; set; } = hatchRotation;
-        public float CloudRadius { get; set; } = cloudRadius;
-        public float CloudInciseDeg { get; set; } = cloudInciseDeg;
-    }
-
-    public class PlanSelectorReturn(string planTarget, bool isPinCopy)
-    {
-        public string PlanTarget { get; set; } = planTarget;
-        public bool IsPinCopy { get; set; } = isPinCopy;
-    }
-
-    public class PlanEditReturn(string nameEntry, string descEntry, bool allowExport, int planRotate, string planColor, bool? lockAction)
-    {
-        public string NameEntry { get; set; } = nameEntry;
-        public string DescEntry { get; set; } = descEntry;
-        public bool AllowExport { get; set; } = allowExport;
-        public int PlanRotate { get; set; } = planRotate;
-        public string PlanColor { get; set; } = planColor;
-        public bool? LockAction { get; set; } = lockAction;
-    }
-
-    public class TextEditReturn(float fontSize, RectangleTextAlignment alignment, RectangleTextStyle style, bool autoSize, string inputTxt, int textPadding)
-    {
-        public float FontSize { get; set; } = fontSize;
-        public RectangleTextAlignment Alignment { get; set; } = alignment;
-        public RectangleTextStyle Style { get; set; } = style;
-        public bool AutoSize { get; set; } = autoSize;
-        public string InputTxt { get; set; } = inputTxt;
-        public int TextPadding { get; set; } = textPadding;
-    }
-
-    public class PriorityItem
-    {
-        public required string Key { get; set; }
-        public required string Color { get; set; }
-    }
-
-    public class MapViewItem
-    {
-        public required string Desc { get; set; }
-        public required string Id { get; set; }
-    }
-
-    public partial class PlanItem : ObservableObject
-    {
-        private readonly Plan _plan;
-
-        public PlanItem(Plan plan)
-        {
-            _plan = plan ?? throw new ArgumentNullException(nameof(plan));
-
-            _plan.PropertyChanged += (s, e) =>
-            {
-                if (e.PropertyName == nameof(Plan.AllowExport))
-                {
-                    OnPropertyChanged(nameof(AllowExport));
-                    OnPropertyChanged(nameof(DisplayOpacity));
-                }
-                else if (e.PropertyName == nameof(Plan.PlanColor))
-                    OnPropertyChanged(nameof(PlanColor));
-                else if (e.PropertyName == nameof(Plan.PinCount))
-                    OnPropertyChanged(nameof(PinCount));
-            };
-        }
-
-        public string PlanId { get; set; } = string.Empty;
-        public string PlanRoute { get; set; } = string.Empty;
-        public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
-        public bool IsWebMapPlan { get; set; }
-
-        private string _thumbnail;
-        public string Thumbnail
-        {
-            get => _thumbnail;
-            set
-            {
-                if (_thumbnail != value)
-                {
-                    _thumbnail = value;
-                    OnPropertyChanged();
-                }
-            }
-        }
-
-        public bool ShowThumbnail => !IsWebMapPlan;
-        public bool AllowExport
-        {
-            get => _plan.AllowExport;
-            set
-            {
-                if (_plan.AllowExport != value)
-                {
-                    _plan.AllowExport = value;
-                    OnPropertyChanged();
-                    OnPropertyChanged(nameof(DisplayOpacity));
-                }
-            }
-        }
-
-        public string PlanColor
-        {
-            get => _plan.PlanColor;
-            set
-            {
-                if (_plan.PlanColor != value)
-                {
-                    _plan.PlanColor = value;
-                    OnPropertyChanged(nameof(PlanColor));
-                }
-            }
-        }
-
-        public int PinCount
-        {
-            get => _plan.PinCount;
-            set
-            {
-                if (_plan.PinCount != value)
-                {
-                    _plan.PinCount = value;
-                    OnPropertyChanged(nameof(PinCount));
-                }
-            }
-        }
-
-        [ObservableProperty] public partial string Title { get; set; }
-        [ObservableProperty] public partial bool IsSelected { get; set; }
-    }
-
-    public partial class FotoItem : ObservableObject
-    {
-        [ObservableProperty] public partial ImageSource DisplayImage { get; set; }
-        [ObservableProperty] [NotifyPropertyChangedFor(nameof(DisplayOpacity))] public partial bool AllowExport { get; set; }
-        public string ImagePath { get; set; }
-        public DateTime DateTime { get; set; }
-        public string OnPlanId { get; set; }
-        public string OnPinId { get; set; }
-        public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
-
-        public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
-        public void ReloadImage()
-        {
-            if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath)) return;
-
-            try
-            {
-                var bytes = File.ReadAllBytes(ImagePath);
-                DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Fehler beim Laden: {ex.Message}");
-            }
-        }
-
-        public FotoItem Initialize()
-        {
-            ReloadImage();
-            return this;
+            return string.IsNullOrWhiteSpace(planName) || string.IsNullOrWhiteSpace(PinLocation)
+                ? planName + PinLocation
+                : $"{planName}  /  {PinLocation}";
         }
     }
 
-    public class PdfItem
+    // --- Modellgebundene Werte --------------------------------------
+    public string PinName
     {
-        public string ImagePath { get; set; }
-        public string PreviewPath { get; set; }
-        public string PdfPath { get; set; }
-        public bool IsChecked { get; set; }
-        public int Dpi { get; set; }
-        public string DisplayName { get; set; }
-        public string ImageName { get; set; }
-        public int PdfPage { get; set; }
-        public int FinalWidth { get; set; }
-        public int FinalHeight { get; set; }
+        get => Model.PinName;
+        set => SetModel(Model.PinName, value, v => Model.PinName = v);
     }
 
-    public class StylePickerItem
+    public string PinDesc
     {
-        public string Text { get; set; }
-        public string BackgroundColor { get; set; }
-        public string BorderColor { get; set; }
-        public string TextColor { get; set; }
-        public int LineWidth { get; set; }
-        public string StrokeStyle { get; set; }
-        public bool IsHatchEffect { get; set; } = false;
-        public float HatchStrokeWitdh { get; set; }
-        public float HatchStrokeSpace { get; set; }
-        public float HatchRotation { get; set; }
-
-        public double[] StrokeDashArray =>
-            Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
+        get => Model.PinDesc;
+        set => SetModel(Model.PinDesc, value, v => Model.PinDesc = v);
     }
 
-    public partial class ColorBoxItem : ObservableObject
+    public string PinLocation
     {
-        [ObservableProperty] public partial Color BackgroundColor { get; set; }
-        [ObservableProperty] public partial bool IsSelected { get; set; }
-        public bool IsAddButton { get; set; }
+        get => Model.PinLocation;
+        set => SetModel(Model.PinLocation, value, v => Model.PinLocation = v, [nameof(PlanDisplay)]);
     }
 
-    public class RatioItem
+    public string PinIcon
     {
-        public required string Name { get; set; }
-        public double Value { get; set; }
+        get => Model.PinIcon;
+        set => SetModel(Model.PinIcon, value, v => Model.PinIcon = v, [nameof(DisplayIconPath)]);
     }
+
+    public bool IsAllowExport
+    {
+        get => Model.IsAllowExport;
+        set => SetModel(Model.IsAllowExport, value, v => Model.IsAllowExport = v, [nameof(DisplayOpacity)]);
+    }
+
+    public bool IsLockPosition
+    {
+        get => Model.IsLockPosition;
+        set => SetModel(Model.IsLockPosition, value, v => Model.IsLockPosition = v);
+    }
+
+    public int PinPriority
+    {
+        get => Model.PinPriority;
+        set
+        {
+            if (SetModel(Model.PinPriority, value, v => Model.PinPriority = v))
+                UpdatePriorityColor();
+        }
+    }
+
+    // --- Lokaler UI-Zustand -----------------------------------------
+    private bool _isCustomPin;
+    public bool IsCustomPin
+    {
+        get => _isCustomPin;
+        set => SetProperty(ref _isCustomPin, value);
+    }
+
+    private bool _isWebMapPin;
+    public bool IsWebMapPin
+    {
+        get => _isWebMapPin;
+        set => SetProperty(ref _isWebMapPin, value);
+    }
+
+    private Color _priorityColor;
+    public Color PriorityColor
+    {
+        get => _priorityColor;
+        set => SetProperty(ref _priorityColor, value);
+    }
+
+    public List<string> PinPriorites { get; } =
+        [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
+
+    private void UpdatePriorityColor()
+    {
+        var items = SettingsService.Instance.PriorityItems;
+
+        PriorityColor = PinPriority > 0 && PinPriority < items.Count
+            ? Color.FromArgb(items[PinPriority].Color)
+            : Application.Current.RequestedTheme == AppTheme.Dark
+                ? (Color)Application.Current.Resources["PrimaryDarkText"]
+                : (Color)Application.Current.Resources["PrimaryText"];
+    }
+
+    protected override void OnModelPropertyChanged(string propertyName)
+    {
+        if (propertyName == nameof(Pin.IsAllowExport))
+            Notify(nameof(IsAllowExport), nameof(DisplayOpacity));
+    }
+}
+
+// =====================================================================
+//  Fotos und Icons
+// =====================================================================
+
+/// <summary>Ein Foto in der Galerie bzw. an einem Pin.</summary>
+public partial class FotoItem : ObservableObject
+{
+    [ObservableProperty] public partial ImageSource DisplayImage { get; set; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DisplayOpacity))]
+    public partial bool AllowExport { get; set; }
+
+    public string ImagePath { get; set; }
+    public DateTime DateTime { get; set; }
+    public string OnPlanId { get; set; }
+    public string OnPinId { get; set; }
+
+    public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
+    public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
+
+    /// <summary>Bild ueber einen Byte-Stream laden - umgeht den MAUI-Bildcache.</summary>
+    public void ReloadImage()
+    {
+        if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath)) return;
+
+        try
+        {
+            var bytes = File.ReadAllBytes(ImagePath);
+            DisplayImage = ImageSource.FromStream(() => new MemoryStream(bytes));
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Laden: {ex.Message}");
+        }
+    }
+
+    public FotoItem Initialize()
+    {
+        ReloadImage();
+        return this;
+    }
+}
+
+/// <summary>Ein Icon aus der Icon-Galerie.</summary>
+public class IconItem(
+    string fileName, string displayName, Point anchorPoint, Size iconSize,
+    bool isRotationLocked, bool isAutoScaleLocked, bool isCustomIcon,
+    SKColor pinColor, double iconScale, string category, bool isDefaultIcon)
+{
+    public string FileName { get; set; } = fileName;
+    public string DisplayName { get; set; } = displayName;
+    public Point AnchorPoint { get; set; } = anchorPoint;
+    public Size IconSize { get; set; } = iconSize;
+    public bool IsRotationLocked { get; set; } = isRotationLocked;
+    public bool IsAutoScaleLocked { get; set; } = isAutoScaleLocked;
+    public bool IsCustomIcon { get; set; } = isCustomIcon;
+    public bool IsCustomPin { get; set; } = false;
+    public SKColor PinColor { get; set; } = pinColor;
+    public double IconScale { get; set; } = iconScale;
+    public string Category { get; set; } = category;
+    public bool IsDefaultIcon { get; set; } = isDefaultIcon;
+
+    public string DisplayIconPath
+    {
+        get
+        {
+            if (!IsCustomIcon) return FileName;
+
+            string fullPath = Path.Combine(Settings.DataDirectory, "customicons", FileName);
+
+            // Default-Icon laden, falls das CustomIcon nicht existiert
+            return File.Exists(fullPath)
+                ? fullPath
+                : IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
+        }
+    }
+}
+
+// =====================================================================
+//  Einfache Listen- und Auswahl-Items
+// =====================================================================
+
+/// <summary>Eine PDF-Seite im Import-Dialog.</summary>
+public class PdfItem
+{
+    public string ImagePath { get; set; }
+    public string PreviewPath { get; set; }
+    public string PdfPath { get; set; }
+    public bool IsChecked { get; set; }
+    public int Dpi { get; set; }
+    public string DisplayName { get; set; }
+    public string ImageName { get; set; }
+    public int PdfPage { get; set; }
+    public int FinalWidth { get; set; }
+    public int FinalHeight { get; set; }
+}
+
+/// <summary>Eine Stilvorlage im Style-Picker.</summary>
+public class StylePickerItem
+{
+    public string Text { get; set; }
+    public string BackgroundColor { get; set; }
+    public string BorderColor { get; set; }
+    public string TextColor { get; set; }
+    public int LineWidth { get; set; }
+    public string StrokeStyle { get; set; }
+    public bool IsHatchEffect { get; set; } = false;
+    public float HatchStrokeWitdh { get; set; }
+    public float HatchStrokeSpace { get; set; }
+    public float HatchRotation { get; set; }
+
+    public double[] StrokeDashArray =>
+        Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
+}
+
+public partial class ColorBoxItem : ObservableObject
+{
+    [ObservableProperty] public partial Color BackgroundColor { get; set; }
+    [ObservableProperty] public partial bool IsSelected { get; set; }
+
+    public bool IsAddButton { get; set; }
+}
+
+public class PriorityItem
+{
+    public required string Key { get; set; }
+    public required string Color { get; set; }
+}
+
+public class MapViewItem
+{
+    public required string Desc { get; set; }
+    public required string Id { get; set; }
+}
+
+public class RatioItem
+{
+    public required string Name { get; set; }
+    public double Value { get; set; }
 }

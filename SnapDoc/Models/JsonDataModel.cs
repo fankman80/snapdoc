@@ -4,24 +4,24 @@ using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace SnapDoc.Models;
 
-public class JsonDataModel
+public partial class JsonDataModel : ObservableObject
 {
     public string ProjectId { get; set; } = Guid.NewGuid().ToString();
+    [ObservableProperty] public partial string Client_name { get; set; }
+    [ObservableProperty] public partial string Object_address { get; set; }
+    [ObservableProperty] public partial string Working_title { get; set; }
+    [ObservableProperty] public partial string Project_nr { get; set; }
+    [ObservableProperty] public partial string Object_name { get; set; }
+    [ObservableProperty] public partial string Project_manager { get; set; }
+    [ObservableProperty] public partial string TitleImage { get; set; }
     public string CloudDriveId { get; set; }
     public string CloudFolderId { get; set; }
-    public string Client_name { get; set; }
-    public string Object_address { get; set; }
-    public string Working_title { get; set; }
-    public string Project_nr { get; set; }
-    public string Object_name { get; set; }
     public DateTime Creation_date { get; set; }
-    public string Project_manager { get; set; }
     public Dictionary<string, Plan> Plans { get; set; }
     public string PlanPath { get; set; }
     public string ImagePath { get; set; }
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
-    public string TitleImage { get; set; }
     public Size TitleImageSize { get; set; }
 }
 

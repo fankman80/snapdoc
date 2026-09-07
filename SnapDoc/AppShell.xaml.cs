@@ -14,38 +14,27 @@ namespace SnapDoc;
 public partial class AppShell : Shell
 {
     private readonly AuthService _authService = new();
-    public ObservableCollection<PlanItem> AllPlanItems { get; set; }
-    public ObservableCollection<PlanItem> PlanItems { get; set; }
 
-    private bool _showAddPdfButton = false;
-    public bool ShowAddPdfButton
-    {
-        get => _showAddPdfButton;
-        set { _showAddPdfButton = value; OnPropertyChanged(); }
-    }
+    /// <summary>Kurzzugriff auf das Projekt-ViewModel (Datenquelle aller Bindings).</summary>
+    private static ProjectItem Project => ProjectItem.Current;
 
+    // Reine UI-Auswahl (Markierung in der Planliste) - bleibt in der Shell.
     private PlanItem _selectedPlanItem;
     public PlanItem SelectedPlanItem
     {
         get => _selectedPlanItem;
         set
         {
-            if (_selectedPlanItem != value)
-            {
-                _selectedPlanItem?.IsSelected = false;
-                _selectedPlanItem = value;
-                _selectedPlanItem?.IsSelected = true;
-            }
-        }
-    }
+            if (_selectedPlanItem == value) return;
 
-    private string _infoText = AppResources.kein_projekt_geladen;
-    public string InfoText
-    {
-        get => _infoText;
-        set
-        {
-            _infoText = value;
+            if (_selectedPlanItem != null)
+                _selectedPlanItem.IsSelected = false;
+
+            _selectedPlanItem = value;
+
+            if (_selectedPlanItem != null)
+                _selectedPlanItem.IsSelected = true;
+
             OnPropertyChanged();
         }
     }
@@ -53,6 +42,7 @@ public partial class AppShell : Shell
     public AppShell()
     {
         InitializeComponent();
+
         Routing.RegisterRoute("open_project", typeof(OpenProject));
         Routing.RegisterRoute("icongallery", typeof(IconGallery));
         Routing.RegisterRoute("fotogallery", typeof(FotoGalleryView));
@@ -67,84 +57,24 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("generalmapview", typeof(MapView));
         Routing.RegisterRoute("cloudPickerPage", typeof(CloudPickerPage));
 
-        AllPlanItems = [];
-        PlanItems = [];
-        PlanCollectionView.ItemsSource = PlanItems;
-
-        BindingContext = this;
+        // ItemsSource kommt aus der XAML: ItemsSource="{Binding PlanItems}"
+        BindingContext = Project;
 
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
-        AllPlanItems.CollectionChanged += (s, e) => UpdateButtonVisibility();
         PropertyChanged += OnAppShellPropertyChanged;
 
         ApplyPlanTemplate();
 
-        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
-        {
-            if (m.Value == RemoteChangeType.PlanListUpdated)
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    ReloadPlansFromData();
-                });
-            }
-        });
-
-        WeakReferenceMessenger.Default.Register<TitleImageChangedMessage>(this, (r, m) =>
-        {
-            MainThread.BeginInvokeOnMainThread(async () =>
-            {
-                if (GlobalJson.Data == null)
-                    return;
-
-                string projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
-
-                if (string.IsNullOrEmpty(projectDir))
-                    return;
-
-                await Helper.UpdateProjectTitleImageAsync(GlobalJson.Data, projectDir, m.OldFileName, m.NewFileName);
-
-                Helper.HeaderUpdate();
-            });
-        });
-        ReloadPlansFromData();
+        Project.ReloadPlansFromData();
     }
 
-    public void ReloadPlansFromData()
-    {
-        // Alle alten ShellContents (Routen) und PlanItems sauber aus der Shell entfernen
-        LoadDataToView.ClearAllPlansFromShell();
-
-        // Plaene aus GlobalJson neu ueber LoadDataToView aufbauen
-        if (GlobalJson.Data?.Plans != null)
-        {
-            foreach (var plan in GlobalJson.Data.Plans)
-                LoadDataToView.AddPlan(plan);
-        }
-
-        // Filter anwenden und Button-Sichtbarkeit aktualisieren
-        ApplyFilterAndSorting();
-        UpdateButtonVisibility();
-
-        // Pruefen, ob der aktuell geoeffnete Plan geloescht wurde
-        string currentRoute = Shell.Current?.CurrentState?.Location?.OriginalString;
-        if (!string.IsNullOrEmpty(currentRoute))
-        {
-            string currentPlanId = currentRoute.TrimStart('/');
-            bool isPlanRoute = currentPlanId.StartsWith("webmap_") || currentPlanId.StartsWith("plan_");
-
-            if (isPlanRoute && (GlobalJson.Data?.Plans == null || !GlobalJson.Data.Plans.ContainsKey(currentPlanId)))
-                Shell.Current.GoToAsync("//homescreen");
-        }
-    }
-
+    // ---------------------------------------------------------------
+    // Shell-eigene UI-Logik
+    // ---------------------------------------------------------------
     private void OnAppShellPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(FlyoutIsPresented))
-        {
-            if (!FlyoutIsPresented)
-                WeakReferenceMessenger.Default.Send(new ResetTouchesMessage());
-        }
+        if (e.PropertyName == nameof(FlyoutIsPresented) && !FlyoutIsPresented)
+            WeakReferenceMessenger.Default.Send(new ResetTouchesMessage());
     }
 
     private void ApplyPlanTemplate()
@@ -157,37 +87,146 @@ public partial class AppShell : Shell
                 : (DataTemplate)Resources["PlanListTemplate"];
     }
 
-    public void ApplyFilterAndSorting()
-    {
-        if (AllPlanItems == null) return;
-
-        var filtered = AllPlanItems
-            .Where(p => !SettingsService.Instance.IsHideInactivePlans || p.AllowExport)
-            .ToList();
-
-        PlanItems.Clear();
-        foreach (var item in filtered)
-            PlanItems.Add(item);
-
-        if (!SettingsService.Instance.IsProjectLoaded)
-            InfoText = AppResources.kein_projekt_geladen;
-        else if (AllPlanItems == null || AllPlanItems.Count == 0)
-            InfoText = AppResources.keine_pdf_seiten;
-        else if (SettingsService.Instance.IsHideInactivePlans && (AllPlanItems != null || AllPlanItems.Count > 0))
-            InfoText = $"{AppResources.ausgeblendete_plaene}: {AllPlanItems.Count - PlanItems.Count}";
-        else
-            InfoText = AppResources.plaene_umsortieren_gedrueckt_halten_und_ziehen;
-    }
-
     private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
     {
         if (e.PropertyName == nameof(SettingsService.IsPlanListThumbnails))
             MainThread.BeginInvokeOnMainThread(ApplyPlanTemplate);
 
         if (e.PropertyName == nameof(SettingsService.IsHideInactivePlans))
-            MainThread.BeginInvokeOnMainThread(ApplyFilterAndSorting);
+            MainThread.BeginInvokeOnMainThread(Project.ApplyFilterAndSorting);
     }
 
+    public void HighlightCurrentPlan(string planId)
+    {
+        if (PlanCollectionView == null) return;
+
+        var selected = Project.PlanItems.FirstOrDefault(p => p.PlanId == planId);
+        if (selected != null)
+            PlanCollectionView.SelectedItem = selected;
+    }
+
+    // ---------------------------------------------------------------
+    // Navigation
+    // ---------------------------------------------------------------
+    private async void OnNavigateTapped(object sender, EventArgs e)
+    {
+        if (sender is not Grid ve || ve.GestureRecognizers.FirstOrDefault() is not TapGestureRecognizer tap)
+            return;
+
+        var parameter = tap.CommandParameter?.ToString();
+        if (string.IsNullOrWhiteSpace(parameter)) return;
+
+#if WINDOWS
+        Shell.Current.FlyoutIsPresented = true;
+#endif
+#if ANDROID || IOS
+        Shell.Current.FlyoutIsPresented = false;
+#endif
+        // Navigation auf bestimmte Seiten vermeiden, wenn keine Plaene vorhanden sind
+        if (!Project.HasPlans && (parameter == "exportSettings" ||
+                                  parameter == "pinList" ||
+                                  parameter == "mapview" ||
+                                  parameter == "fotogallery"))
+        {
+            await this.ShowPopupAsync(new PopupAlert(AppResources.keine_plaene_vorhanden_importieren, AppResources.hinweis), Settings.PopupOptions);
+            return;
+        }
+
+        await Shell.Current.GoToAsync(parameter);
+    }
+
+    private async void OnPlanTapped(object sender, EventArgs e)
+    {
+        if (sender is not Grid ve || ve.GestureRecognizers.FirstOrDefault() is not TapGestureRecognizer tap)
+            return;
+
+        var parameter = tap.CommandParameter?.ToString();
+        if (string.IsNullOrWhiteSpace(parameter)) return;
+
+#if WINDOWS
+        Shell.Current.FlyoutIsPresented = true;
+#endif
+#if ANDROID || IOS
+        Shell.Current.FlyoutIsPresented = false;
+#endif
+        await Shell.Current.GoToAsync($"//{parameter}");
+    }
+
+    private async void OnAddPdfClicked(object sender, EventArgs e)
+    {
+        await Shell.Current.GoToAsync("loadPdfImages");
+    }
+
+    private void OnTitleClicked(object sender, EventArgs e)
+    {
+        if (SettingsService.Instance.IsProjectLoaded)
+            WeakReferenceMessenger.Default.Send(new TitleCaptureRequestedMessage());
+    }
+
+    // ---------------------------------------------------------------
+    // Planliste
+    // ---------------------------------------------------------------
+    private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)
+    {
+        if (e.CurrentSelection is { Count: > 0 } && e.CurrentSelection[0] is PlanItem selected)
+            SelectedPlanItem = selected;
+    }
+
+    private void OnAllowExportClicked(object sender, EventArgs e)
+    {
+        if ((sender as Label)?.BindingContext is not PlanItem item) return;
+
+        item.AllowExport = !item.AllowExport;
+
+        // save data to file
+        SaveManager.NotifyDataChanged();
+
+        // Neu filtern und anzeigen, falls HideInactivePlans aktiv ist
+        if (SettingsService.Instance.IsHideInactivePlans)
+            Project.ApplyFilterAndSorting();
+    }
+
+    private static void UpdatePlansOrder(List<string> updatedPlanOrder)
+    {
+        if (GlobalJson.Data?.Plans == null) return;
+
+        var plansList = GlobalJson.Data.Plans.ToList();
+        var reorderedPlans = updatedPlanOrder
+            .Select(planRoute => plansList.FirstOrDefault(p => p.Key == planRoute))
+            .Where(p => p.Key != null)
+            .ToList();
+
+        GlobalJson.Data.Plans = reorderedPlans.ToDictionary(p => p.Key, p => p.Value);
+    }
+
+    private void OnReorderCompleted(object sender, EventArgs e)
+    {
+        if ((sender as CollectionView)?.ItemsSource is not ObservableCollection<PlanItem> reorderedItems)
+            return;
+
+        var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
+
+        // Masterliste in-place umsortieren (Collection darf nicht neu zugewiesen werden)
+        var all = Project.AllPlanItems;
+        var reordered = orderedIds
+            .Select(id => all.First(p => p.PlanId == id))
+            .Concat(all.Where(p => !orderedIds.Contains(p.PlanId)))
+            .ToList();
+
+        all.Clear();
+        foreach (var p in reordered)
+            all.Add(p);
+
+        UpdatePlansOrder(orderedIds);        // Reihenfolge in JSON aktualisieren
+        Project.ApplyFilterAndSorting();     // Filter wieder anwenden
+
+        // save data to file
+        SaveManager.NotifyDataChanged();
+    }
+
+    // ---------------------------------------------------------------
+    // Footer-Aktionen
+    // ---------------------------------------------------------------
     private async void OnSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupSettings();
@@ -202,12 +241,11 @@ public partial class AppShell : Shell
             var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
             if (result?.Result is not DualPopupResult.Ok) return;
 
-            // Hier das Polling beim Abmelden stoppen
+            // Polling beim Abmelden stoppen
             SaveManager.StopCloudPolling();
-
+            await _authService.LogoutAsync();
             SaveManager.CurrentAuth = null;
             SettingsService.Instance.RefreshCloudState();
-
             return;
         }
 
@@ -218,148 +256,15 @@ public partial class AppShell : Shell
             SaveManager.CurrentAuth = _authService;
             SettingsService.Instance.RefreshCloudState();
 
-            // Hier das Polling nach erfolgreichem Login starten
+            // Polling nach erfolgreichem Login starten
             SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
 
             await SnackbarExtensions.ShowSafeAsync($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", includeDelay: true);
         }
         else if (userName != nameof(DualPopupResult.Cancel))
         {
-            // Wird nur bei echten Fehlern ausgeführt, nicht beim Abbruch durch den Nutzer
+            // Nur bei echten Fehlern, nicht beim Abbruch durch den Nutzer
             await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}:\n{userName}\n{userEmail}", AppResources.fehler), Settings.PopupOptions);
         }
-    }
-
-    private void OnTitleClicked(object sender, EventArgs e)
-    {
-        if (SettingsService.Instance.IsProjectLoaded)
-        {
-            var projectDetails = new ProjectDetails();
-            projectDetails.OnTitleCaptureClicked(null, null);
-        }
-    }
-
-    private async void OnAddPdfClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("loadPdfImages");
-    }
-
-    private async void OnNavigateTapped(object sender, EventArgs e)
-    {
-        if (sender is Grid ve && ve.GestureRecognizers.FirstOrDefault() is TapGestureRecognizer tap)
-        {
-            var parameter = tap.CommandParameter?.ToString();
-            if (!string.IsNullOrWhiteSpace(parameter))
-            {
-#if WINDOWS     
-                Shell.Current.FlyoutIsPresented = true;
-#endif
-#if ANDROID || IOS 
-                Shell.Current.FlyoutIsPresented = false;
-#endif
-                // vermeide Navigation auf bestimmte Seiten wenn keine Pläne vorhanden sind
-                if (GlobalJson.Data.Plans == null && (parameter == "exportSettings" ||
-                                                        parameter == "pinList" ||
-                                                        parameter == "mapview" ||
-                                                        parameter == "fotogallery"))
-                {
-                    await this.ShowPopupAsync(new PopupAlert(AppResources.keine_plaene_vorhanden_importieren, AppResources.hinweis), Settings.PopupOptions);
-                    return;
-                }
-
-                await Shell.Current.GoToAsync(parameter);
-            }
-        }
-    }
-
-    private async void OnPlanTapped(object sender, EventArgs e)
-    {
-        if (sender is Grid ve && ve.GestureRecognizers.FirstOrDefault() is TapGestureRecognizer tap)
-        {
-            var parameter = tap.CommandParameter?.ToString();
-            if (!string.IsNullOrWhiteSpace(parameter))
-            {
-#if WINDOWS     
-                Shell.Current.FlyoutIsPresented = true;
-#endif
-#if ANDROID || IOS
-                Shell.Current.FlyoutIsPresented = false;
-#endif
-                await Shell.Current.GoToAsync($"//{parameter}");
-            }
-        }
-    }
-
-    private void OnAllowExportClicked(object sender, EventArgs e)
-    {
-        var button = sender as Label;
-
-        PlanItem item = (PlanItem)button.BindingContext;
-
-        if (item == null) return;
-
-        item.AllowExport = !item.AllowExport;
-
-        // save data to file
-        SaveManager.NotifyDataChanged();
-
-        // Neu filtern und anzeigen, falls HideInactivePlans aktiv ist
-        if (SettingsService.Instance.IsHideInactivePlans)
-            ApplyFilterAndSorting();
-    }
-
-    private static void UpdatePlansOrder(List<string> updatedPlanOrder)
-    {
-        var plansList = GlobalJson.Data.Plans.ToList();
-        var reorderedPlans = updatedPlanOrder.Select(planRoute =>
-        {
-            return plansList.FirstOrDefault(p => p.Key == planRoute);
-        }).Where(p => p.Key != null).ToList();
-
-        GlobalJson.Data.Plans = reorderedPlans.ToDictionary(p => p.Key, p => p.Value);
-    }
-
-    private void OnReorderCompleted(object sender, EventArgs e)
-    {
-        if ((sender as CollectionView)?.ItemsSource is not ObservableCollection<PlanItem> reorderedItems) return;
-
-        var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
-
-        // Reorder AllPlanItems anhand der Masterliste, nicht der gefilterten Liste
-        AllPlanItems =
-        [
-            .. orderedIds.Select(id => AllPlanItems.First(p => p.PlanId == id)),
-            .. AllPlanItems.Where(p => !orderedIds.Contains(p.PlanId)),
-        ];
-
-        UpdatePlansOrder(orderedIds); // Reihenfolge in JSON aktualisieren
-
-        ApplyFilterAndSorting(); // Filter wieder anwenden
-
-        // save data to file
-        SaveManager.NotifyDataChanged();
-    }
-
-    private void OnPlanSelectionChanged(object sender, SelectionChangedEventArgs e)
-    {
-        if (e.CurrentSelection != null && e.CurrentSelection.Count > 0 && e.CurrentSelection[0] is PlanItem selected)
-            SelectedPlanItem = selected;
-    }
-
-    public void HighlightCurrentPlan(string planId)
-    {
-        if (PlanItems == null || PlanCollectionView == null) return;
-
-        var selected = PlanItems.FirstOrDefault(p => p.PlanId == planId);
-        if (selected != null)
-            PlanCollectionView.SelectedItem = selected;
-    }
-
-    private void UpdateButtonVisibility()
-    {
-        bool isProjectLoaded = SettingsService.Instance.IsProjectLoaded;
-        bool isListEmpty = (AllPlanItems == null || AllPlanItems.Count == 0);
-
-        ShowAddPdfButton = isProjectLoaded && isListEmpty;
     }
 }

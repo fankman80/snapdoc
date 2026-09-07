@@ -2,6 +2,11 @@
 
 namespace SnapDoc.Messages;
 
+public class TitleCaptureRequestedMessage : ValueChangedMessage<bool>
+{
+    public TitleCaptureRequestedMessage() : base(true) { }
+}
+
 public class PinChangedMessage(string pinId) : ValueChangedMessage<string>(pinId)
 {
 }

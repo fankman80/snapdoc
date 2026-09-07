@@ -10,10 +10,13 @@ namespace SnapDoc.Services;
 public partial class SettingsService : ObservableObject
 {
     // --- Singleton ---
+    private const string SettingsFileName = "appsettings.ini";
+    public const string FlyoutHeaderTitle = "SnapDoc";
+    public const string FlyoutHeaderDesc = "by Emch+Berger AG Bern";
+    public const string FlyoutHeaderImageThumb = "banner_thumbnail.png";
+    public const string DefaultJson = "snapdoc_data.json";
     private static readonly Lazy<SettingsService> _instance = new(() => new SettingsService());
     public static SettingsService Instance => _instance.Value;
-
-    private const string SettingsFileName = "appsettings.ini";
     private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
     // --- Theme Dictionaries ---
@@ -92,7 +95,6 @@ public partial class SettingsService : ObservableObject
     public string ProjectPath { get; set; }
 
     [ObservableProperty] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
-    [ObservableProperty] public partial string DefaultJson { get; set; } = "snapdoc_data.json";
     [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
     [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
     [ObservableProperty] public partial int FlashMode { get; set; } = 0;
@@ -100,9 +102,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
     [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
     [ObservableProperty] public partial string LastPinId { get; set; }
-    [ObservableProperty] public partial string FlyoutHeaderTitle { get; set; } = "SnapDoc";
-    [ObservableProperty] public partial string FlyoutHeaderDesc { get; set; } = "by Emch+Berger AG Bern";
-    [ObservableProperty] public partial string FlyoutHeaderImageThumb { get; set; } = "banner_thumbnail.png";
     [ObservableProperty] public partial string FlyoutHeaderImage { get; set; } = "";
     [ObservableProperty] public partial bool IconGalleryGridView { get; set; } = false;
     [ObservableProperty] public partial bool PhotoGalleryGridView { get; set; } = false;
@@ -346,7 +345,6 @@ public partial class SettingsService : ObservableObject
         var settings = new SettingsModel
         {
             OsBaseScale = OsBaseScale,
-            DefaultJson = DefaultJson,
             PinMinScaleLimit = PinMinScaleLimit,
             PinMaxScaleLimit = PinMaxScaleLimit,
             MapIconSize = MapIconSize,
@@ -435,7 +433,6 @@ public partial class SettingsService : ObservableObject
             var defaultSettings = new SettingsService();
 
             OsBaseScale = settings.OsBaseScale ?? defaultSettings.OsBaseScale;
-            DefaultJson = !string.IsNullOrWhiteSpace(settings.DefaultJson) ? settings.DefaultJson : defaultSettings.DefaultJson;
             PinMinScaleLimit = settings.PinMinScaleLimit ?? defaultSettings.PinMinScaleLimit;
             PinMaxScaleLimit = settings.PinMaxScaleLimit ?? defaultSettings.PinMaxScaleLimit;
             MapIconSize = settings.MapIconSize ?? defaultSettings.MapIconSize;
@@ -524,7 +521,6 @@ public partial class SettingsService : ObservableObject
         // Einfach den Konstruktor einmal wieder aufrufen
         var defaultSettings = new SettingsService();
         OsBaseScale = defaultSettings.OsBaseScale;
-        DefaultJson = defaultSettings.DefaultJson;
         PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
         PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
         MapIconSize = defaultSettings.MapIconSize;

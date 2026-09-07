@@ -301,7 +301,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
                 // 2. Lokale JSON direkt speichern
                 string json = System.Text.Json.JsonSerializer.Serialize(GlobalJson.Data, GlobalJson.GetOptions());
-                string filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.Instance.DefaultJson);
+                string filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.DefaultJson);
                 File.WriteAllText(filePath, json);
             }
         }

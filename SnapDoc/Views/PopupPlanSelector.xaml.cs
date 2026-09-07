@@ -110,7 +110,7 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 
         var index = selectedRadioButtonIndex;
 
-        var filteredPlans = shell.PlanItems.Where(plan =>
+        var filteredPlans = ProjectItem.Current.PlanItems.Where(plan =>
         {
             if (plan.PlanId != null && plan.PlanId.Contains("webmap", StringComparison.OrdinalIgnoreCase))
                 return false;

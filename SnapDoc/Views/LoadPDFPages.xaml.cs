@@ -258,7 +258,7 @@ public partial class LoadPDFPages : ContentPage
             SaveManager.NotifyDataChanged();
 
             if (Shell.Current is AppShell shell)
-                shell.ApplyFilterAndSorting();
+                ProjectItem.Current.ApplyFilterAndSorting();
 
             // BusyOverlay schließen
             await BusyService.HideAsync();

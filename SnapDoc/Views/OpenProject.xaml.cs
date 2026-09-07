@@ -43,7 +43,7 @@ public partial class OpenProject : ContentPage
                             ? Path.Combine(
                                 Settings.DataDirectory,
                                 SettingsService.Instance.ProjectPath,
-                                SettingsService.Instance.DefaultJson)
+                                SettingsService.DefaultJson)
                             : null;
                 foreach (var file in files)
                 {
@@ -62,9 +62,9 @@ public partial class OpenProject : ContentPage
                             // 2. Umbenennungs-Logik: Pruefen ob der Name vom Standard abweicht
                             string currentFileName = Path.GetFileName(currentFilePath);
 
-                            if (!currentFileName.Equals(SettingsService.Instance.DefaultJson, StringComparison.OrdinalIgnoreCase))
+                            if (!currentFileName.Equals(SettingsService.DefaultJson, StringComparison.OrdinalIgnoreCase))
                             {
-                                string newFilePath = Path.Combine(projectDir, SettingsService.Instance.DefaultJson);
+                                string newFilePath = Path.Combine(projectDir, SettingsService.DefaultJson);
 
                                 // Nur umbenennen, falls am Ziel nicht schon eine Datei liegt
                                 if (!File.Exists(newFilePath))
@@ -393,7 +393,7 @@ public partial class OpenProject : ContentPage
             counter++;
         }
 
-        string filePath = Path.Combine(Settings.DataDirectory, _result, SettingsService.Instance.DefaultJson);
+        string filePath = Path.Combine(Settings.DataDirectory, _result, SettingsService.DefaultJson);
 
         SaveManager.ResetCloudSync();
         LoadDataToView.ResetData();
@@ -414,8 +414,9 @@ public partial class OpenProject : ContentPage
 
         SettingsService.Instance.IsProjectLoaded = true;
         GlobalJson.LoadFromFile(filePath);
+
         LoadDataToView.LoadData(new FileResult(filePath));
-        Helper.HeaderUpdate();  // UI-Aktualisierung
+        ProjectItem.Current.Attach(GlobalJson.Data);
 
         // save data to file
         SaveManager.NotifyDataChanged();
@@ -568,7 +569,7 @@ public partial class OpenProject : ContentPage
 
 
             LoadDataToView.LoadData(new FileResult(item.FilePath));
-            Helper.HeaderUpdate();
+            ProjectItem.Current.Attach(GlobalJson.Data);
 
             if (GlobalJson.Data.Plans != null)
             {
@@ -654,7 +655,7 @@ public partial class OpenProject : ContentPage
                         string projectDirectoryPath = Path.GetDirectoryName(fullPath);
                         string fileName = Path.GetFileName(fullPath);
                         bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
-                                                 fileName.Equals(SettingsService.Instance.DefaultJson, StringComparison.OrdinalIgnoreCase);
+                                                 fileName.Equals(SettingsService.DefaultJson, StringComparison.OrdinalIgnoreCase);
 
                         // Lösche das Projektverzeichnis und alle enthaltenen Dateien
                         if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
@@ -688,7 +689,7 @@ public partial class OpenProject : ContentPage
                             await Shell.Current.GoToAsync("//homescreen");
                             SettingsService.Instance.IsProjectLoaded = false;
                             LoadDataToView.ResetData();
-                            Helper.HeaderUpdate();
+                            ProjectItem.Current.Attach(GlobalJson.Data);
                         }
 
                         LoadJsonFiles();
@@ -774,7 +775,7 @@ public partial class OpenProject : ContentPage
                     GlobalJson.LoadFromFile(item.FilePath);
                     SaveManager.Initialize(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
-                    Helper.HeaderUpdate();
+                    ProjectItem.Current.Attach(GlobalJson.Data);
 
                     await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
                     break;
@@ -798,7 +799,7 @@ public partial class OpenProject : ContentPage
                             LoadDataToView.ResetData();
                             GlobalJson.LoadFromFile(currentFilePath);
                             LoadDataToView.LoadData(new FileResult(currentFilePath));
-                            Helper.HeaderUpdate();
+                            ProjectItem.Current.Attach(GlobalJson.Data);
                         }
 
                         LoadJsonFiles();

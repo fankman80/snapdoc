@@ -161,8 +161,7 @@ public partial class MapView : IQueryAttributable
         if (query.TryGetValue("planId", out var planIdObj))
         {
             planId = planIdObj as string ?? string.Empty;
-            Title = (Shell.Current as AppShell)
-                ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title;
+            Title = ProjectItem.Current?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title;
         }
 
         if (newPinId != pinId)
@@ -911,11 +910,11 @@ public partial class MapView : IQueryAttributable
             section.Items.Remove(shellContent);
 
         // Masterliste bereinigen
-        var masterItem = shell.AllPlanItems
+        var masterItem = ProjectItem.Current.AllPlanItems
             .FirstOrDefault(p => p.PlanId == planId);
 
         if (masterItem != null)
-            shell.AllPlanItems.Remove(masterItem);
+            ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
         if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
@@ -932,7 +931,7 @@ public partial class MapView : IQueryAttributable
         SaveManager.NotifyDataChanged();
 
         // Anzeige neu aufbauen
-        shell.ApplyFilterAndSorting();
+        ProjectItem.Current.ApplyFilterAndSorting();
 
         await Shell.Current.GoToAsync("//homescreen");
     }
@@ -970,8 +969,7 @@ public partial class MapView : IQueryAttributable
         if (sender is not Entry entry) return;
 
         // Titel speichern
-        (Shell.Current as AppShell)
-            ?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
+        ProjectItem.Current?.AllPlanItems.FirstOrDefault(i => i.PlanId == planId)!.Title = Title;
 
         GlobalJson.Data.Plans[planId].Name = Title;
 

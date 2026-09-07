@@ -2,10 +2,11 @@
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SkiaSharp;
-using SnapDoc.Models;
 using SnapDoc.Messages;
+using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using System.Globalization;
 
 namespace SnapDoc.Views;
 
@@ -14,52 +15,27 @@ public partial class ProjectDetails : ContentPage
     public ProjectDetails()
     {
         InitializeComponent();
+
+        BindingContext = ProjectItem.Current;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        BindingContext = ProjectItem.Current;
 
-        LoadDataToUI();
-
-        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
-        {
-            if (m.Value == RemoteChangeType.ProjectDetailsUpdated)
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    LoadDataToUI();
-                });
-            }
-        });
-
-        WeakReferenceMessenger.Default.Register<TitleImageChangedMessage>(this, (r, m) =>
-        {
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                LoadDataToUI();
-                Helper.HeaderUpdate();
-            });
-        });
-
-        Helper.HeaderUpdate();
+        WeakReferenceMessenger.Default.Register<TitleCaptureRequestedMessage>(this, (r, m) => MainThread.BeginInvokeOnMainThread(() => OnTitleCaptureClicked(null, null)));
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
 
-        WeakReferenceMessenger.Default.Unregister<RemoteDataChangedMessage>(this);
-
-        WeakReferenceMessenger.Default.Unregister<TitleImageChangedMessage>(this);
+        WeakReferenceMessenger.Default.Unregister<TitleCaptureRequestedMessage>(this);
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
     {
-        UpdateProjectData();
-
-        Helper.HeaderUpdate();
-
         await Shell.Current.GoToAsync("//homescreen");
 
 #if ANDROID || IOS
@@ -94,7 +70,7 @@ public partial class ProjectDetails : ContentPage
             }
 
             // 3. JSON aktualisieren
-            GlobalJson.Data.TitleImage = thumbFileName;
+            ProjectItem.Current.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
             GlobalJson.SaveToFile();
 
@@ -104,8 +80,6 @@ public partial class ProjectDetails : ContentPage
 
             // 4. JSON-Aenderungen UND die 2 neuen Bilddateien an SaveManager uebergeben
             SaveManager.NotifyDataChanged([(destinationPath, GlobalJson.Data.ImagePath), (destinationThumbPath, GlobalJson.Data.ThumbnailPath)]);
-
-            Helper.HeaderUpdate();
         }
     }
 
@@ -157,7 +131,7 @@ public partial class ProjectDetails : ContentPage
                 }
 
                 // 3. JSON aktualisieren
-                GlobalJson.Data.TitleImage = thumbFileName;
+                ProjectItem.Current.TitleImage = thumbFileName;
 
                 // Codec in einem using-Block kapseln, um Memory Leaks zu verhindern
                 using (var codec = SKCodec.Create(sourceFilePath))
@@ -175,8 +149,6 @@ public partial class ProjectDetails : ContentPage
                     (destinationPath, GlobalJson.Data.ImagePath), // Originalbild im Images-Ordner
                     (destinationThumbPath, GlobalJson.Data.ThumbnailPath) // Thumbnailbild im Thumbnails-Ordner
                 ]);
-
-                Helper.HeaderUpdate();
             }
         }
         catch (Exception ex)
@@ -187,15 +159,11 @@ public partial class ProjectDetails : ContentPage
 
     private async void OnAddPdfClicked(object sender, EventArgs e)
     {
-        UpdateProjectData();
-
         await Shell.Current.GoToAsync("loadPdfImages");
     }
 
     private async void OnAddWebMapClicked(object sender, EventArgs e)
     {
-        UpdateProjectData();
-
         var popup = new PopupEntry(header: AppResources.karte_aus_webmap,
                                    desc: AppResources.online_map_requirement_hint + ".",
                                    title: AppResources.plan_name,
@@ -227,46 +195,21 @@ public partial class ProjectDetails : ContentPage
 
         // Shell aktualisieren
         var shell = Shell.Current as AppShell;
-        shell.ApplyFilterAndSorting();
+        ProjectItem.Current.ApplyFilterAndSorting();
 
         await Shell.Current.GoToAsync($"//{planId}");
     }
 
     private async void CalendarClicked(object sender, EventArgs e)
     {
-        UpdateProjectData();
-
-        var popup = new PopupCalendarView(DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today);
+        var popup = new PopupCalendarView(ProjectItem.Current.CreationDate);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        if (!string.IsNullOrEmpty(result.Result))
-            creation_date.Text = result.Result;
-    }
+        if (string.IsNullOrEmpty(result?.Result)) return;
 
-    private void UpdateProjectData()
-    {
-        GlobalJson.Data.Client_name = client_name.Text;
-        GlobalJson.Data.Object_address = object_address.Text;
-        GlobalJson.Data.Working_title = working_title.Text;
-        GlobalJson.Data.Project_nr = project_nr.Text;
-        GlobalJson.Data.Object_name = object_name.Text;
-        GlobalJson.Data.Project_manager = project_manager.Text;
-        GlobalJson.Data.Creation_date = DateTime.TryParse(creation_date.Text, out DateTime parsedDate) ? parsedDate : DateTime.Today;
-
-        // save data to file
-        SaveManager.NotifyDataChanged();
-    }
-
-    private void LoadDataToUI()
-    {
-        if (!client_name.IsFocused) client_name.Text = GlobalJson.Data.Client_name;
-        if (!object_address.IsFocused) object_address.Text = GlobalJson.Data.Object_address;
-        if (!working_title.IsFocused) working_title.Text = GlobalJson.Data.Working_title;
-        if (!project_nr.IsFocused) project_nr.Text = GlobalJson.Data.Project_nr;
-        if (!object_name.IsFocused) object_name.Text = GlobalJson.Data.Object_name;
-        if (!project_manager.IsFocused) project_manager.Text = GlobalJson.Data.Project_manager;
-
-        creation_date.Text = GlobalJson.Data.Creation_date.ToString("dd.MM.yyyy", System.Globalization.CultureInfo.InvariantCulture);
+        if (DateTime.TryParseExact(result.Result, "dd.MM.yyyy",
+        CultureInfo.InvariantCulture, DateTimeStyles.None, out var picked))
+            ProjectItem.Current.CreationDate = picked;
     }
 
     private async void OnImageTapped(object sender, EventArgs e)

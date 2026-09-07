@@ -6,16 +6,18 @@ namespace SnapDoc;
 
 public partial class LoadDataToView
 {
+    private static ProjectItem Project => ProjectItem.Current;
+
     public static void LoadData(FileResult path)
     {
         if (path == null || string.IsNullOrEmpty(path.FullPath)) return;
-        if (Shell.Current is not AppShell shell) return;
-        if (GlobalJson.Data.Plans == null) return;
+        if (Shell.Current is not AppShell) return;
+        if (GlobalJson.Data?.Plans == null) return;
 
         foreach (var plan in GlobalJson.Data.Plans)
             AddPlan(plan);
 
-        shell.ApplyFilterAndSorting();
+        Project.ApplyFilterAndSorting();
     }
 
     public static void AddPlan(KeyValuePair<string, Models.Plan> plan)
@@ -52,6 +54,7 @@ public partial class LoadDataToView
             AutomationId = planId
         };
 
+        // Shell-Routen bleiben Aufgabe der Shell
         shell.Items.Add(shellContent);
 
         var item = new PlanItem(plan.Value)
@@ -67,31 +70,19 @@ public partial class LoadDataToView
             item.Thumbnail = Path.Combine(
                 Settings.DataDirectory,
                 SettingsService.Instance.ProjectPath,
-                GlobalJson.Data.PlanPath,
+                Project.PlanFolder,
                 "thumbnails",
                 plan.Value.File);
         }
 
-        shell.AllPlanItems.Add(item);
+        // Datenhaltung liegt im ViewModel
+        Project.AllPlanItems.Add(item);
     }
 
     public static void ResetData()
     {
         ClearAllPlansFromShell();
-
-        // Reset Datenbank
-        GlobalJson.Data.Client_name = null;
-        GlobalJson.Data.Object_address = null;
-        GlobalJson.Data.Working_title = null;
-        GlobalJson.Data.Project_nr = null;
-        GlobalJson.Data.Object_name = null;
-        GlobalJson.Data.Creation_date = DateTime.Now;
-        GlobalJson.Data.Project_manager = null;
-        GlobalJson.Data.Plans = null;
-        GlobalJson.Data.PlanPath = null;
-        GlobalJson.Data.ImagePath = null;
-        GlobalJson.Data.ThumbnailPath = null;
-        GlobalJson.Data.CustomPinsPath = null;
+        Project.Reset();
     }
 
     public static void ClearAllPlansFromShell()
@@ -103,7 +94,7 @@ public partial class LoadDataToView
         {
             try
             {
-                var planIds = shell.AllPlanItems
+                var planIds = Project.AllPlanItems
                     .Where(p => p?.PlanId != null)
                     .Select(p => p.PlanId)
                     .ToHashSet();
@@ -148,10 +139,9 @@ public partial class LoadDataToView
                     }
                 }
 
-                // Daten im Shell-Modell komplett leeren
-                shell.PlanItems.Clear();
-                shell.AllPlanItems.Clear();
-                shell.ApplyFilterAndSorting();
+                // Daten im ViewModel komplett leeren
+                Project.AllPlanItems.Clear();
+                Project.PlanItems.Clear();
             }
             catch (Exception ex)
             {
