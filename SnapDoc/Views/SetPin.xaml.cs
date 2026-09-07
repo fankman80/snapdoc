@@ -274,9 +274,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnOkayClick(object sender, EventArgs e)
     {
-        // save data to file
-        SaveManager.NotifyDataChanged();
-
         WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, Pin.IsLockPosition));
 
         await Shell.Current.GoToAsync("..");

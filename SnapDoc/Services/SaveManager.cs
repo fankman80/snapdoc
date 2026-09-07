@@ -463,25 +463,8 @@ public static class SaveManager
             localPlan.PlanColor = cloudPlan.PlanColor;
             localPlan.AllowExport = cloudPlan.AllowExport;
 
-            // Bei Namens-, Farb- oder Exportaenderung das PlanItem direkt aktualisieren
-            if (nameOrExportChanged || colorChanged)
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    var item = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
-                    if (item == null) return;
-
-                    item.Title = cloudPlan.Name;
-                    item.AllowExport = cloudPlan.AllowExport;
-                    item.PlanColor = cloudPlan.PlanColor;
-                });
-            }
-
             if (detailsChanged)
-            {
-                WeakReferenceMessenger.Default.Send(new PlanDetailsChangedMessage(
-                    (planId, cloudPlan.Name, cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
-            }
+                WeakReferenceMessenger.Default.Send(new PlanDetailsChangedMessage((planId, cloudPlan.Name, cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
         }
 
         localPlan.Pins ??= [];

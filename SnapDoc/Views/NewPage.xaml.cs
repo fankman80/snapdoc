@@ -222,17 +222,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             });
         });
 
-        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
-        {
-            if (m.Value == RemoteChangeType.PinsUpdated)
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    PlanImage.InvalidateSurface();
-                });
-            }
-        });
-
         WeakReferenceMessenger.Default.Register<ResetTouchesMessage>(this, (r, m) =>
         {
             MainThread.BeginInvokeOnMainThread(() => { ResetTouchState(); });
@@ -240,22 +229,15 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         WeakReferenceMessenger.Default.Register<PlanDetailsChangedMessage>(this, (r, m) =>
         {
-            var (updatedPlanId, newName, description, isGrayscale, planColor) = m.Value;
-            if (updatedPlanId == planId)
+            var (updatedPlanId, newName, _, isGrayscale, _) = m.Value;
+            if (updatedPlanId != planId) return;
+
+            MainThread.BeginInvokeOnMainThread(() =>
             {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    Title = newName;
-                    thisPlan.Name = newName;
-                    thisPlan.Description = description;
-                    thisPlan.IsGrayscale = isGrayscale;
-                    thisPlan.PlanColor = planColor;
-
-                    IsGrayscaleMode = isGrayscale;
-
-                    PlanImage.InvalidateSurface();
-                });
-            }
+                Title = newName;
+                IsGrayscaleMode = isGrayscale;
+                PlanImage.InvalidateSurface();
+            });
         });
     }
 
@@ -1324,7 +1306,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 ProjectItem.Current.AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
                 Title = result.Result.NameEntry;
 
-                thisPlan.Name = result.Result.NameEntry;
                 thisPlan.Description = result.Result.DescEntry;
                 thisPlan.AllowExport = result.Result.AllowExport;
                 thisPlan.PlanColor = result.Result.PlanColor;

@@ -1,5 +1,6 @@
 #nullable disable
 using CommunityToolkit.Mvvm.ComponentModel;
+using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
@@ -10,14 +11,25 @@ namespace SnapDoc;
 /// (PlanItem, PinItem, ...). Uebernimmt die PropertyChanged-Weiterleitung vom Modell
 /// und stellt einen kompakten Setter bereit.
 /// </summary>
-public abstract class ModelItem<TModel> : ObservableObject where TModel : ObservableObject
+public abstract class ModelItem<TModel> : ObservableObject, IDisposable where TModel : ObservableObject
 {
     protected readonly TModel Model;
+    private bool _disposed;
 
     protected ModelItem(TModel model)
     {
         Model = model ?? throw new ArgumentNullException(nameof(model));
         Model.PropertyChanged += OnModelChanged;
+    }
+
+    public void Dispose()
+    {
+        if (_disposed) return;
+
+        Model.PropertyChanged -= OnModelChanged;
+        _disposed = true;
+
+        GC.SuppressFinalize(this);
     }
 
     private void OnModelChanged(object sender, PropertyChangedEventArgs e)
@@ -31,7 +43,7 @@ public abstract class ModelItem<TModel> : ObservableObject where TModel : Observ
     /// abhaengiger (berechneter) Properties ueber <paramref name="alsoNotify"/>.
     /// </summary>
     protected bool SetModel<T>(T current, T value, Action<T> setter, string[] alsoNotify = null,
-                               [CallerMemberName] string propertyName = null)
+    [CallerMemberName] string propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(current, value)) return false;
 
@@ -42,6 +54,7 @@ public abstract class ModelItem<TModel> : ObservableObject where TModel : Observ
             foreach (var p in alsoNotify)
                 OnPropertyChanged(p);
 
+        SaveManager.NotifyDataChanged(); // Autosave, entprellt
         return true;
     }
 

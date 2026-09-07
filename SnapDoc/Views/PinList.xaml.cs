@@ -99,19 +99,6 @@ public partial class PinList : ContentPage
         });
     }
 
-    private void Pin_PropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName == nameof(PinItem.IsAllowExport))
-        {
-            var pinItem = (PinItem)sender;
-
-            GlobalJson.Data.Plans[pinItem.OnPlanId].Pins[pinItem.SelfId].IsAllowExport = pinItem.IsAllowExport;
-
-            // save data to file
-            SaveManager.NotifyDataChanged();
-        }
-    }
-
     private async void OnPinClicked(object sender, EventArgs e)
     {
         var button = sender as Button;
@@ -142,17 +129,8 @@ public partial class PinList : ContentPage
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        var button = sender as Button;
-
-        PinItem item = (PinItem)button.BindingContext;
-
-        if (item != null)
-        {
-            item.IsAllowExport = !item.IsAllowExport;
-
-            // save data to file
-            SaveManager.NotifyDataChanged();
-        }
+        if (sender is Button { BindingContext: PinItem item })
+            item.IsAllowExport = !item.IsAllowExport; // speichert selbst
     }
 
     private void OnSortPickerChanged(object sender, EventArgs e)

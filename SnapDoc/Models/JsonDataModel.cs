@@ -27,18 +27,16 @@ public partial class JsonDataModel : ObservableObject
 
 public partial class Plan : ObservableObject
 {
-    public string Name { get; set; }
+    [ObservableProperty] public partial string Name { get; set; }
+    [ObservableProperty] public partial string Description { get; set; }
+    [ObservableProperty] public partial bool IsGrayscale { get; set; }
+    [ObservableProperty] public partial bool AllowExport { get; set; }
+    [ObservableProperty] public partial string PlanColor { get; set; }
+    [ObservableProperty] public partial int PinCount { get; set; }
+
     public string File { get; set; }
     public Size ImageSize { get; set; }
-    public bool IsGrayscale { get; set; }
-    public string Description { get; set; }
     public Dictionary<string, Pin> Pins { get; set; } = [];
-
-    [ObservableProperty] public partial bool AllowExport { get; set; }
-
-    [ObservableProperty] public partial string PlanColor { get; set; }
-
-    [ObservableProperty] public partial int PinCount { get; set; }
 }
 
 public partial class Pin : ObservableObject

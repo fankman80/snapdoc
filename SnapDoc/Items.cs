@@ -28,17 +28,17 @@ public partial class FileItem : ObservableObject
 //  Plaene
 // =====================================================================
 
-/// <summary>ViewModel-Wrapper um <see cref="Plan"/> fuer die Planliste im Flyout.</summary>
-public partial class PlanItem : ModelItem<Plan>
+/// <summary>
+/// ViewModel-Wrapper um <see cref="Plan"/> fuer die Planliste im Flyout.
+/// Alle Modellaenderungen - auch die aus dem Cloud-Merge - kommen ueber
+/// <see cref="OnModelPropertyChanged"/> automatisch in der UI an.
+/// </summary>
+public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
 {
-    public PlanItem(Plan plan) : base(plan) { }
-
-    // --- Identitaet -------------------------------------------------
     public string PlanId { get; set; } = string.Empty;
     public string PlanRoute { get; set; } = string.Empty;
     public bool IsWebMapPlan { get; set; }
 
-    [ObservableProperty] public partial string Title { get; set; }
     [ObservableProperty] public partial bool IsSelected { get; set; }
     [ObservableProperty] public partial string Thumbnail { get; set; }
 
@@ -47,6 +47,20 @@ public partial class PlanItem : ModelItem<Plan>
     public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
 
     // --- Modellgebundene Werte --------------------------------------
+
+    /// <summary>Planname - liegt im Modell, damit Umbenennungen aus der Cloud ankommen.</summary>
+    public string Title
+    {
+        get => Model.Name;
+        set => SetModel(Model.Name, value, v => Model.Name = v);
+    }
+
+    public string Description
+    {
+        get => Model.Description;
+        set => SetModel(Model.Description, value, v => Model.Description = v);
+    }
+
     public bool AllowExport
     {
         get => Model.AllowExport;
@@ -59,19 +73,32 @@ public partial class PlanItem : ModelItem<Plan>
         set => SetModel(Model.PlanColor, value, v => Model.PlanColor = v);
     }
 
+    public bool IsGrayscale
+    {
+        get => Model.IsGrayscale;
+        set => SetModel(Model.IsGrayscale, value, v => Model.IsGrayscale = v);
+    }
+
     public int PinCount
     {
         get => Model.PinCount;
         set => SetModel(Model.PinCount, value, v => Model.PinCount = v);
     }
 
+    // --- Modelländerungen durchreichen ------------------------------
     protected override void OnModelPropertyChanged(string propertyName)
     {
         switch (propertyName)
         {
-            case nameof(Plan.AllowExport): Notify(nameof(AllowExport), nameof(DisplayOpacity)); break;
+            case nameof(Plan.Name): Notify(nameof(Title)); break;
+            case nameof(Plan.Description): Notify(nameof(Description)); break;
             case nameof(Plan.PlanColor): Notify(nameof(PlanColor)); break;
             case nameof(Plan.PinCount): Notify(nameof(PinCount)); break;
+            case nameof(Plan.IsGrayscale): Notify(nameof(IsGrayscale)); break;
+
+            case nameof(Plan.AllowExport):
+                Notify(nameof(AllowExport), nameof(DisplayOpacity));
+                break;
         }
     }
 }
@@ -80,7 +107,11 @@ public partial class PlanItem : ModelItem<Plan>
 //  Pins
 // =====================================================================
 
-/// <summary>ViewModel-Wrapper um <see cref="Pin"/> fuer Pin-Liste und Detailansicht.</summary>
+/// <summary>
+/// ViewModel-Wrapper um <see cref="Pin"/> fuer Pin-Liste und Detailansicht.
+/// Reagiert auf saemtliche Modellaenderungen selbst - ein Messenger-Abo
+/// pro Pin waere bei vielen Pins unnoetig teuer.
+/// </summary>
 public partial class PinItem : ModelItem<Pin>
 {
     public PinItem(Pin pin) : base(pin)
@@ -122,11 +153,13 @@ public partial class PinItem : ModelItem<Pin>
     {
         get
         {
-            string planName = GlobalJson.Data.Plans[OnPlanId].Name;
+            if (GlobalJson.Data?.Plans == null ||
+                !GlobalJson.Data.Plans.TryGetValue(OnPlanId, out var plan))
+                return PinLocation ?? "";
 
-            return string.IsNullOrWhiteSpace(planName) || string.IsNullOrWhiteSpace(PinLocation)
-                ? planName + PinLocation
-                : $"{planName}  /  {PinLocation}";
+            return string.IsNullOrWhiteSpace(plan.Name) || string.IsNullOrWhiteSpace(PinLocation)
+                ? plan.Name + PinLocation
+                : $"{plan.Name}  /  {PinLocation}";
         }
     }
 
@@ -213,10 +246,49 @@ public partial class PinItem : ModelItem<Pin>
                 : (Color)Application.Current.Resources["PrimaryText"];
     }
 
+    // --- Modelländerungen durchreichen ------------------------------
     protected override void OnModelPropertyChanged(string propertyName)
     {
-        if (propertyName == nameof(Pin.IsAllowExport))
-            Notify(nameof(IsAllowExport), nameof(DisplayOpacity));
+        switch (propertyName)
+        {
+            case nameof(Pin.PinName): Notify(nameof(PinName)); break;
+            case nameof(Pin.PinDesc): Notify(nameof(PinDesc)); break;
+            case nameof(Pin.SelfId): Notify(nameof(SelfId)); break;
+            case nameof(Pin.OnPlanId): Notify(nameof(OnPlanId), nameof(PlanDisplay)); break;
+            case nameof(Pin.DateTime): Notify(nameof(Time)); break;
+            case nameof(Pin.GeoLocation): Notify(nameof(HasGeolocation)); break;
+            case nameof(Pin.IsLockPosition): Notify(nameof(IsLockPosition)); break;
+
+            case nameof(Pin.PinLocation):
+                Notify(nameof(PinLocation), nameof(PlanDisplay));
+                break;
+
+            case nameof(Pin.PinIcon):
+                Notify(nameof(PinIcon), nameof(DisplayIconPath));
+                break;
+
+            case nameof(Pin.IsCustomIcon):
+                Notify(nameof(DisplayIconPath));
+                break;
+
+            case nameof(Pin.IsAllowExport):
+                Notify(nameof(IsAllowExport), nameof(DisplayOpacity));
+                break;
+
+            case nameof(Pin.PinPriority):
+                Notify(nameof(PinPriority));
+                UpdatePriorityColor();
+                break;
+
+            case nameof(Pin.IsCustomPin):
+                IsCustomPin = Model.IsCustomPin;
+                Notify(nameof(DisplayIconPath));
+                break;
+
+            case nameof(Pin.IsWebMapPin):
+                IsWebMapPin = Model.IsWebMapPin;
+                break;
+        }
     }
 }
 
@@ -239,7 +311,11 @@ public partial class FotoItem : ObservableObject
     public string OnPinId { get; set; }
 
     public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
-    public string PlanDisplay => GlobalJson.Data.Plans[OnPlanId].Name;
+
+    public string PlanDisplay =>
+        GlobalJson.Data?.Plans != null && GlobalJson.Data.Plans.TryGetValue(OnPlanId, out var plan)
+            ? plan.Name
+            : "";
 
     /// <summary>Bild ueber einen Byte-Stream laden - umgeht den MAUI-Bildcache.</summary>
     public void ReloadImage()
