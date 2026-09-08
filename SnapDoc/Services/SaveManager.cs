@@ -508,6 +508,7 @@ public static class SaveManager
             localPin.DateTime = cloudPin.DateTime;
             localPin.IsWebMapPin = cloudPin.IsWebMapPin;
             localPin.IsCustomPin = cloudPin.IsCustomPin;
+            localPin.IsCustomIcon = cloudPin.IsCustomIcon;
             localPin.Pos = cloudPin.Pos;
             localPin.PinPriority = cloudPin.PinPriority;
             localPin.Fotos = cloudPin.Fotos;

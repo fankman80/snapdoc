@@ -2,9 +2,11 @@
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SkiaSharp;
+using SkiaSharp.Views.Maui;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Globalization;
 using System.Runtime.CompilerServices;
 using static SnapDoc.Helper;
 
@@ -12,11 +14,22 @@ namespace SnapDoc.Views;
 
 public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 {
+    // --- Konstanten fuer die Vorschau ---
+    private const float CanvasPadding = 12f;   // Rand, damit das Kreuz bei Anchor 0/1 nicht abgeschnitten wird
+    private const float CrossRadius = 9f;      // halbe Kreuzgroesse in DIP
+    private const string BlinkAnimationName = "BlinkCross";
+    private static readonly SKSamplingOptions IconSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+
     public IconItem iconItem;
+
     public int IconPreviewWidth { get; set; } = 120;
     public int IconPreviewHeight { get; set; }
 
-    // AutoComplete / Kategorien-Eigenschaften
+    private SKBitmap _iconBitmap;
+    private float _blink = 1f;                 // 0..1, steuert die Helligkeit des Kreuzes
+    private bool _suppressTextSync;            // verhindert Rueckkopplung Anchor <-> Entry
+
+    // --- AutoComplete / Kategorien ---
     private readonly List<string> _allCategories = [];
     public ObservableCollection<string> FilteredCategories { get; set; } = [];
 
@@ -37,49 +50,132 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     public PopupIconEdit(IconItem _iconItem)
     {
         InitializeComponent();
-        iconItem = _iconItem;
-        iconImage.Source = iconItem.DisplayIconPath;
-        iconName.Text = iconItem.DisplayName;
 
-        // Alle vorhandenen Kategorien aus dem Service laden
-        _allCategories = SettingsService.Instance.IconCategories ?? [];
+        iconItem = _iconItem;
+
+        iconName.Text = iconItem.DisplayName;
         iconCategory.Text = iconItem.Category;
+
+        _allCategories = SettingsService.Instance.IconCategories ?? [];
         FilteredCategories.Clear();
         IsCategorySuggestionsVisible = false;
 
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
 
+        LoadIconBitmap();
+
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
-        Anchor_X_Text = Anchor_X.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
-        Anchor_Y_Text = Anchor_Y.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture);
 
         IconScale = iconItem.IconScale;
         allowRotate.IsToggled = iconItem.IsRotationLocked;
         allowAutoScale.IsToggled = iconItem.IsAutoScaleLocked;
-        SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
         setDefault.IsToggled = iconItem.IsDefaultIcon;
+        SelectedColor = new Color(iconItem.PinColor.Red, iconItem.PinColor.Green, iconItem.PinColor.Blue);
 
         if (iconItem.IsCustomIcon)
             deleteIcon.IsVisible = true;
 
         BindingContext = this;
+
         StartBlinking();
     }
 
-    private Color selectedColor;
-    public Color SelectedColor
+    // ------------------------------------------------------------------
+    //  Vorschau / SkiaSharp
+    // ------------------------------------------------------------------
+
+    private void LoadIconBitmap()
     {
-        get => selectedColor;
-        set
+        try
         {
-            if (selectedColor != value)
-            {
-                selectedColor = value;
-                OnPropertyChanged();
-            }
+            var path = iconItem.DisplayIconPath;
+            if (string.IsNullOrEmpty(path) || !File.Exists(path))
+                return;
+
+            using var stream = File.OpenRead(path);
+            _iconBitmap = SKBitmap.Decode(stream);
+        }
+        catch
+        {
+            _iconBitmap = null;
         }
     }
+
+    private void OnPaintIconPreview(object sender, SKPaintSurfaceEventArgs e)
+    {
+        var canvas = e.Surface.Canvas;
+        canvas.Clear();
+
+        // DIP -> Pixel
+        float scale = iconCanvas.Width > 0
+            ? e.Info.Width / (float)iconCanvas.Width
+            : 1f;
+
+        float pad = CanvasPadding * scale;
+        float imgW = IconPreviewWidth * scale;
+        float imgH = IconPreviewHeight * scale;
+
+        var dest = new SKRect(pad, pad, pad + imgW, pad + imgH);
+
+        if (_iconBitmap != null)
+            canvas.DrawBitmap(_iconBitmap, dest, IconSampling);
+
+        // Anchor exakt im Bildkoordinatensystem
+        float x = dest.Left + (float)Anchor_X * imgW;
+        float y = dest.Top + (float)Anchor_Y * imgH;
+        float r = CrossRadius * scale;
+
+        // Halo, damit das Kreuz auf jedem Icon sichtbar bleibt
+        using var halo = new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 3.5f * scale,
+            Color = SKColors.White.WithAlpha(200),
+            IsAntialias = true
+        };
+        DrawCross(canvas, x, y, r, halo);
+
+        // Kreuz, blinkend
+        byte v = (byte)(_blink * 255);
+        using var cross = new SKPaint
+        {
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = 1.5f * scale,
+            Color = new SKColor(v, v, v),
+            IsAntialias = true
+        };
+        DrawCross(canvas, x, y, r, cross);
+        canvas.DrawCircle(x, y, r * 0.45f, cross);
+    }
+
+    private static void DrawCross(SKCanvas c, float x, float y, float r, SKPaint p)
+    {
+        c.DrawLine(x - r, y, x + r, y, p);
+        c.DrawLine(x, y - r, x, y + r, p);
+    }
+
+    private void StartBlinking()
+    {
+        var blink = new Animation
+        {
+            { 0, 0.5, new Animation(v => { _blink = (float)v; iconCanvas.InvalidateSurface(); }, 0, 1) },
+            { 0.5, 1, new Animation(v => { _blink = (float)v; iconCanvas.InvalidateSurface(); }, 1, 0) }
+        };
+
+        blink.Commit(iconCanvas, BlinkAnimationName, length: 400, repeat: () => true);
+    }
+
+    private void Cleanup()
+    {
+        iconCanvas?.AbortAnimation(BlinkAnimationName);
+        _iconBitmap?.Dispose();
+        _iconBitmap = null;
+    }
+
+    // ------------------------------------------------------------------
+    //  Anchor
+    // ------------------------------------------------------------------
 
     private double anchor_X;
     public double Anchor_X
@@ -87,13 +183,17 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_X;
         set
         {
-            double clampedValue = Math.Clamp(value, 0.0, 1.0);
-            if (anchor_X != clampedValue)
-            {
-                anchor_X = clampedValue;
-                TransX = (int)(clampedValue * IconPreviewWidth);
-                OnPropertyChanged();
-            }
+            double clamped = Math.Clamp(value, 0.0, 1.0);
+            if (anchor_X == clamped)
+                return;
+
+            anchor_X = clamped;
+            OnPropertyChanged();
+
+            if (!_suppressTextSync)
+                SetTextSilently(nameof(Anchor_X_Text), ref anchor_X_Text, Format(clamped));
+
+            iconCanvas?.InvalidateSurface();
         }
     }
 
@@ -103,13 +203,17 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_Y;
         set
         {
-            double clampedValue = Math.Clamp(value, 0.0, 1.0);
-            if (anchor_Y != clampedValue)
-            {
-                anchor_Y = clampedValue;
-                TransY = (int)(clampedValue * IconPreviewHeight);
-                OnPropertyChanged();
-            }
+            double clamped = Math.Clamp(value, 0.0, 1.0);
+            if (anchor_Y == clamped)
+                return;
+
+            anchor_Y = clamped;
+            OnPropertyChanged();
+
+            if (!_suppressTextSync)
+                SetTextSilently(nameof(Anchor_Y_Text), ref anchor_Y_Text, Format(clamped));
+
+            iconCanvas?.InvalidateSurface();
         }
     }
 
@@ -119,20 +223,17 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_X_Text;
         set
         {
-            if (anchor_X_Text != value)
-            {
-                anchor_X_Text = value;
-                OnPropertyChanged();
+            if (anchor_X_Text == value)
+                return;
 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    string cleanX = value.Replace(',', '.');
-                    if (double.TryParse(cleanX, System.Globalization.CultureInfo.InvariantCulture, out double parsedX))
-                    {
-                        double clampedX = Math.Clamp(parsedX, 0.0, 1.0);
-                        TransX = (int)(clampedX * IconPreviewWidth);
-                    }
-                }
+            anchor_X_Text = value;
+            OnPropertyChanged();
+
+            if (TryParseAnchor(value, out double parsed))
+            {
+                _suppressTextSync = true;
+                Anchor_X = parsed;
+                _suppressTextSync = false;
             }
         }
     }
@@ -143,47 +244,55 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         get => anchor_Y_Text;
         set
         {
-            if (anchor_Y_Text != value)
-            {
-                anchor_Y_Text = value;
-                OnPropertyChanged();
+            if (anchor_Y_Text == value)
+                return;
 
-                if (!string.IsNullOrEmpty(value))
-                {
-                    string cleanY = value.Replace(',', '.');
-                    if (double.TryParse(cleanY, System.Globalization.CultureInfo.InvariantCulture, out double parsedY))
-                    {
-                        double clampedY = Math.Clamp(parsedY, 0.0, 1.0);
-                        TransY = (int)(clampedY * IconPreviewHeight);
-                    }
-                }
+            anchor_Y_Text = value;
+            OnPropertyChanged();
+
+            if (TryParseAnchor(value, out double parsed))
+            {
+                _suppressTextSync = true;
+                Anchor_Y = parsed;
+                _suppressTextSync = false;
             }
         }
     }
 
-    private int transX;
-    public int TransX
+    private static bool TryParseAnchor(string text, out double value)
     {
-        get => transX;
-        set
-        {
-            if (transX != value)
-            {
-                transX = value;
-                OnPropertyChanged();
-            }
-        }
+        value = 0;
+        if (string.IsNullOrWhiteSpace(text))
+            return false;
+
+        return double.TryParse(text.Replace(',', '.'), NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
 
-    private int transY;
-    public int TransY
+    private static string Format(double value)
+        => value.ToString("0.0", CultureInfo.InvariantCulture);
+
+    private void SetTextSilently(string propertyName, ref string field, string value)
     {
-        get => transY;
+        if (field == value)
+            return;
+
+        field = value;
+        OnPropertyChanged(propertyName);
+    }
+
+    // ------------------------------------------------------------------
+    //  Uebrige Eigenschaften
+    // ------------------------------------------------------------------
+
+    private Color selectedColor;
+    public Color SelectedColor
+    {
+        get => selectedColor;
         set
         {
-            if (transY != value)
+            if (selectedColor != value)
             {
-                transY = value;
+                selectedColor = value;
                 OnPropertyChanged();
             }
         }
@@ -203,7 +312,10 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         }
     }
 
-    // --- AutoComplete Event-Handler für die Kategorie ---
+    // ------------------------------------------------------------------
+    //  AutoComplete Kategorie
+    // ------------------------------------------------------------------
+
     private void OnCategoryTextChanged(object sender, TextChangedEventArgs e)
     {
         var keyword = e.NewTextValue;
@@ -215,15 +327,9 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             return;
         }
 
-        var filtered = _allCategories
-            .Where(x => x.Contains(keyword, StringComparison.OrdinalIgnoreCase))
-            .ToList();
-
         FilteredCategories.Clear();
-        foreach (var item in filtered)
-        {
+        foreach (var item in _allCategories.Where(x => x.Contains(keyword, StringComparison.OrdinalIgnoreCase)))
             FilteredCategories.Add(item);
-        }
 
         IsCategorySuggestionsVisible = FilteredCategories.Count > 0;
     }
@@ -235,36 +341,34 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             iconCategory.Text = selectedCategory;
             IsCategorySuggestionsVisible = false;
 
-            // Auswahl fuer den naechsten Klick zuruecksetzen
             if (sender is CollectionView cv)
                 cv.SelectedItem = null;
         }
     }
 
+    // ------------------------------------------------------------------
+    //  Farbwahl
+    // ------------------------------------------------------------------
+
+    private async void OnColorPickerClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupColorPicker(SelectedColor);
+        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+
+        if (result.Result != null)
+            SelectedColor = Color.FromArgb(result.Result.ColorHex);
+    }
+
+    // ------------------------------------------------------------------
+    //  Schliessen
+    // ------------------------------------------------------------------
+
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        if (!string.IsNullOrEmpty(Anchor_X_Text))
-        {
-            string cleanX = Anchor_X_Text.Replace(',', '.');
-            if (double.TryParse(cleanX, System.Globalization.CultureInfo.InvariantCulture, out double parsedX))
-            {
-                Anchor_X = parsedX;
-            }
-        }
-
-        if (!string.IsNullOrEmpty(Anchor_Y_Text))
-        {
-            string cleanY = Anchor_Y_Text.Replace(',', '.');
-            if (double.TryParse(cleanY, System.Globalization.CultureInfo.InvariantCulture, out double parsedY))
-            {
-                Anchor_Y = parsedY;
-            }
-        }
-
         var file = Path.GetFileName(iconItem.FileName);
         string returnValue = null;
 
-        if (deleteIcon.IsToggled == false)
+        if (!deleteIcon.IsToggled)
         {
             var updatedItem = new IconItem(
                 file,
@@ -293,6 +397,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         else
         {
             var iconFile = Path.Combine(Settings.DataDirectory, "customicons", file);
+
             if (File.Exists(iconFile))
             {
                 if (iconItem.IsDefaultIcon)
@@ -300,8 +405,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                     SettingsService.Instance.DefaultPinIcon = Settings.IconData.FirstOrDefault().FileName;
                     SettingsService.Instance.SaveSettings();
                 }
-                File.Delete(iconFile);
 
+                File.Delete(iconFile);
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
                 IconLookup.Remove(file);
                 returnValue = "deleted";
@@ -312,45 +417,26 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         SettingsService.Instance.IconCategories = iconCategories;
         IconLookup.Initialize(Settings.IconData);
 
+        Cleanup();
+
         try { await CloseAsync(returnValue); }
         catch (InvalidOperationException) { }
     }
 
     private async void OnCancelClicked(object sender, EventArgs e)
     {
+        Cleanup();
+
         try { await CloseAsync(null); }
         catch (InvalidOperationException) { }
     }
 
+    // ------------------------------------------------------------------
+    //  INotifyPropertyChanged
+    // ------------------------------------------------------------------
+
     public new event PropertyChangedEventHandler PropertyChanged;
+
     protected new virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
-    {
-        PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
-    }
-
-    private async void OnColorPickerClicked(object sender, EventArgs e)
-    {
-        var popup = new PopupColorPicker(SelectedColor);
-        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
-
-        if (result.Result != null)
-            SelectedColor = Color.FromArgb(result.Result.ColorHex);
-    }
-
-    private void StartBlinking()
-    {
-        var blinkAnimation = new Animation
-        {
-            {
-                0, 0.5,
-                new Animation(v => { blinkingLabel.TextColor = Color.FromRgb(v, v, v); }, 0, 1)
-            },
-            {
-                0.5, 1,
-                new Animation(v => { blinkingLabel.TextColor = Color.FromRgb(v, v, v); }, 1, 0)
-            }
-        };
-
-        blinkAnimation.Commit(blinkingLabel, "BlinkColor", length: 400, repeat: () => true);
-    }
+        => PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 }
