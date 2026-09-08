@@ -2,7 +2,6 @@
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
 
 namespace SnapDoc.Views;
 

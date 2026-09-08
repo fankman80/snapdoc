@@ -406,9 +406,10 @@ public partial class MapView : IQueryAttributable
 
     private async void KmlExportClicked(object sender, EventArgs e)
     {
-        string outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.Instance.ProjectPath + ".kml");
-
+        var project = ProjectItem.Current;
+        string outputPath = Path.Combine(project.ProjectDirectory, SettingsService.Instance.ProjectPath + ".kml");
         List<(double Latitude, double Longitude, string Name, DateTime Time, string Desc)> coordinates = [];
+
         foreach (var plan in GlobalJson.Data.Plans)
         {
             if (GlobalJson.Data.Plans[plan.Key].Pins != null)
@@ -473,8 +474,9 @@ public partial class MapView : IQueryAttributable
                 if (imageBytes == null || imageBytes.Length == 0) return;
 
                 string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
-                string folderPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath);
-                string thumbFolderPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath);
+                var project = ProjectItem.Current;
+                string folderPath = Path.Combine(project.ProjectDirectory, project.ImageFolder);
+                string thumbFolderPath = Path.Combine(project.ProjectDirectory, project.ThumbnailFolder);
                 string filepath = Path.Combine(folderPath, filename);
                 string thumbPath = Path.Combine(thumbFolderPath, filename);
 
@@ -485,8 +487,14 @@ public partial class MapView : IQueryAttributable
                 {
                     try { File.Delete(Path.Combine(folderPath, mapImage.File)); }
                     catch { /* Optional: Logging */ }
+
                     try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); }
                     catch { /* Optional: Logging */ }
+
+                    // Cloud Cleanup
+                    _ = SaveManager.DeleteCloudFileAsync($"{project.ImageFolder}/{mapImage.File}");
+                    _ = SaveManager.DeleteCloudFileAsync($"{project.ThumbnailFolder}/{mapImage.File}");
+
                     currentPin.Fotos.Remove(Path.GetFileName(mapImage.File));
                 }
 
@@ -504,8 +512,11 @@ public partial class MapView : IQueryAttributable
 
                 currentPin.Fotos[filename] = newImageData;
 
-                // save data to file
-                SaveManager.NotifyDataChanged();
+                // JSON + beide Bilddateien fuer den Cloud-Sync registrieren
+                SaveManager.NotifyDataChanged(
+                [
+                    (filepath, project.ImageFolder), (thumbPath, project.ThumbnailFolder)
+                ]);
             }
         }
     }
@@ -918,12 +929,17 @@ public partial class MapView : IQueryAttributable
 
         if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
 
-        // JSON + Files löschen
-        plan = GlobalJson.Data.Plans[planId];
+        var project = ProjectItem.Current;
+        string planFolder = Path.Combine(project.ProjectDirectory, project.PlanFolder);
 
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "gs_" + plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
+        // JSON + Files löschen
+        DeleteIfExists(Path.Combine(planFolder, plan.File));
+        DeleteIfExists(Path.Combine(planFolder, "gs_" + plan.File));
+        DeleteIfExists(Path.Combine(planFolder, "thumbnails", plan.File));
+
+        // Cloud Cleanup
+        _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/{plan.File}");
+        _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/thumbnails/{plan.File}");
 
         GlobalJson.Data.Plans.Remove(planId);
 

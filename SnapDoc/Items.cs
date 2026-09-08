@@ -290,7 +290,7 @@ public partial class PinItem : ModelItem<Pin>
 
             case nameof(Pin.PinPriority):
                 Notify(nameof(PinPriority));
-                UpdatePriorityColor();
+                MainThread.BeginInvokeOnMainThread(UpdatePriorityColor);
                 break;
 
             case nameof(Pin.IsCustomPin):

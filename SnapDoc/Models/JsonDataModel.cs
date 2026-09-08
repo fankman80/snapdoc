@@ -33,7 +33,6 @@ public partial class Plan : ObservableObject
     [ObservableProperty] public partial bool AllowExport { get; set; }
     [ObservableProperty] public partial string PlanColor { get; set; }
     [ObservableProperty] public partial int PinCount { get; set; }
-
     public string File { get; set; }
     public Size ImageSize { get; set; }
     public Dictionary<string, Pin> Pins { get; set; } = [];
@@ -41,39 +40,38 @@ public partial class Plan : ObservableObject
 
 public partial class Pin : ObservableObject
 {
-    public Point Pos { get; set; }
-    public Point Anchor { get; set; }
-    public Size Size { get; set; }
-    public double PinScale { get; set; }
-    public string PinName { get; set; }
-    public string PinDesc { get; set; }
-    public string PinLocation { get; set; }
-    public int PinPriority { get; set; }
-    public string OnPlanId { get; set; }
-    public string SelfId { get; set; }
-    public DateTime DateTime { get; set; }
-    public SKColor PinColor { get; set; }
-    public double PinRotation { get; set; }
-    public GeoLocData GeoLocation { get; set; }
-    public bool IsCustomIcon { get; set; }
-    public bool IsWebMapPin { get; set; }
-    public Dictionary<string, Foto> Fotos { get; set; }
+    [ObservableProperty] public partial string PinName { get; set; }
+    [ObservableProperty] public partial string PinDesc { get; set; }
+    [ObservableProperty] public partial string PinLocation { get; set; }
+    [ObservableProperty] public partial string OnPlanId { get; set; }
+    [ObservableProperty] public partial DateTime DateTime { get; set; }
+    [ObservableProperty] public partial GeoLocData GeoLocation { get; set; }
+    [ObservableProperty] public partial bool IsCustomIcon { get; set; }
+    [ObservableProperty] public partial int PinPriority { get; set; }
     [ObservableProperty] public partial string PinIcon { get; set; }
     [ObservableProperty] public partial bool IsCustomPin { get; set; }
     [ObservableProperty] public partial bool IsAllowExport { get; set; }
     [ObservableProperty] public partial bool IsLockPosition { get; set; }
     [ObservableProperty] public partial bool IsLockRotate { get; set; }
     [ObservableProperty] public partial bool IsLockAutoScale { get; set; }
+    public Point Pos { get; set; }
+    public Point Anchor { get; set; }
+    public Size Size { get; set; }
+    public double PinScale { get; set; }
+    public string SelfId { get; set; }
+    public SKColor PinColor { get; set; }
+    public double PinRotation { get; set; }
+    public bool IsWebMapPin { get; set; }
+    public Dictionary<string, Foto> Fotos { get; set; }
 }
 
 public partial class Foto : ObservableObject
 {
+    [ObservableProperty] public partial bool AllowExport { get; set; }
     public string File { get; set; }
     public bool HasOverlay { get; set; }
     public DateTime DateTime { get; set; }
     public Size ImageSize { get; set; }
-
-    [ObservableProperty] public partial bool AllowExport { get; set; }
 }
 
 public class GeoLocData
