@@ -64,16 +64,8 @@
                     </CollectionView>
                 </controls:BorderedExpander>
 
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="*" />
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="44" />
-                        <RowDefinition Height="44" />
-                        <RowDefinition Height="44" />
-                    </Grid.RowDefinitions>
+                <Grid ColumnDefinitions="*,*"
+                      RowDefinitions="44,44,44">
                     <Grid Grid.Column="0" Grid.Row="0">
                         <Border HeightRequest="44"
                                 StrokeThickness="0"
@@ -282,7 +274,7 @@
             </VerticalStackLayout>     
         </ScrollView>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, *">
+        <Grid Grid.Row="1" ColumnDefinitions="*,*">
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     Text="{x:Static res:AppResources.abbrechen}"

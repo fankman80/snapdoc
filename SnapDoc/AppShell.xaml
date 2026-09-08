@@ -161,18 +161,11 @@
         <DataTemplate>
             <Grid x:DataType="local:ProjectItem"
                   BindingContext="{x:Static local:ProjectItem.Current}"
+                  ColumnDefinitions="Auto,*"
+                  RowDefinitions="Auto,Auto,Auto"
                   Padding="0,0,6,0"
                   RowSpacing="0"
                   BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
                 <ImageButton Grid.Column="0" Grid.RowSpan="2"
                              HeightRequest="100"
                              WidthRequest="100"
@@ -314,18 +307,9 @@
     <Shell.FlyoutFooterTemplate>
         <DataTemplate>
             <Grid BackgroundColor="{AppThemeBinding Light={DynamicResource Gray050}, Dark={DynamicResource PrimaryBackgroundDark}}"
-                  RowSpacing="0">
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="24" />
-                    <RowDefinition Height="Auto" />
-                </Grid.RowDefinitions>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                
+                  RowSpacing="0"
+                  ColumnDefinitions="Auto,Auto,*,Auto"
+                  RowDefinitions="24,Auto">
                 <Label Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="4"
                        x:DataType="local:ProjectItem"
                        BindingContext="{x:Static local:ProjectItem.Current}"

@@ -98,7 +98,7 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnEditClicked" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="16, Auto, *, 50, 50"
+                            <Grid ColumnDefinitions="16,Auto,*,50,50"
                                   RowDefinitions="Auto, Auto, Auto, Auto"
                                   RowSpacing="0" ColumnSpacing="0">
 

@@ -47,15 +47,11 @@
             <!-- Template für Liste -->
             <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
                 <Grid HeightRequest="80"
+                      ColumnDefinitions="80,*,Auto"
                       Opacity="{Binding DisplayOpacity}">
                     <Grid.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnImageTapped" />
                     </Grid.GestureRecognizers>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="80" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                    </Grid.ColumnDefinitions>
                     <Image Grid.Column="0"
                            Source="{Binding DisplayImage}"
                            Aspect="AspectFill">

@@ -163,7 +163,7 @@
                              SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                              SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-            <Grid ColumnDefinitions="*, *">
+            <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"

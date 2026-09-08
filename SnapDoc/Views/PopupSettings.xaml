@@ -218,7 +218,8 @@
                 </controls:BorderedExpander>
 
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.farbschema}">
-                    <Grid ColumnDefinitions="Auto, *" RowDefinitions="Auto, Auto, Auto">
+                    <Grid ColumnDefinitions="Auto,*"
+                          RowDefinitions="Auto,Auto,Auto">
                         <Label Grid.Column="0" Grid.Row="0"
                                VerticalTextAlignment="Center"
                                Text="{x:Static res:AppResources.app_modus}"/>
@@ -251,17 +252,8 @@
                                 LowerValue="{Binding PdfFullViewDpi}"
                                 MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                 MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                        <Grid ColumnDefinitions="Auto,*"
+                              RowDefinitions="Auto,Auto,Auto,Auto">
                             <Label Grid.Column="0" Grid.Row="0" Text="{x:Static res:AppResources.kamera}" VerticalOptions="Center"/>
                             <controls:CustomRadioPicker Grid.Column="1" Grid.Row="0"
                                                         x:Name="cameraPicker"
@@ -275,17 +267,8 @@
                                                         SelectedItem="{Binding SelectedAppLanguage}"/>
                             <Label Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="2" Text="{x:Static res:AppResources.die_sprache_wird_erst_nach_einem_neustart_gewechselt}" FontSize="12"/>
                         </Grid>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*" />
-                                <ColumnDefinition Width="Auto" />
-                            </Grid.ColumnDefinitions>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition Height="Auto" />
-                            </Grid.RowDefinitions>
+                        <Grid ColumnDefinitions="*,Auto"
+                              RowDefinitions="Auto,Auto,Auto,Auto">
                             <Button Grid.Column="0" Grid.Row="0"
                                     IsVisible="{Binding IsProjectLoaded}"
                                     Text="{x:Static res:AppResources.projektdaten}"
@@ -331,7 +314,8 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, Auto">
+        <Grid Grid.Row="1"
+              ColumnDefinitions="*,Auto">
             <Button Grid.Column="1"                    
                     Text="{x:Static res:AppResources.ok}"
                     MinimumWidthRequest="100"

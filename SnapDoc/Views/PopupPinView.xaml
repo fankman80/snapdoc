@@ -59,7 +59,7 @@
             </HorizontalStackLayout>
             <local:BorderlessEditor Text="{Binding Pin.PinDesc}" FontFamily="{x:StaticResource AppFontFamily}" FontSize="12" Margin="0,0,0,16"/>
 
-            <Grid ColumnDefinitions="*, 50, 50">
+            <Grid ColumnDefinitions="*,50,50">
                 <Button Grid.Column="1"
                         Padding="0"
                         HeightRequest="36"

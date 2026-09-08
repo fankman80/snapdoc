@@ -19,7 +19,7 @@
             <TapGestureRecognizer Tapped="OnClicked" />
         </Border.GestureRecognizers>
 
-        <Grid ColumnDefinitions="*, Auto">
+        <Grid ColumnDefinitions="*,Auto">
             <Label x:Name="DisplayLabel"
                    TextColor="{Binding TextColor, Source={x:Reference this}}"
                    FontSize="{Binding FontSize, Source={x:Reference this}}"

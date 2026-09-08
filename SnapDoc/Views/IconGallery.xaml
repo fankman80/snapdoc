@@ -58,13 +58,8 @@
             <!-- Template für Liste (Label sichtbar) -->
             <DataTemplate x:Key="IconListTemplate"
                           x:DataType="local:IconItem">
-                <Grid HeightRequest="48">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="100" />
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
-                        <ColumnDefinition Width="26" />
-                    </Grid.ColumnDefinitions>
+                <Grid HeightRequest="48"
+                      ColumnDefinitions="100,*,Auto,26">
                     <Grid.Behaviors>
                         <vm:UnifiedTapBehavior
                             x:DataType="views:IconGallery"

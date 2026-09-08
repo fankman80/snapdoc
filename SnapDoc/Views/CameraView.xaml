@@ -92,7 +92,7 @@
             <Grid x:Name="liveButtons" 
                   HorizontalOptions="Center" 
                   WidthRequest="400" 
-                  ColumnDefinitions="*, *, *">
+                  ColumnDefinitions="*,*,*">
 
                 <Button Grid.Column="0"
                         Padding="{OnPlatform Default=0, WinUI=0, iOS=5, Android=0}"
@@ -128,7 +128,7 @@
             <Grid x:Name="previewButtons"
                   IsVisible="False" 
                   HorizontalOptions="Center"
-                  ColumnDefinitions="auto, auto"
+                  ColumnDefinitions="Auto,Auto"
                   ColumnSpacing="40">
                 <Button Grid.Column="0" 
                         Text="{x:Static local:MaterialIcons.Close}"

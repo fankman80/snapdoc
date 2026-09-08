@@ -41,7 +41,7 @@
                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-            <Grid ColumnDefinitions="*, *">
+            <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                             x:Name="cancelButtonText"
                             Text="{x:Static res:AppResources.abbrechen}"

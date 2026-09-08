@@ -22,6 +22,19 @@ public partial class FileItem : ObservableObject
     [ObservableProperty] public partial string ThumbnailPath { get; set; }
     [ObservableProperty] public partial bool HasCloudSync { get; set; }
     [ObservableProperty] public partial bool IsActive { get; set; }
+
+    private bool _isSyncChecked;
+    public bool IsSyncChecked
+    {
+        get => _isSyncChecked;
+        set
+        {
+            if (SetProperty(ref _isSyncChecked, value))
+                OnPropertyChanged(nameof(DisplayOpacity));
+        }
+    }
+
+    public double DisplayOpacity => IsSyncChecked ? 1.0 : 0.4;
 }
 
 // =====================================================================

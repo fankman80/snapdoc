@@ -56,7 +56,7 @@
                     ToolTipProperties.Text="{x:Static res:AppResources.projekt_loeschen}"
                     Clicked="OnDeleteClicked" />
 
-            <Grid ColumnDefinitions="*, *">
+            <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         HorizontalOptions="Fill"
                         x:Name="cancelButtonText"

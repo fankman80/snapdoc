@@ -37,13 +37,8 @@
 
             <ScrollView Grid.Row="0">
                 <VerticalStackLayout>
-                    <Grid ColumnSpacing="0">
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                            <ColumnDefinition Width="Auto" />
-                        </Grid.ColumnDefinitions>
+                    <Grid ColumnSpacing="0"
+                          ColumnDefinitions="*,Auto,Auto,Auto">
                         <VerticalStackLayout Grid.Column="0">
                             <Label Text="{x:Static res:AppResources.export_vorlage}"/>
                             <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
@@ -207,12 +202,8 @@
                 </VerticalStackLayout>
             </ScrollView>
 
-            <Grid Grid.Row="1">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
+            <Grid Grid.Row="1"
+                  ColumnDefinitions="*,Auto,Auto">
                 <Button Grid.Column="1"
                         MinimumWidthRequest="100"
                         Padding="0"

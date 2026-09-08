@@ -18,7 +18,7 @@
             <Line x:Name="headerLine" Stroke="{AppThemeBinding Light=LightSlateGray, Dark=LightGray}" X2="500" />
             <Label x:Name="titleText"
                    HorizontalOptions="Start"/>
-            <Grid ColumnDefinitions="*, *" Margin="0,8,0,0">
+            <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"

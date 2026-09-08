@@ -45,7 +45,7 @@
 
         <!-- Buttons -->
         <Grid Grid.Row="2"
-              ColumnDefinitions="*, *"
+              ColumnDefinitions="*,*"
               ColumnSpacing="8">
             <Button Grid.Column="0"
                     Text="{x:Static res:AppResources.abbrechen}"

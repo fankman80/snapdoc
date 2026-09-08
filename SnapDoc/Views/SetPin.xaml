@@ -117,7 +117,8 @@
         </CollectionView>
 
         <VerticalStackLayout Grid.Row="1" Spacing="8">
-            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0">
+            <Grid ColumnDefinitions="*,Auto"
+                  ColumnSpacing="0">
                 <controls:BorderedEntry
                         Grid.Column="0"
                         Text="{Binding Pin.PinLocation}"
@@ -142,17 +143,11 @@
                 BackgroundColor="Transparent"
                 BorderColor="{DynamicResource SecondaryBackground}"
                 PlaceholderColor="{DynamicResource SecondaryBackground}"
-                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>            
-            <Grid RowSpacing="0" Margin="0,6,0,0">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*" />
-                    <ColumnDefinition Width="Auto" />
-                    <ColumnDefinition Width="Auto" />
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50" />
-                    <RowDefinition Height="50" />
-                </Grid.RowDefinitions>
+                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+            <Grid RowSpacing="0"
+                  Margin="0,6,0,0"
+                  ColumnDefinitions="*,Auto,Auto"
+                  RowDefinitions="50,50">
                 <controls:Switch Grid.Row="0"
                                 LabelText="{x:Static res:AppResources.pin_exportieren}"
                                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -227,7 +222,7 @@
                 </Grid>
             </Border>
 
-            <Grid Grid.ColumnDefinitions="Auto, *, Auto, Auto">
+            <Grid Grid.ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Grid.Column="0"
                         IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                         Padding="0"

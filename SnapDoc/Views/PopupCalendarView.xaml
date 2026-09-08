@@ -13,7 +13,7 @@
           WidthRequest="320">
         <VerticalStackLayout>
             <controls:CalendarView x:Name="calendar" />
-            <Grid ColumnDefinitions="Auto, *, Auto, Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

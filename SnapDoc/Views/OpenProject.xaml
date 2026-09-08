@@ -79,7 +79,8 @@
                         <Grid ColumnDefinitions="66,*,Auto"
                               RowDefinitions="25,37"
                               ColumnSpacing="8"
-                              RowSpacing="4">
+                              RowSpacing="4"
+                              Opacity="{Binding DisplayOpacity}">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnProjectClicked" />
                             </Grid.GestureRecognizers>
@@ -122,6 +123,7 @@
                                         VerticalOptions="Center"/>
                             </Border>
                             <Button Grid.Column="2" Grid.RowSpan="2"
+                                    IsEnabled="{Binding IsSyncChecked}"
                                     Padding="0"
                                     HorizontalOptions="Start"
                                     VerticalOptions="Center"

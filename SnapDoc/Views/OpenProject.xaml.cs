@@ -30,6 +30,7 @@ public partial class OpenProject : ContentPage
     private async void LoadJsonFiles()
     {
         string rootDirectory = Settings.DataDirectory;
+        bool isOnline = SaveManager.CurrentAuth?.IsLoggedIn == true;
 
         // 1. Lokale JSON-Dateien einlesen
         var foundFiles = await Task.Run(() =>
@@ -108,7 +109,8 @@ public partial class OpenProject : ContentPage
                         FileDate = File.GetLastWriteTime(currentFilePath),
                         ImagePath = thumbPath,
                         ThumbnailPath = thumbPath,
-                        IsActive = currentFilePath == activeFilePath
+                        IsActive = currentFilePath == activeFilePath,
+                        IsSyncChecked = !isOnline
                     });
                 }
             }
@@ -212,6 +214,7 @@ public partial class OpenProject : ContentPage
                                 MainThread.BeginInvokeOnMainThread(() =>
                                 {
                                     item.HasCloudSync = false;
+                                    item.IsSyncChecked = true;
                                 });
 
                                 continue;
@@ -353,17 +356,28 @@ public partial class OpenProject : ContentPage
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
                             item.HasCloudSync = true;
+                            item.IsSyncChecked = true;
                         });
                     }
                     catch (Exception ex)
                     {
                         System.Diagnostics.Debug.WriteLine($"Cloud-Abgleich für '{item.FileName}' fehlgeschlagen: {ex}");
+                        MainThread.BeginInvokeOnMainThread(() => item.IsSyncChecked = true);
                     }
                 }
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"Cloud-Sync fehlgeschlagen: {ex}");
+            }
+            finally
+            {
+                // Sicherheitsnetz: nichts darf dauerhaft gesperrt bleiben
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    foreach (var item in foundFiles)
+                        item.IsSyncChecked = true;
+                });
             }
         });
     }
@@ -507,6 +521,10 @@ public partial class OpenProject : ContentPage
 
         // Wenn das Projekt bereits aktiv ist, nichts tun.
         if (item.IsActive)
+            return;
+
+        // Erst nach abgeschlossenem Cloud-Check oeffnen
+        if (!item.IsSyncChecked)
             return;
 
         // Sperre aktivieren

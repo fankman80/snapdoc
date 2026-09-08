@@ -9,7 +9,7 @@
     <Grid RowDefinitions="Auto, Auto, *">
         <!-- Monatsname Header mit Navigation -->
         <Grid Grid.Row="0" 
-              ColumnDefinitions="Auto, *, Auto" 
+              ColumnDefinitions="Auto,*,Auto" 
               VerticalOptions="Center">
 
             <!-- Pfeil links (Vorheriger Monat) -->

@@ -8,7 +8,7 @@
 
     <Grid x:DataType="controls:Switch"
           Padding="0,2"
-          ColumnDefinitions="Auto, Auto" 
+          ColumnDefinitions="Auto,Auto" 
           ColumnSpacing="16"
           VerticalOptions="Center"
           HorizontalOptions="Start">

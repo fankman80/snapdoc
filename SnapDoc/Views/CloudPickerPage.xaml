@@ -33,7 +33,7 @@
         </Grid.RowDefinitions>
 
         <!-- Dynamic Header Card -->
-        <Grid Grid.Row="0" ColumnDefinitions="*, Auto" ColumnSpacing="0">
+        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="0">
             <Border Grid.Column="0"
                     Padding="12,10"
                     StrokeShape="RoundRectangle 8"
@@ -132,7 +132,7 @@
                             Stroke="Transparent"
                             BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}"
                             Padding="12,8">
-                        <Grid ColumnDefinitions="Auto, *, Auto" ColumnSpacing="12">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="12">
                             <!-- Dynamic Icon -->
                             <Label Grid.Column="0"
                                    Text="{Binding Icon}"
@@ -189,7 +189,7 @@
         <Grid Grid.Row="3" 
               x:DataType="views:CloudPickerPage"
               IsVisible="{Binding IsFolderMode, Source={x:Reference Name=ThisPage}}"
-              ColumnDefinitions="*, Auto" 
+              ColumnDefinitions="*,Auto" 
               ColumnSpacing="10">
 
             <Button Grid.Column="1" 
