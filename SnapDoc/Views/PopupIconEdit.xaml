@@ -22,6 +22,8 @@
                 <Grid ColumnDefinitions="Auto,*">
                     <skia:SKCanvasView x:Name="iconCanvas"
                         Grid.Column="0"
+                        EnableTouchEvents="True"
+                        Touch="OnCanvasTouch"
                         PaintSurface="OnPaintIconPreview"
                         WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
                         HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}" />

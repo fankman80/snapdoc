@@ -19,15 +19,15 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     private const float CrossRadius = 9f;      // halbe Kreuzgroesse in DIP
     private const string BlinkAnimationName = "BlinkCross";
     private static readonly SKSamplingOptions IconSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
-
-    public IconItem iconItem;
-
-    public int IconPreviewWidth { get; set; } = 120;
-    public int IconPreviewHeight { get; set; }
-
+    private const float GrabRadius = 22f; // Fangradius in DIP
+    private bool _isDragging;
     private SKBitmap _iconBitmap;
     private float _blink = 1f;                 // 0..1, steuert die Helligkeit des Kreuzes
     private bool _suppressTextSync;            // verhindert Rueckkopplung Anchor <-> Entry
+
+    public IconItem iconItem;
+    public int IconPreviewWidth { get; set; } = 120;
+    public int IconPreviewHeight { get; set; }
 
     // --- AutoComplete / Kategorien ---
     private readonly List<string> _allCategories = [];
@@ -269,7 +269,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     }
 
     private static string Format(double value)
-        => value.ToString("0.0", CultureInfo.InvariantCulture);
+        => value.ToString("0.00", CultureInfo.InvariantCulture);
 
     private void SetTextSilently(string propertyName, ref string field, string value)
     {
@@ -429,6 +429,51 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
         try { await CloseAsync(null); }
         catch (InvalidOperationException) { }
+    }
+
+    private void OnCanvasTouch(object sender, SKTouchEventArgs e)
+    {
+        float scale = iconCanvas.Width > 0
+        ? (float)(iconCanvas.CanvasSize.Width / iconCanvas.Width)
+        : 1f;
+
+        float pad = CanvasPadding * scale;
+        float imgW = IconPreviewWidth * scale;
+        float imgH = IconPreviewHeight * scale;
+
+        switch (e.ActionType)
+        {
+            case SKTouchAction.Pressed:
+                float cx = pad + (float)Anchor_X * imgW;
+                float cy = pad + (float)Anchor_Y * imgH;
+
+                // nur greifen, wenn nahe genug am Kreuz
+                _isDragging = Math.Abs(e.Location.X - cx) <= GrabRadius * scale
+                && Math.Abs(e.Location.Y - cy) <= GrabRadius * scale;
+
+                if (_isDragging)
+                    UpdateAnchorFromTouch(e.Location, pad, imgW, imgH);
+                break;
+
+            case SKTouchAction.Moved:
+                if (_isDragging)
+                    UpdateAnchorFromTouch(e.Location, pad, imgW, imgH);
+                break;
+
+            case SKTouchAction.Released:
+            case SKTouchAction.Cancelled:
+            case SKTouchAction.Exited:
+                _isDragging = false;
+                break;
+        }
+
+        e.Handled = true; // verhindert, dass die ScrollView den Drag klaut
+    }
+
+    private void UpdateAnchorFromTouch(SKPoint p, float pad, float imgW, float imgH)
+    {
+        Anchor_X = Math.Round((p.X - pad) / imgW, 3);
+        Anchor_Y = Math.Round((p.Y - pad) / imgH, 3);
     }
 
     // ------------------------------------------------------------------
