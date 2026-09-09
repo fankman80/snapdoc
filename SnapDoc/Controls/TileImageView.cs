@@ -1740,7 +1740,7 @@ public partial class TileImageView : ContentView, IDisposable
 
                     try
                     {
-                        bitmap = LoadPinBitmapInternal(path);
+                        bitmap = IconBitmapLoader.Load(path);
                     }
                     catch (Exception ex)
                     {
@@ -1772,129 +1772,6 @@ public partial class TileImageView : ContentView, IDisposable
                     _loadingPinPaths.Remove(path);
             });
         }
-    }
-
-    private static SKBitmap LoadPinBitmapInternal(string iconPath)
-    {
-        if (string.IsNullOrEmpty(iconPath)) return null;
-
-        if (File.Exists(iconPath))
-        {
-            try
-            {
-                using var stream = File.OpenRead(iconPath);
-                return SKBitmap.Decode(stream);
-            }
-            catch { /* Ignorieren */ }
-        }
-
-        string cacheFolder = Settings.CacheDirectory;
-        if (!Directory.Exists(cacheFolder))
-            Directory.CreateDirectory(cacheFolder);
-
-        string fileName = Path.GetFileName(iconPath);
-        string targetCachePath = Path.Combine(cacheFolder, fileName);
-
-        if (File.Exists(targetCachePath))
-        {
-            try
-            {
-                using var stream = File.OpenRead(targetCachePath);
-                return SKBitmap.Decode(stream);
-            }
-            catch { /* Ignorieren */ }
-        }
-
-        try
-        {
-#if ANDROID
-            var context = Android.App.Application.Context;
-            string imageName = Path.GetFileNameWithoutExtension(fileName).ToLower();
-            int resId = context.Resources.GetIdentifier(imageName, "drawable", context.PackageName);
-
-            if (resId != 0)
-            {
-                using var resourceStream = context.Resources.OpenRawResource(resId);
-                using (var targetStream = File.Create(targetCachePath))
-                {
-                    resourceStream.CopyTo(targetStream);
-                }
-
-                using var readStream = File.OpenRead(targetCachePath);
-                return SKBitmap.Decode(readStream);
-            }
-#elif IOS
-            string imageName = Path.GetFileNameWithoutExtension(fileName);
-            using var uiImage = UIKit.UIImage.FromBundle(imageName);
-
-            if (uiImage != null)
-            {
-                using var nsData = uiImage.AsPNG();
-
-                if (nsData != null)
-                {
-                    using var stream = nsData.AsStream();
-                    using (var targetStream = File.Create(targetCachePath))
-                    {
-                        stream.CopyTo(targetStream);
-                    }
-
-                    using var readStream = File.OpenRead(targetCachePath);
-                    return SKBitmap.Decode(readStream);
-                }
-            }
-#elif WINDOWS
-            string fileNameOnly = Path.GetFileName(iconPath);
-            string nameWithoutExt = Path.GetFileNameWithoutExtension(fileNameOnly);
-            string ext = Path.GetExtension(fileNameOnly);
-            string baseDir = AppContext.BaseDirectory;
-
-            string[] searchDirs =
-            [
-                Path.Combine(baseDir, "Assets", "pins"),
-                Path.Combine(baseDir, "Assets"),
-                baseDir
-            ];
-
-            foreach (var dir in searchDirs)
-            {
-                if (!Directory.Exists(dir)) continue;
-
-                string targetPath = Path.Combine(dir, fileNameOnly);
-
-                if (!File.Exists(targetPath))
-                    targetPath = Path.Combine(dir, $"{nameWithoutExt}.scale-100{ext}");
-
-                if (!File.Exists(targetPath))
-                    targetPath = Directory.GetFiles(dir, $"{nameWithoutExt}.scale-*{ext}").FirstOrDefault();
-
-                if (!string.IsNullOrEmpty(targetPath) && File.Exists(targetPath))
-                {
-                    try
-                    {
-                        using var stream = File.OpenRead(targetPath);
-                        return SKBitmap.Decode(stream);
-                    }
-                    catch { /* Ignorieren */ }
-                }
-            }
-#else
-            using var packageStream = FileSystem.OpenAppPackageFileAsync(iconPath).GetAwaiter().GetResult();
-            using (var targetStream = File.Create(targetCachePath))
-            {
-                packageStream.CopyTo(targetStream);
-            }
-
-            using var readStream = File.OpenRead(targetCachePath);
-            return SKBitmap.Decode(readStream);
-#endif
-        }
-        catch (Exception ex)
-        {
-            Debug.WriteLine($"Fehler beim Extrahieren des Pins: {ex.Message}");
-        }
-
-        return null;
     }
 
     // ---------------------------------------------------------------------------------

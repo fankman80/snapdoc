@@ -16,37 +16,39 @@
     <Grid x:DataType="views:PopupIconEdit"
           Padding="6"
           WidthRequest="320"
-          RowDefinitions="*, Auto">
-        <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">
+          RowDefinitions="Auto,*,Auto">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+            <skia:SKCanvasView
+                x:Name="iconCanvas"
+                Grid.Column="0"
+                EnableTouchEvents="True"
+                Touch="OnCanvasTouch"
+                PaintSurface="OnPaintIconPreview"
+                WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
+                HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}" />
+            
+            <VerticalStackLayout Grid.Column="1">
+                <controls:BorderedEntry
+                    Text="{Binding Anchor_X_Text}"
+                    Placeholder="{x:Static res:AppResources.anker_x}"
+                    BackgroundColor="Transparent"
+                    Keyboard="Numeric"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                    Text="{Binding Anchor_Y_Text}"
+                    Placeholder="{x:Static res:AppResources.anker_y}"
+                    BackgroundColor="Transparent"
+                    Keyboard="Numeric"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+            </VerticalStackLayout>
+        </Grid>
+        
+        <ScrollView Grid.Row="1" VerticalOptions="Start" MaximumHeightRequest="800">
             <VerticalStackLayout Margin="0,0,0,6" Spacing="8">
-                <Grid ColumnDefinitions="Auto,*">
-                    <skia:SKCanvasView x:Name="iconCanvas"
-                        Grid.Column="0"
-                        EnableTouchEvents="True"
-                        Touch="OnCanvasTouch"
-                        PaintSurface="OnPaintIconPreview"
-                        WidthRequest="{Binding IconPreviewWidth, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}"
-                        HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}" />
-                    <VerticalStackLayout Grid.Column="1">
-                        <controls:BorderedEntry
-                            Text="{Binding Anchor_X_Text}"
-                            Placeholder="{x:Static res:AppResources.anker_x}"
-                            BackgroundColor="Transparent"
-                            Keyboard="Numeric"
-                            BorderColor="{DynamicResource SecondaryBackground}"
-                            PlaceholderColor="{DynamicResource SecondaryBackground}"
-                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                        <controls:BorderedEntry
-                            Text="{Binding Anchor_Y_Text}"
-                            Placeholder="{x:Static res:AppResources.anker_y}"
-                            BackgroundColor="Transparent"
-                            Keyboard="Numeric"
-                            BorderColor="{DynamicResource SecondaryBackground}"
-                            PlaceholderColor="{DynamicResource SecondaryBackground}"
-                            FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                    </VerticalStackLayout>
-                </Grid>
-
                 <controls:BorderedEntry
                     x:Name="iconName"
                     Placeholder="{x:Static res:AppResources.bezeichnung}"
@@ -55,7 +57,7 @@
                     BorderColor="{DynamicResource SecondaryBackground}"
                     PlaceholderColor="{DynamicResource SecondaryBackground}"
                     FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-
+                
                 <VerticalStackLayout Spacing="2">
                     <Grid RowDefinitions="Auto, Auto">
                         <!-- Input-Feld -->
@@ -188,7 +190,7 @@
             </VerticalStackLayout>
         </ScrollView>
 
-        <Grid Grid.Row="1" ColumnDefinitions="*, *">
+        <Grid Grid.Row="2" ColumnDefinitions="*,*">
             <Button Grid.Column="0"
                     x:Name="cancelButtonText"
                     Text="{x:Static res:AppResources.abbrechen}"

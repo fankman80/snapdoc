@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
+using SnapDoc.Controls;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -24,7 +25,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     private SKBitmap _iconBitmap;
     private float _blink = 1f;                 // 0..1, steuert die Helligkeit des Kreuzes
     private bool _suppressTextSync;            // verhindert Rueckkopplung Anchor <-> Entry
-
+    private long? _activePointer;
     public IconItem iconItem;
     public int IconPreviewWidth { get; set; } = 120;
     public int IconPreviewHeight { get; set; }
@@ -62,7 +63,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
         IconPreviewHeight = (int)(IconPreviewWidth * iconItem.IconSize.Height / iconItem.IconSize.Width);
 
-        LoadIconBitmap();
+        _ = LoadIconBitmapAsync();
 
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
@@ -85,21 +86,10 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     //  Vorschau / SkiaSharp
     // ------------------------------------------------------------------
 
-    private void LoadIconBitmap()
+    private async Task LoadIconBitmapAsync()
     {
-        try
-        {
-            var path = iconItem.DisplayIconPath;
-            if (string.IsNullOrEmpty(path) || !File.Exists(path))
-                return;
-
-            using var stream = File.OpenRead(path);
-            _iconBitmap = SKBitmap.Decode(stream);
-        }
-        catch
-        {
-            _iconBitmap = null;
-        }
+        _iconBitmap = await IconBitmapLoader.LoadAsync(iconItem.DisplayIconPath);
+        iconCanvas?.InvalidateSurface();
     }
 
     private void OnPaintIconPreview(object sender, SKPaintSurfaceEventArgs e)
@@ -444,36 +434,31 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
-                float cx = pad + (float)Anchor_X * imgW;
-                float cy = pad + (float)Anchor_Y * imgH;
-
-                // nur greifen, wenn nahe genug am Kreuz
-                _isDragging = Math.Abs(e.Location.X - cx) <= GrabRadius * scale
-                && Math.Abs(e.Location.Y - cy) <= GrabRadius * scale;
-
-                if (_isDragging)
-                    UpdateAnchorFromTouch(e.Location, pad, imgW, imgH);
+                if (_activePointer != null) break;
+                _activePointer = e.Id;
+                _isDragging = true;
+                UpdateAnchorFromTouch(e.Location, pad, imgW, imgH);
                 break;
 
             case SKTouchAction.Moved:
-                if (_isDragging)
+                if (_isDragging && e.Id == _activePointer)
                     UpdateAnchorFromTouch(e.Location, pad, imgW, imgH);
                 break;
 
             case SKTouchAction.Released:
             case SKTouchAction.Cancelled:
-            case SKTouchAction.Exited:
                 _isDragging = false;
+                _activePointer = null;
                 break;
         }
 
-        e.Handled = true; // verhindert, dass die ScrollView den Drag klaut
+        e.Handled = true;
     }
 
     private void UpdateAnchorFromTouch(SKPoint p, float pad, float imgW, float imgH)
     {
-        Anchor_X = Math.Round((p.X - pad) / imgW, 3);
-        Anchor_Y = Math.Round((p.Y - pad) / imgH, 3);
+        Anchor_X = Math.Round((p.X - pad) / imgW, 2);
+        Anchor_Y = Math.Round((p.Y - pad) / imgH, 2);
     }
 
     // ------------------------------------------------------------------
