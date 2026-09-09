@@ -43,6 +43,7 @@ public partial class TileImageView : ContentView, IDisposable
     private SKFont _fpsFont;
     private SKPaint _fpsTextPaint;
     private SKPaint _fpsBackPaint;
+    private int _baseFallbackLevel = 0;
 
     // ---------------------------------------------------------------------------------
     //  Felder - Kachel-Cache und Loader
@@ -358,6 +359,10 @@ public partial class TileImageView : ContentView, IDisposable
             GetLevelTileCounts(zoom, maxZoom, tileSize, size, out int tilesX, out int tilesY);
             _isPermanentLevel[zoom] = (long)tilesX * tilesY <= PermanentTileBudget;
         }
+
+        _baseFallbackLevel = 0;
+        for (int z = 0; z < _isPermanentLevel.Length; z++)
+            if (_isPermanentLevel[z]) _baseFallbackLevel = z;
     }
 
     private static void GetLevelTileCounts(int zoom, int maxZoom, int tileSize, SKSize imageSize, out int tilesX, out int tilesY)
@@ -761,6 +766,10 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (isPrimaryPass)
             EnsureTileCacheCapacity(baseZoom, desiredZoom, maxZoom, tileSize, imageSize, view);
+
+        int guaranteed = Math.Min(_baseFallbackLevel, Math.Min(baseZoom, maxAvailableZoom));
+        if (guaranteed < baseZoom)
+            DrawTileLayer(canvas, guaranteed, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
 
         DrawTileLayer(canvas, baseZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: true);
 

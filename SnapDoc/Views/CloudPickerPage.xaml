@@ -33,43 +33,27 @@
         </Grid.RowDefinitions>
 
         <!-- Dynamic Header Card -->
-        <Grid Grid.Row="0" ColumnDefinitions="*,Auto" ColumnSpacing="0">
-            <Border Grid.Column="0"
-                    Padding="12,10"
-                    StrokeShape="RoundRectangle 8"
-                    Stroke="Transparent"
-                    BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}">
-                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
-                    <Label Grid.Column="0"
-                           FontFamily="MaterialOutlined"
-                           Text="{x:Static local:MaterialIcons.Info}"
-                           FontSize="24"
-                           TextColor="{DynamicResource Primary}"
-                           VerticalOptions="Center" />
-                    <Label Grid.Column="1"
-                           x:DataType="views:CloudPickerPage"
-                           Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
-                           FontSize="12"
-                           TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                           VerticalOptions="Center"
-                           LineBreakMode="WordWrap"/>
-                </Grid>
-            </Border>
-
-            <Button Grid.Column="1"
-                    IsVisible="{Binding IsJsonMode, Source={x:Reference Name=ThisPage}}"
-                    Text="{x:Static local:MaterialIcons.Document_search}"
-                    FontSize="34"
-                    Padding="0"
-                    Margin="10,0,0,0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.suche_nach_projekten}"
-                    Clicked="OnSearchProjectsClicked"/>
-        </Grid>
+        <Border Grid.Row="0"
+                Padding="12,10"
+                StrokeShape="RoundRectangle 8"
+                Stroke="Transparent"
+                BackgroundColor="{AppThemeBinding Light=#08000000, Dark=#10FFFFFF}">
+            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                <Label Grid.Column="0"
+                        FontFamily="MaterialOutlined"
+                        Text="{x:Static local:MaterialIcons.Info}"
+                        FontSize="24"
+                        TextColor="{DynamicResource Primary}"
+                        VerticalOptions="Center" />
+                <Label Grid.Column="1"
+                        x:DataType="views:CloudPickerPage"
+                        Text="{Binding HeaderSubtitle, Source={x:Reference Name=ThisPage}}"
+                        FontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        VerticalOptions="Center"
+                        LineBreakMode="WordWrap"/>
+            </Grid>
+        </Border>
 
         <!-- Breadcrumb-Navigation -->
         <Border Grid.Row="1"

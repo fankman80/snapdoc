@@ -137,8 +137,7 @@ public partial class OpenProject : ContentPage
 
             try
             {
-                var remoteProjects =
-                    await SaveManager.SearchRemoteProjectsAsync();
+                var remoteProjects = await SaveManager.SearchRemoteProjectsAsync();
 
                 if (remoteProjects == null)
                     return;

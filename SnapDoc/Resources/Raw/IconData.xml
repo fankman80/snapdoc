@@ -1324,5 +1324,70 @@
 		<Color Red="250" Green="186" Blue="252" />
 		<Scale>0.4</Scale>
 		<Category>Türen und Tore</Category>
-	</Item>		
+	</Item>
+	
+	<Item>
+		<FileName>x_flag_red.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.06" Y="0.96" />
+		<Size Width="128" Height="128" />
+		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<CustomIcon>false</CustomIcon>
+		<Color Red="255" Green="0" Blue="0" />
+		<Scale>0.75</Scale>
+		<Category>Flaggen</Category>
+	</Item>
+	
+	<Item>
+		<FileName>x_flag_blue.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.06" Y="0.96" />
+		<Size Width="128" Height="128" />
+		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<CustomIcon>false</CustomIcon>
+		<Color Red="0" Green="50" Blue="204" />
+		<Scale>0.75</Scale>
+		<Category>Flaggen</Category>
+	</Item>
+	
+	<Item>
+		<FileName>x_flag_green.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.06" Y="0.96" />
+		<Size Width="128" Height="128" />
+		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<CustomIcon>false</CustomIcon>
+		<Color Red="0" Green="153" Blue="0" />
+		<Scale>0.75</Scale>
+		<Category>Flaggen</Category>
+	</Item>
+	
+	<Item>
+		<FileName>x_flag_pink.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.06" Y="0.96" />
+		<Size Width="128" Height="128" />
+		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<CustomIcon>false</CustomIcon>
+		<Color Red="252" Green="2" Blue="202" />
+		<Scale>0.75</Scale>
+		<Category>Flaggen</Category>
+	</Item>
+	
+	<Item>
+		<FileName>x_flag_yellow.png</FileName>
+		<Description></Description>
+		<AnchorPoint X="0.06" Y="0.96" />
+		<Size Width="128" Height="128" />
+		<RotationLocked>false</RotationLocked>
+		<AutoScaleLocked>true</AutoScaleLocked>
+		<CustomIcon>false</CustomIcon>
+		<Color Red="217" Green="217" Blue="20" />
+		<Scale>0.75</Scale>
+		<Category>Flaggen</Category>
+	</Item>
 </IconData>

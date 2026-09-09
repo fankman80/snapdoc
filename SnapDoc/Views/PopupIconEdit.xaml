@@ -17,7 +17,7 @@
           Padding="6"
           WidthRequest="320"
           RowDefinitions="Auto,*,Auto">
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*" Margin="0,0,0,8">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*">
             <skia:SKCanvasView
                 x:Name="iconCanvas"
                 Grid.Column="0"

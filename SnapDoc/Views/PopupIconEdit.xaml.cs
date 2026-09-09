@@ -17,10 +17,9 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 {
     // --- Konstanten fuer die Vorschau ---
     private const float CanvasPadding = 12f;   // Rand, damit das Kreuz bei Anchor 0/1 nicht abgeschnitten wird
-    private const float CrossRadius = 9f;      // halbe Kreuzgroesse in DIP
+    private const float CrossRadius = 11f;      // halbe Kreuzgroesse in DIP
     private const string BlinkAnimationName = "BlinkCross";
     private static readonly SKSamplingOptions IconSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
-    private const float GrabRadius = 22f; // Fangradius in DIP
     private bool _isDragging;
     private SKBitmap _iconBitmap;
     private float _blink = 1f;                 // 0..1, steuert die Helligkeit des Kreuzes

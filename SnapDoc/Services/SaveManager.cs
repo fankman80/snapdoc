@@ -1494,9 +1494,26 @@ public static class SaveManager
 public class RemoteProjectDto
 {
     public string FileName { get; set; } = string.Empty;
+
     public string DriveId { get; set; } = string.Empty;
+
     public string FolderId { get; set; } = string.Empty;
+
+    // ID der eigentlichen JSON-Datei
+    public string ItemId { get; set; } = string.Empty;
+
+    // Aus Object_name im JSON
+    public string ObjectName { get; set; } = string.Empty;
+
+    // Optional: Pfad für Anzeige im Suchdialog
+    public string FolderPath { get; set; } = string.Empty;
+
     public DateTimeOffset LastModified { get; set; }
+
+    public string DisplayName =>
+    string.IsNullOrWhiteSpace(ObjectName)
+    ? Path.GetFileNameWithoutExtension(FileName)
+    : ObjectName;
 }
 
 public class CloudDownloadFile
