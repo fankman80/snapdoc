@@ -1327,8 +1327,8 @@
 	</Item>
 	
 	<Item>
-		<FileName>x_flag_red.png</FileName>
-		<Description></Description>
+		<FileName>flag_red.png</FileName>
+		<Description>Rote Fahne</Description>
 		<AnchorPoint X="0.06" Y="0.96" />
 		<Size Width="128" Height="128" />
 		<RotationLocked>false</RotationLocked>
@@ -1340,8 +1340,8 @@
 	</Item>
 	
 	<Item>
-		<FileName>x_flag_blue.png</FileName>
-		<Description></Description>
+		<FileName>flag_blue.png</FileName>
+		<Description>Blaue Fahne</Description>
 		<AnchorPoint X="0.06" Y="0.96" />
 		<Size Width="128" Height="128" />
 		<RotationLocked>false</RotationLocked>
@@ -1353,8 +1353,8 @@
 	</Item>
 	
 	<Item>
-		<FileName>x_flag_green.png</FileName>
-		<Description></Description>
+		<FileName>flag_green.png</FileName>
+		<Description>Grüne Fahne</Description>
 		<AnchorPoint X="0.06" Y="0.96" />
 		<Size Width="128" Height="128" />
 		<RotationLocked>false</RotationLocked>
@@ -1366,8 +1366,8 @@
 	</Item>
 	
 	<Item>
-		<FileName>x_flag_pink.png</FileName>
-		<Description></Description>
+		<FileName>flag_pink.png</FileName>
+		<Description>Pinke Fahne</Description>
 		<AnchorPoint X="0.06" Y="0.96" />
 		<Size Width="128" Height="128" />
 		<RotationLocked>false</RotationLocked>
@@ -1379,8 +1379,8 @@
 	</Item>
 	
 	<Item>
-		<FileName>x_flag_yellow.png</FileName>
-		<Description></Description>
+		<FileName>flag_yellow.png</FileName>
+		<Description>Gelbe Fahne</Description>
 		<AnchorPoint X="0.06" Y="0.96" />
 		<Size Width="128" Height="128" />
 		<RotationLocked>false</RotationLocked>
