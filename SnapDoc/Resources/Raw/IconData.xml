@@ -1336,7 +1336,7 @@
 		<CustomIcon>false</CustomIcon>
 		<Color Red="255" Green="0" Blue="0" />
 		<Scale>0.75</Scale>
-		<Category>Flaggen</Category>
+		<Category>Fahnen</Category>
 	</Item>
 	
 	<Item>
@@ -1349,7 +1349,7 @@
 		<CustomIcon>false</CustomIcon>
 		<Color Red="0" Green="50" Blue="204" />
 		<Scale>0.75</Scale>
-		<Category>Flaggen</Category>
+		<Category>Fahnen</Category>
 	</Item>
 	
 	<Item>
@@ -1362,7 +1362,7 @@
 		<CustomIcon>false</CustomIcon>
 		<Color Red="0" Green="153" Blue="0" />
 		<Scale>0.75</Scale>
-		<Category>Flaggen</Category>
+		<Category>Fahnen</Category>
 	</Item>
 	
 	<Item>
@@ -1375,7 +1375,7 @@
 		<CustomIcon>false</CustomIcon>
 		<Color Red="252" Green="2" Blue="202" />
 		<Scale>0.75</Scale>
-		<Category>Flaggen</Category>
+		<Category>Fahnen</Category>
 	</Item>
 	
 	<Item>
@@ -1388,6 +1388,6 @@
 		<CustomIcon>false</CustomIcon>
 		<Color Red="217" Green="217" Blue="20" />
 		<Scale>0.75</Scale>
-		<Category>Flaggen</Category>
+		<Category>Fahnen</Category>
 	</Item>
 </IconData>
