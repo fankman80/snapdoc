@@ -103,20 +103,11 @@ public partial class IconGallery : ContentPage, IQueryAttributable
 
             if (result == null) return;
 
-            var origName = Path.Combine(Settings.DataDirectory, "customicons", result.FileName);
-            var ext = Path.GetExtension(origName);
-            string newName = origName;
-            int i = 1;
-            while (File.Exists(newName))
-            {
-                newName = Path.GetFileNameWithoutExtension(origName) + "_" + i.ToString() + ext;
-                i++;
-            }
+            var ext = Path.GetExtension(result.FileName);
+            string fileName = $"customicon_{DateTime.Now.Ticks}{ext}";
 
-            var fileName = newName;    
             using var stream = await result.OpenReadAsync();
             var localPath = Path.Combine(Settings.DataDirectory, "customicons", fileName);
-
             Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, "customicons"));
 
             using (var fileStream = File.Create(localPath))

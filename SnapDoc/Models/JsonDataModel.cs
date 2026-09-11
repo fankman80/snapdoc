@@ -14,6 +14,7 @@ public partial class JsonDataModel : ObservableObject
     [ObservableProperty] public partial string Object_name { get; set; }
     [ObservableProperty] public partial string Project_manager { get; set; }
     [ObservableProperty] public partial string TitleImage { get; set; }
+    [ObservableProperty] public partial string CustomIconsPath { get; set; }
     public string CloudDriveId { get; set; }
     public string CloudFolderId { get; set; }
     public DateTime Creation_date { get; set; }

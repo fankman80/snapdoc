@@ -6,6 +6,8 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using System.Collections.Concurrent;
 using System.Text.Json;
+using SkiaSharp;
+using static SnapDoc.Helper;
 
 namespace SnapDoc.Services;
 
@@ -480,57 +482,58 @@ public static class SaveManager
             WeakReferenceMessenger.Default.Send(new PinDeletedMessage(deletedId));
         }
 
-        if (cloudPlan.Pins == null) return;
-
-        // Neue oder geaenderte Pins verarbeiten
-        foreach (var cloudPinKp in cloudPlan.Pins)
+        if (cloudPlan.Pins != null)
         {
-            var pinId = cloudPinKp.Key;
-            var cloudPin = cloudPinKp.Value;
-
-            if (!localPlan.Pins.TryGetValue(pinId, out Pin? localPin))
+            // Neue oder geaenderte Pins verarbeiten
+            foreach (var cloudPinKp in cloudPlan.Pins)
             {
-                localPlan.Pins.Add(pinId, cloudPin);
-                WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
-                continue;
+                var pinId = cloudPinKp.Key;
+                var cloudPin = cloudPinKp.Value;
+
+                if (!localPlan.Pins.TryGetValue(pinId, out Pin? localPin))
+                {
+                    localPlan.Pins.Add(pinId, cloudPin);
+                    WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
+                    continue;
+                }
+
+                // Visuelle Eigenschaften pruefen (loest Canvas-Redraw aus)
+                bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
+                                     localPin.PinRotation != cloudPin.PinRotation ||
+                                     localPin.PinIcon != cloudPin.PinIcon ||
+                                     localPin.PinColor != cloudPin.PinColor ||
+                                     localPin.PinScale != cloudPin.PinScale ||
+                                     localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
+                                     localPin.IsLockRotate != cloudPin.IsLockRotate;
+
+                // ALLE Daten synchronisieren
+                localPin.Anchor = cloudPin.Anchor;
+                localPin.DateTime = cloudPin.DateTime;
+                localPin.IsWebMapPin = cloudPin.IsWebMapPin;
+                localPin.IsCustomPin = cloudPin.IsCustomPin;
+                localPin.IsCustomIcon = cloudPin.IsCustomIcon;
+                localPin.Pos = cloudPin.Pos;
+                localPin.PinPriority = cloudPin.PinPriority;
+                localPin.Fotos = cloudPin.Fotos;
+                localPin.GeoLocation = cloudPin.GeoLocation;
+                localPin.IsAllowExport = cloudPin.IsAllowExport;
+                localPin.IsLockAutoScale = cloudPin.IsLockAutoScale;
+                localPin.IsLockPosition = cloudPin.IsLockPosition;
+                localPin.IsLockRotate = cloudPin.IsLockRotate;
+                localPin.OnPlanId = cloudPin.OnPlanId;
+                localPin.PinColor = cloudPin.PinColor;
+                localPin.PinIcon = cloudPin.PinIcon;
+                localPin.PinName = cloudPin.PinName;
+                localPin.PinDesc = cloudPin.PinDesc;
+                localPin.Size = cloudPin.Size;
+                localPin.SelfId = cloudPin.SelfId;
+                localPin.PinScale = cloudPin.PinScale;
+                localPin.PinLocation = cloudPin.PinLocation;
+                localPin.PinRotation = cloudPin.PinRotation;
+
+                if (uiNeedsRedraw)
+                    WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
             }
-
-            // Visuelle Eigenschaften pruefen (loest Canvas-Redraw aus)
-            bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
-                                 localPin.PinRotation != cloudPin.PinRotation ||
-                                 localPin.PinIcon != cloudPin.PinIcon ||
-                                 localPin.PinColor != cloudPin.PinColor ||
-                                 localPin.PinScale != cloudPin.PinScale ||
-                                 localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
-                                 localPin.IsLockRotate != cloudPin.IsLockRotate;
-
-            // ALLE Daten synchronisieren
-            localPin.Anchor = cloudPin.Anchor;
-            localPin.DateTime = cloudPin.DateTime;
-            localPin.IsWebMapPin = cloudPin.IsWebMapPin;
-            localPin.IsCustomPin = cloudPin.IsCustomPin;
-            localPin.IsCustomIcon = cloudPin.IsCustomIcon;
-            localPin.Pos = cloudPin.Pos;
-            localPin.PinPriority = cloudPin.PinPriority;
-            localPin.Fotos = cloudPin.Fotos;
-            localPin.GeoLocation = cloudPin.GeoLocation;
-            localPin.IsAllowExport = cloudPin.IsAllowExport;
-            localPin.IsLockAutoScale = cloudPin.IsLockAutoScale;
-            localPin.IsLockPosition = cloudPin.IsLockPosition;
-            localPin.IsLockRotate = cloudPin.IsLockRotate;
-            localPin.OnPlanId = cloudPin.OnPlanId;
-            localPin.PinColor = cloudPin.PinColor;
-            localPin.PinIcon = cloudPin.PinIcon;
-            localPin.PinName = cloudPin.PinName;
-            localPin.PinDesc = cloudPin.PinDesc;
-            localPin.Size = cloudPin.Size;
-            localPin.SelfId = cloudPin.SelfId;
-            localPin.PinScale = cloudPin.PinScale;
-            localPin.PinLocation = cloudPin.PinLocation;
-            localPin.PinRotation = cloudPin.PinRotation;
-
-            if (uiNeedsRedraw)
-                WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
         }
 
         // Zaehler nach allen Aenderungen einmalig korrigieren
@@ -634,7 +637,8 @@ public static class SaveManager
             project.PlanFolder,
             $"{project.PlanFolder}/thumbnails",
             project.ThumbnailFolder,
-            project.CustomPinsFolder
+            project.CustomPinsFolder,
+            project.CustomIconsFolder
         ];
 
         foreach (var subfolder in subfolders)
@@ -1238,22 +1242,80 @@ public static class SaveManager
             {
                 var pin = pinPair.Value;
 
-                if (!pin.IsCustomPin || string.IsNullOrEmpty(pin.PinIcon))
-                    continue;
+                if (pin.IsCustomPin || !string.IsNullOrEmpty(pin.PinIcon))
+                {
+                    string localPinPath = Path.Combine(projectDir, project.CustomPinsFolder, pin.PinIcon);
+                    if (File.Exists(localPinPath)) continue;
 
-                string localPinPath = Path.Combine(projectDir, project.CustomPinsFolder, pin.PinIcon);
-                if (File.Exists(localPinPath)) continue;
+                    await DownloadSpecificFileAsync(driveId, rootFolderId,
+                        $"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
 
-                await DownloadSpecificFileAsync(driveId, rootFolderId,
-                    $"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
+                    string dataFile = Path.ChangeExtension(pin.PinIcon, ".data");
+                    string localDataPath = Path.Combine(projectDir, project.CustomPinsFolder, dataFile);
 
-                string dataFile = Path.ChangeExtension(pin.PinIcon, ".data");
-                string localDataPath = Path.Combine(projectDir, project.CustomPinsFolder, dataFile);
-
-                await DownloadSpecificFileAsync(driveId, rootFolderId,
-                    $"{project.CustomPinsFolder}/{dataFile}", localDataPath);
+                    await DownloadSpecificFileAsync(driveId, rootFolderId,
+                        $"{project.CustomPinsFolder}/{dataFile}", localDataPath);
+                }
+                else if (pin.IsCustomIcon && !string.IsNullOrEmpty(pin.PinIcon))
+                {
+                    await EnsureCustomIconAvailableAsync(driveId, rootFolderId, pin.PinIcon);
+                }
             }
         }
+    }
+
+    private static async Task EnsureCustomIconAvailableAsync(string driveId, string rootFolderId, string iconFileName)
+    {
+        // Bereits registriert (z.B. selbst erstellt oder frueherer Sync) - nichts zu tun
+        if (IconLookup.Get(iconFileName) != null) return;
+
+        string iconDir = Path.Combine(Settings.DataDirectory, "customicons");
+        string localPngPath = Path.Combine(iconDir, iconFileName);
+        var project = ProjectItem.Current;
+        string metaFileName = Path.ChangeExtension(iconFileName, ".json");
+        string localMetaPath = Path.Combine(iconDir, metaFileName);
+
+        Directory.CreateDirectory(iconDir);
+
+        if (!File.Exists(localPngPath))
+            await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.CustomIconsFolder}/{iconFileName}", localPngPath);
+
+        await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.CustomIconsFolder}/{metaFileName}", localMetaPath);
+
+        // Download fehlgeschlagen - naechster Sync-Zyklus versucht es erneut
+        if (!File.Exists(localPngPath) || !File.Exists(localMetaPath)) return;
+
+        try
+        {
+            var meta = JsonSerializer.Deserialize<CustomIconMetadata>(await File.ReadAllTextAsync(localMetaPath));
+            if (meta == null) return;
+
+            var newIconItem = new IconItem(
+            iconFileName,
+            meta.DisplayName,
+            new Point(meta.AnchorX, meta.AnchorY),
+            new Size(meta.SizeWidth, meta.SizeHeight),
+            meta.IsRotationLocked,
+            meta.IsAutoScaleLocked,
+            isCustomIcon: true,
+            SKColor.Parse(meta.PinColorHex),
+            meta.IconScale,
+            meta.Category,
+            isDefaultIcon: false);
+
+            // Exakt derselbe Ablauf wie in PopupIconEdit.OnOkClicked
+            Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), newIconItem);
+            IconLookup.AddOrUpdate(newIconItem);
+
+            Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out var iconCategories);
+            SettingsService.Instance.IconCategories = iconCategories;
+            IconLookup.Initialize(Settings.IconData);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Fehler beim Registrieren des CustomIcons '{iconFileName}': {ex.Message}");
+        }
+        try { File.Delete(localMetaPath); } catch { /* unkritisch */ }
     }
 
     private static async Task DownloadSpecificFileAsync(string driveId, string rootFolderId, string relativeCloudPath, string localDestinationPath)
@@ -1525,4 +1587,18 @@ public class CloudDownloadFile
 {
     public string Id { get; set; } = string.Empty;
     public string RelativePath { get; set; } = string.Empty;
+}
+
+public class CustomIconMetadata
+{
+    public string? DisplayName { get; set; }
+    public double AnchorX { get; set; }
+    public double AnchorY { get; set; }
+    public double SizeWidth { get; set; }
+    public double SizeHeight { get; set; }
+    public bool IsRotationLocked { get; set; }
+    public bool IsAutoScaleLocked { get; set; }
+    public string? PinColorHex { get; set; }
+    public double IconScale { get; set; }
+    public string? Category { get; set; }
 }

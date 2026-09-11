@@ -22,9 +22,9 @@ namespace SnapDoc;
 public partial class ProjectItem : ObservableObject
 {
     private const string DefaultTitleImage = SettingsService.FlyoutHeaderImageThumb;
-
     private JsonDataModel _model;
     private bool _suspendSave;
+    public string CustomIconsFolder => Or(_model.CustomIconsPath, "customicons");
 
     #region Singleton
 
@@ -81,9 +81,7 @@ public partial class ProjectItem : ObservableObject
     /// </summary>
     public void Attach(JsonDataModel model)
     {
-        if (_model != null)
-            _model.PropertyChanged -= OnModelPropertyChanged;
-
+        _model?.PropertyChanged -= OnModelPropertyChanged;
         _model = model ?? new JsonDataModel();
         _model.PropertyChanged += OnModelPropertyChanged;
 
@@ -174,16 +172,17 @@ public partial class ProjectItem : ObservableObject
     public string CloudFolderId => _model.CloudFolderId;
     public bool IsCloudLinked => !string.IsNullOrWhiteSpace(_model.CloudFolderId);
 
+#pragma warning disable CA1822
     public string ProjectDirectory =>
         string.IsNullOrWhiteSpace(SettingsService.Instance?.ProjectPath)
             ? null
             : Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath);
+#pragma warning restore CA1822
 
     public string PlanFolder => Or(_model.PlanPath, "plans");
     public string ImageFolder => Or(_model.ImagePath, "images");
     public string ThumbnailFolder => Or(_model.ThumbnailPath, "thumbnails");
     public string CustomPinsFolder => Or(_model.CustomPinsPath, "custompins");
-
     public string TitleImageFileName => Or(_model.TitleImage, DefaultTitleImage);
 
     private static string Or(string value, string fallback)
@@ -251,7 +250,7 @@ public partial class ProjectItem : ObservableObject
 
     #region Anzeigewerte (ersetzen Helper.HeaderUpdate)
 
-    public bool IsLoaded => SettingsService.Instance?.IsProjectLoaded == true;
+    public static bool IsLoaded => SettingsService.Instance?.IsProjectLoaded == true;
     public bool HasName => !string.IsNullOrWhiteSpace(_model.Object_name);
 
     public string FlyoutHeaderTitle =>

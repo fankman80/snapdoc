@@ -377,6 +377,9 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             IconLookup.AddOrUpdate(updatedItem);
             returnValue = file;
 
+            if (updatedItem.IsCustomIcon)
+                CustomIconSync.Upload(updatedItem);
+
             if (setDefault.IsToggled)
             {
                 SettingsService.Instance.DefaultPinIcon = file;
@@ -398,6 +401,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
                 File.Delete(iconFile);
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
                 IconLookup.Remove(file);
+                _ = SaveManager.DeleteCloudFileAsync($"{ProjectItem.Current.CustomIconsFolder}/{file}");
+                _ = SaveManager.DeleteCloudFileAsync($"{ProjectItem.Current.CustomIconsFolder}/{Path.ChangeExtension(file, ".json")}");
                 returnValue = "deleted";
             }
         }
