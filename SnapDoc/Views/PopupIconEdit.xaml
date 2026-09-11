@@ -53,7 +53,6 @@
                     x:Name="iconName"
                     Placeholder="{x:Static res:AppResources.bezeichnung}"
                     BackgroundColor="Transparent"
-                    Keyboard="Numeric"
                     BorderColor="{DynamicResource SecondaryBackground}"
                     PlaceholderColor="{DynamicResource SecondaryBackground}"
                     FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>

@@ -1242,23 +1242,21 @@ public static class SaveManager
             {
                 var pin = pinPair.Value;
 
-                if (pin.IsCustomPin || !string.IsNullOrEmpty(pin.PinIcon))
+                if (pin.IsCustomPin && !string.IsNullOrEmpty(pin.PinIcon))
                 {
                     string localPinPath = Path.Combine(projectDir, project.CustomPinsFolder, pin.PinIcon);
                     if (File.Exists(localPinPath)) continue;
 
-                    await DownloadSpecificFileAsync(driveId, rootFolderId,
-                        $"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
+                    await DownloadSpecificFileAsync(driveId, rootFolderId,$"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
 
                     string dataFile = Path.ChangeExtension(pin.PinIcon, ".data");
                     string localDataPath = Path.Combine(projectDir, project.CustomPinsFolder, dataFile);
-
-                    await DownloadSpecificFileAsync(driveId, rootFolderId,
-                        $"{project.CustomPinsFolder}/{dataFile}", localDataPath);
+                    await DownloadSpecificFileAsync(driveId, rootFolderId,$"{project.CustomPinsFolder}/{dataFile}", localDataPath);
                 }
                 else if (pin.IsCustomIcon && !string.IsNullOrEmpty(pin.PinIcon))
                 {
                     await EnsureCustomIconAvailableAsync(driveId, rootFolderId, pin.PinIcon);
+                    WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinPair.Key));
                 }
             }
         }
@@ -1266,11 +1264,13 @@ public static class SaveManager
 
     private static async Task EnsureCustomIconAvailableAsync(string driveId, string rootFolderId, string iconFileName)
     {
-        // Bereits registriert (z.B. selbst erstellt oder frueherer Sync) - nichts zu tun
-        if (IconLookup.Get(iconFileName) != null) return;
-
         string iconDir = Path.Combine(Settings.DataDirectory, "customicons");
         string localPngPath = Path.Combine(iconDir, iconFileName);
+
+        // Bereits vorhanden UND registriert - nichts zu tun
+        if (File.Exists(localPngPath) && IconLookup.Get(iconFileName)?.FileName == iconFileName)
+            return;
+
         var project = ProjectItem.Current;
         string metaFileName = Path.ChangeExtension(iconFileName, ".json");
         string localMetaPath = Path.Combine(iconDir, metaFileName);

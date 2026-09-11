@@ -20,14 +20,17 @@ public partial class PinList : ContentPage
         BindingContext = this;
 
         WeakReferenceMessenger.Default.Register<PinList, PinDeletedMessage>(this, (r, m) =>
-            MainThread.BeginInvokeOnMainThread(() => r.RemovePin(m.Value)));
+        MainThread.BeginInvokeOnMainThread(() => r.RemovePin(m.Value)));
 
         WeakReferenceMessenger.Default.Register<PinList, PinAddedMessage>(this, (r, m) =>
-            MainThread.BeginInvokeOnMainThread(() =>
-            {
-                var (planId, pinId) = m.Value;
-                r.AddPin(planId, pinId);
-            }));
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            var (planId, pinId) = m.Value;
+            r.AddPin(planId, pinId);
+        }));
+
+        WeakReferenceMessenger.Default.Register<PinList, PinChangedMessage>(this, (r, m) =>
+        MainThread.BeginInvokeOnMainThread(() => r.RefreshPinIcon(m.Value)));
     }
 
     protected override async void OnAppearing()
@@ -49,6 +52,12 @@ public partial class PinList : ContentPage
         base.OnDisappearing();
 
         SortPicker.SelectedIndexChanged -= OnSortPickerChanged;
+    }
+
+    private void RefreshPinIcon(string pinId)
+    {
+        var item = _allPins.FirstOrDefault(p => p.SelfId == pinId);
+        item?.RefreshIcon();
     }
 
     private void LoadPins()

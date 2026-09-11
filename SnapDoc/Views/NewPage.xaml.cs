@@ -174,16 +174,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         var customIconPath = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
                         if (File.Exists(customIconPath))
                             resolvedPath = customIconPath;
-                        else
-                        {
-                            string defaultPin = SettingsService.Instance.DefaultPinIcon;
-                            var iconItem = Helper.IconLookup.Get(defaultPin);
-                            if (iconItem != null)
-                            {
-                                resolvedPath = iconItem.FileName;
-                                currentAnchor = iconItem.AnchorPoint;
-                            }
-                        }
+                        else { /* Fallback aufs Default-Icon */ }
                     }
                     else
                         resolvedPath = pinIcon;

@@ -141,6 +141,7 @@ public partial class PinItem : ModelItem<Pin>
     public string OnPlanId => Model.OnPlanId;
     public DateTime Time => Model.DateTime;
     public bool HasGeolocation => Model.GeoLocation != null;
+    public void RefreshIcon() => Notify(nameof(DisplayIconPath));
 
     // --- Anzeige ----------------------------------------------------
     public double DisplayOpacity => IsAllowExport ? 1.0 : 0.3;
