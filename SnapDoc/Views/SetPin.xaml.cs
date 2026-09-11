@@ -71,12 +71,13 @@ public partial class SetPin : ContentPage, IQueryAttributable
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        
-        SizeChanged -= OnSizeChanged;
 
+        SizeChanged -= OnSizeChanged;
         _imageLoadingCts?.Cancel();
         _imageLoadingCts?.Dispose();
         _imageLoadingCts = null;
+
+        Pin?.Dispose();
     }
 
     public void ApplyQueryAttributes(IDictionary<string, object> query)
@@ -239,6 +240,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         toPlan.Pins[newId] = clonedPin;
         toPlan.PinCount++;
 
+        WeakReferenceMessenger.Default.Send(new PinAddedMessage((toPlanId, newId)));
+
         if (isCopy)
         {
             clonedPin.Fotos?.Clear();
@@ -320,6 +323,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         // Pin aus Datenmodell entfernen
         plan.Pins.Remove(pinId);
+        plan.PinCount = plan.Pins.Count;
 
         // Speicher-Event ausloesen
         SaveManager.NotifyDataChanged();

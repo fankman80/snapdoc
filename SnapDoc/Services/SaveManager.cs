@@ -471,8 +471,9 @@ public static class SaveManager
 
         // Geloeschte Pins entfernen
         var deletedPinIds = localPlan.Pins.Keys
-            .Except(cloudPlan.Pins?.Keys ?? (IEnumerable<string>)[])
-            .ToList();
+        .Except(cloudPlan.Pins?.Keys ?? Enumerable.Empty<string>())
+        .ToList();
+
         foreach (var deletedId in deletedPinIds)
         {
             localPlan.Pins.Remove(deletedId);
@@ -531,6 +532,10 @@ public static class SaveManager
             if (uiNeedsRedraw)
                 WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
         }
+
+        // Zaehler nach allen Aenderungen einmalig korrigieren
+        if (localPlan.PinCount != localPlan.Pins.Count)
+            localPlan.PinCount = localPlan.Pins.Count;
     }
 
     // ===============================================================

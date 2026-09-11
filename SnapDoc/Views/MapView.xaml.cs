@@ -913,10 +913,10 @@ public partial class MapView : IQueryAttributable
 
         if (Shell.Current is not AppShell shell) return;
 
-        // Shell-Navigation entfernen
-        var shellContent = shell
-            .FindByName<ShellContent>(planId);
+        await Shell.Current.GoToAsync("//homescreen");
 
+        // Shell-Navigation entfernen
+        var shellContent = shell.FindByName<ShellContent>(planId);
         if (shellContent?.Parent is ShellSection section)
             section.Items.Remove(shellContent);
 
@@ -941,6 +941,12 @@ public partial class MapView : IQueryAttributable
         _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/{plan.File}");
         _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/thumbnails/{plan.File}");
 
+        if (plan.Pins != null)
+        {
+            foreach (var pinId in plan.Pins.Keys.ToList())
+                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
+        }
+
         GlobalJson.Data.Plans.Remove(planId);
 
         // save data to file
@@ -948,8 +954,6 @@ public partial class MapView : IQueryAttributable
 
         // Anzeige neu aufbauen
         ProjectItem.Current.ApplyFilterAndSorting();
-
-        await Shell.Current.GoToAsync("//homescreen");
     }
 
     private static void DeleteIfExists(string path)

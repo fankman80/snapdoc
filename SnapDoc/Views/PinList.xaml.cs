@@ -1,4 +1,6 @@
 ﻿#nullable disable
+using CommunityToolkit.Mvvm.Messaging;
+using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
@@ -16,6 +18,16 @@ public partial class PinList : ContentPage
     {
         InitializeComponent();
         BindingContext = this;
+
+        WeakReferenceMessenger.Default.Register<PinList, PinDeletedMessage>(this, (r, m) =>
+            MainThread.BeginInvokeOnMainThread(() => r.RemovePin(m.Value)));
+
+        WeakReferenceMessenger.Default.Register<PinList, PinAddedMessage>(this, (r, m) =>
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                var (planId, pinId) = m.Value;
+                r.AddPin(planId, pinId);
+            }));
     }
 
     protected override async void OnAppearing()
@@ -41,17 +53,38 @@ public partial class PinList : ContentPage
 
     private void LoadPins()
     {
+        foreach (var item in _allPins) item.Dispose();
         _allPins.Clear();
+
         foreach (var plan in GlobalJson.Data.Plans.Values)
         {
-            if (plan.Pins != null)
-            {
-                foreach (var pin in plan.Pins.Values)
-                {
-                    _allPins.Add(new PinItem(pin));
-                }
-            }
+            if (plan.Pins == null) continue;
+            foreach (var pin in plan.Pins.Values)
+                _allPins.Add(new PinItem(pin));
         }
+
+        ApplyFilterAndSort();
+    }
+
+    private void RemovePin(string pinId)
+    {
+        var item = _allPins.FirstOrDefault(p => p.SelfId == pinId);
+        if (item == null) return;
+
+        _allPins.Remove(item);
+        item.Dispose();
+        ApplyFilterAndSort();
+    }
+
+    private void AddPin(string planId, string pinId)
+    {
+        if (_allPins.Any(p => p.SelfId == pinId)) return;
+
+        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan) ||
+        !plan.Pins.TryGetValue(pinId, out var pinData))
+            return;
+
+        _allPins.Add(new PinItem(pinData));
         ApplyFilterAndSort();
     }
 

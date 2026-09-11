@@ -140,7 +140,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 if (pin != null)
                 {
                     pinList.Remove(pin);
-                    thisPlan.PinCount = pinList.Count;
                     PlanImage.InvalidateSurface();
                 }
             });
@@ -1382,6 +1381,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 catch (IOException) { }
                 catch (UnauthorizedAccessException) { }
             }
+        }
+
+        if (plan.Pins != null)
+        {
+            foreach (var pinId in plan.Pins.Keys.ToList())
+                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
         }
 
         GlobalJson.Data.Plans.Remove(planId);

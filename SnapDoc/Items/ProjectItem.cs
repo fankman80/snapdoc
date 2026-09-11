@@ -63,6 +63,12 @@ public partial class ProjectItem : ObservableObject
             MainThread.BeginInvokeOnMainThread(r.RefreshTitleImage);
         });
 
+        WeakReferenceMessenger.Default.Register<ProjectItem, PinAddedMessage>(this, (r, m) =>
+            MainThread.BeginInvokeOnMainThread(() => r.Notify(nameof(PinCountTotal))));
+
+        WeakReferenceMessenger.Default.Register<ProjectItem, PinDeletedMessage>(this, (r, m) =>
+            MainThread.BeginInvokeOnMainThread(() => r.Notify(nameof(PinCountTotal))));
+
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
     }
 
