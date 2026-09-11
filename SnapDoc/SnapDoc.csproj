@@ -99,7 +99,7 @@
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
         <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.4.0" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2705" />
-        <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.88.0" />
+        <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.89.0" />
     </ItemGroup>
 
 	<ItemGroup>
@@ -113,11 +113,11 @@
 		<PackageReference Include="Mapsui.Maui" Version="5.1.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
 		<PackageReference Include="Microsoft.Graph" Version="6.6.0" />
-		<PackageReference Include="Microsoft.Identity.Client" Version="4.88.0" />
+		<PackageReference Include="Microsoft.Identity.Client" Version="4.89.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.101" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.101" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
-		<PackageReference Include="Sentry.Maui" Version="6.10.0" />
+		<PackageReference Include="Sentry.Maui" Version="6.11.0" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.152.0" />
 	</ItemGroup>

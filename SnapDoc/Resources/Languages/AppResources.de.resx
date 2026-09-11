@@ -1108,7 +1108,7 @@
     <value>Projektordner konnte nicht geöffnet werden</value>
   </data>
   <data name="projekt_wirklich_herunterladen" xml:space="preserve">
-    <value>Projekt „{0}“ wirklich herunterladen?</value>
+    <value>Projekt „{0}“ herunterladen und synchronisieren?</value>
   </data>
   <data name="von_sharepoint_oder_onedrive_herunterladen" xml:space="preserve">
     <value>Von SharePoint oder OneDrive herunterladen</value>

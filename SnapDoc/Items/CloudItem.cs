@@ -1,8 +1,9 @@
-﻿using SnapDoc.Services;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using SnapDoc.Services;
 
 namespace SnapDoc.Models;
 
-public class CloudItem
+public partial class CloudItem : ObservableObject
 {
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
@@ -11,6 +12,13 @@ public class CloudItem
     public bool ShowChevron => IsFolder && !IsBackNavigation;
     public DateTimeOffset? LastModified { get; set; }
     public RemoteProjectDto? RemoteProject { get; set; }
+
+    [ObservableProperty] public partial string? ObjectName { get; set; }
+
+    partial void OnObjectNameChanged(string? value)
+    {
+        OnPropertyChanged(nameof(DisplayName));
+    }
 
     // Gibt das Datum und die Uhrzeit formatiert zurück
     public string LastModifiedText => LastModified.HasValue
@@ -24,8 +32,7 @@ public class CloudItem
             ? MaterialIcons.Folder
             : MaterialIcons.Description;
 
-    // Besser lesbarer Text für den Zurück-Eintrag
     public string DisplayName => IsBackNavigation
         ? "Übergeordneter Ordner"
-        : Name;
+        : (string.IsNullOrWhiteSpace(ObjectName) ? Name : ObjectName);
 }

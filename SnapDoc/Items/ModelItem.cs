@@ -4,7 +4,7 @@ using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace SnapDoc;
+namespace SnapDoc.Items;
 
 /// <summary>
 /// Basisklasse fuer alle ViewModel-Wrapper, die ein Modell aus SnapDoc.Models kapseln

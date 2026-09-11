@@ -1,10 +1,12 @@
 using CommunityToolkit.Maui.Extensions;
+using Microsoft.Graph;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 namespace SnapDoc.Views;
 
@@ -14,6 +16,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private string _currentDriveId = string.Empty;
     private CloudPickerMode _mode = CloudPickerMode.SelectFolder;
     private bool _isInitialized;
+
+    // Begrenzt gleichzeitige Object_name-Abfragen, damit nicht 50 Requests auf einmal feuern
+    private static readonly SemaphoreSlim _objectNameLookupGate = new(4);
 
     public string ModeParam
     {
@@ -112,8 +117,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 .GetAsync(config =>
                 {
                     // lastModifiedDateTime hinzugefügt
-                    config.QueryParameters.Select =
-                        ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference"];
+                    config.QueryParameters.Select = ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference"];
                 });
 
             CloudItems.Clear();
@@ -142,9 +146,14 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                             {
                                 DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
                                 FolderId = item.ParentReference?.Id ?? folderId,
+                                ItemId = item.Id ?? string.Empty,
                                 FileName = item.Name ?? string.Empty,
                                 LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
                             };
+
+                            // Objektbezeichnung im Hintergrund nachladen (blockiert die Anzeige nicht).
+                            // Solange dies noch läuft, bleibt einfach der Dateiname sichtbar.
+                            _ = ResolveObjectNameAsync(cloudItem);
                         }
 
                         CloudItems.Add(cloudItem);
@@ -156,6 +165,59 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         catch (Exception ex)
         {
             await this.ShowPopupAsync(new PopupAlert($"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}", AppResources.fehler), Settings.PopupOptions);
+        }
+    }
+
+    /// <summary>
+    /// Liest ausschliesslich das Feld "Object_name" aus der Cloud-JSON aus (ohne komplettes
+    /// Deserialisieren) und ersetzt anschliessend im UI den Dateinamen durch die Objektbezeichnung.
+    /// Schlägt der Abruf fehl (z.B. Netzwerkfehler oder Feld fehlt), bleibt einfach der Dateiname stehen.
+    /// </summary>
+    private static async Task ResolveObjectNameAsync(CloudItem cloudItem)
+    {
+        var project = cloudItem.RemoteProject;
+
+        if (project == null || SaveManager.CurrentAuth?.GraphClient == null)
+            return;
+
+        await _objectNameLookupGate.WaitAsync();
+
+        try
+        {
+            await using var stream = await SaveManager.CurrentAuth.GraphClient
+                .Drives[project.DriveId]
+                .Items[project.FolderId]
+                .ItemWithPath(project.FileName)
+                .Content
+                .GetAsync();
+
+            if (stream == null)
+                return;
+
+            using var document = await JsonDocument.ParseAsync(stream);
+
+            if (document.RootElement.TryGetProperty("Object_name", out var property))
+            {
+                string? objectName = property.GetString();
+
+                if (!string.IsNullOrWhiteSpace(objectName))
+                {
+                    project.ObjectName = objectName;
+
+                    MainThread.BeginInvokeOnMainThread(() =>
+                    {
+                        cloudItem.ObjectName = objectName;
+                    });
+                }
+            }
+        }
+        catch
+        {
+            // Datei evtl. (noch) nicht lesbar / kein Object_name vorhanden.
+        }
+        finally
+        {
+            _objectNameLookupGate.Release();
         }
     }
 
@@ -208,8 +270,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
         var project = selectedItem.RemoteProject;
 
-        // Bestätigung
-        string projectName = Path.GetFileNameWithoutExtension(project.FileName);
+        // Bestätigung - bevorzugt die Objektbezeichnung aus der JSON, sonst Fallback auf Dateinamen
+        string projectName = project.DisplayName;
         var popup = new PopupDualResponse(string.Format(AppResources.projekt_wirklich_herunterladen, projectName), AppResources.info);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
         if (result?.Result is not DualPopupResult.Ok) return;

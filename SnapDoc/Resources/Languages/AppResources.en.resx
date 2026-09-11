@@ -1108,7 +1108,7 @@
     <value>The project folder could not be opened</value>
   </data>
   <data name="projekt_wirklich_herunterladen" xml:space="preserve">
-    <value>Really download project "{0}"?</value>
+    <value>Download and synchronize project "{0}"?</value>
   </data>
   <data name="von_sharepoint_oder_onedrive_herunterladen" xml:space="preserve">
     <value>Download from SharePoint or OneDrive</value>

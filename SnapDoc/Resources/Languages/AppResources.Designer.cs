@@ -2383,7 +2383,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt „{0}“ wirklich herunterladen? ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt „{0}“ herunterladen und synchronisieren? ähnelt.
         /// </summary>
         internal static string projekt_wirklich_herunterladen {
             get {

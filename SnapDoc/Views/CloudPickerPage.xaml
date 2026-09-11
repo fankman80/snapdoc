@@ -128,7 +128,7 @@
                             <VerticalStackLayout Grid.Column="1"
                                                  Spacing="2"
                                                  VerticalOptions="Center">
-                                <Label Text="{Binding Name}"
+                                <Label Text="{Binding DisplayName}"
                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                                        LineBreakMode="TailTruncation" />
                                 <Label Text="{Binding LastModifiedText}"

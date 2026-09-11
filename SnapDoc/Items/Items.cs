@@ -1,6 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
+using SnapDoc.Items;
 using SnapDoc.Models;
 using SnapDoc.Services;
 using static SnapDoc.Helper;
