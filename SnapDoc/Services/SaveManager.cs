@@ -517,7 +517,6 @@ public static class SaveManager
                 localPin.IsCustomIcon = cloudPin.IsCustomIcon;
                 localPin.Pos = cloudPin.Pos;
                 localPin.PinPriority = cloudPin.PinPriority;
-                localPin.Fotos = cloudPin.Fotos;
                 localPin.GeoLocation = cloudPin.GeoLocation;
                 localPin.IsAllowExport = cloudPin.IsAllowExport;
                 localPin.IsLockAutoScale = cloudPin.IsLockAutoScale;
@@ -534,6 +533,8 @@ public static class SaveManager
                 localPin.PinLocation = cloudPin.PinLocation;
                 localPin.PinRotation = cloudPin.PinRotation;
 
+                MergeFotos(localPin, cloudPin);
+
                 if (uiNeedsRedraw)
                     WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
             }
@@ -544,6 +545,38 @@ public static class SaveManager
             localPlan.PinCount = localPlan.Pins.Count;
     }
 
+    private static void MergeFotos(Pin localPin, Pin cloudPin)
+    {
+        localPin.Fotos ??= [];
+        var cloudFotos = cloudPin.Fotos ?? [];
+
+        // Fotos entfernen, die in der Cloud geloescht wurden
+        var deletedFotoIds = localPin.Fotos.Keys.Except(cloudFotos.Keys).ToList();
+        foreach (var deletedId in deletedFotoIds)
+            localPin.Fotos.Remove(deletedId);
+
+        // Neue oder geaenderte Fotos von der Cloud uebernehmen
+        foreach (var cloudFotoKp in cloudFotos)
+        {
+            var fotoId = cloudFotoKp.Key;
+            var cloudFoto = cloudFotoKp.Value;
+
+            if (!localPin.Fotos.TryGetValue(fotoId, out Foto localFoto))
+            {
+                // Von Cloud neu hinzugefuegt
+                localPin.Fotos.Add(fotoId, cloudFoto);
+                continue;
+            }
+
+            // Bereits vorhanden - Cloud-Stand uebernehmen
+            localFoto.AllowExport = cloudFoto.AllowExport;
+            localFoto.File = cloudFoto.File;
+            localFoto.HasOverlay = cloudFoto.HasOverlay;
+            localFoto.DateTime = cloudFoto.DateTime;
+            localFoto.ImageSize = cloudFoto.ImageSize;
+        }
+    }
+    
     // ===============================================================
     //  Ordnerstruktur
     // ===============================================================
