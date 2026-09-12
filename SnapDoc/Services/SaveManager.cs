@@ -1405,35 +1405,29 @@ public static class SaveManager
         _pollingCts?.Dispose();
         _pollingCts = null;
     }
-
+    
     private static async Task CheckETagAndSyncAsync()
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return;
-
         if (GlobalJson.Data == null ||
             string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
             string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId)) return;
-
         try
         {
-            // Nur Metadaten abrufen - enthaelt den ETag, kostet kaum Datenvolumen
             var cloudItem = await CurrentAuth.GraphClient.Drives[GlobalJson.Data.CloudDriveId]
                 .Items[GlobalJson.Data.CloudFolderId]
                 .ItemWithPath(CloudFileName)
                 .GetAsync();
-
             if (cloudItem?.ETag == null) return;
 
-            // Wenn noch kein ETag gespeichert ist, initialisieren
-            if (string.IsNullOrEmpty(_lastKnownETag))
-            {
-                _lastKnownETag = cloudItem.ETag;
-                return;
-            }
+            bool baselineMissing = string.IsNullOrEmpty(_lastKnownETag);
+            bool etagChanged = !baselineMissing && cloudItem.ETag != _lastKnownETag;
 
-            if (cloudItem.ETag != _lastKnownETag)
+            if (baselineMissing || etagChanged)
             {
                 _lastKnownETag = cloudItem.ETag;
+                // Auch beim ERSTEN Poll nach Login/Projektstart synchronisieren,
+                // damit Änderungen, die während der Offline-Phase passiert sind, nachgeholt werden.
                 await SyncJsonOnlyFromCloudAsync();
             }
         }
@@ -1442,7 +1436,7 @@ public static class SaveManager
             Console.WriteLine($"Polling-Check fehlgeschlagen: {ex.Message}");
         }
     }
-
+    
     // ===============================================================
     //  Bedarfs-Download
     // ===============================================================
