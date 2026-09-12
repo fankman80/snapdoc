@@ -550,10 +550,24 @@ public static class SaveManager
         localPin.Fotos ??= [];
         var cloudFotos = cloudPin.Fotos ?? [];
 
-        // Fotos entfernen, die in der Cloud geloescht wurden
-        var deletedFotoIds = localPin.Fotos.Keys.Except(cloudFotos.Keys).ToList();
-        foreach (var deletedId in deletedFotoIds)
-            localPin.Fotos.Remove(deletedId);
+        string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
+        string imageFolder = ProjectItem.Current.ImageFolder;
+
+        // Nur entfernen, wenn die lokale Bilddatei ebenfalls nicht mehr existiert -
+        // sonst koennten offline aufgenommene, noch nicht hochgeladene Fotos verloren gehen.
+        var candidateDeletedIds = localPin.Fotos.Keys.Except(cloudFotos.Keys).ToList();
+        foreach (var deletedId in candidateDeletedIds)
+        {
+            var localFoto = localPin.Fotos[deletedId];
+            string? localImagePath = !string.IsNullOrEmpty(projectDir) && !string.IsNullOrEmpty(localFoto.File)
+                ? Path.Combine(projectDir, imageFolder, localFoto.File)
+                : null;
+
+             bool stillExistsLocally = localImagePath != null && File.Exists(localImagePath);
+            if (!stillExistsLocally)
+                localPin.Fotos.Remove(deletedId);
+            // sonst: vermutlich nur noch nicht hochgeladen -> behalten
+        }
 
         // Neue oder geaenderte Fotos von der Cloud uebernehmen
         foreach (var cloudFotoKp in cloudFotos)
@@ -563,12 +577,10 @@ public static class SaveManager
 
             if (!localPin.Fotos.TryGetValue(fotoId, out Foto localFoto))
             {
-                // Von Cloud neu hinzugefuegt
                 localPin.Fotos.Add(fotoId, cloudFoto);
                 continue;
             }
 
-            // Bereits vorhanden - Cloud-Stand uebernehmen
             localFoto.AllowExport = cloudFoto.AllowExport;
             localFoto.File = cloudFoto.File;
             localFoto.HasOverlay = cloudFoto.HasOverlay;
