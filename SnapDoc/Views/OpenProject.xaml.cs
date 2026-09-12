@@ -48,6 +48,10 @@ public partial class OpenProject : ContentPage
                             : null;
                 foreach (var file in files)
                 {
+                    if (file.Contains($"{Path.DirectorySeparatorChar}customicons{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase) ||
+                    file.Contains($"{Path.DirectorySeparatorChar}custompins{Path.DirectorySeparatorChar}", StringComparison.OrdinalIgnoreCase))
+                        continue;
+                
                     string currentFilePath = file;
                     string projectDir = Path.GetDirectoryName(currentFilePath);
                     string thumbPath = "banner_thumbnail.png";
