@@ -315,6 +315,9 @@ public static class SaveManager
                 _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
                 _lastKnownETag = cloudItem.ETag;
             }
+            
+            // Fehlende Projektdateien beim Öffnen nachladen
+            await DownloadMissingProjectFilesAsync(myDrive.Id, targetFolderId);
         }
         catch (Exception ex)
         {
