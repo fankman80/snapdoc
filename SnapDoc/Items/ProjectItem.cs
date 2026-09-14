@@ -66,8 +66,9 @@ public partial class ProjectItem : ObservableObject
         WeakReferenceMessenger.Default.Register<ProjectItem, PinAddedMessage>(this, (r, m) =>
             MainThread.BeginInvokeOnMainThread(() => r.Notify(nameof(PinCountTotal))));
 
-        WeakReferenceMessenger.Default.Register<ProjectItem, PinDeletedMessage>(this, (r, m) =>
-            MainThread.BeginInvokeOnMainThread(() => r.Notify(nameof(PinCountTotal))));
+        WeakReferenceMessenger.Default.Register<ProjectItem, PlanDeletedMessage>(this, (r, m) =>
+            MainThread.BeginInvokeOnMainThread(() =>
+                r.Notify(nameof(PlanCount), nameof(HasPlans), nameof(PinCountTotal))));
 
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
     }
@@ -280,9 +281,9 @@ public partial class ProjectItem : ObservableObject
         ? string.Empty
         : _model.Creation_date.ToString("dd.MM.yyyy", CultureInfo.InvariantCulture);
 
-    public int PlanCount => _model.Plans?.Count ?? 0;
+    public int PlanCount => SyncOps.LivePlans(_model).Count();
     public bool HasPlans => PlanCount > 0;
-    public int PinCountTotal => _model.Plans?.Values.Sum(p => p.Pins?.Count ?? 0) ?? 0;
+    public int PinCountTotal => SyncOps.LivePlans(_model).Sum(p => SyncOps.LivePinCount(p.Value));
 
     #endregion
 
@@ -335,7 +336,7 @@ public partial class ProjectItem : ObservableObject
 
         if (_model?.Plans != null)
         {
-            foreach (var plan in _model.Plans)
+            foreach (var plan in SyncOps.LivePlans(_model))
                 LoadDataToView.AddPlan(plan);
         }
 
@@ -348,7 +349,10 @@ public partial class ProjectItem : ObservableObject
         string currentPlanId = currentRoute.TrimStart('/');
         bool isPlanRoute = currentPlanId.StartsWith("webmap_") || currentPlanId.StartsWith("plan_");
 
-        if (isPlanRoute && (_model?.Plans == null || !_model.Plans.ContainsKey(currentPlanId)))
+        if (isPlanRoute &&
+            (_model?.Plans == null ||
+             !_model.Plans.TryGetValue(currentPlanId, out var openPlan) ||
+             openPlan.IsDeleted()))
             Shell.Current.GoToAsync("//homescreen");
     }
 
@@ -398,6 +402,10 @@ public partial class ProjectItem : ObservableObject
         if (EqualityComparer<T>.Default.Equals(current, value)) return;
 
         setter(value);
+
+        if (!_suspendSave)
+            _model.Touch();
+
         OnPropertyChanged(propertyName);
 
         if (alsoNotify != null)

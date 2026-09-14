@@ -1,5 +1,6 @@
 #nullable disable
 using CommunityToolkit.Mvvm.ComponentModel;
+using SnapDoc.Models;
 using SnapDoc.Services;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -46,8 +47,12 @@ public abstract class ModelItem<TModel> : ObservableObject, IDisposable where TM
     [CallerMemberName] string propertyName = null)
     {
         if (EqualityComparer<T>.Default.Equals(current, value)) return false;
-
         setter(value);
+
+        // Stempeln VOR der UI-Benachrichtigung, damit ein sofort ausgelöster Save bereits den neuen Stand hochlädt.
+        if (Model is ISyncStamped stamped)
+            stamped.Touch();
+
         OnPropertyChanged(propertyName);
 
         if (alsoNotify != null)

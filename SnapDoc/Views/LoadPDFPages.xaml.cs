@@ -323,7 +323,8 @@ public partial class LoadPDFPages : ContentPage
             Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
                 var item = items[i];
-                string fileName = $"plan_{timeStamp}_{i}.jpg";
+                string baseName = $"plan_{SyncClock.NewId()}_{i}";
+                string fileName = baseName + ".jpg";
                 string planId = $"plan_{timeStamp}_{i}";
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
@@ -339,6 +340,9 @@ public partial class LoadPDFPages : ContentPage
                     AllowExport = true,
                     PlanColor = "#00FFFFFF"
                 };
+
+                plan.Touch();
+                processedPlans[i] = new KeyValuePair<string, Plan>(baseName, plan);
 
                 try
                 {
@@ -391,7 +395,7 @@ public partial class LoadPDFPages : ContentPage
                 foreach (var planKvp in processedPlans)
                 {
                     if (planKvp.Value != null)
-                        GlobalJson.Data.Plans[Path.GetFileNameWithoutExtension(planKvp.Value.File)] = planKvp.Value;
+                        GlobalJson.Data.Plans[planKvp.Key] = planKvp.Value;
                 }
             }
 

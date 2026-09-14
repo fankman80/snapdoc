@@ -55,7 +55,7 @@ public class CapturePicture
                 try { File.Delete(foto.FullPath); } catch { }
             }
 
-            string filename = customFilename ?? $"IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
+            string filename = customFilename ?? $"IMG_{SyncClock.NewId()}.jpg";
             string resultPath = null;
             int finalWidth = 0;
             int finalHeight = 0;

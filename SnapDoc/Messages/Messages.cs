@@ -38,3 +38,7 @@ public class TitleImageChangedMessage(string oldFileName, string newFileName)
     public string OldFileName { get; } = oldFileName;
     public string NewFileName { get; } = newFileName;
 }
+
+public class PlanDeletedMessage(string planId) : ValueChangedMessage<string>(planId)
+{
+}

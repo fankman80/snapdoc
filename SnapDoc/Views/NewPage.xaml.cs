@@ -268,9 +268,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         pinList.Clear();
 
-        if (thisPlan.Pins != null)
-            foreach (var pinId in thisPlan.Pins.Keys)
-                await AddPin(pinId);
+        foreach (var pinEntry in SyncOps.LivePins(thisPlan))
+            await AddPin(pinEntry.Key);
 
         PlanImage.Pins = pinList;
     }
@@ -282,7 +281,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (pin != null)
         {
             pinList.Add(pin);
-            thisPlan.PinCount = pinList.Count;
+            thisPlan.PinCount = SyncOps.LivePinCount(thisPlan);
         }
 
         return pin;
@@ -290,7 +289,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task<MapPin> CreateMapPinAsync(string pinId)
     {
-        if (!thisPlan.Pins.TryGetValue(pinId, out var pinData))
+        if (!SyncOps.TryGetLivePin(thisPlan, pinId, out var pinData))
             return null;
 
         string pinIcon = pinData.PinIcon;
@@ -365,7 +364,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private async void OnPinTapped(object sender, MapPin pin)
     {
         if (pin == null) return;
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan) || !plan.Pins.ContainsKey(pin.Id)) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan) ||
+            !SyncOps.TryGetLivePin(plan, pin.Id, out _)) return;
         if (isPinSet) return;
 
         tappedPin = pin;
@@ -376,7 +376,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnPinDoubleTapped(object sender, MapPin pin)
     {
         if (pin == null) return;
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan) || !plan.Pins.ContainsKey(pin.Id)) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan) ||
+            !SyncOps.TryGetLivePin(plan, pin.Id, out _)) return;
         if (isPinSet) return;
 
         tappedPin = pin;
@@ -494,7 +495,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         bool overwrite = false)
     {
 
-        string currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string currentDateTime = SyncClock.NewId();
         string _newPin = SettingsService.Instance.DefaultPinIcon;
         var iconItem = Helper.IconLookup.Get(_newPin);
 
@@ -557,15 +558,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
             {
                 plan.Pins ??= [];
+                newPinData.Touch();
                 plan.Pins[currentDateTime] = newPinData;
 
-                // save data to file
                 SaveManager.NotifyDataChanged();
 
                 await AddPin(currentDateTime);
-
-                thisPlan.PinCount = plan.Pins.Count;
-
+                thisPlan.PinCount = SyncOps.LivePinCount(plan);
                 _ = UpdatePinLocationAsync(newPinData);
             }
         }
@@ -1308,19 +1307,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 }
 
                 // Update lock action
-                if (result.Result.LockAction != null)
+                if (result.Result.LockAction == true)
                 {
-                    if (result.Result.LockAction == true)
-                    {
-                        pinList.ToList().ForEach(p => { p.IsLockPosition = true; });
-                        thisPlan.Pins.ToList().ForEach(p => { p.Value.IsLockPosition = true; });
-                    }
-                    else
-                    {
-                        pinList.Where(p => !p.IsCustomPin).ToList().ForEach(p => { p.IsLockPosition = false; });
-                        thisPlan.Pins.Where(p => !p.Value.IsCustomPin).ToList().ForEach(p => { p.Value.IsLockPosition = false; });
-                    }
-                    PlanImage.InvalidateSurface();
+                    pinList.ToList().ForEach(p => p.IsLockPosition = true);
+                    foreach (var p in SyncOps.LivePins(thisPlan))
+                        p.Value.IsLockPosition = true;
+                }
+                else
+                {
+                    pinList.Where(p => !p.IsCustomPin).ToList()
+                           .ForEach(p => p.IsLockPosition = false);
+
+                    foreach (var p in SyncOps.LivePins(thisPlan).Where(p => !p.Value.IsCustomPin))
+                        p.Value.IsLockPosition = false;
                 }
 
                 // save data to file
@@ -1345,48 +1344,47 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (masterItem != null)
             ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan)) return;
 
         // JSON + Files loeschen
         DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
         DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
 
-        // Cloud Cleanup
-        _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.PlanPath}/{plan.File}");
-        _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
+        // Cloud-Dateien erst nach dem Tombstone-Upload entfernen
+        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/{plan.File}");
+        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
 
-        // Plan-Tiles aus dem Cache-Ordner loeschen
-        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
-        if (Directory.Exists(cacheDir))
-        {
-            string baseFileName = Path.GetFileNameWithoutExtension(plan.File).Replace("_r", "");
-            string searchPattern = $"*{baseFileName}*";
-            var matchingDirectories = Directory.GetDirectories(cacheDir, searchPattern);
+        DeleteTileCache(plan.File);
 
-            foreach (var dir in matchingDirectories)
-            {
-                try
-                {
-                    Directory.Delete(dir, true);
-                }
-                catch (IOException) { }
-                catch (UnauthorizedAccessException) { }
-            }
-        }
+        // Markiert Plan + alle Pins + Fotos, sendet PlanDeletedMessage
+        // und ruft NotifyDataChanged. Die manuelle PinDeletedMessage-Schleife
+        // und Plans.Remove entfallen dadurch.
+        SyncOps.DeletePlan(planId);
 
-        if (plan.Pins != null)
-        {
-            foreach (var pinId in plan.Pins.Keys.ToList())
-                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
-        }
-
-        GlobalJson.Data.Plans.Remove(planId);
-
-        // Speicher-Event ausloesen
-        SaveManager.NotifyDataChanged();
-
-        // Anzeige neu aufbauen
         ProjectItem.Current.ApplyFilterAndSorting();
+    }
+
+    /// <summary>
+    /// Entfernt die Tile-Cache-Ordner eines Plans. Webmap-Plaene haben keine
+    /// Datei - ohne die Leerstring-Pruefung wuerde das Suchmuster zu "**"
+    /// und ALLE Tile-Ordner samt denen anderer Projekte loeschen.
+    /// </summary>
+    private static void DeleteTileCache(string planFile)
+    {
+        if (string.IsNullOrWhiteSpace(planFile)) return;
+
+        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
+        if (!Directory.Exists(cacheDir)) return;
+
+        string baseFileName = Path.GetFileNameWithoutExtension(planFile).Replace("_r", "");
+        if (string.IsNullOrWhiteSpace(baseFileName)) return;
+
+        foreach (var dir in Directory.GetDirectories(cacheDir, $"*{baseFileName}*"))
+        {
+            try { Directory.Delete(dir, true); }
+            catch (IOException) { }
+            catch (UnauthorizedAccessException) { }
+        }
     }
 
     private static void DeleteIfExists(string path)
@@ -1448,16 +1446,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // Umpositionierung der Pins
         if (thisPlan.Pins != null)
         {
-            foreach (var pinId in thisPlan.Pins.Keys)
+            foreach (var pinEntry in SyncOps.LivePins(thisPlan).ToList())
             {
+                var pinId = pinEntry.Key;
+                var pinData = pinEntry.Value;
+
                 var pin = pinList.FirstOrDefault(p => p.Id == pinId);
                 if (pin != null)
                     pinList.Remove(pin);
 
-                thisPlan.Pins[pinId].Pos = RotatePin(thisPlan.Pins[pinId].Pos, angle);
+                pinData.Pos = RotatePin(pinData.Pos, angle);
 
-                if (thisPlan.Pins[pinId].IsLockRotate)
-                    thisPlan.Pins[pinId].PinRotation = (thisPlan.Pins[pinId].PinRotation + angle) % 360;
+                if (pinData.IsLockRotate)
+                    pinData.PinRotation = (pinData.PinRotation + angle) % 360;
 
                 await AddPin(pinId);
             }

@@ -65,11 +65,10 @@ public partial class PinList : ContentPage
         foreach (var item in _allPins) item.Dispose();
         _allPins.Clear();
 
-        foreach (var plan in GlobalJson.Data.Plans.Values)
+        foreach (var plan in SyncOps.LivePlans(GlobalJson.Data))
         {
-            if (plan.Pins == null) continue;
-            foreach (var pin in plan.Pins.Values)
-                _allPins.Add(new PinItem(pin));
+            foreach (var pin in SyncOps.LivePins(plan.Value))
+                _allPins.Add(new PinItem(pin.Value));
         }
 
         ApplyFilterAndSort();
@@ -89,8 +88,8 @@ public partial class PinList : ContentPage
     {
         if (_allPins.Any(p => p.SelfId == pinId)) return;
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan) ||
-        !plan.Pins.TryGetValue(pinId, out var pinData))
+        if (!SyncOps.TryGetLivePlan(planId, out var plan) ||
+            !SyncOps.TryGetLivePin(plan, pinId, out var pinData))
             return;
 
         _allPins.Add(new PinItem(pinData));
@@ -155,7 +154,9 @@ public partial class PinList : ContentPage
         string planId = button.AutomationId;
         string pinId = button.ClassId;
 
-        if (GlobalJson.Data.Plans[planId].Pins[pinId].IsCustomPin) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan)) return;
+        if (!SyncOps.TryGetLivePin(plan, pinId, out var pinData)) return;
+        if (pinData.IsCustomPin) return; ;
 
         await Shell.Current.GoToAsync($"icongallery?planId={planId}&pinId={pinId}");
     }

@@ -14,7 +14,7 @@ public partial class LoadDataToView
         if (Shell.Current is not AppShell) return;
         if (GlobalJson.Data?.Plans == null) return;
 
-        foreach (var plan in GlobalJson.Data.Plans)
+        foreach (var plan in SyncOps.LivePlans(GlobalJson.Data))
             AddPlan(plan);
 
         Project.ApplyFilterAndSorting();

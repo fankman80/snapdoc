@@ -146,7 +146,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                             {
                                 DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
                                 FolderId = item.ParentReference?.Id ?? folderId,
-                                ItemId = item.Id ?? string.Empty,
                                 FileName = item.Name ?? string.Empty,
                                 LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
                             };

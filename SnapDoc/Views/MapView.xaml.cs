@@ -223,16 +223,17 @@ public partial class MapView : IQueryAttributable
         pinImage = new Mapsui.Styles.Image { Source = uri };
 
         var plansToSearch = string.IsNullOrEmpty(planId)
-            ? GlobalJson.Data.Plans
-            : GlobalJson.Data.Plans.Where(p => p.Key == planId);
+            ? SyncOps.LivePlans(GlobalJson.Data)
+            : SyncOps.LivePlans(GlobalJson.Data).Where(p => p.Key == planId);
 
         foreach (var planEntry in plansToSearch)
         {
             var currentPlanId = planEntry.Key;
-            var pins = planEntry.Value.Pins ?? [];
-            foreach (var pinEntry in pins)
+
+            foreach (var pinEntry in SyncOps.LivePins(planEntry.Value))
             {
                 var p = pinEntry.Value;
+
                 if (p.GeoLocation?.WGS84 != null)
                 {
                     var loc = p.GeoLocation.WGS84;
@@ -261,8 +262,8 @@ public partial class MapView : IQueryAttributable
 
             if (!string.IsNullOrEmpty(planId) && !string.IsNullOrEmpty(pinId))
             {
-                if (GlobalJson.Data.Plans.TryGetValue(planId, out var plan) &&
-                    plan.Pins.TryGetValue(pinId, out var pinData))
+                if (SyncOps.TryGetLivePlan(planId, out var plan) &&
+                    SyncOps.TryGetLivePin(plan, pinId, out var pinData))
                 {
                     Pin = new PinItem(pinData);
                     SetPosBtn.IsVisible = true;
@@ -410,20 +411,19 @@ public partial class MapView : IQueryAttributable
         string outputPath = Path.Combine(project.ProjectDirectory, SettingsService.Instance.ProjectPath + ".kml");
         List<(double Latitude, double Longitude, string Name, DateTime Time, string Desc)> coordinates = [];
 
-        foreach (var plan in GlobalJson.Data.Plans)
+        foreach (var plan in SyncOps.LivePlans(GlobalJson.Data))
         {
-            if (GlobalJson.Data.Plans[plan.Key].Pins != null)
+            foreach (var pinEntry in SyncOps.LivePins(plan.Value))
             {
-                foreach (var pin in GlobalJson.Data.Plans[plan.Key].Pins)
+                var pin = pinEntry.Value;
+
+                if (pin.GeoLocation?.WGS84 != null)
                 {
-                    if (GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation != null)
-                    {
-                        coordinates.Add((GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.Latitude,
-                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].GeoLocation.WGS84.Longitude,
-                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinName,
-                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].DateTime,
-                                         GlobalJson.Data.Plans[plan.Key].Pins[pin.Key].PinDesc));
-                    }
+                    coordinates.Add((pin.GeoLocation.WGS84.Latitude,
+                                     pin.GeoLocation.WGS84.Longitude,
+                                     pin.PinName,
+                                     pin.DateTime,
+                                     pin.PinDesc));
                 }
             }
         }
@@ -473,7 +473,7 @@ public partial class MapView : IQueryAttributable
 
                 if (imageBytes == null || imageBytes.Length == 0) return;
 
-                string filename = $"MAP_IMG_{DateTime.Now:yyyyMMdd_HHmmss}.jpg";
+                string filename = $"MAP_IMG_{SyncClock.NewId()}.jpg";
                 var project = ProjectItem.Current;
                 string folderPath = Path.Combine(project.ProjectDirectory, project.ImageFolder);
                 string thumbFolderPath = Path.Combine(project.ProjectDirectory, project.ThumbnailFolder);
@@ -482,24 +482,24 @@ public partial class MapView : IQueryAttributable
 
                 // Suche in den Fotos nach dem MAP_IMG
                 var currentPin = GlobalJson.Data.Plans[planId].Pins[pinId];
-                var mapImage = currentPin.Fotos.Values.FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+
+                var mapImage = SyncOps.LiveFotos(currentPin)
+                    .Select(kv => kv.Value)
+                    .FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+
                 if (mapImage != null)
                 {
-                    try { File.Delete(Path.Combine(folderPath, mapImage.File)); }
-                    catch { /* Optional: Logging */ }
+                    try { File.Delete(Path.Combine(folderPath, mapImage.File)); } catch { }
+                    try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); } catch { }
 
-                    try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); }
-                    catch { /* Optional: Logging */ }
+                    SaveManager.QueueCloudDelete($"{project.ImageFolder}/{mapImage.File}");
+                    SaveManager.QueueCloudDelete($"{project.ThumbnailFolder}/{mapImage.File}");
 
-                    // Cloud Cleanup
-                    _ = SaveManager.DeleteCloudFileAsync($"{project.ImageFolder}/{mapImage.File}");
-                    _ = SaveManager.DeleteCloudFileAsync($"{project.ThumbnailFolder}/{mapImage.File}");
-
-                    currentPin.Fotos.Remove(Path.GetFileName(mapImage.File));
+                    // Tombstone statt Remove
+                    SyncOps.DeleteFoto(planId, pinId, Path.GetFileName(mapImage.File));
                 }
 
                 await File.WriteAllBytesAsync(filepath, imageBytes);
-
                 await Thumbnail.Generate(filepath, thumbPath);
 
                 Foto newImageData = new()
@@ -509,8 +509,10 @@ public partial class MapView : IQueryAttributable
                     DateTime = DateTime.Now,
                     ImageSize = imageSize
                 };
+                newImageData.Touch();
 
                 currentPin.Fotos[filename] = newImageData;
+                currentPin.Touch();
 
                 // JSON + beide Bilddateien fuer den Cloud-Sync registrieren
                 SaveManager.NotifyDataChanged(
@@ -708,7 +710,7 @@ public partial class MapView : IQueryAttributable
             var newCenter = SphericalMercator.FromLonLat(location.Longitude, location.Latitude).ToMPoint();
             map.Navigator.CenterOnAndZoomTo(newCenter, map.Navigator.Resolutions[18]);
 
-            var currentDateTime = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            var currentDateTime = SyncClock.NewId();
 
             Models.Pin newPinData = new()
             {
@@ -740,13 +742,12 @@ public partial class MapView : IQueryAttributable
             if (GlobalJson.Data.Plans.TryGetValue(planId, out Plan plan))
             {
                 plan.Pins ??= [];
+                newPinData.Touch();
                 plan.Pins[currentDateTime] = newPinData;
-                GlobalJson.Data.Plans[planId].PinCount += 1;
+                plan.PinCount = SyncOps.LivePinCount(plan);
 
-                // Save data to file
                 SaveManager.NotifyDataChanged();
-
-                AddPin(map, new Point(location.Longitude, location.Latitude), planId, plan.Pins[currentDateTime].SelfId);
+                AddPin(map, new Point(location.Longitude, location.Latitude), planId, currentDateTime);
             }
 
             // Ladeanzeige schliessen
@@ -927,32 +928,20 @@ public partial class MapView : IQueryAttributable
         if (masterItem != null)
             ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan)) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan)) return;
 
         var project = ProjectItem.Current;
         string planFolder = Path.Combine(project.ProjectDirectory, project.PlanFolder);
 
-        // JSON + Files löschen
         DeleteIfExists(Path.Combine(planFolder, plan.File));
         DeleteIfExists(Path.Combine(planFolder, "gs_" + plan.File));
         DeleteIfExists(Path.Combine(planFolder, "thumbnails", plan.File));
 
-        // Cloud Cleanup
-        _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/{plan.File}");
-        _ = SaveManager.DeleteCloudFileAsync($"{project.PlanFolder}/thumbnails/{plan.File}");
+        SaveManager.QueueCloudDelete($"{project.PlanFolder}/{plan.File}");
+        SaveManager.QueueCloudDelete($"{project.PlanFolder}/thumbnails/{plan.File}");
 
-        if (plan.Pins != null)
-        {
-            foreach (var pinId in plan.Pins.Keys.ToList())
-                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
-        }
+        SyncOps.DeletePlan(planId);
 
-        GlobalJson.Data.Plans.Remove(planId);
-
-        // save data to file
-        SaveManager.NotifyDataChanged();
-
-        // Anzeige neu aufbauen
         ProjectItem.Current.ApplyFilterAndSorting();
     }
 
@@ -964,9 +953,8 @@ public partial class MapView : IQueryAttributable
 
     private static async Task UpdateAndSavePinLocationAsync(string planId, string pinId, double lon, double lat)
     {
-        if (string.IsNullOrEmpty(planId) || string.IsNullOrEmpty(pinId)) return;
-
-        var pin = GlobalJson.Data.Plans[planId].Pins[pinId];
+        if (!SyncOps.TryGetLivePlan(planId, out var plan)) return;
+        if (!SyncOps.TryGetLivePin(plan, pinId, out var pin)) return;
 
         pin.GeoLocation ??= new GeoLocData();
 

@@ -87,7 +87,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
 
-        Pin = new PinItem(GlobalJson.Data.Plans[PlanId].Pins[PinId]);
+        if (SyncOps.TryGetLivePlan(PlanId, out var plan) && SyncOps.TryGetLivePin(plan, PinId, out var pinModel))
+            Pin = new PinItem(pinModel);
     }
 
     private void FotoLoader()
@@ -97,8 +98,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
         _imageLoadingCts = new CancellationTokenSource();
         var token = _imageLoadingCts.Token;
 
-        var fotoItems = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.Values
-            .Where(img => img != null && !string.IsNullOrWhiteSpace(img.File))
+        var fotoItems = SyncOps.LiveFotos(GlobalJson.Data.Plans[PlanId].Pins[PinId])
+            .Select(kv => kv.Value)
+            .Where(img => !string.IsNullOrWhiteSpace(img.File))
             .Select(img => new FotoItem
             {
                 ImagePath = Path.Combine(
@@ -203,7 +205,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (result?.Result is not DualPopupResult.Ok) return;
 
         DeletePinData(PinId);
-        WeakReferenceMessenger.Default.Send(new PinDeletedMessage(PinId));
         await Shell.Current.GoToAsync($"///{PlanId}");
     }
 
@@ -216,46 +217,45 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await MoveOrCopyPinAsync(PinId, PlanId, result.Result.PlanTarget, result.Result.IsPinCopy);
     }
 
-    private static async Task MoveOrCopyPinAsync(
-    string pinId,
-    string fromPlanId,
-    string toPlanId,
-    bool isCopy)
+    private static async Task MoveOrCopyPinAsync(string pinId, string fromPlanId, string toPlanId, bool isCopy)
     {
-        if (!GlobalJson.Data.Plans.TryGetValue(toPlanId, out Plan toPlan)) return;
-        if (!GlobalJson.Data.Plans.TryGetValue(fromPlanId, out Plan fromPlan)) return;
-        if (!fromPlan.Pins.TryGetValue(pinId, out Pin originalPin)) return;
+        if (!SyncOps.TryGetLivePlan(toPlanId, out var toPlan)) return;
+        if (!SyncOps.TryGetLivePlan(fromPlanId, out var fromPlan)) return;
+        if (!SyncOps.TryGetLivePin(fromPlan, pinId, out var originalPin)) return;
 
         Pin clonedPin = DeepClone(originalPin);
 
-        string newId = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        // Kollisionsfreie ID – siehe Hinweis unten
+        string newId = SyncClock.NewId();
 
         clonedPin.SelfId = newId;
         clonedPin.OnPlanId = toPlanId;
+        clonedPin.DeletedAt = null;          // Klon ist immer lebendig
+        clonedPin.Touch();
 
         if (fromPlanId == toPlanId)
-            clonedPin.Pos = new Point(clonedPin.Pos.X + SettingsService.Instance.PinDuplicateOffset, clonedPin.Pos.Y);
+            clonedPin.Pos = new Point(
+                clonedPin.Pos.X + SettingsService.Instance.PinDuplicateOffset, clonedPin.Pos.Y);
+
+        if (isCopy)
+            clonedPin.Fotos = [];            // statt Clear() – Fotos kann null sein
 
         toPlan.Pins ??= [];
         toPlan.Pins[newId] = clonedPin;
-        toPlan.PinCount++;
+        toPlan.PinCount = SyncOps.LivePinCount(toPlan);
+        toPlan.Touch();
 
         WeakReferenceMessenger.Default.Send(new PinAddedMessage((toPlanId, newId)));
 
-        if (isCopy)
+        if (!isCopy)
         {
-            clonedPin.Fotos?.Clear();
-        }
-        else
-        {
-            fromPlan.Pins.Remove(pinId);
-            fromPlan.PinCount--;
-            WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
+            // Verschieben: Original als gelöscht markieren.
+            // Fotos gehören jetzt dem Klon, also NICHT die Dateien löschen.
+            SyncOps.DeletePin(fromPlanId, pinId);
+            fromPlan.PinCount = SyncOps.LivePinCount(fromPlan);
         }
 
-        // save data to file
         SaveManager.NotifyDataChanged();
-
         await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
     }
 
@@ -284,49 +284,45 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void DeletePinData(string pinId)
     {
-        if (!GlobalJson.Data.Plans.TryGetValue(PlanId, out var plan) ||
-            !plan.Pins.TryGetValue(pinId, out var pinToDelete))
-            return;
+        if (!SyncOps.TryGetLivePlan(PlanId, out var plan)) return;
+        if (!SyncOps.TryGetLivePin(plan, pinId, out var pinToDelete)) return;
 
-        // Foto-Dateien loeschen (lokal + Cloud)
-        foreach (var foto in pinToDelete.Fotos.Values)
+        string projectDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath);
+
+        // --- Fotos: lokal sofort weg, Cloud erst nach Tombstone-Upload ---
+        foreach (var foto in pinToDelete.Fotos?.Values ?? Enumerable.Empty<Foto>())
         {
             string fileName = foto.File;
             if (string.IsNullOrEmpty(fileName)) continue;
 
-            string imagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
+            string imagePath = Path.Combine(projectDir, GlobalJson.Data.ImagePath, fileName);
             if (File.Exists(imagePath)) File.Delete(imagePath);
 
-            string thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
+            string thumbPath = Path.Combine(projectDir, GlobalJson.Data.ThumbnailPath, fileName);
             if (File.Exists(thumbPath)) File.Delete(thumbPath);
 
-            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
-            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
+            // NICHT mehr direkt löschen: solange die Tombstone nicht in der
+            // Cloud liegt, kennt Gerät B den Pin als lebendig und würde
+            // das Bild nachladen wollen – ins Leere.
+            SaveManager.QueueCloudDelete($"{GlobalJson.Data.ImagePath}/{fileName}");
+            SaveManager.QueueCloudDelete($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
         }
 
-        // CustomPin-Grafiken loeschen (lokal + Cloud)
+        // --- CustomPin-Grafiken ---
         if (pinToDelete.IsCustomPin && !string.IsNullOrEmpty(pinToDelete.PinIcon))
         {
             string baseName = Path.GetFileNameWithoutExtension(pinToDelete.PinIcon);
-            string filenamePng = baseName + ".png";
-            string filenameData = baseName + ".data";
-
-            string pathPng = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, filenamePng);
-            if (File.Exists(pathPng)) File.Delete(pathPng);
-
-            string pathData = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, filenameData);
-            if (File.Exists(pathData)) File.Delete(pathData);
-
-            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{filenamePng}");
-            _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{filenameData}");
+            foreach (var ext in new[] { ".png", ".data" })
+            {
+                string file = baseName + ext;
+                string path = Path.Combine(projectDir, GlobalJson.Data.CustomPinsPath, file);
+                if (File.Exists(path)) File.Delete(path);
+                SaveManager.QueueCloudDelete($"{GlobalJson.Data.CustomPinsPath}/{file}");
+            }
         }
 
-        // Pin aus Datenmodell entfernen
-        plan.Pins.Remove(pinId);
-        plan.PinCount = plan.Pins.Count;
-
-        // Speicher-Event ausloesen
-        SaveManager.NotifyDataChanged();
+        // Tombstone setzen + PinCount + Save (sendet PinDeletedMessage)
+        SyncOps.DeletePin(PlanId, pinId);
     }
 
     private async void ZoomToPinClicked(object sender, EventArgs e)
@@ -360,7 +356,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 ImageSize = imgSize
             };
 
+            newImageData.Touch();
             GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
+            GlobalJson.Data.Plans[PlanId].Pins[PinId].Touch();
 
             string originalPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, path.FileName);
             string thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
@@ -387,34 +385,48 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnReorderCompleted(object sender, EventArgs e)
     {
-        if (sender is CollectionView { ItemsSource: ObservableCollection<FotoItem> reorderedItems })
+        if (sender is not CollectionView { ItemsSource: ObservableCollection<FotoItem> reorderedItems })
+            return;
+
+        var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
+        var currentFotos = pin.Fotos ?? [];
+        var newFotosDict = new Dictionary<string, Foto>();
+
+        // 1. Neue Reihenfolge der sichtbaren Fotos
+        foreach (var img in reorderedItems)
         {
-            var currentFotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
-
-            var newFotosDict = reorderedItems.ToDictionary(
-                img => Path.GetFileName(img.ImagePath),
-                img =>
+            var fileName = Path.GetFileName(img.ImagePath);
+            if (currentFotos.TryGetValue(fileName, out var existing))
+            {
+                if (existing.AllowExport != img.AllowExport)
                 {
-                    var fileName = Path.GetFileName(img.ImagePath);
-                    if (currentFotos.TryGetValue(fileName, out var existingFoto))
-                    {
-                        existingFoto.AllowExport = img.AllowExport;
-                        return existingFoto;
-                    }
-
-                    return new Foto
-                    {
-                        File = fileName,
-                        AllowExport = img.AllowExport,
-                        DateTime = img.DateTime
-                    };
-                });
-
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos = newFotosDict;
-
-            // save data to file
-            SaveManager.NotifyDataChanged();
+                    existing.AllowExport = img.AllowExport;
+                    existing.Touch();
+                }
+                newFotosDict[fileName] = existing;
+            }
+            else
+            {
+                var created = new Foto
+                {
+                    File = fileName,
+                    AllowExport = img.AllowExport,
+                    DateTime = img.DateTime
+                };
+                created.Touch();
+                newFotosDict[fileName] = created;
+            }
         }
+
+        // 2. Tombstones hinten anhängen – sonst gehen sie verloren und
+        //    die gelöschten Fotos kehren beim nächsten Sync zurück.
+        foreach (var kv in currentFotos)
+            if (kv.Value.IsDeleted() && !newFotosDict.ContainsKey(kv.Key))
+                newFotosDict[kv.Key] = kv.Value;
+
+        pin.Fotos = newFotosDict;
+        pin.Touch();
+        SaveManager.NotifyDataChanged();
     }
 
     private void OnAllowExportClicked(object sender, EventArgs e)
@@ -425,7 +437,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
             var fileName = Path.GetFileName(item.ImagePath);
             if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.TryGetValue(fileName, out var foto))
+            {
                 foto.AllowExport = item.AllowExport;
+                foto.Touch();
+            }
 
             // save data to file
             SaveManager.NotifyDataChanged();

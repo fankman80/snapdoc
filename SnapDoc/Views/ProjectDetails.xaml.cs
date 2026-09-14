@@ -171,7 +171,7 @@ public partial class ProjectDetails : ContentPage
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (result?.Result == null) return;
 
-        string planId = "webmap_" + DateTime.Now.ToString("yyyyMMdd_HHmmss");
+        string planId = "webmap_" + SyncClock.NewId();
         Plan plan = new()
         {
             Name = result.Result == "" ? "Online Map" : result.Result,
@@ -182,6 +182,7 @@ public partial class ProjectDetails : ContentPage
             AllowExport = true,
             PlanColor = "#00FFFFFF"
         };
+        plan.Touch();
 
         var newPlan = new KeyValuePair<string, Plan>(planId, plan);
         LoadDataToView.AddPlan(newPlan);

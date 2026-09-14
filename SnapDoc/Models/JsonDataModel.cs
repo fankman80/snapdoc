@@ -1,12 +1,58 @@
 ﻿#nullable disable
-using SkiaSharp;
 using CommunityToolkit.Mvvm.ComponentModel;
+using SkiaSharp;
+using System.ComponentModel;
 
 namespace SnapDoc.Models;
 
-public partial class JsonDataModel : ObservableObject
+public abstract partial class SyncModel : ObservableObject, ISyncStamped
+{
+    public DateTimeOffset ModifiedAt { get; set; }
+    public string ModifiedBy { get; set; }
+    public DateTimeOffset? DeletedAt { get; set; }
+
+    /// <summary>Diese Properties duerfen NIE ein Stempeln ausloesen (Endlosschleife).</summary>
+    private static readonly HashSet<string> SyncMeta =
+        [nameof(ModifiedAt), nameof(ModifiedBy), nameof(DeletedAt)];
+
+    /// <summary>
+    /// Zusaetzliche Properties, die kein Stempeln ausloesen sollen - fuer
+    /// abgeleitete/berechnete Werte. Von Unterklassen ueberschreibbar.
+    /// </summary>
+    protected virtual bool IsDerived(string propertyName) => false;
+
+    protected override void OnPropertyChanged(PropertyChangedEventArgs e)
+    {
+        base.OnPropertyChanged(e);
+
+        if (e.PropertyName == null) return;
+        if (SyncMeta.Contains(e.PropertyName)) return;
+        if (IsDerived(e.PropertyName)) return;
+
+        this.Touch();
+    }
+
+    /// <summary>
+    /// Setzt einen Wert ohne PropertyChanged und stempelt. Fuer Properties, die
+    /// kein Binding brauchen (Pos, Size, File, ...) - sie muessen den Stempel
+    /// trotzdem setzen, sonst verliert der Merge diese Aenderungen.
+    /// </summary>
+    protected bool SetPlain<T>(ref T field, T value)
+    {
+        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        field = value;
+        this.Touch();
+        return true;
+    }
+}
+
+// =====================================================================
+//  Projekt
+// =====================================================================
+public partial class JsonDataModel : SyncModel
 {
     public string ProjectId { get; set; } = Guid.NewGuid().ToString();
+
     [ObservableProperty] public partial string Client_name { get; set; }
     [ObservableProperty] public partial string Object_address { get; set; }
     [ObservableProperty] public partial string Working_title { get; set; }
@@ -15,31 +61,86 @@ public partial class JsonDataModel : ObservableObject
     [ObservableProperty] public partial string Project_manager { get; set; }
     [ObservableProperty] public partial string TitleImage { get; set; }
     [ObservableProperty] public partial string CustomIconsPath { get; set; }
+
+    private DateTime _creation_date;
+    public DateTime Creation_date
+    {
+        get => _creation_date;
+        set => SetPlain(ref _creation_date, value);
+    }
+
+    private Size _titleImageSize;
+    public Size TitleImageSize
+    {
+        get => _titleImageSize;
+        set => SetPlain(ref _titleImageSize, value);
+    }
+
+    // --- Bewusst OHNE Stempel -------------------------------------------
+    // Cloud-Verknuepfung ist geraetelokale Information. Wuerde sie stempeln,
+    // loeste jedes Verknuepfen/Reparieren einen Upload aus und beide Geraete
+    // wuerden sich gegenseitig hochschaukeln.
     public string CloudDriveId { get; set; }
     public string CloudFolderId { get; set; }
-    public DateTime Creation_date { get; set; }
-    public Dictionary<string, Plan> Plans { get; set; }
+
+    // Ordnernamen werden einmalig beim Anlegen gesetzt.
     public string PlanPath { get; set; }
     public string ImagePath { get; set; }
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
-    public Size TitleImageSize { get; set; }
+
+    // Die Plan-Struktur wird pro Plan gestempelt, nicht auf Projektebene.
+    public Dictionary<string, Plan> Plans { get; set; }
 }
 
-public partial class Plan : ObservableObject
+// =====================================================================
+//  Plan
+// =====================================================================
+public partial class Plan : SyncModel
 {
     [ObservableProperty] public partial string Name { get; set; }
     [ObservableProperty] public partial string Description { get; set; }
     [ObservableProperty] public partial bool IsGrayscale { get; set; }
     [ObservableProperty] public partial bool AllowExport { get; set; }
     [ObservableProperty] public partial string PlanColor { get; set; }
+
+    /// <summary>
+    /// Abgeleiteter Anzeigewert - wird aus der Pin-Anzahl neu berechnet und
+    /// darf deshalb NICHT stempeln. Sonst gilt ein Geraet, das nur gezaehlt
+    /// hat, als "neuer" und gewinnt gegen eine echte Aenderung.
+    /// </summary>
     [ObservableProperty] public partial int PinCount { get; set; }
-    public string File { get; set; }
-    public Size ImageSize { get; set; }
+
+    private string _file;
+    public string File
+    {
+        get => _file;
+        set => SetPlain(ref _file, value);
+    }
+
+    private Size _imageSize;
+    public Size ImageSize
+    {
+        get => _imageSize;
+        set => SetPlain(ref _imageSize, value);
+    }
+
     public Dictionary<string, Pin> Pins { get; set; } = [];
+
+    /// <summary>
+    /// PinCount wird an vielen Stellen neu berechnet (AddPin, Merge,
+    /// Reparaturschleife). Wuerde das stempeln, gaelte ein Geraet, das nur
+    /// nachgezaehlt hat, als "neuer" und gewaenne gegen eine echte Aenderung
+    /// des anderen Geraets.
+    /// </summary>
+    protected override bool IsDerived(string propertyName)
+        => propertyName == nameof(PinCount);
 }
 
-public partial class Pin : ObservableObject
+// =====================================================================
+//  Pin
+// =====================================================================
+public partial class Pin : SyncModel
 {
     [ObservableProperty] public partial string PinName { get; set; }
     [ObservableProperty] public partial string PinDesc { get; set; }
@@ -55,39 +156,118 @@ public partial class Pin : ObservableObject
     [ObservableProperty] public partial bool IsLockPosition { get; set; }
     [ObservableProperty] public partial bool IsLockRotate { get; set; }
     [ObservableProperty] public partial bool IsLockAutoScale { get; set; }
-    public Point Pos { get; set; }
-    public Point Anchor { get; set; }
-    public Size Size { get; set; }
-    public double PinScale { get; set; }
+
+    private Point _pos;
+    public Point Pos
+    {
+        get => _pos;
+        set => SetPlain(ref _pos, value);
+    }
+
+    private Point _anchor;
+    public Point Anchor
+    {
+        get => _anchor;
+        set => SetPlain(ref _anchor, value);
+    }
+
+    private Size _size;
+    public Size Size
+    {
+        get => _size;
+        set => SetPlain(ref _size, value);
+    }
+
+    private double _pinScale;
+    public double PinScale
+    {
+        get => _pinScale;
+        set => SetPlain(ref _pinScale, value);
+    }
+
+    private double _pinRotation;
+    public double PinRotation
+    {
+        get => _pinRotation;
+        set => SetPlain(ref _pinRotation, value);
+    }
+
+    private SKColor _pinColor;
+    public SKColor PinColor
+    {
+        get => _pinColor;
+        set => SetPlain(ref _pinColor, value);
+    }
+
+    private bool _isWebMapPin;
+    public bool IsWebMapPin
+    {
+        get => _isWebMapPin;
+        set => SetPlain(ref _isWebMapPin, value);
+    }
+
+    /// <summary>Identitaet des Pins - wird einmal bei der Erstellung gesetzt.</summary>
     public string SelfId { get; set; }
-    public SKColor PinColor { get; set; }
-    public double PinRotation { get; set; }
-    public bool IsWebMapPin { get; set; }
-    public Dictionary<string, Foto> Fotos { get; set; }
+
+    public Dictionary<string, Foto> Fotos { get; set; } = [];
 }
 
-public partial class Foto : ObservableObject
+// =====================================================================
+//  Foto
+// =====================================================================
+public partial class Foto : SyncModel
 {
     [ObservableProperty] public partial bool AllowExport { get; set; }
-    public string File { get; set; }
-    public bool HasOverlay { get; set; }
-    public DateTime DateTime { get; set; }
-    public Size ImageSize { get; set; }
+
+    private string _file;
+    public string File
+    {
+        get => _file;
+        set => SetPlain(ref _file, value);
+    }
+
+    private bool _hasOverlay;
+    public bool HasOverlay
+    {
+        get => _hasOverlay;
+        set => SetPlain(ref _hasOverlay, value);
+    }
+
+    private DateTime _dateTime;
+    public DateTime DateTime
+    {
+        get => _dateTime;
+        set => SetPlain(ref _dateTime, value);
+    }
+
+    private Size _imageSize;
+    public Size ImageSize
+    {
+        get => _imageSize;
+        set => SetPlain(ref _imageSize, value);
+    }
 }
 
+// =====================================================================
+//  Geodaten (nicht synchronisiert - haengen immer am Pin)
+// =====================================================================
 public class GeoLocData
 {
     private readonly Location _wsg84;
+
     public GeoLocData() { }
+
     public GeoLocData(Location wsg84)
     {
         _wsg84 = wsg84;
         Initialize();
     }
+
     public DateTimeOffset Timestamp { get; set; }
     public GeolocationAccuracy Accuracy { get; set; }
     public LocationWGS84 WGS84 { get; set; }
     public LocationCH1903 CH1903 { get; set; }
+
     private async void Initialize()
     {
         if (_wsg84 != null)

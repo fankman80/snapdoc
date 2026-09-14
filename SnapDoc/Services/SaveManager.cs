@@ -2,12 +2,13 @@
 using Microsoft.Graph;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
+using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Models;
 using System.Collections.Concurrent;
 using System.Text.Json;
-using SkiaSharp;
 using static SnapDoc.Helper;
+using static SnapDoc.Models.SyncStampExtensions;
 
 namespace SnapDoc.Services;
 
@@ -15,7 +16,14 @@ public static class SaveManager
 {
     private const int MaxSaveRetries = 3;
 
+    /// <summary>Stempel fuer Altprojekte ohne Sync-Metadaten. MUSS auf allen
+    /// Geraeten identisch sein, sonst gewinnt zufaellig das Geraet, das zuletzt
+    /// geoeffnet hat.</summary>
+    private static readonly DateTimeOffset LegacySeed =
+        new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
+
     private static readonly ConcurrentDictionary<(string LocalFilePath, string SubFolder), byte> _pendingUploadQueue = new();
+    private static readonly ConcurrentDictionary<string, byte> _pendingCloudDeletes = new();
 
     private static readonly Lock _fileLock = new();
     private static readonly Lock _debounceLock = new();
@@ -35,13 +43,108 @@ public static class SaveManager
     public static string? TargetFolderId { get; set; }
     public static AuthService? CurrentAuth { get; set; }
 
+    // ===============================================================
+    //  Initialisierung und Migration
+    // ===============================================================
+
     public static void Initialize(string filePath)
     {
         GlobalJson.LoadFromFile(filePath);
+        PrepareLoadedData();
 
         _lastKnownWriteTime = File.Exists(filePath)
             ? File.GetLastWriteTimeUtc(filePath)
             : default;
+    }
+
+    /// <summary>
+    /// Bringt frisch geladene Daten in einen sync-faehigen Zustand:
+    /// fehlende Stempel nachziehen und abgelaufene Tombstones entfernen.
+    /// </summary>
+    private static void PrepareLoadedData()
+    {
+        // ACHTUNG: beide Aufrufe muessen laufen. Mit "||" wuerde der zweite
+        // uebersprungen, sobald der erste true liefert.
+        bool backfilled = BackfillStamps(GlobalJson.Data);
+        bool purged = SyncOps.PurgeTombstones(GlobalJson.Data);
+
+        if (backfilled || purged)
+            GlobalJson.SaveToFile();
+    }
+
+    /// <summary>
+    /// Setzt fehlende Zeitstempel auf einen festen Seed. Ohne das liefert
+    /// SyncClock.Compare ueberall 0 und der Merge uebernimmt nichts.
+    /// Bewusst ohne Touch(), damit jede echte spaetere Aenderung gewinnt.
+    /// </summary>
+    private static bool BackfillStamps(JsonDataModel? data)
+    {
+        if (data == null) return false;
+        bool changed = false;
+
+        if (data.ModifiedAt == default)
+        {
+            data.ModifiedAt = LegacySeed;
+            data.ModifiedBy = "legacy";
+            changed = true;
+        }
+
+        foreach (var plan in data.Plans?.Values ?? Enumerable.Empty<Plan>())
+        {
+            if (plan.ModifiedAt == default)
+            {
+                plan.ModifiedAt = LegacySeed;
+                plan.ModifiedBy = "legacy";
+                changed = true;
+            }
+
+            foreach (var pin in plan.Pins?.Values ?? Enumerable.Empty<Pin>())
+            {
+                if (pin.ModifiedAt == default)
+                {
+                    pin.ModifiedAt = LegacySeed;
+                    pin.ModifiedBy = "legacy";
+                    changed = true;
+                }
+
+                foreach (var foto in pin.Fotos?.Values ?? Enumerable.Empty<Foto>())
+                {
+                    if (foto.ModifiedAt == default)
+                    {
+                        foto.ModifiedAt = LegacySeed;
+                        foto.ModifiedBy = "legacy";
+                        changed = true;
+                    }
+                }
+            }
+        }
+
+        return changed;
+    }
+
+    // ===============================================================
+    //  Cloud-Loeschungen
+    // ===============================================================
+
+    /// <summary>
+    /// Merkt eine Cloud-Datei zum Loeschen vor. Sie wird erst entfernt, wenn
+    /// die zugehoerige Tombstone erfolgreich hochgeladen wurde - sonst kennt
+    /// das andere Geraet den Pin noch als lebendig und laedt ins Leere.
+    /// </summary>
+    public static void QueueCloudDelete(string relativeCloudPath)
+    {
+        if (!string.IsNullOrEmpty(relativeCloudPath))
+            _pendingCloudDeletes.TryAdd(relativeCloudPath.Replace("\\", "/"), 0);
+    }
+
+    private static async Task ProcessPendingCloudDeletionsAsync()
+    {
+        if (_pendingCloudDeletes.IsEmpty) return;
+        if (CurrentAuth is not { IsLoggedIn: true }) return;
+
+        foreach (var path in _pendingCloudDeletes.Keys.ToList())
+            if (_pendingCloudDeletes.TryRemove(path, out _))
+                await DeleteCloudFileAsync(path);
     }
 
     // ===============================================================
@@ -81,7 +184,6 @@ public static class SaveManager
             try
             {
                 await Task.Delay(delayMilliseconds, token);
-
                 if (!token.IsCancellationRequested)
                     await SaveWithSyncCheckAsync();
             }
@@ -132,7 +234,6 @@ public static class SaveManager
             }
 
             GlobalJson.SaveToFile();
-
             _lastKnownWriteTime = File.Exists(filePath)
                 ? File.GetLastWriteTimeUtc(filePath)
                 : DateTime.UtcNow;
@@ -149,6 +250,7 @@ public static class SaveManager
         string driveId = activeData.CloudDriveId;
         string targetFolderId = activeData.CloudFolderId;
         string activeCloudFileName = CloudFileName;
+
         string frozenJsonPayload = GlobalJson.ToJson();
 
         // 4. Ab hier Cloud-Synchronisation
@@ -178,8 +280,7 @@ public static class SaveManager
 
                         if (cloudStream != null)
                         {
-                            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
-
+                            var cloudData = await GlobalJson.DeserializeAsync(cloudStream);
                             if (cloudData != null)
                             {
                                 lock (_fileLock)
@@ -244,12 +345,14 @@ public static class SaveManager
             Console.WriteLine($"Cloud-Upload fehlgeschlagen: {ex.Message}");
         }
 
-        // Nach dem JSON-Sync alle angesammelten Dateien im Hintergrund abarbeiten
+        // Erst jetzt duerfen Binaerdateien verschwinden - die Tombstones
+        // liegen nach dem erfolgreichen Upload sicher in der Cloud.
+        await ProcessPendingCloudDeletionsAsync();
+
+        // Nach dem JSON-Sync alle angesammelten Dateien abarbeiten
         if (!_pendingUploadQueue.IsEmpty && CurrentAuth is { IsLoggedIn: true })
         {
-            var keys = _pendingUploadQueue.Keys.ToList();
-
-            foreach (var fileItem in keys)
+            foreach (var fileItem in _pendingUploadQueue.Keys.ToList())
             {
                 // Entfernt genau dieses Element atomar aus der Queue
                 if (_pendingUploadQueue.TryRemove(fileItem, out _))
@@ -267,7 +370,10 @@ public static class SaveManager
         GlobalJson.LoadFromFile(localFilePath);
 
         if (!authService.IsLoggedIn || authService.GraphClient == null)
+        {
+            PrepareLoadedData();
             return;
+        }
 
         try
         {
@@ -283,8 +389,8 @@ public static class SaveManager
                 : (!string.IsNullOrEmpty(projectDirectory) ? Path.GetFileName(projectDirectory) : "DefaultProject");
 
             string sanitizedProjectName = SanitizeName(projectName);
-
             string? targetFolderId = await EnsureCloudFolderStructureAsync(authService, myDrive.Id, sanitizedProjectName);
+
             if (string.IsNullOrEmpty(targetFolderId))
                 return;
 
@@ -300,7 +406,7 @@ public static class SaveManager
             if (stream == null || cloudItem == null)
                 return;
 
-            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(stream, GlobalJson.GetOptions());
+            var cloudData = await GlobalJson.DeserializeAsync(stream);
             if (cloudData == null)
                 return;
 
@@ -315,8 +421,13 @@ public static class SaveManager
                 _lastKnownCloudSyncTime = cloudItem.LastModifiedDateTime.Value;
                 _lastKnownETag = cloudItem.ETag;
             }
-            
-            // Fehlende Projektdateien beim Öffnen nachladen
+
+            // Das Cloud-Projekt kann von einem noch nicht migrierten Geraet
+            // stammen - Stempel nachziehen, dann Tombstones aufraeumen.
+            PrepareLoadedData();
+            _lastKnownWriteTime = File.GetLastWriteTimeUtc(localFilePath);
+
+            // Fehlende Projektdateien beim Oeffnen nachladen
             await DownloadMissingProjectFilesAsync(myDrive.Id, targetFolderId);
         }
         catch (Exception ex)
@@ -329,9 +440,7 @@ public static class SaveManager
     {
         try
         {
-            string externalJson = File.ReadAllText(filePath);
-            var externalData = JsonSerializer.Deserialize<JsonDataModel>(externalJson, GlobalJson.GetOptions());
-
+            var externalData = GlobalJson.ReadFromFile(filePath);
             if (externalData != null)
                 MergeModels(GlobalJson.Data, externalData);
         }
@@ -345,43 +454,57 @@ public static class SaveManager
     //  Merge
     // ===============================================================
 
-    public static void MergeModels(JsonDataModel local, JsonDataModel cloud)
+    /// <summary>
+    /// Vereinigt den lokalen Stand mit dem Cloud-Stand. Geloescht wird nur,
+    /// was eine Tombstone traegt - fehlende Schluessel gelten als "dem anderen
+    /// Geraet noch unbekannt" und bleiben erhalten.
+    /// </summary>
+    public static void MergeModels(JsonDataModel? local, JsonDataModel? cloud)
     {
         if (local == null || cloud == null) return;
 
+        // Ohne das Gate stempelt jede Zuweisung unten das Objekt mit DIESEM
+        // Geraet - empfangene Cloud-Werte gaelten dann als lokale Aenderung.
+        using var _ = SyncStampGate.Suspend();
+
         bool titleImageChanged = local.TitleImage != cloud.TitleImage;
         string oldTitleImage = local.TitleImage;
-
-        // Projektdetails vergleichen und uebertragen
         bool projectDetailsChanged = false;
 
-        if (local.Client_name != cloud.Client_name ||
-            local.Working_title != cloud.Working_title ||
-            local.Object_address != cloud.Object_address ||
-            local.Project_nr != cloud.Project_nr ||
-            local.Object_name != cloud.Object_name ||
-            local.Project_manager != cloud.Project_manager ||
-            local.Creation_date != cloud.Creation_date ||
-            titleImageChanged)
+        // --- Projektdetails: nur uebernehmen, wenn die Cloud neuer ist ----
+        if (SyncClock.Compare(cloud, local) > 0)
         {
-            local.Client_name = cloud.Client_name;
-            local.Working_title = cloud.Working_title;
-            local.Object_address = cloud.Object_address;
-            local.Project_nr = cloud.Project_nr;
-            local.Object_name = cloud.Object_name;
-            local.Project_manager = cloud.Project_manager;
-            local.Creation_date = cloud.Creation_date;
+            projectDetailsChanged =
+                local.Client_name != cloud.Client_name ||
+                local.Working_title != cloud.Working_title ||
+                local.Object_address != cloud.Object_address ||
+                local.Project_nr != cloud.Project_nr ||
+                local.Object_name != cloud.Object_name ||
+                local.Project_manager != cloud.Project_manager ||
+                local.Creation_date != cloud.Creation_date ||
+                titleImageChanged;
 
-            projectDetailsChanged = true;
-        }
+            if (projectDetailsChanged)
+            {
+                local.Client_name = cloud.Client_name;
+                local.Working_title = cloud.Working_title;
+                local.Object_address = cloud.Object_address;
+                local.Project_nr = cloud.Project_nr;
+                local.Object_name = cloud.Object_name;
+                local.Project_manager = cloud.Project_manager;
+                local.Creation_date = cloud.Creation_date;
 
-        if (titleImageChanged)
-        {
-            local.TitleImage = cloud.TitleImage;
-            local.TitleImageSize = cloud.TitleImageSize;
+                local.ModifiedAt = cloud.ModifiedAt;
+                local.ModifiedBy = cloud.ModifiedBy;
+            }
 
-            // ProjectItem laedt die neue Datei nach und aktualisiert die UI
-            WeakReferenceMessenger.Default.Send(new TitleImageChangedMessage(oldTitleImage, cloud.TitleImage));
+            if (titleImageChanged)
+            {
+                local.TitleImage = cloud.TitleImage;
+                local.TitleImageSize = cloud.TitleImageSize;
+                WeakReferenceMessenger.Default.Send(
+                    new TitleImageChangedMessage(oldTitleImage, cloud.TitleImage));
+            }
         }
 
         if (cloud.Plans == null)
@@ -392,52 +515,60 @@ public static class SaveManager
         }
 
         local.Plans ??= [];
-
         bool planStructureChanged = false;
-        bool planOrderChanged = !local.Plans.Keys.SequenceEqual(cloud.Plans.Keys);
 
-        // Geloeschte Plaene entfernen (Strukturaenderung)
-        var deletedPlanIds = local.Plans.Keys.Except(cloud.Plans.Keys).ToList();
-        if (deletedPlanIds.Count > 0)
+        // --- Plaene: Vereinigung beider Schluesselmengen ------------------
+        foreach (var planId in local.Plans.Keys.Union(cloud.Plans.Keys).ToList())
         {
-            foreach (var deletedId in deletedPlanIds)
-                local.Plans.Remove(deletedId);
+            bool hasLocal = local.Plans.TryGetValue(planId, out var localPlan);
+            bool hasCloud = cloud.Plans.TryGetValue(planId, out var cloudPlan);
 
-            planStructureChanged = true;
-        }
+            // Nur lokal => offline angelegt, der Cloud noch unbekannt.
+            // BEHALTEN. Der Upload direkt nach diesem Merge schickt ihn hoch.
+            // Kein planStructureChanged: der Plan ist lokal laengst sichtbar,
+            // sonst wuerde jeder Poll einen kompletten Shell-Reload ausloesen.
+            if (hasLocal && !hasCloud)
+                continue;
 
-        foreach (var cloudPlanKp in cloud.Plans)
-        {
-            var planId = cloudPlanKp.Key;
-            var cloudPlan = cloudPlanKp.Value;
-
-            // Neue Plaene hinzufuegen (Strukturaenderung)
-            if (!local.Plans.TryGetValue(planId, out Plan? localPlan))
+            // Nur in der Cloud => von einem anderen Geraet.
+            if (!hasLocal && hasCloud && cloudPlan != null)
             {
                 local.Plans.Add(planId, cloudPlan);
-                planStructureChanged = true;
+                if (cloudPlan.IsLive()) planStructureChanged = true;
                 continue;
             }
 
+            if (localPlan is null || cloudPlan is null) continue;
+
+            bool wasVisible = localPlan.IsLive();
+
             MergePlan(planId, localPlan, cloudPlan);
+
+            // Sichtbarkeit gewechselt => Planliste muss neu aufgebaut werden
+            if (wasVisible != localPlan.IsLive())
+            {
+                planStructureChanged = true;
+                if (!localPlan.IsLive())
+                    WeakReferenceMessenger.Default.Send(new PlanDeletedMessage(planId));
+            }
         }
 
-        // Wenn sich die Reihenfolge geaendert hat, lokales Dictionary neu aufbauen
-        if (planOrderChanged)
+        // Reihenfolge nach der Cloud ausrichten, lokale Neuzugaenge hinten
+        // anhaengen (die Cloud kennt sie noch nicht).
+        var orderedKeys = cloud.Plans.Keys.Where(local.Plans.ContainsKey)
+            .Concat(local.Plans.Keys.Where(k => !cloud.Plans.ContainsKey(k)))
+            .ToList();
+
+        if (!local.Plans.Keys.SequenceEqual(orderedKeys))
         {
-            var orderedDictionary = new Dictionary<string, Plan>();
-
-            foreach (var cloudKey in cloud.Plans.Keys)
-            {
-                if (local.Plans.TryGetValue(cloudKey, out Plan? plan))
-                    orderedDictionary.Add(cloudKey, plan);
-            }
-
-            local.Plans = orderedDictionary;
+            var ordered = new Dictionary<string, Plan>();
+            foreach (var key in orderedKeys)
+                ordered.Add(key, local.Plans[key]);
+            local.Plans = ordered;
             planStructureChanged = true;
         }
 
-        // UI-Benachrichtigungen feuern
+        // --- UI-Benachrichtigungen ---------------------------------------
         if (projectDetailsChanged)
             WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.ProjectDetailsUpdated));
 
@@ -448,101 +579,126 @@ public static class SaveManager
 
     private static void MergePlan(string planId, Plan localPlan, Plan cloudPlan)
     {
-        bool nameOrExportChanged = localPlan.Name != cloudPlan.Name || localPlan.AllowExport != cloudPlan.AllowExport;
-        bool colorChanged = localPlan.PlanColor != cloudPlan.PlanColor;
-
-        bool detailsChanged = localPlan.Description != cloudPlan.Description ||
-                              localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
-                              colorChanged ||
-                              nameOrExportChanged;
-
-        if (detailsChanged ||
-            localPlan.File != cloudPlan.File ||
-            localPlan.ImageSize != cloudPlan.ImageSize)
+        // --- Plan-Eigenschaften: juengerer Stand gewinnt ------------------
+        if (SyncClock.Compare(cloudPlan, localPlan) > 0)
         {
-            localPlan.Name = cloudPlan.Name;
-            localPlan.File = cloudPlan.File;
-            localPlan.Description = cloudPlan.Description;
-            localPlan.ImageSize = cloudPlan.ImageSize;
-            localPlan.IsGrayscale = cloudPlan.IsGrayscale;
-            localPlan.PlanColor = cloudPlan.PlanColor;
-            localPlan.AllowExport = cloudPlan.AllowExport;
+            bool nameOrExportChanged = localPlan.Name != cloudPlan.Name ||
+                                       localPlan.AllowExport != cloudPlan.AllowExport;
 
-            if (detailsChanged)
-                WeakReferenceMessenger.Default.Send(new PlanDetailsChangedMessage((planId, cloudPlan.Name, cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
-        }
+            bool detailsChanged = localPlan.Description != cloudPlan.Description ||
+                                  localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
+                                  localPlan.PlanColor != cloudPlan.PlanColor ||
+                                  nameOrExportChanged;
 
-        localPlan.Pins ??= [];
-
-        // Geloeschte Pins entfernen
-        var deletedPinIds = localPlan.Pins.Keys
-        .Except(cloudPlan.Pins?.Keys ?? Enumerable.Empty<string>())
-        .ToList();
-
-        foreach (var deletedId in deletedPinIds)
-        {
-            localPlan.Pins.Remove(deletedId);
-            WeakReferenceMessenger.Default.Send(new PinDeletedMessage(deletedId));
-        }
-
-        if (cloudPlan.Pins != null)
-        {
-            // Neue oder geaenderte Pins verarbeiten
-            foreach (var cloudPinKp in cloudPlan.Pins)
+            if (detailsChanged ||
+                localPlan.File != cloudPlan.File ||
+                localPlan.ImageSize != cloudPlan.ImageSize ||
+                localPlan.DeletedAt != cloudPlan.DeletedAt)
             {
-                var pinId = cloudPinKp.Key;
-                var cloudPin = cloudPinKp.Value;
+                localPlan.Name = cloudPlan.Name;
+                localPlan.File = cloudPlan.File;
+                localPlan.Description = cloudPlan.Description;
+                localPlan.ImageSize = cloudPlan.ImageSize;
+                localPlan.IsGrayscale = cloudPlan.IsGrayscale;
+                localPlan.PlanColor = cloudPlan.PlanColor;
+                localPlan.AllowExport = cloudPlan.AllowExport;
 
-                if (!localPlan.Pins.TryGetValue(pinId, out Pin? localPin))
-                {
-                    localPlan.Pins.Add(pinId, cloudPin);
-                    WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
-                    continue;
-                }
+                localPlan.DeletedAt = cloudPlan.DeletedAt;
+                localPlan.ModifiedAt = cloudPlan.ModifiedAt;
+                localPlan.ModifiedBy = cloudPlan.ModifiedBy;
 
-                // Visuelle Eigenschaften pruefen (loest Canvas-Redraw aus)
-                bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
-                                     localPin.PinRotation != cloudPin.PinRotation ||
-                                     localPin.PinIcon != cloudPin.PinIcon ||
-                                     localPin.PinColor != cloudPin.PinColor ||
-                                     localPin.PinScale != cloudPin.PinScale ||
-                                     localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
-                                     localPin.IsLockRotate != cloudPin.IsLockRotate;
-
-                // ALLE Daten synchronisieren
-                localPin.Anchor = cloudPin.Anchor;
-                localPin.DateTime = cloudPin.DateTime;
-                localPin.IsWebMapPin = cloudPin.IsWebMapPin;
-                localPin.IsCustomPin = cloudPin.IsCustomPin;
-                localPin.IsCustomIcon = cloudPin.IsCustomIcon;
-                localPin.Pos = cloudPin.Pos;
-                localPin.PinPriority = cloudPin.PinPriority;
-                localPin.GeoLocation = cloudPin.GeoLocation;
-                localPin.IsAllowExport = cloudPin.IsAllowExport;
-                localPin.IsLockAutoScale = cloudPin.IsLockAutoScale;
-                localPin.IsLockPosition = cloudPin.IsLockPosition;
-                localPin.IsLockRotate = cloudPin.IsLockRotate;
-                localPin.OnPlanId = cloudPin.OnPlanId;
-                localPin.PinColor = cloudPin.PinColor;
-                localPin.PinIcon = cloudPin.PinIcon;
-                localPin.PinName = cloudPin.PinName;
-                localPin.PinDesc = cloudPin.PinDesc;
-                localPin.Size = cloudPin.Size;
-                localPin.SelfId = cloudPin.SelfId;
-                localPin.PinScale = cloudPin.PinScale;
-                localPin.PinLocation = cloudPin.PinLocation;
-                localPin.PinRotation = cloudPin.PinRotation;
-
-                MergeFotos(localPin, cloudPin);
-
-                if (uiNeedsRedraw)
-                    WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
+                if (detailsChanged && localPlan.IsLive())
+                    WeakReferenceMessenger.Default.Send(
+                        new PlanDetailsChangedMessage((planId, cloudPlan.Name,
+                            cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
             }
         }
 
-        // Zaehler nach allen Aenderungen einmalig korrigieren
-        if (localPlan.PinCount != localPlan.Pins.Count)
-            localPlan.PinCount = localPlan.Pins.Count;
+        // --- Pins: Vereinigung beider Schluesselmengen --------------------
+        localPlan.Pins ??= [];
+        var cloudPins = cloudPlan.Pins ?? [];
+
+        foreach (var pinId in localPlan.Pins.Keys.Union(cloudPins.Keys).ToList())
+        {
+            bool hasLocal = localPlan.Pins.TryGetValue(pinId, out var localPin);
+            bool hasCloud = cloudPins.TryGetValue(pinId, out var cloudPin);
+
+            // Nur lokal => offline angelegt, noch nicht hochgeladen.
+            // NICHT loeschen - das war der urspruengliche Fehler.
+            if (hasLocal && !hasCloud)
+                continue;
+
+            // Nur in der Cloud => von einem anderen Geraet.
+            if (!hasLocal && hasCloud && cloudPin != null)
+            {
+                localPlan.Pins.Add(pinId, cloudPin);
+                if (cloudPin.IsLive())
+                    WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
+                continue;
+            }
+
+            if (localPin is null || cloudPin is null) continue;
+
+            // Beide kennen ihn => aelterer Stand verliert.
+            if (SyncClock.Compare(cloudPin, localPin) <= 0)
+                continue;
+
+            bool wasVisible = localPin.IsLive();
+
+            bool uiNeedsRedraw = localPin.Pos != cloudPin.Pos ||
+                                 localPin.PinRotation != cloudPin.PinRotation ||
+                                 localPin.PinIcon != cloudPin.PinIcon ||
+                                 localPin.PinColor != cloudPin.PinColor ||
+                                 localPin.PinScale != cloudPin.PinScale ||
+                                 localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
+                                 localPin.IsLockRotate != cloudPin.IsLockRotate;
+
+            CopyPinValues(localPin, cloudPin);
+            MergeFotos(localPin, cloudPin);
+
+            if (wasVisible && !localPin.IsLive())
+                WeakReferenceMessenger.Default.Send(new PinDeletedMessage(pinId));
+            else if (!wasVisible && localPin.IsLive())
+                WeakReferenceMessenger.Default.Send(new PinAddedMessage((planId, pinId)));
+            else if (uiNeedsRedraw && localPin.IsLive())
+                WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinId));
+        }
+
+        // Zaehler beruecksichtigt nur sichtbare Pins
+        int liveCount = SyncOps.LivePinCount(localPlan);
+        if (localPlan.PinCount != liveCount)
+            localPlan.PinCount = liveCount;
+    }
+
+    /// <summary>Uebertraegt alle Pin-Nutzdaten inkl. Sync-Metadaten.</summary>
+    private static void CopyPinValues(Pin target, Pin source)
+    {
+        target.Anchor = source.Anchor;
+        target.DateTime = source.DateTime;
+        target.IsWebMapPin = source.IsWebMapPin;
+        target.IsCustomPin = source.IsCustomPin;
+        target.IsCustomIcon = source.IsCustomIcon;
+        target.Pos = source.Pos;
+        target.PinPriority = source.PinPriority;
+        target.GeoLocation = source.GeoLocation;
+        target.IsAllowExport = source.IsAllowExport;
+        target.IsLockAutoScale = source.IsLockAutoScale;
+        target.IsLockPosition = source.IsLockPosition;
+        target.IsLockRotate = source.IsLockRotate;
+        target.OnPlanId = source.OnPlanId;
+        target.PinColor = source.PinColor;
+        target.PinIcon = source.PinIcon;
+        target.PinName = source.PinName;
+        target.PinDesc = source.PinDesc;
+        target.Size = source.Size;
+        target.SelfId = source.SelfId;
+        target.PinScale = source.PinScale;
+        target.PinLocation = source.PinLocation;
+        target.PinRotation = source.PinRotation;
+
+        target.DeletedAt = source.DeletedAt;
+        target.ModifiedAt = source.ModifiedAt;
+        target.ModifiedBy = source.ModifiedBy;
     }
 
     private static void MergeFotos(Pin localPin, Pin cloudPin)
@@ -550,45 +706,35 @@ public static class SaveManager
         localPin.Fotos ??= [];
         var cloudFotos = cloudPin.Fotos ?? [];
 
-        string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
-        string imageFolder = ProjectItem.Current.ImageFolder;
-
-        // Nur entfernen, wenn die lokale Bilddatei ebenfalls nicht mehr existiert -
-        // sonst koennten offline aufgenommene, noch nicht hochgeladene Fotos verloren gehen.
-        var candidateDeletedIds = localPin.Fotos.Keys.Except(cloudFotos.Keys).ToList();
-        foreach (var deletedId in candidateDeletedIds)
+        foreach (var fotoId in localPin.Fotos.Keys.Union(cloudFotos.Keys).ToList())
         {
-            var localFoto = localPin.Fotos[deletedId];
-            string? localImagePath = !string.IsNullOrEmpty(projectDir) && !string.IsNullOrEmpty(localFoto.File)
-                ? Path.Combine(projectDir, imageFolder, localFoto.File)
-                : null;
+            bool hasLocal = localPin.Fotos.TryGetValue(fotoId, out var localFoto);
+            bool hasCloud = cloudFotos.TryGetValue(fotoId, out var cloudFoto);
 
-             bool stillExistsLocally = localImagePath != null && File.Exists(localImagePath);
-            if (!stillExistsLocally)
-                localPin.Fotos.Remove(deletedId);
-            // sonst: vermutlich nur noch nicht hochgeladen -> behalten
-        }
+            // Offline aufgenommen, noch nicht hochgeladen => behalten.
+            if (hasLocal && !hasCloud) continue;
 
-        // Neue oder geaenderte Fotos von der Cloud uebernehmen
-        foreach (var cloudFotoKp in cloudFotos)
-        {
-            var fotoId = cloudFotoKp.Key;
-            var cloudFoto = cloudFotoKp.Value;
-
-            if (!localPin.Fotos.TryGetValue(fotoId, out Foto localFoto))
+            if (!hasLocal && hasCloud && cloudFoto != null)
             {
                 localPin.Fotos.Add(fotoId, cloudFoto);
                 continue;
             }
+
+            if (localFoto is null || cloudFoto is null) continue;
+            if (SyncClock.Compare(cloudFoto, localFoto) <= 0) continue;
 
             localFoto.AllowExport = cloudFoto.AllowExport;
             localFoto.File = cloudFoto.File;
             localFoto.HasOverlay = cloudFoto.HasOverlay;
             localFoto.DateTime = cloudFoto.DateTime;
             localFoto.ImageSize = cloudFoto.ImageSize;
+
+            localFoto.DeletedAt = cloudFoto.DeletedAt;
+            localFoto.ModifiedAt = cloudFoto.ModifiedAt;
+            localFoto.ModifiedBy = cloudFoto.ModifiedBy;
         }
     }
-    
+
     // ===============================================================
     //  Ordnerstruktur
     // ===============================================================
@@ -697,7 +843,6 @@ public static class SaveManager
             foreach (var part in parts)
             {
                 var folderItem = await GetOrCreateFolderAsync(authService, driveId, currentParentId, part);
-
                 if (folderItem != null && !string.IsNullOrEmpty(folderItem.Id))
                     currentParentId = folderItem.Id;
                 else
@@ -723,7 +868,6 @@ public static class SaveManager
             if (myDrive?.Id == null) return false;
 
             string driveId = myDrive.Id;
-
             await EnsureProjectSubfoldersAsync(CurrentAuth, driveId, TargetFolderId);
 
             if (GlobalJson.Data != null)
@@ -775,7 +919,6 @@ public static class SaveManager
                 return (false, null, null);
 
             TargetFolderId = projectFolder.Id;
-
             await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, TargetFolderId);
 
             if (GlobalJson.Data != null)
@@ -918,7 +1061,6 @@ public static class SaveManager
             {
                 projectData.CloudDriveId = remoteProject.DriveId;
                 projectData.CloudFolderId = remoteProject.FolderId;
-
                 File.WriteAllText(localJsonPath, JsonSerializer.Serialize(projectData, GlobalJson.GetOptions()));
             }
 
@@ -1078,13 +1220,11 @@ public static class SaveManager
         for (int i = 0; i < parts.Length - 1; i++)
         {
             var folder = await GetOrCreateFolderAsync(CurrentAuth, driveId, currentFolderId, parts[i]);
-
             if (folder?.Id == null)
             {
                 Console.WriteLine($"Konnte Cloud-Ordner nicht erstellen: {parts[i]}");
                 return;
             }
-
             currentFolderId = folder.Id;
         }
 
@@ -1135,17 +1275,14 @@ public static class SaveManager
             if (!string.IsNullOrEmpty(subFolder))
             {
                 var parts = subFolder.Split(['/', '\\'], StringSplitOptions.RemoveEmptyEntries);
-
                 foreach (var part in parts)
                 {
                     var folder = await GetOrCreateFolderAsync(CurrentAuth, driveId, currentFolderId, part);
-
                     if (folder?.Id == null)
                     {
                         Console.WriteLine($"Konnte Unterordner {part} nicht finden/erstellen.");
                         return;
                     }
-
                     currentFolderId = folder.Id;
                 }
             }
@@ -1170,36 +1307,6 @@ public static class SaveManager
     // ===============================================================
     //  Cloud-Status und Polling
     // ===============================================================
-
-    public static async Task<bool> IsCloudVersionNewerAsync()
-    {
-        if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
-
-        if (GlobalJson.Data == null ||
-            string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
-            string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId))
-            return false;
-
-        try
-        {
-            var cloudItem = await CurrentAuth.GraphClient.Drives[GlobalJson.Data.CloudDriveId]
-                .Items[GlobalJson.Data.CloudFolderId]
-                .ItemWithPath(CloudFileName)
-                .GetAsync();
-
-            if (cloudItem?.LastModifiedDateTime != null)
-            {
-                string localFilePath = GlobalJson.GetFilePath();
-
-                if (File.Exists(localFilePath))
-                    return cloudItem.LastModifiedDateTime > File.GetLastWriteTimeUtc(localFilePath);
-            }
-        }
-        catch (ODataError) { /* Datei existiert in Cloud (noch) nicht */ }
-        catch (Exception ex) { Console.WriteLine($"Fehler beim Check-Update: {ex.Message}"); }
-
-        return false;
-    }
 
     public static async Task<bool> SyncJsonOnlyFromCloudAsync()
     {
@@ -1229,7 +1336,7 @@ public static class SaveManager
             if (cloudStream == null || cloudItem == null)
                 return false;
 
-            var cloudData = await JsonSerializer.DeserializeAsync<JsonDataModel>(cloudStream, GlobalJson.GetOptions());
+            var cloudData = await GlobalJson.DeserializeAsync(cloudStream);
             if (cloudData == null)
                 return false;
 
@@ -1248,6 +1355,7 @@ public static class SaveManager
 
             // Nur Dateien herunterladen, die lokal fehlen
             await DownloadMissingProjectFilesAsync(driveId, targetFolderId);
+
             return true;
         }
         catch (Exception ex)
@@ -1270,7 +1378,8 @@ public static class SaveManager
 
         var project = ProjectItem.Current;
 
-        foreach (var planPair in GlobalJson.Data.Plans)
+        // Nur lebende Objekte: fuer geloeschte Pins waere der Download sinnlos.
+        foreach (var planPair in SyncOps.LivePlans(GlobalJson.Data))
         {
             var plan = planPair.Value;
 
@@ -1278,15 +1387,12 @@ public static class SaveManager
             if (!string.IsNullOrEmpty(plan.File))
             {
                 string localPath = Path.Combine(projectDir, project.PlanFolder, plan.File);
-
                 if (!File.Exists(localPath))
                     await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.PlanFolder}/{plan.File}", localPath);
             }
 
-            if (plan.Pins == null) continue;
-
             // CustomPins innerhalb des Plans pruefen
-            foreach (var pinPair in plan.Pins)
+            foreach (var pinPair in SyncOps.LivePins(plan))
             {
                 var pin = pinPair.Value;
 
@@ -1295,11 +1401,11 @@ public static class SaveManager
                     string localPinPath = Path.Combine(projectDir, project.CustomPinsFolder, pin.PinIcon);
                     if (File.Exists(localPinPath)) continue;
 
-                    await DownloadSpecificFileAsync(driveId, rootFolderId,$"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
+                    await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.CustomPinsFolder}/{pin.PinIcon}", localPinPath);
 
                     string dataFile = Path.ChangeExtension(pin.PinIcon, ".data");
                     string localDataPath = Path.Combine(projectDir, project.CustomPinsFolder, dataFile);
-                    await DownloadSpecificFileAsync(driveId, rootFolderId,$"{project.CustomPinsFolder}/{dataFile}", localDataPath);
+                    await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.CustomPinsFolder}/{dataFile}", localDataPath);
                 }
                 else if (pin.IsCustomIcon && !string.IsNullOrEmpty(pin.PinIcon))
                 {
@@ -1339,17 +1445,17 @@ public static class SaveManager
             if (meta == null) return;
 
             var newIconItem = new IconItem(
-            iconFileName,
-            meta.DisplayName,
-            new Point(meta.AnchorX, meta.AnchorY),
-            new Size(meta.SizeWidth, meta.SizeHeight),
-            meta.IsRotationLocked,
-            meta.IsAutoScaleLocked,
-            isCustomIcon: true,
-            SKColor.Parse(meta.PinColorHex),
-            meta.IconScale,
-            meta.Category,
-            isDefaultIcon: false);
+                iconFileName,
+                meta.DisplayName,
+                new Point(meta.AnchorX, meta.AnchorY),
+                new Size(meta.SizeWidth, meta.SizeHeight),
+                meta.IsRotationLocked,
+                meta.IsAutoScaleLocked,
+                isCustomIcon: true,
+                SKColor.Parse(meta.PinColorHex),
+                meta.IconScale,
+                meta.Category,
+                isDefaultIcon: false);
 
             // Exakt derselbe Ablauf wie in PopupIconEdit.OnOkClicked
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), newIconItem);
@@ -1363,6 +1469,7 @@ public static class SaveManager
         {
             Console.WriteLine($"Fehler beim Registrieren des CustomIcons '{iconFileName}': {ex.Message}");
         }
+
         try { File.Delete(localMetaPath); } catch { /* unkritisch */ }
     }
 
@@ -1431,7 +1538,6 @@ public static class SaveManager
         _ = Task.Run(async () =>
         {
             using var timer = new PeriodicTimer(TimeSpan.FromSeconds(intervalSeconds));
-
             try
             {
                 while (await timer.WaitForNextTickAsync(token))
@@ -1450,19 +1556,22 @@ public static class SaveManager
         _pollingCts?.Dispose();
         _pollingCts = null;
     }
-    
+
     private static async Task CheckETagAndSyncAsync()
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return;
+
         if (GlobalJson.Data == null ||
             string.IsNullOrEmpty(GlobalJson.Data.CloudDriveId) ||
             string.IsNullOrEmpty(GlobalJson.Data.CloudFolderId)) return;
+
         try
         {
             var cloudItem = await CurrentAuth.GraphClient.Drives[GlobalJson.Data.CloudDriveId]
                 .Items[GlobalJson.Data.CloudFolderId]
                 .ItemWithPath(CloudFileName)
                 .GetAsync();
+
             if (cloudItem?.ETag == null) return;
 
             bool baselineMissing = string.IsNullOrEmpty(_lastKnownETag);
@@ -1471,8 +1580,9 @@ public static class SaveManager
             if (baselineMissing || etagChanged)
             {
                 _lastKnownETag = cloudItem.ETag;
+
                 // Auch beim ERSTEN Poll nach Login/Projektstart synchronisieren,
-                // damit Änderungen, die während der Offline-Phase passiert sind, nachgeholt werden.
+                // damit Aenderungen aus der Offline-Phase nachgeholt werden.
                 await SyncJsonOnlyFromCloudAsync();
             }
         }
@@ -1481,7 +1591,7 @@ public static class SaveManager
             Console.WriteLine($"Polling-Check fehlgeschlagen: {ex.Message}");
         }
     }
-    
+
     // ===============================================================
     //  Bedarfs-Download
     // ===============================================================
@@ -1564,7 +1674,7 @@ public static class SaveManager
             if (stream == null)
                 return null;
 
-            return await JsonSerializer.DeserializeAsync<JsonDataModel>(stream, GlobalJson.GetOptions());
+            return await GlobalJson.DeserializeAsync(stream);
         }
         catch (Exception ex)
         {
@@ -1594,6 +1704,7 @@ public static class SaveManager
         }
 
         _pendingUploadQueue.Clear();
+        _pendingCloudDeletes.Clear();
     }
 
     private static string SanitizeName(string name)
@@ -1603,26 +1714,18 @@ public static class SaveManager
 public class RemoteProjectDto
 {
     public string FileName { get; set; } = string.Empty;
-
     public string DriveId { get; set; } = string.Empty;
-
     public string FolderId { get; set; } = string.Empty;
-
-    // ID der eigentlichen JSON-Datei
-    public string ItemId { get; set; } = string.Empty;
 
     // Aus Object_name im JSON
     public string ObjectName { get; set; } = string.Empty;
 
-    // Optional: Pfad für Anzeige im Suchdialog
-    public string FolderPath { get; set; } = string.Empty;
-
     public DateTimeOffset LastModified { get; set; }
 
     public string DisplayName =>
-    string.IsNullOrWhiteSpace(ObjectName)
-    ? Path.GetFileNameWithoutExtension(FileName)
-    : ObjectName;
+        string.IsNullOrWhiteSpace(ObjectName)
+        ? Path.GetFileNameWithoutExtension(FileName)
+        : ObjectName;
 }
 
 public class CloudDownloadFile

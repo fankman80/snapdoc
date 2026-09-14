@@ -1,7 +1,8 @@
 ﻿#nullable disable
 using SnapDoc.Models;
-using System.Text.Json;
 using SnapDoc.Services;
+using System.Text.Json;
+using static SnapDoc.Models.SyncStampExtensions;
 
 namespace SnapDoc;
 
@@ -39,6 +40,10 @@ public static class GlobalJson
 
     public static void FromJson(string json)
     {
+        // Gate: sonst stempelt jeder Setter beim Deserialisieren neu und
+        // ueberschreibt die gerade eingelesenen ModifiedAt-Werte.
+        using var _ = SyncStampGate.Suspend();
+
         var options = GetOptions();
         _userData = JsonSerializer.Deserialize<JsonDataModel>(json, options);
     }
@@ -49,6 +54,8 @@ public static class GlobalJson
         {
             if (File.Exists(filePath))
             {
+                using var _ = SyncStampGate.Suspend();
+
                 string json = File.ReadAllText(filePath);
                 return JsonSerializer.Deserialize<JsonDataModel>(json, GetOptions());
             }
@@ -126,6 +133,12 @@ public static class GlobalJson
         {
             Console.WriteLine($"Fehler beim Erstellen der Datei: {ex.Message}");
         }
+    }
+
+    public static async Task<JsonDataModel> DeserializeAsync(Stream stream)
+    {
+        using var _ = SyncStampGate.Suspend();
+        return await JsonSerializer.DeserializeAsync<JsonDataModel>(stream, GetOptions());
     }
 
     public static String GetFilePath()
