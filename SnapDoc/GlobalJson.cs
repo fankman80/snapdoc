@@ -27,11 +27,14 @@ public static class GlobalJson
         return new JsonSerializerOptions
         {
             WriteIndented = true,
-            Converters = { new SKColorConverter() },
-            //DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingDefault  //Ignoriert "IsEmpty": false und "IsZero": false,
+            Converters =
+            {
+                new SKColorConverter(),
+                new PointJsonConverter(),
+                new SizeJsonConverter()
+            },
         };
     }
-
     public static string ToJson()
     {
         var options = GetOptions();

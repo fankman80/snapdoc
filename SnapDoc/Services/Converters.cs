@@ -152,3 +152,71 @@ public class SKColorConverter : JsonConverter<SKColor>
         writer.WriteStringValue(colorString);
     }
 }
+
+public sealed class PointJsonConverter : JsonConverter<Point>
+{
+    public override Point Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+    {
+        double x = 0, y = 0;
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject) break;
+            if (reader.TokenType != JsonTokenType.PropertyName) continue;
+
+            string prop = reader.GetString();
+            reader.Read();
+
+            if (string.Equals(prop, "X", StringComparison.OrdinalIgnoreCase))
+                x = reader.GetDouble();
+            else if (string.Equals(prop, "Y", StringComparison.OrdinalIgnoreCase))
+                y = reader.GetDouble();
+            else if (reader.TokenType is JsonTokenType.StartObject or JsonTokenType.StartArray)
+                reader.TrySkip();
+        }
+
+        return new Point(x, y);
+    }
+
+    public override void Write(Utf8JsonWriter writer, Point value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteNumber("X", value.X);
+        writer.WriteNumber("Y", value.Y);
+        writer.WriteEndObject();
+    }
+}
+
+public sealed class SizeJsonConverter : JsonConverter<Size>
+{
+    public override Size Read(ref Utf8JsonReader reader, Type type, JsonSerializerOptions options)
+    {
+        double w = 0, h = 0;
+
+        while (reader.Read())
+        {
+            if (reader.TokenType == JsonTokenType.EndObject) break;
+            if (reader.TokenType != JsonTokenType.PropertyName) continue;
+
+            string prop = reader.GetString();
+            reader.Read();
+
+            if (string.Equals(prop, "Width", StringComparison.OrdinalIgnoreCase))
+                w = reader.GetDouble();
+            else if (string.Equals(prop, "Height", StringComparison.OrdinalIgnoreCase))
+                h = reader.GetDouble();
+            else if (reader.TokenType is JsonTokenType.StartObject or JsonTokenType.StartArray)
+                reader.TrySkip();
+        }
+
+        return new Size(w, h);
+    }
+
+    public override void Write(Utf8JsonWriter writer, Size value, JsonSerializerOptions options)
+    {
+        writer.WriteStartObject();
+        writer.WriteNumber("Width", value.Width);
+        writer.WriteNumber("Height", value.Height);
+        writer.WriteEndObject();
+    }
+}

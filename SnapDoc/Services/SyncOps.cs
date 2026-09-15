@@ -46,8 +46,8 @@ public static class SyncOps
     /// </summary>
     public static void DeletePin(string planId, string pinId, bool notify = true)
     {
-        if (!TryGetLivePlan(planId, out var plan)) return;
-        if (!TryGetLivePin(plan, pinId, out var pin)) return;
+        if (!TryGetLivePlan(planId, out var plan) || plan is null) return;
+        if (!TryGetLivePin(plan, pinId, out var pin) || pin is null) return;
 
         // Fotos mit-markieren, sonst bleiben sie als Waisen in der Galerie
         foreach (var f in pin.Fotos?.Values ?? Enumerable.Empty<Foto>())
@@ -65,7 +65,7 @@ public static class SyncOps
 
     public static void DeletePlan(string planId)
     {
-        if (!TryGetLivePlan(planId, out var plan)) return;
+        if (!TryGetLivePlan(planId, out var plan) || plan is null) return;
 
         foreach (var pin in plan.Pins?.Values ?? Enumerable.Empty<Pin>())
         {
@@ -85,9 +85,9 @@ public static class SyncOps
 
     public static void DeleteFoto(string planId, string pinId, string fotoId)
     {
-        if (!TryGetLivePlan(planId, out var plan)) return;
-        if (!TryGetLivePin(plan, pinId, out var pin)) return;
-        if (pin.Fotos == null || !pin.Fotos.TryGetValue(fotoId, out var foto)) return;
+        if (!TryGetLivePlan(planId, out var plan) || plan is null) return;
+        if (!TryGetLivePin(plan, pinId, out var pin) || pin is null) return;
+        if (pin.Fotos == null || !pin.Fotos.TryGetValue(fotoId, out var foto) || foto is null) return;
 
         foto.MarkDeleted();
         pin.Touch();
@@ -119,7 +119,9 @@ public static class SyncOps
                 continue;
             }
 
-            foreach (var pinId in plan.Pins?.Keys.ToList() ?? [])
+            if (plan.Pins is null) continue;
+
+            foreach (var pinId in plan.Pins.Keys.ToList())
             {
                 var pin = plan.Pins[pinId];
 
@@ -130,7 +132,9 @@ public static class SyncOps
                     continue;
                 }
 
-                foreach (var fotoId in pin.Fotos?.Keys.ToList() ?? [])
+                if (pin.Fotos is null) continue;
+
+                foreach (var fotoId in pin.Fotos.Keys.ToList())
                 {
                     if (pin.Fotos[fotoId].DeletedAt is { } fd && fd < cutoff)
                     {
