@@ -10,15 +10,7 @@ public abstract partial class SyncModel : ObservableObject, ISyncStamped
     public DateTimeOffset ModifiedAt { get; set; }
     public string ModifiedBy { get; set; }
     public DateTimeOffset? DeletedAt { get; set; }
-
-    /// <summary>Diese Properties duerfen NIE ein Stempeln ausloesen (Endlosschleife).</summary>
-    private static readonly HashSet<string> SyncMeta =
-        [nameof(ModifiedAt), nameof(ModifiedBy), nameof(DeletedAt)];
-
-    /// <summary>
-    /// Zusaetzliche Properties, die kein Stempeln ausloesen sollen - fuer
-    /// abgeleitete/berechnete Werte. Von Unterklassen ueberschreibbar.
-    /// </summary>
+    private static readonly HashSet<string> SyncMeta = [nameof(ModifiedAt), nameof(ModifiedBy), nameof(DeletedAt)];
     protected virtual bool IsDerived(string propertyName) => false;
 
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
@@ -32,14 +24,10 @@ public abstract partial class SyncModel : ObservableObject, ISyncStamped
         this.Touch();
     }
 
-    /// <summary>
-    /// Setzt einen Wert ohne PropertyChanged und stempelt. Fuer Properties, die
-    /// kein Binding brauchen (Pos, Size, File, ...) - sie muessen den Stempel
-    /// trotzdem setzen, sonst verliert der Merge diese Aenderungen.
-    /// </summary>
     protected bool SetPlain<T>(ref T field, T value)
     {
-        if (EqualityComparer<T>.Default.Equals(field, value)) return false;
+        if (EqualityComparer<T>.Default.Equals(field, value))
+            return false;
         field = value;
         this.Touch();
         return true;
@@ -52,7 +40,8 @@ public abstract partial class SyncModel : ObservableObject, ISyncStamped
 public partial class JsonDataModel : SyncModel
 {
     public string ProjectId { get; set; } = Guid.NewGuid().ToString();
-
+    public string CloudDriveId { get; set; }
+    public string CloudFolderId { get; set; }
     [ObservableProperty] public partial string Client_name { get; set; }
     [ObservableProperty] public partial string Object_address { get; set; }
     [ObservableProperty] public partial string Working_title { get; set; }
@@ -75,21 +64,11 @@ public partial class JsonDataModel : SyncModel
         get => _titleImageSize;
         set => SetPlain(ref _titleImageSize, value);
     }
-
-    // --- Bewusst OHNE Stempel -------------------------------------------
-    // Cloud-Verknuepfung ist geraetelokale Information. Wuerde sie stempeln,
-    // loeste jedes Verknuepfen/Reparieren einen Upload aus und beide Geraete
-    // wuerden sich gegenseitig hochschaukeln.
-    public string CloudDriveId { get; set; }
-    public string CloudFolderId { get; set; }
-
-    // Ordnernamen werden einmalig beim Anlegen gesetzt.
+    
     public string PlanPath { get; set; }
     public string ImagePath { get; set; }
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
-
-    // Die Plan-Struktur wird pro Plan gestempelt, nicht auf Projektebene.
     public Dictionary<string, Plan> Plans { get; set; }
 }
 
@@ -103,12 +82,6 @@ public partial class Plan : SyncModel
     [ObservableProperty] public partial bool IsGrayscale { get; set; }
     [ObservableProperty] public partial bool AllowExport { get; set; }
     [ObservableProperty] public partial string PlanColor { get; set; }
-
-    /// <summary>
-    /// Abgeleiteter Anzeigewert - wird aus der Pin-Anzahl neu berechnet und
-    /// darf deshalb NICHT stempeln. Sonst gilt ein Geraet, das nur gezaehlt
-    /// hat, als "neuer" und gewinnt gegen eine echte Aenderung.
-    /// </summary>
     [ObservableProperty] public partial int PinCount { get; set; }
 
     private string _file;
@@ -126,15 +99,7 @@ public partial class Plan : SyncModel
     }
 
     public Dictionary<string, Pin> Pins { get; set; } = [];
-
-    /// <summary>
-    /// PinCount wird an vielen Stellen neu berechnet (AddPin, Merge,
-    /// Reparaturschleife). Wuerde das stempeln, gaelte ein Geraet, das nur
-    /// nachgezaehlt hat, als "neuer" und gewaenne gegen eine echte Aenderung
-    /// des anderen Geraets.
-    /// </summary>
-    protected override bool IsDerived(string propertyName)
-        => propertyName == nameof(PinCount);
+    protected override bool IsDerived(string propertyName) => propertyName == nameof(PinCount);
 }
 
 // =====================================================================
@@ -206,9 +171,7 @@ public partial class Pin : SyncModel
         set => SetPlain(ref _isWebMapPin, value);
     }
 
-    /// <summary>Identitaet des Pins - wird einmal bei der Erstellung gesetzt.</summary>
     public string SelfId { get; set; }
-
     public Dictionary<string, Foto> Fotos { get; set; } = [];
 }
 
@@ -254,9 +217,7 @@ public partial class Foto : SyncModel
 public class GeoLocData
 {
     private readonly Location _wsg84;
-
     public GeoLocData() { }
-
     public GeoLocData(Location wsg84)
     {
         _wsg84 = wsg84;
