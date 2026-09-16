@@ -46,9 +46,9 @@
         <Setter Property="Shadow">
             <Setter.Value>
                 <Shadow Brush="Black"
-                        Offset="0,3"
-                        Radius="6"
-                        Opacity="0.5" />
+                        Offset="{OnPlatform Android='0,4', Default='0,3'}"
+                        Radius="{OnPlatform Android=8, Default=6}"
+                        Opacity="{OnPlatform Android=0.4, Default=0.5}" />
             </Setter.Value>
         </Setter>
     </Style>
