@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using DocumentFormat.OpenXml.Spreadsheet;
 using SkiaSharp;
 using SnapDoc.Controls;
 using SnapDoc.Models;
@@ -248,21 +249,18 @@ public partial class LoadPDFPages : ContentPage
         try
         {
             // BusyOverlay anzeigen
-            await BusyService.ShowAsync(
-                AppResources.pdf_wird_konvertiert);
-
+            await BusyService.ShowAsync(AppResources.pdf_wird_konvertiert);
             await LoadPDFImages();
 
-            await ProcessFileOrganizationLogic();
+            var uploads = await ProcessFileOrganizationLogic();
 
-            SaveManager.NotifyDataChanged();
+            SaveManager.NotifyDataChanged(uploads);
 
             if (Shell.Current is AppShell shell)
                 ProjectItem.Current.ApplyFilterAndSorting();
 
             // BusyOverlay schließen
             await BusyService.HideAsync();
-
             await Shell.Current.GoToAsync("project_details");
         }
         catch (Exception ex)
@@ -308,24 +306,52 @@ public partial class LoadPDFPages : ContentPage
         });
     }
 
-    private async Task ProcessFileOrganizationLogic()
+    private async Task<List<(string LocalFilePath, string SubFolder)>> ProcessFileOrganizationLogic()
     {
+        // Auswahl auf dem UI-Thread einsammeln - der Zugriff auf
+        // fileListView.ItemsSource aus Task.Run heraus ist auf Android
+        // nicht zulaessig.
+        var items = fileListView.ItemsSource?.Cast<PdfItem>()
+            .Where(x => x.IsChecked)
+            .ToList() ?? [];
+
+        if (items.Count == 0)
+            return [];
+
+        // Sammelt alle Dateien, die anschliessend in die Cloud sollen.
+        var uploads = new System.Collections.Concurrent.ConcurrentBag<(string, string)>();
+
+        string planFolder = GlobalJson.Data.PlanPath;
+        string thumbFolder = $"{planFolder}/thumbnails";
+
         await Task.Run(() =>
         {
-            string imageDirectory = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
-            Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
+            // Geraete-ID einmalig anfordern, BEVOR Parallel.For startet.
+            // plan.Touch() liest sie - der erste Preferences-Zugriff soll
+            // nicht aus mehreren Worker-Threads gleichzeitig passieren.
+            _ = SyncClock.DeviceId;
 
-            var items = fileListView.ItemsSource.Cast<PdfItem>().Where(x => x.IsChecked).ToList();
-            string timeStamp = DateTime.Now.ToString("yyyyMMdd_HHmmss");
+            string imageDirectory = Path.Combine(
+                Settings.DataDirectory,
+                SettingsService.Instance.ProjectPath,
+                planFolder);
+
+            // Beide Ebenen anlegen: bei einem frisch erstellten Projekt
+            // existiert der Plan-Ordner selbst noch nicht.
+            Directory.CreateDirectory(imageDirectory);
+            Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
             var processedPlans = new KeyValuePair<string, Plan>[items.Count];
 
             Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
                 var item = items[i];
+
+                // Ein einziger Bezeichner fuer Key UND Dateiname - vorher
+                // liefen hier baseName und planId auseinander.
                 string baseName = $"plan_{SyncClock.NewId()}_{i}";
                 string fileName = baseName + ".jpg";
-                string planId = $"plan_{timeStamp}_{i}";
+
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
@@ -342,12 +368,12 @@ public partial class LoadPDFPages : ContentPage
                 };
 
                 plan.Touch();
-                processedPlans[i] = new KeyValuePair<string, Plan>(baseName, plan);
 
                 try
                 {
                     using var inputStream = File.OpenRead(item.PreviewPath);
                     using var originalBitmap = SKBitmap.Decode(inputStream);
+
                     int maxThumbSize = SettingsService.Instance.PlanThumbSize;
                     int targetWidth = originalBitmap.Width;
                     int targetHeight = originalBitmap.Height;
@@ -367,6 +393,7 @@ public partial class LoadPDFPages : ContentPage
                     }
 
                     using var resizedBitmap = originalBitmap.Resize(new SKImageInfo(targetWidth, targetHeight), SKSamplingOptions.Default);
+
                     if (resizedBitmap != null)
                     {
                         using var image = SKImage.FromBitmap(resizedBitmap);
@@ -381,17 +408,32 @@ public partial class LoadPDFPages : ContentPage
                 }
                 catch
                 {
-                    File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
+                    try { File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true); } catch { }
+                }
+
+                // Ohne Planbild keinen Eintrag anlegen - sonst entstuende ein
+                // Plan, dessen Datei nie existiert hat.
+                if (!File.Exists(item.ImagePath))
+                {
+                    System.Diagnostics.Debug.WriteLine($"Planbild fehlt, Eintrag wird uebersprungen: {item.ImagePath}");
+                    return;
                 }
 
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
 
-                processedPlans[i] = new KeyValuePair<string, Plan>(planId, plan);
+                // Fuer den Cloud-Upload vormerken
+                uploads.Add((destinationFilePath, planFolder));
+
+                if (File.Exists(destinationThumbPath))
+                    uploads.Add((destinationThumbPath, thumbFolder));
+
+                processedPlans[i] = new KeyValuePair<string, Plan>(baseName, plan);
             });
 
             lock (GlobalJson.Data)
             {
                 GlobalJson.Data.Plans ??= [];
+
                 foreach (var planKvp in processedPlans)
                 {
                     if (planKvp.Value != null)
@@ -410,13 +452,14 @@ public partial class LoadPDFPages : ContentPage
 
             if (Directory.Exists(Settings.CacheDirectory))
             {
-                var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
-                foreach (var cacheFile in cacheFiles)
+                foreach (var cacheFile in Directory.GetFiles(Settings.CacheDirectory))
                 {
                     try { File.Delete(cacheFile); } catch { }
                 }
             }
         });
+
+        return [.. uploads];
     }
 
     private void OnChangeRowsClicked(object sender, EventArgs e)

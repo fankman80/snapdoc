@@ -37,12 +37,20 @@
     <Style x:Key="ToolButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
         <Setter Property="TextColor" Value="{DynamicResource PrimaryDarkText}" />
-        <Setter Property="WidthRequest" Value="60" />
-        <Setter Property="HeightRequest" Value="60" />
-        <Setter Property="CornerRadius" Value="30" />
+        <Setter Property="WidthRequest" Value="54" />
+        <Setter Property="HeightRequest" Value="54" />
+        <Setter Property="CornerRadius" Value="27" />
         <Setter Property="Padding" Value="0" />
-        <Setter Property="FontSize" Value="{OnPlatform Default='34', iOS='28'}" />
+        <Setter Property="FontSize" Value="{OnPlatform Default='32', iOS='28'}" />
         <Setter Property="FontFamily" Value="MaterialOutlined" />
+        <Setter Property="Shadow">
+            <Setter.Value>
+                <Shadow Brush="Black"
+                        Offset="0,3"
+                        Radius="6"
+                        Opacity="0.5" />
+            </Setter.Value>
+        </Setter>
     </Style>
     
     <Style TargetType="ActivityIndicator">

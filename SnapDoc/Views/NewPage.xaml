@@ -81,7 +81,7 @@
                         StrokeThickness="0"
                         HeightRequest="60"
                         VerticalOptions="End"
-                        Margin="20,0,20,100"
+                        Margin="16,0,16,100"
                         ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
@@ -94,7 +94,7 @@
                             Minimum="1"
                             Maximum="200"
                             Step="1"
-                            Margin="65,0,65,0"
+                            Margin="61,0,61,0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
@@ -106,7 +106,7 @@
                         Text="{x:Static local:MaterialIcons.Draw}"  
                         IsVisible="False"
                         Style="{StaticResource ToolButtonStyle}"
-                        Margin="20,0,0,180"
+                        Margin="16,0,0,180"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -120,7 +120,7 @@
                         WidthRequest="50"
                         CornerRadius="25"
                         Padding="0"
-                        Margin="25,0,0,105"
+                        Margin="21,0,0,105"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -132,7 +132,7 @@
                        HorizontalOptions="End"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="0,0,30,118"
+                       Margin="0,0,26,118"
                        ZIndex="10001"/>                
                 <Label x:Name="SizeModeLabel"
                        FontSize="11"
@@ -140,13 +140,13 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="95,0,0,104"
+                       Margin="88,0,0,104"
                        ZIndex="10001"/>                
                 <Border BackgroundColor="{DynamicResource Primary}"
                         StrokeThickness="0"
                         HeightRequest="60"
                         VerticalOptions="End"
-                        Margin="20,0,20,20"
+                        Margin="16,0,16,16"
                         ZIndex="10000">
                     <Border.StrokeShape>
                         <RoundRectangle CornerRadius="30"/>
@@ -159,7 +159,7 @@
                             Minimum="-180"
                             Maximum="180"
                             Step="1"
-                            Margin="65,0,65,0"
+                            Margin="61,0,61,0"
                             ThumbColor="{DynamicResource PrimaryDarkText}"
                             MinimumTrackColor="{DynamicResource PrimaryDarkText}"
                             MaximumTrackColor="{DynamicResource PrimaryDarkText}"
@@ -175,7 +175,7 @@
                         WidthRequest="50"
                         CornerRadius="25"
                         Padding="0"
-                        Margin="25,0,0,25"
+                        Margin="21,0,0,21"
                         ZIndex="10001"
                         HorizontalOptions="Start"
                         VerticalOptions="End"
@@ -184,7 +184,7 @@
                         HeightRequest="50"
                         WidthRequest="50"
                         BackgroundColor="{DynamicResource PrimaryDarkText}"
-                        Margin="0,0,25,25"
+                        Margin="0,0,21,21"
                         ZIndex="10001"
                         StrokeThickness="0"
                         HorizontalOptions="End"
@@ -210,13 +210,13 @@
                        HorizontalOptions="Start"
                        VerticalOptions="End"
                        TextColor="{DynamicResource PrimaryDarkText}"
-                       Margin="95,0,0,24"
+                       Margin="88,0,0,20"
                        ZIndex="10001"/>
             </Grid>
 
             <Button x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                     IsVisible="{Binding IsButtonActuallyVisible}"
-                    Margin="0,0,20,20"
+                    Margin="0,0,16,16"
                     ZIndex="10000"
                     Rotation="38"
                     Text="{x:Static local:MaterialIcons.Keep}"  
@@ -228,7 +228,7 @@
 
             <Button x:Name="DrawBtn"
                     Text="{x:Static local:MaterialIcons.Draw}"   
-                    Margin="20,0,0,20"
+                    Margin="16,0,0,16"
                     ZIndex="10000"
                     Style="{StaticResource ToolButtonStyle}"
                     AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
@@ -239,7 +239,7 @@
             <VerticalStackLayout x:DataType="views:NewPage"
                                  IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference Name=ThisPage}}"
                                  Spacing="16"
-                                 Margin="20"
+                                 Margin="16"
                                  HorizontalOptions="Start"
                                  VerticalOptions="End"
                                  ZIndex="10000"
@@ -254,8 +254,8 @@
                             Style="{StaticResource ToolButtonStyle}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                             Clicked="PenSettingsClicked"/>
-                    <Border WidthRequest="20"
-                            HeightRequest="20"
+                    <Border WidthRequest="18"
+                            HeightRequest="18"
                             BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                             StrokeThickness="0"
                             AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
@@ -270,8 +270,8 @@
                                     Radius="3"/>
                         </Border.Shadow>
                     </Border>
-                    <Border WidthRequest="20"
-                            HeightRequest="20"
+                    <Border WidthRequest="18"
+                            HeightRequest="18"
                             BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                             StrokeThickness="0"
                             AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
@@ -326,7 +326,7 @@
                     ZIndex="9998"/>
             <Button AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
-                    Margin="0,0,20,20"
+                    Margin="0,0,16,16"
                     BackgroundColor="Red"
                     Text="{x:Static local:MaterialIcons.Close}"    
                     Style="{StaticResource ToolButtonStyle}"                    

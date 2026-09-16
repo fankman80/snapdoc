@@ -75,26 +75,22 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PdfItem">
-                        <Grid MinimumHeightRequest="140"
-                              BackgroundColor="Gray">
+                        <VerticalStackLayout BackgroundColor="Gray" Spacing="0">
                             <Image Source="{Binding PreviewPath}"
                                    Aspect="AspectFit"
                                    HorizontalOptions="Center"
-                                   VerticalOptions="Center"
-                                   HeightRequest="180"/>
+                                   VerticalOptions="Center"/>
                             <CheckBox IsChecked="{Binding IsChecked}"
                                       Color="{DynamicResource Primary}"
                                       VerticalOptions="End"
-                                      HorizontalOptions="End"
-                                      ZIndex="2"/>
-                        </Grid>
+                                      HorizontalOptions="End"/>
+                        </VerticalStackLayout>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
 
             <Grid Grid.Row="1"
-                  Margin="0,6,16,16"
-                  ColumnSpacing="10"
+                  Margin="0,0,16,16"
                   ColumnDefinitions="*,Auto,Auto">
                 <Button Grid.Column="1"
                         Text="{x:Static res:AppResources.abbrechen}"

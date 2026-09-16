@@ -126,7 +126,7 @@
         
         <Button x:Name="DrawBtn"
                 Text="{x:Static local:MaterialIcons.Draw}"
-                Margin="20,0,0,20"
+                Margin="16,0,0,16"
                 ZIndex="10000"
                 VerticalOptions="End"
                 HorizontalOptions="Start"
@@ -137,7 +137,7 @@
         <VerticalStackLayout x:DataType="views:ImageViewPage"
                              IsVisible="{Binding IsToolButtonsVisible}"
                              Spacing="16"
-                             Margin="20"
+                             Margin="16"
                              HorizontalOptions="Start"
                              VerticalOptions="End"
                              ZIndex="10000">
@@ -150,8 +150,8 @@
                         Style="{StaticResource ToolButtonStyle}"
                         ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                         Clicked="PenSettingsClicked"/>
-                <Border WidthRequest="20"
-                        HeightRequest="20"
+                <Border WidthRequest="18"
+                        HeightRequest="18"
                         BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                         StrokeThickness="0"
                         AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
@@ -166,8 +166,8 @@
                                 Radius="3"/>
                     </Border.Shadow>
                 </Border>
-                <Border WidthRequest="20"
-                        HeightRequest="20"
+                <Border WidthRequest="18"
+                        HeightRequest="18"
                         BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
                         StrokeThickness="0"
                         AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
