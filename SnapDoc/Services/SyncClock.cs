@@ -8,7 +8,9 @@ public static class SyncClock
     private static DateTimeOffset _last = DateTimeOffset.MinValue;
     private static string? _deviceId;
 
-    /// <summary>Stabile ID dieses Geräts – überlebt App-Neustarts.</summary>
+    /// <summary>
+    /// Stabile ID dieses Geräts – überlebt App-Neustarts.
+    /// </summary>
     public static string DeviceId
     {
         get
@@ -26,10 +28,7 @@ public static class SyncClock
     }
 
     /// <summary>
-    /// Streng monoton steigende Zeitstempel. Schützt gegen Rücksprünge
-    /// der Systemzeit (NTP-Korrektur, manuelles Verstellen) – sonst könnte
-    /// eine neue Änderung älter aussehen als eine alte und beim Merge
-    /// verworfen werden.
+    /// Zeitstempel. Schützt gegen Rücksprünge der Systemzeit
     /// </summary>
     public static DateTimeOffset Now()
     {
@@ -43,9 +42,8 @@ public static class SyncClock
     }
 
     /// <summary>
-    /// > 0 => "a" ist neuer und gewinnt. Bei gleichem Zeitstempel
-    /// entscheidet die Geräte-ID, damit BEIDE Geräte unabhängig
-    /// voneinander zum selben Ergebnis kommen.
+    /// Bei gleichem Zeitstempel entscheidet die Geräte-ID,
+    /// damit BEIDE Geräte unabhängig voneinander zum selben Ergebnis kommen.
     /// </summary>
     public static int Compare(ISyncStamped? a, ISyncStamped? b)
     {
@@ -55,8 +53,7 @@ public static class SyncClock
     }
 
     /// <summary>
-    /// Kollisionsfreie ID. Ersetzt das bisherige
-    /// DateTime.Now.ToString("yyyyMMdd_HHmmss") – siehe Schritt 7.3.
+    /// Kollisionsfreie ID
     /// </summary>
     public static string NewId()
         => $"{DateTime.Now:yyyyMMdd_HHmmss}_{DeviceId[..4]}{Random.Shared.Next(0x1000, 0xFFFF):x}";

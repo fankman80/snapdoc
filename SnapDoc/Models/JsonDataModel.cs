@@ -12,7 +12,6 @@ public abstract partial class SyncModel : ObservableObject, ISyncStamped
     public DateTimeOffset? DeletedAt { get; set; }
     private static readonly HashSet<string> SyncMeta = [nameof(ModifiedAt), nameof(ModifiedBy), nameof(DeletedAt)];
     protected virtual bool IsDerived(string propertyName) => false;
-
     protected override void OnPropertyChanged(PropertyChangedEventArgs e)
     {
         base.OnPropertyChanged(e);

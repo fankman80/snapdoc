@@ -7,23 +7,16 @@ namespace SnapDoc.Views;
 
 public partial class PopupProjectEdit : Popup<string>
 {
-    public PopupProjectEdit(bool isActive = false, string okText = null, string cancelText = null)
+    public PopupProjectEdit(string cancelText = null)
     {
         InitializeComponent();
-        okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
-        UploadButton.IsVisible = SettingsService.Instance.IsCloudLoggedIn && isActive;
+        UploadButton.IsVisible = SettingsService.Instance.IsCloudLoggedIn;
     }
     
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         try { await CloseAsync(null); }
-        catch (InvalidOperationException) { }
-    }
-
-    private async void OnDeleteClicked(object sender, EventArgs e)
-    {
-        try { await CloseAsync("Delete"); }
         catch (InvalidOperationException) { }
     }
 

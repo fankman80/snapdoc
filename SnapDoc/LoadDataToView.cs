@@ -1,4 +1,5 @@
 ﻿#nullable disable
+using Microsoft.Maui.Controls.PlatformConfiguration.AndroidSpecific;
 using SnapDoc.Services;
 using SnapDoc.Views;
 
@@ -99,44 +100,34 @@ public partial class LoadDataToView
                     .Select(p => p.PlanId)
                     .ToHashSet();
 
-                for (int i = shell.Items.Count - 1; i >= 0; i--)
+                for (int j = shell.Items.Count - 1; j >= 0; j--)
                 {
-                    var shellItem = shell.Items[i];
-                    if (shellItem?.Items == null) continue;
+                    var section = shell.Items[j];
+                    if (section?.Items == null) continue;
 
-                    for (int j = shellItem.Items.Count - 1; j >= 0; j--)
+                    bool removedFromSection = false;
+
+                    for (int k = section.Items.Count - 1; k >= 0; k--)
                     {
-                        var section = shellItem.Items[j];
-                        if (section?.Items == null) continue;
+                        var content = section.Items[k];
 
-                        for (int k = section.Items.Count - 1; k >= 0; k--)
-                        {
-                            var content = section.Items[k];
-
-                            // Pruefen, ob dieser Content zu den Plaenen gehoert
-                            if (content?.Route != null && planIds.Contains(content.Route))
-                            {
-                                try
-                                {
-                                    section.Items.RemoveAt(k);
-                                }
-                                catch (Exception)
-                                {
-                                    // Faengt MAUI-interne Fehler lautlos ab
-                                }
-                            }
-                        }
-
-                        // Wenn die Sektion leer ist, ebenfalls ueber Index entfernen
-                        if (section.Items.Count == 0)
+                        // Pruefen, ob dieser Content zu den Plaenen gehoert
+                        if (content?.Route != null && planIds.Contains(content.Route))
                         {
                             try
                             {
-                                shellItem.Items.RemoveAt(j);
+                                section.Items.RemoveAt(k);
+                                removedFromSection = true;
                             }
-                            catch { }
+                            catch (Exception)
+                            {
+                                // Faengt MAUI-interne Fehler lautlos ab
+                            }
                         }
                     }
+
+                    if (removedFromSection && section.Items.Count == 0 && !ReferenceEquals(section, shell.CurrentItem?.CurrentItem))
+                        try { shell.Items.RemoveAt(j); } catch { }
                 }
 
                 // Daten im ViewModel komplett leeren

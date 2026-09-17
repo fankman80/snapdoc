@@ -12,7 +12,6 @@ namespace SnapDoc;
 //  Datei-/Projektlisten
 // =====================================================================
 
-/// <summary>Ein Projekt in der Projektliste (OpenProject).</summary>
 public partial class FileItem : ObservableObject
 {
     public required string FileName { get; set; }
@@ -45,11 +44,6 @@ public partial class FileItem : ObservableObject
 //  Plaene
 // =====================================================================
 
-/// <summary>
-/// ViewModel-Wrapper um <see cref="Plan"/> fuer die Planliste im Flyout.
-/// Alle Modellaenderungen - auch die aus dem Cloud-Merge - kommen ueber
-/// <see cref="OnModelPropertyChanged"/> automatisch in der UI an.
-/// </summary>
 public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
 {
     public string PlanId { get; set; } = string.Empty;
@@ -64,8 +58,6 @@ public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
     public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
 
     // --- Modellgebundene Werte --------------------------------------
-
-    /// <summary>Planname - liegt im Modell, damit Umbenennungen aus der Cloud ankommen.</summary>
     public string Title
     {
         get => Model.Name;
@@ -124,11 +116,6 @@ public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
 //  Pins
 // =====================================================================
 
-/// <summary>
-/// ViewModel-Wrapper um <see cref="Pin"/> fuer Pin-Liste und Detailansicht.
-/// Reagiert auf saemtliche Modellaenderungen selbst - ein Messenger-Abo
-/// pro Pin waere bei vielen Pins unnoetig teuer.
-/// </summary>
 public partial class PinItem : ModelItem<Pin>
 {
     public PinItem(Pin pin) : base(pin)
@@ -314,7 +301,6 @@ public partial class PinItem : ModelItem<Pin>
 //  Fotos und Icons
 // =====================================================================
 
-/// <summary>Ein Foto in der Galerie bzw. an einem Pin.</summary>
 public partial class FotoItem : ObservableObject
 {
     [ObservableProperty] public partial ImageSource DisplayImage { get; set; }
@@ -327,15 +313,11 @@ public partial class FotoItem : ObservableObject
     public DateTime DateTime { get; set; }
     public string OnPlanId { get; set; }
     public string OnPinId { get; set; }
-
     public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
-
     public string PlanDisplay =>
         GlobalJson.Data?.Plans != null && GlobalJson.Data.Plans.TryGetValue(OnPlanId, out var plan)
             ? plan.Name
             : "";
-
-    /// <summary>Bild ueber einen Byte-Stream laden - umgeht den MAUI-Bildcache.</summary>
     public void ReloadImage()
     {
         if (string.IsNullOrEmpty(ImagePath) || !File.Exists(ImagePath)) return;
@@ -358,7 +340,6 @@ public partial class FotoItem : ObservableObject
     }
 }
 
-/// <summary>Ein Icon aus der Icon-Galerie.</summary>
 public class IconItem(
     string fileName, string displayName, Point anchorPoint, Size iconSize,
     bool isRotationLocked, bool isAutoScaleLocked, bool isCustomIcon,
@@ -397,7 +378,6 @@ public class IconItem(
 //  Einfache Listen- und Auswahl-Items
 // =====================================================================
 
-/// <summary>Eine PDF-Seite im Import-Dialog.</summary>
 public class PdfItem
 {
     public string ImagePath { get; set; }
@@ -412,7 +392,6 @@ public class PdfItem
     public int FinalHeight { get; set; }
 }
 
-/// <summary>Eine Stilvorlage im Style-Picker.</summary>
 public class StylePickerItem
 {
     public string Text { get; set; }
@@ -425,9 +404,7 @@ public class StylePickerItem
     public float HatchStrokeWitdh { get; set; }
     public float HatchStrokeSpace { get; set; }
     public float HatchRotation { get; set; }
-
-    public double[] StrokeDashArray =>
-        Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
+    public double[] StrokeDashArray => Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
 }
 
 public partial class ColorBoxItem : ObservableObject

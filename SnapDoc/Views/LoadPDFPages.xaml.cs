@@ -92,7 +92,7 @@ public partial class LoadPDFPages : ContentPage
 
                     if (ext == ".pdf")
                     {
-                        // --- A) PDF-VERARBEITUNG ---
+                        // PDF-VERARBEITUNG
                         string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{fileIndex}.pdf");
 
                         using (var sourceStream = await file.OpenReadAsync())
@@ -129,7 +129,7 @@ public partial class LoadPDFPages : ContentPage
                     }
                     else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
                     {
-                        // --- B) BILD-VERARBEITUNG (JPG / PNG) ---
+                        // BILD-VERARBEITUNG (JPG / PNG)
                         string imgBaseName = $"img_{importId}_{fileIndex}";
                         string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                         string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
@@ -308,9 +308,6 @@ public partial class LoadPDFPages : ContentPage
 
     private async Task<List<(string LocalFilePath, string SubFolder)>> ProcessFileOrganizationLogic()
     {
-        // Auswahl auf dem UI-Thread einsammeln - der Zugriff auf
-        // fileListView.ItemsSource aus Task.Run heraus ist auf Android
-        // nicht zulaessig.
         var items = fileListView.ItemsSource?.Cast<PdfItem>()
             .Where(x => x.IsChecked)
             .ToList() ?? [];
@@ -327,8 +324,6 @@ public partial class LoadPDFPages : ContentPage
         await Task.Run(() =>
         {
             // Geraete-ID einmalig anfordern, BEVOR Parallel.For startet.
-            // plan.Touch() liest sie - der erste Preferences-Zugriff soll
-            // nicht aus mehreren Worker-Threads gleichzeitig passieren.
             _ = SyncClock.DeviceId;
 
             string imageDirectory = Path.Combine(
@@ -336,8 +331,7 @@ public partial class LoadPDFPages : ContentPage
                 SettingsService.Instance.ProjectPath,
                 planFolder);
 
-            // Beide Ebenen anlegen: bei einem frisch erstellten Projekt
-            // existiert der Plan-Ordner selbst noch nicht.
+            // Beide Ebenen anlegen: bei einem frisch erstellten Projekt existiert der Plan-Ordner selbst noch nicht.
             Directory.CreateDirectory(imageDirectory);
             Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
@@ -346,12 +340,8 @@ public partial class LoadPDFPages : ContentPage
             Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
                 var item = items[i];
-
-                // Ein einziger Bezeichner fuer Key UND Dateiname - vorher
-                // liefen hier baseName und planId auseinander.
                 string baseName = $"plan_{SyncClock.NewId()}_{i}";
                 string fileName = baseName + ".jpg";
-
                 string destinationFilePath = Path.Combine(imageDirectory, fileName);
                 string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
@@ -411,8 +401,7 @@ public partial class LoadPDFPages : ContentPage
                     try { File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true); } catch { }
                 }
 
-                // Ohne Planbild keinen Eintrag anlegen - sonst entstuende ein
-                // Plan, dessen Datei nie existiert hat.
+                // Ohne Planbild keinen Eintrag anlegen
                 if (!File.Exists(item.ImagePath))
                 {
                     System.Diagnostics.Debug.WriteLine($"Planbild fehlt, Eintrag wird uebersprungen: {item.ImagePath}");

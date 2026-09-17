@@ -27,6 +27,7 @@ public partial class ImageViewPage : IQueryAttributable
     private bool isPanningActive = false;
     private double totalPanX = 0;
     private readonly TransformViewModel fotoContainer;
+    private const double MaxDisplayEdge = 2048;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -169,8 +170,9 @@ public partial class ImageViewPage : IQueryAttributable
                     {
                         if (codec != null)
                         {
-                            FotoContainer.WidthRequest = codec.Info.Width;
-                            FotoContainer.HeightRequest = codec.Info.Height;
+                            var (w, h) = ClampSize(codec.Info.Width, codec.Info.Height);
+                            FotoContainer.WidthRequest = w;
+                            FotoContainer.HeightRequest = h;
                         }
                     }
 
@@ -519,6 +521,7 @@ public partial class ImageViewPage : IQueryAttributable
                     drawingController.Reset();
 
                 drawingView = drawingController.CreateCanvasView();
+                drawingView.IgnorePixelScaling = true;
                 drawingView.Opacity = 0;
                 canvasContainer.Children.Add(drawingView);
 
@@ -724,6 +727,9 @@ public partial class ImageViewPage : IQueryAttributable
 
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
+        if (drawingView == null || drawingView.CanvasSize.Width <= 0 || drawingView.CanvasSize.Height <= 0)
+            return;
+
         SKBitmap fotoBitmap;
     
         using (var fotoStream = File.OpenRead(fotoPath))
@@ -860,9 +866,10 @@ public partial class ImageViewPage : IQueryAttributable
                             double imgWidth = codec.Info.Width;
                             double imgHeight = codec.Info.Height;
 
-                            FotoContainer.WidthRequest = imgWidth;
-                            FotoContainer.HeightRequest = imgHeight;
-                            FitImageToDimensions(imgWidth, imgHeight);
+                            var (w, h) = ClampSize(codec.Info.Width, codec.Info.Height);
+                            FotoContainer.WidthRequest = w;
+                            FotoContainer.HeightRequest = h;
+                            FitImageToDimensions(w, h);
                         }
                     }
                     FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
@@ -943,5 +950,11 @@ public partial class ImageViewPage : IQueryAttributable
 
         // Nach Aufnahmedatum sortieren
         return [.. result.OrderBy(f => f.DateTime)];
+    }
+
+    private static (double W, double H) ClampSize(double w, double h)
+    {
+        var f = Math.Min(1.0, MaxDisplayEdge / Math.Max(w, h));
+        return (Math.Round(w * f), Math.Round(h * f));
     }
 }

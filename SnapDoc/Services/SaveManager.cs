@@ -16,30 +16,23 @@ public static class SaveManager
 {
     private const int MaxSaveRetries = 3;
 
-    /// <summary>Stempel fuer Altprojekte ohne Sync-Metadaten. MUSS auf allen
+    /// <summary>
+    /// Stempel fuer Altprojekte ohne Sync-Metadaten. MUSS auf allen
     /// Geraeten identisch sein, sonst gewinnt zufaellig das Geraet, das zuletzt
-    /// geoeffnet hat.</summary>
-    private static readonly DateTimeOffset LegacySeed =
-        new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
+    /// geoeffnet hat.
+    /// </summary>
+    private static readonly DateTimeOffset LegacySeed = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
     private static readonly ConcurrentDictionary<(string LocalFilePath, string SubFolder), byte> _pendingUploadQueue = new();
     private static readonly ConcurrentDictionary<string, byte> _pendingCloudDeletes = new();
-
     private static readonly Lock _fileLock = new();
     private static readonly Lock _debounceLock = new();
-
-    // Verhindert, dass Debounce-Timer und Cloud-Polling gleichzeitig speichern
     private static readonly SemaphoreSlim _saveGate = new(1, 1);
-
     private static CancellationTokenSource? _pollingCts;
     private static CancellationTokenSource? _debounceCts;
-
     private static DateTime _lastKnownWriteTime;
     private static DateTimeOffset _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
     private static string? _lastKnownETag;
-
     private static string CloudFileName => SettingsService.DefaultJson;
-
     public static string? TargetFolderId { get; set; }
     public static AuthService? CurrentAuth { get; set; }
 
@@ -63,8 +56,6 @@ public static class SaveManager
     /// </summary>
     private static void PrepareLoadedData()
     {
-        // ACHTUNG: beide Aufrufe muessen laufen. Mit "||" wuerde der zweite
-        // uebersprungen, sobald der erste true liefert.
         bool backfilled = BackfillStamps(GlobalJson.Data);
         bool purged = SyncOps.PurgeTombstones(GlobalJson.Data);
 
@@ -75,7 +66,6 @@ public static class SaveManager
     /// <summary>
     /// Setzt fehlende Zeitstempel auf einen festen Seed. Ohne das liefert
     /// SyncClock.Compare ueberall 0 und der Merge uebernimmt nichts.
-    /// Bewusst ohne Touch(), damit jede echte spaetere Aenderung gewinnt.
     /// </summary>
     private static bool BackfillStamps(JsonDataModel? data)
     {
@@ -125,7 +115,6 @@ public static class SaveManager
     // ===============================================================
     //  Cloud-Loeschungen
     // ===============================================================
-
     /// <summary>
     /// Merkt eine Cloud-Datei zum Loeschen vor. Sie wird erst entfernt, wenn
     /// die zugehoerige Tombstone erfolgreich hochgeladen wurde - sonst kennt
@@ -151,15 +140,12 @@ public static class SaveManager
     //  Debounce
     // ===============================================================
 
-    // Standard-Aufruf ohne Dateien (nur JSON sync)
     public static void NotifyDataChanged(int delayMilliseconds = 2000)
         => NotifyDataChanged([], delayMilliseconds);
 
-    // Komfort-Ueberladung fuer eine einzelne Datei
     public static void NotifyDataChanged(string localFilePath, string subFolder, int delayMilliseconds = 2000)
         => NotifyDataChanged([(localFilePath, subFolder)], delayMilliseconds);
 
-    // Hauptmethode fuer mehrere Dateien gleichzeitig
     public static void NotifyDataChanged(IEnumerable<(string LocalFilePath, string SubFolder)> files, int delayMilliseconds = 2000)
     {
         foreach (var (localFilePath, subFolder) in files)
@@ -463,10 +449,7 @@ public static class SaveManager
     {
         if (local == null || cloud == null) return;
 
-        // Ohne das Gate stempelt jede Zuweisung unten das Objekt mit DIESEM
-        // Geraet - empfangene Cloud-Werte gaelten dann als lokale Aenderung.
         using var _ = SyncStampGate.Suspend();
-
         bool titleImageChanged = local.TitleImage != cloud.TitleImage;
         string oldTitleImage = local.TitleImage;
         bool projectDetailsChanged = false;
@@ -517,7 +500,6 @@ public static class SaveManager
         local.Plans ??= [];
         bool planStructureChanged = false;
 
-        // --- Plaene: Vereinigung beider Schluesselmengen ------------------
         foreach (var planId in local.Plans.Keys.Union(cloud.Plans.Keys).ToList())
         {
             bool hasLocal = local.Plans.TryGetValue(planId, out var localPlan);
@@ -525,8 +507,6 @@ public static class SaveManager
 
             // Nur lokal => offline angelegt, der Cloud noch unbekannt.
             // BEHALTEN. Der Upload direkt nach diesem Merge schickt ihn hoch.
-            // Kein planStructureChanged: der Plan ist lokal laengst sichtbar,
-            // sonst wuerde jeder Poll einen kompletten Shell-Reload ausloesen.
             if (hasLocal && !hasCloud)
                 continue;
 
@@ -568,18 +548,16 @@ public static class SaveManager
             planStructureChanged = true;
         }
 
-        // --- UI-Benachrichtigungen ---------------------------------------
         if (projectDetailsChanged)
             WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.ProjectDetailsUpdated));
 
-        // Nur bei echter Strukturaenderung ein Shell-Reload ausloesen
         if (planStructureChanged)
             WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.PlanListUpdated));
     }
 
     private static void MergePlan(string planId, Plan localPlan, Plan cloudPlan)
     {
-        // --- Plan-Eigenschaften: juengerer Stand gewinnt ------------------
+        // Plan-Eigenschaften: juengerer Stand gewinnt
         if (SyncClock.Compare(cloudPlan, localPlan) > 0)
         {
             bool nameOrExportChanged = localPlan.Name != cloudPlan.Name ||
@@ -614,7 +592,7 @@ public static class SaveManager
             }
         }
 
-        // --- Pins: Vereinigung beider Schluesselmengen --------------------
+        // Pins: Vereinigung beider Schluesselmengen
         localPlan.Pins ??= [];
         var cloudPins = cloudPlan.Pins ?? [];
 
@@ -624,7 +602,6 @@ public static class SaveManager
             bool hasCloud = cloudPins.TryGetValue(pinId, out var cloudPin);
 
             // Nur lokal => offline angelegt, noch nicht hochgeladen.
-            // NICHT loeschen - das war der urspruengliche Fehler.
             if (hasLocal && !hasCloud)
                 continue;
 
@@ -670,7 +647,9 @@ public static class SaveManager
             localPlan.PinCount = liveCount;
     }
 
-    /// <summary>Uebertraegt alle Pin-Nutzdaten inkl. Sync-Metadaten.</summary>
+    /// <summary>
+    /// Uebertraegt alle Pin-Nutzdaten inkl. Sync-Metadaten.
+    /// </summary>
     private static void CopyPinValues(Pin target, Pin source)
     {
         target.Anchor = source.Anchor;
@@ -792,13 +771,11 @@ public static class SaveManager
         }
         catch (ODataError ex) when (ex.ResponseStatusCode == 404)
         {
-            // Elternordner existiert nicht - Erstellung waere sinnlos
             Console.WriteLine($"Elternordner nicht gefunden: {parentId}");
             return null;
         }
         catch (Exception ex)
         {
-            // Abruf fehlgeschlagen: NICHT erstellen, sonst drohen Duplikate
             Console.WriteLine($"Ordnerabruf fehlgeschlagen ({folderName}): {ex.Message}");
             return null;
         }
@@ -855,7 +832,6 @@ public static class SaveManager
     //  Cloud-Projekte anlegen / verknuepfen
     // ===============================================================
 
-    // Synchronisiert die aktuelle Datei mit einem bestehenden Ordner in der Cloud.
     public static async Task<bool> SyncWithExistingFolderAsync(string parentFolderId)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
@@ -1457,7 +1433,6 @@ public static class SaveManager
                 meta.Category,
                 isDefaultIcon: false);
 
-            // Exakt derselbe Ablauf wie in PopupIconEdit.OnOkClicked
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), newIconItem);
             IconLookup.AddOrUpdate(newIconItem);
 
@@ -1580,9 +1555,6 @@ public static class SaveManager
             if (baselineMissing || etagChanged)
             {
                 _lastKnownETag = cloudItem.ETag;
-
-                // Auch beim ERSTEN Poll nach Login/Projektstart synchronisieren,
-                // damit Aenderungen aus der Offline-Phase nachgeholt werden.
                 await SyncJsonOnlyFromCloudAsync();
             }
         }
@@ -1692,8 +1664,6 @@ public static class SaveManager
         TargetFolderId = null;
         _lastKnownETag = null;
         _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
-
-        // Wichtig: sonst merged das naechste Projekt gegen einen fremden Zeitstempel
         _lastKnownWriteTime = default;
 
         lock (_debounceLock)
@@ -1716,12 +1686,8 @@ public class RemoteProjectDto
     public string FileName { get; set; } = string.Empty;
     public string DriveId { get; set; } = string.Empty;
     public string FolderId { get; set; } = string.Empty;
-
-    // Aus Object_name im JSON
     public string ObjectName { get; set; } = string.Empty;
-
     public DateTimeOffset LastModified { get; set; }
-
     public string DisplayName =>
         string.IsNullOrWhiteSpace(ObjectName)
         ? Path.GetFileNameWithoutExtension(FileName)

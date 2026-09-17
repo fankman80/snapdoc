@@ -1,7 +1,9 @@
 ﻿#nullable disable
+using Codeuctivity.OpenXmlPowerTools;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
+using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using static SnapDoc.Models.SyncStampExtensions;
@@ -751,6 +753,52 @@ public partial class OpenProject : ContentPage
     /// </summary>
     private static void InvalidateRemoteCache() => _remoteCache = null;
 
+    private async void OnDeleteClicked(object sender, EventArgs e)
+    {
+            var button = sender as Button;
+
+            if (button?.BindingContext is not FileItem item)
+                return;
+
+            var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+            var result1 = await this.ShowPopupAsync<DualPopupResult>(popup1, Settings.PopupOptions);
+
+            if (result1.Result is not DualPopupResult.Ok)
+                return;
+
+            string fullPath = item.FilePath;
+
+            if (string.IsNullOrEmpty(fullPath))
+                return;
+
+            // Nicht der Dateiname entscheidet, sondern ob es das geladene Projekt ist
+            bool isCurrentProject = item.IsActive;
+
+            // Tile-Cache nur loeschen, solange GlobalJson.Data noch das Projekt haelt
+            if (isCurrentProject)
+                DeleteTileCacheForProject();
+
+            // Loesche das Projektverzeichnis und alle enthaltenen Dateien
+            string projectDirectoryPath = Path.GetDirectoryName(fullPath);
+            if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
+                Directory.Delete(projectDirectoryPath, true);
+
+            // Aktives Projekt entladen - aber auf der Projektliste bleiben
+            if (isCurrentProject)
+            {
+                SaveManager.ResetCloudSync();
+                SettingsService.Instance.IsProjectLoaded = false;
+                SettingsService.Instance.ProjectPath = null;
+                LoadDataToView.ResetData();
+                GlobalJson.Data = new JsonDataModel();
+                GlobalJson.UpdateFilePath(null);
+                ProjectItem.Current.Attach(GlobalJson.Data);
+            }
+
+            InvalidateRemoteCache();
+            LoadJsonFiles();
+    }
+
     private async void OnEditClicked(object sender, EventArgs e)
     {
         if (_isProcessing)
@@ -765,7 +813,7 @@ public partial class OpenProject : ContentPage
             if (button?.BindingContext is not FileItem item)
                 return;
 
-            var _popup = new PopupProjectEdit(entry: item.FileName, isActive: item.IsActive);
+            var _popup = new PopupProjectEdit();
             var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
 
             if (_result == null || string.IsNullOrEmpty(_result.Result))
@@ -773,45 +821,6 @@ public partial class OpenProject : ContentPage
 
             switch (_result.Result)
             {
-                case "Delete":
-                    await Task.Delay(200);
-
-                    var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-                    var result1 = await this.ShowPopupAsync<DualPopupResult>(popup1, Settings.PopupOptions);
-
-                    if (result1.Result is DualPopupResult.Ok)
-                    {
-                        string fullPath = item.FilePath;
-
-                        if (string.IsNullOrEmpty(fullPath)) return;
-
-                        string projectDirectoryPath = Path.GetDirectoryName(fullPath);
-                        string fileName = Path.GetFileName(fullPath);
-
-                        bool isCurrentProject = !string.IsNullOrEmpty(fileName) &&
-                                                 fileName.Equals(SettingsService.DefaultJson, StringComparison.OrdinalIgnoreCase);
-
-                        // Loesche das Projektverzeichnis und alle enthaltenen Dateien
-                        if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
-                            Directory.Delete(projectDirectoryPath, true);
-
-                        // Loesche Plan-Tiles aus dem Cache-Ordner
-                        DeleteTileCacheForProject();
-
-                        // Wenn das geloeschte Projekt das aktuell geladene ist,
-                        // zurueck zum Homescreen navigieren und Daten zuruecksetzen
-                        if (isCurrentProject)
-                        {
-                            await Shell.Current.GoToAsync("//homescreen");
-                            SettingsService.Instance.IsProjectLoaded = false;
-                            LoadDataToView.ResetData();
-                            ProjectItem.Current.Attach(GlobalJson.Data);
-                        }
-                        InvalidateRemoteCache();
-                        LoadJsonFiles();
-                    }
-                    break;
-
                 case "Zip":
                     await Task.Delay(200);
 
@@ -889,40 +898,12 @@ public partial class OpenProject : ContentPage
 
                     SettingsService.Instance.IsProjectLoaded = true;
                     LoadDataToView.ResetData();
-
                     SaveManager.Initialize(item.FilePath);
-
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
                     ProjectItem.Current.Attach(GlobalJson.Data);
                     InvalidateRemoteCache();
+
                     await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
-                    break;
-
-                case null:
-                    break;
-
-                default:
-                    var currentFilePath = item.FilePath;
-
-                    if (File.Exists(currentFilePath))
-                    {
-                        GlobalJson.LoadFromFile(currentFilePath);
-                        GlobalJson.Data.Object_name = _result.Result;
-                        GlobalJson.SaveToFile();
-
-                        SaveManager.NotifyDataChanged();
-
-                        // Wenn das umbenannte Projekt gerade aktiv ist, Header aktualisieren
-                        if (item.IsActive)
-                        {
-                            LoadDataToView.ResetData();
-                            GlobalJson.LoadFromFile(currentFilePath);
-                            LoadDataToView.LoadData(new FileResult(currentFilePath));
-                            ProjectItem.Current.Attach(GlobalJson.Data);
-                        }
-
-                        LoadJsonFiles();
-                    }
                     break;
             }
         }

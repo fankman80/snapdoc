@@ -76,34 +76,36 @@
                     <Border StrokeThickness="1"
                             Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                             StrokeShape="RoundRectangle 4">
-                        <Grid ColumnDefinitions="66,*,Auto"
+                        <Grid ColumnDefinitions="66,*,Auto,Auto"
                               RowDefinitions="25,37"
-                              ColumnSpacing="8"
+                              ColumnSpacing="0"
                               RowSpacing="4"
                               Opacity="{Binding DisplayOpacity}">
                             <Grid.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnProjectClicked" />
                             </Grid.GestureRecognizers>
-                            <Border Grid.Column="0" Grid.ColumnSpan="3" Grid.RowSpan="2"
+                            <Border Grid.Column="0" Grid.ColumnSpan="4" Grid.RowSpan="2"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                     Opacity="0.1"
                                     IsVisible="{Binding IsActive}" />
                             <Label Grid.Column="1" Grid.Row="0"
-                                    VerticalTextAlignment="Center"
-                                    MaxLines="1"
-                                    LineBreakMode="TailTruncation"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                    Text="{Binding FileName}"/>
+                                   Margin="8,0,0,0"
+                                   VerticalTextAlignment="Center"
+                                   MaxLines="1"
+                                   LineBreakMode="TailTruncation"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                                   Text="{Binding FileName}"/>
                             <Label Grid.Column="1" Grid.Row="1"
-                                    FontSize="12"
-                                    VerticalTextAlignment="Center"
-                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                    FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
-                                    Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
+                                   Margin="8,0,0,0"
+                                   FontSize="12"
+                                   VerticalTextAlignment="Center"
+                                   TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                   FontAttributes="{Binding IsActive, Converter={StaticResource BoolToFontAttributesConverter}}"
+                                   Text="{Binding FileDate, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"/>
                             <Image Grid.Column="0" Grid.RowSpan="2"
-                                    Source="{Binding ThumbnailPath}"
-                                    Aspect="AspectFill"/>      
+                                   Source="{Binding ThumbnailPath}"
+                                   Aspect="AspectFill"/>
                             <Border Grid.Column="0" Grid.RowSpan="2"
                                     IsVisible="{Binding HasCloudSync}"
                                     HorizontalOptions="Start"
@@ -116,13 +118,14 @@
                                     StrokeShape="RoundRectangle 13"
                                     BackgroundColor="White">
                                 <Label Text="{x:Static local:MaterialIcons.Cloud}"
-                                        FontSize="16"
-                                        FontFamily="MaterialOutlined"
-                                        TextColor="{DynamicResource Primary}"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="Center"/>
+                                       FontSize="16"
+                                       FontFamily="MaterialOutlined"
+                                       TextColor="{DynamicResource Primary}"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center"/>
                             </Border>
                             <Button Grid.Column="2" Grid.RowSpan="2"
+                                    IsVisible="{Binding IsActive}"
                                     IsEnabled="{Binding IsSyncChecked}"
                                     Padding="0"
                                     HorizontalOptions="Start"
@@ -170,6 +173,16 @@
                                     </VisualStateGroupList>
                                 </VisualStateManager.VisualStateGroups>
                             </Button>
+                            <Button Grid.Column="3" Grid.RowSpan="2"                                   
+                                    Padding="0"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    Text="{x:Static local:MaterialIcons.Delete}"
+                                    FontSize="30"
+                                    FontFamily="MaterialOutlined"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    Clicked="OnDeleteClicked"/>
                         </Grid>
                     </Border>
                 </DataTemplate>
