@@ -19,6 +19,9 @@ public partial class FileItem : ObservableObject
     public required string FilePath { get; set; }
     public required DateTime FileDate { get; set; }
 
+    [System.Text.Json.Serialization.JsonIgnore]
+    public JsonDataModel CachedData { get; set; }
+
     [ObservableProperty] public partial string ImagePath { get; set; }
     [ObservableProperty] public partial string ThumbnailPath { get; set; }
     [ObservableProperty] public partial bool HasCloudSync { get; set; }
