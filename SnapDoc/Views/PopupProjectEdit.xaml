@@ -14,14 +14,6 @@
     <Grid Padding="6"
           WidthRequest="320">
         <VerticalStackLayout HorizontalOptions="Fill">
-            <controls:BorderedEntry
-                    x:Name="text_entry"
-                    Placeholder="{x:Static res:AppResources.projekt_titel}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-
             <Button Text="{x:Static res:AppResources.zip_exportieren}"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
