@@ -662,12 +662,15 @@ public partial class ImageViewPage : IQueryAttributable
                 if (File.Exists(imgPath))
                     File.Delete(imgPath);
                 File.Move(origPath, imgPath);
-
+                
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-
+                
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
+                
+                // Cloud-Original entfernen, da lokal bereits zurückkopiert
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/originals/{ImgSource}");
             }
             else
             {
@@ -679,7 +682,7 @@ public partial class ImageViewPage : IQueryAttributable
 
                 // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
-
+                
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
@@ -700,7 +703,8 @@ public partial class ImageViewPage : IQueryAttributable
             // Geaenderte Foto- und Thumbnail-Dateien fuer den Sync registrieren
             SaveManager.NotifyDataChanged([
                 (imgPath, GlobalJson.Data.ImagePath),
-                (thumbPath, GlobalJson.Data.ThumbnailPath)
+                (thumbPath, GlobalJson.Data.ThumbnailPath),
+                (origPath, $"{GlobalJson.Data.ImagePath}/originals")
             ]);
         }
 
