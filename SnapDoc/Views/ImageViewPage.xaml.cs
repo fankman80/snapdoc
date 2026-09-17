@@ -521,7 +521,7 @@ public partial class ImageViewPage : IQueryAttributable
                     drawingController.Reset();
 
                 drawingView = drawingController.CreateCanvasView();
-                drawingView.IgnorePixelScaling = true;
+                drawingView.IgnorePixelScaling = false;
                 drawingView.Opacity = 0;
                 canvasContainer.Children.Add(drawingView);
 
