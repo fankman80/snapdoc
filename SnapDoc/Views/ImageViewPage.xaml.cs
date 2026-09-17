@@ -37,9 +37,9 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly float hatchStrokeWitdh = 2f;
     private readonly float hatchStrokeSpace = 8f;
     private readonly float hatchRotation = 45f;
-    private int lineWidth = 8;
+    private int lineWidth = 3;
     private string strokeStyle = "";
-    private float cloudRadius = 60;
+    private float cloudRadius = 20;
     private float cloudInciseDeg = 15;
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
