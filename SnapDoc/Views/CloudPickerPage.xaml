@@ -43,7 +43,7 @@
                         FontFamily="MaterialOutlined"
                         Text="{x:Static local:MaterialIcons.Info}"
                         FontSize="24"
-                        TextColor="{DynamicResource Primary}"
+                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                         VerticalOptions="Center" />
                 <Label Grid.Column="1"
                         x:DataType="views:CloudPickerPage"
@@ -122,7 +122,7 @@
                                    Text="{Binding Icon}"
                                    FontFamily="MaterialOutlined"
                                    FontSize="28"
-                                   TextColor="{DynamicResource Primary}"
+                                   TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                    VerticalOptions="Center"/>
                             <!-- Name -->
                             <VerticalStackLayout Grid.Column="1"
