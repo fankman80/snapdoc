@@ -482,6 +482,7 @@ public partial class OpenProject : ContentPage
         LoadDataToView.ResetData();
 
         GlobalJson.CreateNewFile(filePath);
+        GlobalJson.LoadFromFile(filePath);
 
         GlobalJson.Data.Client_name = "";
         GlobalJson.Data.Object_address = "";
@@ -497,16 +498,12 @@ public partial class OpenProject : ContentPage
         GlobalJson.Data.TitleImage = "banner_thumbnail.png";
 
         SettingsService.Instance.IsProjectLoaded = true;
+        SettingsService.Instance.ProjectPath = _result; 
 
-        GlobalJson.LoadFromFile(filePath);
         LoadDataToView.LoadData(new FileResult(filePath));
         ProjectItem.Current.Attach(GlobalJson.Data);
-
-        // save data to file
         SaveManager.NotifyDataChanged();
-
         LoadJsonFiles();
-
         await Shell.Current.GoToAsync("project_details");
 
 #if ANDROID || IOS
@@ -886,7 +883,10 @@ public partial class OpenProject : ContentPage
                     }
 
                     if (item.HasCloudSync)
-                        return;
+                    {
+                        await SnackbarExtensions.ShowSafeAsync("Das Projekt ist bereits synchronisiert.", includeDelay: true);
+                        return; 
+                    }
 
                     if (FileListView.ItemsSource is IEnumerable<FileItem> items)
                     {
@@ -895,8 +895,10 @@ public partial class OpenProject : ContentPage
                     }
 
                     item.IsActive = true;
-
                     SettingsService.Instance.IsProjectLoaded = true;
+    
+                    SettingsService.Instance.ProjectPath = Path.GetFileName(Path.GetDirectoryName(item.FilePath));
+
                     LoadDataToView.ResetData();
                     SaveManager.Initialize(item.FilePath);
                     LoadDataToView.LoadData(new FileResult(item.FilePath));
