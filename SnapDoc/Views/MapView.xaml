@@ -93,7 +93,10 @@
                 VerticalOptions="Start"
                 Clicked="OnRulerClicked">
             <Button.Shadow>
-                <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                <Shadow Brush="Black"
+                        Offset="{OnPlatform Android='0,4', Default='0,3'}"
+                        Radius="{OnPlatform Android=8, Default=6}"
+                        Opacity="{OnPlatform Android=0.4, Default=0.4}" />
             </Button.Shadow>
         </Button>
 
@@ -116,7 +119,10 @@
                     SelectedIndexChanged="OnLayerChanged">
             </Picker>
             <Border.Shadow>
-                <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                <Shadow Brush="Black"
+                        Offset="{OnPlatform Android='0,4', Default='0,3'}"
+                        Radius="{OnPlatform Android=8, Default=6}"
+                        Opacity="{OnPlatform Android=0.4, Default=0.4}" />
             </Border.Shadow>            
         </Border>
 
@@ -124,27 +130,33 @@
                              HorizontalOptions="End"
                              VerticalOptions="End"
                              Spacing="16"
-                             Padding="20">
+                             Padding="16">
             <Button Text="{x:Static local:MaterialIcons.Add_location_alt}"
                     HorizontalOptions="End"
                     Style="{StaticResource ToolButtonStyle}"
                     Clicked="SetPinClicked">
                 <Button.Shadow>
-                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                    <Shadow Brush="Black"
+                        Offset="{OnPlatform Android='0,4', Default='0,3'}"
+                        Radius="{OnPlatform Android=8, Default=6}"
+                        Opacity="{OnPlatform Android=0.4, Default=0.4}" />
                 </Button.Shadow>
             </Button>
             <Border x:Name="SetPosBtn"
                     IsVisible="False"
                     Padding="10,10,14,10"
-                    HeightRequest="60"
+                    HeightRequest="54"
                     StrokeThickness="0"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    StrokeShape="RoundRectangle 30">
+                    BackgroundColor="{DynamicResource Primary}"
+                    StrokeShape="RoundRectangle 27">
                 <Border.GestureRecognizers>
                     <TapGestureRecognizer Tapped="SetPosClicked"/>
                 </Border.GestureRecognizers>
                 <Border.Shadow>
-                    <Shadow Brush="Black" Opacity="0.4" Offset="2,2" Radius="3"/>
+                    <Shadow Brush="Black"
+                        Offset="{OnPlatform Android='0,4', Default='0,3'}"
+                        Radius="{OnPlatform Android=8, Default=6}"
+                        Opacity="{OnPlatform Android=0.4, Default=0.4}" />
                 </Border.Shadow>
                 <Grid ColumnDefinitions="Auto,*"
                       ColumnSpacing="6"
