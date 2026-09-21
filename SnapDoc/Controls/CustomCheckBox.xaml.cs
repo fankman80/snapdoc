@@ -47,7 +47,7 @@ public partial class CustomCheckBox : ContentView
         nameof(BorderThickness), typeof(double), typeof(CustomCheckBox), 1.5);
 
     public static readonly BindableProperty BoxSizeProperty = BindableProperty.Create(
-        nameof(BoxSize), typeof(double), typeof(CustomCheckBox), 24.0,
+        nameof(BoxSize), typeof(double), typeof(CustomCheckBox), 26.0,
         propertyChanged: OnBoxSizeChanged);
 
     public static readonly BindableProperty SpacingProperty = BindableProperty.Create(
@@ -66,14 +66,14 @@ public partial class CustomCheckBox : ContentView
         nameof(FontSize), typeof(double), typeof(CustomCheckBox), Label.FontSizeProperty.DefaultValue);
 
     public static readonly BindableProperty CheckGlyphProperty = BindableProperty.Create(
-        nameof(CheckGlyph), typeof(string), typeof(CustomCheckBox), "\u2713"); // ✓
+        nameof(CheckGlyph), typeof(string), typeof(CustomCheckBox), MaterialIcons.Check_small);
 
     public static readonly BindableProperty CheckGlyphFontFamilyProperty = BindableProperty.Create(
-        nameof(CheckGlyphFontFamily), typeof(string), typeof(CustomCheckBox), null,
+        nameof(CheckGlyphFontFamily), typeof(string), typeof(CustomCheckBox), "MaterialOutlined",
         propertyChanged: OnVisualStateChanged);
-
+    
     public static readonly BindableProperty CheckGlyphScaleProperty = BindableProperty.Create(
-        nameof(CheckGlyphScale), typeof(double), typeof(CustomCheckBox), 0.62,
+        nameof(CheckGlyphScale), typeof(double), typeof(CustomCheckBox), 0.95,
         propertyChanged: OnVisualStateChanged);
 
     public static readonly BindableProperty AnimateProperty = BindableProperty.Create(
@@ -169,10 +169,9 @@ public partial class CustomCheckBox : ContentView
 
         GlyphLabel.TextColor = CheckColor;
         GlyphLabel.FontSize = BoxSize * CheckGlyphScale;
-        GlyphLabel.FontAttributes = FontAttributes.Bold;
-        if (!string.IsNullOrEmpty(CheckGlyphFontFamily))
-            GlyphLabel.FontFamily = CheckGlyphFontFamily;
-
+        GlyphLabel.FontAttributes = string.IsNullOrEmpty(CheckGlyphFontFamily)
+            ? FontAttributes.Bold
+            : FontAttributes.None;
         TextLabel.Opacity = IsEnabledCheck ? 1.0 : 0.5;
 
         if (animated)
