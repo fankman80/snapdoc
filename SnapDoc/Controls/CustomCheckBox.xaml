@@ -28,7 +28,8 @@
 
             <!-- Häkchen -->
             <Label x:Name="GlyphLabel"
-                   Text="{Binding CheckGlyph, Source={x:Reference this}}"
+                   Text="{x:Static local:MaterialIcons.Check}"
+                   FontFamily="MaterialOutlined"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    Opacity="0" />
