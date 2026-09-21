@@ -2,6 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:viewmodels="clr-namespace:SnapDoc.ViewModels"
@@ -75,16 +76,26 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PdfItem">
-                        <VerticalStackLayout BackgroundColor="Gray" Spacing="0">
+                        <Grid BackgroundColor="Gray">
                             <Image Source="{Binding PreviewPath}"
                                    Aspect="AspectFit"
                                    HorizontalOptions="Center"
-                                   VerticalOptions="Center"/>
-                            <CheckBox IsChecked="{Binding IsChecked}"
-                                      Color="{DynamicResource Primary}"
-                                      VerticalOptions="End"
-                                      HorizontalOptions="End"/>
-                        </VerticalStackLayout>
+                                   VerticalOptions="Center" />
+                            <controls:CustomCheckBox IsChecked="{Binding IsChecked}"
+                                                     BoxSize="30"
+                                                     BorderThickness="2"
+                                                     Spacing="0"
+                                                     ControlPadding="0"
+                                                     BorderColor="White"
+                                                     UncheckedBackgroundColor="#33000000"
+                                                     CheckedBackgroundColor="{DynamicResource Primary}"
+                                                     CheckedBorderColor="White"
+                                                     CheckColor="White"
+                                                     CheckGlyphScale="0.55"
+                                                     HorizontalOptions="Start"
+                                                     VerticalOptions="Start"
+                                                     Margin="8" />
+                        </Grid>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
