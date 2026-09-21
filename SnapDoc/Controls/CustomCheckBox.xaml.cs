@@ -65,15 +65,8 @@ public partial class CustomCheckBox : ContentView
     public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(
         nameof(FontSize), typeof(double), typeof(CustomCheckBox), Label.FontSizeProperty.DefaultValue);
 
-    public static readonly BindableProperty CheckGlyphProperty = BindableProperty.Create(
-        nameof(CheckGlyph), typeof(string), typeof(CustomCheckBox), MaterialIcons.Check_small);
-
-    public static readonly BindableProperty CheckGlyphFontFamilyProperty = BindableProperty.Create(
-        nameof(CheckGlyphFontFamily), typeof(string), typeof(CustomCheckBox), "MaterialOutlined",
-        propertyChanged: OnVisualStateChanged);
-    
     public static readonly BindableProperty CheckGlyphScaleProperty = BindableProperty.Create(
-        nameof(CheckGlyphScale), typeof(double), typeof(CustomCheckBox), 0.95,
+        nameof(CheckGlyphScale), typeof(double), typeof(CustomCheckBox), 0.7,
         propertyChanged: OnVisualStateChanged);
 
     public static readonly BindableProperty AnimateProperty = BindableProperty.Create(
@@ -102,8 +95,6 @@ public partial class CustomCheckBox : ContentView
     public string Text { get => (string)GetValue(TextProperty); set => SetValue(TextProperty, value); }
     public string FontFamily { get => (string)GetValue(FontFamilyProperty); set => SetValue(FontFamilyProperty, value); }
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
-    public string CheckGlyph { get => (string)GetValue(CheckGlyphProperty); set => SetValue(CheckGlyphProperty, value); }
-    public string CheckGlyphFontFamily { get => (string)GetValue(CheckGlyphFontFamilyProperty); set => SetValue(CheckGlyphFontFamilyProperty, value); }
     public double CheckGlyphScale { get => (double)GetValue(CheckGlyphScaleProperty); set => SetValue(CheckGlyphScaleProperty, value); }
     public bool Animate { get => (bool)GetValue(AnimateProperty); set => SetValue(AnimateProperty, value); }
     public ICommand Command { get => (ICommand)GetValue(CommandProperty); set => SetValue(CommandProperty, value); }
@@ -169,9 +160,6 @@ public partial class CustomCheckBox : ContentView
 
         GlyphLabel.TextColor = CheckColor;
         GlyphLabel.FontSize = BoxSize * CheckGlyphScale;
-        GlyphLabel.FontAttributes = string.IsNullOrEmpty(CheckGlyphFontFamily)
-            ? FontAttributes.Bold
-            : FontAttributes.None;
         TextLabel.Opacity = IsEnabledCheck ? 1.0 : 0.5;
 
         if (animated)
