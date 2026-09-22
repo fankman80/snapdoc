@@ -47,6 +47,7 @@ public static class MauiProgram
                 fonts.AddFont("OpenSans-Italic.ttf", "OpenSansItalic");
                 fonts.AddFont("OpenSans-BoldItalic.ttf", "OpenSansBoldItalic");
                 fonts.AddFont("MaterialSymbolsOutlined-Light.ttf", "MaterialOutlined");
+                fonts.AddFont("MaterialSymbolsOutlined-Regular.ttf", "MaterialOutlinedRegular");
             });
 
         builder.Services.AddSingleton<AuthService>();
