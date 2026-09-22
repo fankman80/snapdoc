@@ -30,7 +30,7 @@
             <!-- Häkchen -->
             <Label x:Name="GlyphLabel"
                    Text="{x:Static local:MaterialIcons.Check}"
-                   FontFamily="MaterialOutlined"
+                   FontFamily="MaterialOutlinedRegular"
                    HorizontalOptions="Center"
                    VerticalOptions="Center"
                    Opacity="0" />
