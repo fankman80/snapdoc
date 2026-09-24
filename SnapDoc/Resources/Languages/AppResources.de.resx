@@ -165,8 +165,8 @@
   <data name="foto_breite" xml:space="preserve">
     <value>Foto (Breite)</value>
   </data>
-  <data name="alle_fotos" xml:space="preserve">
-    <value>Alle Fotos</value>
+  <data name="fotos" xml:space="preserve">
+    <value>Fotos</value>
   </data>
   <data name="foto_loeschen" xml:space="preserve">
     <value>Foto löschen</value>
@@ -213,8 +213,8 @@
   <data name="pdf_seiten_hinzufügen" xml:space="preserve">
     <value>Pläne aus PDF oder JPG/PNG hinzufügen</value>
   </data>
-  <data name="pin_liste" xml:space="preserve">
-    <value>Pin Liste</value>
+  <data name="pins" xml:space="preserve">
+    <value>Pins</value>
   </data>
   <data name="pinbeschriftung" xml:space="preserve">
     <value>Pinbeschriftung</value>
