@@ -178,15 +178,15 @@ public partial class CustomCheckBox : ContentView
             GlyphLabel.Scale = 0.6;
             GlyphLabel.Opacity = 0;
             await Task.WhenAll(
-                GlyphLabel.FadeTo(1, 120, Easing.CubicOut),
-                GlyphLabel.ScaleTo(1.15, 110, Easing.CubicOut));
-            await GlyphLabel.ScaleTo(1.0, 80, Easing.CubicIn);
+                GlyphLabel.FadeToAsync(1, 120, Easing.CubicOut),
+                GlyphLabel.ScaleToAsync(1.15, 110, Easing.CubicOut));
+            await GlyphLabel.ScaleToAsync(1.0, 80, Easing.CubicIn);
         }
         else
         {
             await Task.WhenAll(
-                GlyphLabel.FadeTo(0, 100, Easing.CubicIn),
-                GlyphLabel.ScaleTo(0.6, 100, Easing.CubicIn));
+                GlyphLabel.FadeToAsync(0, 100, Easing.CubicIn),
+                GlyphLabel.ScaleToAsync(0.6, 100, Easing.CubicIn));
         }
     }
 
@@ -197,8 +197,8 @@ public partial class CustomCheckBox : ContentView
 
         if (Animate)
         {
-            await BoxBorder.ScaleTo(0.88, 60, Easing.CubicOut);
-            await BoxBorder.ScaleTo(1.0, 60, Easing.CubicIn);
+            await BoxBorder.ScaleToAsync(0.88, 60, Easing.CubicOut);
+            await BoxBorder.ScaleToAsync(1.0, 60, Easing.CubicIn);
         }
 
         IsChecked = !IsChecked;
