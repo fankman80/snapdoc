@@ -504,9 +504,6 @@
   <data name="pins" xml:space="preserve">
     <value>Pins</value>
   </data>
-  <data name="fotos" xml:space="preserve">
-    <value>Images</value>
-  </data>
   <data name="farben_hinzufuegen" xml:space="preserve">
     <value>Add colors</value>
   </data>
