@@ -27,6 +27,7 @@ public static class MauiProgram
         var builder = MauiApp.CreateBuilder();
         builder
             .UseMauiApp<App>()
+            .UseMauiCommunityToolkitCamera()
             .UseMauiCommunityToolkit(options => { options.SetShouldEnableSnackbarOnWindows(false); }) // Setze auf true, wenn CommunityToolkit Issue #3276 gefixt wurde
             .UseSkiaSharp()
             .UseSentry(options =>
