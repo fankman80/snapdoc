@@ -6,7 +6,7 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
-             x:Class="SnapDoc.Views.CameraView"
+             x:Class="SnapDoc.Views.CameraPage"
              x:DataType="views:CameraPage"
              Shell.NavBarIsVisible="False">
 
