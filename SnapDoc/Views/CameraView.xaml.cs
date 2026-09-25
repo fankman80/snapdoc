@@ -11,13 +11,10 @@ public partial class CameraView : ContentPage
     private Size _optimalSize;
     private double _userSelectedRatio = SettingsService.Instance.CaptureRatio;
     private FlashMode _currentFlashMode = (FlashMode)SettingsService.Instance.FlashMode;
-
     private bool _isZoomSupported = false;
     private bool _suppressZoomEvents = false;
     private bool _isRatioPickerExpanded = false;
     private CancellationTokenSource? _zoomTimerCts;
-
-    // Start-Gating: die Kamera darf erst starten, wenn BEIDE Bedingungen erfuellt sind.
     private bool _camerasReady = false;
     private bool _sizeReady = false;
     private bool _isStarted = false;
