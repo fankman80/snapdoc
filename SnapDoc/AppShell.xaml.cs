@@ -51,7 +51,7 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("pinList", typeof(PinList));
         Routing.RegisterRoute("exportSettings", typeof(ExportSettings));
         Routing.RegisterRoute("xmleditor", typeof(EditorView));
-        Routing.RegisterRoute("cameraView", typeof(CameraView));
+        Routing.RegisterRoute("cameraPage", typeof(CameraPage));
         Routing.RegisterRoute("generalmapview", typeof(MapView));
         Routing.RegisterRoute("cloudPickerPage", typeof(CloudPickerPage));
 
