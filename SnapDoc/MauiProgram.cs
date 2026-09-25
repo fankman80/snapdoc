@@ -50,7 +50,6 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddTransient<HomeScreen>();
-        builder.UseMauiCameraView();
         
 #if IOS || MACCATALYST
         builder.ConfigureMauiHandlers(handlers =>
