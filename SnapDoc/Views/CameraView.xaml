@@ -14,10 +14,10 @@
             <TapGestureRecognizer Tapped="OnContainerTapped" />
         </Grid.GestureRecognizers>
 
-        <Grid x:Name="CameraContainer" 
-              HorizontalOptions="Fill" 
-              VerticalOptions="Fill" 
-              BackgroundColor="Black">
+        <Grid x:Name="cameraFrame"
+              IsClippedToBounds="True"
+              HorizontalOptions="Center"
+              VerticalOptions="Center">
             <cv:CameraView x:Name="cameraView"
                            HorizontalOptions="Center"
                            VerticalOptions="Center"/>
