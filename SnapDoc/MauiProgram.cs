@@ -1,6 +1,5 @@
 ﻿using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Storage;
-using Camera.MAUI;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
 using SnapDoc.Views;
