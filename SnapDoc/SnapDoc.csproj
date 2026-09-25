@@ -103,6 +103,7 @@
     </ItemGroup>
 
 	<ItemGroup>
+        <PackageReference Include="CommunityToolkit.Maui.Camera" Version="6.1.0" />
 		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.621" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
