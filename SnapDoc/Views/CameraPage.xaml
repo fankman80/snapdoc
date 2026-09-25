@@ -7,7 +7,7 @@
              xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Views.CameraView"
-             x:DataType="views:CameraView"
+             x:DataType="views:CameraPage"
              Shell.NavBarIsVisible="False">
 
     <Grid HorizontalOptions="Fill" VerticalOptions="Fill" BackgroundColor="Black">
