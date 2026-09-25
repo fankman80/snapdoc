@@ -104,7 +104,6 @@
 
 	<ItemGroup>
         <PackageReference Include="CommunityToolkit.Maui.Camera" Version="6.1.0" />
-		<PackageReference Include="CameraMaui" Version="1.4.14" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.621" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="15.0.1" />
@@ -203,7 +202,7 @@
 		</MauiXaml>
 		<MauiXaml Update="Controls\RangeSlider.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Controls\CustomRadioPicker.xaml" Generator="MSBuild:Compile" />
-		<MauiXaml Update="Views\CameraView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\CameraPage.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\CloudPickerPage.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
