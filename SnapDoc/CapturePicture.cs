@@ -36,7 +36,7 @@ public class CapturePicture
 
             static async Task<FileResult> OpenCustomCamera()
             {
-                await Shell.Current.GoToAsync("cameraView");
+                await Shell.Current.GoToAsync("cameraPage");
                 return await CameraResultService.WaitForCaptureAsync();
             }
 
