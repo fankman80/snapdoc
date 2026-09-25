@@ -7,7 +7,7 @@ using System.Diagnostics;
 
 namespace SnapDoc.Views;
 
-public partial class CameraView : ContentPage
+public partial class CameraPage : ContentPage
 {
     private string? _tempFilePath = string.Empty;
 
@@ -26,7 +26,7 @@ public partial class CameraView : ContentPage
     // der aufrufende Klick-Handler darueber wieder zusammengefuehrt.
     private TaskCompletionSource<Stream?>? _captureTcs;
 
-    public CameraView()
+    public CameraPage()
     {
         InitializeComponent();
     }
