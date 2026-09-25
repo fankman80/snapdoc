@@ -501,9 +501,6 @@
   <data name="projekte" xml:space="preserve">
     <value>Projekte</value>
   </data>
-  <data name="pins" xml:space="preserve">
-    <value>Pins</value>
-  </data>
   <data name="farben_hinzufuegen" xml:space="preserve">
     <value>Farben hinzufügen</value>
   </data>
