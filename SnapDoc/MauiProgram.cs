@@ -4,9 +4,7 @@ using Camera.MAUI;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
 using SnapDoc.Views;
-
 using SnapDoc.Services;
-
 
 #if WINDOWS
 using Microsoft.Maui.LifecycleEvents;
