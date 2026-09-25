@@ -178,15 +178,6 @@ public partial class CameraView : ContentPage
 #endif
     }
 
-    /// <summary>
-    /// Das Seitenverhaeltnis, das die Preview tatsaechlich liefert.
-    /// </summary>
-    private double GetPreviewRatio()
-    {
-        if (_optimalSize.Width <= 0 || _optimalSize.Height <= 0) return 4.0 / 3.0;
-        return NormalizeRatio(_optimalSize.Width, _optimalSize.Height);
-    }
-
     private async Task RestartPreview(Size? specificSize = null)
     {
         try
@@ -213,61 +204,36 @@ public partial class CameraView : ContentPage
         }
     }
 
-    /// <summary>
-    /// Zwei Ebenen:
-    /// 1. cameraFrame wird auf das vom Benutzer gewaehlte Seitenverhaeltnis gesetzt
-    ///    und clippt seinen Inhalt. Das ist der sichtbare Bildausschnitt.
-    /// 2. cameraView wird auf das Verhaeltnis der Preview gesetzt und so skaliert,
-    ///    dass es den Rahmen vollstaendig ausfuellt (Aspect-Fill). Der Ueberstand
-    ///    wird vom Rahmen abgeschnitten - optisch identisch zu CropToRatio.
-    /// Stimmen beide Verhaeltnisse ueberein (iOS/Windows), passiert kein Zuschnitt.
-    /// </summary>
     private void UpdateCameraLayout(double width, double height)
     {
         if (cameraView?.Camera == null || _optimalSize.Width <= 0) return;
         if (width <= 0 || height <= 0) return;
 
         bool isPortrait = height > width;
-
-        double previewRatio = GetPreviewRatio();
         double userRatio = ResolveUserRatio();
+        double target = isPortrait ? (1 / userRatio) : userRatio;
 
-        double frameTarget = isPortrait ? (1 / userRatio) : userRatio;
-        double previewTarget = isPortrait ? (1 / previewRatio) : previewRatio;
-
-        // 1. Rahmen in den verfuegbaren Platz einpassen (Contain).
-        double frameWidth, frameHeight;
-        if ((width / height) > frameTarget)
+        // Rahmen in den verfuegbaren Platz einpassen (Contain).
+        double finalWidth, finalHeight;
+        if ((width / height) > target)
         {
-            frameHeight = height;
-            frameWidth = height * frameTarget;
+            finalHeight = height;
+            finalWidth = height * target;
         }
         else
         {
-            frameWidth = width;
-            frameHeight = width / frameTarget;
-        }
-
-        // 2. Preview so skalieren, dass sie den Rahmen sicher ueberdeckt (Cover).
-        double previewWidth = frameWidth;
-        double previewHeight = frameWidth / previewTarget;
-
-        if (previewHeight < frameHeight)
-        {
-            previewHeight = frameHeight;
-            previewWidth = frameHeight * previewTarget;
+            finalWidth = width;
+            finalHeight = width / target;
         }
 
         Dispatcher.Dispatch(() =>
         {
-            cameraFrame.WidthRequest = frameWidth;
-            cameraFrame.HeightRequest = frameHeight;
+            cameraFrame.WidthRequest = finalWidth;
+            cameraFrame.HeightRequest = finalHeight;
             cameraFrame.HorizontalOptions = LayoutOptions.Center;
             cameraFrame.VerticalOptions = LayoutOptions.Center;
-            cameraFrame.IsClippedToBounds = true;
-
-            cameraView.WidthRequest = previewWidth;
-            cameraView.HeightRequest = previewHeight;
+            cameraView.WidthRequest = finalWidth;
+            cameraView.HeightRequest = finalHeight;
             cameraView.HorizontalOptions = LayoutOptions.Center;
             cameraView.VerticalOptions = LayoutOptions.Center;
         });
