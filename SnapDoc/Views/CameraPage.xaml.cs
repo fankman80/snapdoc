@@ -10,20 +10,15 @@ namespace SnapDoc.Views;
 public partial class CameraPage : ContentPage
 {
     private string? _tempFilePath = string.Empty;
-
+    private bool _isCapturing = false;
     private double _userSelectedRatio = SettingsService.Instance.CaptureRatio;
     private CameraFlashMode _currentFlashMode = (CameraFlashMode)SettingsService.Instance.FlashMode;
-
     private bool _isZoomSupported = false;
     private bool _suppressZoomEvents = false;
     private bool _isRatioPickerExpanded = false;
     private CancellationTokenSource? _zoomTimerCts;
-
     private IReadOnlyList<CameraInfo> _cameras = Array.Empty<CameraInfo>();
     private bool _isStarted = false;
-
-    // Ergebnis des Capture-Vorgangs. MediaCaptured feuert asynchron, deshalb wird
-    // der aufrufende Klick-Handler darueber wieder zusammengefuehrt.
     private TaskCompletionSource<Stream?>? _captureTcs;
 
     public CameraPage()
@@ -329,7 +324,8 @@ public partial class CameraPage : ContentPage
 
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
-        if (flashOverlay.IsVisible || cameraView.IsCameraBusy) return;
+        if (_isCapturing) return;
+        _isCapturing = true;
 
         try
         {
@@ -367,6 +363,7 @@ public partial class CameraPage : ContentPage
             _captureTcs = null;
             await flashOverlay.FadeToAsync(0, 200);
             flashOverlay.IsVisible = false;
+            _isCapturing = false;
         }
     }
 
