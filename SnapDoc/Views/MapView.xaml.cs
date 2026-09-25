@@ -37,14 +37,8 @@ namespace SnapDoc.Views;
 
 public partial class MapView : IQueryAttributable
 {
-    // ---------------------------------------------------------------------
-    // OpenStreetMap Tile Usage Policy
-    // Eindeutiger User-Agent mit Kontaktadresse. Ohne diesen liefert
-    // tile.openstreetmap.org "403 Access blocked".
-    // ---------------------------------------------------------------------
     private const string OsmUserAgent = "SnapDoc (+m.fankhauser@gmx.net)";
     private const string OsmTileUrl = "https://tile.openstreetmap.org/{z}/{x}/{y}.png";
-
     private string planId;
     private string pinId = string.Empty;
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
@@ -831,13 +825,6 @@ public partial class MapView : IQueryAttributable
         };
     }
 
-    /// <summary>
-    /// Erzeugt den OpenStreetMap-Layer konform zur Tile Usage Policy:
-    /// offizielle Tile-URL (ohne a/b/c-Subdomains) und eindeutiger User-Agent
-    /// mit Kontaktadresse. Ohne beides antwortet der Server mit "403 Access blocked".
-    /// Der User-Agent wird ueber configureHttpRequestMessage gesetzt, da BruTile 6
-    /// keinen userAgent-Parameter mehr kennt.
-    /// </summary>
     private static TileLayer CreateOpenStreetMapLayer()
     {
         var tileSource = new HttpTileSource(
