@@ -26,10 +26,6 @@ public partial class CameraPage : ContentPage
         InitializeComponent();
     }
 
-    // ------------------------------------------------------------------
-    // Lebenszyklus
-    // ------------------------------------------------------------------
-
     protected override async void OnAppearing()
     {
         base.OnAppearing();
@@ -94,18 +90,20 @@ public partial class CameraPage : ContentPage
 
         cameraView.SelectedCamera = camera;
         cameraView.ImageCaptureResolution = SelectResolution(camera, _userSelectedRatio);
-
-        Debug.WriteLine($"[CAM] {camera.Name} -> {cameraView.ImageCaptureResolution.Width}x{cameraView.ImageCaptureResolution.Height}");
-
-        ConfigureZoom(camera);
         cameraView.CameraFlashMode = _currentFlashMode;
         UpdateFlashButtonUI();
-
-        PopulateRatioButtons(camera);
         UpdateCameraLayout(Width, Height);
 
         await cameraView.StartCameraPreview(CancellationToken.None);
+
+        Debug.WriteLine($"[CAM] {camera.Name} -> {cameraView.ImageCaptureResolution.Width}x{cameraView.ImageCaptureResolution.Height}, " +
+                        $"Resolutions: {camera.SupportedResolutions?.Count ?? 0}, " +
+                        $"Zoom: {camera.MinimumZoomFactor}-{camera.MaximumZoomFactor}");
+
+        ConfigureZoom(camera);
+        PopulateRatioButtons(camera);
     }
+
 
     // ------------------------------------------------------------------
     // Aufloesung / Seitenverhaeltnis
