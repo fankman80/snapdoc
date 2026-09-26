@@ -12,10 +12,6 @@
              BackgroundColor="Black">
 
     <Grid RowDefinitions="56,*" BackgroundColor="Black">
-
-        <!-- ============================================================
-             Row 0: Top-Bar  (Schliessen | Blitz | Seitenverhaeltnis)
-             ============================================================ -->
         <Grid Grid.Row="0"
               Padding="8,0"
               ZIndex="10">
@@ -46,7 +42,6 @@
                     BackgroundColor="Transparent"
                     Clicked="OnFlashButtonClicked" />
 
-            <!-- Eingeklappt: nur das aktive Format. Ausgeklappt: alle nebeneinander. -->
             <HorizontalStackLayout x:Name="ratioContainer"
                                    HorizontalOptions="End"
                                    VerticalOptions="Center"
@@ -68,16 +63,7 @@
                 </BindableLayout.ItemTemplate>
             </HorizontalStackLayout>
         </Grid>
-
-        <!-- ============================================================
-             Row 1: Verfuegbare Flaeche fuer die Vorschau.
-             previewArea fuellt die Zeile; seine Groesse ist die Basis fuer
-             UpdateCameraLayout (beruecksichtigt so auch Safe Areas).
-             ============================================================ -->
         <Grid Grid.Row="1" x:Name="previewArea">
-
-            <!-- previewHost bekommt exakt die Groesse der Vorschau und ist oben verankert.
-                 Alles darin ist relativ zur Vorschau positioniert, nicht zur Seite. -->
             <Grid x:Name="previewHost"
                   HorizontalOptions="Center"
                   VerticalOptions="Start">
@@ -119,8 +105,6 @@
                                              HeightRequest="280"
                                              WidthRequest="80"
                                              ValueChanged="OnZoomSliderValueChanged" />
-
-                <!-- Live: Ausloeser (weisser Ring) in der Mitte, Kamerawechsel rechts. -->
                 <Grid x:Name="liveButtons"
                       VerticalOptions="End"
                       Margin="0,0,0,24"
@@ -168,11 +152,10 @@
                             FontFamily="MaterialOutlined"
                             TextColor="White"
                             BackgroundColor="#404040"
-                            Opacity="0.8"
+                            Opacity="0.6"
                             Clicked="OnSwitchCameraClicked" />
                 </Grid>
 
-                <!-- Nach der Aufnahme: Verwerfen / Speichern. -->
                 <Grid x:Name="previewButtons"
                       IsVisible="False"
                       VerticalOptions="End"
@@ -182,7 +165,7 @@
                       ColumnSpacing="40">
                     <Button Grid.Column="0"
                             Text="{x:Static local:MaterialIcons.Close}"
-                            FontSize="26"
+                            FontSize="30"
                             FontFamily="MaterialOutlined"
                             Padding="0"
                             HeightRequest="52"
@@ -192,7 +175,7 @@
                             TextColor="White" />
                     <Button Grid.Column="1"
                             Text="{x:Static local:MaterialIcons.Save}"
-                            FontSize="26"
+                            FontSize="30"
                             FontFamily="MaterialOutlined"
                             Padding="0"
                             HeightRequest="52"
