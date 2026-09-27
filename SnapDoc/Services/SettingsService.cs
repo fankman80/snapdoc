@@ -97,7 +97,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
     [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
     [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
-    [ObservableProperty] public partial int FlashMode { get; set; } = 0;
+    [ObservableProperty] public partial int FlashMode { get; set; } = 2;
     [ObservableProperty] public partial double CaptureRatio { get; set; } = 1.33;
     [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
     [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
