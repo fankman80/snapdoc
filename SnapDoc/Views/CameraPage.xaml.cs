@@ -760,11 +760,13 @@ public partial class CameraPage : ContentPage
 
         var dst = new SKBitmap(w, h, src.ColorType, src.AlphaType);
         using var canvas = new SKCanvas(dst);
+        using var image = SKImage.FromBitmap(src);
+
         canvas.Translate(w / 2f, h / 2f);
         if (flipH) canvas.Scale(-1, 1);
         canvas.RotateDegrees(degrees);
         canvas.Translate(-src.Width / 2f, -src.Height / 2f);
-        canvas.DrawBitmap(src, 0, 0);
+        canvas.DrawImage(image, 0, 0, SKSamplingOptions.Default);
         return dst;
     }
 
