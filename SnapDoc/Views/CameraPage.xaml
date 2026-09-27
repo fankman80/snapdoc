@@ -12,6 +12,8 @@
              BackgroundColor="Black">
 
     <Grid RowDefinitions="56,*" BackgroundColor="Black">
+
+        <!-- Top-Bar: bleibt immer oben (Hochformat gesperrt), Icons drehen sich -->
         <Grid Grid.Row="0"
               Padding="8,0"
               ZIndex="10">
@@ -42,6 +44,7 @@
                     BackgroundColor="Transparent"
                     Clicked="OnFlashButtonClicked" />
 
+            <!-- Quadratische Buttons, damit der gedrehte Text nicht ueberlappt -->
             <HorizontalStackLayout x:Name="ratioContainer"
                                    HorizontalOptions="End"
                                    VerticalOptions="Center"
@@ -51,8 +54,8 @@
                         <Button Text="{Binding Name}"
                                 CommandParameter="{Binding Value}"
                                 Clicked="OnRatioClicked"
-                                WidthRequest="48"
-                                HeightRequest="36"
+                                WidthRequest="44"
+                                HeightRequest="44"
                                 Padding="0"
                                 FontSize="14"
                                 FontAttributes="Bold"
@@ -63,6 +66,7 @@
                 </BindableLayout.ItemTemplate>
             </HorizontalStackLayout>
         </Grid>
+
         <Grid Grid.Row="1" x:Name="previewArea">
             <Grid x:Name="previewHost"
                   HorizontalOptions="Center"
@@ -81,10 +85,14 @@
                     </toolkit:CameraView>
                 </Grid>
 
-                <Image x:Name="previewImage"
-                       IsVisible="False"
-                       BackgroundColor="Black"
-                       Aspect="AspectFit" />
+                <!-- AbsoluteLayout erlaubt es, das Bild mit vertauschten Massen
+                     zu platzieren und dann um 90 Grad zu drehen -->
+                <AbsoluteLayout x:Name="previewImageLayer"
+                                IsVisible="False"
+                                BackgroundColor="Black">
+                    <Image x:Name="previewImage"
+                           Aspect="AspectFit" />
+                </AbsoluteLayout>
 
                 <controls:VerticalZoomSlider x:Name="customZoomSlider"
                                              VerticalOptions="Center"
@@ -105,6 +113,7 @@
                                              HeightRequest="280"
                                              WidthRequest="80"
                                              ValueChanged="OnZoomSliderValueChanged" />
+
                 <Grid x:Name="liveButtons"
                       VerticalOptions="End"
                       Margin="0,0,0,24"
@@ -163,23 +172,29 @@
                       Margin="0,0,0,24"
                       ColumnDefinitions="Auto,Auto"
                       ColumnSpacing="40">
+
                     <Button Grid.Column="0"
+                            x:Name="retakeButton"
                             Text="{x:Static local:MaterialIcons.Close}"
                             FontSize="30"
                             FontFamily="MaterialOutlined"
                             Padding="0"
-                            HeightRequest="52"
-                            WidthRequest="80"
+                            HeightRequest="64"
+                            WidthRequest="64"
+                            CornerRadius="32"
                             Clicked="OnRetakeClicked"
                             BackgroundColor="#E53935"
                             TextColor="White" />
+
                     <Button Grid.Column="1"
+                            x:Name="confirmButton"
                             Text="{x:Static local:MaterialIcons.Save}"
                             FontSize="30"
                             FontFamily="MaterialOutlined"
                             Padding="0"
-                            HeightRequest="52"
-                            WidthRequest="80"
+                            HeightRequest="64"
+                            WidthRequest="64"
+                            CornerRadius="32"
                             Clicked="OnConfirmClicked"
                             BackgroundColor="#43A047"
                             TextColor="White" />
