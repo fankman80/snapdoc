@@ -119,6 +119,24 @@
                       Margin="0,0,0,24"
                       ColumnDefinitions="*,Auto,*">
 
+                    <!-- Taschenlampe: links vom Ausloeser, Gegenstueck zum Kamerawechsel -->
+                    <Button Grid.Column="0"
+                            x:Name="torchButton"
+                            IsVisible="False"
+                            HorizontalOptions="Center"
+                            VerticalOptions="Center"
+                            HeightRequest="52"
+                            WidthRequest="52"
+                            CornerRadius="26"
+                            Padding="0"
+                            Text="{x:Static local:MaterialIcons.Flashlight_off}"
+                            FontSize="30"
+                            FontFamily="MaterialOutlined"
+                            TextColor="White"
+                            BackgroundColor="#404040"
+                            Opacity="0.6"
+                            Clicked="OnTorchClicked" />
+
                     <Button Grid.Column="1"
                             x:Name="controlButton"
                             HeightRequest="76"
