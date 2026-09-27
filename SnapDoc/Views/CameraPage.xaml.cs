@@ -34,7 +34,7 @@ public partial class CameraPage : ContentPage
     private bool _isRatioPickerExpanded = false;
     private bool _isInPreviewMode = false;
     private CancellationTokenSource? _zoomTimerCts;
-
+    private bool _isTorchOn = false;
     private IReadOnlyList<CameraInfo> _cameras = Array.Empty<CameraInfo>();
     private bool _isStarted = false;
     private bool _isCapturing = false;
@@ -88,6 +88,8 @@ public partial class CameraPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+
+        cameraView.IsTorchOn = false;
 
         StopOrientationTracking();
         OrientationLock.Unlock();
@@ -159,6 +161,9 @@ public partial class CameraPage : ContentPage
             cameraView.CameraFlashMode = _currentFlashMode;
 
             UpdateFlashButtonUI();
+            _isTorchOn = false;
+            torchButton.IsVisible = camera.IsFlashSupported;
+            UpdateTorchUI();
             UpdateCameraLayout();
 
             Log($"{camera.Name}: Ratio {_userSelectedRatio:F2}, Capture {cameraView.ImageCaptureResolution.Width}x{cameraView.ImageCaptureResolution.Height}");
@@ -182,6 +187,7 @@ public partial class CameraPage : ContentPage
         await Task.Delay(700);
         PopulateRatioButtons(camera);
         await ConfigureZoomAsync(camera);
+        ApplyTorch();
     }
 
     // ------------------------------------------------------------------
@@ -258,6 +264,7 @@ public partial class CameraPage : ContentPage
         yield return switchCameraButton;
         yield return retakeButton;
         yield return confirmButton;
+        yield return torchButton;
 
         foreach (var child in ratioContainer.Children)
             if (child is VisualElement ve)
@@ -869,7 +876,7 @@ public partial class CameraPage : ContentPage
             _ => CameraFlashMode.Auto
         };
 
-        cameraView.CameraFlashMode = _currentFlashMode;
+        ApplyTorch();   // setzt den Blitz, ausser die Taschenlampe ist an
         SettingsService.Instance.FlashMode = (int)_currentFlashMode;
         UpdateFlashButtonUI();
     }
@@ -884,6 +891,45 @@ public partial class CameraPage : ContentPage
         };
 
         flashButton.TextColor = _currentFlashMode == CameraFlashMode.Off ? Colors.White : Colors.Yellow;
+    }
+
+    // ------------------------------------------------------------------
+    // Taschenlampe
+    // ------------------------------------------------------------------
+    private void OnTorchClicked(object sender, EventArgs e)
+    {
+        _isTorchOn = !_isTorchOn;
+        ApplyTorch();
+    }
+
+    /// <summary>
+    /// Setzt Licht und Blitz passend zum aktuellen Zustand.
+    /// Bei eingeschaltetem Licht wird der Blitz fuer die Aufnahme deaktiviert,
+    /// die gespeicherte Blitz-Einstellung bleibt aber unveraendert.
+    /// </summary>
+    private void ApplyTorch()
+    {
+        bool supported = cameraView.SelectedCamera?.IsFlashSupported == true;
+        if (!supported) _isTorchOn = false;
+
+        bool on = _isTorchOn && !_isInPreviewMode;
+
+        cameraView.IsTorchOn = on;
+        cameraView.CameraFlashMode = on ? CameraFlashMode.Off : _currentFlashMode;
+
+        UpdateTorchUI();
+    }
+
+    private void UpdateTorchUI()
+    {
+        torchButton.Text = _isTorchOn ? MaterialIcons.Flashlight_on : MaterialIcons.Flashlight_off;
+        torchButton.TextColor = _isTorchOn ? Colors.Black : Colors.White;
+        torchButton.BackgroundColor = _isTorchOn ? Colors.Yellow : Color.FromArgb("#404040");
+        torchButton.Opacity = _isTorchOn ? 1.0 : 0.6;
+
+        // Blitz ist bei Dauerlicht wirkungslos -> sichtbar deaktivieren.
+        flashButton.IsEnabled = !_isTorchOn;
+        flashButton.Opacity = _isTorchOn ? 0.4 : 1.0;
     }
 
     /// <summary>
@@ -922,6 +968,7 @@ public partial class CameraPage : ContentPage
 
         ToggleUI(isPreview: false);
         await RestartPreview();
+        ApplyTorch();
     }
 
     private async void OnConfirmClicked(object s, EventArgs e)
@@ -959,6 +1006,7 @@ public partial class CameraPage : ContentPage
         {
             _isRatioPickerExpanded = false;
             customZoomSlider.IsVisible = false;
+            cameraView.IsTorchOn = false;
         }
         else
         {
