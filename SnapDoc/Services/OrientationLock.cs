@@ -8,16 +8,30 @@ using System.Diagnostics;
 namespace SnapDoc.Services;
 
 /// <summary>
-/// Sperrt die Bildschirmdrehung fuer eine einzelne Seite (wie die Systemkamera).
+/// Sperrt die Bildschirmdrehung für eine einzelne Seite (wie die Systemkamera).
 /// </summary>
 public static class OrientationLock
 {
 #if ANDROID
     private static ScreenOrientation? _previous;
 #elif IOS
-    /// <summary>Wird vom AppDelegate abgefragt.</summary>
-    public static UIInterfaceOrientationMask SupportedOrientations { get; private set; }
-        = UIInterfaceOrientationMask.AllButUpsideDown;
+    private static UIInterfaceOrientationMask? _current;
+
+    /// <summary>
+    /// Standard ohne Sperre, passend zur Info.plist:
+    /// iPad alle vier Richtungen, iPhone alle ausser "auf dem Kopf".
+    /// </summary>
+    private static UIInterfaceOrientationMask DefaultMask =>
+        UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Pad
+            ? UIInterfaceOrientationMask.All
+            : UIInterfaceOrientationMask.AllButUpsideDown;
+
+    /// <summary>
+    /// Wird vom AppDelegate abgefragt. Wird erst beim ersten Zugriff ausgewertet
+    /// (immer auf dem Main Thread), damit UIDevice nicht aus einem
+    /// statischen Initialisierer auf einem anderen Thread aufgerufen wird.
+    /// </summary>
+    public static UIInterfaceOrientationMask SupportedOrientations => _current ??= DefaultMask;
 #endif
 
     public static void LockPortrait()
@@ -25,6 +39,7 @@ public static class OrientationLock
 #if ANDROID
         var activity = Platform.CurrentActivity;
         if (activity == null) return;
+
         _previous ??= activity.RequestedOrientation;
         activity.RequestedOrientation = ScreenOrientation.Portrait;
 #elif IOS
@@ -37,17 +52,18 @@ public static class OrientationLock
 #if ANDROID
         var activity = Platform.CurrentActivity;
         if (activity == null) return;
+
         activity.RequestedOrientation = _previous ?? ScreenOrientation.Unspecified;
         _previous = null;
 #elif IOS
-        Apply(UIInterfaceOrientationMask.AllButUpsideDown);
+        Apply(DefaultMask);
 #endif
     }
 
 #if IOS
     private static void Apply(UIInterfaceOrientationMask mask)
     {
-        SupportedOrientations = mask;
+        _current = mask;
 
         if (OperatingSystem.IsIOSVersionAtLeast(16))
         {
@@ -67,4 +83,4 @@ public static class OrientationLock
         }
     }
 #endif
-  }
+}
