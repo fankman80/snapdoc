@@ -1,6 +1,7 @@
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Core.Primitives;
 using CommunityToolkit.Maui.Views;
+using Microsoft.Maui.Layouts;
 using SkiaSharp;
 using SnapDoc.Services;
 using System.Diagnostics;
@@ -26,8 +27,8 @@ public partial class CameraPage : ContentPage
     // Wird bei jedem Kamerastart automatisch gesetzt (GetBestRatio).
     // Eine manuelle Auswahl gilt nur bis zum naechsten Start / Kamerawechsel.
     private double _userSelectedRatio = 4.0 / 3.0;
-    private CameraFlashMode _currentFlashMode = (CameraFlashMode)SettingsService.Instance.FlashMode;
 
+    private CameraFlashMode _currentFlashMode = (CameraFlashMode)SettingsService.Instance.FlashMode;
     private bool _isZoomSupported = false;
     private bool _suppressZoomEvents = false;
     private bool _isRatioPickerExpanded = false;
@@ -42,13 +43,22 @@ public partial class CameraPage : ContentPage
     // Klick-Handler zurueckgefuehrt.
     private TaskCompletionSource<Stream?>? _captureTcs;
 
+    // Physische Geraeteausrichtung - die Seite selbst bleibt im Hochformat.
+    //   0  = Hochformat
+    //   90 = Querformat, Geraeteoberkante zeigt nach links
+    //  -90 = Querformat, Geraeteoberkante zeigt nach rechts
+    // Gleichzeitig der Drehwinkel (im Uhrzeigersinn), damit Icons aufrecht stehen.
+    private int _deviceRotation = 0;
+
+    // Ausrichtung, in der das aktuell angezeigte Vorschaubild aufgenommen wurde.
+    private int _previewRotation = 0;
+
     public CameraPage()
     {
         InitializeComponent();
 
         // Die Vorschau richtet sich nach der tatsaechlich verfuegbaren Flaeche unter
-        // der Top-Bar - nicht nach der Seitengroesse. So werden Top-Bar und Safe Areas
-        // automatisch beruecksichtigt.
+        // der Top-Bar - nicht nach der Seitengroesse.
         previewArea.SizeChanged += (_, _) => UpdateCameraLayout();
     }
 
@@ -59,6 +69,11 @@ public partial class CameraPage : ContentPage
     protected override async void OnAppearing()
     {
         base.OnAppearing();
+
+        // Wie die Systemkamera: Layout bleibt im Hochformat, nur die Icons drehen sich.
+        OrientationLock.LockPortrait();
+        StartOrientationTracking();
+        ApplyControlRotation(animate: false);
 
         try
         {
@@ -73,6 +88,10 @@ public partial class CameraPage : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+
+        StopOrientationTracking();
+        OrientationLock.Unlock();
+
         CameraResultService.SetResult(null);
         cameraView.StopCameraPreview();
         _isStarted = false;
@@ -138,6 +157,7 @@ public partial class CameraPage : ContentPage
             cameraView.SelectedCamera = camera;
             cameraView.ImageCaptureResolution = SelectResolution(camera, _userSelectedRatio);
             cameraView.CameraFlashMode = _currentFlashMode;
+
             UpdateFlashButtonUI();
             UpdateCameraLayout();
 
@@ -146,7 +166,6 @@ public partial class CameraPage : ContentPage
             if (isSwitch)
             {
                 await Task.Delay(300);
-
                 var startTask = cameraView.StartCameraPreview(CancellationToken.None);
                 if (await Task.WhenAny(startTask, Task.Delay(5000)) != startTask)
                     Log("StartCameraPreview hat nach 5 s nicht zurückgekehrt.");
@@ -161,9 +180,102 @@ public partial class CameraPage : ContentPage
 
         // Zoom-Grenzen liefert Android erst, wenn die Kamera tatsaechlich gebunden ist.
         await Task.Delay(700);
-
         PopulateRatioButtons(camera);
         await ConfigureZoomAsync(camera);
+    }
+
+    // ------------------------------------------------------------------
+    // Geraeteausrichtung
+    // ------------------------------------------------------------------
+
+    private void StartOrientationTracking()
+    {
+        try
+        {
+            if (!Accelerometer.Default.IsSupported)
+            {
+                Log("Kein Beschleunigungssensor - Icons werden nicht gedreht.");
+                return;
+            }
+
+            Accelerometer.Default.ReadingChanged -= OnAccelerometerReadingChanged;
+            Accelerometer.Default.ReadingChanged += OnAccelerometerReadingChanged;
+
+            if (!Accelerometer.Default.IsMonitoring)
+                Accelerometer.Default.Start(SensorSpeed.UI);
+        }
+        catch (Exception ex)
+        {
+            Log($"Accelerometer-Start fehlgeschlagen: {ex.Message}");
+        }
+    }
+
+    private void StopOrientationTracking()
+    {
+        try
+        {
+            Accelerometer.Default.ReadingChanged -= OnAccelerometerReadingChanged;
+            if (Accelerometer.Default.IsMonitoring)
+                Accelerometer.Default.Stop();
+        }
+        catch (Exception ex)
+        {
+            Log($"Accelerometer-Stop fehlgeschlagen: {ex.Message}");
+        }
+    }
+
+    /// <summary>
+    /// Ermittelt die Ausrichtung aus der Schwerkraft in der Displayebene.
+    /// Mit Hysterese (35-55 Grad), damit die Icons an der Grenze nicht flackern.
+    /// Liegt das Geraet flach oder steht es auf dem Kopf, bleibt der letzte Zustand.
+    /// </summary>
+    private void OnAccelerometerReadingChanged(object? sender, AccelerometerChangedEventArgs e)
+    {
+        var a = e.Reading.Acceleration;
+        double x = a.X, y = a.Y;
+
+        // Geraet liegt (fast) flach -> keine verlaessliche Aussage.
+        if (Math.Sqrt(x * x + y * y) < 0.5) return;
+
+        // 0 = aufrecht, +90 = rechte Kante oben, -90 = linke Kante oben.
+        double angle = Math.Atan2(x, y) * 180.0 / Math.PI;
+
+        int candidate = _deviceRotation;
+        if (Math.Abs(angle) < 35) candidate = 0;
+        else if (angle > 55 && angle < 125) candidate = 90;
+        else if (angle < -55 && angle > -125) candidate = -90;
+
+        if (candidate == _deviceRotation) return;
+
+        _deviceRotation = candidate;
+        MainThread.BeginInvokeOnMainThread(() => ApplyControlRotation(animate: true));
+    }
+
+    private IEnumerable<VisualElement> RotatableViews()
+    {
+        yield return closeButton;
+        yield return flashButton;
+        yield return switchCameraButton;
+        yield return retakeButton;
+        yield return confirmButton;
+
+        foreach (var child in ratioContainer.Children)
+            if (child is VisualElement ve)
+                yield return ve;
+    }
+
+    private void ApplyControlRotation(bool animate)
+    {
+        double target = _deviceRotation;
+
+        foreach (var view in RotatableViews())
+        {
+            view.CancelAnimations();
+            if (animate)
+                _ = view.RotateToAsync(target, 200, Easing.CubicOut);
+            else
+                view.Rotation = target;
+        }
     }
 
     // ------------------------------------------------------------------
@@ -209,6 +321,7 @@ public partial class CameraPage : ContentPage
             return (Width > 0 && Height > 0) ? NormalizeRatio(Width, Height) : 4.0 / 3.0;
 
         if (_userSelectedRatio <= 0) return 4.0 / 3.0;
+
         return _userSelectedRatio < 1.0 ? 1.0 / _userSelectedRatio : _userSelectedRatio;
     }
 
@@ -244,8 +357,7 @@ public partial class CameraPage : ContentPage
 
     /// <summary>
     /// Passt die Vorschau in die Flaeche unter der Top-Bar ein und verankert sie oben.
-    /// previewHost bekommt dieselbe Groesse wie die Vorschau - dadurch liegen
-    /// Ausloeser und Kamerawechsel immer vollstaendig im Bild, egal welches Format.
+    /// Da die Seite im Hochformat gesperrt ist, ist das praktisch immer der Hochformat-Fall.
     /// </summary>
     private void UpdateCameraLayout()
     {
@@ -273,12 +385,13 @@ public partial class CameraPage : ContentPage
         {
             previewHost.WidthRequest = finalWidth;
             previewHost.HeightRequest = finalHeight;
-
             cameraFrame.WidthRequest = finalWidth;
             cameraFrame.HeightRequest = finalHeight;
-
             cameraView.WidthRequest = finalWidth;
             cameraView.HeightRequest = finalHeight;
+
+            if (_isInPreviewMode)
+                LayoutPreviewImage();
         });
     }
 
@@ -309,13 +422,15 @@ public partial class CameraPage : ContentPage
             BindableLayout.SetItemsSource(ratioContainer, available);
             _isRatioPickerExpanded = false;
             UpdateRatioPickerUI(animate: false);
+
+            // Neu erzeugte Buttons sofort in die aktuelle Ausrichtung bringen.
+            ApplyControlRotation(animate: false);
         });
     }
 
     /// <summary>
     /// Eingeklappt: nur das aktive Format (gelb). Ausgeklappt: alle Formate
-    /// nebeneinander; der Blitz-Button wird dann ausgeblendet, damit sich die
-    /// Reihe nicht mit ihm ueberschneidet.
+    /// nebeneinander; der Blitz-Button wird dann ausgeblendet.
     /// </summary>
     private void UpdateRatioPickerUI(bool animate = true)
     {
@@ -366,7 +481,6 @@ public partial class CameraPage : ContentPage
             }
 
             await provider.RefreshAvailableCameras(CancellationToken.None);
-
             var refreshed = provider.AvailableCameras;
             var match = refreshed?.FirstOrDefault(c => c.Position == camera.Position && c.Name == camera.Name);
 
@@ -377,10 +491,8 @@ public partial class CameraPage : ContentPage
             }
 
             _cameras = refreshed!;
-
             cameraView.SelectedCamera = match;
             cameraView.ImageCaptureResolution = SelectResolution(match, _userSelectedRatio);
-
             ApplyZoomRange(match);
             Log($"Zoom nach Refresh: {match.MinimumZoomFactor} - {match.MaximumZoomFactor}");
         }
@@ -441,16 +553,16 @@ public partial class CameraPage : ContentPage
     // Aufnahme
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Kurzer, unabhaengiger Blitz-Effekt; der Timeout umfasst den ganzen Vorgang,
-    /// damit ein haengendes CaptureImage die UI nicht blockiert.
-    /// </summary>
     private async void OnCaptureClicked(object sender, EventArgs e)
     {
         if (_isCapturing) return;
         _isCapturing = true;
 
+        // Ausrichtung im Moment des Ausloesens festhalten.
+        int captureRotation = _deviceRotation;
+
         var flashTask = FlashAsync();
+
         var tcs = new TaskCompletionSource<Stream?>(TaskCreationOptions.RunContinuationsAsynchronously);
         _captureTcs = tcs;
 
@@ -468,9 +580,9 @@ public partial class CameraPage : ContentPage
                 return;
             }
 
-            _tempFilePath = await SavePhotoToCache(stream, ResolveUserRatio(), GetCaptureRatio());
-            previewImage.Source = ImageSource.FromFile(_tempFilePath);
+            _tempFilePath = await SavePhotoToCache(stream, ResolveUserRatio(), GetCaptureRatio(), captureRotation);
 
+            ShowCapturedImage(_tempFilePath!, captureRotation);
             ToggleUI(isPreview: true);
             cameraView.StopCameraPreview();
         }
@@ -518,72 +630,214 @@ public partial class CameraPage : ContentPage
         _captureTcs?.TrySetResult(null);
     }
 
-    private static async Task<string?> SavePhotoToCache(Stream photoStream, double targetRatio, double captureRatio)
+    private static async Task<string?> SavePhotoToCache(Stream photoStream, double targetRatio, double captureRatio, int deviceRotation)
     {
         var path = Path.Combine(FileSystem.CacheDirectory, $"Cap_{DateTime.Now:yyyyMMdd_HHmmss_fff}.jpg");
 
         using (var fs = File.Create(path))
             await photoStream.CopyToAsync(fs);
 
-        // Nur zuschneiden, wenn die Kamera kein passendes Seitenverhaeltnis anbot.
-        if (Math.Abs(captureRatio - targetRatio) > RatioTolerance)
-            await Task.Run(() => CropToRatio(path, targetRatio));
+        await Task.Run(() => NormalizeImage(path, targetRatio, captureRatio, deviceRotation));
 
         return path;
     }
 
+    // ------------------------------------------------------------------
+    // Bildnachbearbeitung (EXIF, Drehung, Zuschnitt)
+    // ------------------------------------------------------------------
+
     /// <summary>
-    /// Schneidet das Bild mittig auf das gewuenschte Seitenverhaeltnis zu.
-    /// Erwartet einen aufgeloesten Wert >= 1.0 (siehe ResolveUserRatio).
+    /// 1. EXIF-Ausrichtung in die Pixel uebernehmen.
+    /// 2. Fehlende Drehung ergaenzen (Seite ist auf Hochformat gesperrt -
+    ///    je nach Plattform dreht das Toolkit das Querformatbild nicht selbst).
+    /// 3. Bei Bedarf auf das Zielverhaeltnis zuschneiden.
+    /// Die Datei wird nur neu geschrieben, wenn sich tatsaechlich etwas geaendert hat.
     /// </summary>
-    private static void CropToRatio(string path, double resolvedRatio)
+    private static void NormalizeImage(string path, double targetRatio, double captureRatio, int deviceRotation)
     {
         try
         {
-            if (resolvedRatio <= 0) return;
+            SKEncodedOrigin origin;
+            SKBitmap? bitmap;
 
-            using var original = SKBitmap.Decode(path);
-            if (original == null) return;
-
-            bool isLandscape = original.Width >= original.Height;
-
-            double longSide = Math.Max(original.Width, original.Height);
-            double shortSide = Math.Min(original.Width, original.Height);
-            double currentRatio = longSide / shortSide;
-
-            if (Math.Abs(currentRatio - resolvedRatio) < 0.02) return;
-
-            int newLong, newShort;
-            if (currentRatio > resolvedRatio)
+            using (var codec = SKCodec.Create(path))
             {
-                newShort = (int)shortSide;
-                newLong = (int)Math.Round(shortSide * resolvedRatio);
-            }
-            else
-            {
-                newLong = (int)longSide;
-                newShort = (int)Math.Round(longSide / resolvedRatio);
+                if (codec == null) return;
+                origin = codec.EncodedOrigin;
+                bitmap = SKBitmap.Decode(codec);
             }
 
-            int newWidth = isLandscape ? newLong : newShort;
-            int newHeight = isLandscape ? newShort : newLong;
+            if (bitmap == null) return;
 
-            int left = (original.Width - newWidth) / 2;
-            int top = (original.Height - newHeight) / 2;
+            try
+            {
+                bool changed = false;
 
-            using var cropped = new SKBitmap(newWidth, newHeight);
-            if (!original.ExtractSubset(cropped, new SKRectI(left, top, left + newWidth, top + newHeight)))
-                return;
+                if (origin != SKEncodedOrigin.TopLeft)
+                {
+                    Replace(ref bitmap, ApplyOrigin(bitmap, origin));
+                    changed = true;
+                }
 
-            using var image = SKImage.FromBitmap(cropped);
-            using var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality);
-            using var fs = File.Create(path);
-            data.SaveTo(fs);
+                int missing = GetMissingRotation(bitmap.Width, bitmap.Height, deviceRotation);
+                if (missing != 0)
+                {
+                    Replace(ref bitmap, Transform(bitmap, missing));
+                    changed = true;
+                }
+
+                if (Math.Abs(captureRatio - targetRatio) > RatioTolerance)
+                {
+                    var cropped = CropToRatio(bitmap, targetRatio);
+                    if (cropped != null)
+                    {
+                        Replace(ref bitmap, cropped);
+                        changed = true;
+                    }
+                }
+
+                if (!changed) return;
+
+                using var image = SKImage.FromBitmap(bitmap);
+                using var data = image.Encode(SKEncodedImageFormat.Jpeg, SettingsService.Instance.FotoQuality);
+                using var fs = File.Create(path);
+                data.SaveTo(fs);
+            }
+            finally
+            {
+                bitmap.Dispose();
+            }
         }
         catch (Exception ex)
         {
-            Log($"CropToRatio failed: {ex.Message}");
+            Log($"NormalizeImage failed: {ex.Message}");
         }
+    }
+
+    private static void Replace(ref SKBitmap current, SKBitmap next)
+    {
+        if (ReferenceEquals(current, next)) return;
+        current.Dispose();
+        current = next;
+    }
+
+    /// <summary>
+    /// Wurde im Querformat ausgeloest, das Bild ist aber hochkant,
+    /// hat das Toolkit nicht gedreht -> Gegenrotation liefern.
+    /// Bei 1:1 ist das nicht erkennbar; dann wird angenommen, dass nicht gedreht wurde.
+    /// </summary>
+    private static int GetMissingRotation(int width, int height, int deviceRotation)
+    {
+        if (deviceRotation == 0) return 0;
+
+        bool isLandscape = width > height;
+        if (width == height || !isLandscape)
+            return -deviceRotation;
+
+        return 0;
+    }
+
+    private static SKBitmap ApplyOrigin(SKBitmap src, SKEncodedOrigin origin) => origin switch
+    {
+        SKEncodedOrigin.TopRight => Transform(src, 0, flipH: true),
+        SKEncodedOrigin.BottomRight => Transform(src, 180),
+        SKEncodedOrigin.BottomLeft => Transform(src, 180, flipH: true),
+        SKEncodedOrigin.LeftTop => Transform(src, 90, flipH: true),
+        SKEncodedOrigin.RightTop => Transform(src, 90),
+        SKEncodedOrigin.RightBottom => Transform(src, -90, flipH: true),
+        SKEncodedOrigin.LeftBottom => Transform(src, -90),
+        _ => src
+    };
+
+    /// <summary>
+    /// Dreht (im Uhrzeigersinn, Vielfache von 90) und spiegelt optional horizontal.
+    /// </summary>
+    private static SKBitmap Transform(SKBitmap src, int degrees, bool flipH = false)
+    {
+        bool swap = Math.Abs(degrees) % 180 == 90;
+        int w = swap ? src.Height : src.Width;
+        int h = swap ? src.Width : src.Height;
+
+        var dst = new SKBitmap(w, h, src.ColorType, src.AlphaType);
+        using var canvas = new SKCanvas(dst);
+        canvas.Translate(w / 2f, h / 2f);
+        if (flipH) canvas.Scale(-1, 1);
+        canvas.RotateDegrees(degrees);
+        canvas.Translate(-src.Width / 2f, -src.Height / 2f);
+        canvas.DrawBitmap(src, 0, 0);
+        return dst;
+    }
+
+    /// <summary>
+    /// Schneidet mittig auf das gewuenschte Seitenverhaeltnis zu (>= 1.0).
+    /// Gibt null zurueck, wenn nichts zu tun ist.
+    /// </summary>
+    private static SKBitmap? CropToRatio(SKBitmap original, double resolvedRatio)
+    {
+        if (resolvedRatio <= 0) return null;
+
+        bool isLandscape = original.Width >= original.Height;
+        double longSide = Math.Max(original.Width, original.Height);
+        double shortSide = Math.Min(original.Width, original.Height);
+        double currentRatio = longSide / shortSide;
+
+        if (Math.Abs(currentRatio - resolvedRatio) < 0.02) return null;
+
+        int newLong, newShort;
+        if (currentRatio > resolvedRatio)
+        {
+            newShort = (int)shortSide;
+            newLong = (int)Math.Round(shortSide * resolvedRatio);
+        }
+        else
+        {
+            newLong = (int)longSide;
+            newShort = (int)Math.Round(longSide / resolvedRatio);
+        }
+
+        int newWidth = isLandscape ? newLong : newShort;
+        int newHeight = isLandscape ? newShort : newLong;
+        int left = (original.Width - newWidth) / 2;
+        int top = (original.Height - newHeight) / 2;
+
+        // ExtractSubset teilt sich den Speicher mit dem Original -> Kopie erzeugen.
+        using var subset = new SKBitmap();
+        if (!original.ExtractSubset(subset, new SKRectI(left, top, left + newWidth, top + newHeight)))
+            return null;
+
+        return subset.Copy();
+    }
+
+    // ------------------------------------------------------------------
+    // Vorschau des aufgenommenen Bildes
+    // ------------------------------------------------------------------
+
+    private void ShowCapturedImage(string path, int rotation)
+    {
+        _previewRotation = rotation;
+        previewImage.Source = ImageSource.FromFile(path);
+        LayoutPreviewImage();
+    }
+
+    /// <summary>
+    /// Querformatbilder werden gedreht dargestellt - so sieht der Benutzer das Foto
+    /// genau so, wie er es im Sucher gesehen hat. Dafuer bekommt das Image vertauschte
+    /// Masse und wird zentriert um 90 Grad gedreht.
+    /// </summary>
+    private void LayoutPreviewImage()
+    {
+        double w = previewHost.Width > 0 ? previewHost.Width : previewHost.WidthRequest;
+        double h = previewHost.Height > 0 ? previewHost.Height : previewHost.HeightRequest;
+        if (w <= 0 || h <= 0) return;
+
+        bool rotated = _previewRotation != 0;
+        var bounds = rotated
+            ? new Rect((w - h) / 2, (h - w) / 2, h, w)
+            : new Rect(0, 0, w, h);
+
+        AbsoluteLayout.SetLayoutFlags(previewImage, AbsoluteLayoutFlags.None);
+        AbsoluteLayout.SetLayoutBounds(previewImage, bounds);
+        previewImage.Rotation = _previewRotation;
     }
 
     private async Task RestartPreview()
@@ -627,7 +881,6 @@ public partial class CameraPage : ContentPage
             _ => MaterialIcons.Flash_auto
         };
 
-        // Aktiver Blitz gelb hervorheben, wie in der Systemkamera.
         flashButton.TextColor = _currentFlashMode == CameraFlashMode.Off ? Colors.White : Colors.Yellow;
     }
 
@@ -658,10 +911,13 @@ public partial class CameraPage : ContentPage
 
     private async void OnRetakeClicked(object sender, EventArgs e)
     {
+        previewImage.Source = null;
+
         if (!string.IsNullOrEmpty(_tempFilePath) && File.Exists(_tempFilePath))
             File.Delete(_tempFilePath);
 
         _tempFilePath = string.Empty;
+
         ToggleUI(isPreview: false);
         await RestartPreview();
     }
@@ -692,7 +948,7 @@ public partial class CameraPage : ContentPage
     {
         _isInPreviewMode = isPreview;
 
-        previewImage.IsVisible = isPreview;
+        previewImageLayer.IsVisible = isPreview;
         previewButtons.IsVisible = isPreview;
         liveButtons.IsVisible = !isPreview;
         ratioContainer.IsVisible = !isPreview;
@@ -701,6 +957,11 @@ public partial class CameraPage : ContentPage
         {
             _isRatioPickerExpanded = false;
             customZoomSlider.IsVisible = false;
+        }
+        else
+        {
+            _previewRotation = 0;
+            previewImage.Rotation = 0;
         }
 
         flashButton.IsVisible = !isPreview && !_isRatioPickerExpanded;
