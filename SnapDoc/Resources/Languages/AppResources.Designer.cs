@@ -3155,6 +3155,25 @@ namespace SnapDoc.Resources.Languages {
                 return ResourceManager.GetString("zu_pin_wechseln", resourceCulture);
             }
         }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild ähnelt.
+        /// </summary>
+        public static string titelbild {
+            get {
+                return ResourceManager.GetString("titelbild", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild entfernen ähnelt.
+        /// </summary>
+        public static string titelbild_entfernen {
+            get {
+                return ResourceManager.GetString("titelbild_entfernen", resourceCulture);
+            }
+        }
+        
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Zum bearbeiten ziehen ähnelt.
