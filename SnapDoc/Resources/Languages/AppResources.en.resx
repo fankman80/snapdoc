@@ -1147,9 +1147,15 @@
     <value>Unknown user</value>
   </data>
   <data name="titelbild" xml:space="preserve">
-    <value>Title image</value>
+    <value>Cover image</value>
   </data>
   <data name="titelbild_entfernen" xml:space="preserve">
-    <value>Remove title image</value>
+    <value>Remove cover image</value>
+  </data>
+  <data name="titelbild_kamera" xml:space="preserve">
+    <value>Camera</value>
+  </data>
+  <data name="titelbild_datei" xml:space="preserve">
+    <value>File</value>
   </data>
 </root>
