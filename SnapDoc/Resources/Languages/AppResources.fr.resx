@@ -1146,4 +1146,10 @@
   <data name="unbekannter_nutzer" xml:space="preserve">
     <value>Utilisateur inconnu</value>
   </data>
+  <data name="titelbild" xml:space="preserve">
+    <value>Image de couverture</value>
+  </data>
+  <data name="titelbild_entfernen" xml:space="preserve">
+    <value>Supprimer l'image de couverture</value>
+  </data>
 </root>
