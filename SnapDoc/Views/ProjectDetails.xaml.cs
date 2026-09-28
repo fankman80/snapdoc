@@ -15,6 +15,11 @@ public partial class ProjectDetails : ContentPage
     // Wert in TitleImage, wenn kein eigenes Bild gesetzt ist (HasTitleImage = false).
     private const string DefaultTitleImage = "banner_thumbnail.png";
 
+    private const uint MenuAnimationMs = 150;
+    private const double MenuSlideOffset = 24;
+
+    private bool _isTitleMenuOpen;
+
     public ProjectDetails()
     {
         InitializeComponent();
@@ -32,6 +37,7 @@ public partial class ProjectDetails : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        CloseTitleMenuImmediately();
         WeakReferenceMessenger.Default.Unregister<TitleCaptureRequestedMessage>(this);
     }
 
@@ -44,41 +50,127 @@ public partial class ProjectDetails : ContentPage
     }
 
     // ------------------------------------------------------------------
+    // Titelbild-Menue
+    // ------------------------------------------------------------------
+
+    private async void OnTitleEditClicked(object sender, EventArgs e)
+        => await SetTitleMenuAsync(!_isTitleMenuOpen);
+
+    private async void OnTitleMenuScrimTapped(object sender, TappedEventArgs e)
+        => await SetTitleMenuAsync(false);
+
+    private async void OnTitleCameraTapped(object sender, TappedEventArgs e)
+    {
+        await SetTitleMenuAsync(false);
+        await CaptureTitleImageAsync();
+    }
+
+    private async void OnTitleFileTapped(object sender, TappedEventArgs e)
+    {
+        await SetTitleMenuAsync(false);
+        await PickTitleImageAsync();
+    }
+
+    private async void OnTitleRemoveTapped(object sender, TappedEventArgs e)
+    {
+        await SetTitleMenuAsync(false);
+
+        bool confirmed = await DisplayAlertAsync(
+            AppResources.titelbild_entfernen + "?", string.Empty,
+            AppResources.ok, AppResources.abbrechen);
+
+        if (confirmed)
+            RemoveTitleImage();
+    }
+
+    /// <summary>
+    /// Klappt die Aktionen animiert auf/zu. Der Stift wird dabei zum X.
+    /// Der Papierkorb (oben links) erscheint nur bei eigenem Bild.
+    /// </summary>
+    private async Task SetTitleMenuAsync(bool open)
+    {
+        if (_isTitleMenuOpen == open) return;
+        _isTitleMenuOpen = open;
+
+        titleEditButton.Text = open ? MaterialIcons.Close : MaterialIcons.Edit;
+
+        titleMenu.CancelAnimations();
+        titleMenuScrim.CancelAnimations();
+        titleRemoveChip.CancelAnimations();
+
+        bool showRemove = ProjectItem.Current.HasTitleImage;
+
+        if (open)
+        {
+            titleMenu.TranslationX = MenuSlideOffset;
+            titleMenu.Opacity = 0;
+            titleMenu.IsVisible = true;
+            titleMenuScrim.Opacity = 0;
+            titleMenuScrim.IsVisible = true;
+            titleRemoveChip.Opacity = 0;
+            titleRemoveChip.IsVisible = showRemove;
+
+            await Task.WhenAll(
+                titleMenu.FadeToAsync(1, MenuAnimationMs),
+                titleMenu.TranslateToAsync(0, 0, MenuAnimationMs, Easing.CubicOut),
+                titleMenuScrim.FadeToAsync(1, MenuAnimationMs),
+                showRemove ? titleRemoveChip.FadeToAsync(1, MenuAnimationMs) : Task.CompletedTask);
+        }
+        else
+        {
+            await Task.WhenAll(
+                titleMenu.FadeToAsync(0, MenuAnimationMs),
+                titleMenu.TranslateToAsync(MenuSlideOffset, 0, MenuAnimationMs, Easing.CubicIn),
+                titleMenuScrim.FadeToAsync(0, MenuAnimationMs),
+                titleRemoveChip.FadeToAsync(0, MenuAnimationMs));
+
+            // Wurde waehrend der Animation wieder geoeffnet, nicht ausblenden.
+            if (!_isTitleMenuOpen)
+            {
+                titleMenu.IsVisible = false;
+                titleMenuScrim.IsVisible = false;
+                titleRemoveChip.IsVisible = false;
+            }
+        }
+    }
+
+    private void CloseTitleMenuImmediately()
+    {
+        _isTitleMenuOpen = false;
+        titleMenu.CancelAnimations();
+        titleMenuScrim.CancelAnimations();
+        titleRemoveChip.CancelAnimations();
+        titleMenu.IsVisible = false;
+        titleMenu.Opacity = 0;
+        titleMenuScrim.IsVisible = false;
+        titleMenuScrim.Opacity = 0;
+        titleRemoveChip.IsVisible = false;
+        titleRemoveChip.Opacity = 0;
+        titleEditButton.Text = MaterialIcons.Edit;
+    }
+
+    // ------------------------------------------------------------------
     // Titelbild
     // ------------------------------------------------------------------
 
     /// <summary>
-    /// Tippen aufs Bild: eigenes Bild -> Vollansicht, Platzhalter -> Auswahl.
+    /// Offenes Menue -> schliessen. Eigenes Bild -> Vollansicht. Platzhalter -> Menue oeffnen.
     /// </summary>
     private async void OnImageTapped(object sender, EventArgs e)
     {
+        if (_isTitleMenuOpen)
+        {
+            await SetTitleMenuAsync(false);
+            return;
+        }
+
         if (!ProjectItem.Current.HasTitleImage)
         {
-            OnChangeTitleImageClicked(sender, e);
+            await SetTitleMenuAsync(true);
             return;
         }
 
         await Shell.Current.GoToAsync($"imageview?imgSource=showTitle&gotoBtn=false");
-    }
-
-    /// <summary>
-    /// Auswahl fuer den Bearbeiten-Button. "Entfernen" nur bei eigenem Bild.
-    /// </summary>
-    private async void OnChangeTitleImageClicked(object sender, EventArgs e)
-    {
-        string camera = AppResources.titelbild_mit_der_kamera_erstellen;
-        string file = AppResources.titelbild_von_der_festplatte_hochladen;
-        string remove = ProjectItem.Current.HasTitleImage ? AppResources.titelbild_entfernen : null;
-
-        string choice = await DisplayActionSheetAsync(
-            AppResources.titelbild, AppResources.abbrechen, remove, camera, file);
-
-        if (choice == camera)
-            await CaptureTitleImageAsync();
-        else if (choice == file)
-            await PickTitleImageAsync();
-        else if (remove != null && choice == remove)
-            RemoveTitleImage();
     }
 
     /// <summary>Wird auch per TitleCaptureRequestedMessage aufgerufen.</summary>
