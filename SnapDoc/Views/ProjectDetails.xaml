@@ -55,12 +55,106 @@
                 </ImageButton.Triggers>
             </ImageButton>
 
-            <!-- Bearbeiten-Button: immer sichtbar, halbtransparent fuer helle Bilder -->
-            <Button Text="{x:Static local:MaterialIcons.Photo_camera}"
+            <!-- Abdunklung bei offenem Menue; Tippen schliesst -->
+            <BoxView x:Name="titleMenuScrim"
+                     IsVisible="False"
+                     Opacity="0"
+                     Color="#66000000">
+                <BoxView.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTitleMenuScrimTapped" />
+                </BoxView.GestureRecognizers>
+            </BoxView>
+
+            <!-- Papierkorb oben links, nur bei eigenem Bild (wird im Code gesetzt) -->
+            <Border x:Name="titleRemoveChip"
+                    IsVisible="False"
+                    Opacity="0"
+                    StrokeShape="RoundRectangle 18"
+                    Stroke="#B3FFFFFF"
+                    StrokeThickness="1"
+                    BackgroundColor="#E53935"
+                    HeightRequest="36"
+                    WidthRequest="36"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Start"
+                    Margin="10,10,0,0"
+                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild_entfernen}">
+                <Border.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnTitleRemoveTapped" />
+                </Border.GestureRecognizers>
+                <Label Text="{x:Static local:MaterialIcons.Delete}"
+                       FontFamily="MaterialOutlined"
+                       FontSize="18"
+                       TextColor="White"
+                       HorizontalOptions="Center"
+                       VerticalOptions="Center"/>
+            </Border>
+
+            <!-- Aktionen uebereinander links vom Stift, gleich breit -->
+            <VerticalStackLayout x:Name="titleMenu"
+                                 IsVisible="False"
+                                 Opacity="0"
+                                 Spacing="6"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="End"
+                                 Margin="0,0,58,12">
+
+                <Border StrokeShape="RoundRectangle 18"
+                        Stroke="#B3FFFFFF"
+                        StrokeThickness="1"
+                        BackgroundColor="#CC000000"
+                        HeightRequest="36"
+                        HorizontalOptions="Fill"
+                        Padding="12,0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnTitleCameraTapped" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="{x:Static local:MaterialIcons.Photo_camera}"
+                               FontFamily="MaterialOutlined"
+                               FontSize="18"
+                               TextColor="White"
+                               VerticalOptions="Center"/>
+                        <Label Text="{x:Static res:AppResources.titelbild_kamera}"
+                               FontSize="14"
+                               TextColor="White"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <Border StrokeShape="RoundRectangle 18"
+                        Stroke="#B3FFFFFF"
+                        StrokeThickness="1"
+                        BackgroundColor="#CC000000"
+                        HeightRequest="36"
+                        HorizontalOptions="Fill"
+                        Padding="12,0">
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnTitleFileTapped" />
+                    </Border.GestureRecognizers>
+                    <HorizontalStackLayout Spacing="6" VerticalOptions="Center">
+                        <Label Text="{x:Static local:MaterialIcons.Image_search}"
+                               FontFamily="MaterialOutlined"
+                               FontSize="18"
+                               TextColor="White"
+                               VerticalOptions="Center"/>
+                        <Label Text="{x:Static res:AppResources.titelbild_datei}"
+                               FontSize="14"
+                               TextColor="White"
+                               VerticalOptions="Center"/>
+                    </HorizontalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+
+            <!-- Stift / X -->
+            <Button x:Name="titleEditButton"
+                    Text="{x:Static local:MaterialIcons.Edit}"
                     FontFamily="MaterialOutlined"
                     FontSize="22"
                     TextColor="White"
                     BackgroundColor="#80000000"
+                    BorderColor="#B3FFFFFF"
+                    BorderWidth="1"
                     WidthRequest="40"
                     HeightRequest="40"
                     CornerRadius="20"
@@ -69,7 +163,7 @@
                     VerticalOptions="End"
                     Margin="0,0,10,10"
                     ToolTipProperties.Text="{x:Static res:AppResources.titelbild}"
-                    Clicked="OnChangeTitleImageClicked"/>
+                    Clicked="OnTitleEditClicked"/>
         </Grid>
 
         <Grid Grid.Row="1" Margin="16,6,16,16">
