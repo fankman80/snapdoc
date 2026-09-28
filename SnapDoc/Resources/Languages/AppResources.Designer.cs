@@ -3159,7 +3159,7 @@ namespace SnapDoc.Resources.Languages {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild ähnelt.
         /// </summary>
-        public static string titelbild {
+        internal static string titelbild {
             get {
                 return ResourceManager.GetString("titelbild", resourceCulture);
             }
@@ -3168,7 +3168,7 @@ namespace SnapDoc.Resources.Languages {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild entfernen ähnelt.
         /// </summary>
-        public static string titelbild_entfernen {
+        internal static string titelbild_entfernen {
             get {
                 return ResourceManager.GetString("titelbild_entfernen", resourceCulture);
             }
