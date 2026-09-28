@@ -210,7 +210,7 @@
   <data name="ok" xml:space="preserve">
     <value>OK</value>
   </data>
-  <data name="pdf_seiten_hinzufügen" xml:space="preserve">
+  <data name="pdf_seiten_hinzufuegen" xml:space="preserve">
     <value>Pläne aus PDF oder JPG/PNG hinzufügen</value>
   </data>
   <data name="pins" xml:space="preserve">
