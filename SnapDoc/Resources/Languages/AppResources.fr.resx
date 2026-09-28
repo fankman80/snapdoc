@@ -1152,4 +1152,10 @@
   <data name="titelbild_entfernen" xml:space="preserve">
     <value>Supprimer l'image de couverture</value>
   </data>
+  <data name="titelbild_kamera" xml:space="preserve">
+    <value>Caméra</value>
+  </data>
+  <data name="titelbild_datei" xml:space="preserve">
+    <value>Fichier</value>
+  </data>
 </root>
