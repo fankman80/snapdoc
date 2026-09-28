@@ -1908,9 +1908,9 @@ namespace SnapDoc.Resources.Languages {
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pläne aus PDF oder JPG/PNG hinzufügen ähnelt.
         /// </summary>
-        internal static string pdf_seiten_hinzufügen {
+        internal static string pdf_seiten_hinzufuegen {
             get {
-                return ResourceManager.GetString("pdf_seiten_hinzufügen", resourceCulture);
+                return ResourceManager.GetString("pdf_seiten_hinzufuegen", resourceCulture);
             }
         }
         
