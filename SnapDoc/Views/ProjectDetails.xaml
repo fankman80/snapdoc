@@ -2,7 +2,7 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/maui/global"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-             xmlns:views="clr-namespace:SnapDoc.Views"            
+             xmlns:views="clr-namespace:SnapDoc.Views"
              xmlns:services="clr-namespace:SnapDoc.Services"
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
@@ -11,43 +11,19 @@
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.ProjectDetails"
-             x:Name="ThisPage"             
+             x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektverwaltung}">
 
+    <!-- Titelleiste nur noch mit Titel - die Bildaktionen sitzen auf dem Bild -->
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto"
-              ColumnSpacing="0">
-            <Label Grid.Row="0"
-                   x:DataType="views:ProjectDetails"
+        <Grid>
+            <Label x:DataType="views:ProjectDetails"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
-                   Background="Transparent"
                    BackgroundColor="Transparent"
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-            <Button Grid.Column="1"                    
-                    Text="{x:Static local:MaterialIcons.Photo_camera}"
-                    FontSize="24"
-                    Padding="0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild_mit_der_kamera_erstellen}"
-                    Clicked="OnTitleCaptureClicked"/>
-            <Button Grid.Column="2"                    
-                    Text="{x:Static local:MaterialIcons.Image_search}"
-                    FontSize="24"
-                    Padding="0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild_von_der_festplatte_hochladen}"
-                    Clicked="OnTitleOpenClicked"/>
         </Grid>
     </Shell.TitleView>
 
@@ -59,14 +35,42 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ImageButton Grid.Row="0"
-                     Source="{Binding TitleImageFullSource}"
-                     IsVisible="{Binding HasTitleImage}"
-                     HeightRequest="100"
-                     Aspect="AspectFill"
-                     HorizontalOptions="Fill"
-                     VerticalOptions="Fill"
-                     Clicked="OnImageTapped"/>
+        <!-- Headerbild: immer sichtbar, ohne eigenes Bild mit Platzhalter banner.jpg -->
+        <Grid Grid.Row="0"
+              HeightRequest="100">
+
+            <ImageButton Source="{Binding TitleImageFullSource}"
+                         Aspect="AspectFill"
+                         HorizontalOptions="Fill"
+                         VerticalOptions="Fill"
+                         CornerRadius="0"
+                         Clicked="OnImageTapped">
+                <ImageButton.Triggers>
+                    <!-- Kein eigenes Bild: Platzhalter statt TitleImageFullSource -->
+                    <DataTrigger TargetType="ImageButton"
+                                 Binding="{Binding HasTitleImage}"
+                                 Value="False">
+                        <Setter Property="Source" Value="banner.jpg" />
+                    </DataTrigger>
+                </ImageButton.Triggers>
+            </ImageButton>
+
+            <!-- Bearbeiten-Button: immer sichtbar, halbtransparent fuer helle Bilder -->
+            <Button Text="{x:Static local:MaterialIcons.Photo_camera}"
+                    FontFamily="MaterialOutlined"
+                    FontSize="22"
+                    TextColor="White"
+                    BackgroundColor="#80000000"
+                    WidthRequest="40"
+                    HeightRequest="40"
+                    CornerRadius="20"
+                    Padding="0"
+                    HorizontalOptions="End"
+                    VerticalOptions="End"
+                    Margin="0,0,10,10"
+                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild}"
+                    Clicked="OnChangeTitleImageClicked"/>
+        </Grid>
 
         <Grid Grid.Row="1" Margin="16,6,16,16">
             <Grid.RowDefinitions>
@@ -83,7 +87,7 @@
                         BorderColor="{DynamicResource SecondaryBackground}"
                         PlaceholderColor="{DynamicResource SecondaryBackground}"
                         FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-                    
+
                     <controls:BorderedEntry
                         Text="{Binding ClientName, Mode=TwoWay}"
                         Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
@@ -136,7 +140,7 @@
                         BorderWidth="1"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
-                        Clicked="CalendarClicked"/>                        
+                        Clicked="CalendarClicked"/>
                 </VerticalStackLayout>
             </ScrollView>
 
@@ -149,6 +153,7 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.karte_aus_webmap}"
                         Clicked="OnAddWebMapClicked"/>
+
                 <Button Grid.Column="1"
                         Padding="0"
                         Text="&#xE415;&#xE43F;"
@@ -159,6 +164,7 @@
                         FontSize="30"
                         ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufuegen}"
                         Clicked="OnAddPdfClicked"/>
+
                 <Button Grid.Column="3"
                         Padding="0"
                         Text="{x:Static res:AppResources.ok}"
