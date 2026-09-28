@@ -157,7 +157,7 @@
                         TextColor="{DynamicResource PrimaryDarkText}"
                         FontFamily="MaterialOutlined"
                         FontSize="30"
-                        ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufuegen}"
                         Clicked="OnAddPdfClicked"/>
                 <Button Grid.Column="3"
                         Padding="0"
