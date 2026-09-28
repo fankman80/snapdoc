@@ -3174,13 +3174,30 @@ namespace SnapDoc.Resources.Languages {
             }
         }
         
-        
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Zum bearbeiten ziehen ähnelt.
         /// </summary>
         internal static string zum_bearbeiten_ziehen {
             get {
                 return ResourceManager.GetString("zum_bearbeiten_ziehen", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
+        /// </summary>
+        internal static string titelbild_kamera {
+            get {
+                return ResourceManager.GetString("titelbild_kamera", resourceCulture);
+            }
+        }
+
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Datei ähnelt.
+        /// </summary>
+        internal static string titelbild_datei {
+            get {
+                return ResourceManager.GetString("titelbild_datei", resourceCulture);
             }
         }
     }
