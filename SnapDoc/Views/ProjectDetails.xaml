@@ -58,7 +58,7 @@
             <!-- Abdunklung bei offenem Menue; Tippen schliesst -->
             <BoxView x:Name="titleMenuScrim"
                      IsVisible="False"
-                     Opacity="0"
+                     Opacity="0.3"
                      Color="#66000000">
                 <BoxView.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTitleMenuScrimTapped" />
@@ -150,18 +150,18 @@
             <Button x:Name="titleEditButton"
                     Text="{x:Static local:MaterialIcons.Edit}"
                     FontFamily="MaterialOutlined"
-                    FontSize="22"
+                    FontSize="18"
                     TextColor="White"
                     BackgroundColor="#80000000"
                     BorderColor="#B3FFFFFF"
                     BorderWidth="1"
-                    WidthRequest="40"
-                    HeightRequest="40"
-                    CornerRadius="20"
+                    WidthRequest="36"
+                    HeightRequest="36"
+                    CornerRadius="18"
                     Padding="0"
                     HorizontalOptions="End"
                     VerticalOptions="End"
-                    Margin="0,0,10,10"
+                    Margin="0,0,12,12"
                     ToolTipProperties.Text="{x:Static res:AppResources.titelbild}"
                     Clicked="OnTitleEditClicked"/>
         </Grid>
