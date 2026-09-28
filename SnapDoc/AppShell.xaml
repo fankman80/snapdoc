@@ -283,7 +283,7 @@
                             IsVisible="{Binding ShowAddPdfButton, Source={x:Static local:ProjectItem.Current}}"
                             BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                             TextColor="{DynamicResource PrimaryDarkText}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufügen}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufuegen}"
                             Clicked="OnAddPdfClicked"/>
                 </VerticalStackLayout>
 
