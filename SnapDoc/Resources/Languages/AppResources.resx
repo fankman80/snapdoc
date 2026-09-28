@@ -1146,4 +1146,10 @@
   <data name="unbekannter_nutzer" xml:space="preserve">
     <value>Unbekannter Nutzer</value>
   </data>
+  <data name="titelbild" xml:space="preserve">
+    <value>Titelbild</value>
+  </data>
+  <data name="titelbild_entfernen" xml:space="preserve">
+    <value>Titelbild entfernen</value>
+  </data>
 </root>
