@@ -1152,4 +1152,10 @@
   <data name="titelbild_entfernen" xml:space="preserve">
     <value>Titelbild entfernen</value>
   </data>
+  <data name="titelbild_kamera" xml:space="preserve">
+    <value>Kamera</value>
+  </data>
+  <data name="titelbild_datei" xml:space="preserve">
+    <value>Datei</value>
+  </data>
 </root>
