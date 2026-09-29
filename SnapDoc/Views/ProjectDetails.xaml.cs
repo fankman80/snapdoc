@@ -30,8 +30,6 @@ public partial class ProjectDetails : ContentPage
     {
         base.OnAppearing();
         BindingContext = ProjectItem.Current;
-        WeakReferenceMessenger.Default.Register<TitleCaptureRequestedMessage>(this, (r, m) =>
-            MainThread.BeginInvokeOnMainThread(() => OnTitleCaptureClicked(null, null)));
     }
 
     protected override void OnDisappearing()
