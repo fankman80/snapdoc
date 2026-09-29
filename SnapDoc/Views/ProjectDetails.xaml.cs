@@ -36,7 +36,6 @@ public partial class ProjectDetails : ContentPage
     {
         base.OnDisappearing();
         CloseTitleMenuImmediately();
-        WeakReferenceMessenger.Default.Unregister<TitleCaptureRequestedMessage>(this);
     }
 
     private async void OnOkayClicked(object sender, EventArgs e)
