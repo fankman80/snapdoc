@@ -58,8 +58,8 @@
             <!-- Abdunklung bei offenem Menue; Tippen schliesst -->
             <BoxView x:Name="titleMenuScrim"
                      IsVisible="False"
-                     Opacity="0.7"
-                     Color="Black">
+                     Opacity="0"
+                     Color="#66000000">
                 <BoxView.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTitleMenuScrimTapped" />
                 </BoxView.GestureRecognizers>
@@ -96,7 +96,7 @@
                                  Spacing="6"
                                  HorizontalOptions="End"
                                  VerticalOptions="End"
-                                 Margin="0,0,58,12">
+                                 Margin="0,0,56,12">
 
                 <Border StrokeShape="RoundRectangle 18"
                         Stroke="#B3FFFFFF"
@@ -151,12 +151,13 @@
                     FontFamily="MaterialOutlined"
                     FontSize="18"
                     TextColor="White"
-                    BackgroundColor="Black"
-                    Opacity="0.5"
+                    BackgroundColor="#80000000"
                     BorderColor="#B3FFFFFF"
                     BorderWidth="1"
                     WidthRequest="36"
                     HeightRequest="36"
+                    MinimumWidthRequest="36"
+                    MinimumHeightRequest="36"
                     CornerRadius="18"
                     Padding="0"
                     HorizontalOptions="End"
