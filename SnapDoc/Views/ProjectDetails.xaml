@@ -93,7 +93,6 @@
             <!-- Aktionen uebereinander links vom Stift, gleich breit -->
             <VerticalStackLayout x:Name="titleMenu"
                                  IsVisible="False"
-                                 Opacity="0"
                                  Spacing="6"
                                  HorizontalOptions="End"
                                  VerticalOptions="End"
@@ -102,8 +101,7 @@
                 <Border StrokeShape="RoundRectangle 18"
                         Stroke="#B3FFFFFF"
                         StrokeThickness="1"
-                        BackgroundColor="Black"
-                        Opacity="0.5"
+                        BackgroundColor="#80000000"
                         HeightRequest="36"
                         HorizontalOptions="Fill"
                         Padding="12,0">
@@ -126,8 +124,7 @@
                 <Border StrokeShape="RoundRectangle 18"
                         Stroke="#B3FFFFFF"
                         StrokeThickness="1"
-                        BackgroundColor="Black"
-                        Opacity="0.5"
+                        BackgroundColor="#80000000"
                         HeightRequest="36"
                         HorizontalOptions="Fill"
                         Padding="12,0">
