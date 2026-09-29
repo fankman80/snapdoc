@@ -56,14 +56,14 @@
             </ImageButton>
 
             <!-- Abdunklung bei offenem Menue; Tippen schliesst -->
-            <BoxView x:Name="titleMenuScrim"
-                     IsVisible="False"
-                     Opacity="0"
-                     Color="#66000000">
-                <BoxView.GestureRecognizers>
+            <Grid x:Name="titleMenuScrim"
+                  IsVisible="False"
+                  Opacity="0"
+                  BackgroundColor="#66000000">
+                <Grid.GestureRecognizers>
                     <TapGestureRecognizer Tapped="OnTitleMenuScrimTapped" />
-                </BoxView.GestureRecognizers>
-            </BoxView>
+                </Grid.GestureRecognizers>
+            </Grid>
 
             <!-- Papierkorb oben links, nur bei eigenem Bild (wird im Code gesetzt) -->
             <Border x:Name="titleRemoveChip"
