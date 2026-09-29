@@ -166,13 +166,12 @@
                   Padding="0,0,6,0"
                   RowSpacing="0"
                   BackgroundColor="{AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}">
-                <ImageButton Grid.Column="0" Grid.RowSpan="2"
-                             HeightRequest="100"
-                             WidthRequest="100"
-                             Aspect="AspectFill"
-                             BackgroundColor="Transparent"
-                             Source="{Binding TitleImageSource}"
-                             Clicked="OnTitleClicked"/>
+                <Image Grid.Column="0" Grid.RowSpan="2"
+                       HeightRequest="100"
+                       WidthRequest="100"
+                       Aspect="AspectFill"
+                       BackgroundColor="Transparent"
+                       Source="{Binding TitleImageSource}"/>
                 <Label Grid.Column="1" Grid.Row="0"
                        Text="{Binding FlyoutHeaderTitle}"
                        LineBreakMode="TailTruncation"
