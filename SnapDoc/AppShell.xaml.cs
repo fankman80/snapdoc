@@ -155,12 +155,6 @@ public partial class AppShell : Shell
         await Shell.Current.GoToAsync("loadPdfImages");
     }
 
-    private void OnTitleClicked(object sender, EventArgs e)
-    {
-        if (SettingsService.Instance.IsProjectLoaded)
-            WeakReferenceMessenger.Default.Send(new TitleCaptureRequestedMessage());
-    }
-
     // ---------------------------------------------------------------
     // Planliste
     // ---------------------------------------------------------------
