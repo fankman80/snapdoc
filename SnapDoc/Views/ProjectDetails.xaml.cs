@@ -10,12 +10,9 @@ namespace SnapDoc.Views;
 
 public partial class ProjectDetails : ContentPage
 {
-    // Wert in TitleImage, wenn kein eigenes Bild gesetzt ist (HasTitleImage = false).
     private const string DefaultTitleImage = "banner_thumbnail.png";
-
     private const uint MenuAnimationMs = 150;
     private const double MenuSlideOffset = 24;
-
     private bool _isTitleMenuOpen;
 
     public ProjectDetails()
@@ -119,7 +116,6 @@ public partial class ProjectDetails : ContentPage
                 titleMenuScrim.FadeToAsync(0, MenuAnimationMs),
                 titleRemoveChip.FadeToAsync(0, MenuAnimationMs));
 
-            // Wurde waehrend der Animation wieder geoeffnet, nicht ausblenden.
             if (!_isTitleMenuOpen)
             {
                 titleMenu.IsVisible = false;
@@ -148,9 +144,6 @@ public partial class ProjectDetails : ContentPage
     // Titelbild
     // ------------------------------------------------------------------
 
-    /// <summary>
-    /// Offenes Menue -> schliessen. Eigenes Bild -> Vollansicht. Platzhalter -> Menue oeffnen.
-    /// </summary>
     private async void OnImageTapped(object sender, EventArgs e)
     {
         if (_isTitleMenuOpen)
@@ -168,7 +161,6 @@ public partial class ProjectDetails : ContentPage
         await Shell.Current.GoToAsync($"imageview?imgSource=showTitle&gotoBtn=false");
     }
 
-    /// <summary>Wird auch per TitleCaptureRequestedMessage aufgerufen.</summary>
     public async void OnTitleCaptureClicked(object sender, EventArgs e)
         => await CaptureTitleImageAsync();
 
@@ -176,7 +168,7 @@ public partial class ProjectDetails : ContentPage
     {
         try
         {
-            // 1. Alten Dateinamen vor der Kameraaufnahme sichern
+            // Alten Dateinamen vor der Kameraaufnahme sichern
             string oldTitleImage = GlobalJson.Data.TitleImage;
             string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
 
@@ -187,15 +179,15 @@ public partial class ProjectDetails : ContentPage
 
             if (result == null) return;
 
-            // 2. Alte Dateien lokal UND aus der Cloud loeschen
+            // Alte Dateien lokal UND aus der Cloud loeschen
             DeleteTitleImageFiles(oldTitleImage);
 
-            // 3. JSON aktualisieren
+            // JSON aktualisieren
             ProjectItem.Current.TitleImage = thumbFileName;
             GlobalJson.Data.TitleImageSize = imgSize;
             GlobalJson.SaveToFile();
 
-            // 4. JSON-Aenderungen UND die 2 neuen Bilddateien an SaveManager uebergeben
+            // JSON-Aenderungen UND die 2 neuen Bilddateien an SaveManager uebergeben
             var (imagePath, thumbPath) = GetTitleImagePaths(thumbFileName);
             SaveManager.NotifyDataChanged([
                 (imagePath, GlobalJson.Data.ImagePath),
@@ -220,7 +212,7 @@ public partial class ProjectDetails : ContentPage
 
             if (fileResult == null) return;
 
-            // 1. Alten Dateinamen vor dem Ueberschreiben merken
+            // Alten Dateinamen vor dem Ueberschreiben merken
             string oldTitleImage = GlobalJson.Data.TitleImage;
             string thumbFileName = $"title_{DateTime.Now.Ticks}.jpg";
             string sourceFilePath = fileResult.FullPath;
@@ -238,10 +230,10 @@ public partial class ProjectDetails : ContentPage
 
             await Thumbnail.Generate(sourceFilePath, destinationThumbPath);
 
-            // 2. Alte Dateien lokal UND in der Cloud loeschen
+            // Alte Dateien lokal UND in der Cloud loeschen
             DeleteTitleImageFiles(oldTitleImage);
 
-            // 3. JSON aktualisieren
+            // JSON aktualisieren
             ProjectItem.Current.TitleImage = thumbFileName;
 
             // Codec in einem using-Block kapseln, um Memory Leaks zu verhindern
@@ -254,7 +246,7 @@ public partial class ProjectDetails : ContentPage
 
             GlobalJson.SaveToFile();
 
-            // 4. JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
+            // JSON UND die zwei neuen Bilddateien fuer den Upload registrieren
             SaveManager.NotifyDataChanged([
                 (destinationPath, GlobalJson.Data.ImagePath),         // Originalbild im Images-Ordner
                 (destinationThumbPath, GlobalJson.Data.ThumbnailPath) // Thumbnail im Thumbnails-Ordner
@@ -346,13 +338,9 @@ public partial class ProjectDetails : ContentPage
 
         var newPlan = new KeyValuePair<string, Plan>(planId, plan);
         LoadDataToView.AddPlan(newPlan);
-
-        // Ueberpruefen, ob die Plans-Struktur initialisiert ist
         GlobalJson.Data.Plans ??= [];
         GlobalJson.Data.Plans[planId] = plan;
-
         SaveManager.NotifyDataChanged();
-
         ProjectItem.Current.ApplyFilterAndSorting();
         await Shell.Current.GoToAsync($"//{planId}");
     }
@@ -362,9 +350,7 @@ public partial class ProjectDetails : ContentPage
         var popup = new PopupCalendarView(ProjectItem.Current.CreationDate);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
         if (string.IsNullOrEmpty(result?.Result)) return;
-
-        if (DateTime.TryParseExact(result.Result, "dd.MM.yyyy",
-            CultureInfo.InvariantCulture, DateTimeStyles.None, out var picked))
+        if (DateTime.TryParseExact(result.Result, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var picked))
             ProjectItem.Current.CreationDate = picked;
     }
 }

@@ -1,6 +1,4 @@
 using CommunityToolkit.Maui.Core;
-using CommunityToolkit.Maui.Core.Primitives;
-using CommunityToolkit.Maui.Views;
 using Microsoft.Maui.Layouts;
 using SkiaSharp;
 using SnapDoc.Services;
@@ -10,24 +8,18 @@ namespace SnapDoc.Views;
 
 public partial class CameraPage : ContentPage
 {
-    // Nominale Seitenverhaeltnisse fuer die Ratio-Buttons (immer >= 1.0).
     private static readonly (string Name, double Value)[] NominalRatios =
-    {
+    [
         ("16:9", 16.0 / 9.0),
         ("3:2", 3.0 / 2.0),
         ("4:3", 4.0 / 3.0),
         ("5:4", 5.0 / 4.0),
         ("1:1", 1.0),
-    };
+    ];
 
     private const double RatioTolerance = 0.05;
-
     private string? _tempFilePath = string.Empty;
-
-    // Wird bei jedem Kamerastart automatisch gesetzt (GetBestRatio).
-    // Eine manuelle Auswahl gilt nur bis zum naechsten Start / Kamerawechsel.
     private double _userSelectedRatio = 4.0 / 3.0;
-
     private CameraFlashMode _currentFlashMode = (CameraFlashMode)SettingsService.Instance.FlashMode;
     private bool _isZoomSupported = false;
     private bool _suppressZoomEvents = false;
@@ -35,30 +27,17 @@ public partial class CameraPage : ContentPage
     private bool _isInPreviewMode = false;
     private CancellationTokenSource? _zoomTimerCts;
     private bool _isTorchOn = false;
-    private IReadOnlyList<CameraInfo> _cameras = Array.Empty<CameraInfo>();
+    private IReadOnlyList<CameraInfo> _cameras = [];
     private bool _isStarted = false;
     private bool _isCapturing = false;
-
-    // MediaCaptured feuert asynchron; darueber wird das Ergebnis in den
-    // Klick-Handler zurueckgefuehrt.
     private TaskCompletionSource<Stream?>? _captureTcs;
-
-    // Physische Geraeteausrichtung - die Seite selbst bleibt im Hochformat.
-    //   0  = Hochformat
-    //   90 = Querformat, Geraeteoberkante zeigt nach links
-    //  -90 = Querformat, Geraeteoberkante zeigt nach rechts
-    // Gleichzeitig der Drehwinkel (im Uhrzeigersinn), damit Icons aufrecht stehen.
     private int _deviceRotation = 0;
-
-    // Ausrichtung, in der das aktuell angezeigte Vorschaubild aufgenommen wurde.
     private int _previewRotation = 0;
 
     public CameraPage()
     {
         InitializeComponent();
 
-        // Die Vorschau richtet sich nach der tatsaechlich verfuegbaren Flaeche unter
-        // der Top-Bar - nicht nach der Seitengroesse.
         previewArea.SizeChanged += (_, _) => UpdateCameraLayout();
     }
 
@@ -70,7 +49,6 @@ public partial class CameraPage : ContentPage
     {
         base.OnAppearing();
 
-        // Wie die Systemkamera: Layout bleibt im Hochformat, nur die Icons drehen sich.
         OrientationLock.LockPortrait();
         StartOrientationTracking();
         ApplyControlRotation(animate: false);
@@ -81,7 +59,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"Init-Fehler: {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine($"Init-Fehler: {ex.GetType().Name}: {ex.Message}");
         }
     }
 
@@ -99,8 +77,6 @@ public partial class CameraPage : ContentPage
         _isStarted = false;
     }
 
-    private static void Log(string message) => Debug.WriteLine($"[CAM] {message}");
-
     private async Task InitializeCameraAsync()
     {
         if (_isStarted) return;
@@ -110,27 +86,17 @@ public partial class CameraPage : ContentPage
             status = await Permissions.RequestAsync<Permissions.Camera>();
 
         if (status != PermissionStatus.Granted)
-        {
-            Log("Kameraberechtigung fehlt.");
             return;
-        }
 
-        // OnAppearing kann feuern, bevor der native Handler der CameraView verbunden ist.
         for (int i = 0; i < 30 && (cameraView.Handler == null || !cameraView.IsAvailable); i++)
             await Task.Delay(100);
 
         if (cameraView.Handler == null)
-        {
-            Log("CameraView-Handler nach 3 s nicht verbunden.");
             return;
-        }
 
         _cameras = await cameraView.GetAvailableCameras(CancellationToken.None);
         if (_cameras.Count == 0)
-        {
-            Log("GetAvailableCameras lieferte 0 Kameras.");
             return;
-        }
 
         switchCameraButton.IsVisible = _cameras.Count > 1;
 
@@ -166,24 +132,21 @@ public partial class CameraPage : ContentPage
             UpdateTorchUI();
             UpdateCameraLayout();
 
-            Log($"{camera.Name}: Ratio {_userSelectedRatio:F2}, Capture {cameraView.ImageCaptureResolution.Width}x{cameraView.ImageCaptureResolution.Height}");
-
             if (isSwitch)
             {
                 await Task.Delay(300);
                 var startTask = cameraView.StartCameraPreview(CancellationToken.None);
                 if (await Task.WhenAny(startTask, Task.Delay(5000)) != startTask)
-                    Log("StartCameraPreview hat nach 5 s nicht zurückgekehrt.");
+                    Debug.WriteLine("StartCameraPreview hat nach 5 s nicht zurückgekehrt.");
                 else
                     await startTask;
             }
         }
         catch (Exception ex)
         {
-            Log($"Start-Fehler ({camera.Position}): {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine($"Start-Fehler ({camera.Position}): {ex.GetType().Name}: {ex.Message}");
         }
 
-        // Zoom-Grenzen liefert Android erst, wenn die Kamera tatsaechlich gebunden ist.
         await Task.Delay(700);
         PopulateRatioButtons(camera);
         await ConfigureZoomAsync(camera);
@@ -199,10 +162,7 @@ public partial class CameraPage : ContentPage
         try
         {
             if (!Accelerometer.Default.IsSupported)
-            {
-                Log("Kein Beschleunigungssensor - Icons werden nicht gedreht.");
                 return;
-            }
 
             Accelerometer.Default.ReadingChanged -= OnAccelerometerReadingChanged;
             Accelerometer.Default.ReadingChanged += OnAccelerometerReadingChanged;
@@ -212,7 +172,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"Accelerometer-Start fehlgeschlagen: {ex.Message}");
+            Debug.WriteLine($"Accelerometer-Start fehlgeschlagen: {ex.Message}");
         }
     }
 
@@ -226,7 +186,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"Accelerometer-Stop fehlgeschlagen: {ex.Message}");
+            Debug.WriteLine($"Accelerometer-Stop fehlgeschlagen: {ex.Message}");
         }
     }
 
@@ -293,7 +253,7 @@ public partial class CameraPage : ContentPage
         => Math.Max(w, h) / Math.Min(w, h);
 
     private static IEnumerable<Size> ValidResolutions(CameraInfo camera)
-        => camera.SupportedResolutions?.Where(r => r.Width > 0 && r.Height > 0) ?? Enumerable.Empty<Size>();
+        => camera.SupportedResolutions?.Where(r => r.Width > 0 && r.Height > 0) ?? [];
 
     /// <summary>
     /// Das beste Format fuer das Geraet:
@@ -315,8 +275,8 @@ public partial class CameraPage : ContentPage
         var largest = valid.OrderByDescending(r => r.Width * r.Height).First();
         double ratio = NormalizeRatio(largest.Width, largest.Height);
 
-        var nominal = NominalRatios.OrderBy(n => Math.Abs(n.Value - ratio)).First();
-        return Math.Abs(nominal.Value - ratio) < RatioTolerance ? nominal.Value : ratio;
+        var (Name, Value) = NominalRatios.OrderBy(n => Math.Abs(n.Value - ratio)).First();
+        return Math.Abs(Value - ratio) < RatioTolerance ? Value : ratio;
     }
 
     /// <summary>
@@ -429,8 +389,6 @@ public partial class CameraPage : ContentPage
             BindableLayout.SetItemsSource(ratioContainer, available);
             _isRatioPickerExpanded = false;
             UpdateRatioPickerUI(animate: false);
-
-            // Neu erzeugte Buttons sofort in die aktuelle Ausrichtung bringen.
             ApplyControlRotation(animate: false);
         });
     }
@@ -482,30 +440,23 @@ public partial class CameraPage : ContentPage
         {
             var services = cameraView.Handler?.MauiContext?.Services;
             if (services?.GetService(typeof(ICameraProvider)) is not ICameraProvider provider)
-            {
-                Log("ICameraProvider nicht gefunden - Zoom bleibt deaktiviert.");
                 return;
-            }
 
             await provider.RefreshAvailableCameras(CancellationToken.None);
             var refreshed = provider.AvailableCameras;
             var match = refreshed?.FirstOrDefault(c => c.Position == camera.Position && c.Name == camera.Name);
 
             if (match == null || match.MaximumZoomFactor <= match.MinimumZoomFactor)
-            {
-                Log($"Zoom nach Refresh weiterhin {match?.MinimumZoomFactor} - {match?.MaximumZoomFactor}.");
                 return;
-            }
 
             _cameras = refreshed!;
             cameraView.SelectedCamera = match;
             cameraView.ImageCaptureResolution = SelectResolution(match, _userSelectedRatio);
             ApplyZoomRange(match);
-            Log($"Zoom nach Refresh: {match.MinimumZoomFactor} - {match.MaximumZoomFactor}");
         }
         catch (Exception ex)
         {
-            Log($"Zoom-Refresh fehlgeschlagen: {ex.Message}");
+            Debug.WriteLine($"Zoom-Refresh fehlgeschlagen: {ex.Message}");
         }
     }
 
@@ -565,11 +516,8 @@ public partial class CameraPage : ContentPage
         if (_isCapturing) return;
         _isCapturing = true;
 
-        // Ausrichtung im Moment des Ausloesens festhalten.
         int captureRotation = _deviceRotation;
-
         var flashTask = FlashAsync();
-
         var tcs = new TaskCompletionSource<Stream?>(TaskCreationOptions.RunContinuationsAsynchronously);
         _captureTcs = tcs;
 
@@ -582,10 +530,7 @@ public partial class CameraPage : ContentPage
 
             using var stream = await tcs.Task;
             if (stream == null)
-            {
-                Log(cts.IsCancellationRequested ? "Capture-Timeout." : "Capture ohne Ergebnis.");
                 return;
-            }
 
             _tempFilePath = await SavePhotoToCache(stream, ResolveUserRatio(), GetCaptureRatio(), captureRotation);
 
@@ -595,7 +540,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"Capture error: {ex.Message}");
+            Debug.WriteLine($"Capture error: {ex.Message}");
             await RestartPreview();
         }
         finally
@@ -615,7 +560,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"CaptureImage: {ex.GetType().Name}: {ex.Message}");
+            Debug.WriteLine($"CaptureImage: {ex.GetType().Name}: {ex.Message}");
             tcs.TrySetResult(null);
         }
     }
@@ -633,7 +578,7 @@ public partial class CameraPage : ContentPage
 
     private void OnMediaCaptureFailed(object? sender, MediaCaptureFailedEventArgs e)
     {
-        Log($"Capture failed: {e.FailureReason}");
+        Debug.WriteLine($"Capture failed: {e.FailureReason}");
         _captureTcs?.TrySetResult(null);
     }
 
@@ -717,7 +662,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"NormalizeImage failed: {ex.Message}");
+            Debug.WriteLine($"NormalizeImage failed: {ex.Message}");
         }
     }
 
@@ -859,7 +804,7 @@ public partial class CameraPage : ContentPage
         }
         catch (Exception ex)
         {
-            Log($"Restart error: {ex.Message}");
+            Debug.WriteLine($"Restart error: {ex.Message}");
         }
     }
 
@@ -982,10 +927,7 @@ public partial class CameraPage : ContentPage
     private async void OnSwitchCameraClicked(object sender, EventArgs e)
     {
         if (_cameras.Count <= 1)
-        {
-            Log($"Kamerawechsel nicht möglich: {_cameras.Count} Kamera(s) bekannt.");
             return;
-        }
 
         var currentPosition = cameraView.SelectedCamera?.Position ?? CameraPosition.Rear;
         var next = _cameras.FirstOrDefault(c => c.Position != currentPosition) ?? _cameras[0];

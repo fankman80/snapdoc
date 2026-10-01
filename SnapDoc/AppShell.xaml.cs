@@ -14,11 +14,7 @@ namespace SnapDoc;
 public partial class AppShell : Shell
 {
     private readonly AuthService _authService = new();
-
-    /// <summary>Kurzzugriff auf das Projekt-ViewModel (Datenquelle aller Bindings).</summary>
     private static ProjectItem Project => ProjectItem.Current;
-
-    // Reine UI-Auswahl (Markierung in der Planliste) - bleibt in der Shell.
     private PlanItem _selectedPlanItem;
     public PlanItem SelectedPlanItem
     {
@@ -55,7 +51,6 @@ public partial class AppShell : Shell
         Routing.RegisterRoute("generalmapview", typeof(MapView));
         Routing.RegisterRoute("cloudPickerPage", typeof(CloudPickerPage));
 
-        // ItemsSource kommt aus der XAML: ItemsSource="{Binding PlanItems}"
         BindingContext = Project;
 
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
@@ -197,8 +192,6 @@ public partial class AppShell : Shell
             return;
 
         var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
-
-        // Masterliste in-place umsortieren (Collection darf nicht neu zugewiesen werden)
         var all = Project.AllPlanItems;
         var reordered = orderedIds
             .Select(id => all.First(p => p.PlanId == id))
