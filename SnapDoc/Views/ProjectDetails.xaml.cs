@@ -1,8 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Mvvm.Messaging;
 using SkiaSharp;
-using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -174,7 +172,7 @@ public partial class ProjectDetails : ContentPage
     public async void OnTitleCaptureClicked(object sender, EventArgs e)
         => await CaptureTitleImageAsync();
 
-    private async Task CaptureTitleImageAsync()
+    private static async Task CaptureTitleImageAsync()
     {
         try
         {
@@ -210,7 +208,7 @@ public partial class ProjectDetails : ContentPage
         }
     }
 
-    private async Task PickTitleImageAsync()
+    private static async Task PickTitleImageAsync()
     {
         try
         {
@@ -272,7 +270,7 @@ public partial class ProjectDetails : ContentPage
     /// Loescht das eigene Titelbild und setzt auf den Standardwert zurueck
     /// (HasTitleImage = false -> Platzhalter banner.jpg wird angezeigt).
     /// </summary>
-    private void RemoveTitleImage()
+    private static void RemoveTitleImage()
     {
         try
         {
