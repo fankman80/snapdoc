@@ -13,7 +13,7 @@
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
-             Title="{x:Static res:AppResources.pin_liste}">
+             Title="{x:Static res:AppResources.pins}">
 
     <Shell.TitleView>
         <HorizontalStackLayout Spacing="0">

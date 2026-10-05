@@ -13,7 +13,7 @@
              BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
              x:Class="SnapDoc.Views.FotoGalleryView"             
              x:Name="ThisPage"             
-             Title="{x:Static res:AppResources.alle_fotos}">
+             Title="{x:Static res:AppResources.fotos}">
 
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto"
