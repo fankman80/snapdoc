@@ -1,7 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
-using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Globalization;
@@ -280,10 +279,6 @@ public partial class ProjectDetails : ContentPage
             Path.Combine(projectDir, GlobalJson.Data.ThumbnailPath, fileName));
     }
 
-    /// <summary>
-    /// Loescht Original und Thumbnail lokal und in der Cloud.
-    /// Der Standardwert wird nie geloescht.
-    /// </summary>
     private static void DeleteTitleImageFiles(string fileName)
     {
         if (string.IsNullOrEmpty(fileName) || fileName == DefaultTitleImage) return;
@@ -294,47 +289,6 @@ public partial class ProjectDetails : ContentPage
 
         _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
         _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
-    }
-
-    // ------------------------------------------------------------------
-    // Weitere Aktionen
-    // ------------------------------------------------------------------
-
-    private async void OnAddPdfClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("loadPdfImages");
-    }
-
-    private async void OnAddWebMapClicked(object sender, EventArgs e)
-    {
-        var popup = new PopupEntry(header: AppResources.karte_aus_webmap,
-                                   desc: AppResources.online_map_requirement_hint + ".",
-                                   title: AppResources.plan_name,
-                                   okText: AppResources.erstellen);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-
-        if (result?.Result == null) return;
-
-        string planId = "webmap_" + SyncClock.NewId();
-        Plan plan = new()
-        {
-            Name = result.Result == "" ? "Online Map" : result.Result,
-            File = "",
-            ImageSize = new Size(0, 0),
-            IsGrayscale = false,
-            Description = "",
-            AllowExport = true,
-            PlanColor = "#00FFFFFF"
-        };
-        plan.Touch();
-
-        var newPlan = new KeyValuePair<string, Plan>(planId, plan);
-        LoadDataToView.AddPlan(newPlan);
-        GlobalJson.Data.Plans ??= [];
-        GlobalJson.Data.Plans[planId] = plan;
-        SaveManager.NotifyDataChanged();
-        ProjectItem.Current.ApplyFilterAndSorting();
-        await Shell.Current.GoToAsync($"//{planId}");
     }
 
     private async void CalendarClicked(object sender, EventArgs e)

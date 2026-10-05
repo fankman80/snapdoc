@@ -963,8 +963,8 @@
   <data name="lupeneinstellungen" xml:space="preserve">
     <value>Loupe settings</value>
   </data>
-  <data name="plaene_hinzufuegen" xml:space="preserve">
-    <value>Add plans</value>
+  <data name="plan_hinzufuegen" xml:space="preserve">
+    <value>Add plan</value>
   </data>
   <data name="hatchAngle" xml:space="preserve">
     <value>Hatch angle</value>
@@ -1157,5 +1157,11 @@
   </data>
   <data name="titelbild_datei" xml:space="preserve">
     <value>File</value>
+  </data>
+  <data name="onlinekarte" xml:space="preserve">
+    <value>Online map</value>
+  </data>
+  <data name="pdf_bild" xml:space="preserve">
+    <value>PDF / Image</value>
   </data>
 </root>

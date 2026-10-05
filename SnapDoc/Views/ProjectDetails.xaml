@@ -167,100 +167,70 @@
                     Clicked="OnTitleEditClicked"/>
         </Grid>
 
-        <Grid Grid.Row="1" Margin="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+        <ScrollView Grid.Row="1" Margin="16">
+            <VerticalStackLayout Spacing="6">
+                <controls:BorderedEntry
+                    Text="{Binding ObjectName, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.objektbezeichnung}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-            <ScrollView Grid.Row="0">
-                <VerticalStackLayout Spacing="6">
-                    <controls:BorderedEntry
-                        Text="{Binding ObjectName, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.objektbezeichnung}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                    Text="{Binding ClientName, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                    <controls:BorderedEntry
-                        Text="{Binding ClientName, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEditor
+                    Text="{Binding ObjectAddress, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.adresse}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                    <controls:BorderedEditor
-                        Text="{Binding ObjectAddress, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.adresse}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                    Text="{Binding WorkingTitle, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.projektvorgang}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                    <controls:BorderedEntry
-                        Text="{Binding WorkingTitle, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.projektvorgang}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                    Text="{Binding ProjectNr, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.projektnummer}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                    <controls:BorderedEntry
-                        Text="{Binding ProjectNr, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.projektnummer}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                <controls:BorderedEntry
+                    Text="{Binding ProjectManager, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.projektleitung}"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    PlaceholderColor="{DynamicResource SecondaryBackground}"
+                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
 
-                    <controls:BorderedEntry
-                        Text="{Binding ProjectManager, Mode=TwoWay}"
-                        Placeholder="{x:Static res:AppResources.projektleitung}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
-
-                    <Button
-                        Text="{Binding CreationDateDisplay}"
-                        Margin="0,8,0,0"
-                        HeightRequest="44"
-                        FontSize="{StaticResource AppFontSizeNormal}"
-                        HorizontalOptions="Start"
-                        VerticalOptions="Center"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        BorderWidth="1"
-                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
-                        Clicked="CalendarClicked"/>
-                </VerticalStackLayout>
-            </ScrollView>
-
-            <Grid Grid.Row="1" ColumnDefinitions="Auto,Auto,*" RowDefinitions="Auto,Auto">
-                <Label Grid.Row="0" Grid.ColumnSpan="3" Text="{x:Static res:AppResources.plaene_hinzufuegen}"/>
-                <Button Grid.Column="0" Grid.Row="1"
-                        Padding="0"
-                        MinimumWidthRequest="80"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.karte_aus_webmap}"
-                        Clicked="OnAddWebMapClicked"/>
-
-                <Button Grid.Column="1" Grid.Row="1"
-                        Padding="0"
-                        Text="&#xE415;&#xE3F4;"
-                        MinimumWidthRequest="80"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        FontFamily="MaterialOutlined"
-                        FontSize="30"
-                        ToolTipProperties.Text="{x:Static res:AppResources.pdf_seiten_hinzufuegen}"
-                        Clicked="OnAddPdfClicked"/>
-            </Grid>
-        </Grid>
+                <Button
+                    Text="{Binding CreationDateDisplay}"
+                    Margin="0,8,0,0"
+                    HeightRequest="44"
+                    FontSize="{StaticResource AppFontSizeNormal}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BackgroundColor="Transparent"
+                    BorderColor="{DynamicResource SecondaryBackground}"
+                    BorderWidth="1"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
+                    Clicked="CalendarClicked"/>
+            </VerticalStackLayout>
+        </ScrollView>
     </Grid>
 </ContentPage>

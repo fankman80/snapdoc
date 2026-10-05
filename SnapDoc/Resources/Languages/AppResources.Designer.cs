@@ -88,15 +88,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Alle Fotos ähnelt.
-        /// </summary>
-        internal static string alle_fotos {
-            get {
-                return ResourceManager.GetString("alle_fotos", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die alle Icons ähnelt.
         /// </summary>
         internal static string alle_icons {
@@ -1861,6 +1852,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Onlinekarte ähnelt.
+        /// </summary>
+        internal static string onlinekarte {
+            get {
+                return ResourceManager.GetString("onlinekarte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ordner auswählen, in dem das Projekt gespeichert werden soll. ähnelt.
         /// </summary>
         internal static string ordner_auswaehlen_projekt_speichern {
@@ -1884,6 +1884,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string osm_karte {
             get {
                 return ResourceManager.GetString("osm_karte", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die PDF / Bild ähnelt.
+        /// </summary>
+        internal static string pdf_bild {
+            get {
+                return ResourceManager.GetString("pdf_bild", resourceCulture);
             }
         }
         
@@ -2032,15 +2041,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pin Liste ähnelt.
-        /// </summary>
-        internal static string pin_liste {
-            get {
-                return ResourceManager.GetString("pin_liste", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin löschen ähnelt.
         /// </summary>
         internal static string pin_loeschen {
@@ -2104,15 +2104,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Pläne hinzufügen ähnelt.
-        /// </summary>
-        internal static string plaene_hinzufuegen {
-            get {
-                return ResourceManager.GetString("plaene_hinzufuegen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pläne umsortieren: Gedrückt halten und ziehen ähnelt.
         /// </summary>
         internal static string plaene_umsortieren_gedrueckt_halten_und_ziehen {
@@ -2154,6 +2145,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string plan_exportieren {
             get {
                 return ResourceManager.GetString("plan_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Plan hinzufügen ähnelt.
+        /// </summary>
+        internal static string plan_hinzufuegen {
+            get {
+                return ResourceManager.GetString("plan_hinzufuegen", resourceCulture);
             }
         }
         
@@ -2842,11 +2842,47 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild ähnelt.
+        /// </summary>
+        internal static string titelbild {
+            get {
+                return ResourceManager.GetString("titelbild", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Datei ähnelt.
+        /// </summary>
+        internal static string titelbild_datei {
+            get {
+                return ResourceManager.GetString("titelbild_datei", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild entfernen ähnelt.
+        /// </summary>
+        internal static string titelbild_entfernen {
+            get {
+                return ResourceManager.GetString("titelbild_entfernen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild (Höhe) ähnelt.
         /// </summary>
         internal static string titelbild_hoehe {
             get {
                 return ResourceManager.GetString("titelbild_hoehe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
+        /// </summary>
+        internal static string titelbild_kamera {
+            get {
+                return ResourceManager.GetString("titelbild_kamera", resourceCulture);
             }
         }
         
@@ -3155,24 +3191,6 @@ namespace SnapDoc.Resources.Languages {
                 return ResourceManager.GetString("zu_pin_wechseln", resourceCulture);
             }
         }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild ähnelt.
-        /// </summary>
-        internal static string titelbild {
-            get {
-                return ResourceManager.GetString("titelbild", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Titelbild entfernen ähnelt.
-        /// </summary>
-        internal static string titelbild_entfernen {
-            get {
-                return ResourceManager.GetString("titelbild_entfernen", resourceCulture);
-            }
-        }
         
         /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Zum bearbeiten ziehen ähnelt.
@@ -3180,24 +3198,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string zum_bearbeiten_ziehen {
             get {
                 return ResourceManager.GetString("zum_bearbeiten_ziehen", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
-        /// </summary>
-        internal static string titelbild_kamera {
-            get {
-                return ResourceManager.GetString("titelbild_kamera", resourceCulture);
-            }
-        }
-
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Datei ähnelt.
-        /// </summary>
-        internal static string titelbild_datei {
-            get {
-                return ResourceManager.GetString("titelbild_datei", resourceCulture);
             }
         }
     }

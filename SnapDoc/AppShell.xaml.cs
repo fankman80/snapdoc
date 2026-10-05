@@ -3,18 +3,27 @@ using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
 using SnapDoc.Controls;
 using SnapDoc.Messages;
+using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.Views;
 using System.Collections.ObjectModel;
+using System.Collections.Specialized;
 using System.ComponentModel;
 
 namespace SnapDoc;
 
 public partial class AppShell : Shell
 {
+    private const uint AddPlanAnimationMs = 120;
+    private const double AddPlanRowHeight = 44;
+
     private readonly AuthService _authService = new();
     private static ProjectItem Project => ProjectItem.Current;
+
+    private bool _isAddPlanMenuOpen;
+    private INotifyCollectionChanged _observedPlanItems;
+
     private PlanItem _selectedPlanItem;
     public PlanItem SelectedPlanItem
     {
@@ -24,9 +33,7 @@ public partial class AppShell : Shell
             if (_selectedPlanItem == value) return;
 
             _selectedPlanItem?.IsSelected = false;
-
             _selectedPlanItem = value;
-
             _selectedPlanItem?.IsSelected = true;
 
             OnPropertyChanged();
@@ -56,8 +63,11 @@ public partial class AppShell : Shell
         SettingsService.Instance.PropertyChanged += OnSettingsChanged;
         PropertyChanged += OnAppShellPropertyChanged;
 
-        ApplyPlanTemplate();
+        // Planliste neu vermessen, wenn Plaene hinzukommen/wegfallen oder die Liste ersetzt wird
+        PlanCollectionView.PropertyChanged += OnPlanCollectionViewPropertyChanged;
+        ObservePlanItems(PlanCollectionView.ItemsSource);
 
+        ApplyPlanTemplate();
         Project.ReloadPlansFromData();
     }
 
@@ -66,8 +76,18 @@ public partial class AppShell : Shell
     // ---------------------------------------------------------------
     private void OnAppShellPropertyChanged(object sender, PropertyChangedEventArgs e)
     {
-        if (e.PropertyName == nameof(FlyoutIsPresented) && !FlyoutIsPresented)
+        if (e.PropertyName != nameof(FlyoutIsPresented)) return;
+
+        if (!FlyoutIsPresented)
+        {
+            SetAddPlanMenuImmediately(false);
             WeakReferenceMessenger.Default.Send(new ResetTouchesMessage());
+            return;
+        }
+
+        // Leeres Projekt: Planquellen direkt anbieten
+        if (!Project.HasPlans && SettingsService.Instance.IsProjectLoaded)
+            SetAddPlanMenuImmediately(true);
     }
 
     private void ApplyPlanTemplate()
@@ -78,6 +98,8 @@ public partial class AppShell : Shell
             SettingsService.Instance.IsPlanListThumbnails
                 ? (DataTemplate)Resources["PlanThumbnailTemplate"]
                 : (DataTemplate)Resources["PlanListTemplate"];
+
+        RefreshPlanListHeight();
     }
 
     private void OnSettingsChanged(object sender, PropertyChangedEventArgs e)
@@ -87,6 +109,9 @@ public partial class AppShell : Shell
 
         if (e.PropertyName == nameof(SettingsService.IsHideInactivePlans))
             MainThread.BeginInvokeOnMainThread(Project.ApplyFilterAndSorting);
+
+        if (e.PropertyName == nameof(SettingsService.IsProjectLoaded))
+            MainThread.BeginInvokeOnMainThread(UpdatePlanListMaxHeight);
     }
 
     public void HighlightCurrentPlan(string planId)
@@ -96,6 +121,66 @@ public partial class AppShell : Shell
         var selected = Project.PlanItems.FirstOrDefault(p => p.PlanId == planId);
         if (selected != null)
             PlanCollectionView.SelectedItem = selected;
+    }
+
+    private static void CloseFlyoutOnMobile()
+    {
+#if WINDOWS
+        Shell.Current.FlyoutIsPresented = true;
+#endif
+#if ANDROID || IOS
+        Shell.Current.FlyoutIsPresented = false;
+#endif
+    }
+
+    // ---------------------------------------------------------------
+    // Hoehe der Planliste
+    // Die Liste waechst mit ihrem Inhalt, "Plan hinzufuegen" haengt direkt darunter.
+    // Erst wenn der Platz nicht mehr reicht, wird sie begrenzt und scrollt.
+    // ---------------------------------------------------------------
+    private void OnPlanAreaSizeChanged(object sender, EventArgs e)
+        => UpdatePlanListMaxHeight();
+
+    private void UpdatePlanListMaxHeight()
+    {
+        if (PlanArea == null || PlanCollectionView == null || PlanArea.Height <= 0) return;
+
+        double addRow = AddPlanRow.IsVisible ? AddPlanRowHeight : 0;
+        double available = PlanArea.Height - PlanArea.Padding.VerticalThickness - addRow;
+
+        PlanCollectionView.MaximumHeightRequest = Math.Max(0, available);
+    }
+
+    private void OnPlanCollectionViewPropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(ItemsView.ItemsSource))
+            ObservePlanItems(PlanCollectionView.ItemsSource);
+    }
+
+    private void ObservePlanItems(object itemsSource)
+    {
+        _observedPlanItems?.CollectionChanged -= OnPlanItemsCollectionChanged;
+        _observedPlanItems = itemsSource as INotifyCollectionChanged;
+        _observedPlanItems?.CollectionChanged += OnPlanItemsCollectionChanged;
+
+        RefreshPlanListHeight();
+    }
+
+    private void OnPlanItemsCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+        => RefreshPlanListHeight();
+
+    /// <summary>
+    /// Die CollectionView meldet Inhaltsaenderungen nicht immer an das Layout weiter.
+    /// Deshalb wird nach Aenderungen explizit neu vermessen.
+    /// </summary>
+    private void RefreshPlanListHeight()
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            if (PlanCollectionView == null) return;
+            UpdatePlanListMaxHeight();
+            ((IView)PlanCollectionView).InvalidateMeasure();
+        });
     }
 
     // ---------------------------------------------------------------
@@ -109,12 +194,8 @@ public partial class AppShell : Shell
         var parameter = tap.CommandParameter?.ToString();
         if (string.IsNullOrWhiteSpace(parameter)) return;
 
-#if WINDOWS
-        Shell.Current.FlyoutIsPresented = true;
-#endif
-#if ANDROID || IOS
-        Shell.Current.FlyoutIsPresented = false;
-#endif
+        CloseFlyoutOnMobile();
+
         // Navigation auf bestimmte Seiten vermeiden, wenn keine Plaene vorhanden sind
         if (!Project.HasPlans && (parameter == "exportSettings" ||
                                   parameter == "pinList" ||
@@ -136,18 +217,102 @@ public partial class AppShell : Shell
         var parameter = tap.CommandParameter?.ToString();
         if (string.IsNullOrWhiteSpace(parameter)) return;
 
-#if WINDOWS
-        Shell.Current.FlyoutIsPresented = true;
-#endif
-#if ANDROID || IOS
-        Shell.Current.FlyoutIsPresented = false;
-#endif
+        CloseFlyoutOnMobile();
+
         await Shell.Current.GoToAsync($"//{parameter}");
     }
 
-    private async void OnAddPdfClicked(object sender, EventArgs e)
+    // ---------------------------------------------------------------
+    // Plan hinzufuegen (unter der Planliste)
+    // ---------------------------------------------------------------
+    private async void OnAddPlanTapped(object sender, TappedEventArgs e)
+        => await SetAddPlanMenuAsync(!_isAddPlanMenuOpen);
+
+    private async void OnAddPdfTapped(object sender, TappedEventArgs e)
     {
+        SetAddPlanMenuImmediately(false);
+        CloseFlyoutOnMobile();
         await Shell.Current.GoToAsync("loadPdfImages");
+    }
+
+    private async void OnAddWebMapTapped(object sender, TappedEventArgs e)
+    {
+        SetAddPlanMenuImmediately(false);
+        await AddWebMapPlanAsync();
+    }
+
+    /// <summary>
+    /// Wechselt animiert zwischen "+ Plan hinzufuegen" und den beiden Planquellen.
+    /// Die Zeilenhoehe bleibt konstant (44).
+    /// </summary>
+    private async Task SetAddPlanMenuAsync(bool open)
+    {
+        if (_isAddPlanMenuOpen == open) return;
+        _isAddPlanMenuOpen = open;
+
+        var show = open ? AddPlanOptions : AddPlanCollapsed;
+        var hide = open ? AddPlanCollapsed : AddPlanOptions;
+
+        show.CancelAnimations();
+        hide.CancelAnimations();
+
+        await hide.FadeToAsync(0, AddPlanAnimationMs);
+        if (_isAddPlanMenuOpen != open) return; // inzwischen erneut umgeschaltet
+        hide.IsVisible = false;
+
+        show.Opacity = 0;
+        show.IsVisible = true;
+        await show.FadeToAsync(1, AddPlanAnimationMs);
+    }
+
+    private void SetAddPlanMenuImmediately(bool open)
+    {
+        if (AddPlanOptions == null || AddPlanCollapsed == null) return;
+
+        _isAddPlanMenuOpen = open;
+
+        AddPlanOptions.CancelAnimations();
+        AddPlanCollapsed.CancelAnimations();
+
+        AddPlanOptions.IsVisible = open;
+        AddPlanOptions.Opacity = open ? 1 : 0;
+        AddPlanCollapsed.IsVisible = !open;
+        AddPlanCollapsed.Opacity = open ? 0 : 1;
+    }
+
+    private async Task AddWebMapPlanAsync()
+    {
+        var popup = new PopupEntry(header: AppResources.karte_aus_webmap,
+                                   desc: AppResources.online_map_requirement_hint + ".",
+                                   title: AppResources.plan_name,
+                                   okText: AppResources.erstellen);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (result?.Result == null) return;
+
+        string planId = "webmap_" + SyncClock.NewId();
+        Plan plan = new()
+        {
+            Name = result.Result == "" ? "Online Map" : result.Result,
+            File = "",
+            ImageSize = new Size(0, 0),
+            IsGrayscale = false,
+            Description = "",
+            AllowExport = true,
+            PlanColor = "#00FFFFFF"
+        };
+        plan.Touch();
+
+        var newPlan = new KeyValuePair<string, Plan>(planId, plan);
+        LoadDataToView.AddPlan(newPlan);
+
+        GlobalJson.Data.Plans ??= [];
+        GlobalJson.Data.Plans[planId] = plan;
+
+        SaveManager.NotifyDataChanged();
+        Project.ApplyFilterAndSorting();
+
+        CloseFlyoutOnMobile();
+        await Shell.Current.GoToAsync($"//{planId}");
     }
 
     // ---------------------------------------------------------------
@@ -178,6 +343,7 @@ public partial class AppShell : Shell
         if (GlobalJson.Data?.Plans == null) return;
 
         var plansList = GlobalJson.Data.Plans.ToList();
+
         var reorderedPlans = updatedPlanOrder
             .Select(planRoute => plansList.FirstOrDefault(p => p.Key == planRoute))
             .Where(p => p.Key != null)
@@ -193,6 +359,7 @@ public partial class AppShell : Shell
 
         var orderedIds = reorderedItems.Select(p => p.PlanId).ToList();
         var all = Project.AllPlanItems;
+
         var reordered = orderedIds
             .Select(id => all.First(p => p.PlanId == id))
             .Concat(all.Where(p => !orderedIds.Contains(p.PlanId)))
@@ -228,6 +395,7 @@ public partial class AppShell : Shell
 
             // Polling beim Abmelden stoppen
             SaveManager.StopCloudPolling();
+
             await _authService.LogoutAsync();
             SaveManager.CurrentAuth = null;
             SettingsService.Instance.RefreshCloudState();
