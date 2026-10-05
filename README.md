@@ -1,17 +1,17 @@
 # SnapDoc
 [🇩🇪 Deutsch](#deutsch) | [🇺🇸 English](#english)
-![Alt-Text](./SnapDoc/Resources/Images/banner.png)
+
 ## Deutsch
 **SnapDoc** ist eine plattformübergreifende .NET MAUI-App (Windows, Android, iOS) für das Bauwesen, Architektur, Fachplaner und Immobilienverwalter.
 Mit SnapDoc lassen sich **Bestandesaufnahmen von Gebäuden und Aussenbereichen** effizient erstellen, Mängel oder Bausituationen **geolokalisiert dokumentieren** und mit **Text, Symbolen/Icons und Fotografien** ergänzen. Aus diesen Daten können automatisch **Berichte** generiert werden, basierend auf einfach zu erstellenden Word-Vorlagen.
 
 ### Technologien
 - .NET MAUI (C# / .NET 10)
-- MR.Gestures (für Pinch, Pan, Touch-Gesten)
-- CommunityToolkit.Maui.Views.DrawingView (für Zeichnungen)
-- UraniumUI (für moderne UI-Komponenten)
-- SharpZipLib (für Archivierung / Export)
-- OpenXmlPowerTools & DocumentFormat.OpenXml (für Word-Exporte)
+- SharpZipLib
+- OpenXmlPowerTools & DocumentFormat.OpenXml
+- Mapsui Library for mapping
+- Microsoft Graph Client Library
+- SkiaSharp for .NET MAUI
 
 ### Hauptfunktionen / Features
 - **Digitale Bestandesaufnahme:** Dokumentiere Gebäude oder Außenbereiche direkt auf dem Plan oder Bild.  
@@ -31,13 +31,12 @@ Mit SnapDoc lassen sich **Bestandesaufnahmen von Gebäuden und Aussenbereichen**
 With SnapDoc, you can efficiently create **surveys of buildings and outdoor areas**, **geolocate defects or construction situations**, and enhance them with **text, symbols/icons, and photographs**. From this data, **reports** can be automatically generated based on simple Word templates.
 
 ### Technologies
-- .NET MAUI (.NET 10)
-- C#
-- MR.Gestures (for pinch, pan, and touch gestures)
-- CommunityToolkit.Maui.Views.DrawingView (for annotations)
-- UraniumUI (for modern UI components)
-- SharpZipLib (for archiving/export)
-- OpenXmlPowerTools & DocumentFormat.OpenXml (for Word export)
+- .NET MAUI (C# / .NET 10)
+- SharpZipLib
+- OpenXmlPowerTools & DocumentFormat.OpenXml
+- Mapsui Library for mapping
+- Microsoft Graph Client Library
+- SkiaSharp for .NET MAUI
 
 ### Main Features
 - **Digital Surveys:** Document buildings or outdoor areas directly on the plan or image.  
