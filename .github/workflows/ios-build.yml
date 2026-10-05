@@ -57,6 +57,7 @@ jobs:
       - name: Build and Sign IPA
         run: |
           dotnet publish SnapDoc/SnapDoc.csproj -f net10.0-ios -c Release \
+          -p:TargetFrameworks=net10.0-ios \
           -p:ArchiveOnBuild=true \
           -p:CodesignKey="Apple Distribution" \
           -p:CodesignProvision="MAUI_AppStore_Distribution" \
