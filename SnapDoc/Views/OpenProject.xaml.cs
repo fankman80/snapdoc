@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using Codeuctivity.OpenXmlPowerTools;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using SnapDoc.Controls;
@@ -30,7 +29,32 @@ public partial class OpenProject : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
+        SettingsService.Instance.PropertyChanged += OnSettingsPropertyChanged;
+
         LoadJsonFiles();
+    }
+
+    protected override void OnDisappearing()
+    {
+        base.OnDisappearing();
+        SettingsService.Instance.PropertyChanged -= OnSettingsPropertyChanged;
+
+        // Laufenden Abgleich stoppen, wenn die Seite verlassen wird
+        _loadCts?.Cancel();
+
+    }
+
+    /// <summary>
+    /// Login/Logout waehrend die Projektliste offen ist -> Liste neu aufbauen,
+    /// damit Sperre und Cloud-Abgleich zum aktuellen Status passen.
+    /// </summary>
+    private void OnSettingsPropertyChanged(object sender, System.ComponentModel.PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(SettingsService.IsCloudLoggedIn))
+            return;
+
+        InvalidateRemoteCache();
+        MainThread.BeginInvokeOnMainThread(LoadJsonFiles);
     }
 
     private async void LoadJsonFiles()
@@ -145,6 +169,13 @@ public partial class OpenProject : ContentPage
         // -----------------------------------------------------------------
         // 2. CollectionView sofort anzeigen
         // -----------------------------------------------------------------
+        bool isOnlineNow = SaveManager.CurrentAuth?.IsLoggedIn == true;
+        if (isOnlineNow != isOnline)
+        {
+            foreach (var item in foundFiles)
+                item.IsSyncChecked = !isOnlineNow;
+        }
+
         FileListView.ItemsSource = foundFiles;
         ProjectCounterLabel.Text = $"{foundFiles.Count} {AppResources.projekte}";
 
@@ -158,7 +189,7 @@ public partial class OpenProject : ContentPage
 
             try
             {
-                var remoteProjects = await GetRemoteProjectsAsync();
+                var remoteProjects = await GetRemoteProjectsAsync(ct: ct);
                 if (remoteProjects == null || ct.IsCancellationRequested)
                     return;
 
@@ -223,7 +254,6 @@ public partial class OpenProject : ContentPage
 
                             try
                             {
-                                // Nur die Id abfragen - deutlich kleinere Antwort
                                 var folderCheck = await SaveManager.CurrentAuth.GraphClient
                                     .Drives[d.CloudDriveId]
                                     .Items[d.CloudFolderId]
@@ -237,7 +267,6 @@ public partial class OpenProject : ContentPage
                                         FolderId = d.CloudFolderId,
                                         FileName = SettingsService.DefaultJson
                                     };
-
                                     MarkChecked(m.Item, true);
                                     resolved.Add((m.Item, rp));
                                 }
@@ -246,18 +275,25 @@ public partial class OpenProject : ContentPage
                                     MarkChecked(m.Item, false);
                                 }
                             }
-                            catch
+                            catch (Microsoft.Graph.Models.ODataErrors.ODataError ex) when (ex.ResponseStatusCode == 404)
                             {
-                                // Ordner existiert in der Cloud nicht mehr (404 / NotFound)
-                                // -> Verwaiste IDs lokal loeschen
+                                // Ordner existiert in der Cloud wirklich nicht mehr -> verwaiste IDs loeschen
                                 d.CloudDriveId = null;
                                 d.CloudFolderId = null;
-
                                 await File.WriteAllTextAsync(
                                     m.Item.FilePath,
                                     System.Text.Json.JsonSerializer.Serialize(d, GlobalJson.GetOptions()),
                                     CancellationToken.None);
-
+                                MarkChecked(m.Item, false);
+                            }
+                            catch (OperationCanceledException)
+                            {
+                                throw;
+                            }
+                            catch (Exception ex)
+                            {
+                                // Token-/Netzwerkfehler: IDs NICHT anfassen, nur freigeben
+                                System.Diagnostics.Debug.WriteLine($"Cloud-Pruefung '{m.Item.FileName}' fehlgeschlagen: {ex.Message}");
                                 MarkChecked(m.Item, false);
                             }
                         }
@@ -527,17 +563,34 @@ public partial class OpenProject : ContentPage
         return cleanName;
     }
 
+    private static readonly FilePickerFileType ZipFileType = new(
+        new Dictionary<DevicePlatform, IEnumerable<string>>
+        {
+        { DevicePlatform.iOS,         new[] { "public.zip-archive", "com.pkware.zip-archive" } },
+        { DevicePlatform.MacCatalyst, new[] { "public.zip-archive", "com.pkware.zip-archive" } },
+        { DevicePlatform.Android,     new[] { "application/zip", "application/x-zip-compressed" } },
+        { DevicePlatform.WinUI,       new[] { ".zip" } },
+        });
+
     private async void OnUploadClicked(object sender, EventArgs e)
     {
         try
         {
             var fileResult = await FilePicker.Default.PickAsync(new PickOptions
             {
-                PickerTitle = AppResources.bitte_waehle_zip
+                PickerTitle = AppResources.bitte_waehle_zip,
+                FileTypes = ZipFileType
             });
 
             if (fileResult == null)
                 return;
+
+            // Sicherheitsprüfung: Manche Android-Provider liefern einen falschen MIME-Type
+            if (!fileResult.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
+            {
+                await SnackbarExtensions.ShowSafeAsync(AppResources.bitte_waehle_zip, includeDelay: true);
+                return;
+            }
 
             // Ladeanzeige aktivieren
             await BusyService.ShowAsync(AppResources.projekt_wird_importiert);
@@ -735,14 +788,37 @@ public partial class OpenProject : ContentPage
     /// Liefert den Cloud-Projektindex, innerhalb der TTL aus dem Cache.
     /// force = true nach Upload/Loeschen, um den Cache zu umgehen.
     /// </summary>
-    private static async Task<List<RemoteProjectDto>> GetRemoteProjectsAsync(bool force = false)
+    private static async Task<List<RemoteProjectDto>> GetRemoteProjectsAsync(bool force = false, CancellationToken ct = default)
     {
         if (!force && _remoteCache != null && DateTime.UtcNow - _remoteCacheTime < RemoteCacheTtl)
             return _remoteCache;
 
-        _remoteCache = await SaveManager.SearchRemoteProjectsAsync();
-        _remoteCacheTime = DateTime.UtcNow;
-        return _remoteCache;
+        const int maxAttempts = 3;
+
+        for (int attempt = 1; attempt <= maxAttempts; attempt++)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            try
+            {
+                var result = await SaveManager.SearchRemoteProjectsAsync();
+                if (result != null)
+                {
+                    _remoteCache = result;
+                    _remoteCacheTime = DateTime.UtcNow;
+                    return result;
+                }
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                System.Diagnostics.Debug.WriteLine($"Remote-Index Versuch {attempt} fehlgeschlagen: {ex.Message}");
+            }
+
+            if (attempt < maxAttempts)
+                await Task.Delay(TimeSpan.FromSeconds(attempt * 2), ct);
+        }
+
+        return null;
     }
 
     /// <summary>
