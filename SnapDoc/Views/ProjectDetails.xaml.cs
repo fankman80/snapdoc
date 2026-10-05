@@ -33,14 +33,6 @@ public partial class ProjectDetails : ContentPage
         CloseTitleMenuImmediately();
     }
 
-    private async void OnOkayClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//homescreen");
-#if ANDROID || IOS
-        Shell.Current.FlyoutIsPresented = true;
-#endif
-    }
-
     // ------------------------------------------------------------------
     // Titelbild-Menue
     // ------------------------------------------------------------------
