@@ -14,7 +14,10 @@
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektverwaltung}">
 
-    <!-- Titelleiste nur noch mit Titel - die Bildaktionen sitzen auf dem Bild -->
+    <Shell.BackButtonBehavior>
+        <BackButtonBehavior IsVisible="False" />
+    </Shell.BackButtonBehavior>
+
     <Shell.TitleView>
         <Grid>
             <Label x:DataType="views:ProjectDetails"

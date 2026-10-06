@@ -7,12 +7,12 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
-             x:DataType="views:SetPin"
-             x:Class="SnapDoc.Views.SetPin"
-             x:Name="ThisPage"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"             
+             BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"  
+             x:DataType="views:SetPin"
+             x:Class="SnapDoc.Views.SetPin"
+             x:Name="ThisPage"             
              Title="{x:Static res:AppResources.pin_bearbeiten}">
 
     <Shell.BackButtonBehavior>
