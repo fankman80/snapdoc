@@ -62,11 +62,8 @@
         </Grid>
     </Shell.TitleView>
 
-    <Grid Margin="16">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="*" />
-            <RowDefinition Height="Auto" />
-        </Grid.RowDefinitions>
+    <Grid Margin="16"
+          RowDefinitions="*,Auto">
         <CollectionView Grid.Row="0"
                         x:Name="ImageGallery"
                         ItemsSource="{Binding Fotos}"
@@ -249,7 +246,7 @@
                         MinimumWidthRequest="100"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnOkayClick"/>
+                        Clicked="OnOkayClicked"/>
             </Grid>
         </VerticalStackLayout>
     </Grid>

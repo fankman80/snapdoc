@@ -275,7 +275,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
     }
 
-    private async void OnOkayClick(object sender, EventArgs e)
+    private async void OnOkayClicked(object sender, EventArgs e)
     {
         WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, Pin.IsLockPosition));
 

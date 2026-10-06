@@ -539,7 +539,9 @@ public partial class OpenProject : ContentPage
         LoadDataToView.LoadData(new FileResult(filePath));
         ProjectItem.Current.Attach(GlobalJson.Data);
         SaveManager.NotifyDataChanged();
+
         LoadJsonFiles();
+
         await Shell.Current.GoToAsync("project_details");
 
 #if ANDROID || IOS
