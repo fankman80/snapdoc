@@ -14,10 +14,6 @@
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektverwaltung}">
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>
-
     <Shell.TitleView>
         <Grid>
             <Label x:DataType="views:ProjectDetails"

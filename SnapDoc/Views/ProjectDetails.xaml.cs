@@ -20,11 +20,6 @@ public partial class ProjectDetails : ContentPage
         BindingContext = ProjectItem.Current;
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        return true; // Back blockiert
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();

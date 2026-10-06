@@ -331,7 +331,7 @@ public partial class OpenProject : ContentPage
                         if (string.IsNullOrWhiteSpace(projectDir))
                             continue;
 
-                        // 3.3 Cloud-Verknuepfung aktualisieren
+                        // Cloud-Verknuepfung aktualisieren
                         bool cloudLinkChanged = localData.CloudDriveId != remoteProject.DriveId ||
                                                 localData.CloudFolderId != remoteProject.FolderId;
 
@@ -346,7 +346,7 @@ public partial class OpenProject : ContentPage
                                 CancellationToken.None);
                         }
 
-                        // 3.4 Cloud-JSON lesen
+                        // Cloud-JSON lesen
                         var remoteData = await SaveManager.GetRemoteProjectDataAsync(
                                          remoteProject.DriveId,
                                          remoteProject.FolderId,
@@ -363,7 +363,7 @@ public partial class OpenProject : ContentPage
                                 ? remoteData.TitleImage
                                 : "banner_thumbnail.png";
 
-                        // 3.5 Titelbild geaendert?
+                        // Titelbild geaendert?
                         bool titleImageChanged = !localTitleImage.Equals(
                                 remoteTitleImage,
                                 StringComparison.OrdinalIgnoreCase);
@@ -395,7 +395,7 @@ public partial class OpenProject : ContentPage
                         }
                         else
                         {
-                            // 3.6 Name gleich, aber Dateien fehlen?
+                            // Name gleich, aber Dateien fehlen?
                             string thumbnailFolder = !string.IsNullOrWhiteSpace(localData.ThumbnailPath)
                                     ? localData.ThumbnailPath
                                     : "thumbnails";
@@ -428,7 +428,7 @@ public partial class OpenProject : ContentPage
                             }
                         }
 
-                        // 3.7 CollectionView aktualisieren (nur bei tatsaechlicher Aenderung)
+                        // CollectionView aktualisieren (nur bei tatsaechlicher Aenderung)
                         string finalThumbnailFolder = !string.IsNullOrWhiteSpace(localData.ThumbnailPath)
                                 ? localData.ThumbnailPath
                                 : "thumbnails";
@@ -674,16 +674,14 @@ public partial class OpenProject : ContentPage
             SettingsService.Instance.IsProjectLoaded = true;
             LoadDataToView.ResetData();
 
-            // Laedt die Datei, zieht fehlende Sync-Stempel nach und
-            // entfernt abgelaufene Tombstones.
+            // Laedt die Datei, zieht fehlende Sync-Stempel nach und entfernt abgelaufene Tombstones.
             SaveManager.Initialize(item.FilePath);
 
             if (SaveManager.CurrentAuth?.IsLoggedIn == true)
             {
                 await BusyService.ShowAsync(AppResources.daten_werden_synchronisiert);
 
-                // Merged direkt in GlobalJson.Data und speichert anschliessend -
-                // kein erneutes LoadFromFile noetig.
+                // Merged direkt in GlobalJson.Data und speichert anschliessend - kein erneutes LoadFromFile noetig.
                 await SaveManager.SyncJsonOnlyFromCloudAsync();
 
                 await BusyService.ShowAsync(AppResources.projekt_wird_geladen);
@@ -972,7 +970,6 @@ public partial class OpenProject : ContentPage
 
                     item.IsActive = true;
                     SettingsService.Instance.IsProjectLoaded = true;
-    
                     SettingsService.Instance.ProjectPath = Path.GetFileName(Path.GetDirectoryName(item.FilePath));
 
                     LoadDataToView.ResetData();
