@@ -151,6 +151,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Angemeldet als: ähnelt.
+        /// </summary>
+        internal static string angemeldet_als {
+            get {
+                return ResourceManager.GetString("angemeldet_als", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die anheften ähnelt.
         /// </summary>
         internal static string anheften {

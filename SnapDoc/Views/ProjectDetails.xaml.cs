@@ -61,16 +61,17 @@ public partial class ProjectDetails : ContentPage
         await PickTitleImageAsync();
     }
 
-    private async void OnTitleRemoveTapped(object sender, TappedEventArgs e)
+    private async void OnTitleRemoveTapped(object sender, EventArgs e)
     {
         await SetTitleMenuAsync(false);
 
-        bool confirmed = await DisplayAlertAsync(
-            AppResources.titelbild_entfernen + "?", string.Empty,
-            AppResources.ok, AppResources.abbrechen);
+        var popup = new PopupDualResponse(AppResources.titelbild_entfernen + "?", okText: AppResources.loeschen);
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
-        if (confirmed)
-            RemoveTitleImage();
+        if (result.Result is not DualPopupResult.Ok)
+            return;
+
+        RemoveTitleImage();
     }
 
     /// <summary>

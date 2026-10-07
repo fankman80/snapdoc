@@ -66,29 +66,26 @@
             </Grid>
 
             <!-- Papierkorb oben links, nur bei eigenem Bild (wird im Code gesetzt) -->
-            <Border x:Name="titleRemoveChip"
+            <Button x:Name="titleRemoveChip"
                     IsVisible="False"
                     Opacity="0"
-                    StrokeShape="RoundRectangle 18"
-                    Stroke="#B3FFFFFF"
-                    StrokeThickness="1"
+                    Text="{x:Static local:MaterialIcons.Delete}"
+                    FontFamily="MaterialOutlined"
+                    FontSize="18"
+                    TextColor="White"
                     BackgroundColor="#E53935"
-                    HeightRequest="36"
+                    BorderColor="#B3FFFFFF"
+                    BorderWidth="1"
                     WidthRequest="36"
+                    HeightRequest="36"
+                    MinimumWidthRequest="36"
+                    MinimumHeightRequest="36"
+                    CornerRadius="18"
+                    Padding="0"
                     HorizontalOptions="Start"
                     VerticalOptions="Start"
                     Margin="12,12,0,0"
-                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild_entfernen}">
-                <Border.GestureRecognizers>
-                    <TapGestureRecognizer Tapped="OnTitleRemoveTapped" />
-                </Border.GestureRecognizers>
-                <Label Text="{x:Static local:MaterialIcons.Delete}"
-                       FontFamily="MaterialOutlined"
-                       FontSize="18"
-                       TextColor="White"
-                       HorizontalOptions="Center"
-                       VerticalOptions="Center"/>
-            </Border>
+                    Clicked="OnTitleRemoveTapped"/>
 
             <!-- Aktionen uebereinander links vom Stift, gleich breit -->
             <VerticalStackLayout x:Name="titleMenu"
@@ -163,7 +160,6 @@
                     HorizontalOptions="End"
                     VerticalOptions="End"
                     Margin="0,0,12,12"
-                    ToolTipProperties.Text="{x:Static res:AppResources.titelbild}"
                     Clicked="OnTitleEditClicked"/>
         </Grid>
 

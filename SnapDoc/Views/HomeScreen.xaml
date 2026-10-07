@@ -5,6 +5,7 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
              xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              x:Class="SnapDoc.Views.HomeScreen"
              x:DataType="views:HomeScreen"
              Shell.TitleColor="{DynamicResource PrimaryDark}"
@@ -34,7 +35,7 @@
                     VerticalOptions="Start"
                     Margin="20"
                     Spacing="10">
-                <Label Text="Angemeldet als:" FontAttributes="Bold" TextColor="LightGray" HorizontalOptions="End" />
+                <Label Text="{x:Static res:AppResources.angemeldet_als}" FontAttributes="Bold" TextColor="LightGray" HorizontalOptions="End" />
                 <Label Text="{Binding CurrentUserName}" TextColor="LightGray" HorizontalOptions="End" />
                 <Label Text="{Binding CurrentUserEmail}" TextColor="LightGray" HorizontalOptions="End" />
             </VerticalStackLayout>

@@ -1167,4 +1167,7 @@
   <data name="plaene_hinzufuegen" xml:space="preserve">
     <value>Pläne hinzufügen</value>
   </data>
+  <data name="angemeldet_als" xml:space="preserve">
+    <value>Angemeldet als:</value>
+  </data>
 </root>
