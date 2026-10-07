@@ -33,6 +33,8 @@ public static class SaveManager
     private static DateTimeOffset _lastKnownCloudSyncTime = DateTimeOffset.MinValue;
     private static string? _lastKnownETag;
     private static string CloudFileName => SettingsService.DefaultJson;
+    private static readonly ConcurrentDictionary<string, byte> _verifiedCloudIcons = new(StringComparer.OrdinalIgnoreCase);
+    private static volatile bool _missingFilesPending;
     public static string? TargetFolderId { get; set; }
     public static AuthService? CurrentAuth { get; set; }
 
@@ -286,6 +288,8 @@ public static class SaveManager
                 }
             }
             catch (ODataError) { /* Existiert nicht */ }
+
+            await EnsureCustomIconsInCloudAsync(driveId, targetFolderId);
 
             byte[] byteArray = System.Text.Encoding.UTF8.GetBytes(frozenJsonPayload);
             using var stream = new MemoryStream(byteArray);
@@ -1352,6 +1356,7 @@ public static class SaveManager
         string? projectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
         if (string.IsNullOrEmpty(projectDir)) return;
 
+        _missingFilesPending = false;
         var project = ProjectItem.Current;
 
         // Nur lebende Objekte: fuer geloeschte Pins waere der Download sinnlos.
@@ -1385,21 +1390,27 @@ public static class SaveManager
                 }
                 else if (pin.IsCustomIcon && !string.IsNullOrEmpty(pin.PinIcon))
                 {
-                    await EnsureCustomIconAvailableAsync(driveId, rootFolderId, pin.PinIcon);
-                    WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinPair.Key));
+                    string localIcon = Path.Combine(Settings.DataDirectory, "customicons", pin.PinIcon);
+                    bool alreadyThere = File.Exists(localIcon) && IconLookup.Get(pin.PinIcon)?.FileName == pin.PinIcon;
+                    if (alreadyThere) continue;
+
+                    if (await EnsureCustomIconAvailableAsync(driveId, rootFolderId, pin.PinIcon))
+                        WeakReferenceMessenger.Default.Send(new PinChangedMessage(pinPair.Key));
+                    else
+                        _missingFilesPending = true;
                 }
             }
         }
     }
 
-    private static async Task EnsureCustomIconAvailableAsync(string driveId, string rootFolderId, string iconFileName)
+    private static async Task<bool> EnsureCustomIconAvailableAsync(string driveId, string rootFolderId, string iconFileName)
     {
         string iconDir = Path.Combine(Settings.DataDirectory, "customicons");
         string localPngPath = Path.Combine(iconDir, iconFileName);
 
         // Bereits vorhanden UND registriert - nichts zu tun
         if (File.Exists(localPngPath) && IconLookup.Get(iconFileName)?.FileName == iconFileName)
-            return;
+            return true;
 
         var project = ProjectItem.Current;
         string metaFileName = Path.ChangeExtension(iconFileName, ".json");
@@ -1413,12 +1424,16 @@ public static class SaveManager
         await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.CustomIconsFolder}/{metaFileName}", localMetaPath);
 
         // Download fehlgeschlagen - naechster Sync-Zyklus versucht es erneut
-        if (!File.Exists(localPngPath) || !File.Exists(localMetaPath)) return;
+        if (!File.Exists(localPngPath) || !File.Exists(localMetaPath)) return false;
 
         try
         {
             var meta = JsonSerializer.Deserialize<CustomIconMetadata>(await File.ReadAllTextAsync(localMetaPath));
-            if (meta == null) return;
+            if (meta == null)
+            {
+                try { File.Delete(localMetaPath); } catch { /* unkritisch */ }
+                return false;
+            }
 
             var newIconItem = new IconItem(
                 iconFileName,
@@ -1443,9 +1458,11 @@ public static class SaveManager
         catch (Exception ex)
         {
             Console.WriteLine($"Fehler beim Registrieren des CustomIcons '{iconFileName}': {ex.Message}");
+            return false;
         }
 
         try { File.Delete(localMetaPath); } catch { /* unkritisch */ }
+        return true;
     }
 
     private static async Task DownloadSpecificFileAsync(string driveId, string rootFolderId, string relativeCloudPath, string localDestinationPath)
@@ -1557,10 +1574,100 @@ public static class SaveManager
                 _lastKnownETag = cloudItem.ETag;
                 await SyncJsonOnlyFromCloudAsync();
             }
+            else if (_missingFilesPending)
+            {
+                await _saveGate.WaitAsync();
+                try { await DownloadMissingProjectFilesAsync(GlobalJson.Data.CloudDriveId, GlobalJson.Data.CloudFolderId); }
+                finally { _saveGate.Release(); }
+            }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Polling-Check fehlgeschlagen: {ex.Message}");
+        }
+    }
+
+    // ===============================================================
+    //  CustomIcons projektbezogen in die Cloud spiegeln
+    // ===============================================================
+    private static async Task EnsureCustomIconsInCloudAsync(string driveId, string rootFolderId)
+    {
+        if (CurrentAuth?.GraphClient == null || GlobalJson.Data == null) return;
+
+        string iconFolder = ProjectItem.Current.CustomIconsFolder;
+
+        var iconNames = SyncOps.LivePlans(GlobalJson.Data)
+            .SelectMany(p => SyncOps.LivePins(p.Value))
+            .Select(p => p.Value)
+            .Where(p => p.IsCustomIcon && !string.IsNullOrEmpty(p.PinIcon))
+            .Select(p => p.PinIcon)
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .Where(n => !_verifiedCloudIcons.ContainsKey(n))
+            .ToList();
+
+        foreach (var iconFileName in iconNames)
+        {
+            try
+            {
+                string metaFileName = Path.ChangeExtension(iconFileName, ".json");
+
+                if (await CloudFileExistsAsync(driveId, rootFolderId, $"{iconFolder}/{iconFileName}") &&
+                    await CloudFileExistsAsync(driveId, rootFolderId, $"{iconFolder}/{metaFileName}"))
+                {
+                    _verifiedCloudIcons.TryAdd(iconFileName, 0);
+                    continue;
+                }
+
+                string localPng = Path.Combine(Settings.DataDirectory, "customicons", iconFileName);
+                var item = IconLookup.Get(iconFileName);
+
+                // Dieses Geraet kennt das Icon selbst nicht -> nicht als verifiziert markieren
+                if (!File.Exists(localPng) || item == null) continue;
+
+                await UploadFileAsync(driveId, rootFolderId, localPng, $"{iconFolder}/{iconFileName}");
+
+                var meta = new CustomIconMetadata
+                {
+                    DisplayName = item.DisplayName,
+                    AnchorX = item.AnchorPoint.X,
+                    AnchorY = item.AnchorPoint.Y,
+                    SizeWidth = item.IconSize.Width,
+                    SizeHeight = item.IconSize.Height,
+                    IsRotationLocked = item.IsRotationLocked,
+                    IsAutoScaleLocked = item.IsAutoScaleLocked,
+                    PinColorHex = item.PinColor.ToString(), // "#aarrggbb", SKColor.Parse kann das lesen
+                    IconScale = item.IconScale,
+                    Category = item.Category
+                };
+
+                string tempMeta = Path.Combine(FileSystem.CacheDirectory, metaFileName);
+                await File.WriteAllTextAsync(tempMeta, JsonSerializer.Serialize(meta));
+                await UploadFileAsync(driveId, rootFolderId, tempMeta, $"{iconFolder}/{metaFileName}");
+                try { File.Delete(tempMeta); } catch { /* unkritisch */ }
+
+                _verifiedCloudIcons.TryAdd(iconFileName, 0);
+                Console.WriteLine($"CustomIcon in Projekt-Cloud gespiegelt: {iconFileName}");
+            }
+            catch (Exception ex)
+            {
+                // Nicht verifiziert -> naechster Save versucht es erneut
+                Console.WriteLine($"CustomIcon-Upload fehlgeschlagen ({iconFileName}): {ex.Message}");
+            }
+        }
+    }
+
+    private static async Task<bool> CloudFileExistsAsync(string driveId, string rootFolderId, string relativePath)
+    {
+        try
+        {
+            var item = await CurrentAuth!.GraphClient!.Drives[driveId].Items[rootFolderId]
+                .ItemWithPath(relativePath)
+                .GetAsync();
+            return item?.File != null;
+        }
+        catch (ODataError ex) when (ex.ResponseStatusCode == 404)
+        {
+            return false;
         }
     }
 
@@ -1675,6 +1782,8 @@ public static class SaveManager
 
         _pendingUploadQueue.Clear();
         _pendingCloudDeletes.Clear();
+        _verifiedCloudIcons.Clear();
+        _missingFilesPending = false;
     }
 
     private static string SanitizeName(string name)
