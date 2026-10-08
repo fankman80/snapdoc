@@ -9,12 +9,6 @@ using System.Text.Json;
 using System.Xml.Linq;
 using SnapDoc.Models;
 
-#if ANDROID
-using Microsoft.Maui.Graphics;
-using System.IO;
-using Android.Opengl;
-#endif
-
 namespace SnapDoc;
 
 public class Helper

@@ -1,7 +1,6 @@
 ﻿#nullable disable
 using SharpKml.Base;
 using SharpKml.Dom;
-using Point = SharpKml.Dom.Point;
 
 namespace SnapDoc;
 
@@ -18,17 +17,17 @@ public class KmlGenerator
         // Hinzufügen von Placemarks für jede Koordinate
         foreach (var (Latitude, Longitude, Name, Time, Desc) in coordinates)
         {
-            var point = new Point
+            var point = new SharpKml.Dom.Point
             {
                 Coordinate = new Vector(Latitude, Longitude)
             };
 
-            var timeStamp = new SharpKml.Dom.Timestamp
+            var timeStamp = new Timestamp
             {
                 When = Time
             };
 
-            var description = new SharpKml.Dom.Description
+            var description = new Description
             {
                 Text = Desc
             };

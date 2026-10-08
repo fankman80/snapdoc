@@ -15,11 +15,9 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private double workR, workG, workB;
     private double workH, workS, workV;
 
-    public ICommand TapCommand =>
-        new Command<ColorBoxItem>(item => SelectColor(item));
+    public ICommand TapCommand => new Command<ColorBoxItem>(item => SelectColor(item));
 
-    public ICommand DoubleTapCommand =>
-        new Command<ColorBoxItem>(item => DeleteColor(item));
+    public ICommand DoubleTapCommand => new Command<ColorBoxItem>(item => DeleteColor(item));
 
     public PopupColorPicker(Color selectedColor, byte fillOpacity = 255, bool fillOpacityVisibility = false, string okText = "Ok")
     {

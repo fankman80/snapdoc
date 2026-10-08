@@ -1,8 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Mvvm.Messaging;
 using SkiaSharp;
-using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Globalization;
@@ -43,11 +41,9 @@ public partial class ProjectDetails : ContentPage
     // Titelbild-Menue
     // ------------------------------------------------------------------
 
-    private async void OnTitleEditClicked(object sender, EventArgs e)
-        => await SetTitleMenuAsync(!_isTitleMenuOpen);
+    private async void OnTitleEditClicked(object sender, EventArgs e) => await SetTitleMenuAsync(!_isTitleMenuOpen);
 
-    private async void OnTitleMenuScrimTapped(object sender, TappedEventArgs e)
-        => await SetTitleMenuAsync(false);
+    private async void OnTitleMenuScrimTapped(object sender, TappedEventArgs e) => await SetTitleMenuAsync(false);
 
     private async void OnTitleCameraTapped(object sender, TappedEventArgs e)
     {

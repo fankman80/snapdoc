@@ -25,6 +25,7 @@ public partial class ExportReport
 
     [GeneratedRegex(@"\$\{(?<type>pin_captureTime|pin_captureDate)(?:/(?<format>[^}]+))?\}")]
     private static partial Regex PinDateTimeRegex();
+
     private record ImagePlaceholderData(string Type, SizeF Size, string FullMatch);
     private static readonly Dictionary<string, string> imageRelationshipIds = [];
     private static string storeItemId;

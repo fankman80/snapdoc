@@ -1,5 +1,4 @@
-﻿using Codeuctivity.OpenXmlPowerTools;
-using SkiaSharp;
+﻿using SkiaSharp;
 
 namespace SnapDoc.DrawingTool;
 

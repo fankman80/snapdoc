@@ -9,7 +9,7 @@ public interface ISyncStamped
     DateTimeOffset? DeletedAt { get; set; }
 }
 
-public static class SyncStampExtensions
+public static partial class SyncStampExtensions
 {
     public static bool IsDeleted(this ISyncStamped? item) => item?.DeletedAt != null;
     public static bool IsLive(this ISyncStamped? item) => item != null && item.DeletedAt == null;
@@ -31,7 +31,7 @@ public static class SyncStampExtensions
         item.ModifiedBy = SyncClock.DeviceId;
     }
 
-    public static class SyncStampGate
+    public static partial class SyncStampGate
     {
         private static readonly AsyncLocal<int> _depth = new();
         public static bool IsSuspended => _depth.Value > 0;
@@ -42,7 +42,7 @@ public static class SyncStampExtensions
             return new Scope();
         }
 
-        private sealed class Scope : IDisposable
+        private sealed partial class Scope : IDisposable
         {
             private bool _done;
             public void Dispose()

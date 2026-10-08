@@ -24,7 +24,6 @@ public class InteractivePolylineDrawable
     public float CloudRadius { get; set; } = 20f;
     public float CloudOverlap { get; set; } = 0.8333f;
     public float CloudInciseDeg { get; set; } = 15f;
-
     public SKColor FillColor { get; set; } = SKColors.LightGreen.WithAlpha(128);
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);

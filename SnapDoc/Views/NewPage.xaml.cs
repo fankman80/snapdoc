@@ -15,16 +15,6 @@ using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
 
-#if WINDOWS
-using SnapDoc.Platforms.Windows;
-#endif
-
-#if IOS
-using UIKit;
-using CoreAnimation;
-using CommunityToolkit.Maui.Core.Extensions;
-#endif
-
 namespace SnapDoc.Views;
 
 public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
