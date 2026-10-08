@@ -40,28 +40,31 @@
 		<EnableWindowsTargeting>true</EnableWindowsTargeting>	
 	</PropertyGroup>
 
-	<!-- Android Signing (Release) -->
+	<!-- Android: alle Konfigurationen -->
+	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
+		<AndroidPackageFormat>aab</AndroidPackageFormat>
+	</PropertyGroup>
+
+	<!-- Android: Release (Signing, R8, AOT) -->
 	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
+		<!-- Signing -->
 		<AndroidKeyStore>true</AndroidKeyStore>
+		<AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
 		<AndroidSigningKeyAlias>$(AndroidKeyAlias)</AndroidSigningKeyAlias>
 		<AndroidSigningKeyPass>$(AndroidKeyPassword)</AndroidSigningKeyPass>
 		<AndroidSigningStorePass>$(AndroidStorePassword)</AndroidSigningStorePass>
-		<AndroidSigningKeyStore>$(AndroidKeyStorePath)</AndroidSigningKeyStore>
-	</PropertyGroup>
 
-	<!-- Android Debug/Release Flags -->
-	<PropertyGroup Condition="$(TargetFramework.Contains('-android'))">
-		<AndroidPackageFormat>aab</AndroidPackageFormat>
-		<AndroidUseAapt2>True</AndroidUseAapt2>
-		<AndroidCreatePackagePerAbi>False</AndroidCreatePackagePerAbi>
-	</PropertyGroup>
-
-	<PropertyGroup Condition="'$(Configuration)' == 'Release' And $(TargetFramework.Contains('-android'))">
+		<!-- Code-Optimierung -->
 		<AndroidLinkTool>r8</AndroidLinkTool>
+		<AndroidR8ObfuscationMode>private-members</AndroidR8ObfuscationMode>
+
+		<!-- AOT -->
 		<RunAOTCompilation>true</RunAOTCompilation>
+		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
+
+		<!-- Debug-Symbole für Play Console (Crash-Analyse) -->
 		<AndroidGenerateDebugSymbols>true</AndroidGenerateDebugSymbols>
 		<AndroidStripNativeDebugSymbols>false</AndroidStripNativeDebugSymbols>
-		<AndroidEnableProfiledAot>true</AndroidEnableProfiledAot>
 	</PropertyGroup>
 
 	<!-- General Release Flags -->
