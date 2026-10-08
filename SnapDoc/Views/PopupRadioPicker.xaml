@@ -11,10 +11,10 @@
                x:DataType="views:PopupRadioPicker"
                x:Class="SnapDoc.Views.PopupRadioPicker">
 
-    <Grid Padding="6,10,6,6"
+    <Grid Padding="6,6,6,0"
           WidthRequest="240"
           VerticalOptions="Center">
-        <Grid RowDefinitions="Auto, Auto" RowSpacing="12">
+        <Grid RowDefinitions="Auto, Auto" RowSpacing="0">
             <ScrollView Grid.Row="0"
                         MaximumHeightRequest="400">
                 <VerticalStackLayout x:Name="RadioGroupContainer"

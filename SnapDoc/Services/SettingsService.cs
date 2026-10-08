@@ -29,13 +29,6 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDarkAccent"] = "#00b0ca",
             ["Secondary"] = "#00b0ca",
         },
-        ["Minimalist"] = new()
-        {
-            ["Primary"] = "#000000",
-            ["PrimaryDark"] = "#ededed",
-            ["PrimaryDarkAccent"] = "#ffffff",
-            ["Secondary"] = "#949494",
-        },
         ["Flower"] = new()
         {
             ["Primary"] = "#9f4bcc",
