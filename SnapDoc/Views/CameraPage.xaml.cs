@@ -60,6 +60,10 @@ public partial class CameraPage : ContentPage
         catch (Exception ex)
         {
             Debug.WriteLine($"Init-Fehler: {ex.GetType().Name}: {ex.Message}");
+            await DisplayAlertAsync("Kamera nicht verfügbar",
+                "Die Kamera konnte nicht gestartet werden. Bitte prüfe, ob sie aktiviert ist und nicht von einer anderen App verwendet wird.",
+                "OK");
+            await Shell.Current.GoToAsync("..");
         }
     }
 

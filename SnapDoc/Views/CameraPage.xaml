@@ -85,15 +85,14 @@
                     </toolkit:CameraView>
                 </Grid>
 
-                <!-- AbsoluteLayout erlaubt es, das Bild mit vertauschten Massen
-                     zu platzieren und dann um 90 Grad zu drehen -->
+                <!-- AbsoluteLayout erlaubt es, das Bild mit vertauschten Massen zu platzieren und dann um 90 Grad zu drehen -->
                 <AbsoluteLayout x:Name="previewImageLayer"
                                 IsVisible="False"
                                 BackgroundColor="Black">
                     <Image x:Name="previewImage"
                            Aspect="AspectFit" />
                 </AbsoluteLayout>
-
+    
                 <controls:VerticalZoomSlider x:Name="customZoomSlider"
                                              VerticalOptions="Center"
                                              HorizontalOptions="End"
@@ -119,7 +118,7 @@
                       Margin="0,0,0,24"
                       ColumnDefinitions="*,Auto,*">
 
-                    <!-- Taschenlampe: links vom Ausloeser, Gegenstueck zum Kamerawechsel -->
+                    <!-- Taschenlampe: links vom Ausloeser -->
                     <Button Grid.Column="0"
                             x:Name="torchButton"
                             IsVisible="False"
@@ -137,6 +136,7 @@
                             Opacity="0.6"
                             Clicked="OnTorchClicked" />
 
+                    <!-- Ausloeser: mittig, groesser, rund, mit Animation bei Klick -->
                     <Button Grid.Column="1"
                             x:Name="controlButton"
                             HeightRequest="76"
@@ -166,6 +166,7 @@
                         </VisualStateManager.VisualStateGroups>
                     </Button>
 
+                    <!-- Kamerawechsel: rechts vom Ausloeser -->
                     <Button Grid.Column="2"
                             x:Name="switchCameraButton"
                             HorizontalOptions="Center"
