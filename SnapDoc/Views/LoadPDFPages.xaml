@@ -56,16 +56,11 @@
     </Shell.TitleView>
 
     <Grid>
-        <Grid Margin="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
-
+        <Grid Margin="0" RowDefinitions="*,Auto">
             <CollectionView x:Name="fileListView"
                             Grid.Row="0"
                             SelectionMode="None"
-                            ItemSizingStrategy="MeasureAllItems"
+                            ItemSizingStrategy="MeasureFirstItem"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
                     <GridItemsLayout Orientation="Vertical"
@@ -76,11 +71,12 @@
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PdfItem">
-                        <Grid BackgroundColor="Gray">
+                        <Grid BackgroundColor="Gray"
+                              HeightRequest="{Binding TileHeight, Source={x:Reference Name=ThisPage}, x:DataType=views:LoadPDFPages}">
                             <Image Source="{Binding PreviewPath}"
                                    Aspect="AspectFit"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
+                                   HorizontalOptions="Fill"
+                                   VerticalOptions="Fill" />
                             <controls:CustomCheckBox IsChecked="{Binding IsChecked}"
                                                      Spacing="0"
                                                      ControlPadding="0"

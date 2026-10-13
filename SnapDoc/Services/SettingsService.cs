@@ -103,7 +103,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int FotoQuality { get; set; } = 80;
     [ObservableProperty] public partial int PlanQuality { get; set; } = 90;
     [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
-    [ObservableProperty] public partial int PlanThumbSize { get; set; } = 512;
+    [ObservableProperty] public partial int PlanThumbSize { get; set; } = 1024;
     [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
     [ObservableProperty] public partial int IconPreviewSize { get; set; } = 64;
     [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;

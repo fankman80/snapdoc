@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using DocumentFormat.OpenXml.Spreadsheet;
 using SkiaSharp;
 using SnapDoc.Controls;
 using SnapDoc.Models;
@@ -12,17 +11,19 @@ public partial class LoadPDFPages : ContentPage
 {
     IEnumerable<FileResult> resultList;
     private bool _isProcessing = false;
+    private bool _isListView;
 
     private static readonly FilePickerFileType CustomMediaFileType = new(
-    new Dictionary<DevicePlatform, IEnumerable<string>>
-    {
-        { DevicePlatform.iOS, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } },
-        { DevicePlatform.Android, new[] { "application/pdf", "image/jpeg", "image/png" } },
-        { DevicePlatform.WinUI, new[] { ".pdf", ".jpg", ".jpeg", ".png" } },
-        { DevicePlatform.MacCatalyst, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } }
-    });
+        new Dictionary<DevicePlatform, IEnumerable<string>>
+        {
+            { DevicePlatform.iOS, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } },
+            { DevicePlatform.Android, new[] { "application/pdf", "image/jpeg", "image/png" } },
+            { DevicePlatform.WinUI, new[] { ".pdf", ".jpg", ".jpeg", ".png" } },
+            { DevicePlatform.MacCatalyst, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } }
+        });
 
     public int DynamicSpan { get; set; } = 0;
+    public double TileHeight { get; set; } = 200;
 
     public LoadPDFPages()
     {
@@ -33,7 +34,6 @@ public partial class LoadPDFPages : ContentPage
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         SizeChanged += OnSizeChanged;
         LoadPreviewPDFImages();
     }
@@ -41,14 +41,10 @@ public partial class LoadPDFPages : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-
         SizeChanged -= OnSizeChanged;
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        return true;
-    }
+    protected override bool OnBackButtonPressed() => true;
 
     private async void LoadPreviewPDFImages()
     {
@@ -57,30 +53,22 @@ public partial class LoadPDFPages : ContentPage
 
         try
         {
-            // Cache leeren
-            if (Directory.Exists(Settings.CacheDirectory))
-            {
-                foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
-                {
-                    try { File.Delete(file); } catch { }
-                }
-            }
+            ClearCache();
 
             resultList = await PickMediaFileAsync();
-
             if (resultList == null || !resultList.Any())
             {
                 await Shell.Current.GoToAsync("..");
                 return;
             }
 
-            // Ladeanzeige aktivieren
             await BusyService.ShowAsync(AppResources.lade_pdf_seiten);
 
             string importId = DateTime.Now.ToString("yyyyMMddHHmmss");
+            int thumbSize = SettingsService.Instance.PlanThumbSize;
+            int fullDpi = SettingsService.Instance.PdfFullViewDpi;
             List<PdfItem> pdfImages = [];
 
-            // Verarbeitung im Hintergrund ausfuehren
             await Task.Run(async () =>
             {
                 Directory.CreateDirectory(Settings.CacheDirectory);
@@ -92,9 +80,7 @@ public partial class LoadPDFPages : ContentPage
 
                     if (ext == ".pdf")
                     {
-                        // PDF-VERARBEITUNG
                         string localPdfPath = Path.Combine(Settings.CacheDirectory, $"input_{fileIndex}.pdf");
-
                         using (var sourceStream = await file.OpenReadAsync())
                         using (var destStream = File.Create(localPdfPath))
                         {
@@ -109,8 +95,9 @@ public partial class LoadPDFPages : ContentPage
                             string imgBaseName = $"pdf_{importId}_{fileIndex}_page_{i}";
                             string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                             string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
-                            var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, previewPath, i, SettingsService.Instance.PdfThumbDpi);
-                            int targetDpi = SettingsService.Instance.PdfFullViewDpi;
+
+                            // Vorschau direkt klein rendern (laengste Kante = PlanThumbSize)
+                            await NativePdfRenderer.SaveThumbnailAsync(nativeDoc, previewPath, i, thumbSize);
 
                             pdfImages.Add(new PdfItem
                             {
@@ -118,28 +105,26 @@ public partial class LoadPDFPages : ContentPage
                                 PreviewPath = previewPath,
                                 PdfPath = localPdfPath,
                                 IsChecked = true,
-                                Dpi = targetDpi,
+                                Dpi = fullDpi,
                                 DisplayName = $"Plan {fileIndex + 1} – Seite {i + 1}",
                                 ImageName = imgBaseName,
                                 PdfPage = i,
-                                FinalWidth = width,
-                                FinalHeight = height
+                                // Wird in LoadPDFImages() beim Vollrendern gesetzt
+                                FinalWidth = 0,
+                                FinalHeight = 0
                             });
                         }
                     }
                     else if (ext == ".jpg" || ext == ".jpeg" || ext == ".png")
                     {
-                        // BILD-VERARBEITUNG (JPG / PNG)
                         string imgBaseName = $"img_{importId}_{fileIndex}";
                         string previewPath = Path.Combine(Settings.CacheDirectory, "preview_" + imgBaseName + ".jpg");
                         string imgPath = Path.Combine(Settings.CacheDirectory, imgBaseName + ".jpg");
 
-                        int imageWidth = 0;
-                        int imageHeight = 0;
+                        int imageWidth, imageHeight;
 
                         if (ext == ".png")
                         {
-                            // PNG zu JPG konvertieren
                             using var sourceStream = await file.OpenReadAsync();
                             using var bitmap = SKBitmap.Decode(sourceStream);
                             imageWidth = bitmap.Width;
@@ -147,36 +132,31 @@ public partial class LoadPDFPages : ContentPage
 
                             using var image = SKImage.FromBitmap(bitmap);
                             using var data = image.Encode(SKEncodedImageFormat.Jpeg, 90);
-
-                            using (var destStream = File.Create(imgPath))
-                                data.SaveTo(destStream);
-
-                            File.Copy(imgPath, previewPath, overwrite: true);
+                            using var destStream = File.Create(imgPath);
+                            data.SaveTo(destStream);
                         }
                         else
                         {
-                            // JPG/JPEG direkt in Cache kopieren
                             using (var sourceStream = await file.OpenReadAsync())
                             using (var destStream = File.Create(imgPath))
                             {
                                 await sourceStream.CopyToAsync(destStream);
                             }
 
-                            // Bildgroesse mittels SkiaSharp ermitteln
-                            using (var bitmap = SKBitmap.Decode(imgPath))
-                            {
-                                imageWidth = bitmap.Width;
-                                imageHeight = bitmap.Height;
-                            }
-
-                            File.Copy(imgPath, previewPath, overwrite: true);
+                            // Nur Header lesen, nicht das ganze Bild dekodieren
+                            using var codec = SKCodec.Create(imgPath);
+                            imageWidth = codec.Info.Width;
+                            imageHeight = codec.Info.Height;
                         }
+
+                        // Vorschau verkleinert erzeugen statt 1:1 kopieren
+                        CreateDownscaledPreview(imgPath, previewPath, thumbSize);
 
                         pdfImages.Add(new PdfItem
                         {
                             ImagePath = imgPath,
                             PreviewPath = previewPath,
-                            PdfPath = null, // Ist kein PDF
+                            PdfPath = null,
                             IsChecked = true,
                             Dpi = 0,
                             DisplayName = Path.GetFileNameWithoutExtension(file.FileName),
@@ -191,6 +171,7 @@ public partial class LoadPDFPages : ContentPage
                 }
             });
 
+            UpdateSpan();
             fileListView.ItemsSource = pdfImages;
         }
         catch (Exception ex)
@@ -204,6 +185,29 @@ public partial class LoadPDFPages : ContentPage
         }
     }
 
+    private static void CreateDownscaledPreview(string sourcePath, string previewPath, int maxSize)
+    {
+        using var src = SKBitmap.Decode(sourcePath);
+        if (src == null)
+        {
+            File.Copy(sourcePath, previewPath, overwrite: true);
+            return;
+        }
+
+        double scale = Math.Min(1.0, (double)maxSize / Math.Max(src.Width, src.Height));
+        int w = Math.Max(1, (int)Math.Round(src.Width * scale));
+        int h = Math.Max(1, (int)Math.Round(src.Height * scale));
+
+        using var resized = scale < 1.0
+            ? src.Resize(new SKImageInfo(w, h), new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear))
+            : src.Copy();
+
+        using var img = SKImage.FromBitmap(resized);
+        using var data = img.Encode(SKEncodedImageFormat.Jpeg, 80);
+        using var fs = File.Create(previewPath);
+        data.SaveTo(fs);
+    }
+
     public static async Task<IEnumerable<FileResult>> PickMediaFileAsync()
     {
         try
@@ -213,7 +217,6 @@ public partial class LoadPDFPages : ContentPage
                 PickerTitle = AppResources.pdf_dateien_auswaehlen,
                 FileTypes = CustomMediaFileType
             });
-
             if (fileResult != null)
                 return fileResult;
         }
@@ -226,40 +229,28 @@ public partial class LoadPDFPages : ContentPage
 
     private void OnCancelClicked(object sender, EventArgs e)
     {
-        var cacheFiles = Directory.GetFiles(Settings.CacheDirectory);
-        foreach (var cacheFile in cacheFiles)
-        {
-            File.Delete(cacheFile);
-        }
+        ClearCache();
         Shell.Current.GoToAsync("..");
     }
 
-    private void OnPagesAddClicked(object sender, EventArgs e)
-    {
-        AddPdfImages();
-    }
+    private void OnPagesAddClicked(object sender, EventArgs e) => AddPdfImages();
 
     private async void AddPdfImages()
     {
-        if (_isProcessing)
-            return;
-
+        if (_isProcessing) return;
         _isProcessing = true;
 
         try
         {
-            // BusyOverlay anzeigen
             await BusyService.ShowAsync(AppResources.pdf_wird_konvertiert);
+
             await LoadPDFImages();
-
             var uploads = await ProcessFileOrganizationLogic();
-
             SaveManager.NotifyDataChanged(uploads);
 
-            if (Shell.Current is AppShell shell)
+            if (Shell.Current is AppShell)
                 ProjectItem.Current.ApplyFilterAndSorting();
 
-            // BusyOverlay schließen
             await BusyService.HideAsync();
             await Shell.Current.GoToAsync("project_details");
         }
@@ -269,41 +260,42 @@ public partial class LoadPDFPages : ContentPage
         }
         finally
         {
-            // BusyOverlay schließen
             await BusyService.HideAsync();
-
             _isProcessing = false;
         }
     }
 
+    /// <summary>
+    /// Rendert nur die angehakten PDF-Seiten in voller Aufloesung (PdfFullViewDpi).
+    /// </summary>
     private async Task LoadPDFImages()
     {
         var itemsToProcess = fileListView.ItemsSource.Cast<PdfItem>()
-                        .Where(x => x.IsChecked && !string.IsNullOrEmpty(x.PdfPath))
-                        .ToList();
+            .Where(x => x.IsChecked && !string.IsNullOrEmpty(x.PdfPath))
+            .ToList();
 
         int totalPages = itemsToProcess.Count;
         int processedPages = 0;
 
-        // Nur die Elemente filtern, die wirklich aus einem PDF gerendert werden muessen (PdfPath != null)
         var groups = itemsToProcess.GroupBy(x => x.PdfPath).ToList();
 
-        await Parallel.ForEachAsync(groups, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, async (group, cancellationToken) =>
-        {
-            byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key, cancellationToken);
-            using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
-
-            foreach (var item in group)
+        await Parallel.ForEachAsync(groups,
+            new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount },
+            async (group, cancellationToken) =>
             {
-                int current = Interlocked.Increment(ref processedPages);
-                await BusyService.SetMessageAsync(string.Format(AppResources.pdf_seite_wird_generiert, current, totalPages));
+                byte[] pdfBytes = await File.ReadAllBytesAsync(group.Key, cancellationToken);
+                using var nativeDoc = await NativePdfRenderer.OpenDocumentAsync(pdfBytes);
 
-                string imgPath = Path.Combine(Settings.DataDirectory, Settings.CacheDirectory, item.ImageName + ".jpg");
-                var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, imgPath, item.PdfPage, item.Dpi);
-                item.FinalWidth = width;
-                item.FinalHeight = height;
-            }
-        });
+                foreach (var item in group)
+                {
+                    int current = Interlocked.Increment(ref processedPages);
+                    await BusyService.SetMessageAsync(string.Format(AppResources.pdf_seite_wird_generiert, current, totalPages));
+
+                    var (width, height) = await NativePdfRenderer.SavePageAsync(nativeDoc, item.ImagePath, item.PdfPage, item.Dpi);
+                    item.FinalWidth = width;
+                    item.FinalHeight = height;
+                }
+            });
     }
 
     private async Task<List<(string LocalFilePath, string SubFolder)>> ProcessFileOrganizationLogic()
@@ -315,23 +307,15 @@ public partial class LoadPDFPages : ContentPage
         if (items.Count == 0)
             return [];
 
-        // Sammelt alle Dateien, die anschliessend in die Cloud sollen.
         var uploads = new System.Collections.Concurrent.ConcurrentBag<(string, string)>();
-
         string planFolder = GlobalJson.Data.PlanPath;
         string thumbFolder = $"{planFolder}/thumbnails";
 
         await Task.Run(() =>
         {
-            // Geraete-ID einmalig anfordern, BEVOR Parallel.For startet.
             _ = SyncClock.DeviceId;
 
-            string imageDirectory = Path.Combine(
-                Settings.DataDirectory,
-                SettingsService.Instance.ProjectPath,
-                planFolder);
-
-            // Beide Ebenen anlegen: bei einem frisch erstellten Projekt existiert der Plan-Ordner selbst noch nicht.
+            string imageDirectory = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, planFolder);
             Directory.CreateDirectory(imageDirectory);
             Directory.CreateDirectory(Path.Combine(imageDirectory, "thumbnails"));
 
@@ -340,79 +324,35 @@ public partial class LoadPDFPages : ContentPage
             Parallel.For(0, items.Count, new ParallelOptions { MaxDegreeOfParallelism = Environment.ProcessorCount }, i =>
             {
                 var item = items[i];
-                string baseName = $"plan_{SyncClock.NewId()}_{i}";
-                string fileName = baseName + ".jpg";
-                string destinationFilePath = Path.Combine(imageDirectory, fileName);
-                string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
 
-                Size _imgSize = new(item.FinalWidth, item.FinalHeight);
-
-                Plan plan = new()
-                {
-                    Name = item.DisplayName,
-                    File = fileName,
-                    ImageSize = _imgSize,
-                    IsGrayscale = false,
-                    AllowExport = true,
-                    PlanColor = "#00FFFFFF"
-                };
-
-                plan.Touch();
-
-                try
-                {
-                    using var inputStream = File.OpenRead(item.PreviewPath);
-                    using var originalBitmap = SKBitmap.Decode(inputStream);
-
-                    int maxThumbSize = SettingsService.Instance.PlanThumbSize;
-                    int targetWidth = originalBitmap.Width;
-                    int targetHeight = originalBitmap.Height;
-
-                    if (targetWidth > maxThumbSize || targetHeight > maxThumbSize)
-                    {
-                        if (targetWidth > targetHeight)
-                        {
-                            targetHeight = (int)(targetHeight * ((double)maxThumbSize / targetWidth));
-                            targetWidth = maxThumbSize;
-                        }
-                        else
-                        {
-                            targetWidth = (int)(targetWidth * ((double)maxThumbSize / targetHeight));
-                            targetHeight = maxThumbSize;
-                        }
-                    }
-
-                    using var resizedBitmap = originalBitmap.Resize(new SKImageInfo(targetWidth, targetHeight), SKSamplingOptions.Default);
-
-                    if (resizedBitmap != null)
-                    {
-                        using var image = SKImage.FromBitmap(resizedBitmap);
-                        using var thumbData = image.Encode(SKEncodedImageFormat.Jpeg, 75);
-                        using var thumbStream = File.OpenWrite(destinationThumbPath);
-                        thumbData.SaveTo(thumbStream);
-                    }
-                    else
-                    {
-                        File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true);
-                    }
-                }
-                catch
-                {
-                    try { File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true); } catch { }
-                }
-
-                // Ohne Planbild keinen Eintrag anlegen
                 if (!File.Exists(item.ImagePath))
                 {
                     System.Diagnostics.Debug.WriteLine($"Planbild fehlt, Eintrag wird uebersprungen: {item.ImagePath}");
                     return;
                 }
 
+                string baseName = $"plan_{SyncClock.NewId()}_{i}";
+                string fileName = baseName + ".jpg";
+                string destinationFilePath = Path.Combine(imageDirectory, fileName);
+                string destinationThumbPath = Path.Combine(imageDirectory, "thumbnails", fileName);
+
+                Plan plan = new()
+                {
+                    Name = item.DisplayName,
+                    File = fileName,
+                    ImageSize = new Size(item.FinalWidth, item.FinalHeight),
+                    IsGrayscale = false,
+                    AllowExport = true,
+                    PlanColor = "#00FFFFFF"
+                };
+                plan.Touch();
+
+                // Vorschau hat bereits PlanThumbSize -> direkt als Thumbnail uebernehmen
+                try { File.Copy(item.PreviewPath, destinationThumbPath, overwrite: true); } catch { }
+
                 File.Copy(item.ImagePath, destinationFilePath, overwrite: true);
 
-                // Fuer den Cloud-Upload vormerken
                 uploads.Add((destinationFilePath, planFolder));
-
                 if (File.Exists(destinationThumbPath))
                     uploads.Add((destinationThumbPath, thumbFolder));
 
@@ -422,7 +362,6 @@ public partial class LoadPDFPages : ContentPage
             lock (GlobalJson.Data)
             {
                 GlobalJson.Data.Plans ??= [];
-
                 foreach (var planKvp in processedPlans)
                 {
                     if (planKvp.Value != null)
@@ -439,47 +378,44 @@ public partial class LoadPDFPages : ContentPage
                 }
             });
 
-            if (Directory.Exists(Settings.CacheDirectory))
-            {
-                foreach (var cacheFile in Directory.GetFiles(Settings.CacheDirectory))
-                {
-                    try { File.Delete(cacheFile); } catch { }
-                }
-            }
+            ClearCache();
         });
 
         return [.. uploads];
     }
 
+    private static void ClearCache()
+    {
+        if (!Directory.Exists(Settings.CacheDirectory)) return;
+        foreach (var file in Directory.GetFiles(Settings.CacheDirectory))
+        {
+            try { File.Delete(file); } catch { }
+        }
+    }
+
     private void OnChangeRowsClicked(object sender, EventArgs e)
     {
-        if (DynamicSpan == 1)
-        {
-            DynamicSpan = 0;
-            btnRows.Text = Settings.TableRowIcon;
-        }
-        else
-        {
-            DynamicSpan = 1;
-            btnRows.Text = Settings.TableGridIcon;
-        }
+        _isListView = !_isListView;
+        btnRows.Text = _isListView ? Settings.TableGridIcon : Settings.TableRowIcon;
         UpdateSpan();
     }
 
-    private void OnSizeChanged(object sender, EventArgs e)
-    {
-        UpdateSpan();
-    }
+    private void OnSizeChanged(object sender, EventArgs e) => UpdateSpan();
 
     private void UpdateSpan()
     {
-        if (DynamicSpan != 1)
-        {
-            double screenWidth = this.Width;
-            double imageWidth = SettingsService.Instance.PlanPreviewSize;
-            DynamicSpan = Math.Max(SettingsService.Instance.GridViewMinColumns, (int)(screenWidth / imageWidth));
-        }
+        if (Width <= 0) return;
+
+        DynamicSpan = _isListView
+            ? 1
+            : Math.Max(SettingsService.Instance.GridViewMinColumns,
+                       (int)(Width / SettingsService.Instance.PlanPreviewSize));
+
+        const double spacing = 4;
+        double tileWidth = (Width - spacing * (DynamicSpan - 1)) / DynamicSpan;
+        TileHeight = Math.Floor(tileWidth / Math.Sqrt(2));
 
         OnPropertyChanged(nameof(DynamicSpan));
+        OnPropertyChanged(nameof(TileHeight));
     }
 }

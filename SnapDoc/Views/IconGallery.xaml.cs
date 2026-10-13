@@ -259,10 +259,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
             btnRows.Text = Settings.TableGridIcon;
     }
 
-    private void OnSizeChanged(object sender, EventArgs e)
-    {
-        UpdateSpan();
-    }
+    private void OnSizeChanged(object sender, EventArgs e) => UpdateSpan();
 
     private void UpdateSpan()
     {
