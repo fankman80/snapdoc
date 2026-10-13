@@ -1836,8 +1836,16 @@ public static class SaveManager
 
         if (!_connectivityHooked)
         {
-            Connectivity.Current.ConnectivityChanged += OnConnectivityChanged;
-            _connectivityHooked = true;
+            try
+            {
+                Connectivity.Current.ConnectivityChanged += OnConnectivityChanged;
+                _connectivityHooked = true;
+            }
+            catch (Exception ex)
+            {
+                // z.B. fehlende Berechtigung – Polling übernimmt den Nachholvorgang
+                Console.WriteLine($"Connectivity-Hook nicht verfügbar: {ex.Message}");
+            }
         }
 
         _ = Task.Run(async () =>
@@ -1863,7 +1871,8 @@ public static class SaveManager
 
         if (_connectivityHooked)
         {
-            Connectivity.Current.ConnectivityChanged -= OnConnectivityChanged;
+            try { Connectivity.Current.ConnectivityChanged -= OnConnectivityChanged; }
+            catch { /* unkritisch */ }
             _connectivityHooked = false;
         }
     }
