@@ -4,7 +4,9 @@ using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.Controls;
 using SnapDoc.DrawingTool;
+using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
@@ -391,29 +393,21 @@ public partial class ImageViewPage : IQueryAttributable
                 plan.Pins.TryGetValue(PinId, out var pin) &&
                 pin.Fotos.TryGetValue(ImgSource, out var fotoToDelete))
             {
-                string fileName = fotoToDelete.File;
+                string fileName = string.IsNullOrEmpty(fotoToDelete.File) ? ImgSource : fotoToDelete.File;
 
-                if (!string.IsNullOrEmpty(fileName))
+                // Tombstone statt Remove – Cloud-Dateien folgen automatisch nach dem Sync
+                SyncOps.DeleteFoto(PlanId, PinId, ImgSource);
+
+                string projectDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath);
+                foreach (var f in new[]
                 {
-                    // Lokales Loeschen
-                    string fileOriginal = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", fileName);
-                    if (File.Exists(fileOriginal))
-                        File.Delete(fileOriginal);
-
-                    string fileImage = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
-                    if (File.Exists(fileImage))
-                        File.Delete(fileImage);
-
-                    string fileThumb = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, fileName);
-                    if (File.Exists(fileThumb))
-                        File.Delete(fileThumb);
-
-                    // Cloud Cleanup
-                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/originals/{fileName}");
-                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/{fileName}");
-                    _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
+                    Path.Combine(projectDir, GlobalJson.Data.ImagePath, "originals", fileName),
+                    Path.Combine(projectDir, GlobalJson.Data.ImagePath, fileName),
+                    Path.Combine(projectDir, GlobalJson.Data.ThumbnailPath, fileName)
+                })
+                {
+                    if (File.Exists(f)) File.Delete(f);
                 }
-                pin.Fotos.Remove(ImgSource);
             }
         }
 
@@ -553,23 +547,28 @@ public partial class ImageViewPage : IQueryAttributable
         });
     }
 
-    private void EraseClicked(object sender, EventArgs e)
+    private async void EraseClicked(object sender, EventArgs e)
     {
         drawingController.Reset();
 
-        if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
+        if (!GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
+            return;
+
+        string origPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath,
+                                       GlobalJson.Data.ImagePath, "originals", ImgSource);
+
+        if (!File.Exists(origPath))
+            await SaveManager.DownloadMediaOnDemandAsync(ImgSource, $"{GlobalJson.Data.ImagePath}/originals");
+
+        if (!File.Exists(origPath))
         {
-            isCleared = true;
-            var imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
-
-            FotoContainer.Source = ImageSource.FromStream(() =>
-            {
-                return File.OpenRead(imgPath);
-            });
-
-            // save data to file
-            SaveManager.NotifyDataChanged();
+            await SnackbarExtensions.ShowSafeAsync("Original nicht verfügbar – bitte online gehen.", includeDelay: true);
+            return;
         }
+
+        isCleared = true;
+        var bytes = await File.ReadAllBytesAsync(origPath);
+        FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
     }
 
     private async void TextClicked(object sender, EventArgs e)
@@ -656,56 +655,63 @@ public partial class ImageViewPage : IQueryAttributable
             var imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
             var origPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
             var thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, ImgSource);
+            var uploads = new List<(string, string)>
+            {
+                (imgPath, GlobalJson.Data.ImagePath),
+                (thumbPath, GlobalJson.Data.ThumbnailPath)
+            };
 
             if (isCleared)
             {
                 if (File.Exists(imgPath))
                     File.Delete(imgPath);
                 File.Move(origPath, imgPath);
-                
+
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-                
+
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
-                
-                // Cloud-Original entfernen, da lokal bereits zurückkopiert
-                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.ImagePath}/originals/{ImgSource}");
+
+                // Original in der Cloud entfernen (wird nach dem JSON-Sync ausgefuehrt)
+                SaveManager.QueueCloudDelete($"{GlobalJson.Data.ImagePath}/originals/{ImgSource}");
             }
             else
             {
-                if (!Directory.Exists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals")))
-                    Directory.CreateDirectory(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals"));
+                Directory.CreateDirectory(Path.GetDirectoryName(origPath)!);
+
+                bool hadOverlay = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay;
+
+                if (!File.Exists(origPath) && hadOverlay)
+                    await SaveManager.DownloadMediaOnDemandAsync(ImgSource, $"{GlobalJson.Data.ImagePath}/originals");
 
                 if (!File.Exists(origPath))
+                {
+                    if (hadOverlay)
+                    {
+                        // Sonst würde das bemalte Bild zum "Original"
+                        await SnackbarExtensions.ShowSafeAsync("Original nicht verfügbar – bitte online gehen.", includeDelay: true);
+                        return; // Zeichenmodus bleibt offen, später erneut versuchen
+                    }
                     File.Copy(imgPath, origPath);
+                }
 
-                // Save overlay: wir zeichnen die overlay auf overlayCanvas (ohne Handles)
                 await SaveFotoWithOverlay(imgPath, imgPath);
-                
+
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
 
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
+
+                uploads.Add((origPath, $"{GlobalJson.Data.ImagePath}/originals"));
             }
 
-            // ändere Json-Key
-            var fotos = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos;
-            if (fotos.TryGetValue(ImgSource, out var value))
-            {
-                fotos.Remove(ImgSource);
-                fotos[Path.GetFileName(imgPath)] = value;
-                ImgSource = Path.GetFileName(imgPath);
-            }
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].File = Path.GetFileName(imgPath);
+            var foto = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource];
+            foto.File = Path.GetFileName(imgPath);
+            foto.Touch();
 
-            // Geaenderte Foto- und Thumbnail-Dateien fuer den Sync registrieren
-            SaveManager.NotifyDataChanged([
-                (imgPath, GlobalJson.Data.ImagePath),
-                (thumbPath, GlobalJson.Data.ThumbnailPath),
-                (origPath, $"{GlobalJson.Data.ImagePath}/originals")
-            ]);
+            SaveManager.NotifyDataChanged(uploads);
         }
 
         // Cleanup drawing canvas
@@ -925,30 +931,14 @@ public partial class ImageViewPage : IQueryAttributable
         if (GlobalJson.Data?.Plans == null)
             return result;
 
-        // Alle Plaene durchgehen
-        foreach (var planKvp in GlobalJson.Data.Plans)
+        // Nur lebende Objekte: gelöschte Pläne, Pins und Fotos ausblenden.
+        // ToList() erstellt eine Momentaufnahme, damit ein Merge im Hintergrund keine Exception auslöst.
+        foreach (var (planId, plan) in SyncOps.LivePlans(GlobalJson.Data).ToList())
         {
-            var planId = planKvp.Key;
-            var plan = planKvp.Value;
-            if (plan?.Pins == null) continue;
-
-            // Alle Pins des Plans durchgehen
-            foreach (var pinKvp in plan.Pins)
+            foreach (var (pinId, pin) in SyncOps.LivePins(plan).ToList())
             {
-                var pinId = pinKvp.Key;
-                var pin = pinKvp.Value;
-                if (pin?.Fotos == null) continue;
-
-                // Alle Fotos des Pins durchgehen
-                foreach (var fotoKvp in pin.Fotos)
-                {
-                    var fotoKey = fotoKvp.Key;
-                    var foto = fotoKvp.Value;
-                    if (foto != null)
-                    {
-                        result.Add((planId, pinId, fotoKey, foto.DateTime));
-                    }
-                }
+                foreach (var (fotoKey, foto) in SyncOps.LiveFotos(pin).ToList())
+                    result.Add((planId, pinId, fotoKey, foto.DateTime));
             }
         }
 

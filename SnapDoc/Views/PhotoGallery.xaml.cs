@@ -1,7 +1,10 @@
 ﻿#nullable disable
+using CommunityToolkit.Mvvm.Messaging;
+using SnapDoc.Messages;
+using SnapDoc.Models;
+using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
-using SnapDoc.Resources.Languages;
 
 namespace SnapDoc.Views;
 
@@ -38,15 +41,19 @@ public partial class FotoGalleryView : ContentPage
     {
         base.OnAppearing();
 
+        // Remote-Änderungen (Löschen/Hinzufügen/Overlay vom anderen Gerät) live übernehmen
+        WeakReferenceMessenger.Default.Register<RemoteDataChangedMessage>(this, (r, m) =>
+        {
+            if (m.Value == RemoteChangeType.FotosUpdated)
+                MainThread.BeginInvokeOnMainThread(FotoLoader);
+        });
+
         Dispatcher.Dispatch(async () =>
         {
             SetIconGridView();
-
             await Task.Delay(100);
             UpdateSpan();
-
             FotoLoader();
-
             SizeChanged += OnSizeChanged;
         });
     }
@@ -54,11 +61,11 @@ public partial class FotoGalleryView : ContentPage
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        WeakReferenceMessenger.Default.Unregister<RemoteDataChangedMessage>(this);
 
         _imageLoadingCts?.Cancel();
         _imageLoadingCts?.Dispose();
         _imageLoadingCts = null;
-
         SizeChanged -= OnSizeChanged;
     }
 
@@ -69,38 +76,27 @@ public partial class FotoGalleryView : ContentPage
         var token = _imageLoadingCts.Token;
 
         var list = new List<FotoItem>();
+        if (GlobalJson.Data?.Plans == null) return;
 
-        foreach (var planEntry in GlobalJson.Data.Plans)
+        // Nur lebende Pläne, Pins und Fotos – gelöschte erzeugen sonst leere Items
+        foreach (var (planId, plan) in SyncOps.LivePlans(GlobalJson.Data).ToList())
         {
-            var planId = planEntry.Key;
-            var plan = planEntry.Value;
-            if (plan?.Pins == null)
-                continue;
-
-            foreach (var pinEntry in plan.Pins)
+            foreach (var (pinId, pin) in SyncOps.LivePins(plan).ToList())
             {
-                var pinId = pinEntry.Key;
-                var pin = pinEntry.Value;
-                if (pin?.Fotos == null)
-                    continue;
-
-                foreach (var fotoEntry in pin.Fotos)
+                foreach (var (fotoKey, foto) in SyncOps.LiveFotos(pin).ToList())
                 {
-                    var foto = fotoEntry.Value;
-                    if (foto == null || string.IsNullOrWhiteSpace(foto.File))
-                        continue;
+                    string file = string.IsNullOrWhiteSpace(foto.File) ? fotoKey : foto.File;
+                    if (string.IsNullOrWhiteSpace(file)) continue;
 
                     list.Add(new FotoItem
                     {
-                        ImagePath = SafeCombine(
-                            Settings.DataDirectory,
-                            SettingsService.Instance.ProjectPath,
-                            GlobalJson.Data.ThumbnailPath,
-                            foto.File),
+                        ImagePath = SafeCombine(Settings.DataDirectory, SettingsService.Instance.ProjectPath,
+                                                GlobalJson.Data.ThumbnailPath, file),
                         DateTime = foto.DateTime,
                         AllowExport = foto.AllowExport,
                         OnPlanId = planId,
-                        OnPinId = pinId
+                        OnPinId = pinId,
+                        FotoKey = fotoKey
                     });
                 }
             }
@@ -108,8 +104,6 @@ public partial class FotoGalleryView : ContentPage
 
         AllFotos = list;
         ApplyFilterAndSorting();
-
-        // Startet das Laden der Bilder im Hintergrund
         Task.Run(() => LoadImagesInBackgroundAsync(token), token);
     }
 
@@ -167,17 +161,17 @@ public partial class FotoGalleryView : ContentPage
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        var tappedButton = sender as Button;
-        FotoItem item = (FotoItem)tappedButton.BindingContext;
+        if ((sender as Button)?.BindingContext is not FotoItem item) return;
 
-        if (item == null) return;
+        if (!SyncOps.TryGetLivePlan(item.OnPlanId, out var plan) ||
+            !SyncOps.TryGetLivePin(plan, item.OnPinId, out var pin) ||
+            pin.Fotos == null || !pin.Fotos.TryGetValue(item.FotoKey, out var foto))
+            return;
 
         item.AllowExport = !item.AllowExport;
+        foto.AllowExport = item.AllowExport;   // gleichsetzen statt getrennt toggeln
+        foto.Touch();
 
-        var fileName = Path.GetFileName(item.ImagePath);
-        GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport = !GlobalJson.Data.Plans[item.OnPlanId].Pins[item.OnPinId].Fotos[fileName].AllowExport;
-
-        // save data to file
         SaveManager.NotifyDataChanged();
     }
 
@@ -193,13 +187,10 @@ public partial class FotoGalleryView : ContentPage
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        if (sender is not VisualElement element) return;
-        if (element.BindingContext is not FotoItem item) return;
-
-        var fileName = Path.GetFileName(item.ImagePath);
+        if ((sender as VisualElement)?.BindingContext is not FotoItem item) return;
 
         await Shell.Current.GoToAsync(
-            $"imageview?imgSource={fileName}&planId={item.OnPlanId}&pinId={item.OnPinId}&gotoBtn=true");
+            $"imageview?imgSource={item.FotoKey}&planId={item.OnPlanId}&pinId={item.OnPinId}&gotoBtn=true");
     }
 
     private void OnSortPickerChanged(object sender, EventArgs e)

@@ -20,7 +20,7 @@ public partial class TileImageView : ContentView, IDisposable
     private const int MaxConcurrentTileLoads = 4;
     private const int MaxQueuedTileRequests = 96;
     private const int PermanentTileBudget = 64;
-    private const int RenderCoalesceMs = 8;
+    private const int StateSyncIntervalMs = 100;
     private const string PyramidCompleteMarker = ".complete";
 
     // ---------------------------------------------------------------------------------
@@ -56,15 +56,21 @@ public partial class TileImageView : ContentView, IDisposable
     private int _activeTileLoads = 0;
     private int _renderGeneration = 0;
     private int _maxGeneratedLevel = -1;
+    private int _pyramidMaxZoom = SettingsService.Instance.MaxZoomLevel;
+    private int _pyramidTileSize = Math.Max(1, SettingsService.Instance.TileSize);
     private int _displayZoom = -1;
     private bool[] _isPermanentLevel = [];
 
     // ---------------------------------------------------------------------------------
     //  Felder - Rendering-Steuerung
     // ---------------------------------------------------------------------------------
-    private bool _renderPending = false;
+    private long _lastStateSyncTicks = 0;
+    private bool _stateSyncScheduled = false;
     private SKColor _placeholderSKColor = Colors.LightGray.ToSKColor();
+    // Fuer die Pyramiden-Erzeugung (CPU, ohne Mipmaps)
     private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
+    // Fuer die Darstellung: Mipmaps verhindern Moire/Flimmern bei verkleinert gezeichneten Kacheln
+    private static readonly SKSamplingOptions TileSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
 
     // ---------------------------------------------------------------------------------
     //  Felder - Eingabe
@@ -194,11 +200,14 @@ public partial class TileImageView : ContentView, IDisposable
 
     public static readonly BindableProperty MaxZoomLevelProperty =
         BindableProperty.Create(nameof(MaxZoomLevel), typeof(int), typeof(TileImageView), SettingsService.Instance.MaxZoomLevel,
-            propertyChanged: (bindable, o, n) =>
+            propertyChanged: async (bindable, o, n) =>
             {
                 var control = (TileImageView)bindable;
-                control.RebuildLevelMetadata();
-                control.InvalidateView();
+
+                if ((int)o != (int)n && !string.IsNullOrEmpty(control.SourceImagePath))
+                    await control.ProcessNewImageAsync(control.SourceImagePath);
+                else
+                    control.InvalidateView();
             });
 
     public static readonly BindableProperty PinsProperty =
@@ -322,15 +331,55 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     private void RequestRender()
     {
-        if (_disposed || _renderPending || _canvasView == null) return;
+        if (_disposed || _canvasView == null) return;
 
-        _renderPending = true;
-        _canvasView.Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(RenderCoalesceMs), () =>
+        if (MainThread.IsMainThread)
         {
-            _renderPending = false;
+            _canvasView.InvalidateSurface();
+            return;
+        }
+
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
             if (!_disposed)
                 _canvasView?.InvalidateSurface();
         });
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Oeffentlichen Zustand (BindableProperties) gedrosselt synchronisieren
+    // ---------------------------------------------------------------------------------
+    private void SyncPublicState(bool force = false)
+    {
+        if (_disposed) return;
+
+        if (!MainThread.IsMainThread)
+        {
+            MainThread.BeginInvokeOnMainThread(() => SyncPublicState(force));
+            return;
+        }
+
+        long now = Stopwatch.GetTimestamp();
+
+        if (!force && Stopwatch.GetElapsedTime(_lastStateSyncTicks, now).TotalMilliseconds < StateSyncIntervalMs)
+        {
+            if (!_stateSyncScheduled)
+            {
+                _stateSyncScheduled = true;
+                Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(StateSyncIntervalMs), () =>
+                {
+                    _stateSyncScheduled = false;
+                    SyncPublicState(force: true);
+                });
+            }
+            return;
+        }
+
+        _lastStateSyncTicks = now;
+
+        CurrentScale = _scale;
+        CurrentPan = new SKPoint(_panX, _panY);
+        CurrentRotation = _rotationDegrees; // OnCurrentRotationChanged ignoriert identische Werte
     }
 
     private void InvalidateView()
@@ -346,13 +395,13 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     private void RebuildLevelMetadata()
     {
-        int maxZoom = MaxZoomLevel;
+        int maxZoom = _pyramidMaxZoom;
         _isPermanentLevel = new bool[Math.Max(1, maxZoom + 1)];
 
         var size = OriginalImageSize;
         if (size.IsEmpty) return;
 
-        int tileSize = Math.Max(1, TileSize);
+        int tileSize = _pyramidTileSize;
 
         for (int zoom = 0; zoom <= maxZoom; zoom++)
         {
@@ -454,7 +503,10 @@ public partial class TileImageView : ContentView, IDisposable
                         var bmp = new SKBitmap(info);
 
                         if (codec.GetPixels(info, bmp.GetPixels()) == SKCodecResult.Success)
+                        {
+                            bmp.SetImmutable();
                             decoded = bmp;
+                        }
                         else
                             bmp.Dispose();
                     }
@@ -537,9 +589,7 @@ public partial class TileImageView : ContentView, IDisposable
         _panX = canvasWidth * 0.5f - pinAbsX * _scale;
         _panY = canvasHeight * 0.5f - pinAbsY * _scale;
 
-        CurrentScale = _scale;
-        CurrentPan = new SKPoint(_panX, _panY);
-        CurrentRotation = _rotationDegrees;
+        SyncPublicState(force: true);
 
         _pendingPinId = null;
         _pendingZoomFactor = null;
@@ -571,8 +621,7 @@ public partial class TileImageView : ContentView, IDisposable
         _panX = mouseLocation.X - transformedPoint.X;
         _panY = mouseLocation.Y - transformedPoint.Y;
 
-        CurrentScale = _scale;
-        CurrentPan = new SKPoint(_panX, _panY);
+        SyncPublicState();
 
         InvalidateView();
     }
@@ -614,7 +663,7 @@ public partial class TileImageView : ContentView, IDisposable
 
     public void ImageFit()
     {
-        if (_canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
+        if (OriginalImageSize.IsEmpty || _canvasView.CanvasSize.Width <= 0 || _canvasView.CanvasSize.Height <= 0)
         {
             _pendingImageFit = true;
             _pendingPinId = null;
@@ -630,9 +679,7 @@ public partial class TileImageView : ContentView, IDisposable
         _panX = (canvasWidth / 2f) - (_scale * OriginalImageSize.Width / 2f);
         _panY = (canvasHeight / 2f) - (_scale * OriginalImageSize.Height / 2f);
 
-        CurrentScale = _scale;
-        CurrentPan = new SKPoint(_panX, _panY);
-        CurrentRotation = _rotationDegrees;
+        SyncPublicState(force: true);
 
         InvalidateView();
     }
@@ -663,7 +710,10 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
+        _canvasView.GRContext?.ResetContext();
+
         var canvas = e.Surface.Canvas;
+        canvas.ResetMatrix();
         canvas.Clear(_placeholderSKColor);
 
         if (_pinsNeedSort)
@@ -672,7 +722,7 @@ public partial class TileImageView : ContentView, IDisposable
             UpdateSortedPins();
         }
 
-        if (HandlePendingViewportActions()) return;
+        HandlePendingViewportActions();
 
         float canvasWidth = _canvasView.CanvasSize.Width;
         float canvasHeight = _canvasView.CanvasSize.Height;
@@ -687,27 +737,19 @@ public partial class TileImageView : ContentView, IDisposable
             DrawFpsCounter(canvas, canvasWidth);
     }
 
-    private bool HandlePendingViewportActions()
+    private void HandlePendingViewportActions()
     {
-        if (!HasValidViewport) return false;
+        if (!HasValidViewport) return;
 
         if (_pendingImageFit)
         {
             _pendingImageFit = false;
             ImageFit();
-            return true;
+            return;
         }
 
         if (_pendingPinId != null)
-        {
-            string pinId = _pendingPinId;
-            double? factor = _pendingZoomFactor;
-
-            ZoomToPin(pinId, factor);
-            return _pendingPinId == null;
-        }
-
-        return false;
+            ZoomToPin(_pendingPinId, _pendingZoomFactor);
     }
 
     private void DrawMapAndPins(SKCanvas canvas, SKRect deviceClip, bool isPrimaryPass)
@@ -717,8 +759,8 @@ public partial class TileImageView : ContentView, IDisposable
         SKSize imageSize = OriginalImageSize;
         if (imageSize.IsEmpty) return;
 
-        int maxZoom = MaxZoomLevel;
-        int tileSize = Math.Max(1, TileSize);
+        int maxZoom = _pyramidMaxZoom;
+        int tileSize = _pyramidTileSize;
         var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
 
         canvas.Save();
@@ -892,7 +934,7 @@ public partial class TileImageView : ContentView, IDisposable
 
                 if (TryGetTile(key, out var bitmap))
                 {
-                    canvas.DrawBitmap(bitmap, destRect, LinearSampling, paint);
+                    canvas.DrawBitmap(bitmap, destRect, TileSampling, paint);
                     continue;
                 }
 
@@ -937,7 +979,7 @@ public partial class TileImageView : ContentView, IDisposable
                 float srcY = (y % factor) * srcSize;
 
                 var srcRect = new SKRect(srcX, srcY, srcX + srcSize, srcY + srcSize);
-                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, LinearSampling, paint);
+                canvas.DrawBitmap(fallbackBitmap, srcRect, destRect, TileSampling, paint);
                 return;
             }
 
@@ -988,7 +1030,7 @@ public partial class TileImageView : ContentView, IDisposable
             float left = -(float)(pin.Anchor.X * pinBitmap.Width);
             float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
 
-            canvas.DrawBitmap(pinBitmap, left, top, LinearSampling);
+            canvas.DrawBitmap(pinBitmap, left, top, TileSampling);
             canvas.Restore();
         }
     }
@@ -1136,6 +1178,7 @@ public partial class TileImageView : ContentView, IDisposable
                 }
 
                 _activeTouches.Remove(e.Id);
+                SyncPublicState(force: true);
                 RequestRender();
                 break;
         }
@@ -1302,10 +1345,7 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (shouldInvalidate)
         {
-            CurrentScale = _scale;
-            CurrentPan = new SKPoint(_panX, _panY);
-            CurrentRotation = _rotationDegrees;
-
+            SyncPublicState(); // gedrosselt waehrend der Geste
             InvalidateView();
         }
     }
@@ -1350,6 +1390,7 @@ public partial class TileImageView : ContentView, IDisposable
             _oldFingerAngle = 0f;
         }
 
+        SyncPublicState(force: true);
         RequestRender();
     }
 
@@ -1546,9 +1587,7 @@ public partial class TileImageView : ContentView, IDisposable
 
             _lastMouseRotationAngle = currentAngle;
 
-            CurrentRotation = _rotationDegrees;
-            CurrentPan = new SKPoint(_panX, _panY);
-
+            SyncPublicState();
             InvalidateView();
         }
 
@@ -1562,6 +1601,7 @@ public partial class TileImageView : ContentView, IDisposable
         _isRightMouseRotating = false;
         var winView = (Microsoft.UI.Xaml.UIElement)sender;
         winView.ReleasePointerCapture(e.Pointer);
+        SyncPublicState(force: true);
         e.Handled = true;
     }
 #endif
@@ -1804,8 +1844,8 @@ public partial class TileImageView : ContentView, IDisposable
             return;
         }
 
-        int tileSize = TileSize;
-        int maxZoomLevel = MaxZoomLevel;
+        int tileSize = Math.Max(1, TileSize);
+        int maxZoomLevel = Math.Max(0, MaxZoomLevel);
         SKColor backgroundColor = _placeholderSKColor;
 
         _loadingIndicator.IsVisible = true;
@@ -1828,10 +1868,10 @@ public partial class TileImageView : ContentView, IDisposable
                 if (size.IsEmpty)
                     return (Valid: false, Size: SKSize.Empty, Folder: string.Empty, TilesExist: false);
 
-                CleanupOldTileFolders(imagePath, tileSize);
+                string folderName = BuildTileFolderName(imagePath, tileSize, maxZoomLevel);
+                string folder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", folderName);
 
-                string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
-                string folder = Path.Combine(FileSystem.AppDataDirectory, "Tiles", $"{fileNameWithoutExt}_{tileSize}");
+                CleanupOldTileFolders(imagePath, folderName);
                 bool complete = File.Exists(Path.Combine(folder, PyramidCompleteMarker));
 
                 return (Valid: true, Size: size, Folder: folder, TilesExist: complete);
@@ -1846,26 +1886,35 @@ public partial class TileImageView : ContentView, IDisposable
                 return;
             }
 
+            _pyramidMaxZoom = maxZoomLevel;
+            _pyramidTileSize = tileSize;
             OriginalImageSize = prepared.Size;
             _computedTileFolder = prepared.Folder;
             RebuildLevelMetadata();
 
             _rotationDegrees = 0f;
-            CurrentRotation = _rotationDegrees;
-
-            if (_pendingPinId == null && !_pendingImageFit)
-            {
-                _scale = 1.0f;
-                _panX = 0f;
-                _panY = 0f;
-                CurrentScale = _scale;
-                CurrentPan = new SKPoint(_panX, _panY);
-            }
 
             if (_pendingPinId != null)
+            {
                 ZoomToPin(_pendingPinId, _pendingZoomFactor);
+            }
+            else if (_pendingImageFit && HasValidViewport)
+            {
+                _pendingImageFit = false;
+                ImageFit();
+            }
             else
+            {
+                if (!_pendingImageFit)
+                {
+                    _scale = 1.0f;
+                    _panX = 0f;
+                    _panY = 0f;
+                }
+
+                SyncPublicState(force: true);
                 RequestRender();
+            }
 
             if (prepared.TilesExist)
             {
@@ -1910,16 +1959,27 @@ public partial class TileImageView : ContentView, IDisposable
         }
     }
 
-    private static void CleanupOldTileFolders(string imagePath, int currentTileSize)
+    private static string BuildTileFolderName(string imagePath, int tileSize, int maxZoomLevel)
+    {
+        var fi = new FileInfo(imagePath);
+        string stamp = $"{fi.Length:x}{fi.LastWriteTimeUtc.Ticks:x}";
+        return $"{Path.GetFileNameWithoutExtension(imagePath)}_{tileSize}_z{maxZoomLevel}_{stamp}";
+    }
+
+    private static void CleanupOldTileFolders(string imagePath, string currentFolderName)
     {
         string fileNameWithoutExt = Path.GetFileNameWithoutExtension(imagePath);
         string baseFolder = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
 
         if (!Directory.Exists(baseFolder)) return;
 
-        foreach (var dir in Directory.GetDirectories(baseFolder, $"{fileNameWithoutExt}_*"))
+        var ownFolder = new System.Text.RegularExpressions.Regex(
+            "^" + System.Text.RegularExpressions.Regex.Escape(fileNameWithoutExt) + @"_\d+(_z\d+_[0-9a-f]+)?$");
+
+        foreach (var dir in Directory.GetDirectories(baseFolder))
         {
-            if (dir.EndsWith($"_{currentTileSize}")) continue;
+            string name = Path.GetFileName(dir);
+            if (name == currentFolderName || !ownFolder.IsMatch(name)) continue;
 
             try
             {

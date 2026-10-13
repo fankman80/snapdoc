@@ -308,7 +308,7 @@ public partial class FotoItem : ObservableObject
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(DisplayOpacity))]
     public partial bool AllowExport { get; set; }
-
+    public string FotoKey { get; set; }
     public string ImagePath { get; set; }
     public DateTime DateTime { get; set; }
     public string OnPlanId { get; set; }

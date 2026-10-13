@@ -41,7 +41,8 @@ namespace SnapDoc
     {
         ProjectDetailsUpdated,
         PlanListUpdated,
-        PinsUpdated
+        PinsUpdated,
+        FotosUpdated
     }
 
     public enum ItemAspect
