@@ -1170,4 +1170,13 @@
   <data name="angemeldet_als" xml:space="preserve">
     <value>Angemeldet als:</value>
   </data>
+  <data name="zeige_sperrsymbole" xml:space="preserve">
+    <value>Sperrsymbole anzeigen</value>
+  </data>
+  <data name="ueberlappung_sperrsymbol" xml:space="preserve">
+    <value>Überlappung Sperrsymbol</value>
+  </data>
+  <data name="groesse_sperrsymbol" xml:space="preserve">
+    <value>Grösse Sperrsymbol</value>
+  </data>
 </root>

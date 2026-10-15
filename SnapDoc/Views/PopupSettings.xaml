@@ -42,6 +42,29 @@
                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
+                <HorizontalStackLayout>
+                    <controls:Switch LabelText="{x:Static res:AppResources.zeige_sperrsymbole}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        IsToggled="{Binding IsShowLockBadges}"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BorderColorOff ="Transparent"
+                        KnobColorOn="White"
+                        KnobColorOff="White"
+                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Button
+                        Padding="0"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        MaximumHeightRequest="28"
+                        MinimumHeightRequest="28"
+                        BackgroundColor="Transparent"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.lupeneinstellungen}"
+                        Clicked="LockSettingsClicked"/>
+                </HorizontalStackLayout>
+
                 <controls:Switch LabelText="{x:Static res:AppResources.planliste_mit_vorschau}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     IsToggled="{Binding IsPlanListThumbnails}"

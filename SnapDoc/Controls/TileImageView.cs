@@ -5,6 +5,7 @@ using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Services;
 using System.Collections.Specialized;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 
 namespace SnapDoc.Controls;
 
@@ -22,6 +23,16 @@ public partial class TileImageView : ContentView, IDisposable
     private const int PermanentTileBudget = 64;
     private const int StateSyncIntervalMs = 100;
     private const string PyramidCompleteMarker = ".complete";
+
+    // ---------------------------------------------------------------------------------
+    //  Lock-Badge
+    // ---------------------------------------------------------------------------------
+    private const float LockBadgeMinFactor = 0.5f;     // Grösse in der Gesamtansicht (50 % von LockBadgeSizeDp)
+    private const float LockBadgeFullSizeZoom = 4f;    // ab 4x Hineinzoomen (relativ zur Gesamtansicht) volle Grösse
+    private static readonly SKPaint LockBadgePaint = new();
+    private SKBitmap _lockBadge;
+    private readonly ConditionalWeakTable<SKBitmap, SKPoint[]> _pinHullCache = [];
+    private bool _showLockBadges = true;
 
     // ---------------------------------------------------------------------------------
     //  Felder - Ansicht
@@ -67,10 +78,8 @@ public partial class TileImageView : ContentView, IDisposable
     private long _lastStateSyncTicks = 0;
     private bool _stateSyncScheduled = false;
     private SKColor _placeholderSKColor = Colors.LightGray.ToSKColor();
-    // Fuer die Pyramiden-Erzeugung (CPU, ohne Mipmaps)
-    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
-    // Fuer die Darstellung: Mipmaps verhindern Moire/Flimmern bei verkleinert gezeichneten Kacheln
-    private static readonly SKSamplingOptions TileSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);
+    private static readonly SKSamplingOptions LinearSampling = new(SKFilterMode.Linear, SKMipmapMode.None);  // Fuer die Pyramiden-Erzeugung (CPU, ohne Mipmaps)
+    private static readonly SKSamplingOptions TileSampling = new(SKFilterMode.Linear, SKMipmapMode.Linear);  // Fuer die Darstellung: Mipmaps verhindern Moire/Flimmern bei verkleinert gezeichneten Kacheln
 
     // ---------------------------------------------------------------------------------
     //  Felder - Eingabe
@@ -189,6 +198,22 @@ public partial class TileImageView : ContentView, IDisposable
                 if ((bool)newValue)
                     control.CurrentRotation = 0f;
             });
+
+    public static readonly BindableProperty IsShowLockBadgesProperty =
+    BindableProperty.Create(nameof(IsShowLockBadges), typeof(bool), typeof(TileImageView), true,
+        propertyChanged: (bindable, o, n) =>
+        {
+            var control = (TileImageView)bindable;
+            control._showLockBadges = (bool)n;
+            if (!(bool)n) { control._lockBadge?.Dispose(); control._lockBadge = null; }
+            control.RequestRender();
+        });
+
+    public bool IsShowLockBadges
+    {
+        get => (bool)GetValue(IsShowLockBadgesProperty);
+        set => SetValue(IsShowLockBadgesProperty, value);
+    }
 
     public static readonly BindableProperty IsGrayscaleEnabledProperty =
         BindableProperty.Create(nameof(IsGrayscaleEnabled), typeof(bool), typeof(TileImageView), false,
@@ -1001,6 +1026,18 @@ public partial class TileImageView : ContentView, IDisposable
         float imgWidth = imageSize.Width;
         float imgHeight = imageSize.Height;
         float mapScale = _scale > 0 ? _scale : 1f;
+        bool showBadges = _showLockBadges;
+        SKBitmap lockBadge = null;
+        float lockBadgeDrawSize = 0f;
+        float lockBadgeOverlap = 0f;
+
+        if (showBadges)
+        {
+            lockBadge = GetLockBadge(GetLockBadgeSizePx());
+            lockBadgeDrawSize = lockBadge.Width * GetLockBadgeScale();
+            lockBadgeOverlap = settings.LockIconOffset;
+            LockBadgePaint.Color = SKColors.White.WithAlpha(settings.LockIconOpacity);
+        }
 
         foreach (var pin in _sortedPins)
         {
@@ -1014,7 +1051,8 @@ public partial class TileImageView : ContentView, IDisposable
             float halfH = MathF.Max((float)pin.Anchor.Y, 1f - (float)pin.Anchor.Y) * pinBitmap.Height * pinScale;
             float radius = MathF.Sqrt(halfW * halfW + halfH * halfH);
 
-            if (absoluteX < view.Left - radius || absoluteX > view.Right + radius || absoluteY < view.Top - radius || absoluteY > view.Bottom + radius)
+            if (absoluteX < view.Left - radius || absoluteX > view.Right + radius ||
+                absoluteY < view.Top - radius || absoluteY > view.Bottom + radius)
                 continue;
 
             canvas.Save();
@@ -1029,9 +1067,26 @@ public partial class TileImageView : ContentView, IDisposable
 
             float left = -(float)(pin.Anchor.X * pinBitmap.Width);
             float top = -(float)(pin.Anchor.Y * pinBitmap.Height);
+            var pinRect = SKRect.Create(left, top, pinBitmap.Width, pinBitmap.Height);
+            canvas.DrawBitmap(pinBitmap, pinRect, TileSampling);
 
-            canvas.DrawBitmap(pinBitmap, left, top, TileSampling);
-            canvas.Restore();
+            bool showLock = showBadges && pin.IsLockPosition;
+            SKPoint badgeCenter = default;
+
+            // Position bestimmen, solange die Pin-Matrix noch aktiv ist
+            if (showLock)
+                badgeCenter = GetLockBadgeCenter(canvas.TotalMatrix, GetPinHull(pinBitmap), left, top, lockBadgeDrawSize, lockBadgeOverlap);
+
+            canvas.Restore();   // genau EINMAL pro Save()
+
+            if (showLock)
+            {
+                // Ohne Plan-Zoom, Pin-Skalierung und Rotation zeichnen
+                canvas.Save();
+                canvas.ResetMatrix();
+                DrawLockBadge(canvas, badgeCenter, lockBadge, lockBadgeDrawSize);
+                canvas.Restore();
+            }
         }
     }
 
@@ -1133,6 +1188,249 @@ public partial class TileImageView : ContentView, IDisposable
             SKShaderTileMode.Clamp);
 
         _loupeGlarePaint.Shader = _cachedGlareShader;
+    }
+
+    // ---------------------------------------------------------------------------------
+    //  Lock-Badge
+    // ---------------------------------------------------------------------------------
+    private static void DrawLockBadge(SKCanvas canvas, SKPoint center, SKBitmap badge, float drawSize)
+    {
+        float half = drawSize / 2f;
+
+        if (MathF.Abs(drawSize - badge.Width) < 0.5f)
+        {
+            // Volle Grösse: 1:1 auf ganze Pixel -> gestochen scharf
+            canvas.DrawBitmap(badge, MathF.Round(center.X - half), MathF.Round(center.Y - half), SKSamplingOptions.Default, LockBadgePaint);
+            return;
+        }
+
+        // Verkleinert: mit Mipmaps zeichnen -> ruhig und scharf, kein Neuerzeugen nötig
+        var dest = new SKRect(center.X - half, center.Y - half, center.X + half, center.Y + half);
+        canvas.DrawBitmap(badge, dest, TileSampling, LockBadgePaint);
+    }
+
+    /// <summary>
+    /// Ermittelt die Badge-Mitte in Bildschirmkoordinaten: am Punkt des sichtbaren Pin-Umrisses,
+    /// der der oberen linken Ecke am nächsten liegt, leicht nach aussen versetzt.
+    /// </summary>
+    private static SKPoint GetLockBadgeCenter(SKMatrix matrix, SKPoint[] hull, float offsetX, float offsetY, float badgeSize, float overlap)
+    {
+        int n = hull.Length;
+        Span<SKPoint> screen = n <= 256 ? stackalloc SKPoint[n] : new SKPoint[n];
+
+        // Hülle auf den Bildschirm abbilden und Bounding-Box-Ecke oben links bestimmen
+        float minX = float.MaxValue, minY = float.MaxValue;
+        for (int i = 0; i < n; i++)
+        {
+            var p = matrix.MapPoint(hull[i].X + offsetX, hull[i].Y + offsetY);
+            screen[i] = p;
+            if (p.X < minX) minX = p.X;
+            if (p.Y < minY) minY = p.Y;
+        }
+
+        var corner = new SKPoint(minX, minY);
+
+        // Nächstgelegenen Punkt auf dem Umriss (auch zwischen zwei Eckpunkten) suchen
+        SKPoint best = screen[0];
+        float bestDist = float.MaxValue;
+        for (int i = 0; i < n; i++)
+        {
+            SKPoint a = screen[i];
+            SKPoint b = screen[(i + 1) % n];
+            float abX = b.X - a.X, abY = b.Y - a.Y;
+            float lenSq = abX * abX + abY * abY;
+            float t = lenSq > 0f
+                ? Math.Clamp(((corner.X - a.X) * abX + (corner.Y - a.Y) * abY) / lenSq, 0f, 1f)
+                : 0f;
+
+            var q = new SKPoint(a.X + abX * t, a.Y + abY * t);
+            float dx = corner.X - q.X, dy = corner.Y - q.Y;
+            float d = dx * dx + dy * dy;
+            if (d < bestDist) { bestDist = d; best = q; }
+        }
+
+        // Richtung nach aussen: zur Ecke hin; liegt der Punkt genau auf der Ecke -> diagonal
+        float dirX = corner.X - best.X, dirY = corner.Y - best.Y;
+        float len = MathF.Sqrt(dirX * dirX + dirY * dirY);
+        if (len < 0.5f)
+        {
+            dirX = dirY = -0.70710678f;
+        }
+        else
+        {
+            dirX /= len;
+            dirY /= len;
+        }
+
+        // overlap = Anteil des Badges, der über dem Pin liegt
+        float outward = badgeSize * (0.5f - overlap);
+        return new SKPoint(best.X + dirX * outward, best.Y + dirY * outward);
+    }
+
+    private SKPoint[] GetPinHull(SKBitmap bitmap)
+    {
+        if (_pinHullCache.TryGetValue(bitmap, out var hull))
+            return hull;
+
+        hull = ComputeOpaqueHull(bitmap);
+        _pinHullCache.AddOrUpdate(bitmap, hull);
+        return hull;
+    }
+
+    /// <summary>
+    /// Konvexe Hülle aller sichtbaren Pixel (Alpha >= Schwelle) in Bitmap-Koordinaten.
+    /// Pro Zeile werden nur der linke und rechte Randpixel berücksichtigt -> schnell.
+    /// </summary>
+    private static SKPoint[] ComputeOpaqueHull(SKBitmap bmp, byte alphaThreshold = 128)
+    {
+        int w = bmp.Width, h = bmp.Height;
+        var points = new List<SKPoint>(h * 4);
+
+        bool fast = bmp.BytesPerPixel == 4 &&
+                    (bmp.ColorType == SKColorType.Rgba8888 || bmp.ColorType == SKColorType.Bgra8888);
+        ReadOnlySpan<byte> pixels = fast ? bmp.GetPixelSpan() : default;
+        int rowBytes = bmp.RowBytes;
+
+        for (int y = 0; y < h; y++)
+        {
+            int l = -1;
+            for (int x = 0; x < w; x++)
+            {
+                if (AlphaAt(bmp, pixels, fast, rowBytes, x, y) >= alphaThreshold) { l = x; break; }
+            }
+            if (l < 0) continue;
+
+            int r = l;
+            for (int x = w - 1; x > l; x--)
+            {
+                if (AlphaAt(bmp, pixels, fast, rowBytes, x, y) >= alphaThreshold) { r = x; break; }
+            }
+
+            // Pixelkanten statt Pixelmitten -> Umriss liegt exakt auf dem sichtbaren Rand
+            points.Add(new SKPoint(l, y));
+            points.Add(new SKPoint(l, y + 1));
+            points.Add(new SKPoint(r + 1, y));
+            points.Add(new SKPoint(r + 1, y + 1));
+        }
+
+        // Komplett transparent -> Bitmap-Rechteck als Fallback
+        if (points.Count == 0)
+            return [new(0, 0), new(w, 0), new(w, h), new(0, h)];
+
+        return ConvexHull(points);
+    }
+
+    private static byte AlphaAt(SKBitmap bmp, ReadOnlySpan<byte> pixels, bool fast, int rowBytes, int x, int y)
+        => fast ? pixels[y * rowBytes + x * 4 + 3] : bmp.GetPixel(x, y).Alpha;
+
+    /// <summary>Andrew's Monotone Chain - liefert die Hülle im Uhrzeigersinn ohne Duplikate.</summary>
+    private static SKPoint[] ConvexHull(List<SKPoint> pts)
+    {
+        pts.Sort((a, b) => a.X != b.X ? a.X.CompareTo(b.X) : a.Y.CompareTo(b.Y));
+
+        static float Cross(SKPoint o, SKPoint a, SKPoint b)
+            => (a.X - o.X) * (b.Y - o.Y) - (a.Y - o.Y) * (b.X - o.X);
+
+        var hull = new SKPoint[pts.Count * 2];
+        int k = 0;
+
+        for (int i = 0; i < pts.Count; i++)
+        {
+            while (k >= 2 && Cross(hull[k - 2], hull[k - 1], pts[i]) <= 0) k--;
+            hull[k++] = pts[i];
+        }
+
+        for (int i = pts.Count - 2, lower = k + 1; i >= 0; i--)
+        {
+            while (k >= lower && Cross(hull[k - 2], hull[k - 1], pts[i]) <= 0) k--;
+            hull[k++] = pts[i];
+        }
+
+        return hull[..Math.Max(1, k - 1)];
+    }
+
+    /// <summary>
+    /// Faktor 0..1 für die Badge-Grösse abhängig vom Plan-Zoom.
+    /// 1.0 = Gesamtansicht (ImageFit), LockBadgeFullSizeZoom = volle Grösse.
+    /// </summary>
+    private float GetLockBadgeScale()
+    {
+        if (!HasValidViewport) return 1f;
+
+        float fitScale = MathF.Min(
+            _canvasView.CanvasSize.Width / OriginalImageSize.Width,
+            _canvasView.CanvasSize.Height / OriginalImageSize.Height);
+
+        if (fitScale <= 0f) return 1f;
+
+        float zoomRel = _scale / fitScale;
+
+        // Logarithmisch interpolieren -> fühlt sich beim Zoomen gleichmässig an
+        float t = Math.Clamp(MathF.Log2(MathF.Max(zoomRel, 1e-3f)) / MathF.Log2(LockBadgeFullSizeZoom), 0f, 1f);
+
+        return LockBadgeMinFactor + (1f - LockBadgeMinFactor) * t;
+    }
+
+    private SKBitmap GetLockBadge(int size)
+    {
+        if (_lockBadge != null && _lockBadge.Width == size) return _lockBadge;
+        _lockBadge?.Dispose();
+
+        var bmp = new SKBitmap(new SKImageInfo(size, size, SKImageInfo.PlatformColorType, SKAlphaType.Premul));
+
+        float s = size;
+        float blur = s * 0.04f;
+        float r = s / 2f - blur * 3f;            // Platz für den Schatten lassen
+        float cx = s / 2f, cy = s / 2f - blur;   // leicht nach oben, Schatten fällt nach unten
+        float d = r * 2f;                        // Durchmesser = Referenz für das Schloss
+
+        float X(float f) => cx + (f - 0.5f) * d;
+        float Y(float f) => cy + (f - 0.5f) * d;
+
+        using (var c = new SKCanvas(bmp))
+        using (var fill = new SKPaint { IsAntialias = true, Color = SKColors.White })
+        using (var dark = new SKPaint { IsAntialias = true, Color = new SKColor(0x30, 0x30, 0x30) })
+        using (var stroke = new SKPaint { IsAntialias = true, Color = dark.Color, Style = SKPaintStyle.Stroke, StrokeWidth = d * 0.09f })
+        using (var shadow = new SKPaint
+        {
+            IsAntialias = true,
+            Color = new SKColor(0, 0, 0, 70),
+            MaskFilter = SKMaskFilter.CreateBlur(SKBlurStyle.Normal, blur)
+        })
+        using (var ring = new SKPaint
+        {
+            IsAntialias = true,
+            Style = SKPaintStyle.Stroke,
+            StrokeWidth = Math.Max(1f, s * 0.05f),
+            Color = new SKColor(0x30, 0x30, 0x30, 160)
+        })
+        {
+            c.Clear(SKColors.Transparent);
+
+            // Hintergrund: Schatten, Kreis, Rand
+            c.DrawCircle(cx, cy + blur * 1.5f, r, shadow);
+            c.DrawCircle(cx, cy, r, fill);
+            c.DrawCircle(cx, cy, r, ring);
+
+            // Schloss
+            c.DrawRoundRect(new SKRect(X(0.28f), Y(0.46f), X(0.72f), Y(0.76f)), d * 0.05f, d * 0.05f, dark); // Körper
+            c.DrawArc(new SKRect(X(0.36f), Y(0.24f), X(0.64f), Y(0.58f)), 180, 180, false, stroke);          // Bügel
+            c.DrawLine(X(0.36f), Y(0.41f), X(0.36f), Y(0.47f), stroke);
+            c.DrawLine(X(0.64f), Y(0.41f), X(0.64f), Y(0.47f), stroke);
+        }
+
+        bmp.SetImmutable();
+        return _lockBadge = bmp;
+    }
+
+    private int GetLockBadgeSizePx()
+    {
+        // Canvas-Pixel pro MAUI-Einheit (Android-Dichte bzw. Windows-Skalierung)
+        double pxPerDp = _canvasView.Width > 0
+            ? _canvasView.CanvasSize.Width / _canvasView.Width
+            : DeviceDisplay.MainDisplayInfo.Density;
+
+        return Math.Max(8, (int)Math.Round(SettingsService.Instance.LockIconSize * pxPerDp));
     }
 
     // ---------------------------------------------------------------------------------
@@ -2374,6 +2672,9 @@ public partial class TileImageView : ContentView, IDisposable
         _loupeGlarePaint?.Dispose();
 
         _tileLoadSemaphore?.Dispose();
+
+        _lockBadge?.Dispose();
+        _lockBadge = null;
 
         _sortedPins.Clear();
     }

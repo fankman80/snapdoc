@@ -114,12 +114,12 @@
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
 		<PackageReference Include="Mapsui" Version="5.1.0" />
 		<PackageReference Include="Mapsui.Maui" Version="5.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.13" />
 		<PackageReference Include="Microsoft.Graph" Version="6.8.0" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.91.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.110" />
 		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.110" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.12" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.13" />
 		<PackageReference Include="Sentry.Maui" Version="6.12.1" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
 		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.155.0-preview.2.26479.13" />
@@ -155,6 +155,9 @@
 		</Compile>
 		<Compile Update="Views\PopupCalendarView.xaml.cs">
 			<DependentUpon>PopupCalendarView.xaml</DependentUpon>
+		</Compile>
+		<Compile Update="Views\PopupLockBadgeSettings.xaml.cs">
+		  <DependentUpon>PopupLockBadgeSettings.xaml</DependentUpon>
 		</Compile>
 		<Compile Update="Views\PopupShapeSelect.xaml.cs">
 			<DependentUpon>PopupShapeSelect.xaml</DependentUpon>
@@ -213,6 +216,9 @@
 		<MauiXaml Update="Views\MapView.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\NewPage.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupCalendarView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Views\PopupLockBadgeSettings.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupLoupeSettings.xaml">

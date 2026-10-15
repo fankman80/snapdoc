@@ -14,6 +14,7 @@ internal class SettingsModel
     public int? PinSortCrit { get; set; } // Kriterium zur Sortierung der Pins
     public int? IconCategory { get; set; } // Icon-Kategorie
     public bool? IsPlanRotateLocked { get; set; } // Planrotation sperren
+    public bool? IsShowLockBadges { get; set; } // Sperr-Icons auf den Pins anzeigen
     public bool? IsPlanListThumbnails { get; set; } // Planliste mit Thumbnails anzeigen
     public bool? IsHideInactivePlans { get; set; } // Inaktive Pläne in der Planliste ausblenden
     public bool? IsPinAutoLock { get; set; } // Pin nach Platzierung automatisch sperren
@@ -67,6 +68,9 @@ internal class SettingsModel
     public bool? IsLoupeEnabled { get; set; } // Lupe aktivieren/deaktivieren
     public float? LoupeRadius { get; set; } // Radius der Lupe in Pixeln
     public float? LoupeZoomFactor { get; set; } // Zoomfaktor der Lupe
+    public float? LockIconOffset { get; set; } // Offset der Sperr-Icons auf den Pins
+    public float? LockIconSize { get; set; } // Größe der Sperr-Icons auf den Pins
+    public byte? LockIconOpacity { get; set; } // Transparenz der Sperr-Icons auf den Pins
     public int? ParallelDownloads { get; set; } // Anzahl paralleler Downloads
     public int? ParallelUploads { get; set; } // Anzahl paralleler Uploads
     public int? CloudPollingIntervall { get; set; } // Intervall für die Cloud-Abfrage in Sekunden

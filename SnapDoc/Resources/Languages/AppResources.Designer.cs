@@ -1150,6 +1150,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Grösse Sperrsymbol ähnelt.
+        /// </summary>
+        internal static string groesse_sperrsymbol {
+            get {
+                return ResourceManager.GetString("groesse_sperrsymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Grün (G) ähnelt.
         /// </summary>
         internal static string gruen_g {
@@ -2923,6 +2932,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Überlappung Sperrsymbol ähnelt.
+        /// </summary>
+        internal static string ueberlappung_sperrsymbol {
+            get {
+                return ResourceManager.GetString("ueberlappung_sperrsymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Unbekannter Nutzer ähnelt.
         /// </summary>
         internal static string unbekannter_nutzer {
@@ -3162,6 +3180,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string zeige_platzhalter_definitionen {
             get {
                 return ResourceManager.GetString("zeige_platzhalter_definitionen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Sperrsymbole anzeigen ähnelt.
+        /// </summary>
+        internal static string zeige_sperrsymbole {
+            get {
+                return ResourceManager.GetString("zeige_sperrsymbole", resourceCulture);
             }
         }
         

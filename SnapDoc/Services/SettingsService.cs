@@ -109,6 +109,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;
     [ObservableProperty] public partial double DefaultPinZoom { get; set; } = 4;
     [ObservableProperty] public partial bool IsPlanRotateLocked { get; set; } = false;
+    [ObservableProperty] public partial bool IsShowLockBadges { get; set; } = true;
     [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
     [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
     [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
@@ -164,6 +165,9 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = true;
     [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
+    [ObservableProperty] public partial float LockIconOffset { get; set; } = -0.1f;
+    [ObservableProperty] public partial float LockIconSize { get; set; } = 30;
+    [ObservableProperty] public partial byte LockIconOpacity { get; set; } = 128;
     [ObservableProperty] public partial int CloudPollingIntervall { get; set; } = 15;
     [ObservableProperty] public partial int ParallelDownloads { get; set; } = 12;
     [ObservableProperty] public partial int ParallelUploads { get; set; } = 12;
@@ -345,6 +349,7 @@ public partial class SettingsService : ObservableObject
             PinPlaceMode = PinPlaceMode,
             PinDuplicateOffset = PinDuplicateOffset,
             IsPlanRotateLocked = IsPlanRotateLocked,
+            IsShowLockBadges = IsShowLockBadges,
             IsPlanListThumbnails = IsPlanListThumbnails,
             IsHideInactivePlans = IsHideInactivePlans,
             IsPinAutoLock = IsPinAutoLock,
@@ -403,6 +408,9 @@ public partial class SettingsService : ObservableObject
             ShowFpsCounter = ShowFpsCounter,
             LoupeRadius = LoupeRadius,
             LoupeZoomFactor = LoupeZoomFactor,
+            LockIconOffset = LockIconOffset,
+            LockIconSize = LockIconSize,
+            LockIconOpacity = LockIconOpacity,
             CloudPollingIntervall = CloudPollingIntervall,
             ParallelDownloads = ParallelDownloads,
             ParallelUploads = ParallelUploads
@@ -433,6 +441,7 @@ public partial class SettingsService : ObservableObject
             PinPlaceMode = settings.PinPlaceMode ?? defaultSettings.PinPlaceMode;
             PinDuplicateOffset = settings.PinDuplicateOffset ?? defaultSettings.PinDuplicateOffset;
             IsPlanRotateLocked = settings.IsPlanRotateLocked ?? defaultSettings.IsPlanRotateLocked;
+            IsShowLockBadges = settings.IsShowLockBadges ?? defaultSettings.IsShowLockBadges;
             IsPlanListThumbnails = settings.IsPlanListThumbnails ?? defaultSettings.IsPlanListThumbnails;
             IsHideInactivePlans = settings.IsHideInactivePlans ?? defaultSettings.IsHideInactivePlans;
             IsPinAutoLock = settings.IsPinAutoLock ?? defaultSettings.IsPinAutoLock;
@@ -499,6 +508,9 @@ public partial class SettingsService : ObservableObject
             ShowFpsCounter = settings.ShowFpsCounter ?? defaultSettings.ShowFpsCounter;
             LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
             LoupeZoomFactor = settings.LoupeZoomFactor ?? defaultSettings.LoupeZoomFactor;
+            LockIconOffset = settings.LockIconOffset ?? defaultSettings.LockIconOffset;
+            LockIconSize = settings.LockIconSize ?? defaultSettings.LockIconSize;
+            LockIconOpacity = settings.LockIconOpacity ?? defaultSettings.LockIconOpacity;
             CloudPollingIntervall = settings.CloudPollingIntervall ?? defaultSettings.CloudPollingIntervall;
             ParallelDownloads = settings.ParallelDownloads ?? defaultSettings.ParallelDownloads;
             ParallelUploads = settings.ParallelUploads ?? defaultSettings.ParallelUploads;
@@ -521,6 +533,7 @@ public partial class SettingsService : ObservableObject
         PinPlaceMode = defaultSettings.PinPlaceMode;
         PinDuplicateOffset = defaultSettings.PinDuplicateOffset;
         IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
+        IsShowLockBadges = defaultSettings.IsShowLockBadges;
         IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
         IsHideInactivePlans = defaultSettings.IsHideInactivePlans;
         IsPinAutoLock = defaultSettings.IsPinAutoLock;
@@ -579,6 +592,9 @@ public partial class SettingsService : ObservableObject
         ShowFpsCounter = defaultSettings.ShowFpsCounter;
         LoupeRadius = defaultSettings.LoupeRadius;
         LoupeZoomFactor = defaultSettings.LoupeZoomFactor;
+        LockIconOffset = defaultSettings.LockIconOffset;
+        LockIconSize = defaultSettings.LockIconSize;
+        LockIconOpacity = defaultSettings.LockIconOpacity;
         CloudPollingIntervall = defaultSettings.CloudPollingIntervall;
         ParallelDownloads = defaultSettings.ParallelDownloads;
         ParallelUploads = defaultSettings.ParallelUploads;

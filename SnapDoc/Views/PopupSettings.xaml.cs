@@ -78,6 +78,16 @@ public partial class PopupSettings : Popup, IQueryAttributable
         }
     }
 
+    private async void LockSettingsClicked(object sender, EventArgs e)
+    {
+        var popup = new PopupLockBadgeSettings();
+        var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+
+        if (result.Result != null)
+        {
+        }
+    }
+
     private async void LoupeSettingsClicked(object sender, EventArgs e)
     {
         var popup = new PopupLoupeSettings();

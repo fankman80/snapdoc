@@ -1171,4 +1171,13 @@
   <data name="angemeldet_als" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="zeige_sperrsymbole" xml:space="preserve">
+    <value>Show lock icons</value>
+  </data>
+  <data name="ueberlappung_sperrsymbol" xml:space="preserve">
+    <value>Lock icon overlap</value>
+  </data>
+  <data name="groesse_sperrsymbol" xml:space="preserve">
+    <value>Lock icon size</value>
+  </data>
 </root>

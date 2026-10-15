@@ -1171,4 +1171,13 @@
   <data name="angemeldet_als" type="System.Resources.ResXNullRef, System.Windows.Forms">
     <value />
   </data>
+  <data name="zeige_sperrsymbole" xml:space="preserve">
+    <value>Afficher les icônes de verrouillage</value>
+  </data>
+  <data name="ueberlappung_sperrsymbol" xml:space="preserve">
+    <value>Chevauchement du cadenas</value>
+  </data>
+  <data name="groesse_sperrsymbol" xml:space="preserve">
+    <value>Taille du cadenas</value>
+  </data>
 </root>
