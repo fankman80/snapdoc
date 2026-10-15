@@ -167,7 +167,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
     [ObservableProperty] public partial float LockIconOffset { get; set; } = -0.1f;
     [ObservableProperty] public partial float LockIconSize { get; set; } = 30;
-    [ObservableProperty] public partial byte LockIconOpacity { get; set; } = 128;
+    [ObservableProperty] public partial byte LockIconOpacity { get; set; } = 153;
     [ObservableProperty] public partial int CloudPollingIntervall { get; set; } = 15;
     [ObservableProperty] public partial int ParallelDownloads { get; set; } = 12;
     [ObservableProperty] public partial int ParallelUploads { get; set; } = 12;
