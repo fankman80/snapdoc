@@ -33,6 +33,7 @@ public partial class TileImageView : ContentView, IDisposable
     private SKBitmap _lockBadge;
     private readonly ConditionalWeakTable<SKBitmap, SKPoint[]> _pinHullCache = [];
     private bool _showLockBadges = true;
+    private static readonly SKSamplingOptions BadgeSampling = new(SKFilterMode.Linear, SKMipmapMode.None);
 
     // ---------------------------------------------------------------------------------
     //  Felder - Ansicht
@@ -1206,7 +1207,7 @@ public partial class TileImageView : ContentView, IDisposable
 
         // Verkleinert: mit Mipmaps zeichnen -> ruhig und scharf, kein Neuerzeugen nötig
         var dest = new SKRect(center.X - half, center.Y - half, center.X + half, center.Y + half);
-        canvas.DrawBitmap(badge, dest, TileSampling, LockBadgePaint);
+        canvas.DrawBitmap(badge, dest, BadgeSampling, LockBadgePaint);
     }
 
     /// <summary>
@@ -1413,10 +1414,10 @@ public partial class TileImageView : ContentView, IDisposable
             c.DrawCircle(cx, cy, r, ring);
 
             // Schloss
-            c.DrawRoundRect(new SKRect(X(0.28f), Y(0.46f), X(0.72f), Y(0.76f)), d * 0.05f, d * 0.05f, dark); // Körper
+            c.DrawRoundRect(new SKRect(X(0.28f), Y(0.46f), X(0.72f), Y(0.76f)), d * 0.05f, d * 0.03f, dark); // Körper
             c.DrawArc(new SKRect(X(0.36f), Y(0.24f), X(0.64f), Y(0.58f)), 180, 180, false, stroke);          // Bügel
-            c.DrawLine(X(0.36f), Y(0.41f), X(0.36f), Y(0.47f), stroke);
-            c.DrawLine(X(0.64f), Y(0.41f), X(0.64f), Y(0.47f), stroke);
+            c.DrawLine(X(0.36f), Y(0.39f), X(0.36f), Y(0.50f), stroke);
+            c.DrawLine(X(0.64f), Y(0.39f), X(0.64f), Y(0.50f), stroke);
         }
 
         bmp.SetImmutable();
