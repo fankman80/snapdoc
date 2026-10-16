@@ -164,7 +164,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     {
                         resolvedPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, pinIcon);
 
-                        // Pruefen und herunterladen, falls lokal nicht vorhanden
                         if (!File.Exists(resolvedPath))
                         {
                             await SaveManager.DownloadMediaOnDemandAsync(pinIcon, GlobalJson.Data.CustomPinsPath);
@@ -177,13 +176,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         var customIconPath = Path.Combine(Settings.DataDirectory, "customicons", pinIcon);
                         if (File.Exists(customIconPath))
                             resolvedPath = customIconPath;
-                        else { /* Fallback aufs Default-Icon */ }
                     }
                     else
                         resolvedPath = pinIcon;
 
-                    pin.Icon = null;
-                    pin.IconPath = resolvedPath;
+                    bool iconChanged = !string.Equals(pin.IconPath, resolvedPath, StringComparison.Ordinal);
+                    if (iconChanged)
+                    {
+                        pin.Icon = null;
+                        pin.IconPath = resolvedPath;
+                    }
                     pin.Anchor = currentAnchor;
                     pin.RelativeX = (float)pinData.Pos.X;
                     pin.RelativeY = (float)pinData.Pos.Y;
@@ -194,10 +196,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                         ? (float)pinData.PinRotation
                         : (float)PlanImage.CurrentRotation * -1 + (float)pinData.PinRotation;
                     pin.PinScale = (float)pinData.PinScale;
-
-                    var index = pinList.IndexOf(pin);
-                    if (index != -1)
-                        pinList[index] = pin;
 
                     PlanImage.InvalidateSurface();
                 }
@@ -449,8 +447,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private void OnPinMoved(object sender, MapPin movedPin)
     {
         if (movedPin == null) return;
-        if (!GlobalJson.Data.Plans.TryGetValue(planId, out var plan) || !plan.Pins.TryGetValue(movedPin.Id, out var pin)) return;
-        if (pin.IsLockPosition) return;
+        if (!SyncOps.TryGetLivePlan(planId, out var plan) ||
+            !SyncOps.TryGetLivePin(plan, movedPin.Id, out var pin)) return;
+
+        if (pin.IsLockPosition)
+        {
+            movedPin.RelativeX = (float)pin.Pos.X;
+            movedPin.RelativeY = (float)pin.Pos.Y;
+            movedPin.IsLockPosition = true;
+            PlanImage.InvalidateSurface();
+            return;
+        }
 
         pin.Pos = new Point(movedPin.RelativeX, movedPin.RelativeY);
 
@@ -459,9 +466,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             pin.IsLockPosition = true;
             movedPin.IsLockPosition = true;
         }
-        pin.Touch();
 
-        // save data to file
+        pin.Touch();
         SaveManager.NotifyDataChanged();
     }
 

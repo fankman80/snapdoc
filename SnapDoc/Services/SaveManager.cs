@@ -656,7 +656,8 @@ public static class SaveManager
                                 localPin.PinColor != cloudPin.PinColor ||
                                 localPin.PinScale != cloudPin.PinScale ||
                                 localPin.IsLockAutoScale != cloudPin.IsLockAutoScale ||
-                                localPin.IsLockRotate != cloudPin.IsLockRotate;
+                                localPin.IsLockRotate != cloudPin.IsLockRotate ||
+                                localPin.IsLockPosition != cloudPin.IsLockPosition;
 
                 CopyPinValues(localPin, cloudPin);
             }
