@@ -30,6 +30,7 @@
 	<PropertyGroup Condition="$(TargetFramework.Contains('-ios'))">
 		<RuntimeIdentifier>ios-arm64</RuntimeIdentifier>
 		<IncludeSwiftStandardLibraries>true</IncludeSwiftStandardLibraries>
+		<CodesignEntitlements>Platforms/iOS/Entitlements.plist</CodesignEntitlements>
 	</PropertyGroup>
 
 	<!-- Windows Spezifisch -->

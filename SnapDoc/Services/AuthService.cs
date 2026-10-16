@@ -13,13 +13,10 @@ public class AuthService
 {
     private const string ClientId = "00fdac1d-aa0a-49c1-a238-a46a88f69ce6";
     private const string Authority = "https://login.microsoftonline.com/common";
-
     private readonly string[] _scopes = ["User.Read", "Files.ReadWrite.All"];
     private readonly IPublicClientApplication _pca;
-
     public bool IsLoggedIn => GraphClient != null;
     public GraphServiceClient? GraphClient { get; private set; }
-
     public string CurrentUserName { get; private set; } = string.Empty;
     public string CurrentUserEmail { get; private set; } = string.Empty;
 
