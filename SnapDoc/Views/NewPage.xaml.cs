@@ -1380,7 +1380,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/{plan.File}");
         SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
 
-        DeleteTileCache(plan.File);
+        TileCache.DeleteForPlanFile(plan.File);
 
         // Markiert Plan + alle Pins + Fotos, sendet PlanDeletedMessage
         // und ruft NotifyDataChanged. Die manuelle PinDeletedMessage-Schleife
@@ -1388,29 +1388,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SyncOps.DeletePlan(planId);
 
         ProjectItem.Current.ApplyFilterAndSorting();
-    }
-
-    /// <summary>
-    /// Entfernt die Tile-Cache-Ordner eines Plans. Webmap-Plaene haben keine
-    /// Datei - ohne die Leerstring-Pruefung wuerde das Suchmuster zu "**"
-    /// und ALLE Tile-Ordner samt denen anderer Projekte loeschen.
-    /// </summary>
-    private static void DeleteTileCache(string planFile)
-    {
-        if (string.IsNullOrWhiteSpace(planFile)) return;
-
-        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
-        if (!Directory.Exists(cacheDir)) return;
-
-        string baseFileName = Path.GetFileNameWithoutExtension(planFile).Replace("_r", "");
-        if (string.IsNullOrWhiteSpace(baseFileName)) return;
-
-        foreach (var dir in Directory.GetDirectories(cacheDir, $"*{baseFileName}*"))
-        {
-            try { Directory.Delete(dir, true); }
-            catch (IOException) { }
-            catch (UnauthorizedAccessException) { }
-        }
     }
 
     private static void DeleteIfExists(string path)
@@ -1421,80 +1398,111 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task PlanRotate(int angle)
     {
-        var imagePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, thisPlan.File);
-        var thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", thisPlan.File);
-        var imagefile = Path.GetFileNameWithoutExtension(imagePath);
+        if (string.IsNullOrEmpty(thisPlan.File)) return; // Webmap-Plan
 
-        if (imagefile.EndsWith("_r"))
-            imagefile = imagefile.Replace("_r", "");
-        else
-            imagefile += "_r";
-        imagefile += Path.GetExtension(imagePath);
+        string planDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
+        string thumbDir = Path.Combine(planDir, "thumbnails");
 
-        // Ziel-Pfade definieren
-        var outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, imagefile);
-        var thumbOutputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", imagefile);
+        string oldFile = thisPlan.File;
+        string imagePath = Path.Combine(planDir, oldFile);
+        string thumbPath = Path.Combine(thumbDir, oldFile);
 
-        Helper.RotateImageFile(imagePath, outputPath, angle);
-        Helper.RotateImageFile(thumbPath, thumbOutputPath, angle);
+        // Quelle muss lokal vorhanden sein
+        if (!File.Exists(imagePath))
+            await SaveManager.DownloadMediaOnDemandAsync(oldFile, GlobalJson.Data.PlanPath);
+        if (!File.Exists(imagePath)) return;
 
-        // Grösse für die UI-Aktualisierung auslesen
-        using (var stream = File.OpenRead(outputPath))
-        using (var bmp = SKBitmap.Decode(stream))
+        // Eindeutiger Name pro Drehung: alte Kopien und Tile-Caches
+        // können nie mit dem neuen Bild verwechselt werden
+        string newFile = $"{TileCache.GetPlanRootName(oldFile)}_r{DateTime.UtcNow.Ticks}{Path.GetExtension(oldFile)}";
+        string outputPath = Path.Combine(planDir, newFile);
+        string thumbOutputPath = Path.Combine(thumbDir, newFile);
+
+        int thumbSize = (int)SettingsService.Instance.PlanThumbSize;
+        await Task.Run(() =>
         {
-            if (bmp != null)
-                thisPlan.ImageSize = new Size(bmp.Width, bmp.Height);
+            Helper.RotateImageFile(imagePath, outputPath, angle);
+            CreatePlanThumbnail(outputPath, thumbOutputPath, thumbSize);
+        });
+
+        // Nur den Header lesen statt das ganze Planbild zu dekodieren
+        using (var codec = SKCodec.Create(outputPath))
+        {
+            if (codec != null)
+                thisPlan.ImageSize = new Size(codec.Info.Width, codec.Info.Height);
         }
 
-        thisPlan.File = imagefile;
+        // Pins VOR dem Neuladen umrechnen
+        foreach (var (_, pinData) in SyncOps.LivePins(thisPlan).ToList())
+        {
+            pinData.Pos = RotatePin(pinData.Pos, angle);
+            if (pinData.IsLockRotate)
+                pinData.PinRotation = (pinData.PinRotation + angle) % 360;
+            pinData.Touch();
+        }
 
+        thisPlan.File = newFile;
         thisPlan.Touch();
+
+        TileCache.DeleteForPlanFile(oldFile);
 
         await AddPlan();
 
-        // Thumbnail-Pfad in der Shell-CollectionView aktualisieren
-        if (Shell.Current is AppShell shell)
-        {
-            var newThumbPath = Path.Combine(
-                Settings.DataDirectory,
-                SettingsService.Instance.ProjectPath,
-                GlobalJson.Data.PlanPath,
-                "thumbnails",
-                imagefile);
+        var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+        masterItem?.Thumbnail = thumbOutputPath;
+        ProjectItem.Current.ApplyFilterAndSorting();
 
-            if (!string.IsNullOrEmpty(planId))
-            {
-                var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
-                masterItem?.Thumbnail = newThumbPath;
-            }
+        // Alte Dateien: lokal sofort, Cloud erst nach dem JSON-Sync
+        TryDelete(imagePath);
+        TryDelete(thumbPath);
+        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/{oldFile}");
+        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{oldFile}");
 
-            ProjectItem.Current.ApplyFilterAndSorting();
-        }
+        // Neue Dateien hochladen
+        SaveManager.NotifyDataChanged([
+            (outputPath, GlobalJson.Data.PlanPath),
+        (thumbOutputPath, $"{GlobalJson.Data.PlanPath}/thumbnails")
+        ]);
+    }
 
-        // Umpositionierung der Pins
-        if (thisPlan.Pins != null)
-        {
-            foreach (var pinEntry in SyncOps.LivePins(thisPlan).ToList())
-            {
-                var pinId = pinEntry.Key;
-                var pinData = pinEntry.Value;
+    private static void TryDelete(string path)
+    {
+        try { if (File.Exists(path)) File.Delete(path); }
+        catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Löschen fehlgeschlagen: {ex.Message}"); }
+    }
 
-                var pin = pinList.FirstOrDefault(p => p.Id == pinId);
-                if (pin != null)
-                    pinList.Remove(pin);
+    /// <summary>
+    /// Erzeugt ein Plan-Vorschaubild mit maxEdge als längster Kante.
+    /// JPEG wird direkt verkleinert dekodiert, das spart bei großen Plänen viel Speicher.
+    /// </summary>
+    private static void CreatePlanThumbnail(string sourcePath, string destPath, int maxEdge)
+    {
+        using var codec = SKCodec.Create(sourcePath);
+        if (codec == null) return;
 
-                pinData.Pos = RotatePin(pinData.Pos, angle);
+        var info = codec.Info;
+        float scale = Math.Min(1f, (float)maxEdge / Math.Max(info.Width, info.Height));
+        int w = Math.Max(1, (int)Math.Round(info.Width * scale));
+        int h = Math.Max(1, (int)Math.Round(info.Height * scale));
 
-                if (pinData.IsLockRotate)
-                    pinData.PinRotation = (pinData.PinRotation + angle) % 360;
+        // Vom Codec unterstützte Zwischengröße (bei PNG = Originalgröße)
+        var decodeSize = codec.GetScaledDimensions(scale);
+        using var decoded = SKBitmap.Decode(codec, new SKImageInfo(decodeSize.Width, decodeSize.Height));
+        if (decoded == null) return;
 
-                await AddPin(pinId);
-                pinData.Touch();
-            }
-        }
+        using var resized = decoded.Width == w && decoded.Height == h
+            ? decoded.Copy()
+            : decoded.Resize(new SKImageInfo(w, h),
+                             new SKSamplingOptions(SKFilterMode.Linear, SKMipmapMode.Linear));
+        if (resized == null) return;
 
-        // Daten speichern
-        SaveManager.NotifyDataChanged();
+        bool isPng = Path.GetExtension(destPath).Equals(".png", StringComparison.OrdinalIgnoreCase);
+        using var image = SKImage.FromBitmap(resized);
+        using var data = image.Encode(isPng ? SKEncodedImageFormat.Png : SKEncodedImageFormat.Jpeg, 90);
+
+        Directory.CreateDirectory(Path.GetDirectoryName(destPath)!);
+        using var stream = File.Create(destPath);
+        data.SaveTo(stream);
     }
 
     static Point RotatePin(Point oldPos, int angle)

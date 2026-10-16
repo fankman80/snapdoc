@@ -20,7 +20,6 @@ public static class SaveManager
     /// Stempel fuer Altprojekte ohne Sync-Metadaten. MUSS auf allen Geraeten identisch sein.
     /// </summary>
     private static readonly DateTimeOffset LegacySeed = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
-
     private static readonly Lock _fileLock = new();
     private static readonly Lock _debounceLock = new();
     private static readonly SemaphoreSlim _saveGate = new(1, 1);
@@ -33,6 +32,7 @@ public static class SaveManager
     private static string CloudFileName => SettingsService.DefaultJson;
     private static readonly ConcurrentDictionary<string, byte> _verifiedCloudIcons = new(StringComparer.OrdinalIgnoreCase);
     private static volatile bool _missingFilesPending;
+    private static readonly ConcurrentQueue<string> _stalePlanFiles = new();
 
     // Merge-Nebenwirkungen: veraltete Bilddateien + UI-Hinweis fuer Fotolisten
     private static readonly ConcurrentQueue<(string File, bool DropOriginal)> _staleMedia = new();
@@ -542,7 +542,18 @@ public static class SaveManager
             if (localPlan is null || cloudPlan is null) continue;
 
             bool wasVisible = localPlan.IsLive();
+            string oldPlanFile = localPlan.File;
+
             MergePlan(planId, localPlan, cloudPlan);
+
+            // Planbild ausgetauscht (z.B. gedreht)
+            if (!string.Equals(oldPlanFile, localPlan.File, StringComparison.OrdinalIgnoreCase) && localPlan.IsLive())
+            {
+                planStructureChanged = true;   // Vorschaubild in der Planliste
+                if (!string.IsNullOrEmpty(oldPlanFile))
+                    _stalePlanFiles.Enqueue(oldPlanFile);
+                WeakReferenceMessenger.Default.Send(new PlanImageChangedMessage(planId, oldPlanFile));
+            }
 
             if (wasVisible != localPlan.IsLive())
             {
@@ -790,7 +801,7 @@ public static class SaveManager
 
         if (projectDir != null && GlobalJson.Data != null)
         {
-            var (img, thumb, _, _) = Folders(GlobalJson.Data);
+            var (img, thumb, planDir, _) = Folders(GlobalJson.Data);
 
             while (_staleMedia.TryDequeue(out var stale))
             {
@@ -811,10 +822,28 @@ public static class SaveManager
                     }
                 }
             }
+
+            while (_stalePlanFiles.TryDequeue(out var oldPlanFile))
+            {
+                TileCache.DeleteForPlanFile(oldPlanFile);
+
+                // Nur löschen, wenn kein lebender Plan die Datei noch nutzt
+                if (SyncOps.LivePlans(GlobalJson.Data).Any(p =>
+                        string.Equals(p.Value.File, oldPlanFile, StringComparison.OrdinalIgnoreCase)))
+                    continue;
+
+                foreach (var rel in new[] { $"{planDir}/{oldPlanFile}", $"{planDir}/thumbnails/{oldPlanFile}" })
+                {
+                    string full = ToLocalPath(projectDir, rel);
+                    try { if (File.Exists(full)) File.Delete(full); }
+                    catch (Exception ex) { Console.WriteLine($"Alte Plandatei nicht gelöscht ({rel}): {ex.Message}"); }
+                }
+            }
         }
         else
         {
             while (_staleMedia.TryDequeue(out _)) { }
+            while (_stalePlanFiles.TryDequeue(out _)) { }
         }
 
         if (_fotosChanged)
@@ -1706,6 +1735,7 @@ public static class SaveManager
 
         _missingFilesPending = false;
         var project = ProjectItem.Current;
+        bool planThumbsLoaded = false;
 
         foreach (var planPair in SyncOps.LivePlans(GlobalJson.Data).ToList())
         {
@@ -1716,6 +1746,13 @@ public static class SaveManager
                 string localPath = Path.Combine(projectDir, project.PlanFolder, plan.File);
                 if (!File.Exists(localPath))
                     await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.PlanFolder}/{plan.File}", localPath);
+
+                string localThumb = Path.Combine(projectDir, project.PlanFolder, "thumbnails", plan.File);
+                if (!File.Exists(localThumb))
+                {
+                    await DownloadSpecificFileAsync(driveId, rootFolderId, $"{project.PlanFolder}/thumbnails/{plan.File}", localThumb);
+                    planThumbsLoaded |= File.Exists(localThumb);
+                }
             }
 
             foreach (var pinPair in SyncOps.LivePins(plan).ToList())
@@ -1746,6 +1783,9 @@ public static class SaveManager
                 }
             }
         }
+
+        if (planThumbsLoaded)
+            WeakReferenceMessenger.Default.Send(new RemoteDataChangedMessage(RemoteChangeType.PlanListUpdated));
     }
 
     private static async Task<bool> EnsureCustomIconAvailableAsync(string driveId, string rootFolderId, string iconFileName)
@@ -2115,6 +2155,7 @@ public static class SaveManager
         _verifiedCloudIcons.Clear();
         _missingFilesPending = false;
         while (_staleMedia.TryDequeue(out _)) { }
+        while (_stalePlanFiles.TryDequeue(out _)) { }
         _fotosChanged = false;
     }
 

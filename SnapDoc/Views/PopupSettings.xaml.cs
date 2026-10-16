@@ -120,12 +120,18 @@ public partial class PopupSettings : Popup, IQueryAttributable
 
     private async void OnDeleteTileCacheClicked(object sender, EventArgs e)
     {
-        // Lösche Plan-Tiles aus dem Cache-Ordner
-        string cacheDir = Path.Combine(FileSystem.AppDataDirectory, "Tiles");
+        try
+        {
+            int failed = await Task.Run(TileCache.ClearAll);
 
-        if (Directory.Exists(cacheDir))
-            Directory.Delete(cacheDir, recursive: true);
+            await SnackbarExtensions.ShowSafeAsync(AppResources.PlansCacheCleared, includeDelay: true);
 
-        await SnackbarExtensions.ShowSafeAsync(AppResources.PlansCacheCleared, includeDelay: true);
+            if (failed > 0)
+                System.Diagnostics.Debug.WriteLine($"Tile-Cache: {failed} Ordner in Verwendung, übersprungen.");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"Tile-Cache leeren fehlgeschlagen: {ex.Message}");
+        }
     }
 }

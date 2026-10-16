@@ -2,31 +2,23 @@
 
 namespace SnapDoc.Messages;
 
-public class PinChangedMessage(string pinId) : ValueChangedMessage<string>(pinId)
-{
-}
+public class PlanImageChangedMessage(string planId, string oldFile) : ValueChangedMessage<(string PlanId, string OldFile)>((planId, oldFile));
 
-public class PinAddedMessage((string PlanId, string PinId) value) : ValueChangedMessage<(string PlanId, string PinId)>(value)
-{
-}
+public class PinChangedMessage(string pinId) : ValueChangedMessage<string>(pinId);
 
-public class PinDeletedMessage(string pinId) : ValueChangedMessage<string>(pinId)
-{
-}
+public class PinAddedMessage((string PlanId, string PinId) value) : ValueChangedMessage<(string PlanId, string PinId)>(value);
 
-public class PinPropertyChangedMessage(string pinId, bool isLockPosition) : ValueChangedMessage<(string PinId, bool IsLockPosition)>((pinId, isLockPosition))
-{
-}
+public class PinDeletedMessage(string pinId) : ValueChangedMessage<string>(pinId);
 
-public class PlanDetailsChangedMessage((string PlanId, string Name, string Description, bool IsGrayscale, string PlanColor) value) : ValueChangedMessage<(string PlanId, string Name, string Description, bool IsGrayscale, string PlanColor)>(value)
-{
-}
+public class PinPropertyChangedMessage(string pinId, bool isLockPosition) : ValueChangedMessage<(string PinId, bool IsLockPosition)>((pinId, isLockPosition));
+
+public class PlanDetailsChangedMessage((string PlanId, string Name, string Description, bool IsGrayscale, string PlanColor) value) : ValueChangedMessage<(string PlanId, string Name, string Description, bool IsGrayscale, string PlanColor)>(value);
 
 public class RemoteDataChangedMessage(RemoteChangeType changeType) : ValueChangedMessage<RemoteChangeType>(changeType);
 
-public class ResetTouchesMessage
-{ 
-}
+public class ResetTouchesMessage;
+
+public class PlanDeletedMessage(string planId) : ValueChangedMessage<string>(planId);
 
 public class TitleImageChangedMessage(string oldFileName, string newFileName)
 {
@@ -34,6 +26,4 @@ public class TitleImageChangedMessage(string oldFileName, string newFileName)
     public string NewFileName { get; } = newFileName;
 }
 
-public class PlanDeletedMessage(string planId) : ValueChangedMessage<string>(planId)
-{
-}
+
