@@ -1,7 +1,7 @@
 # SnapDoc
 [🇩🇪 Deutsch](#deutsch) | [🇺🇸 English](#english)
 
-<img width="1280" height="640" alt="github_banner" src="https://github.com/fankman80/snapdoc/blob/master/Images/github_banner.png" />
+<img width="640" height="320" alt="github_banner" src="https://github.com/fankman80/snapdoc/blob/master/Images/github_banner.png" />
 
 ## Deutsch
 **SnapDoc** ist eine plattformübergreifende .NET MAUI-App (Windows, Android, iOS) für das Bauwesen, Architektur, Fachplaner und Immobilienverwalter.
