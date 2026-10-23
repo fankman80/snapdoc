@@ -169,6 +169,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial float LockIconSize { get; set; } = 30;
     [ObservableProperty] public partial byte LockIconOpacity { get; set; } = 153;
     [ObservableProperty] public partial int CloudPollingIntervall { get; set; } = 15;
+    [ObservableProperty] public partial int TombstoneKeepDays { get; set; } = 30;
     [ObservableProperty] public partial int ParallelDownloads { get; set; } = 12;
     [ObservableProperty] public partial int ParallelUploads { get; set; } = 12;
 
@@ -412,6 +413,7 @@ public partial class SettingsService : ObservableObject
             LockIconSize = LockIconSize,
             LockIconOpacity = LockIconOpacity,
             CloudPollingIntervall = CloudPollingIntervall,
+            TombstoneKeepDays = TombstoneKeepDays,
             ParallelDownloads = ParallelDownloads,
             ParallelUploads = ParallelUploads
         };
@@ -512,6 +514,7 @@ public partial class SettingsService : ObservableObject
             LockIconSize = settings.LockIconSize ?? defaultSettings.LockIconSize;
             LockIconOpacity = settings.LockIconOpacity ?? defaultSettings.LockIconOpacity;
             CloudPollingIntervall = settings.CloudPollingIntervall ?? defaultSettings.CloudPollingIntervall;
+            TombstoneKeepDays = settings.TombstoneKeepDays ?? defaultSettings.TombstoneKeepDays;
             ParallelDownloads = settings.ParallelDownloads ?? defaultSettings.ParallelDownloads;
             ParallelUploads = settings.ParallelUploads ?? defaultSettings.ParallelUploads;
         }
@@ -596,6 +599,7 @@ public partial class SettingsService : ObservableObject
         LockIconSize = defaultSettings.LockIconSize;
         LockIconOpacity = defaultSettings.LockIconOpacity;
         CloudPollingIntervall = defaultSettings.CloudPollingIntervall;
+        TombstoneKeepDays = defaultSettings.TombstoneKeepDays;
         ParallelDownloads = defaultSettings.ParallelDownloads;
         ParallelUploads = defaultSettings.ParallelUploads;
     }

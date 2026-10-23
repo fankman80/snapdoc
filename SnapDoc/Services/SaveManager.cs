@@ -15,10 +15,7 @@ namespace SnapDoc.Services;
 public static class SaveManager
 {
     private const int MaxSaveRetries = 3;
-
-    /// <summary>
-    /// Stempel fuer Altprojekte ohne Sync-Metadaten. MUSS auf allen Geraeten identisch sein.
-    /// </summary>
+    private static bool IsExpiredTombstone(DateTimeOffset? deletedAt) => deletedAt is { } d && d < DateTimeOffset.UtcNow.AddDays(-SettingsService.Instance.TombstoneKeepDays);
     private static readonly DateTimeOffset LegacySeed = new(2000, 1, 1, 0, 0, 0, TimeSpan.Zero);
     private static readonly Lock _fileLock = new();
     private static readonly Lock _debounceLock = new();
@@ -69,7 +66,7 @@ public static class SaveManager
         // VOR dem Purge, sonst sind die Dateinamen der Tombstones weg
         PurgeLocalTombstoneFiles();
 
-        bool purged = SyncOps.PurgeTombstones(GlobalJson.Data);
+        bool purged = !SyncState.IsDirty && SyncOps.PurgeTombstones(GlobalJson.Data, SettingsService.Instance.TombstoneKeepDays);
 
         if (backfilled || purged)
             GlobalJson.SaveToFile();
@@ -530,6 +527,8 @@ public static class SaveManager
 
             if (!hasLocal && hasCloud && cloudPlan != null)
             {
+                if (IsExpiredTombstone(cloudPlan.DeletedAt)) continue;
+
                 local.Plans.Add(planId, cloudPlan);
                 if (cloudPlan.IsLive())
                 {
@@ -644,6 +643,8 @@ public static class SaveManager
 
             if (!hasLocal && hasCloud && cloudPin != null)
             {
+                if (IsExpiredTombstone(cloudPin.DeletedAt)) continue;
+
                 localPlan.Pins.Add(pinId, cloudPin);
                 if (cloudPin.IsLive())
                 {
@@ -744,6 +745,8 @@ public static class SaveManager
 
             if (!hasLocal && hasCloud && cloudFoto != null)
             {
+                if (IsExpiredTombstone(cloudFoto.DeletedAt)) continue;
+
                 localPin.Fotos.Add(fotoId, cloudFoto);
                 if (cloudFoto.IsLive()) _fotosChanged = true;
                 continue;

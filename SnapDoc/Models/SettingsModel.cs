@@ -74,6 +74,7 @@ internal class SettingsModel
     public int? ParallelDownloads { get; set; } // Anzahl paralleler Downloads
     public int? ParallelUploads { get; set; } // Anzahl paralleler Uploads
     public int? CloudPollingIntervall { get; set; } // Intervall für die Cloud-Abfrage in Sekunden
+    public int? TombstoneKeepDays { get; set; } // Anzahl Tage, die gelöschte Elemente (Tombstones) in der Cloud behalten werden
     public List<string>? ColorList { get; set; } // Systemweite Farbliste (Hex-Werte)
     public List<PriorityItem>? PriorityItems { get; set; } // Liste der Prioritätsstufen (Name und Hex-Farbcode)
     public List<StylePickerItem>? StyleTemplateItems { get; set; } // Liste der Stilvorlagen für den Stil-Editor

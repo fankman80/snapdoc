@@ -102,7 +102,7 @@ public static class SyncOps
     /// sonst verschwindet eine Tombstone, die ein offline gewesenes
     /// Gerät noch braucht.
     /// </summary>
-    public static bool PurgeTombstones(JsonDataModel data, int keepDays = 90)
+    public static bool PurgeTombstones(JsonDataModel data, int keepDays = 30)
     {
         if (data?.Plans == null) return false;
         var cutoff = DateTimeOffset.UtcNow.AddDays(-keepDays);
