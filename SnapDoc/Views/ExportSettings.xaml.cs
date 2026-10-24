@@ -208,13 +208,15 @@ public partial class ExportSettings : ContentPage
                 return;
             }
 
-            // 1. Zielordner wählen (null = abgebrochen)
-            var target = await CloudPickerPage.PickExportFolderAsync();
+            // 1. Zielordner + Dateiname wählen (null = abgebrochen)
+            string defaultName = SettingsService.Instance.ProjectPath + ".docx";
+            var target = await CloudPickerPage.PickExportFolderAsync(defaultName);
             if (target == null)
                 return;
 
-            string fileName = SettingsService.Instance.ProjectPath + ".docx";
-            string outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, fileName);
+            // Lokale Datei bleibt beim Projektnamen, hochgeladen wird mit dem gewählten Namen
+            string localFileName = SettingsService.Instance.ProjectPath + ".docx";
+            string outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, localFileName);
             string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
 
             string uploadError = null;
@@ -227,7 +229,7 @@ public partial class ExportSettings : ContentPage
 
                 // 3. Hochladen
                 uploadError = File.Exists(outputPath)
-                    ? await SaveManager.UploadFileToCloudAsync(target.DriveId, target.FolderId, outputPath, fileName)
+                    ? await SaveManager.UploadFileToCloudAsync(target.DriveId, target.FolderId, outputPath, target.FileName)
                     : $"Bericht wurde nicht erstellt: {outputPath}";
             }
             catch (Exception ex)

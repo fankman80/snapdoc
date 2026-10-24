@@ -1207,4 +1207,13 @@
   <data name="bericht_lokal_speichern" xml:space="preserve">
     <value>Enregistrer le rapport localement</value>
   </data>
+  <data name="dateiname" xml:space="preserve">
+    <value>Nom du fichier</value>
+  </data>
+  <data name="ungueltiger_dateiname" xml:space="preserve">
+    <value>Nom de fichier non valide. Les caractères suivants ne sont pas autorisés : " * : &lt; &gt; ? / \ |</value>
+  </data>
+  <data name="datei_existiert_ueberschreiben" xml:space="preserve">
+    <value>Le fichier « {0} » existe déjà. Voulez-vous le remplacer ?</value>
+  </data>
 </root>

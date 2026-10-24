@@ -1207,4 +1207,13 @@
   <data name="bericht_lokal_speichern" xml:space="preserve">
     <value>Save report locally</value>
   </data>
+  <data name="dateiname" xml:space="preserve">
+    <value>File name</value>
+  </data>
+  <data name="ungueltiger_dateiname" xml:space="preserve">
+    <value>Invalid file name. The following characters are not allowed: " * : &lt; &gt; ? / \ |</value>
+  </data>
+  <data name="datei_existiert_ueberschreiben" xml:space="preserve">
+    <value>The file "{0}" already exists. Do you want to overwrite it?</value>
+  </data>
 </root>

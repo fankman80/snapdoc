@@ -170,13 +170,31 @@
                    HorizontalOptions="Center" />
         </VerticalStackLayout>
 
-        <!-- Bottom Action Bar (Only visible in SelectFolder Mode) -->
+        <!-- Bottom Action Bar -->
         <Grid Grid.Row="3"
               x:DataType="views:CloudPickerPage"
               IsVisible="{Binding IsFolderSelection, Source={x:Reference Name=ThisPage}}"
-              ColumnDefinitions="*,Auto"
+              RowDefinitions="{OnIdiom Phone='Auto,Auto', Default='Auto'}"
+              ColumnDefinitions="{OnIdiom Phone='*', Default='*,Auto'}"
+              RowSpacing="8"
               ColumnSpacing="10">
-            <Button Grid.Column="1"
+
+            <!-- Dateiname (nur im Export-Modus) -->
+            <Entry Grid.Row="0"
+                   Grid.Column="0"
+                   IsVisible="{Binding IsExportMode, Source={x:Reference Name=ThisPage}}"
+                   Text="{Binding ExportFileName, Source={x:Reference Name=ThisPage}, Mode=TwoWay}"
+                   Placeholder="{x:Static res:AppResources.dateiname}"
+                   ClearButtonVisibility="WhileEditing"
+                   IsSpellCheckEnabled="False"
+                   IsTextPredictionEnabled="False"
+                   ReturnType="Done"
+                   VerticalOptions="Center"
+                   Completed="OnSelectFolderClicked" />
+
+            <Button Grid.Row="{OnIdiom Phone=1, Default=0}"
+                    Grid.Column="{OnIdiom Phone=0, Default=1}"
+                    HorizontalOptions="{OnIdiom Phone=Fill, Default=End}"
                     Text="{Binding ActionButtonText, Source={x:Reference Name=ThisPage}}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"

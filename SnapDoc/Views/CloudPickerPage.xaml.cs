@@ -20,6 +20,19 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private CloudFolderSelection? _pickedFolder;
     private static readonly SemaphoreSlim _objectNameLookupGate = new(4);
     public bool ShowEmptyState => IsJsonMode && IsListEmpty;
+    private static string _pendingExportFileName = string.Empty;
+    private string _exportFileName = string.Empty;
+    public string ExportFileName
+    {
+        get => _exportFileName;
+        set
+        {
+            if (_exportFileName == value) return;
+            _exportFileName = value;
+            OnPropertyChanged();
+        }
+    }
+
     public string ModeParam
     {
         set
@@ -74,6 +87,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         InitializeComponent();
         Title = GetTitle();
+        ExportFileName = _pendingExportFileName;
         BindingContext = this;
     }
 
@@ -127,7 +141,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 .Children
                 .GetAsync(config =>
                 {
-                    // lastModifiedDateTime hinzugefügt
                     config.QueryParameters.Select = ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference"];
                 });
 
@@ -138,39 +151,40 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 foreach (var item in children.Value)
                 {
                     bool isFolder = item.Folder != null;
-                    bool isJson = item.File != null && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true;
+                    bool isFile = item.File != null;
+                    bool isJson = isFile && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true;
 
-                    if (isFolder || (IsJsonMode && isJson))
+                    // Ordner immer, JSON nur im Download-Modus, alle Dateien im Export-Modus
+                    if (!(isFolder || (IsJsonMode && isJson) || (IsExportMode && isFile)))
+                        continue;
+
+                    var cloudItem = new CloudItem
                     {
-                        var cloudItem = new CloudItem
+                        Id = item.Id ?? string.Empty,
+                        Name = item.Name ?? "Unbekannt",
+                        IsFolder = isFolder,
+                        LastModified = item.LastModifiedDateTime
+                    };
+
+                    // Projektinfos nur im Download-Modus
+                    if (isJson && IsJsonMode)
+                    {
+                        cloudItem.RemoteProject = new RemoteProjectDto
                         {
-                            Id = item.Id ?? string.Empty,
-                            Name = item.Name ?? "Unbekannt",
-                            IsFolder = isFolder,
-                            LastModified = item.LastModifiedDateTime // Datum übernehmen
+                            DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
+                            FolderId = item.ParentReference?.Id ?? folderId,
+                            FileName = item.Name ?? string.Empty,
+                            LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
                         };
 
-                        // Wenn es eine Json ist, das RemoteProject erstellen
-                        if (isJson)
-                        {
-                            cloudItem.RemoteProject = new RemoteProjectDto
-                            {
-                                DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
-                                FolderId = item.ParentReference?.Id ?? folderId,
-                                FileName = item.Name ?? string.Empty,
-                                LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
-                            };
-
-                            // Objektbezeichnung im Hintergrund nachladen (blockiert die Anzeige nicht).
-                            // Solange dies noch läuft, bleibt einfach der Dateiname sichtbar.
-                            _ = ResolveObjectNameAsync(cloudItem);
-                        }
-
-                        CloudItems.Add(cloudItem);
+                        // Objektbezeichnung im Hintergrund nachladen
+                        _ = ResolveObjectNameAsync(cloudItem);
                     }
+
+                    CloudItems.Add(cloudItem);
                 }
             }
-            OnPropertyChanged(nameof(IsListEmpty));
+
             OnPropertyChanged(nameof(IsListEmpty));
             OnPropertyChanged(nameof(ShowEmptyState));
         }
@@ -265,6 +279,13 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             return;
         }
 
+        // Export-Modus: Dateiname übernehmen (zum Überschreiben)
+        if (IsExportMode)
+        {
+            ExportFileName = selectedItem.Name;
+            return;
+        }
+
         // Nur im JSON-Modus können Dateien ausgewählt werden
         if (!IsJsonMode)
             return;
@@ -355,8 +376,25 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         // Export-Modus: nur Ordner zurückgeben, Upload macht ExportSettings
         if (IsExportMode)
         {
+            string? fileName = NormalizeExportFileName(ExportFileName);
+            if (fileName == null)
+            {
+                await this.ShowPopupAsync(new PopupAlert(AppResources.ungueltiger_dateiname, AppResources.fehler), Settings.PopupOptions);
+                return;
+            }
+
+            // Überschreiben bestätigen, wenn die Datei im Ordner schon existiert
+            bool exists = CloudItems.Any(i => !i.IsFolder && string.Equals(i.Name, fileName, StringComparison.OrdinalIgnoreCase));
+            if (exists)
+            {
+                var popup = new PopupDualResponse(string.Format(AppResources.datei_existiert_ueberschreiben, fileName), AppResources.info);
+                var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+                if (result?.Result is not DualPopupResult.Ok)
+                    return;
+            }
+
             var current = Breadcrumbs.Last();
-            _pickedFolder = new CloudFolderSelection(_currentDriveId, current.Id, current.Name);
+            _pickedFolder = new CloudFolderSelection(_currentDriveId, current.Id, current.Name, fileName);
             await Navigation.PopAsync();
             CompleteFolderPick();
             return;
@@ -405,6 +443,52 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             await Navigation.PopAsync();
         else
             await this.ShowPopupAsync(new PopupAlert(AppResources.projektverzeichnis_cloud_konnte_nicht_erstellt_werden, AppResources.fehler), Settings.PopupOptions);
+    }
+
+    /// <summary>
+    /// Bereinigt den Dateinamen und ergänzt .docx. null = ungültig.
+    /// </summary>
+    private static string? NormalizeExportFileName(string? input)
+    {
+        string name = input?.Trim() ?? string.Empty;
+        if (name.Length == 0)
+            return null;
+
+        // In OneDrive/SharePoint nicht erlaubte Zeichen
+        char[] invalid = ['"', '*', ':', '<', '>', '?', '/', '\\', '|'];
+        if (name.IndexOfAny(invalid) >= 0 || name.EndsWith('.'))
+            return null;
+
+        if (!name.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
+            name += ".docx";
+
+        return name;
+    }
+
+    /// <summary>
+    /// Öffnet den Picker im Export-Modus und liefert Ordner + Dateiname zurück
+    /// (null = abgebrochen).
+    /// </summary>
+    public static async Task<CloudFolderSelection?> PickExportFolderAsync(string defaultFileName)
+    {
+        _folderPickTcs?.TrySetResult(null);
+
+        var tcs = new TaskCompletionSource<CloudFolderSelection?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _folderPickTcs = tcs;
+        _pendingExportFileName = defaultFileName ?? string.Empty;
+
+        try
+        {
+            await Shell.Current.GoToAsync($"cloudPickerPage?mode={CloudPickerMode.SelectExportFolder}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"CloudPicker konnte nicht geöffnet werden: {ex}");
+            _folderPickTcs = null;
+            return null;
+        }
+
+        return await tcs.Task;
     }
 
     private async void ScrollBreadcrumbsToRight()
@@ -502,4 +586,4 @@ public partial class BreadcrumbItem : INotifyPropertyChanged
     public event PropertyChangedEventHandler? PropertyChanged;
 }
 
-public sealed record CloudFolderSelection(string DriveId, string FolderId, string FolderName);
+public sealed record CloudFolderSelection(string DriveId, string FolderId, string FolderName, string FileName);

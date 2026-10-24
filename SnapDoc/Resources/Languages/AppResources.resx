@@ -1206,4 +1206,13 @@
   <data name="bericht_lokal_speichern" xml:space="preserve">
     <value>Bericht lokal speichern</value>
   </data>
+  <data name="dateiname" xml:space="preserve">
+    <value>Dateiname</value>
+  </data>
+  <data name="ungueltiger_dateiname" xml:space="preserve">
+    <value>Ungültiger Dateiname. Folgende Zeichen sind nicht erlaubt: " * : &lt; &gt; ? / \ |</value>
+  </data>
+  <data name="datei_existiert_ueberschreiben" xml:space="preserve">
+    <value>Die Datei «{0}» existiert bereits. Möchtest du sie überschreiben?</value>
+  </data>
 </root>

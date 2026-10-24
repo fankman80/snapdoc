@@ -574,6 +574,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Die Datei «{0}» existiert bereits. Möchtest du sie überschreiben? ähnelt.
+        /// </summary>
+        internal static string datei_existiert_ueberschreiben {
+            get {
+                return ResourceManager.GetString("datei_existiert_ueberschreiben", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Die Datei konnte nicht importiert werden. ähnelt.
         /// </summary>
         internal static string datei_konnte_nicht_importiert_werden {
@@ -588,6 +597,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string dateien_fortschritt {
             get {
                 return ResourceManager.GetString("dateien_fortschritt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Dateiname ähnelt.
+        /// </summary>
+        internal static string dateiname {
+            get {
+                return ResourceManager.GetString("dateiname", resourceCulture);
             }
         }
         
@@ -3027,6 +3045,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string unbekannter_nutzer {
             get {
                 return ResourceManager.GetString("unbekannter_nutzer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ungültiger Dateiname. Folgende Zeichen sind nicht erlaubt: &quot; * : &lt; &gt; ? / \ | ähnelt.
+        /// </summary>
+        internal static string ungueltiger_dateiname {
+            get {
+                return ResourceManager.GetString("ungueltiger_dateiname", resourceCulture);
             }
         }
         
