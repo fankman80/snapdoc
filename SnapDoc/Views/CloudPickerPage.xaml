@@ -155,7 +155,7 @@
         <!-- Empty State -->
         <VerticalStackLayout Grid.Row="2"
                              InputTransparent="True"
-                             IsVisible="{Binding IsListEmpty, Source={x:Reference Name=ThisPage}}"
+                             IsVisible="{Binding ShowEmptyState, Source={x:Reference Name=ThisPage}}"
                              HorizontalOptions="Center" 
                              VerticalOptions="Center" 
                              Spacing="12">
@@ -171,14 +171,13 @@
         </VerticalStackLayout>
 
         <!-- Bottom Action Bar (Only visible in SelectFolder Mode) -->
-        <Grid Grid.Row="3" 
+        <Grid Grid.Row="3"
               x:DataType="views:CloudPickerPage"
-              IsVisible="{Binding IsFolderMode, Source={x:Reference Name=ThisPage}}"
-              ColumnDefinitions="*,Auto" 
+              IsVisible="{Binding IsFolderSelection, Source={x:Reference Name=ThisPage}}"
+              ColumnDefinitions="*,Auto"
               ColumnSpacing="10">
-
-            <Button Grid.Column="1" 
-                    Text="Projekt hier speichern" 
+            <Button Grid.Column="1"
+                    Text="{Binding ActionButtonText, Source={x:Reference Name=ThisPage}}"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
                     Clicked="OnSelectFolderClicked"/>

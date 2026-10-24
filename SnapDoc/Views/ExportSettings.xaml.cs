@@ -12,18 +12,17 @@ public partial class ExportSettings : ContentPage
     private static readonly string[] iOSFileTypes = ["com.microsoft.word.doc", "org.openxmlformats.wordprocessingml.document"];
     private static readonly string[] AndroidFileTypes = ["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
     private static readonly string[] WinUIFileTypes = [".doc", ".docx"];
+    private bool _isCloudUploading;
 
     public ExportSettings()
     {
         InitializeComponent();
     }
-    
+
     protected override void OnAppearing()
     {
         base.OnAppearing();
-
         LoadDocuments();
-
         if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate) && SettingsService.Instance.Templates.Count > 0)
             SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.First();
     }
@@ -39,13 +38,8 @@ public partial class ExportSettings : ContentPage
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupAlert(
-                AppResources.exportvorlage_waehlen_oder_importieren);
-
-            await this.ShowPopupAsync<string>(
-                popup,
-                Settings.PopupOptions);
-
+            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
+            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             return;
         }
 
@@ -118,13 +112,8 @@ public partial class ExportSettings : ContentPage
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
-            var popup = new PopupAlert(
-                AppResources.exportvorlage_waehlen_oder_importieren);
-
-            await this.ShowPopupAsync<string>(
-                popup,
-                Settings.PopupOptions);
-
+            var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
+            await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
             return;
         }
 
@@ -201,6 +190,72 @@ public partial class ExportSettings : ContentPage
         {
             // Ladeanzeige deaktivieren
             await BusyService.HideAsync();
+        }
+    }
+
+    private async void OnCloudUploadClicked(object sender, EventArgs e)
+    {
+        if (_isCloudUploading)
+            return;
+        _isCloudUploading = true;
+
+        try
+        {
+            if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
+            {
+                var popup = new PopupAlert(AppResources.exportvorlage_waehlen_oder_importieren);
+                await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+                return;
+            }
+
+            // 1. Zielordner wählen (null = abgebrochen)
+            var target = await CloudPickerPage.PickExportFolderAsync();
+            if (target == null)
+                return;
+
+            string fileName = SettingsService.Instance.ProjectPath + ".docx";
+            string outputPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, fileName);
+            string templatePath = Path.Combine(Settings.DataDirectory, "templates", SettingsService.Instance.SelectedTemplate);
+
+            string uploadError = null;
+            try
+            {
+                await BusyService.ShowAsync(AppResources.bericht_wird_hochgeladen);
+
+                // 2. Bericht erstellen
+                await Task.Run(async () => await ExportReport.DocX(templatePath, outputPath));
+
+                // 3. Hochladen
+                uploadError = File.Exists(outputPath)
+                    ? await SaveManager.UploadFileToCloudAsync(target.DriveId, target.FolderId, outputPath, fileName)
+                    : $"Bericht wurde nicht erstellt: {outputPath}";
+            }
+            catch (Exception ex)
+            {
+                uploadError = $"{ex.GetType().Name} – {ex.Message}";
+            }
+            finally
+            {
+                if (File.Exists(outputPath))
+                    File.Delete(outputPath);
+
+                await BusyService.HideAsync();
+            }
+
+            if (uploadError != null)
+            {
+                System.Diagnostics.Debug.WriteLine($"Cloud-Upload fehlgeschlagen: {uploadError}");
+                await Shell.Current.GoToAsync("..");
+                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_hochgeladen, includeDelay: true);
+                return;
+            }
+
+            await Shell.Current.GoToAsync("..");
+            _ = SnackbarExtensions.ShowSafeAsync(string.Format(AppResources.bericht_wurde_hochgeladen, target.FolderName), includeDelay: true);
+        }
+        finally
+        {
+            _isCloudUploading = false;
         }
     }
 

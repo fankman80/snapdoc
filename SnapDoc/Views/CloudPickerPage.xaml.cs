@@ -16,10 +16,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private string _currentDriveId = string.Empty;
     private CloudPickerMode _mode = CloudPickerMode.SelectFolder;
     private bool _isInitialized;
-
-    // Begrenzt gleichzeitige Object_name-Abfragen, damit nicht 50 Requests auf einmal feuern
+    private static TaskCompletionSource<CloudFolderSelection?>? _folderPickTcs;
+    private CloudFolderSelection? _pickedFolder;
     private static readonly SemaphoreSlim _objectNameLookupGate = new(4);
-
+    public bool ShowEmptyState => IsJsonMode && IsListEmpty;
     public string ModeParam
     {
         set
@@ -27,52 +27,63 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             if (Enum.TryParse<CloudPickerMode>(value, out var parsedMode))
             {
                 _mode = parsedMode;
-                Title = IsFolderMode ? AppResources.projekt_upload : AppResources.projekt_download;
-
+                Title = GetTitle();
                 OnPropertyChanged(nameof(Title));
                 OnPropertyChanged(nameof(Mode));
                 OnPropertyChanged(nameof(IsFolderMode));
                 OnPropertyChanged(nameof(IsJsonMode));
+                OnPropertyChanged(nameof(IsExportMode));
+                OnPropertyChanged(nameof(IsFolderSelection));
                 OnPropertyChanged(nameof(HeaderSubtitle));
+                OnPropertyChanged(nameof(ActionButtonText));
+                OnPropertyChanged(nameof(ActionButtonText));
+                OnPropertyChanged(nameof(ShowEmptyState));
             }
         }
     }
 
     public bool IsListEmpty => CloudItems == null || CloudItems.Count == 0;
+    public ObservableCollection<BreadcrumbItem> Breadcrumbs { get; set; } = [];
     public CloudPickerMode Mode => _mode;
     public bool IsFolderMode => _mode == CloudPickerMode.SelectFolder;
     public bool IsJsonMode => _mode == CloudPickerMode.SelectJsonFile;
-    public ObservableCollection<BreadcrumbItem> Breadcrumbs { get; set; } = [];
-    public string HeaderSubtitle => IsFolderMode
-        ? AppResources.ordner_auswaehlen_projekt_speichern
-        : AppResources.projektdatei_auswaehlen_zum_synchronisieren;
+    public bool IsExportMode => _mode == CloudPickerMode.SelectExportFolder;
+    public bool IsFolderSelection => IsFolderMode || IsExportMode;
+
+    public string HeaderSubtitle => _mode switch
+    {
+        CloudPickerMode.SelectExportFolder => AppResources.ordner_auswaehlen_bericht_speichern,
+        CloudPickerMode.SelectFolder => AppResources.ordner_auswaehlen_projekt_speichern,
+        _ => AppResources.projektdatei_auswaehlen_zum_synchronisieren
+    };
+
+    public string ActionButtonText => IsExportMode
+        ? AppResources.bericht_hier_speichern
+        : AppResources.projekt_hier_speichern;
+
+    private string GetTitle() => _mode switch
+    {
+        CloudPickerMode.SelectExportFolder => AppResources.bericht_in_cloud_hochladen,
+        CloudPickerMode.SelectFolder => AppResources.projekt_upload,
+        _ => AppResources.projekt_download
+    };
 
     public ObservableCollection<CloudItem> CloudItems { get; set; } = [];
 
     public CloudPickerPage()
     {
         InitializeComponent();
-
-        Title = IsFolderMode
-                    ? AppResources.projekt_upload
-                    : AppResources.projekt_download;
-
+        Title = GetTitle();
         BindingContext = this;
     }
 
     protected override async void OnAppearing()
     {
         base.OnAppearing();
-
         if (_isInitialized)
             return;
-
         _isInitialized = true;
-
-        Title = IsFolderMode
-            ? AppResources.projekt_upload
-            : AppResources.projekt_download;
-
+        Title = GetTitle();
         await LoadRootFolderAsync();
     }
 
@@ -160,6 +171,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 }
             }
             OnPropertyChanged(nameof(IsListEmpty));
+            OnPropertyChanged(nameof(IsListEmpty));
+            OnPropertyChanged(nameof(ShowEmptyState));
         }
         catch (Exception ex)
         {
@@ -336,7 +349,20 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
     private async void OnSelectFolderClicked(object sender, EventArgs e)
     {
-        if (!IsFolderMode || Breadcrumbs.Count == 0)
+        if (Breadcrumbs.Count == 0 || string.IsNullOrEmpty(_currentDriveId))
+            return;
+
+        // Export-Modus: nur Ordner zurückgeben, Upload macht ExportSettings
+        if (IsExportMode)
+        {
+            var current = Breadcrumbs.Last();
+            _pickedFolder = new CloudFolderSelection(_currentDriveId, current.Id, current.Name);
+            await Navigation.PopAsync();
+            CompleteFolderPick();
+            return;
+        }
+
+        if (!IsFolderMode)
             return;
 
         string currentFolderId = Breadcrumbs.Last().Id;
@@ -404,6 +430,52 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         });
     }
 
+    /// <summary>
+    /// Öffnet den Picker im Export-Modus und liefert den gewählten Ordner zurück
+    /// (null = abgebrochen).
+    /// </summary>
+    public static async Task<CloudFolderSelection?> PickExportFolderAsync()
+    {
+        // Evtl. hängenden alten Aufruf sauber beenden
+        _folderPickTcs?.TrySetResult(null);
+
+        var tcs = new TaskCompletionSource<CloudFolderSelection?>(TaskCreationOptions.RunContinuationsAsynchronously);
+        _folderPickTcs = tcs;
+
+        try
+        {
+            // Route an deine registrierte Shell-Route anpassen
+            await Shell.Current.GoToAsync($"cloudPickerPage?mode={CloudPickerMode.SelectExportFolder}");
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine($"CloudPicker konnte nicht geöffnet werden: {ex}");
+            _folderPickTcs = null;
+            return null;
+        }
+
+        return await tcs.Task;
+    }
+
+    private void CompleteFolderPick()
+    {
+        if (!IsExportMode)
+            return;
+
+        var tcs = _folderPickTcs;
+        _folderPickTcs = null;
+        tcs?.TrySetResult(_pickedFolder);
+    }
+
+    protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
+    {
+        base.OnNavigatedFrom(args);
+
+        // Nur wenn die Seite wirklich entfernt wurde (nicht bei Popups/BusyService)
+        if (!Navigation.NavigationStack.Contains(this))
+            CompleteFolderPick();
+    }
+
     public new event PropertyChangedEventHandler? PropertyChanged;
     protected new void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
@@ -429,3 +501,5 @@ public partial class BreadcrumbItem : INotifyPropertyChanged
 
     public event PropertyChangedEventHandler? PropertyChanged;
 }
+
+public sealed record CloudFolderSelection(string DriveId, string FolderId, string FolderName);

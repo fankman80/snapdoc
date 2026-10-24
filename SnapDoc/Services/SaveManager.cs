@@ -1,11 +1,13 @@
 ﻿using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Graph;
+using Microsoft.Graph.Drives.Item.Items.Item.CreateUploadSession;
 using Microsoft.Graph.Models;
 using Microsoft.Graph.Models.ODataErrors;
 using SkiaSharp;
 using SnapDoc.Messages;
 using SnapDoc.Models;
 using System.Collections.Concurrent;
+using System.Net.Http.Headers;
 using System.Text.Json;
 using static SnapDoc.Helper;
 using static SnapDoc.Models.SyncStampExtensions;
@@ -2129,6 +2131,136 @@ public static class SaveManager
         {
             Console.WriteLine($"Cloud-JSON konnte nicht gelesen werden ({jsonFileName}): {ex.Message}");
             return null;
+        }
+    }
+
+    // ===============================================================
+    // Upload-Methode mit UploadSession (große Dateien)
+    // ===============================================================
+    private static readonly HttpClient _uploadHttpClient = new() { Timeout = TimeSpan.FromMinutes(5) };
+
+    public static async Task<string?> UploadFileToCloudAsync(
+        string driveId,
+        string folderId,
+        string localFilePath,
+        string remoteFileName,
+        CancellationToken ct = default)
+    {
+        var graph = CurrentAuth?.GraphClient;
+        if (graph == null)
+            return "GraphClient ist null (nicht angemeldet)";
+
+        if (!File.Exists(localFilePath))
+            return $"Lokale Datei fehlt: {localFilePath}";
+
+        if (string.IsNullOrEmpty(driveId) || string.IsNullOrEmpty(folderId))
+            return $"Ungültiges Ziel (DriveId='{driveId}', FolderId='{folderId}')";
+
+        // 1. Versuch mit Originalnamen
+        var (session, error) = await CreateUploadSessionAsync(graph, driveId, folderId, remoteFileName, ct);
+
+        // Name durch hängende Session gesperrt → mit Zeitstempel ausweichen
+        if (session == null && error == "nameAlreadyExists")
+        {
+            string fallbackName =
+                $"{Path.GetFileNameWithoutExtension(remoteFileName)}_{DateTime.Now:yyyyMMdd-HHmmss}{Path.GetExtension(remoteFileName)}";
+
+            (session, error) = await CreateUploadSessionAsync(graph, driveId, folderId, fallbackName, ct);
+        }
+
+        if (session == null)
+            return error;
+
+        bool success = false;
+        try
+        {
+            const int chunkSize = 320 * 1024 * 10; // 3.2 MB, Vielfaches von 320 KiB
+            await using var stream = File.OpenRead(localFilePath);
+            long total = stream.Length;
+
+            if (total == 0)
+                return "Lokale Datei ist leer (0 Bytes)";
+
+            long offset = 0;
+            var buffer = new byte[chunkSize];
+
+            while (offset < total)
+            {
+                int toRead = (int)Math.Min(chunkSize, total - offset);
+                int read = await stream.ReadAsync(buffer.AsMemory(0, toRead), ct);
+                if (read <= 0)
+                    return $"Lesefehler bei Offset {offset}";
+
+                using var content = new ByteArrayContent(buffer, 0, read);
+                content.Headers.ContentLength = read;
+                content.Headers.ContentRange = new ContentRangeHeaderValue(offset, offset + read - 1, total);
+
+                using var response = await _uploadHttpClient.PutAsync(session.UploadUrl, content, ct);
+                if (!response.IsSuccessStatusCode)
+                {
+                    string body = await response.Content.ReadAsStringAsync(ct);
+                    return $"Upload {offset}-{offset + read - 1}/{total}: {(int)response.StatusCode} – {body}";
+                }
+
+                offset += read;
+            }
+
+            success = true;
+            return null;
+        }
+        catch (Exception ex)
+        {
+            return $"Upload: {ex.GetType().Name} – {ex.Message}";
+        }
+        finally
+        {
+            // Session bei JEDEM Misserfolg schliessen, sonst bleibt der Name gesperrt
+            if (!success)
+            {
+                try { await _uploadHttpClient.DeleteAsync(session.UploadUrl, CancellationToken.None); }
+                catch { /* ignorieren */ }
+            }
+        }
+    }
+
+    private static async Task<(UploadSession? Session, string? Error)> CreateUploadSessionAsync(
+        GraphServiceClient graph, string driveId, string folderId, string fileName, CancellationToken ct)
+    {
+        try
+        {
+            var body = new CreateUploadSessionPostRequestBody
+            {
+                Item = new DriveItemUploadableProperties
+                {
+                    AdditionalData = new Dictionary<string, object>
+                {
+                    { "@microsoft.graph.conflictBehavior", "replace" }
+                }
+                }
+            };
+
+            var session = await graph
+                .Drives[driveId]
+                .Items[folderId]
+                .ItemWithPath(fileName)
+                .CreateUploadSession
+                .PostAsync(body, cancellationToken: ct);
+
+            return string.IsNullOrEmpty(session?.UploadUrl)
+                ? (null, "Keine UploadUrl erhalten")
+                : (session, null);
+        }
+        catch (Microsoft.Graph.Models.ODataErrors.ODataError odataEx)
+        {
+            // Code separat zurückgeben, damit der Aufrufer ausweichen kann
+            if (odataEx.ResponseStatusCode == 409 && odataEx.Error?.Code == "nameAlreadyExists")
+                return (null, "nameAlreadyExists");
+
+            return (null, $"CreateUploadSession: {odataEx.ResponseStatusCode} {odataEx.Error?.Code} – {odataEx.Error?.Message}");
+        }
+        catch (Exception ex)
+        {
+            return (null, $"CreateUploadSession: {ex.GetType().Name} – {ex.Message}");
         }
     }
 

@@ -34,7 +34,8 @@ namespace SnapDoc
     public enum CloudPickerMode
     {
         SelectFolder,
-        SelectJsonFile
+        SelectJsonFile,
+        SelectExportFolder
     }
 
     public enum RemoteChangeType

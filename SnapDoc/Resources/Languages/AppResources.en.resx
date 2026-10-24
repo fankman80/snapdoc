@@ -1180,4 +1180,31 @@
   <data name="groesse_sperrsymbol" xml:space="preserve">
     <value>Lock icon size</value>
   </data>
+  <data name="bericht_in_cloud_hochladen" xml:space="preserve">
+    <value>Upload report to cloud</value>
+  </data>
+  <data name="ordner_auswaehlen_bericht_speichern" xml:space="preserve">
+    <value>Select the folder where the report should be saved.</value>
+  </data>
+  <data name="bericht_hier_speichern" xml:space="preserve">
+    <value>Save report here</value>
+  </data>
+  <data name="projekt_hier_speichern" xml:space="preserve">
+    <value>Save project here</value>
+  </data>
+  <data name="bericht_wird_hochgeladen" xml:space="preserve">
+    <value>Uploading report…</value>
+  </data>
+  <data name="bericht_wurde_hochgeladen" xml:space="preserve">
+    <value>Report uploaded to "{0}"</value>
+  </data>
+  <data name="bericht_wurde_nicht_hochgeladen" xml:space="preserve">
+    <value>Report could not be uploaded</value>
+  </data>
+  <data name="bericht_teilen" xml:space="preserve">
+    <value>Share report</value>
+  </data>
+  <data name="bericht_lokal_speichern" xml:space="preserve">
+    <value>Save report locally</value>
+  </data>
 </root>

@@ -1179,4 +1179,31 @@
   <data name="groesse_sperrsymbol" xml:space="preserve">
     <value>Grösse Sperrsymbol</value>
   </data>
+  <data name="bericht_in_cloud_hochladen" xml:space="preserve">
+    <value>Bericht in Cloud hochladen</value>
+  </data>
+  <data name="ordner_auswaehlen_bericht_speichern" xml:space="preserve">
+    <value>Wähle den Ordner, in dem der Bericht gespeichert werden soll.</value>
+  </data>
+  <data name="bericht_hier_speichern" xml:space="preserve">
+    <value>Bericht hier speichern</value>
+  </data>
+  <data name="projekt_hier_speichern" xml:space="preserve">
+    <value>Projekt hier speichern</value>
+  </data>
+  <data name="bericht_wird_hochgeladen" xml:space="preserve">
+    <value>Bericht wird hochgeladen…</value>
+  </data>
+  <data name="bericht_wurde_hochgeladen" xml:space="preserve">
+    <value>Bericht wurde nach «{0}» hochgeladen</value>
+  </data>
+  <data name="bericht_wurde_nicht_hochgeladen" xml:space="preserve">
+    <value>Bericht konnte nicht hochgeladen werden</value>
+  </data>
+  <data name="bericht_teilen" xml:space="preserve">
+    <value>Bericht teilen</value>
+  </data>
+  <data name="bericht_lokal_speichern" xml:space="preserve">
+    <value>Bericht lokal speichern</value>
+  </data>
 </root>

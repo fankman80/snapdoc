@@ -367,6 +367,42 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht hier speichern ähnelt.
+        /// </summary>
+        internal static string bericht_hier_speichern {
+            get {
+                return ResourceManager.GetString("bericht_hier_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht in Cloud hochladen ähnelt.
+        /// </summary>
+        internal static string bericht_in_cloud_hochladen {
+            get {
+                return ResourceManager.GetString("bericht_in_cloud_hochladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht lokal speichern ähnelt.
+        /// </summary>
+        internal static string bericht_lokal_speichern {
+            get {
+                return ResourceManager.GetString("bericht_lokal_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht teilen ähnelt.
+        /// </summary>
+        internal static string bericht_teilen {
+            get {
+                return ResourceManager.GetString("bericht_teilen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bericht wird gespeichert... ähnelt.
         /// </summary>
         internal static string bericht_wird_gespeichert {
@@ -381,6 +417,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string bericht_wird_geteilt {
             get {
                 return ResourceManager.GetString("bericht_wird_geteilt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht wird hochgeladen… ähnelt.
+        /// </summary>
+        internal static string bericht_wird_hochgeladen {
+            get {
+                return ResourceManager.GetString("bericht_wird_hochgeladen", resourceCulture);
             }
         }
         
@@ -403,6 +448,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht wurde nach «{0}» hochgeladen ähnelt.
+        /// </summary>
+        internal static string bericht_wurde_hochgeladen {
+            get {
+                return ResourceManager.GetString("bericht_wurde_hochgeladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bericht wurde nicht gespeichert. ähnelt.
         /// </summary>
         internal static string bericht_wurde_nicht_gespeichert {
@@ -417,6 +471,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string bericht_wurde_nicht_geteilt {
             get {
                 return ResourceManager.GetString("bericht_wurde_nicht_geteilt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bericht konnte nicht hochgeladen werden ähnelt.
+        /// </summary>
+        internal static string bericht_wurde_nicht_hochgeladen {
+            get {
+                return ResourceManager.GetString("bericht_wurde_nicht_hochgeladen", resourceCulture);
             }
         }
         
@@ -1879,6 +1942,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wähle den Ordner, in dem der Bericht gespeichert werden soll. ähnelt.
+        /// </summary>
+        internal static string ordner_auswaehlen_bericht_speichern {
+            get {
+                return ResourceManager.GetString("ordner_auswaehlen_bericht_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ordner auswählen, in dem das Projekt gespeichert werden soll. ähnelt.
         /// </summary>
         internal static string ordner_auswaehlen_projekt_speichern {
@@ -2316,6 +2388,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string projekt_erfolgreich_heruntergeladen {
             get {
                 return ResourceManager.GetString("projekt_erfolgreich_heruntergeladen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Projekt hier speichern ähnelt.
+        /// </summary>
+        internal static string projekt_hier_speichern {
+            get {
+                return ResourceManager.GetString("projekt_hier_speichern", resourceCulture);
             }
         }
         
