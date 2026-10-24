@@ -16,6 +16,9 @@ public partial class BorderedEntry : ContentView
     public static readonly BindableProperty FocusedBorderThicknessProperty = BindableProperty.Create(nameof(FocusedBorderThickness), typeof(double), typeof(BorderedEntry), 1.0);
     public static readonly BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(BorderedEntry), new CornerRadius(8));
     public static readonly BindableProperty IsPasswordProperty = BindableProperty.Create(nameof(IsPassword), typeof(bool), typeof(BorderedEntry), false);
+    public static readonly BindableProperty IsSpellCheckProperty = BindableProperty.Create(nameof(IsSpellCheck), typeof(bool), typeof(BorderedEntry), false);
+    public static readonly BindableProperty IsTextPredictionProperty = BindableProperty.Create(nameof(IsTextPrediction), typeof(bool), typeof(BorderedEntry), false);
+    public static readonly BindableProperty ClearButtonVisibilityProperty = BindableProperty.Create(nameof(ClearButtonVisibility), typeof(ClearButtonVisibility), typeof(BorderedEntry), ClearButtonVisibility.WhileEditing);
     public static readonly BindableProperty KeyboardProperty = BindableProperty.Create(nameof(Keyboard), typeof(Keyboard), typeof(BorderedEntry), Keyboard.Default);
     public static new readonly BindableProperty BackgroundColorProperty = BindableProperty.Create(nameof(BackgroundColor), typeof(Color), typeof(BorderedEntry), Colors.White);
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(BorderedEntry), defaultValue: (Color)Entry.TextColorProperty.DefaultValue);
@@ -31,6 +34,9 @@ public partial class BorderedEntry : ContentView
     public double FocusedBorderThickness { get => (double)GetValue(FocusedBorderThicknessProperty); set => SetValue(FocusedBorderThicknessProperty, value); }
     public CornerRadius CornerRadius { get => (CornerRadius)GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
     public bool IsPassword { get => (bool)GetValue(IsPasswordProperty); set => SetValue(IsPasswordProperty, value); }
+    public bool IsSpellCheck { get => (bool)GetValue(IsSpellCheckProperty); set => SetValue(IsSpellCheckProperty, value); }
+    public bool IsTextPrediction { get => (bool)GetValue(IsTextPredictionProperty); set => SetValue(IsTextPredictionProperty, value); }
+    public ClearButtonVisibility ClearButtonVisibility { get => (ClearButtonVisibility)GetValue(ClearButtonVisibilityProperty); set => SetValue(ClearButtonVisibilityProperty, value); }
     public Keyboard Keyboard { get => (Keyboard)GetValue(KeyboardProperty); set => SetValue(KeyboardProperty, value); }
     public new Color BackgroundColor { get => (Color)GetValue(BackgroundColorProperty); set => SetValue(BackgroundColorProperty, value); }
     public Color TextColor { get => (Color)GetValue(TextColorProperty); set => SetValue(TextColorProperty, value); }
