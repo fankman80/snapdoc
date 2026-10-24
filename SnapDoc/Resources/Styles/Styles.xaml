@@ -41,7 +41,7 @@
         <Setter Property="HeightRequest" Value="54" />
         <Setter Property="CornerRadius" Value="27" />
         <Setter Property="Padding" Value="0" />
-        <Setter Property="FontSize" Value="{OnPlatform Default='32', iOS='28'}" />
+        <Setter Property="FontSize" Value="{OnPlatform Default='32', iOS='26'}" />
         <Setter Property="FontFamily" Value="MaterialOutlined" />
         <Setter Property="Shadow">
             <Setter.Value>
