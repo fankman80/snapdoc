@@ -112,7 +112,8 @@
                                     VerticalOptions="Center"
                                     CornerRadius="10"
                                     BackgroundColor="Transparent"
-                                    TextColor="{DynamicResource Primary}"/>
+                                    TextColor="{DynamicResource Primary}"
+                                    Clicked="ZoomToPinClicked"/>
                             <Label Padding="0"
                                    Text="{x:Static res:AppResources.auf_plan_zeigen}"
                                    FontSize="11"
