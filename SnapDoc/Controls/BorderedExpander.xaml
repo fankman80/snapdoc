@@ -5,25 +5,24 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Controls.BorderedExpander"
-             x:Name="this"
              x:DataType="controls:BorderedExpander">
 
     <ContentView.ControlTemplate>
         <ControlTemplate>
-            <Border Stroke="{Binding BorderColor, Source={x:Reference this}}"
+            <Border Stroke="{TemplateBinding BorderColor}"
                     StrokeThickness="1"
                     Padding="16,0,10,0"
                     Margin="0,0,0,4">
                 <Border.Triggers>
                     <DataTrigger TargetType="Border"
                                  x:DataType="toolkit:Expander"
-                                 Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
+                                 Binding="{Binding IsExpanded, Source={x:Reference expanderControl}}"
                                  Value="False">
                         <Setter Property="HeightRequest" Value="44" />
                     </DataTrigger>
                     <DataTrigger TargetType="Border"
                                  x:DataType="toolkit:Expander"
-                                 Binding="{Binding Path=IsExpanded, Source={x:Reference expanderControl}}"
+                                 Binding="{Binding IsExpanded, Source={x:Reference expanderControl}}"
                                  Value="True">
                         <Setter Property="HeightRequest" Value="-1" />
                     </DataTrigger>
@@ -31,9 +30,10 @@
                 <Border.StrokeShape>
                     <RoundRectangle CornerRadius="{TemplateBinding CornerRadius}" />
                 </Border.StrokeShape>
+
                 <toolkit:Expander x:Name="expanderControl"
                                   Padding="0"
-                                  IsExpanded="{Binding IsExpanded, Source={x:Reference thisl}, Mode=TwoWay}">
+                                  IsExpanded="{Binding IsExpanded, Source={RelativeSource TemplatedParent}, Mode=TwoWay, x:DataType=controls:BorderedExpander}">
                     <toolkit:Expander.Header>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0" HeightRequest="46" VerticalOptions="Fill">
                             <Label Grid.Column="0"
@@ -55,7 +55,7 @@
                                 <Label.Triggers>
                                     <DataTrigger TargetType="Label"
                                                  x:DataType="toolkit:Expander"
-                                                 Binding="{Binding Path=IsExpanded, Source={RelativeSource AncestorType={x:Type toolkit:Expander}}}"
+                                                 Binding="{Binding IsExpanded, Source={x:Reference expanderControl}}"
                                                  Value="True">
                                         <Setter Property="Rotation" Value="180" />
                                     </DataTrigger>
@@ -69,4 +69,3 @@
         </ControlTemplate>
     </ContentView.ControlTemplate>
 </ContentView>
-           

@@ -887,7 +887,14 @@ public partial class OpenProject : ContentPage
 
         _sheetItem = item;
         ItemSheet.BindingContext = item;
-        SheetUploadRow.IsVisible = SettingsService.Instance.IsCloudLoggedIn && !item.HasCloudSync;
+        bool showUpload = SettingsService.Instance.IsCloudLoggedIn && !item.HasCloudSync;
+        bool showOpenFolder = DeviceInfo.Platform == DevicePlatform.WinUI;
+        bool showZipExport = item.IsActive;
+
+        SheetUploadRow.IsVisible = showUpload;
+
+        // Linie nur, wenn über "Löschen" noch etwas steht
+        SheetDivider.IsVisible = showZipExport || showOpenFolder || showUpload;
 
         // Zurücksetzen und unsichtbar einblenden, damit die Messung stimmt
         ItemSheet.Opacity = 0;

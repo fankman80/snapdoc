@@ -17,24 +17,24 @@
     <Shell.TitleView>
         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0" VerticalOptions="Center">
             <Label Grid.Column="0"
-               x:DataType="views:OpenProject"
-               Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
-               TextColor="{DynamicResource PrimaryDark}"
-               BackgroundColor="Transparent"
-               FontSize="18"
-               VerticalOptions="Center"
-               HorizontalOptions="Start"/>
+                   x:DataType="views:OpenProject"
+                   Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
+                   TextColor="{DynamicResource PrimaryDark}"
+                   BackgroundColor="Transparent"
+                   FontSize="18"
+                   VerticalOptions="Center"
+                   HorizontalOptions="Start"/>
             <Button Grid.Column="1"
-                Text="{x:Static local:MaterialIcons.Add}"
-                FontSize="24"
-                Padding="0"
-                TextColor="{DynamicResource PrimaryDark}"
-                Background="Transparent"
-                FontFamily="MaterialOutlined"
-                VerticalOptions="Center"
-                HorizontalOptions="End"
-                ToolTipProperties.Text="{x:Static res:AppResources.neues_projekt_erstellen}"
-                Clicked="OnAddClicked"/>
+                    Text="{x:Static local:MaterialIcons.Add}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.neues_projekt_erstellen}"
+                    Clicked="OnAddClicked"/>
         </Grid>
     </Shell.TitleView>
 
@@ -329,7 +329,8 @@
                                Text="{x:Static res:AppResources.in_cloud_hochladen}" />
                     </Grid>
 
-                    <BoxView HeightRequest="1"
+                    <BoxView x:Name="SheetDivider"
+                             HeightRequest="1"
                              Margin="0"
                              Color="{AppThemeBinding Light=#1F000000, Dark=#33FFFFFF}" />
 
