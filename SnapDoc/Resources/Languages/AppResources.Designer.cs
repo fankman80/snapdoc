@@ -3166,6 +3166,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verzeichnis nicht gefunden ähnelt.
+        /// </summary>
+        internal static string verzeichnis_nicht_gefunden {
+            get {
+                return ResourceManager.GetString("verzeichnis_nicht_gefunden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Verzeichnis öffnen ähnelt.
         /// </summary>
         internal static string verzeichnis_oeffnen {

@@ -1219,7 +1219,7 @@
     <value>Foto hinzufügen</value>
   </data>
   <data name="einstellungen" xml:space="preserve">
-    <value>Settings</value>
+    <value>Einstellungen</value>
   </data>
   <data name="prioritaet" xml:space="preserve">
     <value>Priorität</value>
@@ -1241,5 +1241,8 @@
   </data>
   <data name="kopieren_verschieben" xml:space="preserve">
     <value>Kopieren / verschieben…</value>
+  </data>
+  <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
+    <value>Verzeichnis nicht gefunden</value>
   </data>
 </root>

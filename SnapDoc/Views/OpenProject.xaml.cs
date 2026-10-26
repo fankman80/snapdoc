@@ -34,14 +34,23 @@ public partial class OpenProject : ContentPage
         LoadJsonFiles();
     }
 
+    protected override bool OnBackButtonPressed()
+    {
+        if (ItemSheetOverlay.IsVisible) { _ = CloseItemSheetAsync(); return true; }
+        if (AddMenuOverlay.IsVisible) { _ = HideAddMenuAsync(); return true; }
+        return base.OnBackButtonPressed();
+    }
+
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
+        AddMenuOverlay.IsVisible = false;
+        ItemSheetOverlay.IsVisible = false;
+        _sheetItem = null;
         SettingsService.Instance.PropertyChanged -= OnSettingsPropertyChanged;
 
         // Laufenden Abgleich stoppen, wenn die Seite verlassen wird
         _loadCts?.Cancel();
-
     }
 
     /// <summary>
@@ -826,163 +835,112 @@ public partial class OpenProject : ContentPage
     /// </summary>
     private static void InvalidateRemoteCache() => _remoteCache = null;
 
-    private async void OnDeleteClicked(object sender, EventArgs e)
+    // ───────── "+"-Menü ─────────
+    private async void OnAddClicked(object sender, EventArgs e)
     {
-            var button = sender as Button;
+        if (AddMenuOverlay.IsVisible) { await HideAddMenuAsync(); return; }
 
-            if (button?.BindingContext is not FileItem item)
-                return;
-
-            var popup1 = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-            var result1 = await this.ShowPopupAsync<DualPopupResult>(popup1, Settings.PopupOptions);
-
-            if (result1.Result is not DualPopupResult.Ok)
-                return;
-
-            string fullPath = item.FilePath;
-
-            if (string.IsNullOrEmpty(fullPath))
-                return;
-
-            // Nicht der Dateiname entscheidet, sondern ob es das geladene Projekt ist
-            bool isCurrentProject = item.IsActive;
-
-            // Tile-Cache nur loeschen, solange GlobalJson.Data noch das Projekt haelt
-            if (isCurrentProject)
-                DeleteTileCacheForProject();
-
-            // Loesche das Projektverzeichnis und alle enthaltenen Dateien
-            string projectDirectoryPath = Path.GetDirectoryName(fullPath);
-            if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
-                Directory.Delete(projectDirectoryPath, true);
-
-            // Aktives Projekt entladen - aber auf der Projektliste bleiben
-            if (isCurrentProject)
-            {
-                SaveManager.ResetCloudSync();
-                SettingsService.Instance.IsProjectLoaded = false;
-                SettingsService.Instance.ProjectPath = null;
-                LoadDataToView.ResetData();
-                GlobalJson.Data = new JsonDataModel();
-                GlobalJson.UpdateFilePath(null);
-                ProjectItem.Current.Attach(GlobalJson.Data);
-            }
-
-            InvalidateRemoteCache();
-            LoadJsonFiles();
+        AddMenu.AnchorX = 1;
+        AddMenu.AnchorY = 0;
+        AddMenu.Opacity = 0;
+        AddMenu.Scale = 0.92;
+        AddMenuOverlay.IsVisible = true;
+        await Task.WhenAll(
+            AddMenu.FadeToAsync(1, 120, Easing.CubicOut),
+            AddMenu.ScaleToAsync(1, 120, Easing.CubicOut));
     }
 
-    private async void OnEditClicked(object sender, EventArgs e)
+    private async Task HideAddMenuAsync()
     {
-        if (_isProcessing)
-            return;
+        if (!AddMenuOverlay.IsVisible) return;
+        await AddMenu.FadeToAsync(0, 90, Easing.CubicIn);
+        AddMenuOverlay.IsVisible = false;
+    }
 
+    private async void OnAddMenuDismiss(object sender, EventArgs e) => await HideAddMenuAsync();
+
+    private async void OnMenuNewTapped(object sender, EventArgs e)
+    {
+        await HideAddMenuAsync();
+        OnNewClicked(sender, e);
+    }
+
+    private async void OnMenuZipImportTapped(object sender, EventArgs e)
+    {
+        await HideAddMenuAsync();
+        OnUploadClicked(sender, e);
+    }
+
+    private async void OnMenuCloudDownloadTapped(object sender, EventArgs e)
+    {
+        await HideAddMenuAsync();
+        OnDownloadFromCloudClicked(sender, e);
+    }
+
+    // ───────── Projekt-Sheet ─────────
+    private FileItem _sheetItem;
+
+    private async void OnItemMoreClicked(object sender, EventArgs e)
+    {
+        if (_isProcessing) return;
+        if (sender is not Button button || button.BindingContext is not FileItem item) return;
+
+        _sheetItem = item;
+        ItemSheet.BindingContext = item;
+        SheetUploadRow.IsVisible = SettingsService.Instance.IsCloudLoggedIn && !item.HasCloudSync;
+
+        // Zurücksetzen und unsichtbar einblenden, damit die Messung stimmt
+        ItemSheet.Opacity = 0;
+        ItemSheet.Scale = 1;
+        ItemSheet.TranslationY = 0;
+        ItemSheet.Margin = new Thickness(0);
+        ItemSheetOverlay.IsVisible = true;
+        await Task.Yield();
+
+        PositionItemSheet(button);
+
+        ItemSheet.Scale = 0.92;
+        await Task.WhenAll(
+            ItemSheet.FadeToAsync(1, 120, Easing.CubicOut),
+            ItemSheet.ScaleToAsync(1, 120, Easing.CubicOut));
+    }
+
+    /// <summary>Schliesst das Sheet und liefert das gewählte Projekt.</summary>
+    private async Task<FileItem> CloseItemSheetAsync()
+    {
+        var item = _sheetItem;
+        _sheetItem = null;
+
+        if (ItemSheetOverlay.IsVisible)
+        {
+            await ItemSheet.FadeToAsync(0, 90, Easing.CubicIn);
+            ItemSheetOverlay.IsVisible = false;
+        }
+        return item;
+    }
+
+    private async void OnItemSheetDismiss(object sender, EventArgs e) => await CloseItemSheetAsync();
+
+    private async void OnSheetZipExportTapped(object sender, EventArgs e) =>
+        await RunGuardedAsync(await CloseItemSheetAsync(), ExportZipAsync);
+
+    private async void OnSheetOpenFolderTapped(object sender, EventArgs e) =>
+        await RunGuardedAsync(await CloseItemSheetAsync(), OpenProjectFolderAsync);
+
+    private async void OnSheetUploadTapped(object sender, EventArgs e) =>
+        await RunGuardedAsync(await CloseItemSheetAsync(), UploadProjectToCloudAsync);
+
+    private async void OnSheetDeleteTapped(object sender, EventArgs e) =>
+        await RunGuardedAsync(await CloseItemSheetAsync(), DeleteProjectAsync);
+
+    /// <summary>Sperre gegen Doppelaktionen + zentrale Fehlerbehandlung.</summary>
+    private async Task RunGuardedAsync(FileItem item, Func<FileItem, Task> action)
+    {
+        if (item == null || _isProcessing) return;
         _isProcessing = true;
-
         try
         {
-            var button = sender as Button;
-
-            if (button?.BindingContext is not FileItem item)
-                return;
-
-            var _popup = new PopupProjectEdit();
-            var _result = await this.ShowPopupAsync<string>(_popup, Settings.PopupOptions);
-
-            if (_result == null || string.IsNullOrEmpty(_result.Result))
-                return;
-
-            switch (_result.Result)
-            {
-                case "Zip":
-                    await Task.Delay(200);
-
-                    var popup2 = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
-                    var result2 = await this.ShowPopupAsync<DualPopupResult>(popup2, Settings.PopupOptions);
-
-                    if (result2.Result is DualPopupResult.Ok)
-                    {
-                        string sourceDirectory = Path.GetDirectoryName(item.FilePath);
-                        string outputPath = Path.Combine(Settings.DataDirectory, Path.GetFileNameWithoutExtension(item.FileName) + ".zip");
-
-                        try
-                        {
-                            // Ladeanzeige aktivieren
-                            await BusyService.ShowAsync(AppResources.daten_werden_komprimiert);
-
-                            // Hintergrundoperation
-                            await Task.Run(() => { Helper.PackDirectory(sourceDirectory, outputPath); });
-                        }
-                        finally
-                        {
-                            // Ladeanzeige deaktivieren
-                            await BusyService.HideAsync();
-                            await Task.Delay(100);
-                        }
-
-                        if (File.Exists(outputPath))
-                        {
-                            using (var saveStream = File.Open(outputPath, FileMode.Open))
-                            {
-                                var fileSaveResult = await FileSaver.Default.SaveAsync(Path.GetFileNameWithoutExtension(item.FileName) + ".zip", saveStream);
-
-                                if (fileSaveResult.IsSuccessful)
-                                    await SnackbarExtensions.ShowSafeAsync(AppResources.zip_wurde_exportiert, includeDelay: true);
-                            }
-
-                            File.Delete(outputPath);
-                        }
-                    }
-                    break;
-
-                case "Folder":
-                    var directoryPath = Path.GetDirectoryName(Path.Combine(Settings.DataDirectory, item.FilePath));
-
-                    if (Directory.Exists(directoryPath))
-                    {
-#if WINDOWS
-                        Process.Start(new ProcessStartInfo
-                        {
-                            FileName = directoryPath,
-                            UseShellExecute = true,
-                            Verb = "open"
-                        });
-#endif
-                    }
-                    break;
-
-                case "Upload":
-                    if (SaveManager.CurrentAuth == null || !SaveManager.CurrentAuth.IsLoggedIn)
-                    {
-                        await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
-                        return;
-                    }
-
-                    if (item.HasCloudSync)
-                    {
-                        await SnackbarExtensions.ShowSafeAsync("Das Projekt ist bereits synchronisiert.", includeDelay: true);
-                        return; 
-                    }
-
-                    if (FileListView.ItemsSource is IEnumerable<FileItem> items)
-                    {
-                        foreach (var f in items)
-                            f.IsActive = false;
-                    }
-
-                    item.IsActive = true;
-                    SettingsService.Instance.IsProjectLoaded = true;
-                    SettingsService.Instance.ProjectPath = Path.GetFileName(Path.GetDirectoryName(item.FilePath));
-
-                    LoadDataToView.ResetData();
-                    SaveManager.Initialize(item.FilePath);
-                    LoadDataToView.LoadData(new FileResult(item.FilePath));
-                    ProjectItem.Current.Attach(GlobalJson.Data);
-                    InvalidateRemoteCache();
-
-                    await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
-                    break;
-            }
+            await action(item);
         }
         catch (Exception ex)
         {
@@ -993,5 +951,161 @@ public partial class OpenProject : ContentPage
             await BusyService.HideAsync();
             _isProcessing = false;
         }
+    }
+
+    // ───────── Aktionen (aus OnEditClicked / OnDeleteClicked) ─────────
+    private async Task ExportZipAsync(FileItem item)
+    {
+        var popup = new PopupDualResponse(AppResources.wollen_sie_projekt_als_zip_exportieren);
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result.Result is not DualPopupResult.Ok) return;
+
+        string sourceDirectory = Path.GetDirectoryName(item.FilePath);
+        string zipName = Path.GetFileNameWithoutExtension(item.FileName) + ".zip";
+        string outputPath = Path.Combine(Settings.DataDirectory, zipName);
+
+        try
+        {
+            await BusyService.ShowAsync(AppResources.daten_werden_komprimiert);
+            await Task.Run(() => Helper.PackDirectory(sourceDirectory, outputPath));
+        }
+        finally
+        {
+            await BusyService.HideAsync();
+            await Task.Delay(100);
+        }
+
+        if (!File.Exists(outputPath)) return;
+
+        using (var saveStream = File.Open(outputPath, FileMode.Open))
+        {
+            var saveResult = await FileSaver.Default.SaveAsync(zipName, saveStream);
+            if (saveResult.IsSuccessful)
+                await SnackbarExtensions.ShowSafeAsync(AppResources.zip_wurde_exportiert, includeDelay: true);
+        }
+        File.Delete(outputPath);
+    }
+
+    private static async Task OpenProjectFolderAsync(FileItem item)
+    {
+#if WINDOWS
+    string directoryPath = Path.GetDirectoryName(item.FilePath);
+    if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
+    {
+        await SnackbarExtensions.ShowSafeAsync(AppResources.verzeichnis_nicht_gefunden, includeDelay: true);
+        return;
+    }
+
+    bool ok = await Windows.System.Launcher.LaunchFolderPathAsync(directoryPath);
+    if (!ok)
+        System.Diagnostics.Debug.WriteLine($"Ordner konnte nicht geöffnet werden: {directoryPath}");
+#else
+        await Task.CompletedTask;
+#endif
+    }
+
+    private async Task UploadProjectToCloudAsync(FileItem item)
+    {
+        if (SaveManager.CurrentAuth?.IsLoggedIn != true)
+        {
+            await this.ShowPopupAsync(new PopupAlert(AppResources.bitte_zuerst_anmelden, AppResources.info), Settings.PopupOptions);
+            return;
+        }
+
+        if (FileListView.ItemsSource is IEnumerable<FileItem> items)
+            foreach (var f in items)
+                f.IsActive = false;
+        item.IsActive = true;
+
+        SettingsService.Instance.IsProjectLoaded = true;
+        SettingsService.Instance.ProjectPath = Path.GetFileName(Path.GetDirectoryName(item.FilePath));
+        LoadDataToView.ResetData();
+        SaveManager.Initialize(item.FilePath);
+        LoadDataToView.LoadData(new FileResult(item.FilePath));
+        ProjectItem.Current.Attach(GlobalJson.Data);
+        InvalidateRemoteCache();
+
+        await Shell.Current.GoToAsync("cloudPickerPage?mode=SelectFolder");
+    }
+
+    private async Task DeleteProjectAsync(FileItem item)
+    {
+        var popup = new PopupDualResponse(AppResources.wollen_sie_dieses_projekt_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+        var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result.Result is not DualPopupResult.Ok) return;
+
+        string fullPath = item.FilePath;
+        if (string.IsNullOrEmpty(fullPath)) return;
+
+        bool isCurrentProject = item.IsActive;
+        if (isCurrentProject)
+            DeleteTileCacheForProject();
+
+        string projectDirectoryPath = Path.GetDirectoryName(fullPath);
+        if (!string.IsNullOrEmpty(projectDirectoryPath) && Directory.Exists(projectDirectoryPath))
+            Directory.Delete(projectDirectoryPath, true);
+
+        if (isCurrentProject)
+        {
+            SaveManager.ResetCloudSync();
+            SettingsService.Instance.IsProjectLoaded = false;
+            SettingsService.Instance.ProjectPath = null;
+            LoadDataToView.ResetData();
+            GlobalJson.Data = new JsonDataModel();
+            GlobalJson.UpdateFilePath(null);
+            ProjectItem.Current.Attach(GlobalJson.Data);
+        }
+
+        InvalidateRemoteCache();
+        LoadJsonFiles();
+    }
+
+    private static Point GetWindowPosition(VisualElement element)
+    {
+#if ANDROID
+        if (element.Handler?.PlatformView is Android.Views.View view)
+        {
+            var loc = new int[2];
+            view.GetLocationInWindow(loc);
+            double density = view.Context?.Resources?.DisplayMetrics?.Density ?? 1;
+            return new Point(loc[0] / density, loc[1] / density);
+        }
+#elif IOS || MACCATALYST
+    if (element.Handler?.PlatformView is UIKit.UIView view)
+    {
+        var p = view.ConvertPointToView(CoreGraphics.CGPoint.Empty, null);
+        return new Point(p.X, p.Y);
+    }
+#elif WINDOWS
+    if (element.Handler?.PlatformView is Microsoft.UI.Xaml.FrameworkElement view)
+    {
+        var p = view.TransformToVisual(null).TransformPoint(new Windows.Foundation.Point(0, 0));
+        return new Point(p.X, p.Y);
+    }
+#endif
+        return Point.Zero;
+    }
+
+    private void PositionItemSheet(VisualElement anchor)
+    {
+        double rootY = GetWindowPosition(RootGrid).Y;
+        double anchorY = GetWindowPosition(anchor).Y;
+        double ay = anchorY - rootY;
+        double h = ItemSheet.Measure(RootGrid.Width, double.PositiveInfinity).Height;
+        bool openUp = ay + anchor.Height + h > RootGrid.Height;
+        double y = openUp ? ay - h : ay + anchor.Height;
+        y = Math.Clamp(y, 0, Math.Max(0, RootGrid.Height - h));
+
+        ItemSheet.Margin = new Thickness(0, y, 4, 0);
+        ItemSheet.AnchorX = 1;
+        ItemSheet.AnchorY = openUp ? 1 : 0;
+    }
+
+    private async void OnFileListScrolled(object sender, ItemsViewScrolledEventArgs e)
+    {
+        if (!ItemSheetOverlay.IsVisible || Math.Abs(e.VerticalDelta) < 2)
+            return;
+
+        await CloseItemSheetAsync();
     }
 }

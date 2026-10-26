@@ -1219,6 +1219,9 @@
   <data name="foto_hinzufuegen" xml:space="preserve">
     <value>Ajouter une photo</value>
   </data>
+  <data name="einstellungen" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
   <data name="prioritaet" xml:space="preserve">
     <value>Priorité</value>
   </data>
@@ -1239,5 +1242,8 @@
   </data>
   <data name="kopieren_verschieben" xml:space="preserve">
     <value>Copier / déplacer…</value>
+  </data>
+  <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
+    <value>Dossier introuvable</value>
   </data>
 </root>

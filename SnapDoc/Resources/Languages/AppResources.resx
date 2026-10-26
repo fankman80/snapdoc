@@ -1242,4 +1242,7 @@
   <data name="kopieren_verschieben" xml:space="preserve">
     <value>Kopieren / verschieben…</value>
   </data>
+  <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
+    <value>Verzeichnis nicht gefunden</value>
+  </data>
 </root>

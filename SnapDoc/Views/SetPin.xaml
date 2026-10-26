@@ -359,7 +359,7 @@
 
                 <VerticalStackLayout>
                     <!-- Kopieren / verschieben -->
-                    <Grid Style="{StaticResource MenuItem}" ColumnDefinitions="Auto,Auto"
+                    <Grid ColumnDefinitions="Auto,Auto"
                           IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnMenuMoveTapped" />
@@ -381,7 +381,7 @@
                              IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}" />
 
                     <!-- Löschen (destruktiv, rot) -->
-                    <Grid Style="{StaticResource MenuItem}" ColumnDefinitions="Auto,Auto">
+                    <Grid ColumnDefinitions="Auto,Auto">
                         <Grid.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnMenuDeleteTapped" />
                         </Grid.GestureRecognizers>
