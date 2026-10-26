@@ -62,7 +62,7 @@
             <VerticalStackLayout Spacing="10">
                 <!-- ═══ Kopfzeile: Icon | Name | Auf Plan zeigen ═══ -->
                 <Border Style="{StaticResource CardBorder}" Padding="8">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                         <!-- Pin-Icon mit Stift-Badge -->
                         <Grid Grid.Column="0" WidthRequest="80" HeightRequest="80">
                             <ImageButton Source="{Binding Pin.DisplayIconPath}"
@@ -81,7 +81,6 @@
                                     HorizontalOptions="End"
                                     VerticalOptions="End"
                                     Padding="0"
-                                    Margin="0,0,-2,-2"
                                     InputTransparent="True">
                                 <Label Text="{x:Static local:MaterialIcons.Edit}"
                                        FontFamily="MaterialOutlined"
@@ -114,12 +113,13 @@
                                     CornerRadius="10"
                                     BackgroundColor="Transparent"
                                     TextColor="{DynamicResource Primary}"/>
-                            <Label Text="{x:Static res:AppResources.auf_plan_zeigen}"
-                                    FontSize="11"
-                                    HorizontalTextAlignment="Center"
-                                    MaximumWidthRequest="70"
-                                    LineBreakMode="WordWrap"
-                                    TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}" />
+                            <Label Padding="0"
+                                   Text="{x:Static res:AppResources.auf_plan_zeigen}"
+                                   FontSize="11"
+                                   HorizontalTextAlignment="Center"
+                                   MaximumWidthRequest="70"
+                                   LineBreakMode="WordWrap"
+                                   TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}" />
                         </VerticalStackLayout>
                     </Grid>
                 </Border>
@@ -220,7 +220,7 @@
 
                 <!-- ═══ Beschreibung ═══ -->
                 <controls:BorderedEditor Text="{Binding Pin.PinDesc}"
-                                         HeightRequest="80"
+                                         MaximumHeightRequest="80"
                                          Placeholder="{x:Static res:AppResources.beschreibung}"/>
 
                 <!-- ═══ Einstellungen ═══ -->
