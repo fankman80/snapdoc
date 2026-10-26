@@ -326,7 +326,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void ZoomToPinClicked(object sender, EventArgs e)
     {
-            await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
+        await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
     }
 
     private async void ZoomToWebPinClicked(object sender, EventArgs e)
