@@ -1104,8 +1104,8 @@
   <data name="projekt_wirklich_herunterladen" xml:space="preserve">
     <value>Projekt „{0}“ herunterladen und synchronisieren?</value>
   </data>
-  <data name="von_sharepoint_oder_onedrive_herunterladen" xml:space="preserve">
-    <value>Von SharePoint oder OneDrive herunterladen</value>
+  <data name="aus_cloud_laden" xml:space="preserve">
+    <value>Aus Cloud laden</value>
   </data>
   <data name="auf_sharepoint_oder_onedrive_hochladen" xml:space="preserve">
     <value>Auf SharePoint oder OneDrive hochladen</value>
@@ -1166,9 +1166,6 @@
   </data>
   <data name="plaene_hinzufuegen" xml:space="preserve">
     <value>Pläne hinzufügen</value>
-  </data>
-  <data name="angemeldet_als" xml:space="preserve">
-    <value>Angemeldet als:</value>
   </data>
   <data name="zeige_sperrsymbole" xml:space="preserve">
     <value>Sperrsymbole anzeigen</value>
@@ -1244,5 +1241,8 @@
   </data>
   <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
     <value>Verzeichnis nicht gefunden</value>
+  </data>
+  <data name="angemeldet_als" xml:space="preserve">
+    <value>Angemeldet als:</value>
   </data>
 </root>

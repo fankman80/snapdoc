@@ -229,4 +229,10 @@ public partial class BorderedEntry : ContentView
         UpdateFloatingLabelState(animate: false);
         BorderCanvas?.InvalidateSurface();
     }
+
+    private void OnFrameTapped(object sender, TappedEventArgs e)
+    {
+        if (!InnerEntry.IsFocused)
+            InnerEntry.Focus();
+    }
 }

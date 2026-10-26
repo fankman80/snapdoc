@@ -69,10 +69,11 @@
                                          CornerRadius="0"
                                          BackgroundColor="Transparent"
                                          Aspect="AspectFit"
-                                         Padding="2"
+                                         Padding="4"
                                          ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
                                          Clicked="OnPinSelectClick" />
-                            <Border WidthRequest="32"
+                            <Border IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
+                                    WidthRequest="32"
                                     HeightRequest="32"
                                     StrokeShape="RoundRectangle 16"
                                     StrokeThickness="0"
@@ -80,7 +81,7 @@
                                     HorizontalOptions="End"
                                     VerticalOptions="End"
                                     Padding="0"
-                                    Margin="0,0,-4,-4"
+                                    Margin="0,0,-2,-2"
                                     InputTransparent="True">
                                 <Label Text="{x:Static local:MaterialIcons.Edit}"
                                        FontFamily="MaterialOutlined"
@@ -91,50 +92,35 @@
                             </Border>
                         </Grid>
 
-                        <Label Grid.Column="1"
-                               Margin="0,6,0,0"
-                               Text="{x:Static res:AppResources.bezeichnung}"
-                               FontSize="12"
-                               TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}"/>
-                        
                         <!-- Name (editierbar) -->
-                        <local:BorderlessEditor Grid.Column="1"
-                                               Text="{Binding Pin.PinName}"
-                                               Placeholder="{x:Static res:AppResources.titel_eingeben}"
-                                               PlaceholderColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}"
-                                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                               FontFamily="{x:StaticResource AppFontFamily}"
-                                               FontAttributes="Bold"
-                                               IsSpellCheckEnabled="False"
-                                               BackgroundColor="Transparent"
-                                               VerticalOptions="Center"/>
+                        <controls:BorderedEditor Grid.Column="1"
+                                                 VerticalOptions="Start"
+                                                 HeightRequest="80"
+                                                 Text="{Binding Pin.PinName}"
+                                                 Placeholder="{x:Static res:AppResources.bezeichnung}"/>
 
                         <!-- Auf Plan zeigen -->
-                        <Border Grid.Column="2"
-                                Style="{StaticResource CardBorder}"
-                                StrokeThickness="1"
-                                Stroke="{AppThemeBinding Light=#40000000, Dark=#55FFFFFF}"
-                                IsVisible="{Binding Pin.IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
-                                Padding="8,6"
-                                VerticalOptions="Center"
-                                ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}">
-                            <Border.GestureRecognizers>
-                                <TapGestureRecognizer Tapped="ZoomToPinClicked" />
-                            </Border.GestureRecognizers>
-                            <VerticalStackLayout Spacing="2">
-                                <Label Text="{x:Static local:MaterialIcons.Recenter}"
-                                       FontFamily="MaterialOutlined"
-                                       FontSize="30"
-                                       HorizontalOptions="Center"
-                                       TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}" />
-                                <Label Text="{x:Static res:AppResources.auf_plan_zeigen}"
-                                       FontSize="11"
-                                       HorizontalTextAlignment="Center"
-                                       MaximumWidthRequest="70"
-                                       LineBreakMode="WordWrap"
-                                       TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}" />
-                            </VerticalStackLayout>
-                        </Border>
+                        <VerticalStackLayout Grid.Column="2"
+                                             Spacing="0"
+                                             VerticalOptions="Center">
+                            <Button Padding="0"
+                                    HeightRequest="30"
+                                    WidthRequest="30"
+                                    Text="{x:Static local:MaterialIcons.Recenter}"
+                                    FontFamily="MaterialOutlined"
+                                    FontSize="30"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    CornerRadius="10"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{DynamicResource Primary}"/>
+                            <Label Text="{x:Static res:AppResources.auf_plan_zeigen}"
+                                    FontSize="11"
+                                    HorizontalTextAlignment="Center"
+                                    MaximumWidthRequest="70"
+                                    LineBreakMode="WordWrap"
+                                    TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}" />
+                        </VerticalStackLayout>
                     </Grid>
                 </Border>
 
@@ -146,7 +132,7 @@
                             HeightRequest="110"
                             StrokeShape="RoundRectangle 10"
                             StrokeDashArray="6,4"
-                            StrokeThickness="1"
+                            StrokeThickness="1.5"
                             Stroke="{AppThemeBinding Light=#40000000, Dark=#55FFFFFF}"
                             BackgroundColor="{AppThemeBinding Light=White, Dark=#14FFFFFF}"
                             ToolTipProperties.Text="{x:Static res:AppResources.foto_hinzufuegen}"
@@ -234,8 +220,8 @@
 
                 <!-- ═══ Beschreibung ═══ -->
                 <controls:BorderedEditor Text="{Binding Pin.PinDesc}"
-                                         Placeholder="{x:Static res:AppResources.beschreibung}"
-                                         BackgroundColor="Transparent"/>
+                                         HeightRequest="80"
+                                         Placeholder="{x:Static res:AppResources.beschreibung}"/>
 
                 <!-- ═══ Einstellungen ═══ -->
                 <!-- Priorität -->

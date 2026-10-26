@@ -84,7 +84,7 @@
                                     Opacity="0.1"
                                     IsVisible="{Binding IsActive}" />
                             <Label Grid.Column="1" Grid.Row="0"
-                                   Margin="8,0,0,0"
+                                   Margin="8,4,0,0"
                                    VerticalTextAlignment="Center"
                                    MaxLines="1"
                                    LineBreakMode="TailTruncation"
@@ -246,7 +246,7 @@
                         <Label Grid.Column="1"
                                FontSize="12"
                                VerticalTextAlignment="Center"
-                               Text="{x:Static res:AppResources.von_sharepoint_oder_onedrive_herunterladen}" />
+                               Text="{x:Static res:AppResources.aus_cloud_laden}" />
                     </Grid>
                 </VerticalStackLayout>
             </Border>

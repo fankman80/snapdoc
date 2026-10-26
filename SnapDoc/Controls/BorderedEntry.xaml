@@ -9,9 +9,14 @@
              x:DataType="controls:BorderedEntry">
 
     <Grid Padding="0,8,0,4">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFrameTapped" />
+        </Grid.GestureRecognizers>
+        
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
                            IgnorePixelScaling="False"
+                           InputTransparent="True"
                            Margin="0" />
 
         <Label x:Name="FloatingLabel"

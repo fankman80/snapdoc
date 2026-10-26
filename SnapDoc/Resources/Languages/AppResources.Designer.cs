@@ -277,6 +277,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Aus Cloud laden ähnelt.
+        /// </summary>
+        internal static string aus_cloud_laden {
+            get {
+                return ResourceManager.GetString("aus_cloud_laden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Ausgeblendete Pläne ähnelt.
         /// </summary>
         internal static string ausgeblendete_plaene {
@@ -3189,15 +3198,6 @@ namespace SnapDoc.Resources.Languages {
         internal static string verzeichnis_wird_geladen {
             get {
                 return ResourceManager.GetString("verzeichnis_wird_geladen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Von SharePoint oder OneDrive herunterladen ähnelt.
-        /// </summary>
-        internal static string von_sharepoint_oder_onedrive_herunterladen {
-            get {
-                return ResourceManager.GetString("von_sharepoint_oder_onedrive_herunterladen", resourceCulture);
             }
         }
         

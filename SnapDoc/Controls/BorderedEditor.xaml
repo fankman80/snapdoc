@@ -9,11 +9,16 @@
              x:DataType="controls:BorderedEditor">
 
     <Grid Padding="0,8,0,4">
+        <Grid.GestureRecognizers>
+            <TapGestureRecognizer Tapped="OnFrameTapped" />
+        </Grid.GestureRecognizers>
+
         <skia:SKCanvasView x:Name="BorderCanvas"
                            PaintSurface="OnPaintSurface"
                            IgnorePixelScaling="False"
+                           InputTransparent="True"
                            Margin="0" />
-        
+
         <Label x:Name="FloatingLabel"
                Text="{Binding Placeholder, Source={x:Reference this}}"
                TextColor="{Binding PlaceholderColor, Source={x:Reference this}}"
@@ -28,18 +33,18 @@
                InputTransparent="True" />
 
         <local:BorderlessEditor x:Name="InnerEditor"
-                               Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}"
-                               TextColor="{Binding TextColor, Source={x:Reference this}}"
-                               FontSize="{Binding FontSize, Source={x:Reference this}}"
-                               FontFamily="{Binding FontFamily, Source={x:Reference this}}"
-                               Keyboard="{Binding Keyboard, Source={x:Reference this}}"
-                               AutoSize="TextChanges"
-                               BackgroundColor="Transparent"
-                               VerticalOptions="Center"
-                               Margin="16,12"
-                               Focused="InnerEditor_Focused"
-                               Unfocused="InnerEditor_Unfocused"
-                               TextChanged="InnerEditor_TextChanged"
-                               SizeChanged="InnerEditor_SizeChanged" />
-    </Grid>
+                                Text="{Binding Text, Source={x:Reference this}, Mode=TwoWay}"
+                                TextColor="{Binding TextColor, Source={x:Reference this}}"
+                                FontSize="{Binding FontSize, Source={x:Reference this}}"
+                                FontFamily="{Binding FontFamily, Source={x:Reference this}}"
+                                Keyboard="{Binding Keyboard, Source={x:Reference this}}"
+                                AutoSize="TextChanges"
+                                BackgroundColor="Transparent"
+                                VerticalOptions="Fill"
+                                Margin="16,12"
+                                Focused="InnerEditor_Focused"
+                                Unfocused="InnerEditor_Unfocused"
+                                TextChanged="InnerEditor_TextChanged"
+                                SizeChanged="InnerEditor_SizeChanged" />
+    </Grid> 
 </ContentView>

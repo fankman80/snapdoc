@@ -1104,8 +1104,8 @@
   <data name="projekt_wirklich_herunterladen" xml:space="preserve">
     <value>Télécharger et synchroniser le projet "{0}" ?</value>
   </data>
-  <data name="von_sharepoint_oder_onedrive_herunterladen" xml:space="preserve">
-    <value>Télécharger depuis SharePoint ou OneDrive</value>
+  <data name="aus_cloud_laden" xml:space="preserve">
+    <value>Charger depuis le cloud</value>
   </data>
   <data name="auf_sharepoint_oder_onedrive_hochladen" xml:space="preserve">
     <value>Téléverser sur SharePoint ou OneDrive</value>
@@ -1166,10 +1166,6 @@
   </data>
   <data name="plaene_hinzufuegen" xml:space="preserve">
     <value>Ajouter des plans</value>
-  </data>
-  <assembly alias="System.Windows.Forms" name="System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089" />
-  <data name="angemeldet_als" type="System.Resources.ResXNullRef, System.Windows.Forms">
-    <value />
   </data>
   <data name="zeige_sperrsymbole" xml:space="preserve">
     <value>Afficher les icônes de verrouillage</value>
@@ -1245,5 +1241,8 @@
   </data>
   <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
     <value>Dossier introuvable</value>
+  </data>
+  <data name="angemeldet_als" xml:space="preserve">
+    <value>Connecté en tant que :</value>
   </data>
 </root>

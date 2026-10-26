@@ -243,4 +243,10 @@ public partial class BorderedEditor : ContentView
             BorderCanvas?.InvalidateSurface();
         });
     }
+
+    private void OnFrameTapped(object sender, TappedEventArgs e)
+    {
+        if (!InnerEditor.IsFocused)
+            InnerEditor.Focus();
+    }
 }
