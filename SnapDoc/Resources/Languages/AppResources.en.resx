@@ -1216,4 +1216,31 @@
   <data name="datei_existiert_ueberschreiben" xml:space="preserve">
     <value>The file "{0}" already exists. Do you want to overwrite it?</value>
   </data>
+  <data name="foto_hinzufuegen" xml:space="preserve">
+    <value>Add photo</value>
+  </data>
+  <data name="einstellungen" xml:space="preserve">
+    <value>Paramètres</value>
+  </data>
+  <data name="prioritaet" xml:space="preserve">
+    <value>Priority</value>
+  </data>
+  <data name="auf_plan_zeigen" xml:space="preserve">
+    <value>Show on plan</value>
+  </data>
+  <data name="icon_aendern" xml:space="preserve">
+    <value>Change icon</value>
+  </data>
+  <data name="weitere_optionen" xml:space="preserve">
+    <value>More options</value>
+  </data>
+  <data name="pin_exportieren_hinweis" xml:space="preserve">
+    <value>Include in reports and plans</value>
+  </data>
+  <data name="position_sperren_hinweis" xml:space="preserve">
+    <value>Prevent moving on the plan</value>
+  </data>
+  <data name="kopieren_verschieben" xml:space="preserve">
+    <value>Copy / move…</value>
+  </data>
 </root>

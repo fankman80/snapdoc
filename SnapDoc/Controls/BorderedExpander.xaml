@@ -5,12 +5,12 @@
              xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Controls.BorderedExpander"
-             x:Name="thisControl"
+             x:Name="this"
              x:DataType="controls:BorderedExpander">
 
     <ContentView.ControlTemplate>
         <ControlTemplate>
-            <Border Stroke="{DynamicResource SecondaryBackground}"
+            <Border Stroke="{Binding BorderColor, Source={x:Reference this}}"
                     StrokeThickness="1"
                     Padding="16,0,10,0"
                     Margin="0,0,0,4">
@@ -33,7 +33,7 @@
                 </Border.StrokeShape>
                 <toolkit:Expander x:Name="expanderControl"
                                   Padding="0"
-                                  IsExpanded="{Binding IsExpanded, Source={x:Reference thisControl}, Mode=TwoWay}">
+                                  IsExpanded="{Binding IsExpanded, Source={x:Reference thisl}, Mode=TwoWay}">
                     <toolkit:Expander.Header>
                         <Grid ColumnDefinitions="*,Auto" ColumnSpacing="0" HeightRequest="46" VerticalOptions="Fill">
                             <Label Grid.Column="0"

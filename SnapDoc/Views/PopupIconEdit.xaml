@@ -30,20 +30,10 @@
             <VerticalStackLayout Grid.Column="1">
                 <controls:BorderedEntry
                     Text="{Binding Anchor_X_Text}"
-                    Placeholder="{x:Static res:AppResources.anker_x}"
-                    BackgroundColor="Transparent"
-                    Keyboard="Numeric"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.anker_x}"/>
                 <controls:BorderedEntry
                     Text="{Binding Anchor_Y_Text}"
-                    Placeholder="{x:Static res:AppResources.anker_y}"
-                    BackgroundColor="Transparent"
-                    Keyboard="Numeric"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.anker_y}"/>
             </VerticalStackLayout>
         </Grid>
         
@@ -51,23 +41,14 @@
             <VerticalStackLayout Margin="0,0,0,6" Spacing="8">
                 <controls:BorderedEntry
                     x:Name="iconName"
-                    Placeholder="{x:Static res:AppResources.bezeichnung}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.bezeichnung}"/>
                 
                 <VerticalStackLayout Spacing="2">
                     <Grid RowDefinitions="Auto, Auto">
                         <!-- Input-Feld -->
                         <controls:BorderedEntry x:Name="iconCategory"
                                Grid.Row="0"
-                               TextChanged="OnCategoryTextChanged"
-                               TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                               Placeholder="{x:Static res:AppResources.kategorie}"
-                               BorderColor="{DynamicResource SecondaryBackground}"
-                               PlaceholderColor="{DynamicResource SecondaryBackground}"
-                               FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                               TextChanged="OnCategoryTextChanged"/>
 
                         <!-- Schwebender Container fuer die Vorschlaege -->
                         <Border Grid.Row="1"

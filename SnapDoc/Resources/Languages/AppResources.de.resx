@@ -1215,4 +1215,31 @@
   <data name="datei_existiert_ueberschreiben" xml:space="preserve">
     <value>Die Datei «{0}» existiert bereits. Möchtest du sie überschreiben?</value>
   </data>
+  <data name="foto_hinzufuegen" xml:space="preserve">
+    <value>Foto hinzufügen</value>
+  </data>
+  <data name="einstellungen" xml:space="preserve">
+    <value>Settings</value>
+  </data>
+  <data name="prioritaet" xml:space="preserve">
+    <value>Priorität</value>
+  </data>
+  <data name="auf_plan_zeigen" xml:space="preserve">
+    <value>Auf Plan zeigen</value>
+  </data>
+  <data name="icon_aendern" xml:space="preserve">
+    <value>Icon ändern</value>
+  </data>
+  <data name="weitere_optionen" xml:space="preserve">
+    <value>Weitere Optionen</value>
+  </data>
+  <data name="pin_exportieren_hinweis" xml:space="preserve">
+    <value>In Berichten und auf Plänen berücksichtigen</value>
+  </data>
+  <data name="position_sperren_hinweis" xml:space="preserve">
+    <value>Verschieben auf dem Plan verhindern</value>
+  </data>
+  <data name="kopieren_verschieben" xml:space="preserve">
+    <value>Kopieren / verschieben…</value>
+  </data>
 </root>

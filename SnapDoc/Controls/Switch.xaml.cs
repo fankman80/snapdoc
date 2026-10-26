@@ -11,7 +11,7 @@ public partial class Switch : ContentView
     }
 
     #region BindableProperties
-    public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnLabelTextChanged);
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Switch), Label.TextColorProperty.DefaultValue);
     public static readonly BindableProperty TextSizeProperty = BindableProperty.Create(nameof(TextSize), typeof(double),typeof(Switch), defaultValue: GetDefaultFontSize());
     public static readonly BindableProperty IsToggledProperty = BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
@@ -39,13 +39,12 @@ public partial class Switch : ContentView
     public Color SwitchColorOn { get => (Color)GetValue(SwitchColorOnProperty); set => SetValue(SwitchColorOnProperty, value); }
     public Color SwitchColorOff { get => (Color)GetValue(SwitchColorOffProperty); set => SetValue(SwitchColorOffProperty, value); }
     #endregion
-
+    public bool HasLabelText => !string.IsNullOrWhiteSpace(LabelText);
     public float KnobSize => (float)(SwitchHeight - (2 * KnobMargin));
     public float CalculatedCornerRadius => (float)(SwitchHeight / 2.0);
     public float CalculatedKnobRadius => KnobSize / 2;
     public Color CurrentKnobColor => IsToggled ? KnobColorOn : KnobColorOff;
     public Color CurrentSwitchColor => IsToggled ? SwitchColorOn : SwitchColorOff;
-
     public double SwitchWidthMinus2 => SwitchWidth - 2;
     public double SwitchHeightMinus2 => SwitchHeight - 2;
 
@@ -57,6 +56,12 @@ public partial class Switch : ContentView
     }
 
     // ===== Event-Handler =====
+
+    private static void OnLabelTextChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is Switch customSwitch)
+            customSwitch.OnPropertyChanged(nameof(HasLabelText));
+    }
 
     private static void OnAnyPropertyChanged(BindableObject bindable, object oldValue, object newValue)
     {

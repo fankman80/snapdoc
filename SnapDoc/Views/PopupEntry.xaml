@@ -21,11 +21,7 @@
                    HorizontalOptions="Start"
                    Text=""/>
             <controls:BorderedEntry
-                        x:Name="textEntry"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                        x:Name="textEntry"/>
             <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"

@@ -1,6 +1,4 @@
 #nullable disable
-using static SnapDoc.Helper;
-
 namespace SnapDoc;
 
 // =====================================================================

@@ -64,12 +64,12 @@
         </Grid>
     </Shell.TitleView>
 
-    <Grid RowDefinitions="*,Auto" Margin="8">
+    <Grid RowDefinitions="*,Auto" Margin="16,10,16,6">
         <CollectionView x:Name="FileListView" Grid.Row="0"
                         SelectionMode="None"
                         ItemsUpdatingScrollMode="KeepScrollOffset">
             <CollectionView.ItemsLayout>
-                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6" HorizontalItemSpacing="6"/>
+                <GridItemsLayout Orientation="Vertical" Span="1" VerticalItemSpacing="6"/>
             </CollectionView.ItemsLayout>
             <CollectionView.ItemTemplate>
                 <DataTemplate x:DataType="local:FileItem">

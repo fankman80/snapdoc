@@ -266,10 +266,6 @@
                     Text="{Binding StrokeStyle}"
                     FontSize="{StaticResource AppFontSizeNormal}"
                     Placeholder="Linienmuster"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextChanged="OnStrokeTextChanged"/>
             </VerticalStackLayout>     
         </ScrollView>

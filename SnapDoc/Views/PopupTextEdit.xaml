@@ -16,11 +16,7 @@
         <VerticalStackLayout x:DataType="views:PopupTextEdit">
             <controls:BorderedEditor
                     Text="{Binding InputTxt}"
-                    Placeholder="{x:Static res:AppResources.text_eingeben}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.text_eingeben}"/>
 
             <HorizontalStackLayout Spacing="10">
                 <!-- LEFT -->

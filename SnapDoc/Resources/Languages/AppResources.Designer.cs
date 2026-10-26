@@ -241,6 +241,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Auf Plan zeigen ähnelt.
+        /// </summary>
+        internal static string auf_plan_zeigen {
+            get {
+                return ResourceManager.GetString("auf_plan_zeigen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Auf SharePoint oder OneDrive hochladen ähnelt.
         /// </summary>
         internal static string auf_sharepoint_oder_onedrive_hochladen {
@@ -790,6 +799,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen ähnelt.
+        /// </summary>
+        internal static string einstellungen {
+            get {
+                return ResourceManager.GetString("einstellungen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen bearbeiten ähnelt.
         /// </summary>
         internal static string einstellungen_bearbeiten {
@@ -1132,6 +1150,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Foto hinzufügen ähnelt.
+        /// </summary>
+        internal static string foto_hinzufuegen {
+            get {
+                return ResourceManager.GetString("foto_hinzufuegen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Foto löschen ähnelt.
         /// </summary>
         internal static string foto_loeschen {
@@ -1326,6 +1353,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string hinweis {
             get {
                 return ResourceManager.GetString("hinweis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Icon ändern ähnelt.
+        /// </summary>
+        internal static string icon_aendern {
+            get {
+                return ResourceManager.GetString("icon_aendern", resourceCulture);
             }
         }
         
@@ -1623,6 +1659,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string kopieren {
             get {
                 return ResourceManager.GetString("kopieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kopieren / verschieben… ähnelt.
+        /// </summary>
+        internal static string kopieren_verschieben {
+            get {
+                return ResourceManager.GetString("kopieren_verschieben", resourceCulture);
             }
         }
         
@@ -2122,6 +2167,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die In Berichten und auf Plänen berücksichtigen ähnelt.
+        /// </summary>
+        internal static string pin_exportieren_hinweis {
+            get {
+                return ResourceManager.GetString("pin_exportieren_hinweis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin-Icon (Breite + Höhe) ähnelt.
         /// </summary>
         internal static string pin_icon_breite_hoehe {
@@ -2365,6 +2419,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Verschieben auf dem Plan verhindern ähnelt.
+        /// </summary>
+        internal static string position_sperren_hinweis {
+            get {
+                return ResourceManager.GetString("position_sperren_hinweis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Positionsbilder (Breite + Höhe) ähnelt.
         /// </summary>
         internal static string positionsbilder_breite_hoehe {
@@ -2379,6 +2442,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string positionsbilder_zuschnitt {
             get {
                 return ResourceManager.GetString("positionsbilder_zuschnitt", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Priorität ähnelt.
+        /// </summary>
+        internal static string prioritaet {
+            get {
+                return ResourceManager.GetString("prioritaet", resourceCulture);
             }
         }
         
@@ -3180,6 +3252,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string warte_auf_dateiauswahl {
             get {
                 return ResourceManager.GetString("warte_auf_dateiauswahl", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Weitere Optionen ähnelt.
+        /// </summary>
+        internal static string weitere_optionen {
+            get {
+                return ResourceManager.GetString("weitere_optionen", resourceCulture);
             }
         }
         

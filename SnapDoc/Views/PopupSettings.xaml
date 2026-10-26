@@ -248,15 +248,13 @@
                                Text="{x:Static res:AppResources.app_modus}"/>
                         <controls:CustomRadioPicker Grid.Column="1" Grid.Row="0"
                                                     ItemsSource="{Binding AppThemes}"
-                                                    SelectedItem="{Binding SelectedAppTheme}"
-                                                    BorderColor="{DynamicResource SecondaryBackground}"/>
+                                                    SelectedItem="{Binding SelectedAppTheme}"/>
                         <Label Grid.Column="0" Grid.Row="1"
                                VerticalTextAlignment="Center"
                                Text="{x:Static res:AppResources.farb_thema}"/>
                         <controls:CustomRadioPicker Grid.Column="1" Grid.Row="1"
                                                     ItemsSource="{Binding ColorThemes}"
-                                                    SelectedItem="{Binding SelectedColorTheme}"
-                                                    BorderColor="{DynamicResource SecondaryBackground}"/>
+                                                    SelectedItem="{Binding SelectedColorTheme}"/>
                     </Grid>
                 </controls:BorderedExpander>
 

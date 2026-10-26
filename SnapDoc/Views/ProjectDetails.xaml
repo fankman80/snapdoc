@@ -167,51 +167,27 @@
             <VerticalStackLayout Spacing="6">
                 <controls:BorderedEntry
                     Text="{Binding ObjectName, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.objektbezeichnung}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.objektbezeichnung}"/>
 
                 <controls:BorderedEntry
                     Text="{Binding ClientName, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.kunde_bauherrschaft}"/>
 
                 <controls:BorderedEditor
                     Text="{Binding ObjectAddress, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.adresse}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.adresse}"/>
 
                 <controls:BorderedEntry
                     Text="{Binding WorkingTitle, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.projektvorgang}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.projektvorgang}"/>
 
                 <controls:BorderedEntry
                     Text="{Binding ProjectNr, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.projektnummer}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.projektnummer}"/>
 
                 <controls:BorderedEntry
                     Text="{Binding ProjectManager, Mode=TwoWay}"
-                    Placeholder="{x:Static res:AppResources.projektleitung}"
-                    BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
-                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                    Placeholder="{x:Static res:AppResources.projektleitung}"/>
 
                 <Button
                     Text="{Binding CreationDateDisplay}"
@@ -221,7 +197,7 @@
                     HorizontalOptions="Start"
                     VerticalOptions="Center"
                     BackgroundColor="Transparent"
-                    BorderColor="{DynamicResource SecondaryBackground}"
+                    BorderColor="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}"
                     BorderWidth="1"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"

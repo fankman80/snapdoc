@@ -46,42 +46,46 @@
         <ResourceDictionary>
             <!-- Template für Liste -->
             <DataTemplate x:Key="GalleryListTemplate" x:DataType="local:FotoItem">
-                <Grid HeightRequest="80"
-                      ColumnDefinitions="80,*,Auto"
-                      Opacity="{Binding DisplayOpacity}">
-                    <Grid.GestureRecognizers>
+                <Border Opacity="{Binding DisplayOpacity}"
+                        StrokeThickness="1"
+                        Stroke="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        StrokeShape="RoundRectangle 4">
+                    <Border.GestureRecognizers>
                         <TapGestureRecognizer Tapped="OnImageTapped" />
-                    </Grid.GestureRecognizers>
-                    <Image Grid.Column="0"
-                           Source="{Binding DisplayImage}"
-                           Aspect="AspectFill">
-                    </Image>
-                    <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                        <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12" FontAttributes="Bold"/>
-                        <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
-                        <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
-                    </VerticalStackLayout>
-                    <HorizontalStackLayout Grid.Column="2" Spacing="0">
-                        <Button Text="{x:Static local:MaterialIcons.Pinboard}"
-                                Padding="0"
-                                FontFamily="MaterialOutlined"
-                                FontSize="30"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"
-                                BackgroundColor="Transparent"
-                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                Clicked="OnEditClicked"/>
-                        <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
-                                Padding="0"
-                                FontFamily="MaterialOutlined"
-                                FontSize="30"
-                                HorizontalOptions="Center"
-                                VerticalOptions="Center"
-                                BackgroundColor="Transparent"
-                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                Clicked="OnAllowExportClicked"/>
-                    </HorizontalStackLayout>
-                </Grid>
+                    </Border.GestureRecognizers>
+                    <Grid HeightRequest="80"
+                          ColumnDefinitions="80,*,Auto">
+                        <Image Grid.Column="0"
+                               Source="{Binding DisplayImage}"
+                               Aspect="AspectFill">
+                        </Image>
+                        <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
+                            <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12" FontAttributes="Bold"/>
+                            <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
+                            <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
+                        </VerticalStackLayout>
+                        <HorizontalStackLayout Grid.Column="2" Spacing="0">
+                            <Button Text="{x:Static local:MaterialIcons.Pinboard}"
+                                    Padding="0"
+                                    FontFamily="MaterialOutlined"
+                                    FontSize="30"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    Clicked="OnEditClicked"/>
+                            <Button Text="{Binding AllowExport, Converter={StaticResource ExportToGlyphConverter}}"
+                                    Padding="0"
+                                    FontFamily="MaterialOutlined"
+                                    FontSize="30"
+                                    HorizontalOptions="Center"
+                                    VerticalOptions="Center"
+                                    BackgroundColor="Transparent"
+                                    TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                    Clicked="OnAllowExportClicked"/>
+                        </HorizontalStackLayout>
+                    </Grid>
+                </Border>
             </DataTemplate>            
             
             <!-- Template für Grid -->
@@ -116,7 +120,7 @@
         </ResourceDictionary>
     </ContentPage.Resources>
 
-    <Grid RowSpacing="10" Margin="10">
+    <Grid RowSpacing="10" Margin="16,10,16,6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -157,8 +161,9 @@
                         ItemsUpdatingScrollMode="KeepItemsInView"
                         CanReorderItems="False"
                         SelectionMode="None"
+                        Margin="-6,0,-6,0"
                         RemainingItemsThreshold="5">
-            <CollectionView.ItemsLayout>
+            <CollectionView.ItemsLayout >
                 <GridItemsLayout Orientation="Vertical"
                                  Span="{Binding DynamicSpan}"
                                  VerticalItemSpacing="6"

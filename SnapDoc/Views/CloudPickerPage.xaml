@@ -185,11 +185,7 @@
                                     Grid.Column="0"
                                     IsVisible="{Binding IsExportMode, Source={x:Reference Name=ThisPage}}"
                                     Text="{Binding ExportFileName, Source={x:Reference Name=ThisPage}, Mode=TwoWay}"
-                                    Placeholder="{x:Static res:AppResources.dateiname}"
-                                    BackgroundColor="Transparent"
-                                    BorderColor="{DynamicResource SecondaryBackground}"
-                                    PlaceholderColor="{DynamicResource SecondaryBackground}"
-                                    FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                                    Placeholder="{x:Static res:AppResources.dateiname}"/>
 
             <Button Grid.Row="1"
                     Grid.Column="0"

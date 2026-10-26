@@ -19,18 +19,10 @@
         <VerticalStackLayout>
             <controls:BorderedEntry
                 x:Name="name_entry"
-                Placeholder="{x:Static res:AppResources.planbezeichnung}"
-                BackgroundColor="Transparent"
-                BorderColor="{DynamicResource SecondaryBackground}"
-                PlaceholderColor="{DynamicResource SecondaryBackground}"
-                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                Placeholder="{x:Static res:AppResources.planbezeichnung}"/>
             <controls:BorderedEditor
                 x:Name="desc_entry"
-                Placeholder="{x:Static res:AppResources.beschreibung}"
-                BackgroundColor="Transparent"
-                BorderColor="{DynamicResource SecondaryBackground}"
-                PlaceholderColor="{DynamicResource SecondaryBackground}"
-                FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                Placeholder="{x:Static res:AppResources.beschreibung}"/>
 
             <Grid>
                 <Border HeightRequest="44"

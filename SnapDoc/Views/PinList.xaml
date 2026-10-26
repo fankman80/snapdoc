@@ -28,7 +28,7 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
-    <Grid RowSpacing="10" Margin="10">
+    <Grid RowSpacing="10" Margin="16,10,16,6">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
@@ -50,6 +50,7 @@
                                    VerticalOptions="Center"
                                    Placeholder="{x:Static res:AppResources.suche}"
                                    TextChanged="SearchEntry_TextChanged"
+                                   BackgroundColor="Transparent"
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
@@ -87,7 +88,7 @@
                             SelectionMode="None"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="8" Span="1"/>
+                    <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="6" Span="1"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PinItem">
@@ -101,7 +102,6 @@
                             <Grid ColumnDefinitions="16,Auto,*,50,50"
                                   RowDefinitions="Auto, Auto, Auto, Auto"
                                   RowSpacing="0" ColumnSpacing="0">
-
                                 <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="4"
                                         Margin="4"
                                         WidthRequest="8"

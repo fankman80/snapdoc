@@ -12,21 +12,31 @@
     <Style TargetType="controls:BorderedEntry">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
+        <Setter Property="FocusedBorderColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
     </Style>
 
     <Style TargetType="controls:BorderedEditor">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+        <Setter Property="BackgroundColor" Value="Transparent" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
+        <Setter Property="FocusedBorderColor" Value="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}" />
+        <Setter Property="PlaceholderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
     </Style>
 
     <Style TargetType="controls:BorderedExpander">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
     </Style>
 
     <Style TargetType="controls:CustomRadioPicker">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}" />
         <Setter Property="FontSize" Value="{StaticResource AppFontSizeNormal}" />
+        <Setter Property="BorderColor" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}" />
     </Style>
 
     <Style TargetType="controls:RangeSlider">
@@ -37,9 +47,9 @@
     <Style x:Key="ToolButtonStyle" TargetType="Button">
         <Setter Property="BackgroundColor" Value="{DynamicResource Primary}" />
         <Setter Property="TextColor" Value="{DynamicResource PrimaryDarkText}" />
-        <Setter Property="WidthRequest" Value="54" />
-        <Setter Property="HeightRequest" Value="54" />
-        <Setter Property="CornerRadius" Value="27" />
+        <Setter Property="WidthRequest" Value="56" />
+        <Setter Property="HeightRequest" Value="56" />
+        <Setter Property="CornerRadius" Value="28" />
         <Setter Property="Padding" Value="0" />
         <Setter Property="FontSize" Value="{OnPlatform Default='32', iOS='26'}" />
         <Setter Property="FontFamily" Value="MaterialOutlined" />
@@ -63,7 +73,7 @@
     </Style>
 
     <Style TargetType="Border">
-        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Gray200}, Dark={StaticResource Gray500}}" />
+        <Setter Property="Stroke" Value="{AppThemeBinding Light={StaticResource Gray300}, Dark={StaticResource Gray400}}" />
         <Setter Property="StrokeShape" Value="Rectangle"/>
         <Setter Property="StrokeThickness" Value="1"/>
     </Style>

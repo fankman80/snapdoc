@@ -13,7 +13,6 @@ namespace SnapDoc.Views;
 
 public partial class SetPin : ContentPage, IQueryAttributable
 {
-    public int DynamicSpan { get; set; } = SettingsService.Instance.GridViewMinColumns;
     private string PlanId;
     private string PinId;
     private CancellationTokenSource _imageLoadingCts;
@@ -55,6 +54,10 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     protected override bool OnBackButtonPressed()
     {
+        // Android-Zurück schliesst zuerst das Menü
+        if (MoreMenuOverlay.IsVisible)
+            _ = HideMoreMenuAsync();
+
         return true; // Back blockiert
     }
 
@@ -62,9 +65,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnAppearing();
 
-        SizeChanged += OnSizeChanged;
-
-        UpdateSpan();
         FotoLoader();
     }
 
@@ -72,7 +72,6 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         base.OnDisappearing();
 
-        SizeChanged -= OnSizeChanged;
         _imageLoadingCts?.Cancel();
         _imageLoadingCts?.Dispose();
         _imageLoadingCts = null;
@@ -375,7 +374,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
             }.Initialize();
 
             Fotos.Add(newItem);
-            this.ForceLayout();
+            ImageGallery.ScrollTo(newItem, position: ScrollToPosition.End, animate: true);
         }
         catch (Exception ex)
         {
@@ -525,55 +524,47 @@ public partial class SetPin : ContentPage, IQueryAttributable
         SettingsService.Instance.SaveSettings();
     }
 
-    private void OnTitleChanged(object sender, EventArgs e)
+    private async void OnMoreClicked(object sender, EventArgs e)
     {
-        if (sender is not Microsoft.Maui.Controls.Entry entry) return;
-
-        // Fokus entfernen
-        entry.Unfocus();
-
-#if ANDROID
-        try
+        if (MoreMenuOverlay.IsVisible)
         {
-            if (entry.Handler?.PlatformView is Android.Views.View nativeView)
-            {
-                var inputMethodManager = nativeView.Context?.GetSystemService(
-                    Android.Content.Context.InputMethodService) as Android.Views.InputMethods.InputMethodManager;
+            await HideMoreMenuAsync();
+            return;
+        }
 
-                // Tastatur schließen
-                inputMethodManager?.HideSoftInputFromWindow(nativeView.WindowToken, 0);
-            }
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"Android keyboard hide failed: {ex.Message}");
-        }
-#endif
+        // Aufklappen von oben rechts
+        MoreMenu.AnchorX = 1;
+        MoreMenu.AnchorY = 0;
+        MoreMenu.Opacity = 0;
+        MoreMenu.Scale = 0.92;
+        MoreMenuOverlay.IsVisible = true;
 
-#if IOS
-        try
-        {
-            UIKit.UIApplication.SharedApplication.SendAction(
-                new ObjCRuntime.Selector("resignFirstResponder"), null, null, null);
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
-        }
-#endif
+        await Task.WhenAll(
+            MoreMenu.FadeToAsync(1, 120, Easing.CubicOut),
+            MoreMenu.ScaleToAsync(1, 120, Easing.CubicOut));
     }
 
-    private void OnSizeChanged(object sender, EventArgs e)
+    private async Task HideMoreMenuAsync()
     {
-        UpdateSpan();
+        if (!MoreMenuOverlay.IsVisible)
+            return;
+
+        await MoreMenu.FadeToAsync(0, 90, Easing.CubicIn);
+        MoreMenuOverlay.IsVisible = false;
     }
 
-    private void UpdateSpan()
-    {
-        double screenWidth = this.Width;
-        double imageWidth = SettingsService.Instance.FotoPreviewSize;
-        DynamicSpan = Math.Max(3, (int)(screenWidth / imageWidth));
+    private async void OnMoreMenuDismiss(object sender, EventArgs e) =>
+        await HideMoreMenuAsync();
 
-        OnPropertyChanged(nameof(DynamicSpan));
+    private async void OnMenuMoveTapped(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+        OnMoveClick(sender, e);
+    }
+
+    private async void OnMenuDeleteTapped(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+        OnDeleteClick(sender, e);
     }
 }

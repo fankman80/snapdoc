@@ -1216,4 +1216,28 @@
   <data name="datei_existiert_ueberschreiben" xml:space="preserve">
     <value>Le fichier « {0} » existe déjà. Voulez-vous le remplacer ?</value>
   </data>
+  <data name="foto_hinzufuegen" xml:space="preserve">
+    <value>Ajouter une photo</value>
+  </data>
+  <data name="prioritaet" xml:space="preserve">
+    <value>Priorité</value>
+  </data>
+  <data name="auf_plan_zeigen" xml:space="preserve">
+    <value>Afficher sur le plan</value>
+  </data>
+  <data name="icon_aendern" xml:space="preserve">
+    <value>Changer l'icône</value>
+  </data>
+  <data name="weitere_optionen" xml:space="preserve">
+    <value>Plus d'options</value>
+  </data>
+  <data name="pin_exportieren_hinweis" xml:space="preserve">
+    <value>Inclure dans les rapports et les plans</value>
+  </data>
+  <data name="position_sperren_hinweis" xml:space="preserve">
+    <value>Empêcher le déplacement sur le plan</value>
+  </data>
+  <data name="kopieren_verschieben" xml:space="preserve">
+    <value>Copier / déplacer…</value>
+  </data>
 </root>

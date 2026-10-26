@@ -125,11 +125,7 @@
 
                     <controls:BorderedEntry
                         Text="{Binding PinLabelPrefix}"
-                        Placeholder="{x:Static res:AppResources.pinbeschriftung}"
-                        BackgroundColor="Transparent"
-                        BorderColor="{DynamicResource SecondaryBackground}"
-                        PlaceholderColor="{DynamicResource SecondaryBackground}"
-                        FocusedBorderColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                        Placeholder="{x:Static res:AppResources.pinbeschriftung}"/>
 
                     <controls:RangeSlider
                          LabelText="{x:Static res:AppResources.maximale_fotoabmessung}"
