@@ -20,7 +20,7 @@
     </Shell.BackButtonBehavior>
 
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+        <Grid ColumnDefinitions="*,Auto,Auto"
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
@@ -31,7 +31,18 @@
                    FontSize="18"
                    VerticalOptions="Center"
                    HorizontalOptions="Start"/>
-            <Button Grid.Column="1"
+            <Button Grid.Column="1"                    
+                    Text="{x:Static local:MaterialIcons.Recenter}"
+                    FontSize="24"
+                    Padding="0"
+                    TextColor="{DynamicResource PrimaryDark}"
+                    Background="Transparent"
+                    FontFamily="MaterialOutlined"
+                    VerticalOptions="Center"
+                    HorizontalOptions="End"
+                    ToolTipProperties.Text="{x:Static res:AppResources.plan_auf_fenstergroesse_zoomen}"                    
+                    Clicked="ZoomToPinClicked"/>
+            <Button Grid.Column="2"
                     Text="{x:Static local:MaterialIcons.More_vert}"
                     FontSize="24"
                     Padding="0"
@@ -62,9 +73,11 @@
             <VerticalStackLayout Spacing="10">
                 <!-- ═══ Kopfzeile: Icon | Name | Auf Plan zeigen ═══ -->
                 <Border Style="{StaticResource CardBorder}" Padding="8">
-                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
                         <!-- Pin-Icon mit Stift-Badge -->
-                        <Grid Grid.Column="0" WidthRequest="80" HeightRequest="80">
+                        <Grid Grid.Column="0"
+                              WidthRequest="64"
+                              HeightRequest="64">
                             <ImageButton Source="{Binding Pin.DisplayIconPath}"
                                          CornerRadius="0"
                                          BackgroundColor="Transparent"
@@ -97,31 +110,6 @@
                                                  HeightRequest="80"
                                                  Text="{Binding Pin.PinName}"
                                                  Placeholder="{x:Static res:AppResources.bezeichnung}"/>
-
-                        <!-- Auf Plan zeigen -->
-                        <VerticalStackLayout Grid.Column="2"
-                                             Spacing="0"
-                                             VerticalOptions="Center">
-                            <Button Padding="0"
-                                    HeightRequest="30"
-                                    WidthRequest="30"
-                                    Text="{x:Static local:MaterialIcons.Recenter}"
-                                    FontFamily="MaterialOutlined"
-                                    FontSize="30"
-                                    HorizontalOptions="Center"
-                                    VerticalOptions="Center"
-                                    CornerRadius="10"
-                                    BackgroundColor="Transparent"
-                                    TextColor="{DynamicResource Primary}"
-                                    Clicked="ZoomToPinClicked"/>
-                            <Label Padding="0"
-                                   Text="{x:Static res:AppResources.auf_plan_zeigen}"
-                                   FontSize="11"
-                                   HorizontalTextAlignment="Center"
-                                   MaximumWidthRequest="70"
-                                   LineBreakMode="WordWrap"
-                                   TextColor="{AppThemeBinding Light=SlateGray, Dark=LightGray}" />
-                        </VerticalStackLayout>
                     </Grid>
                 </Border>
 
