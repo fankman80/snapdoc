@@ -289,11 +289,16 @@
                                         x:Name="PlanCollectionView"
                                         ItemTemplate="{StaticResource PlanListTemplate}"
                                         ItemsSource="{Binding PlanItems}"
-                                        CanReorderItems="True"
                                         SelectionMode="None"
                                         VerticalOptions="Start"
+                                        CanReorderItems="True"
                                         ReorderCompleted="OnReorderCompleted"
-                                        SelectionChanged="OnPlanSelectionChanged"/>
+                                        SelectionChanged="OnPlanSelectionChanged">
+                            <CollectionView.ItemsLayout>
+                                <LinearItemsLayout
+                                Orientation="Vertical"/>
+                            </CollectionView.ItemsLayout>
+                        </CollectionView>
 
                         <!-- Plan hinzufuegen: feste Hoehe 44 -->
                         <Grid Grid.Row="1"

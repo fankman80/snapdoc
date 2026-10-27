@@ -1231,7 +1231,7 @@
     <value>Weitere Optionen</value>
   </data>
   <data name="pin_exportieren_hinweis" xml:space="preserve">
-    <value>In Berichten und auf Plänen berücksichtigen</value>
+    <value>Pin im Bericht darstellen</value>
   </data>
   <data name="position_sperren_hinweis" xml:space="preserve">
     <value>Verschieben auf dem Plan verhindern</value>

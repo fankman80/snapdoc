@@ -92,7 +92,7 @@
                         </Grid>
 
                         <!-- Name (editierbar) -->
-                        <controls:BorderedEditor Grid.Column="1"
+                        <controls:BorderedEditor Grid.Column="1"                                                
                                                  VerticalOptions="Start"
                                                  HeightRequest="80"
                                                  Text="{Binding Pin.PinName}"
@@ -221,7 +221,6 @@
 
                 <!-- ═══ Beschreibung ═══ -->
                 <controls:BorderedEditor Text="{Binding Pin.PinDesc}"
-                                         MaximumHeightRequest="80"
                                          Placeholder="{x:Static res:AppResources.beschreibung}"/>
 
                 <!-- ═══ Einstellungen ═══ -->

@@ -1231,7 +1231,7 @@
     <value>More options</value>
   </data>
   <data name="pin_exportieren_hinweis" xml:space="preserve">
-    <value>Include in reports and plans</value>
+    <value>Show pin in report</value>
   </data>
   <data name="position_sperren_hinweis" xml:space="preserve">
     <value>Prevent moving on the plan</value>

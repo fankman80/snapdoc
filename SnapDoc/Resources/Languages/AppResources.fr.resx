@@ -1231,7 +1231,7 @@
     <value>Plus d'options</value>
   </data>
   <data name="pin_exportieren_hinweis" xml:space="preserve">
-    <value>Inclure dans les rapports et les plans</value>
+    <value>Afficher le repère dans le rapport</value>
   </data>
   <data name="position_sperren_hinweis" xml:space="preserve">
     <value>Empêcher le déplacement sur le plan</value>

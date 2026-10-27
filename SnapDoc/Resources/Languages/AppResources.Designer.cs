@@ -2176,7 +2176,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die In Berichten und auf Plänen berücksichtigen ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin im Bericht darstellen ähnelt.
         /// </summary>
         internal static string pin_exportieren_hinweis {
             get {
