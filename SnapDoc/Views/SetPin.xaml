@@ -40,7 +40,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.plan_auf_fenstergroesse_zoomen}"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"                    
                     Clicked="ZoomToPinClicked"/>
             <Button Grid.Column="2"
                     Text="{x:Static local:MaterialIcons.More_vert}"
@@ -72,19 +72,17 @@
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="10">
                 <!-- ═══ Kopfzeile: Icon | Name | Auf Plan zeigen ═══ -->
-                <Border Style="{StaticResource CardBorder}" Padding="8">
-                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                    <Grid ColumnDefinitions="80,*" ColumnSpacing="8">
                         <!-- Pin-Icon mit Stift-Badge -->
                         <Grid Grid.Column="0"
-                              WidthRequest="64"
-                              HeightRequest="64">
+                              WidthRequest="74"
+                              HeightRequest="74">
                             <ImageButton Source="{Binding Pin.DisplayIconPath}"
-                                         CornerRadius="0"
-                                         BackgroundColor="Transparent"
-                                         Aspect="AspectFit"
-                                         Padding="4"
-                                         ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
-                                         Clicked="OnPinSelectClick" />
+                                            CornerRadius="0"
+                                            BackgroundColor="Transparent"
+                                            Aspect="AspectFit"
+                                            ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
+                                            Clicked="OnPinSelectClick" />
                             <Border IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                                     WidthRequest="32"
                                     HeightRequest="32"
@@ -96,14 +94,14 @@
                                     Padding="0"
                                     InputTransparent="True">
                                 <Label Text="{x:Static local:MaterialIcons.Edit}"
-                                       FontFamily="MaterialOutlined"
-                                       FontSize="20"
-                                       TextColor="White"
-                                       HorizontalOptions="Center"
-                                       VerticalOptions="Center" />
+                                        FontFamily="MaterialOutlined"
+                                        FontSize="20"
+                                        TextColor="White"
+                                        HorizontalOptions="Center"
+                                        VerticalOptions="Center" />
                             </Border>
-                        </Grid>
-
+                        </Grid>  
+                        
                         <!-- Name (editierbar) -->
                         <controls:BorderedEditor Grid.Column="1"                                                
                                                  VerticalOptions="Start"
@@ -111,7 +109,7 @@
                                                  Text="{Binding Pin.PinName}"
                                                  Placeholder="{x:Static res:AppResources.bezeichnung}"/>
                     </Grid>
-                </Border>
+                
 
                 <!-- ═══ Fotos: "+" Galerie scrollt rechts daneben ═══ -->
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4" HeightRequest="110">
