@@ -4,6 +4,8 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractiveRectangleDrawable
 {
+    public MeasureSettings Measure { get; set; } = new();
+    public bool IsResizing { get; set; }
     public bool HasContent => Width > 1f && Height > 1f;
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
@@ -194,6 +196,9 @@ public class InteractiveRectangleDrawable
         if (!string.IsNullOrEmpty(Text))
             DrawMultilineText(canvas);
 
+        if (Measure.IsMeasureActive)
+            DrawMeasurements(canvas);
+
         if (!DisplayHandles) return;
 
         using var handlePaint = new SKPaint
@@ -351,6 +356,39 @@ public class InteractiveRectangleDrawable
             using var outlinePath = outlineBuilder.Detach();
             canvas.DrawPath(outlinePath, linePaint);
         }
+    }
+
+    private void DrawMeasurements(SKCanvas canvas)
+    {
+        float textSize = Measure.MeasureTextSize * density;
+        using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
+
+        // Während des Aufziehens: nur Kantenmasse
+        if (!IsDrawn || IsResizing)
+        {
+            var pts = Points;
+            painter.DrawSegment(canvas, pts[0], pts[1], Measure.FormatLength(Width));   // oben
+            painter.DrawSegment(canvas, pts[1], pts[2], Measure.FormatLength(Height));  // rechts
+            return;
+        }
+
+        // Abgeschlossen: Fläche und Umfang
+        float angle = MeasureLabelPainter.Upright(AllowedAngleDeg);
+        float rad = angle * MathF.PI / 180f;
+        float sin = MathF.Sin(rad);
+        float cos = MathF.Cos(rad);
+        float lh = painter.LabelHeight;
+
+        // Verschiebung entlang der gedrehten Höhenachse
+        SKPoint At(float d) => new(Center.X - d * sin, Center.Y + d * cos);
+
+        // Ohne Text zentriert, mit Text unten im Rechteck
+        float baseOffset = string.IsNullOrWhiteSpace(Text) ? 0f : Height / 2f - lh * 1.4f;
+
+        painter.Draw(canvas, "A = " + Measure.FormatArea(Width * Height),
+                     At(baseOffset - lh * 0.65f), angle, Width);
+        painter.Draw(canvas, "U = " + Measure.FormatLength(2f * (Width + Height)),
+                     At(baseOffset + lh * 0.65f), angle, Width);
     }
 
     private static (float endAngle, float beginAngle) CalculateIntersectAngles(SKPoint p, SKPoint q, float r)

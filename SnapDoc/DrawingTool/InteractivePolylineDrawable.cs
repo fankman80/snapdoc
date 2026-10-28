@@ -4,6 +4,7 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractivePolylineDrawable
 {
+    public MeasureSettings Measure { get; set; } = new();
     public bool HasContent => Points != null && Points.Count > 1;
     public bool HasPoints => Points != null && Points.Count > 0;
     public List<SKPoint> Points { get; set; } = [];
@@ -50,6 +51,9 @@ public class InteractivePolylineDrawable
             else
                 DrawNormalPath(canvas);
         }
+
+        if (Measure.IsMeasureActive && Points.Count >= 2)
+            DrawMeasurements(canvas);
 
         // Handles auch für einen einzelnen Punkt zeichnen
         if (DisplayHandles)
@@ -272,6 +276,46 @@ public class InteractivePolylineDrawable
 
             using var outlinePath = outlineBuilder.Detach();
             canvas.DrawPath(outlinePath, linePaint);
+        }
+    }
+
+    private void DrawMeasurements(SKCanvas canvas)
+    {
+        float textSize = Measure.MeasureTextSize * density;
+        using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
+
+        bool closed = IsClosed && Points.Count >= 3;
+        int segCount = closed ? Points.Count : Points.Count - 1;
+        float total = 0f;
+
+        for (int i = 0; i < segCount; i++)
+        {
+            var a = Points[i];
+            var b = Points[(i + 1) % Points.Count];
+            float len = SKPoint.Distance(a, b);
+            total += len;
+
+            // Segmentlängen nur bei offener Polylinie anzeigen
+            if (!closed)
+                painter.DrawSegment(canvas, a, b, Measure.FormatLength(len));
+        }
+
+        if (closed)
+        {
+            var c = MeasureLabelPainter.Centroid(Points);
+            float area = MeasureLabelPainter.PolygonArea(Points);
+            float half = painter.LabelHeight * 0.65f;
+
+            // Fläche und Umfang zentriert untereinander
+            painter.Draw(canvas, "A = " + Measure.FormatArea(area), new SKPoint(c.X, c.Y - half), 0f);
+            painter.Draw(canvas, "U = " + Measure.FormatLength(total), new SKPoint(c.X, c.Y + half), 0f);
+        }
+        else if (Points.Count >= 3)
+        {
+            var last = Points[^1];
+            float offset = PointRadius * density + painter.LabelHeight;
+            painter.Draw(canvas, "L = " + Measure.FormatLength(total),
+                         new SKPoint(last.X, last.Y - offset), 0f);
         }
     }
 

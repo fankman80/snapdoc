@@ -82,6 +82,7 @@ public partial class Plan : SyncModel
     [ObservableProperty] public partial bool AllowExport { get; set; }
     [ObservableProperty] public partial string PlanColor { get; set; }
     [ObservableProperty] public partial int PinCount { get; set; }
+    [ObservableProperty] public partial float MeasureFactor { get; set; }
 
     private string _file;
     public string File

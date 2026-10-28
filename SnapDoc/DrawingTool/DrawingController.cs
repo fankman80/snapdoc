@@ -31,6 +31,32 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public float MinY { get; private set; }
     public float MaxX { get; private set; }
     public float MaxY { get; private set; }
+    public MeasureSettings Measure { get; } = new();
+
+    public bool IsMeasureActive
+    {
+        get => Measure.IsMeasureActive;
+        set { Measure.IsMeasureActive = value; canvasView?.InvalidateSurface(); }
+    }
+
+    public float MeasureFactor
+    {
+        get => Measure.MeasureFactor;
+        set
+        {
+            if (MathF.Abs(Measure.MeasureFactor - value) < 1e-9f) return;
+            Measure.MeasureFactor = value;
+            if (Measure.IsMeasureActive)
+                canvasView?.InvalidateSurface();
+        }
+    }
+
+    private void ApplyMeasureSettings()
+    {
+        if (CombinedDrawable == null) return;
+        CombinedDrawable.PolyDrawable.Measure = Measure;
+        CombinedDrawable.RectDrawable.Measure = Measure;
+    }
 
     public SKCanvasView CreateCanvasView()
     {
@@ -162,6 +188,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         arrow.HatchStrokeWitdh = hatchStrokeWitdh;
         arrow.HatchStrokeSpace = hatchStrokeSpace;
 
+        ApplyMeasureSettings();
         canvasView?.InvalidateSurface();
     }
 
@@ -267,6 +294,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 if (activeIndex != null)
                 {
                     rectResizeAnchor = rect.GetOppositePoint(activeIndex.Value);
+                    rect.IsResizing = true;
                     DisableViewTransforms();
                 }
             }
@@ -392,6 +420,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable?.RectDrawable;
+
+            rect?.IsResizing = false;
 
             if (rect is { IsDrawn: false })
                 rect.IsDrawn = true;
@@ -781,6 +811,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         // Wir laden das DTO und befüllen das CombinedDrawable
         var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position, this);
+        ApplyMeasureSettings();
 
         if (dto != null)
         {

@@ -343,7 +343,8 @@ public partial class LoadPDFPages : ContentPage
                     ImageSize = new Size(item.FinalWidth, item.FinalHeight),
                     IsGrayscale = false,
                     AllowExport = true,
-                    PlanColor = "#00FFFFFF"
+                    PlanColor = "#00FFFFFF",
+                    MeasureFactor = 20
                 };
                 plan.Touch();
 

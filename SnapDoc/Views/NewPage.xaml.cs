@@ -45,6 +45,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Color selectedFillColor = new(202, 255, 150, 128);
     private Color selectedTextColor = new(0, 0, 0, 255);
     private bool isToolButtonsVisible = false;
+    private bool isMeasureVisible = false;
     private MapPin _editingCustomPin;
     private readonly Dictionary<string, bool> _pendingLockChanges = [];
     public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
@@ -53,13 +54,51 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public Color SelectedFillColor { get => selectedFillColor; set { selectedFillColor = value; OnPropertyChanged(); }}
     public Color SelectedTextColor { get => selectedTextColor; set { selectedTextColor = value; OnPropertyChanged(); }}
     public bool IsToolButtonsVisible { get => isToolButtonsVisible; set { isToolButtonsVisible = value; OnPropertyChanged(); }}
+    public bool IsMeasurePanelVisible => IsMeasureVisible && drawMode is DrawMode.Rect or DrawMode.Poly;
+    public bool IsMeasureVisible
+    {
+        get => isMeasureVisible;
+        set
+        {
+            if (isMeasureVisible == value) return;
+            isMeasureVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsMeasurePanelVisible));
+
+            if (value && drawingView != null)
+                drawingController.MeasureFactor = GetCurrentMeasureFactor();
+            drawingController.IsMeasureActive = value;
+        }
+    }
+
+    public float PlanMeasureFactor
+    {
+        get => thisPlan?.MeasureFactor ?? 1f;
+        set
+        {
+            if (thisPlan == null) return;
+            if (!float.IsFinite(value) || value <= 0) return;   // ungültige Eingaben ignorieren
+            if (MathF.Abs(thisPlan.MeasureFactor - value) < 1e-6f) return;
+
+            thisPlan.MeasureFactor = value;
+            thisPlan.Touch();
+            SaveManager.NotifyDataChanged();
+
+            OnPropertyChanged();
+
+            // Laufende Zeichnung sofort aktualisieren
+            if (drawingView != null)
+                drawingController.MeasureFactor = GetCurrentMeasureFactor();
+        }
+    }
 
     public NewPage(string _planId)
     {
-        InitializeComponent();
         planId = _planId;
-        drawingController = new DrawingController(new TransformViewModel());
         thisPlan = GlobalJson.Data.Plans[planId];
+        drawingController = new DrawingController(new TransformViewModel());
+
+        InitializeComponent();
 
         RegisterMessenger();
     }
@@ -79,6 +118,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.CanvasTapped += OnCanvasTapped;
         PlanImage.CanvasLongPressed += OnCanvasLongPressed;
         PlanImage.PinMoved += OnPinMoved;
+        PlanImage.PropertyChanged += OnPlanImagePropertyChanged;
 
         if (isFirstLoad)
         {
@@ -120,6 +160,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.CanvasTapped -= OnCanvasTapped;
         PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
         PlanImage.PinMoved -= OnPinMoved;
+        PlanImage.PropertyChanged -= OnPlanImagePropertyChanged;
 
         if (!_isShowingPopup)
             Cleanup();
@@ -701,6 +742,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 );
 
                 drawingController.InitialRotation = (float)PlanImage.CurrentRotation;
+                drawingController.MeasureFactor = GetCurrentMeasureFactor();
+                drawingController.Measure.MeasureTextSize = 16f;
+                drawingController.Measure.MeasureUnit = "m";
+                drawingController.IsMeasureActive = IsMeasureVisible;
 
                 drawingView.InvalidateSurface();
                 await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
@@ -713,6 +758,33 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 IsToolButtonsVisible = false;
             }
         });
+    }
+
+    private float GetCurrentMeasureFactor() => 1f / PlanImage.CurrentScale * (float)(0.0254 / 72) * thisPlan.MeasureFactor;
+
+    private void OnPlanImagePropertyChanged(object sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName != nameof(TileImageView.CurrentScale)) return;
+        if (drawingView == null || thisPlan == null || !drawingController.IsMeasureActive) return;
+        if (PlanImage.CurrentScale <= 0) return;
+
+        drawingController.MeasureFactor = GetCurrentMeasureFactor();
+    }
+
+    private void OnMeasureFactorConfirmed(object sender, EventArgs e)
+    {
+        if (thisPlan == null) return;
+
+        var text = MeasureFactorEntry.Text?.Trim().Replace(',', '.');
+        if (float.TryParse(text, System.Globalization.NumberStyles.Float,
+                           System.Globalization.CultureInfo.InvariantCulture, out var value))
+        {
+            PlanMeasureFactor = value;
+        }
+
+        // Anzeige auf gültigen Wert zurücksetzen und Tastatur schliessen
+        MeasureFactorEntry.Text = PlanMeasureFactor.ToString(System.Globalization.CultureInfo.InvariantCulture);
+        MeasureFactorEntry.Unfocus();
     }
 
     private async void DrawingClicked(object sender, EventArgs e) => await StartDrawing();
@@ -754,9 +826,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         drawMode = mode;
         drawingController.DrawMode = mode;
+        OnPropertyChanged(nameof(IsMeasurePanelVisible));
 
         AddTextBtn.IsVisible = mode is DrawMode.Rect or DrawMode.Oval;
         AddCloudyBtn.IsVisible = mode is DrawMode.Poly or DrawMode.Rect or DrawMode.Oval;
+        AddMeasureBtn.IsVisible = mode is DrawMode.Rect or DrawMode.Poly;
 
         var combined = drawingController.CombinedDrawable;
 
@@ -884,6 +958,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         RemoveDrawingView();
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
+        OnPropertyChanged(nameof(IsMeasurePanelVisible));
         IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
@@ -1058,6 +1133,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
         drawingView?.InvalidateSurface();
     }
+
+    private void OnToggleMeasureClicked(object sender, EventArgs e) => IsMeasureVisible = !IsMeasureVisible;
 
     private void OnFullScreenButtonClicked(object sender, EventArgs e)
     {
