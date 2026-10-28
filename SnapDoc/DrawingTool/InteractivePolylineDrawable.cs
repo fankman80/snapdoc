@@ -5,6 +5,7 @@ namespace SnapDoc.DrawingTool;
 public class InteractivePolylineDrawable
 {
     public bool HasContent => Points != null && Points.Count > 1;
+    public bool HasPoints => Points != null && Points.Count > 0;
     public List<SKPoint> Points { get; set; } = [];
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
@@ -39,15 +40,18 @@ public class InteractivePolylineDrawable
 
     public void Draw(SKCanvas canvas)
     {
-        if (Points.Count < 2) return;
+        if (Points.Count == 0) return;
 
-        // Entweder als Wolke oder als normale Linie zeichnen
-        if (IsCloud)
-            DrawCloudPath(canvas);
-        else
-            DrawNormalPath(canvas);
+        // Linie/Wolke erst ab 2 Punkten zeichnen
+        if (Points.Count >= 2)
+        {
+            if (IsCloud)
+                DrawCloudPath(canvas);
+            else
+                DrawNormalPath(canvas);
+        }
 
-        // Handles werden in beiden Modi exakt gleich gezeichnet
+        // Handles auch für einen einzelnen Punkt zeichnen
         if (DisplayHandles)
         {
             using var handleStroke = new SKPaint

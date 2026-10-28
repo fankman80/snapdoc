@@ -15,7 +15,7 @@ public class CombinedDrawable
         if (FreeDrawable?.HasContent == true)
             FreeDrawable.Draw(canvas);
 
-        if (PolyDrawable?.HasContent == true)
+        if (PolyDrawable?.HasPoints == true)
             PolyDrawable.Draw(canvas);
 
         if (RectDrawable?.HasContent == true)

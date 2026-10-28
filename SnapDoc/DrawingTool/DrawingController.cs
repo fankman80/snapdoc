@@ -595,7 +595,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         bool polyEmpty =
             CombinedDrawable.PolyDrawable == null ||
-            CombinedDrawable.PolyDrawable.Points.Count == 0;
+            !CombinedDrawable.PolyDrawable.HasContent;
 
         bool freeEmpty =
             CombinedDrawable.FreeDrawable == null ||
