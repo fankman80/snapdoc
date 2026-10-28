@@ -237,7 +237,7 @@ public partial class PinItem : ModelItem<Pin>
         set => SetProperty(ref _priorityColor, value);
     }
 
-    public List<string> PinPriorites { get; } =
+    public List<string> PinPriorities { get; } =
         [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
 
     private void UpdatePriorityColor()

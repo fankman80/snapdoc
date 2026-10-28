@@ -24,7 +24,6 @@
               ColumnSpacing="0"
               VerticalOptions="Center">
             <Label Grid.Column="0"
-                   x:DataType="views:SetPin"
                    Text="{Binding Title, Source={x:Reference Name=ThisPage}}"
                    TextColor="{DynamicResource PrimaryDark}"
                    BackgroundColor="Transparent"
@@ -59,7 +58,6 @@
     <ContentPage.Resources>
         <!-- Karten -->
         <Style x:Key="CardBorder" TargetType="Border">
-            <Setter Property="StrokeShape" Value="8" />
             <Setter Property="StrokeThickness" Value="0" />
             <Setter Property="Stroke" Value="{AppThemeBinding Light={DynamicResource Gray300}, Dark=#1FFFFFFF}" />
             <Setter Property="BackgroundColor" Value="{AppThemeBinding Light={DynamicResource Gray050}, Dark=#14FFFFFF}" />
@@ -72,18 +70,18 @@
         <ScrollView Grid.Row="0">
             <VerticalStackLayout Spacing="10">
                 <!-- ═══ Kopfzeile: Icon | Name | Auf Plan zeigen ═══ -->
-                    <Grid ColumnDefinitions="80,*" ColumnSpacing="8">
-                        <!-- Pin-Icon mit Stift-Badge -->
-                        <Grid Grid.Column="0"
+                <Grid ColumnDefinitions="80,*" ColumnSpacing="8">
+                    <!-- Pin-Icon mit Stift-Badge -->
+                    <Grid Grid.Column="0"
                               WidthRequest="74"
                               HeightRequest="74">
-                            <ImageButton Source="{Binding Pin.DisplayIconPath}"
+                        <ImageButton Source="{Binding Pin.DisplayIconPath}"
                                             CornerRadius="0"
                                             BackgroundColor="Transparent"
                                             Aspect="AspectFit"
                                             ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
                                             Clicked="OnPinSelectClick" />
-                            <Border IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
+                        <Border IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
                                     WidthRequest="32"
                                     HeightRequest="32"
                                     StrokeShape="RoundRectangle 16"
@@ -93,23 +91,23 @@
                                     VerticalOptions="End"
                                     Padding="0"
                                     InputTransparent="True">
-                                <Label Text="{x:Static local:MaterialIcons.Edit}"
+                            <Label Text="{x:Static local:MaterialIcons.Edit}"
                                         FontFamily="MaterialOutlined"
                                         FontSize="20"
                                         TextColor="White"
                                         HorizontalOptions="Center"
                                         VerticalOptions="Center" />
-                            </Border>
-                        </Grid>  
-                        
-                        <!-- Name (editierbar) -->
-                        <controls:BorderedEditor Grid.Column="1"                                                
+                        </Border>
+                    </Grid>
+
+                    <!-- Name (editierbar) -->
+                    <controls:BorderedEditor Grid.Column="1"                                                
                                                  VerticalOptions="Start"
                                                  HeightRequest="80"
                                                  Text="{Binding Pin.PinName}"
                                                  Placeholder="{x:Static res:AppResources.bezeichnung}"/>
-                    </Grid>
-                
+                </Grid>
+
 
                 <!-- ═══ Fotos: "+" Galerie scrollt rechts daneben ═══ -->
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4" HeightRequest="110">
@@ -153,7 +151,6 @@
                         </CollectionView.ItemsLayout>
                         <CollectionView.ItemTemplate>
                             <DataTemplate x:DataType="local:FotoItem">
-                                <!-- Abstand per Margin, da die Kurzform kein ItemSpacing hat -->
                                 <Border WidthRequest="110"
                                         HeightRequest="110"
                                         StrokeShape="RoundRectangle 10"
@@ -235,7 +232,7 @@
                             <controls:CustomRadioPicker x:Name="PriorityPicker"
                                                         BackgroundColor="Transparent"
                                                         BorderThickness="0"
-                                                        ItemsSource="{Binding Pin.PinPriorites}"
+                                                        ItemsSource="{Binding Pin.PinPriorities}"
                                                         SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}" />
                         </Border>
                         <Button Grid.Column="3"
@@ -243,7 +240,7 @@
                                 Text="{x:Static local:MaterialIcons.Edit_note}"
                                 FontSize="35"
                                 FontFamily="MaterialOutlined"
-                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource Primary}}"
+                                TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                 BackgroundColor="Transparent"
                                 VerticalOptions="Center"
                                 ToolTipProperties.Text="{x:Static res:AppResources.text_bearbeiten}"
@@ -310,6 +307,16 @@
             </VerticalStackLayout>
         </ScrollView>
 
+        <!-- ═══ Fixierte Hauptaktion ═══ -->
+        <Button Grid.Row="1"
+                HorizontalOptions="{OnIdiom Phone=Fill, Default=End}"
+                Text="{x:Static res:AppResources.speichern}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=22, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
+                ContentLayout="Left,10"
+                Clicked="OnOkayClicked" />
+        
         <!-- ═══ ⋮-Menü ═══ -->
         <Grid x:Name="MoreMenuOverlay"
               Grid.RowSpan="2"
@@ -376,16 +383,6 @@
                     </Grid>
                 </VerticalStackLayout>
             </Border>
-        </Grid>
-
-        <!-- ═══ Fixierte Hauptaktion ═══ -->
-        <Button Grid.Row="1"
-                HorizontalOptions="{OnIdiom Phone=Fill, Default=End}"
-                Text="{x:Static res:AppResources.speichern}"
-                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                TextColor="{DynamicResource PrimaryDarkText}"
-                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=22, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
-                ContentLayout="Left,10"
-                Clicked="OnOkayClicked" />
+        </Grid>        
     </Grid>
 </ContentPage>
