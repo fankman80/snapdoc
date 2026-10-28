@@ -25,7 +25,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
-    private static readonly bool UseTouchLift = true; //= DeviceInfo.Platform != DevicePlatform.WinUI;
+    private static readonly bool UseTouchLift = DeviceInfo.Platform != DevicePlatform.WinUI;
     private SKPoint touchLift = SKPoint.Empty;
     private bool isLiftActive = false;
 
