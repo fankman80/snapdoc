@@ -160,7 +160,8 @@
                                         FontSize="30"
                                         FontFamily="MaterialOutlined"
                                         BackgroundColor="Transparent"
-                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"                                            
+                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
                                         Clicked="OnPinClicked"/>
 
                                 <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
@@ -172,7 +173,8 @@
                                         FontSize="30"
                                         FontFamily="MaterialOutlined"
                                         BackgroundColor="Transparent"
-                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"                                            
+                                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"
                                         Clicked="OnPinClicked"/>
 
                                 <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
@@ -182,6 +184,7 @@
                                         FontFamily="MaterialOutlined"
                                         BackgroundColor="Transparent"
                                         TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                        ToolTipProperties.Text="{x:Static res:AppResources.pin_exportieren}"
                                         Clicked="OnAllowExportClicked"/>
                             </Grid>
                         </Border>

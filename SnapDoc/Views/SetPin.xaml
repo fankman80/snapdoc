@@ -40,7 +40,7 @@
                     FontFamily="MaterialOutlined"
                     VerticalOptions="Center"
                     HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"                    
+                    ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"                    
                     Clicked="ZoomToPinClicked"/>
             <Button Grid.Column="2"
                     Text="{x:Static local:MaterialIcons.More_vert}"
