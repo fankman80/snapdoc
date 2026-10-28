@@ -239,14 +239,26 @@
                            VerticalOptions="Center"
                            TextColor="White" 
                            Text="{x:Static res:AppResources.massstab}"/>
-                    <local:BorderlessEntry x:Name="MeasureFactorEntry"
-                           Grid.Column="1"
-                           Text="{Binding PlanMeasureFactor, Source={x:Reference Name=ThisPage}, Mode=OneWay}"
-                           Keyboard="Numeric"
-                           WidthRequest="60"
-                           HorizontalTextAlignment="Center"
-                           BackgroundColor="White"
-                           Completed="OnMeasureFactorConfirmed"/>
+                    <Border Grid.Column="1"
+                            BackgroundColor="White"
+                            StrokeThickness="0"
+                            WidthRequest="70"
+                            HeightRequest="36"
+                            VerticalOptions="Center">
+                        <Border.StrokeShape>
+                            <RoundRectangle CornerRadius="6"/>
+                        </Border.StrokeShape>
+                        <local:BorderlessEntry x:Name="MeasureFactorEntry"
+                                               Text="{Binding PlanMeasureFactor, Source={x:Reference Name=ThisPage}, Mode=OneWay}"
+                                               Keyboard="Numeric"
+                                               TextColor="Black"
+                                               BackgroundColor="Transparent"
+                                               HorizontalTextAlignment="Center"
+                                               VerticalTextAlignment="Center"
+                                               VerticalOptions="Center"
+                                               Margin="0"
+                                               Completed="OnMeasureFactorConfirmed"/>
+                    </Border>
                     <Button Grid.Column="2"
                             Text="{x:Static local:MaterialIcons.Check}"                        
                             FontSize="36"
@@ -261,7 +273,7 @@
                             Clicked="OnMeasureFactorConfirmed"/>
                 </Grid>
             </Border>
-
+            
             <Button x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                     IsVisible="{Binding IsButtonActuallyVisible}"
                     Margin="0,0,16,16"

@@ -25,6 +25,34 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
+    private static readonly bool UseTouchLift = true; //= DeviceInfo.Platform != DevicePlatform.WinUI;
+    private SKPoint touchLift = SKPoint.Empty;
+    private bool isLiftActive = false;
+
+    private bool IsHandleDrag() => DrawMode switch
+    {
+        DrawMode.Poly => activeIndex != null,
+        DrawMode.Rect => activeIndex != null && !isRotatingRectangle,
+        DrawMode.Oval => activeIndex != null && !isRotatingOval,
+        DrawMode.Arrow => activeIndex != null && !isRotatingArrow,
+        _ => false
+    };
+
+    private SKPoint ComputeLift()
+    {
+        float density = (float)Settings.DisplayDensity;
+        float x = SettingsService.Instance.TouchLiftDp.X * density;
+        float y = SettingsService.Instance.TouchLiftDp.Y * density;
+
+        // Bildschirm-Versatz in Canvas-Koordinaten umrechnen (ViewRotation rückgängig machen)
+        float a = (float)(-ViewRotation * Math.PI / 180.0);
+        float cos = MathF.Cos(a);
+        float sin = MathF.Sin(a);
+
+        return new SKPoint(x * cos - y * sin,
+                           x * sin + y * cos);
+    }
+
     public float InitialRotation = 0f;
     public double ViewRotation { get => canvasView?.Rotation ?? 0; set { canvasView?.Rotation = value; }}
     public float MinX { get; private set; }
@@ -228,6 +256,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void OnStartInteraction(SKPoint p)
     {
+        isLiftActive = false; 
+        
         if (CombinedDrawable == null) return;
 
         if (DrawMode == DrawMode.Poly)
@@ -361,8 +391,20 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     {
         if (CombinedDrawable == null) return;
 
+        // Beim ersten Move eines Handle-Drags einmalig nach oben springen
+        SKPoint h = p;
+        if (UseTouchLift && IsHandleDrag())
+        {
+            if (!isLiftActive)
+            {
+                touchLift = ComputeLift();
+                isLiftActive = true;
+            }
+            h = new SKPoint(p.X + touchLift.X, p.Y + touchLift.Y);
+        }
+
         if (DrawMode == DrawMode.Poly && activeIndex != null)
-            CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = p;
+            CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = h;
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable.FreeDrawable.AddPoint(p);
         else if (DrawMode == DrawMode.Rect)
@@ -373,7 +415,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             if (isRotatingRectangle)
                 rect.SetRotationFromPoint(p);
             else if (activeIndex != null && rectResizeAnchor.HasValue)
-                rect.SetFromDrag(rectResizeAnchor.Value, p);
+                rect.SetFromDrag(rectResizeAnchor.Value, h);
             else if (rectDragStart.HasValue)
                 rect.SetFromDrag(rectDragStart.Value, p);
         }
@@ -385,7 +427,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             if (isRotatingOval)
                 oval.SetRotationFromPoint(p);
             else if (activeIndex != null)
-                oval.ResizeFromHandle(activeIndex.Value, p);
+                oval.ResizeFromHandle(activeIndex.Value, h);
             else if (ovalDragStart.HasValue)
                 oval.SetFromDrag(ovalDragStart.Value, p);
         }
@@ -397,9 +439,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             if (isRotatingArrow)
                 arrow.SetRotationFromPoint(p);
             else if (activeIndex == 4)
-                arrow.UpdateShape(p);
+                arrow.UpdateShape(h);
             else if (activeIndex != null && arrowResizeAnchor.HasValue)
-                arrow.SetFromDrag(arrowResizeAnchor.Value, p);
+                arrow.SetFromDrag(arrowResizeAnchor.Value, h);
             else if (arrowDragStart.HasValue)
                 arrow.SetFromDrag(arrowDragStart.Value, p);
         }
@@ -410,13 +452,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private void OnEndInteraction()
     {
         if (DrawMode == DrawMode.Poly)
-        {
             activeIndex = null;
-        }
         else if (DrawMode == DrawMode.Free)
-        {
             CombinedDrawable?.FreeDrawable.EndStroke();
-        }
         else if (DrawMode == DrawMode.Rect)
         {
             var rect = CombinedDrawable?.RectDrawable;
@@ -456,6 +494,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             arrowDragStart = null;
         }
 
+        isLiftActive = false;
         EnableViewTransforms();
 
         canvasView?.InvalidateSurface();

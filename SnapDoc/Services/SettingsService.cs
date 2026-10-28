@@ -4,6 +4,7 @@ using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.Text.Json;
+using SkiaSharp;
 
 namespace SnapDoc.Services;
 
@@ -144,10 +145,11 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial string EditorTheme { get; set; } = "3024-night";
     [ObservableProperty] public partial float PolyLineHandleRadius { get; set; } = 10f;
     [ObservableProperty] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
+    [ObservableProperty] public partial SKPoint TouchLiftDp { get; set; } = new(-0f, -40f);
     [ObservableProperty] public partial int DoubleClickThresholdMs { get; set; } = 300;
     [ObservableProperty] public partial string PolyLineHandleColor { get; set; } = "#ffffff";
     [ObservableProperty] public partial string PolyLineStartHandleColor { get; set; } = "#00FF00";
-    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 160;
+    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 80;
     [ObservableProperty] public partial Point CustomPinOffset { get; set; } = new(0,0);
     [ObservableProperty] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
     [ObservableProperty] public partial string SelectedTemplate { get; set; }
@@ -393,6 +395,7 @@ public partial class SettingsService : ObservableObject
             EditorTheme = EditorTheme,
             PolyLineHandleRadius = PolyLineHandleRadius,
             PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
+            TouchLiftDp = TouchLiftDp,
             DoubleClickThresholdMs = DoubleClickThresholdMs,
             PolyLineHandleColor = PolyLineHandleColor,
             PolyLineStartHandleColor = PolyLineStartHandleColor,
@@ -497,6 +500,7 @@ public partial class SettingsService : ObservableObject
             IsGpsActive = settings.IsGpsActive ?? defaultSettings.IsGpsActive;
             PolyLineHandleRadius = settings.PolyLineHandleRadius ?? defaultSettings.PolyLineHandleRadius;
             PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius ?? defaultSettings.PolyLineHandleTouchRadius;
+            TouchLiftDp = settings.TouchLiftDp ?? defaultSettings.TouchLiftDp;
             DoubleClickThresholdMs = settings.DoubleClickThresholdMs ?? defaultSettings.DoubleClickThresholdMs;
             PolyLineHandleAlpha = settings.PolyLineHandleAlpha ?? defaultSettings.PolyLineHandleAlpha;
             CustomPinOffset = settings.CustomPinOffset ?? defaultSettings.CustomPinOffset;
@@ -579,6 +583,7 @@ public partial class SettingsService : ObservableObject
         EditorTheme = defaultSettings.EditorTheme;
         PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
         PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;
+        TouchLiftDp = defaultSettings.TouchLiftDp;
         DoubleClickThresholdMs = defaultSettings.DoubleClickThresholdMs;
         PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
         PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
