@@ -1245,4 +1245,13 @@
   <data name="angemeldet_als" xml:space="preserve">
     <value>Angemeldet als:</value>
   </data>
+  <data name="wolkenumrandung_ein_ausschalten" xml:space="preserve">
+    <value>Wolkenumrandung ein-/ausschalten</value>
+  </data>
+  <data name="bemassung_ein_ausschalten" xml:space="preserve">
+    <value>Bemassung ein-/ausschalten</value>
+  </data>
+  <data name="massstab" xml:space="preserve">
+    <value>Massstab</value>
+  </data>
 </root>

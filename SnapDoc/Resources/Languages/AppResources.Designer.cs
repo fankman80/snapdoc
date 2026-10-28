@@ -349,6 +349,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bemassung ein-/ausschalten ähnelt.
+        /// </summary>
+        internal static string bemassung_ein_ausschalten {
+            get {
+                return ResourceManager.GetString("bemassung_ein_ausschalten", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Berechtigung fehlt ähnelt.
         /// </summary>
         internal static string berechtigung_fehlt {
@@ -1785,6 +1794,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string lupengroesse {
             get {
                 return ResourceManager.GetString("lupengroesse", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Massstab ähnelt.
+        /// </summary>
+        internal static string massstab {
+            get {
+                return ResourceManager.GetString("massstab", resourceCulture);
             }
         }
         
@@ -3297,6 +3315,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string wolken_ueberschneidung {
             get {
                 return ResourceManager.GetString("wolken_ueberschneidung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wolkenumrandung ein-/ausschalten ähnelt.
+        /// </summary>
+        internal static string wolkenumrandung_ein_ausschalten {
+            get {
+                return ResourceManager.GetString("wolkenumrandung_ein_ausschalten", resourceCulture);
             }
         }
         

@@ -235,7 +235,10 @@
                 <Grid ColumnDefinitions="Auto,Auto,Auto"
                       ColumnSpacing="6"
                       Padding="6">
-                    <Label Grid.Column="0" VerticalOptions="Center" TextColor="White" Text="Massstab"/>
+                    <Label Grid.Column="0"
+                           VerticalOptions="Center"
+                           TextColor="White" 
+                           Text="{x:Static res:AppResources.massstab}"/>
                     <local:BorderlessEntry x:Name="MeasureFactorEntry"
                            Grid.Column="1"
                            Text="{Binding PlanMeasureFactor, Source={x:Reference Name=ThisPage}, Mode=OneWay}"
@@ -342,18 +345,28 @@
                         IsVisible="False"
                         Text="{x:Static local:MaterialIcons.Cloud_off}" 
                         Style="{StaticResource ToolButtonStyle}"
-                        ToolTipProperties.Text="Wolke ein/ausschalten"
+                        ToolTipProperties.Text="{x:Static res:AppResources.wolkenumrandung_ein_ausschalten}"
                         Clicked="CloudyClicked"/>
                 <Grid x:Name="AddMeasureBtn"
                       IsVisible="True">
                     <Button Text="{x:Static local:MaterialIcons.Straighten}"
-                            Style="{StaticResource ToolButtonStyle}"
+                            Style="{StaticResource ToolButtonStyle}"        
+                            ToolTipProperties.Text="{x:Static res:AppResources.bemassung_ein_ausschalten}"
                             Clicked="OnToggleMeasureClicked"/>
+                    <BoxView InputTransparent="True"
+                             IsVisible="{Binding IsMeasureVisible, Source={x:Reference Name=ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
+                             Color="{DynamicResource Primary}"
+                             WidthRequest="6"
+                             HeightRequest="38"
+                             CornerRadius="0"
+                             Rotation="-45"
+                             HorizontalOptions="Center"
+                             VerticalOptions="Center"/>
                     <BoxView InputTransparent="True"
                              IsVisible="{Binding IsMeasureVisible, Source={x:Reference Name=ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
                              Color="{DynamicResource PrimaryDarkText}"
                              WidthRequest="2"
-                             HeightRequest="38"
+                             HeightRequest="36"
                              CornerRadius="0"
                              Rotation="-45"
                              HorizontalOptions="Center"

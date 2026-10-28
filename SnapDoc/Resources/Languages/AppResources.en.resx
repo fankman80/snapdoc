@@ -1245,4 +1245,13 @@
   <data name="angemeldet_als" xml:space="preserve">
     <value>Logged in as:</value>
   </data>
+  <data name="wolkenumrandung_ein_ausschalten" xml:space="preserve">
+    <value>Toggle cloud markup</value>
+  </data>
+  <data name="bemassung_ein_ausschalten" xml:space="preserve">
+    <value>Toggle dimensioning</value>
+  </data>
+  <data name="massstab" xml:space="preserve">
+    <value>Scale</value>
+  </data>
 </root>
