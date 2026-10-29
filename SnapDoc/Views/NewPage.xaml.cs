@@ -55,6 +55,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     public Color SelectedTextColor { get => selectedTextColor; set { selectedTextColor = value; OnPropertyChanged(); }}
     public bool IsToolButtonsVisible { get => isToolButtonsVisible; set { isToolButtonsVisible = value; OnPropertyChanged(); }}
     public bool IsMeasurePanelVisible => IsMeasureVisible && drawMode is DrawMode.Rect or DrawMode.Poly;
+    public string PlanMeasureFactorText => PlanMeasureFactor.ToString(System.Globalization.CultureInfo.InvariantCulture);
     public bool IsMeasureVisible
     {
         get => isMeasureVisible;
@@ -85,6 +86,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SaveManager.NotifyDataChanged();
 
             OnPropertyChanged();
+            OnPropertyChanged(nameof(PlanMeasureFactorText));
 
             // Laufende Zeichnung sofort aktualisieren
             if (drawingView != null)
@@ -99,6 +101,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController = new DrawingController(new TransformViewModel());
 
         InitializeComponent();
+
+        MeasureFactorEntry.UseDecimalInput();
 
         RegisterMessenger();
     }

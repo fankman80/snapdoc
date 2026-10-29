@@ -28,12 +28,14 @@
                 HeightRequest="{Binding IconPreviewHeight, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x+24'}" />
             
             <VerticalStackLayout Grid.Column="1">
-                <controls:BorderedEntry
-                    Text="{Binding Anchor_X_Text}"
-                    Placeholder="{x:Static res:AppResources.anker_x}"/>
-                <controls:BorderedEntry
-                    Text="{Binding Anchor_Y_Text}"
-                    Placeholder="{x:Static res:AppResources.anker_y}"/>
+                <controls:BorderedEntry x:Name="AnchorXEntry"
+                                        Keyboard="Numeric"
+                                        Text="{Binding Anchor_X_Text}"
+                                        Placeholder="{x:Static res:AppResources.anker_x}"/>
+                <controls:BorderedEntry x:Name="AnchorYEntry"
+                                        Keyboard="Numeric"
+                                        Text="{Binding Anchor_Y_Text}"
+                                        Placeholder="{x:Static res:AppResources.anker_y}"/>
             </VerticalStackLayout>
         </Grid>
         

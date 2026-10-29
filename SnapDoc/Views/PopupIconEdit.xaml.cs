@@ -50,6 +50,9 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
     {
         InitializeComponent();
 
+        AnchorXEntry.Entry.UseDecimalInput();
+        AnchorYEntry.Entry.UseDecimalInput();
+
         iconItem = _iconItem;
 
         iconName.Text = iconItem.DisplayName;
@@ -65,6 +68,8 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
         Anchor_X = iconItem.AnchorPoint.X;
         Anchor_Y = iconItem.AnchorPoint.Y;
+        anchor_X_Text = Format(Anchor_X);
+        anchor_Y_Text = Format(Anchor_Y);
 
         IconScale = iconItem.IconScale;
         allowRotate.IsToggled = iconItem.IsRotationLocked;

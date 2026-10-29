@@ -249,7 +249,7 @@
                             <RoundRectangle CornerRadius="6"/>
                         </Border.StrokeShape>
                         <local:BorderlessEntry x:Name="MeasureFactorEntry"
-                                               Text="{Binding PlanMeasureFactor, Source={x:Reference Name=ThisPage}, Mode=OneWay}"
+                                               Text="{Binding PlanMeasureFactorText, Source={x:Reference Name=ThisPage}, Mode=OneWay}"
                                                Keyboard="Numeric"
                                                TextColor="Black"
                                                BackgroundColor="Transparent"

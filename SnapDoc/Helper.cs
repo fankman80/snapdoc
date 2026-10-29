@@ -595,3 +595,26 @@ public partial class SquareView : ContentView
         return base.MeasureOverride(widthConstraint, heightConstraint);
     }
 }
+
+public static class EntryExtensions
+{
+    /// <summary>Numerische Tastatur, auf Android Punkt und Komma als Dezimalzeichen erlauben.</summary>
+    public static void UseDecimalInput(this Entry entry)
+    {
+        entry.Keyboard = Keyboard.Numeric;
+
+#if ANDROID
+        void Apply()
+        {
+            if (entry.Handler?.PlatformView is Android.Widget.EditText et)
+            {
+                et.InputType = Android.Text.InputTypes.ClassNumber | Android.Text.InputTypes.NumberFlagDecimal;
+                et.KeyListener = Android.Text.Method.DigitsKeyListener.GetInstance("0123456789.,");
+            }
+        }
+
+        entry.HandlerChanged += (s, e) => Apply();
+        Apply();   // falls der Handler schon existiert
+#endif
+    }
+}

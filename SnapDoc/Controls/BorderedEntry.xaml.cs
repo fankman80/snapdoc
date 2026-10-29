@@ -6,7 +6,7 @@ namespace SnapDoc.Controls;
 public partial class BorderedEntry : ContentView
 {
     public event EventHandler<TextChangedEventArgs>? TextChanged;
-
+    public Entry Entry => InnerEntry;
     public static readonly BindableProperty TextProperty = BindableProperty.Create(nameof(Text), typeof(string), typeof(BorderedEntry), defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnTextChanged);
     public static readonly BindableProperty PlaceholderProperty = BindableProperty.Create(nameof(Placeholder), typeof(string), typeof(BorderedEntry), string.Empty);
     public static readonly BindableProperty PlaceholderColorProperty = BindableProperty.Create(nameof(PlaceholderColor), typeof(Color), typeof(BorderedEntry), Colors.Gray);

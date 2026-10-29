@@ -1,12 +1,19 @@
 ﻿using SkiaSharp;
+using System.Globalization;
 namespace SnapDoc.DrawingTool;
 
 public class MeasureSettings
 {
+    private float measureFactor = 1f;
+    private static readonly NumberFormatInfo MeasureFormat = new()
+    {
+        NumberDecimalSeparator = ".",
+        NumberGroupSeparator = "'",
+        NumberGroupSizes = [3]
+    };
+
     public bool IsMeasureActive { get; set; } = false;
 
-    private float measureFactor = 1f;
-    /// <summary>Umrechnungsfaktor Pixel → Einheit (z.B. 0.01 für 1px = 1cm → m).</summary>
     public float MeasureFactor
     {
         get => measureFactor;
@@ -18,10 +25,6 @@ public class MeasureSettings
     public float MeasureTextSize { get; set; } = 12f;
     public SKColor MeasureTextColor { get; set; } = SKColors.Black;
     public SKColor MeasureBackgroundColor { get; set; } = SKColors.White.WithAlpha(210);
-
-    public string FormatLength(float px) =>
-        $"{(px * MeasureFactor).ToString("N" + MeasureDecimals)} {MeasureUnit}";
-
-    public string FormatArea(float px2) =>
-        $"{(px2 * MeasureFactor * MeasureFactor).ToString("N" + MeasureDecimals)} {MeasureUnit}²";
+    public string FormatLength(float px) => $"{(px * MeasureFactor).ToString("N" + MeasureDecimals, MeasureFormat)} {MeasureUnit}";
+    public string FormatArea(float px2) => $"{(px2 * MeasureFactor * MeasureFactor).ToString("N" + MeasureDecimals, MeasureFormat)} {MeasureUnit}²";
 }
