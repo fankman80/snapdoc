@@ -282,6 +282,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             activeIndex = poly.FindPointIndex(p.X, p.Y);
             if (activeIndex != null)
             {
+                poly.IsResizing = true;   // ← neu
                 DisableViewTransforms();
             }
 
@@ -452,7 +453,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private void OnEndInteraction()
     {
         if (DrawMode == DrawMode.Poly)
+        {
+            if (CombinedDrawable?.PolyDrawable is { } poly)
+                poly.IsResizing = false;
             activeIndex = null;
+        }
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable?.FreeDrawable.EndStroke();
         else if (DrawMode == DrawMode.Rect)

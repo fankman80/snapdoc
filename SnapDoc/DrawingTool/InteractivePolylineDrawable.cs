@@ -5,6 +5,7 @@ namespace SnapDoc.DrawingTool;
 public class InteractivePolylineDrawable
 {
     public MeasureSettings Measure { get; set; } = new();
+    public bool IsResizing { get; set; }
     public bool HasContent => Points != null && Points.Count > 1;
     public bool HasPoints => Points != null && Points.Count > 0;
     public List<SKPoint> Points { get; set; } = [];
@@ -285,6 +286,7 @@ public class InteractivePolylineDrawable
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
 
         bool closed = IsClosed && Points.Count >= 3;
+        bool showSegments = !closed || IsResizing;
         int segCount = closed ? Points.Count : Points.Count - 1;
         float total = 0f;
 
@@ -295,18 +297,18 @@ public class InteractivePolylineDrawable
             float len = SKPoint.Distance(a, b);
             total += len;
 
-            // Segmentlängen nur bei offener Polylinie anzeigen
-            if (!closed)
+            if (showSegments)
                 painter.DrawSegment(canvas, a, b, Measure.FormatLength(len));
         }
 
         if (closed)
         {
+            if (IsResizing) return;
+
             var c = MeasureLabelPainter.Centroid(Points);
             float area = MeasureLabelPainter.PolygonArea(Points);
             float half = painter.LabelHeight * 0.65f;
 
-            // Fläche und Umfang zentriert untereinander
             painter.Draw(canvas, "A = " + Measure.FormatArea(area), new SKPoint(c.X, c.Y - half), 0f);
             painter.Draw(canvas, "U = " + Measure.FormatLength(total), new SKPoint(c.X, c.Y + half), 0f);
         }
@@ -386,6 +388,7 @@ public class InteractivePolylineDrawable
     public void Reset()
     {
         IsClosed = false;
+        IsResizing = false;
         Points.Clear();
     }
 }
