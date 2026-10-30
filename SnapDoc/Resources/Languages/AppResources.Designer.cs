@@ -808,6 +808,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Einstellungen für Eingabehilfe ähnelt.
+        /// </summary>
+        internal static string eingabehilfe_einstellungen {
+            get {
+                return ResourceManager.GetString("eingabehilfe_einstellungen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Eingeloggt als ähnelt.
         /// </summary>
         internal static string eingeloggt_als {
@@ -1780,15 +1789,6 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Lupeneinstellungen ähnelt.
-        /// </summary>
-        internal static string lupeneinstellungen {
-            get {
-                return ResourceManager.GetString("lupeneinstellungen", resourceCulture);
-            }
-        }
-        
-        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Lupengrösse (Durchmesser) ähnelt.
         /// </summary>
         internal static string lupengroesse {
@@ -1830,6 +1830,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string modus_fuer_pinplatzierung {
             get {
                 return ResourceManager.GetString("modus_fuer_pinplatzierung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Versatz beim Verschieben ähnelt.
+        /// </summary>
+        internal static string move_offset {
+            get {
+                return ResourceManager.GetString("move_offset", resourceCulture);
             }
         }
         
@@ -3189,6 +3198,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string vermessung {
             get {
                 return ResourceManager.GetString("vermessung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Versatz X ähnelt.
+        /// </summary>
+        internal static string versatz_x {
+            get {
+                return ResourceManager.GetString("versatz_x", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Versatz Y ähnelt.
+        /// </summary>
+        internal static string versatz_y {
+            get {
+                return ResourceManager.GetString("versatz_y", resourceCulture);
             }
         }
         

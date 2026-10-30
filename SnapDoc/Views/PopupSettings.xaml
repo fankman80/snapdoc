@@ -61,7 +61,7 @@
                         MinimumHeightRequest="28"
                         BackgroundColor="Transparent"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.lupeneinstellungen}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
                         Clicked="LockSettingsClicked"/>
                 </HorizontalStackLayout>
 
@@ -117,8 +117,31 @@
                         MinimumHeightRequest="28"
                         BackgroundColor="Transparent"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.lupeneinstellungen}"
-                        Clicked="LoupeSettingsClicked"/>
+                        ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
+                        Clicked="GestureHelperSettingsClicked"/>
+                </HorizontalStackLayout>
+
+                <HorizontalStackLayout>
+                    <controls:Switch LabelText="{x:Static res:AppResources.move_offset}"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        IsToggled="{Binding IsMoveOffsetEnabled}"
+                        HorizontalOptions="Start"
+                        VerticalOptions="Center"
+                        BorderColorOff="Transparent"
+                        KnobColorOn="White"
+                        KnobColorOff="White"
+                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <Button
+                        Padding="0"
+                        HorizontalOptions="End"
+                        VerticalOptions="Center"
+                        MaximumHeightRequest="28"
+                        MinimumHeightRequest="28"
+                        BackgroundColor="Transparent"
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
+                        Clicked="GestureHelperSettingsClicked"/>
                 </HorizontalStackLayout>
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
                     <VerticalStackLayout Spacing="0"

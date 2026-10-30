@@ -9,13 +9,16 @@
                xmlns:local="clr-namespace:SnapDoc"              
                BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
                HorizontalOptions="Center"
-               x:Class="SnapDoc.Views.PopupLoupeSettings">
+               x:Class="SnapDoc.Views.PopupGestureHelperSettings"
+               x:Name="ThisPopup">
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+    <Grid x:DataType="views:PopupGestureHelperSettings"
+          BindingContext="{x:Reference ThisPopup}"
           Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <controls:RangeSlider
+                x:DataType="services:SettingsService"
                 LabelText="{x:Static res:AppResources.lupengroesse}"
                 IsRange="False"
                 Minimum="50"
@@ -24,11 +27,12 @@
                 ValueFontSize="12"
                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                 MinimumValueDisplayFormat="{}{0} px"
-                LowerValue="{Binding LoupeRadius}"
+                LowerValue="{Binding LoupeRadius, Source={x:Static services:SettingsService.Instance}}"
                 MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                 MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
             <controls:RangeSlider
+                x:DataType="services:SettingsService"
                 LabelText="{x:Static res:AppResources.vergroesserungsfaktor}"
                 IsRange="False"
                 Minimum="1"
@@ -37,9 +41,21 @@
                 ValueFontSize="12"
                 TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                 MinimumValueDisplayFormat="{}{0}x"
-                LowerValue="{Binding LoupeZoomFactor}"
+                LowerValue="{Binding LoupeZoomFactor, Source={x:Static services:SettingsService.Instance}}"
                 MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                 MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+            <Label Text="{x:Static res:AppResources.move_offset}" Margin="0,10,0,0"/>
+            <HorizontalStackLayout Spacing="8">
+                <controls:BorderedEntry
+                    Keyboard="Numeric"
+                    Text="{Binding TouchLiftXText, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.versatz_x}"/>
+                <controls:BorderedEntry
+                    Keyboard="Numeric"
+                    Text="{Binding TouchLiftYText, Mode=TwoWay}"
+                    Placeholder="{x:Static res:AppResources.versatz_y}"/>
+            </HorizontalStackLayout>
 
             <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"

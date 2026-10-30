@@ -108,7 +108,16 @@ public partial class TileImageView : ContentView, IDisposable
     private IPlanDrawingLayer _drawingLayer;
     private bool _drawingOwnsTouch;
     private bool _hadMultiTouch;
+    private bool _pinLiftActive = false;
+    private SKPoint _pinLiftScreen = SKPoint.Empty;
+    private static SKPoint GetPinTouchLift()
+    {
+        float density = (float)Settings.DisplayDensity;
 
+        return new SKPoint(
+            SettingsService.Instance.TouchLiftDp.X * density,
+            SettingsService.Instance.TouchLiftDp.Y * density);
+    }
     public IPlanDrawingLayer DrawingLayer
     {
         get => _drawingLayer;
@@ -1519,6 +1528,9 @@ public partial class TileImageView : ContentView, IDisposable
                     _draggedPin = null;
                 }
 
+                _pinLiftActive = false;
+                _pinLiftScreen = SKPoint.Empty;
+
                 if (_drawingOwnsTouch)
                 {
                     _drawingLayer?.OnCancel();
@@ -1566,6 +1578,9 @@ public partial class TileImageView : ContentView, IDisposable
             {
                 _originalPinX = _draggedPin.RelativeX;
                 _originalPinY = _draggedPin.RelativeY;
+
+                _pinLiftActive = false;
+                _pinLiftScreen = SKPoint.Empty;
             }
             else
             {
@@ -1577,18 +1592,28 @@ public partial class TileImageView : ContentView, IDisposable
         {
             _hadMultiTouch = true;
 
-            // Zweiter Finger übernimmt: Zeichen-Geste abbrechen -> Zoom/Pan/Drehen
             if (_drawingOwnsTouch)
             {
                 _drawingLayer?.OnCancel();
                 _drawingOwnsTouch = false;
             }
 
-            _draggedPin = null;
+            if (_draggedPin != null)
+            {
+                _draggedPin.RelativeX = _originalPinX;
+                _draggedPin.RelativeY = _originalPinY;
+                _draggedPin = null;
+            }
+
+            _pinLiftActive = false;
+            _pinLiftScreen = SKPoint.Empty;
+
             _longPressCts?.Cancel();
+
             var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
             var p0 = _activeTouches[keys[0]];
             var p1 = _activeTouches[keys[1]];
+
             _oldFingerDistance = SKPoint.Distance(p0, p1);
             _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
         }
@@ -1644,10 +1669,11 @@ public partial class TileImageView : ContentView, IDisposable
         if (_draggedPin != null && _activeTouches.Count == 1)
         {
             if (SKPoint.Distance(_touchStartPoint, e.Location) > ClickThreshold)
+            {
                 _hasDraggedPin = true;
-
-            UpdateDraggedPinPosition(e.Location);
-            shouldInvalidate = true;
+                UpdateDraggedPinPosition(e.Location);
+                shouldInvalidate = true;
+            }
         }
         else if (_activeTouches.Count == 1 && _activeTouches.TryGetValue(e.Id, out SKPoint oldPt))
         {
@@ -1778,9 +1804,11 @@ public partial class TileImageView : ContentView, IDisposable
                 _draggedPin.RelativeX = _originalPinX;
                 _draggedPin.RelativeY = _originalPinY;
             }
-
             _draggedPin = null;
         }
+
+        _pinLiftActive = false;
+        _pinLiftScreen = SKPoint.Empty;
 
         _activeTouches.Remove(e.Id);
 
@@ -2142,22 +2170,39 @@ public partial class TileImageView : ContentView, IDisposable
 
     private void UpdateDraggedPinPosition(SKPoint touchPoint)
     {
-        if (_draggedPin == null || OriginalImageSize == SKSize.Empty) return;
+        if (_draggedPin == null || OriginalImageSize == SKSize.Empty)
+            return;
 
         SKMatrix matrix = BuildMapMatrix();
-        if (!matrix.TryInvert(out SKMatrix inverseMatrix)) return;
 
-        SKPoint currentPlanPoint = inverseMatrix.MapPoint(touchPoint);
-        SKPoint previousPlanPoint = inverseMatrix.MapPoint(_lastTouchPoint);
+        if (!matrix.TryInvert(out SKMatrix inverseMatrix))
+            return;
 
-        float deltaX = currentPlanPoint.X - previousPlanPoint.X;
-        float deltaY = currentPlanPoint.Y - previousPlanPoint.Y;
+        if (SettingsService.Instance.IsMoveOffsetEnabled)
+        {
+            if (!_pinLiftActive)
+            {
+                _pinLiftScreen = GetPinTouchLift();
+                _pinLiftActive = true;
+            }
 
-        float newRelX = _draggedPin.RelativeX + (deltaX / OriginalImageSize.Width);
-        float newRelY = _draggedPin.RelativeY + (deltaY / OriginalImageSize.Height);
+            SKPoint targetScreen = new(touchPoint.X + _pinLiftScreen.X, touchPoint.Y + _pinLiftScreen.Y);
+            SKPoint targetPlan = inverseMatrix.MapPoint(targetScreen);
 
-        _draggedPin.RelativeX = Math.Clamp(newRelX, 0f, 1f);
-        _draggedPin.RelativeY = Math.Clamp(newRelY, 0f, 1f);
+            _draggedPin.RelativeX = Math.Clamp(targetPlan.X / OriginalImageSize.Width, 0f, 1f);
+            _draggedPin.RelativeY = Math.Clamp(targetPlan.Y / OriginalImageSize.Height, 0f, 1f);
+        }
+        else
+        {
+            SKPoint currentPlanPoint = inverseMatrix.MapPoint(touchPoint);
+            SKPoint previousPlanPoint = inverseMatrix.MapPoint(_lastTouchPoint);
+
+            float deltaX = currentPlanPoint.X - previousPlanPoint.X;
+            float deltaY = currentPlanPoint.Y - previousPlanPoint.Y;
+
+            _draggedPin.RelativeX = Math.Clamp(_draggedPin.RelativeX + deltaX / OriginalImageSize.Width, 0f, 1f);
+            _draggedPin.RelativeY = Math.Clamp(_draggedPin.RelativeY + deltaY / OriginalImageSize.Height, 0f, 1f);
+        }
 
         _lastTouchPoint = touchPoint;
     }
@@ -2705,6 +2750,8 @@ public partial class TileImageView : ContentView, IDisposable
     {
         _activeTouches.Clear();
         _draggedPin = null;
+        _pinLiftActive = false;
+        _pinLiftScreen = SKPoint.Empty;
         _isLongPressActive = false;
         _isDoubleTapAction = false;
         _oldFingerDistance = 0f;

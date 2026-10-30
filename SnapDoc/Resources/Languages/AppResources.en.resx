@@ -960,8 +960,8 @@
   <data name="vergroesserungsfaktor" xml:space="preserve">
     <value>Magnification factor</value>
   </data>
-  <data name="lupeneinstellungen" xml:space="preserve">
-    <value>Loupe settings</value>
+  <data name="eingabehilfe_einstellungen" xml:space="preserve">
+    <value>Accessibility settings</value>
   </data>
   <data name="plan_hinzufuegen" xml:space="preserve">
     <value>Add plan</value>
@@ -1253,5 +1253,14 @@
   </data>
   <data name="massstab" xml:space="preserve">
     <value>Scale</value>
+  </data>
+  <data name="move_offset" xml:space="preserve">
+    <value>Offset when moving</value>
+  </data>
+  <data name="versatz_x" xml:space="preserve">
+    <value>Offset X</value>
+  </data>
+  <data name="versatz_y" xml:space="preserve">
+    <value>Offset Y</value>
   </data>
 </root>

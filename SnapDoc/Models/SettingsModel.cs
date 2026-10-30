@@ -71,6 +71,7 @@ internal class SettingsModel
     public bool? IsLoupeEnabled { get; set; } // Lupe aktivieren/deaktivieren
     public float? LoupeRadius { get; set; } // Radius der Lupe in Pixeln
     public float? LoupeZoomFactor { get; set; } // Zoomfaktor der Lupe
+    public bool? IsMoveOffsetEnabled { get; set; } // Verschiebung der Pins beim Verschieben aktivieren/deaktivieren
     public float? LockIconOffset { get; set; } // Offset der Sperr-Icons auf den Pins
     public float? LockIconSize { get; set; } // Größe der Sperr-Icons auf den Pins
     public byte? LockIconOpacity { get; set; } // Transparenz der Sperr-Icons auf den Pins

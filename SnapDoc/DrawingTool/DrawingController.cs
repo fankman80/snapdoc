@@ -23,7 +23,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
-    private static readonly bool UseTouchLift = DeviceInfo.Platform != DevicePlatform.WinUI;
     private SKPoint touchLift = SKPoint.Empty;
     private bool isLiftActive = false;
     private bool IsHandleDrag() => DrawMode switch
@@ -262,8 +261,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void OnStartInteraction(SKPoint p)
     {
-        isLiftActive = false; 
-        
+        isLiftActive = false;
+        touchLift = SKPoint.Empty;
+
         if (CombinedDrawable == null) return;
 
         if (DrawMode == DrawMode.Poly)
@@ -402,7 +402,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         // Beim ersten Move eines Handle-Drags einmalig nach oben springen
         SKPoint h = p;
-        if (UseTouchLift && IsHandleDrag())
+
+        if (SettingsService.Instance.IsMoveOffsetEnabled && IsHandleDrag())
         {
             if (!isLiftActive)
             {
@@ -513,6 +514,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         }
 
         isLiftActive = false;
+        touchLift = SKPoint.Empty;
         EnableViewTransforms();
 
         Invalidate();

@@ -960,8 +960,8 @@
   <data name="vergroesserungsfaktor" xml:space="preserve">
     <value>Facteur de grossissement</value>
   </data>
-  <data name="lupeneinstellungen" xml:space="preserve">
-    <value>Paramètres de la loupe</value>
+  <data name="eingabehilfe_einstellungen" xml:space="preserve">
+    <value>Paramètres d'accessibilité</value>
   </data>
   <data name="plan_hinzufuegen" xml:space="preserve">
     <value>Ajouter un plan</value>
@@ -1253,5 +1253,14 @@
   </data>
   <data name="massstab" xml:space="preserve">
     <value>Échelle</value>
+  </data>
+  <data name="move_offset" xml:space="preserve">
+    <value>Décalage lors du déplacement</value>
+  </data>
+  <data name="versatz_x" xml:space="preserve">
+    <value>Décalage X</value>
+  </data>
+  <data name="versatz_y" xml:space="preserve">
+    <value>Décalage Y</value>
   </data>
 </root>

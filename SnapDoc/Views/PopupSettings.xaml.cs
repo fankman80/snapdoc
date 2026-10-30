@@ -88,9 +88,9 @@ public partial class PopupSettings : Popup, IQueryAttributable
         }
     }
 
-    private async void LoupeSettingsClicked(object sender, EventArgs e)
+    private async void GestureHelperSettingsClicked(object sender, EventArgs e)
     {
-        var popup = new PopupLoupeSettings();
+        var popup = new PopupGestureHelperSettings();
         var result = await Shell.Current.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
         if (result.Result != null)

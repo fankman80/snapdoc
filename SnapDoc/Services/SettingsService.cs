@@ -165,6 +165,7 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
     [ObservableProperty] public partial bool ShowFpsCounter { get; set; } = false;
     [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = true;
+    [ObservableProperty] public partial bool IsMoveOffsetEnabled { get; set; } = false;
     [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
     [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
     [ObservableProperty] public partial float LockIconOffset { get; set; } = -0.1f;
@@ -408,6 +409,7 @@ public partial class SettingsService : ObservableObject
             MaxTileCache = MaxTileCache,
             TileSize = TileSize,
             IsLoupeEnabled = IsLoupeEnabled,
+            IsMoveOffsetEnabled = IsMoveOffsetEnabled,
             MaxZoomLevel = MaxZoomLevel,
             ShowFpsCounter = ShowFpsCounter,
             LoupeRadius = LoupeRadius,
@@ -510,6 +512,7 @@ public partial class SettingsService : ObservableObject
             MaxTileCache = settings.MaxTileCache ?? defaultSettings.MaxTileCache;
             TileSize = settings.TileSize ?? defaultSettings.TileSize;
             IsLoupeEnabled = settings.IsLoupeEnabled ?? defaultSettings.IsLoupeEnabled;
+            IsMoveOffsetEnabled = settings.IsMoveOffsetEnabled ?? defaultSettings.IsMoveOffsetEnabled;
             MaxZoomLevel = settings.MaxZoomLevel ?? defaultSettings.MaxZoomLevel;
             ShowFpsCounter = settings.ShowFpsCounter ?? defaultSettings.ShowFpsCounter;
             LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
@@ -596,6 +599,7 @@ public partial class SettingsService : ObservableObject
         MaxTileCache = defaultSettings.MaxTileCache;
         TileSize = defaultSettings.TileSize;
         IsLoupeEnabled = defaultSettings.IsLoupeEnabled;
+        IsMoveOffsetEnabled = defaultSettings.IsMoveOffsetEnabled;
         MaxZoomLevel = defaultSettings.MaxZoomLevel;
         ShowFpsCounter = defaultSettings.ShowFpsCounter;
         LoupeRadius = defaultSettings.LoupeRadius;
