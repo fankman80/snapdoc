@@ -3,7 +3,6 @@ using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
 using SnapDoc.Controls;
 using SnapDoc.DrawingTool;
 using SnapDoc.Models;
@@ -33,7 +32,6 @@ public partial class ImageViewPage : IQueryAttributable
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
-    private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
     private readonly bool isHatchEffect = false;
     private readonly float hatchStrokeWitdh = 2f;
@@ -43,10 +41,10 @@ public partial class ImageViewPage : IQueryAttributable
     private string strokeStyle = "";
     private float cloudRadius = 20;
     private float cloudInciseDeg = 15;
+    private bool drawingOwnsTouch;
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
-    public Color SelectedBorderColor
-    {
+    public Color SelectedBorderColor {
         get => selectedBorderColor;
         set
         {
@@ -110,6 +108,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         drawingController = new DrawingController(fotoContainer);
+        drawingController.Invalidated += (_, _) => { DrawingView?.InvalidateSurface(); };
 
         SetupDesktopScrollWheel();
     }
@@ -195,7 +194,6 @@ public partial class ImageViewPage : IQueryAttributable
             case GestureStatus.Started:
                 isPanningActive = false;
                 fotoContainer.IsPanningEnabled = false;
-                drawingController.ResizeHandles();
                 break;
 
             case GestureStatus.Running:
@@ -217,6 +215,7 @@ public partial class ImageViewPage : IQueryAttributable
                 fotoContainer.TranslationX += (centerX - focusX) * (scaleFactor - 1.0);
                 fotoContainer.TranslationY += (centerY - focusY) * (scaleFactor - 1.0);
                 fotoContainer.Scale = targetScale;
+                UpdateDrawingViewScale();
                 break;
 
             case GestureStatus.Completed:
@@ -329,8 +328,7 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer.TranslationY -= originY * (scaleRatio - 1);
 
         fotoContainer.Scale = targetScale;
-
-        drawingController.ResizeHandles();
+        UpdateDrawingViewScale();
     }
 
     private async void OnEditClicked(object sender, EventArgs e)
@@ -359,6 +357,8 @@ public partial class ImageViewPage : IQueryAttributable
 
         fotoContainer.TranslationX = (this.Width - imgWidth) / 2;
         fotoContainer.TranslationY = (this.Height - imgHeight) / 2;
+
+        UpdateDrawingViewScale();
     }
 
     private async void OnDeleteButtonClicked(object sender, EventArgs e)
@@ -417,8 +417,7 @@ public partial class ImageViewPage : IQueryAttributable
         await Shell.Current.GoToAsync($"..");
     }
 
-    private async void DrawingClicked(object sender, EventArgs e)
-    => await StartDrawing();
+    private async void DrawingClicked(object sender, EventArgs e) => await StartDrawing();
 
     private async void ShapeButtonClicked(object sender, EventArgs e)
     {
@@ -479,72 +478,47 @@ public partial class ImageViewPage : IQueryAttributable
             combined.OvalDrawable.DisplayHandles = (mode == DrawMode.Oval);
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
-
-        drawingView?.InvalidateSurface();
+        DrawingView?.InvalidateSurface();
     }
 
-    private async Task StartDrawing(bool setDefaultMode = true)
+    private Task StartDrawing(bool setDefaultMode = true)
     {
         fotoContainer.IsPanningEnabled = false;
 
         if (setDefaultMode)
         {
+            drawingController.Reset();
+
             ShapeBtn.Text = MaterialIcons.Rectangle;
             AddCloudyBtn.Text = MaterialIcons.Cloud_off;
             SetDrawMode(DrawMode.Rect);
         }
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
+
         DrawBtn.IsVisible = false;
+        IsToolButtonsVisible = true;
 
-        await MainThread.InvokeOnMainThreadAsync(async () =>
-        {
-            try
-            {
-                var canvasContainer = this.FindByName<Microsoft.Maui.Controls.Grid>("ImageDrawingCanvas");
+        drawingController.InitializeDrawing(
+            SelectedBorderColor.ToSKColor(),
+            SelectedFillColor.ToSKColor(),
+            SelectedTextColor.ToSKColor(),
+            lineWidth,
+            strokeStyle,
+            isHatchEffect,
+            hatchStrokeWitdh,
+            hatchStrokeSpace,
+            hatchRotation,
+            forceReset: setDefaultMode);
 
-                if (drawingView != null)
-                {
-                    drawingController.Detach();
-                    if (canvasContainer.Children.Contains(drawingView))
-                        canvasContainer.Children.Remove(drawingView);
-                    drawingView = null;
-                }
+        // Fotos haben keinen realen Massstab
+        drawingController.IsMeasureActive = false;
+        drawingController.IsActive = true;
+        UpdateDrawingViewScale();
+        DrawingView.IsVisible = true;
+        DrawingView.InvalidateSurface();
 
-                if (setDefaultMode)
-                    drawingController.Reset();
-
-                drawingView = drawingController.CreateCanvasView();
-                drawingView.IgnorePixelScaling = false;
-                drawingView.Opacity = 0;
-                canvasContainer.Children.Add(drawingView);
-
-                IsToolButtonsVisible = true;
-
-                drawingController.InitializeDrawing(
-                    SelectedBorderColor.ToSKColor(),
-                    SelectedFillColor.ToSKColor(),
-                    SelectedTextColor.ToSKColor(),
-                    lineWidth,
-                    strokeStyle,
-                    isHatchEffect,
-                    hatchStrokeWitdh,
-                    hatchStrokeSpace,
-                    hatchRotation,
-                    forceReset: true
-                );
-
-                drawingView.InvalidateSurface();
-                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
-                drawingView.Opacity = 1;
-            }
-            catch (Exception ex)
-            {
-                System.Diagnostics.Debug.WriteLine($"Fehler beim Starten des Drawings: {ex.Message}");
-                DrawBtn.IsVisible = true;
-                IsToolButtonsVisible = false;
-            }
-        });
+        return Task.CompletedTask;
     }
 
     private async void EraseClicked(object sender, EventArgs e)
@@ -627,8 +601,7 @@ public partial class ImageViewPage : IQueryAttributable
             ovalDrawable.AutoSizeText = result.Result.AutoSize;
             ovalDrawable.TextPadding = result.Result.TextPadding;
         }
-
-        drawingView?.InvalidateSurface();
+        DrawingView?.InvalidateSurface();
     }
 
     private void CloudyClicked(object sender, EventArgs e)
@@ -644,13 +617,70 @@ public partial class ImageViewPage : IQueryAttributable
             _ => false
         };
 
-        AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-        drawingView?.InvalidateSurface();
+        AddCloudyBtn.Text =
+            isCloud
+                ? MaterialIcons.Cloud
+                : MaterialIcons.Cloud_off;
+
+        DrawingView.InvalidateSurface();
+    }
+
+    private void OnDrawingPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    {
+        e.Surface.Canvas.Clear(SKColors.Transparent);
+
+        if (!drawingController.IsActive)
+            return;
+
+        drawingController.Draw(e.Surface.Canvas);
+    }
+
+    private void OnDrawingTouch(object sender, SKTouchEventArgs e)
+    {
+        if (!drawingController.IsActive)
+            return;
+
+        switch (e.ActionType)
+        {
+            case SKTouchAction.Pressed:
+                drawingOwnsTouch =
+                    drawingController.OnPressed(e.Location);
+
+                e.Handled = drawingOwnsTouch;
+                break;
+
+            case SKTouchAction.Moved:
+                if (drawingOwnsTouch)
+                {
+                    drawingController.OnMoved(e.Location);
+                    e.Handled = true;
+                }
+                break;
+
+            case SKTouchAction.Released:
+                if (drawingOwnsTouch)
+                {
+                    drawingController.OnReleased();
+                    drawingOwnsTouch = false;
+                    e.Handled = true;
+                }
+                else
+                {
+                    drawingController.OnTap(e.Location);
+                    e.Handled = true;
+                }
+                break;
+
+            case SKTouchAction.Cancelled:
+                drawingController.OnCancel();
+                drawingOwnsTouch = false;
+                break;
+        }
     }
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView != null && !drawingController.IsEmpty() || isCleared == true)
+        if (!drawingController.IsEmpty() || isCleared)
         {
             var imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, ImgSource);
             var origPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, "originals", ImgSource);
@@ -716,74 +746,68 @@ public partial class ImageViewPage : IQueryAttributable
 
         // Cleanup drawing canvas
         fotoContainer.IsPanningEnabled = true;
-        drawingController.Detach();
-        RemoveDrawingView();
+
+        drawingController.IsActive = false;
+        drawingController.OnCancel();
+
+        DrawingView.IsVisible = false;
+        DrawingView.InvalidateSurface();
+
+        drawingOwnsTouch = false;
         drawMode = DrawMode.None;
-        SetDrawMode(drawMode);
+
         IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         isCleared = false;
     }
 
-    private void RemoveDrawingView()
-    {
-        var canvasContainer = this.FindByName<Microsoft.Maui.Controls.Grid>("ImageDrawingCanvas");
-        if (drawingView != null && canvasContainer != null)
-        {
-            canvasContainer.Children.Remove(drawingView);
-            drawingView = null;
-        }
-    }
-
     public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
-        if (drawingView == null || drawingView.CanvasSize.Width <= 0 || drawingView.CanvasSize.Height <= 0)
+        using var fotoStream = File.OpenRead(fotoPath);
+        using var fotoBitmap = SKBitmap.Decode(fotoStream);
+
+        if (fotoBitmap == null)
             return;
 
-        SKBitmap fotoBitmap;
-    
-        using (var fotoStream = File.OpenRead(fotoPath))
+        int originalWidth = fotoBitmap.Width;
+        int originalHeight = fotoBitmap.Height;
+
+        var info = new SKImageInfo(
+            originalWidth,
+            originalHeight,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul);
+
+        using var surface = SKSurface.Create(info);
+
+        if (surface == null)
+            return;
+
+        var canvas = surface.Canvas;
+
+        // Originalfoto
+        canvas.DrawBitmap(fotoBitmap, new SKRect(0, 0, originalWidth, originalHeight), SKSamplingOptions.Default);
+
+        if (!drawingController.IsEmpty())
         {
-            fotoBitmap = SKBitmap.Decode(fotoStream);
+            float drawingWidth = (float)Math.Max(1, FotoContainer.Width);
+            float drawingHeight = (float)Math.Max(1, FotoContainer.Height);
+            float scaleX = originalWidth / drawingWidth;
+            float scaleY = originalHeight / drawingHeight;
+
+            canvas.Save();
+            canvas.Scale(scaleX, scaleY);
+            drawingController.RenderForExport(canvas);
+            canvas.Restore();
         }
 
-        using (fotoBitmap)
-        {
-            int width = fotoBitmap.Width;
-            int height = fotoBitmap.Height;
+        canvas.Flush();
 
-            var info = new SKImageInfo(width, height);
-            using var surface = SKSurface.Create(info);
-            var canvas = surface.Canvas;
-            canvas.DrawBitmap(fotoBitmap, new SKPoint(0, 0), SKSamplingOptions.Default);
+        using var finalImage = surface.Snapshot();
+        using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
+        await using var output = File.Create(outputPath);
 
-            // Overlay erstellen (ohne Handles)
-            using (var overlaySurface = SKSurface.Create(info))
-            {
-                var overlayCanvas = overlaySurface.Canvas;
-                overlayCanvas.Clear(SKColors.Transparent);
-
-                float scaleX = width / drawingView.CanvasSize.Width;
-                float scaleY = height / drawingView.CanvasSize.Height;
-                overlayCanvas.Scale(scaleX, scaleY);
-
-                // Zeichne ohne Handles auf overlayCanvas
-                drawingController.DrawWithoutHandles(overlayCanvas);
-
-                overlayCanvas.Flush();
-
-                using var overlayImage = overlaySurface.Snapshot();
-                var destRect = new SKRect(0, 0, width, height);
-                canvas.DrawImage(overlayImage, destRect, SKSamplingOptions.Default);
-            }
-
-            canvas.Flush();
-
-            using var finalImage = surface.Snapshot();
-            using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
-            using var output = File.Create(outputPath);
-            data.SaveTo(output);
-        }
+        data.SaveTo(output);
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
@@ -922,6 +946,20 @@ public partial class ImageViewPage : IQueryAttributable
 
         PrevImgBtn.IsVisible = currentIndex > 0;
         NextImgBtn.IsVisible = currentIndex >= 0 && currentIndex < sortedFotos.Count - 1;
+    }
+
+    private void UpdateDrawingViewScale()
+    {
+        if (!drawingController.IsActive)
+            return;
+
+        float scale = (float)fotoContainer.Scale;
+
+        if (!float.IsFinite(scale) || scale <= 0f)
+            scale = 1f;
+
+        drawingController.SetViewTransform(scale, 0f);
+        DrawingView.InvalidateSurface();
     }
 
     private static List<(string PlanId, string PinId, string FotoKey, DateTime DateTime)> GetSortedFotos()

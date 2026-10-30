@@ -28,7 +28,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly System.Collections.ObjectModel.ObservableCollection<MapPin> pinList = [];
     private readonly DrawingController drawingController;
-    private SKCanvasView drawingView;
     private DrawMode drawMode = DrawMode.None;
     private bool isHatchEffect = false;
     private float hatchStrokeWitdh = 2f;
@@ -48,6 +47,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool isMeasureVisible = false;
     private MapPin _editingCustomPin;
     private readonly Dictionary<string, bool> _pendingLockChanges = [];
+    private readonly record struct DrawingExportResult(SKRect PlanBounds, int PixelWidth, int PixelHeight, float PinScale);
     public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
     public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); }}
     public Color SelectedBorderColor { get => selectedBorderColor; set { selectedBorderColor = value; OnPropertyChanged(); }}
@@ -66,7 +66,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             OnPropertyChanged();
             OnPropertyChanged(nameof(IsMeasurePanelVisible));
 
-            if (value && drawingView != null)
+            if (value && drawingController.IsActive)
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
             drawingController.IsMeasureActive = value;
         }
@@ -89,7 +89,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             OnPropertyChanged(nameof(PlanMeasureFactorText));
 
             // Laufende Zeichnung sofort aktualisieren
-            if (drawingView != null)
+            if (drawingController.IsActive)
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
         }
     }
@@ -122,7 +122,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.CanvasTapped += OnCanvasTapped;
         PlanImage.CanvasLongPressed += OnCanvasLongPressed;
         PlanImage.PinMoved += OnPinMoved;
-        PlanImage.PropertyChanged += OnPlanImagePropertyChanged;
 
         if (isFirstLoad)
         {
@@ -164,7 +163,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.CanvasTapped -= OnCanvasTapped;
         PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
         PlanImage.PinMoved -= OnPinMoved;
-        PlanImage.PropertyChanged -= OnPlanImagePropertyChanged;
 
         if (!_isShowingPopup)
             Cleanup();
@@ -708,52 +706,24 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             try
             {
-                var absoluteLayout = this.FindByName<AbsoluteLayout>("PlanView");
-
-                if (drawingView != null)
-                {
-                    drawingController.Detach();
-                    if (absoluteLayout.Children.Contains(drawingView))
-                        absoluteLayout.Children.Remove(drawingView);
-                    drawingView = null;
-                }
-
                 if (setDefaultMode)
                     drawingController.Reset();
 
-                drawingView = drawingController.CreateCanvasView();
-                drawingView.Opacity = 0;
-                absoluteLayout.Children.Add(drawingView);
-
-                AbsoluteLayout.SetLayoutBounds(drawingView, new Rect(0, 0, 1, 1));
-                AbsoluteLayout.SetLayoutFlags(drawingView, AbsoluteLayoutFlags.All);
-
-                IsToolButtonsVisible = true;
-
                 drawingController.InitializeDrawing(
-                    SelectedBorderColor.ToSKColor(),
-                    SelectedFillColor.ToSKColor(),
-                    SelectedTextColor.ToSKColor(),
-                    lineWidth,
-                    strokeStyle,
-                    isHatchEffect,
-                    hatchStrokeWitdh,
-                    hatchStrokeSpace,
-                    hatchRotation,
-                    false,
-                    (float)PlanImage.CurrentRotation,
-                    setDefaultMode
-                );
+                    SelectedBorderColor.ToSKColor(), SelectedFillColor.ToSKColor(), SelectedTextColor.ToSKColor(),
+                    lineWidth, strokeStyle, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation,
+                    -(float)PlanImage.CurrentRotation,   // Rechteck bildschirmparallel im gedrehten Plan
+                    setDefaultMode);
 
-                drawingController.InitialRotation = (float)PlanImage.CurrentRotation;
+                drawingController.InitialRotation = 0f;
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
                 drawingController.Measure.MeasureTextSize = 16f;
                 drawingController.Measure.MeasureUnit = "m";
                 drawingController.IsMeasureActive = IsMeasureVisible;
 
-                drawingView.InvalidateSurface();
-                await Task.Yield(); // Kurz warten, bis der erste Frame berechnet ist
-                drawingView.Opacity = 1;
+                drawingController.IsActive = true;
+                PlanImage.DrawingLayer = drawingController;
+                IsToolButtonsVisible = true;
             }
             catch (Exception ex)
             {
@@ -764,16 +734,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         });
     }
 
-    private float GetCurrentMeasureFactor() => 1f / PlanImage.CurrentScale * (float)(0.0254 / 72) * thisPlan.MeasureFactor;
-
-    private void OnPlanImagePropertyChanged(object sender, PropertyChangedEventArgs e)
-    {
-        if (e.PropertyName != nameof(TileImageView.CurrentScale)) return;
-        if (drawingView == null || thisPlan == null || !drawingController.IsMeasureActive) return;
-        if (PlanImage.CurrentScale <= 0) return;
-
-        drawingController.MeasureFactor = GetCurrentMeasureFactor();
-    }
+    private float GetCurrentMeasureFactor() => (float)(0.0254 / 72) * thisPlan.MeasureFactor;
 
     private void OnMeasureFactorConfirmed(object sender, EventArgs e)
     {
@@ -858,20 +819,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             combined.ArrowDrawable.DisplayHandles = (mode == DrawMode.Arrow);
         }
 
-        drawingView?.InvalidateSurface();
+        PlanImage.InvalidateSurface();
     }
 
     private void EraseClicked(object sender, EventArgs e) => drawingController.Reset();
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        if (drawingView == null || drawingController.IsEmpty())
+        if (drawingController.IsEmpty())
         {
             Cleanup();
             return;
         }
 
         var plan = thisPlan;
+
         var customPinPath = Path.Combine(
             Settings.DataDirectory,
             SettingsService.Instance.ProjectPath,
@@ -882,58 +844,71 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         string newBaseName = $"custompin_{DateTime.Now.Ticks}";
         string pngFileName = newBaseName + ".png";
         string dataFileName = newBaseName + ".data";
+
         string pngPath = Path.Combine(customPinPath, pngFileName);
         string dataPath = Path.Combine(customPinPath, dataFileName);
+
         bool isOverwrite = false;
         string oldPngPath = null;
         string oldDataPath = null;
         string oldFileName = null;
 
-        if (tappedPin != null && plan.Pins.TryGetValue(tappedPin.Id, out var oldPin))
+        if (tappedPin != null &&
+            plan.Pins.TryGetValue(tappedPin.Id, out var oldPin))
         {
             isOverwrite = true;
             oldFileName = Path.GetFileName(oldPin.PinIcon);
             oldPngPath = Path.Combine(customPinPath, oldFileName);
-            oldDataPath = Path.Combine(customPinPath, Path.ChangeExtension(oldFileName, ".data"));
+            oldDataPath = Path.Combine(
+                customPinPath,
+                Path.ChangeExtension(oldFileName, ".data"));
         }
 
-        SKRect imageRect = await SaveCanvasAsCroppedPng(pngPath);
+        DrawingExportResult? export =
+            await SaveDrawingAsCroppedPngAsync(pngPath);
+
+        if (export == null)
+        {
+            Cleanup();
+            return;
+        }
+
+        /*
+         * Die .data-Datei speichert die Geometrie relativ zur Bounding-Box.
+         */
         drawingController.SaveToFile(dataPath);
 
-        // Dateien fuer den Cloud-Sync beim SaveManager registrieren
-        SaveManager.NotifyDataChanged([
+        SaveManager.NotifyDataChanged(
+        [
             (pngPath, GlobalJson.Data.CustomPinsPath),
-            (dataPath, GlobalJson.Data.CustomPinsPath)
+        (dataPath, GlobalJson.Data.CustomPinsPath)
         ]);
 
-        float centerX = (float)(drawingView.Width * Settings.DisplayDensity) / 2f;
-        float centerY = (float)(drawingView.Height * Settings.DisplayDensity) / 2f;
-        float panDx = centerX - PlanImage.CurrentPan.X;
-        float panDy = centerY - PlanImage.CurrentPan.Y;
-        float negRad = (float)(-PlanImage.CurrentRotation * Math.PI / 180.0);
-        float cosNeg = (float)Math.Cos(negRad);
-        float sinNeg = (float)Math.Sin(negRad);
-        float centerPixelX = (panDx * cosNeg - panDy * sinNeg) / PlanImage.CurrentScale;
-        float centerPixelY = (panDx * sinNeg + panDy * cosNeg) / PlanImage.CurrentScale;
-        double centerFactorX = centerPixelX / PlanImage.OriginalImageSize.Width;
-        double centerFactorY = centerPixelY / PlanImage.OriginalImageSize.Height;
-        float fx = (float)imageRect.MidX - centerX;
-        float fy = (float)imageRect.MidY - centerY;
-        double ox = (fx / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Width;
-        double oy = (fy / PlanImage.CurrentScale) / PlanImage.OriginalImageSize.Height;
-        Point relativePos = new(centerFactorX + ox, centerFactorY + oy);
+        SKRect planBounds = export.Value.PlanBounds;
+
+        double relativeX =
+            planBounds.MidX / PlanImage.OriginalImageSize.Width;
+
+        double relativeY =
+            planBounds.MidY / PlanImage.OriginalImageSize.Height;
+
+        Point relativePosition = new(
+            Math.Clamp(relativeX, 0d, 1d),
+            Math.Clamp(relativeY, 0d, 1d));
+
+        string displayText =
+            drawingController.CombinedDrawable?.RectDrawable?.Text ?? "";
 
         await SetPin(
-            relativePos,
+            relativePosition,
             pngFileName,
-            (int)imageRect.Width,
-            (int)imageRect.Height,
+            export.Value.PixelWidth,
+            export.Value.PixelHeight,
             new SKColor(SelectedBorderColor.ToUint()),
-            1 / PlanImage.CurrentScale,
+            export.Value.PinScale,
             0,
-            drawingController.CombinedDrawable.RectDrawable.Text,
-            isOverwrite
-        );
+            displayText,
+            isOverwrite);
 
         _editingCustomPin = null;
 
@@ -941,25 +916,39 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             try
             {
-                if (!string.IsNullOrEmpty(oldPngPath) && File.Exists(oldPngPath)) File.Delete(oldPngPath);
-                if (!string.IsNullOrEmpty(oldDataPath) && File.Exists(oldDataPath)) File.Delete(oldDataPath);
+                if (!string.IsNullOrEmpty(oldPngPath) &&
+                    File.Exists(oldPngPath))
+                {
+                    File.Delete(oldPngPath);
+                }
 
-                // Cloud Cleanup
-                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{oldFileName}");
-                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{Path.ChangeExtension(oldFileName, ".data")}");
+                if (!string.IsNullOrEmpty(oldDataPath) &&
+                    File.Exists(oldDataPath))
+                {
+                    File.Delete(oldDataPath);
+                }
+
+                _ = SaveManager.DeleteCloudFileAsync(
+                    $"{GlobalJson.Data.CustomPinsPath}/{oldFileName}");
+
+                _ = SaveManager.DeleteCloudFileAsync(
+                    $"{GlobalJson.Data.CustomPinsPath}/" +
+                    $"{Path.ChangeExtension(oldFileName, ".data")}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine(
+                    $"Löschfehler: {ex.Message}");
             }
         }
+
         Cleanup();
     }
 
     private void Cleanup()
     {
-        drawingController.Detach();
-        RemoveDrawingView();
+        drawingController.IsActive = false;
+        PlanImage.DrawingLayer = null;
         drawMode = DrawMode.None;
         SetDrawMode(drawMode);
         OnPropertyChanged(nameof(IsMeasurePanelVisible));
@@ -972,52 +961,121 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             pinList.Add(_editingCustomPin);
         _editingCustomPin = null;
 
-        drawingView?.InvalidateSurface();
+        PlanImage.InvalidateSurface();
     }
 
-    private void RemoveDrawingView()
+    private async Task<DrawingExportResult?> SaveDrawingAsCroppedPngAsync(string filePath)
     {
-        var absoluteLayout = this.FindByName<AbsoluteLayout>("PlanView");
-        if (drawingView != null && absoluteLayout != null)
+        SKRect? bounds = drawingController.CalculatePlanBoundingBox();
+
+        if (bounds == null ||
+            bounds.Value.Width <= 0f ||
+            bounds.Value.Height <= 0f)
         {
-            absoluteLayout.Children.Remove(drawingView);
-            drawingView = null;
+            return null;
         }
-    }
 
-    public async Task<SKRectI> SaveCanvasAsCroppedPng(string filePath)
-    {
-        var boundingBox = drawingController.CalculateBoundingBox((float)-drawingController.InitialRotation);
-        if (boundingBox == null)
-            return new SKRectI(0, 0, 0, 0);
+        // Die Zeichnung liegt in Plan-Koordinaten.
+        // Mit dem aktuellen Zoom exportieren wir ungefähr in der
+        // Auflösung, in welcher die Zeichnung momentan dargestellt wird.
+        float exportScale = Math.Max(
+            0.01f,
+            (float)PlanImage.CurrentScale);
 
-        float padding = (float)(lineWidth * Settings.DisplayDensity) / 2;
+        // Der Pin muss später wieder auf die ursprüngliche Grösse
+        // im Plan zurückskaliert werden.
+        float pinScale = 1f / exportScale;
 
-        SKRect cropRect = new(
-            boundingBox.Value.Left - padding,
-            boundingBox.Value.Top - padding,
-            boundingBox.Value.Right + padding,
-            boundingBox.Value.Bottom + padding
-        );
+        // Etwas Rand um die Zeichnung.
+        // Die 8 DIP werden zuerst zu Bildschirm-Pixeln
+        // und danach zu Plan-Pixeln umgerechnet.
+        float density = (float)Settings.DisplayDensity;
 
-        var info = new SKImageInfo((int)Math.Ceiling(cropRect.Width), (int)Math.Ceiling(cropRect.Height));
+        float paddingScreenPx = Math.Max(
+            8f * density,
+            lineWidth * density * 2f);
+
+        float paddingPlan = paddingScreenPx / exportScale;
+
+        SKRect crop = bounds.Value;
+        crop.Inflate(paddingPlan, paddingPlan);
+
+        // Grösse des zu erzeugenden PNG.
+        int pixelWidth = Math.Max(
+            1,
+            (int)MathF.Ceiling(crop.Width * exportScale));
+
+        int pixelHeight = Math.Max(
+            1,
+            (int)MathF.Ceiling(crop.Height * exportScale));
+
+        // Sicherheit gegen extrem grosse PNG-Dateien.
+        const int maxExportEdge = 8192;
+
+        int longestEdge = Math.Max(
+            pixelWidth,
+            pixelHeight);
+
+        if (longestEdge > maxExportEdge)
+        {
+            float reduce =
+                (float)maxExportEdge / longestEdge;
+
+            exportScale *= reduce;
+            pinScale = 1f / exportScale;
+
+            pixelWidth = Math.Max(
+                1,
+                (int)MathF.Ceiling(crop.Width * exportScale));
+
+            pixelHeight = Math.Max(
+                1,
+                (int)MathF.Ceiling(crop.Height * exportScale));
+        }
+
+        var info = new SKImageInfo(
+            pixelWidth,
+            pixelHeight,
+            SKColorType.Rgba8888,
+            SKAlphaType.Premul);
+
         using var surface = SKSurface.Create(info);
-        var canvas = surface.Canvas;
+
+        if (surface == null)
+            return null;
+
+        SKCanvas canvas = surface.Canvas;
 
         canvas.Clear(SKColors.Transparent);
-        canvas.Translate(-cropRect.Left, -cropRect.Top);
 
-        drawingController.RenderFinal(canvas, (float)-drawingController.InitialRotation);
+        // Plan-Koordinaten auf die gewünschte PNG-Auflösung skalieren.
+        canvas.Scale(exportScale);
+
+        // BoundingBox nach links oben verschieben,
+        // damit das PNG dort bei 0/0 beginnt.
+        canvas.Translate(
+            -crop.Left,
+            -crop.Top);
+
+        // Zeichnung ohne Handles rendern.
+        drawingController.RenderForExport(canvas);
+
         canvas.Flush();
 
-        using var image = surface.Snapshot();
-        using var data = image.Encode(SKEncodedImageFormat.Png, 90);
-        using (var stream = File.Create(filePath))
-        {
-            data.SaveTo(stream);
-        }
+        using SKImage image = surface.Snapshot();
 
-        return new SKRectI((int)cropRect.Left, (int)cropRect.Top, (int)cropRect.Right, (int)cropRect.Bottom);
+        using SKData data = image.Encode(
+            SKEncodedImageFormat.Png,
+            100);
+
+        await using var stream = File.Create(filePath);
+        data.SaveTo(stream);
+
+        return new DrawingExportResult(
+            crop,
+            pixelWidth,
+            pixelHeight,
+            pinScale);
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
@@ -1118,7 +1176,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             ovalDrawable.TextPadding = result.Result.TextPadding;
         }
 
-        drawingView?.InvalidateSurface();
+        PlanImage.InvalidateSurface();
     }
 
     private void CloudyClicked(object sender, EventArgs e)
@@ -1135,7 +1193,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         };
 
         AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-        drawingView?.InvalidateSurface();
+        PlanImage.InvalidateSurface();
     }
 
     private void OnToggleMeasureClicked(object sender, EventArgs e) => IsMeasureVisible = !IsMeasureVisible;
@@ -1150,68 +1208,96 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void LoadCustomPinClicked(object sender, EventArgs e)
     {
-        if (tappedPin == null || !thisPlan.Pins.TryGetValue(tappedPin.Id, out var pinData) || !pinData.IsCustomPin) return;
-
-        var file = Path.GetFileNameWithoutExtension(pinData.PinIcon) + ".data";
-        var filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.CustomPinsPath, file);
-
-        if (File.Exists(filePath))
+        if (tappedPin == null ||
+            !thisPlan.Pins.TryGetValue(tappedPin.Id, out var pinData) ||
+            !pinData.IsCustomPin)
         {
-            ZoomToPin(tappedPin.Id, 1 / pinData.PinScale);
-            _editingCustomPin = tappedPin;            
-            pinList.Remove(tappedPin);
-            PinEditBorder.IsVisible = false;
-            SettingsService.Instance.IsPinPlaceBtnManualHide = false;
+            return;
+        }
 
-            await StartDrawing(false);
+        var file =
+            Path.GetFileNameWithoutExtension(pinData.PinIcon) + ".data";
 
-            drawingController.LoadFromFile(filePath, new SKPoint(
-                (float)((this.Width / 2 + SettingsService.Instance.CustomPinOffset.X) * Settings.DisplayDensity),
-                (float)((this.Height / 2 + SettingsService.Instance.CustomPinOffset.Y) * Settings.DisplayDensity)));
+        var filePath = Path.Combine(
+            Settings.DataDirectory,
+            SettingsService.Instance.ProjectPath,
+            GlobalJson.Data.CustomPinsPath,
+            file);
 
-            drawingController.ViewRotation = pinData.PinRotation - drawingController.InitialRotation;
+        if (!File.Exists(filePath))
+            return;
 
-            var style = drawingController.LoadedStyle;
-            if (style != null)
+        // Optional:
+        // Auf ungefähr denselben Zoom gehen, mit dem der Pin erstellt wurde.
+        ZoomToPin(tappedPin.Id, 1 / pinData.PinScale);
+
+        _editingCustomPin = tappedPin;
+
+        // PNG-Pin während der Bearbeitung ausblenden.
+        pinList.Remove(tappedPin);
+
+        PinEditBorder.IsVisible = false;
+        SettingsService.Instance.IsPinPlaceBtnManualHide = false;
+
+        // Drawing-Layer auf TileImageView aktivieren.
+        await StartDrawing(false);
+
+        var targetCenter = new SKPoint(
+            (float)(pinData.Pos.X * PlanImage.OriginalImageSize.Width),
+            (float)(pinData.Pos.Y * PlanImage.OriginalImageSize.Height));
+
+        drawingController.LoadFromFile(
+            filePath,
+            targetCenter);
+
+        // -----------------------------------------------------
+        // Style wiederherstellen
+        // -----------------------------------------------------
+
+        var style = drawingController.LoadedStyle;
+
+        if (style != null)
+        {
+            SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
+            SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
+
+            var textColor = SKColors.Black;
+            bool isCloud = false;
+
+            if (drawingController.CombinedDrawable != null)
             {
-                SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
-                SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
-
-                var textColor = SKColors.Black;
-                bool isCloud = false;
-
-                if (drawingController.CombinedDrawable != null)
+                if (drawingController.DrawMode == DrawMode.Rect)
                 {
-                    if (drawingController.DrawMode == DrawMode.Rect)
-                    {
-                        textColor = drawingController.CombinedDrawable.RectDrawable.TextColor;
-                        isCloud = drawingController.CombinedDrawable.RectDrawable.IsCloud;
-                    }
-                    else if (drawingController.DrawMode == DrawMode.Oval)
-                    {
-                        textColor = drawingController.CombinedDrawable.OvalDrawable.TextColor;
-                        isCloud = drawingController.CombinedDrawable.OvalDrawable.IsCloud;
-                    }
-                    else if (drawingController.DrawMode == DrawMode.Poly)
-                    {
-                        isCloud = drawingController.CombinedDrawable.PolyDrawable.IsCloud;
-                    }
+                    textColor = drawingController.CombinedDrawable.RectDrawable.TextColor;
+                    isCloud = drawingController.CombinedDrawable.RectDrawable.IsCloud;
                 }
-                AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-
-                SelectedTextColor = textColor.ToMauiColor();
-
-                lineWidth = (int)style.LineThickness;
-                strokeStyle = style.StrokeStyle;
-                isHatchEffect = style.IsHatchEffect;
-                hatchStrokeWitdh = style.HatchStrokeWitdh;
-                hatchStrokeSpace = style.HatchStrokeSpace;
-                hatchRotation = style.HatchRotation;
+                else if (drawingController.DrawMode == DrawMode.Oval)
+                {
+                    textColor = drawingController.CombinedDrawable.OvalDrawable.TextColor;
+                    isCloud = drawingController.CombinedDrawable.OvalDrawable.IsCloud;
+                }
+                else if (drawingController.DrawMode == DrawMode.Poly)
+                {
+                    isCloud = drawingController.CombinedDrawable.PolyDrawable.IsCloud;
+                }
             }
 
-            if (drawingController.DrawMode != DrawMode.None)
-                SetDrawMode(drawingController.DrawMode);
+            AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
+            SelectedTextColor = textColor.ToMauiColor();
+            lineWidth = (int)style.LineThickness;
+            strokeStyle = style.StrokeStyle;
+            isHatchEffect = style.IsHatchEffect;
+            hatchStrokeWitdh = style.HatchStrokeWitdh;
+            hatchStrokeSpace = style.HatchStrokeSpace;
+            hatchRotation = style.HatchRotation;
         }
+
+        // Aktiven Zeichenmodus wiederherstellen.
+        if (drawingController.DrawMode != DrawMode.None)
+            SetDrawMode(drawingController.DrawMode);
+
+        // Neu zeichnen.
+        PlanImage.InvalidateSurface();
     }
 
     private void OnSizeModeClicked(object sender, EventArgs e)

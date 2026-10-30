@@ -105,6 +105,27 @@ public partial class TileImageView : ContentView, IDisposable
     private SKPoint _lastTapLocation = SKPoint.Empty;
     private bool _isDoubleTapAction = false;
     private bool _isLongPressActive = false;
+    private IPlanDrawingLayer _drawingLayer;
+    private bool _drawingOwnsTouch;
+    private bool _hadMultiTouch;
+
+    public IPlanDrawingLayer DrawingLayer
+    {
+        get => _drawingLayer;
+        set
+        {
+            if (_drawingLayer == value) return;
+            _drawingLayer?.Invalidated -= OnDrawingInvalidated;
+            _drawingLayer = value;
+            _drawingOwnsTouch = false;
+            _drawingLayer?.Invalidated += OnDrawingInvalidated;
+            RequestRender();
+        }
+    }
+
+    private void OnDrawingInvalidated(object sender, EventArgs e) => RequestRender();
+    private bool IsDrawingActive => _drawingLayer?.IsActive == true;
+    private SKPoint ToPlan(SKPoint screen) => BuildMapMatrix().TryInvert(out var inv) ? inv.MapPoint(screen) : screen;
 
     // ---------------------------------------------------------------------------------
     //  Felder - Pins
@@ -756,7 +777,9 @@ public partial class TileImageView : ContentView, IDisposable
 
         DrawMapAndPins(canvas, fullClip, isPrimaryPass: true);
 
-        if (_draggedPin != null && SettingsService.Instance.IsLoupeEnabled)
+        bool drawingHandleActive = DrawingLayer?.IsActive == true && DrawingLayer.ActiveHandle.HasValue;
+
+        if (SettingsService.Instance.IsLoupeEnabled && (_draggedPin != null || drawingHandleActive))
             DrawMagnifyingGlass(canvas);
 
         if (_showFps)
@@ -853,6 +876,12 @@ public partial class TileImageView : ContentView, IDisposable
         }
 
         DrawPins(canvas, imageSize, view);
+
+        if (DrawingLayer?.IsActive == true)
+        {
+            DrawingLayer.SetViewTransform(_scale, _rotationDegrees);
+            DrawingLayer.Draw(canvas);
+        }
 
         canvas.Restore();
     }
@@ -982,7 +1011,6 @@ public partial class TileImageView : ContentView, IDisposable
                 DrawParentFallback(canvas, zoom, x, y, tileSize, destRect, paint);
             }
         }
-
         return complete;
     }
 
@@ -1096,7 +1124,19 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     private void DrawMagnifyingGlass(SKCanvas canvas)
     {
-        if (_draggedPin == null) return;
+        SKPoint planPoint;
+
+        if (DrawingLayer?.IsActive == true && DrawingLayer.ActiveHandle is SKPoint drawingPoint)
+            planPoint = drawingPoint;
+        else if (_draggedPin != null)
+        {
+            // normaler Pin
+            planPoint = new SKPoint(
+                _draggedPin.RelativeX * OriginalImageSize.Width,
+                _draggedPin.RelativeY * OriginalImageSize.Height);
+        }
+        else
+            return;
 
         float currentLoupeRadius = SettingsService.Instance.LoupeRadius * (float)Settings.DisplayDensity;
 
@@ -1105,9 +1145,8 @@ public partial class TileImageView : ContentView, IDisposable
 
         SKMatrix mapMatrix = BuildMapMatrix();
 
-        float pinAbsX = _draggedPin.RelativeX * OriginalImageSize.Width;
-        float pinAbsY = _draggedPin.RelativeY * OriginalImageSize.Height;
-        SKPoint pinScreenPos = mapMatrix.MapPoint(pinAbsX, pinAbsY);
+        // Planposition auf Bildschirmposition umrechnen
+        SKPoint screenPos = mapMatrix.MapPoint(planPoint);
 
         float zoomFactor = SettingsService.Instance.LoupeZoomFactor;
         float margin = 30f;
@@ -1123,18 +1162,20 @@ public partial class TileImageView : ContentView, IDisposable
         canvas.Save();
         canvas.Translate(loupeCenterX, loupeCenterY);
         canvas.ClipPath(_cachedLoupePath, SKClipOperation.Intersect, true);
-
         canvas.Save();
         canvas.Scale(zoomFactor);
-        canvas.Translate(-pinScreenPos.X, -pinScreenPos.Y);
+        canvas.Translate(-screenPos.X, -screenPos.Y);
 
+        // Zeichnet Plan + Pins + DrawingLayer erneut.
         DrawMapAndPins(canvas, loupeDeviceClip, isPrimaryPass: false);
-
         canvas.Restore();
 
+        // Schatten
         canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeInnerShadowPaint);
 
+        // Lichtreflex
         canvas.Save();
+
         float glareRadiusX = _cachedLoupeRadius * 0.85f;
         float glareRadiusY = _cachedLoupeRadius * 0.45f;
         float glareOffsetX = -(_cachedLoupeRadius * 0.15f);
@@ -1144,19 +1185,21 @@ public partial class TileImageView : ContentView, IDisposable
         canvas.DrawOval(glareOffsetX, glareOffsetY, glareRadiusX, glareRadiusY, _loupeGlarePaint);
         canvas.Restore();
 
+        // Rand
         canvas.DrawCircle(0, 0, _cachedLoupeRadius, _loupeBorderPaint);
 
-        float crosshairHalfSize = 15 * (float)Settings.DisplayDensity;
+        // Fadenkreuz
+        float crosshairHalfSize =
+            15f * (float)Settings.DisplayDensity;
+
         canvas.DrawLine(-crosshairHalfSize, 0, crosshairHalfSize, 0, _loupeCrosshairPaint);
         canvas.DrawLine(0, -crosshairHalfSize, 0, crosshairHalfSize, _loupeCrosshairPaint);
-
         canvas.Restore();
     }
 
     private void UpdateLoupeCache(float newRadius)
     {
         _cachedLoupeRadius = newRadius;
-
         _cachedLoupePath?.Dispose();
         _cachedInnerShadowShader?.Dispose();
         _cachedGlareShader?.Dispose();
@@ -1476,6 +1519,12 @@ public partial class TileImageView : ContentView, IDisposable
                     _draggedPin = null;
                 }
 
+                if (_drawingOwnsTouch)
+                {
+                    _drawingLayer?.OnCancel();
+                    _drawingOwnsTouch = false;
+                }
+
                 _activeTouches.Remove(e.Id);
                 SyncPublicState(force: true);
                 RequestRender();
@@ -1496,10 +1545,20 @@ public partial class TileImageView : ContentView, IDisposable
             _touchStartTime = DateTime.UtcNow;
             _hasDraggedPin = false;
             _isDoubleTapAction = false;
+            _hadMultiTouch = false;
             _lastTouchPoint = e.Location;
 
-            _draggedPin = GetPinAtPosition(e.Location);
+            // Zeichenmodus: keine Pins greifen, kein Long-Press
+            if (IsDrawingActive)
+            {
+                _draggedPin = null;
+                _drawingLayer.SetViewTransform(_scale, _rotationDegrees);
+                _drawingOwnsTouch = _drawingLayer.OnPressed(ToPlan(e.Location));
+                RequestRender();
+                return;
+            }
 
+            _draggedPin = GetPinAtPosition(e.Location);
             if (_draggedPin != null && _draggedPin.IsLockPosition)
                 _draggedPin = null;
 
@@ -1516,13 +1575,20 @@ public partial class TileImageView : ContentView, IDisposable
 
         if (_activeTouches.Count == 2)
         {
+            _hadMultiTouch = true;
+
+            // Zweiter Finger übernimmt: Zeichen-Geste abbrechen -> Zoom/Pan/Drehen
+            if (_drawingOwnsTouch)
+            {
+                _drawingLayer?.OnCancel();
+                _drawingOwnsTouch = false;
+            }
+
             _draggedPin = null;
             _longPressCts?.Cancel();
-
             var keys = _activeTouches.Keys.OrderBy(k => k).ToArray();
             var p0 = _activeTouches[keys[0]];
             var p1 = _activeTouches[keys[1]];
-
             _oldFingerDistance = SKPoint.Distance(p0, p1);
             _oldFingerAngle = (float)Math.Atan2(p1.Y - p0.Y, p1.X - p0.X);
         }
@@ -1559,6 +1625,14 @@ public partial class TileImageView : ContentView, IDisposable
     private void HandleTouchMoved(SKTouchEventArgs e)
     {
         if (!HasValidViewport) return;
+        if (_drawingOwnsTouch)
+        {
+            if (_activeTouches.ContainsKey(e.Id))
+                _activeTouches[e.Id] = e.Location;
+            _drawingLayer?.OnMoved(ToPlan(e.Location));
+            RequestRender();
+            return;
+        }
         if (_isDoubleTapAction) return;
         if (_isLongPressActive) return;
 
@@ -1652,6 +1726,33 @@ public partial class TileImageView : ContentView, IDisposable
     private void HandleTouchReleased(SKTouchEventArgs e)
     {
         _longPressCts?.Cancel();
+
+        if (IsDrawingActive || _drawingOwnsTouch)
+        {
+            bool isDrawTap = _activeTouches.Count == 1
+                             && !_drawingOwnsTouch
+                             && !_hadMultiTouch
+                             && SKPoint.Distance(_touchStartPoint, e.Location) < ClickThreshold
+                             && (DateTime.UtcNow - _touchStartTime).TotalMilliseconds < 300;
+
+            if (_drawingOwnsTouch)
+            {
+                _drawingLayer?.OnReleased();
+                _drawingOwnsTouch = false;
+            }
+            else if (isDrawTap)
+                _drawingLayer?.OnTap(ToPlan(e.Location));
+
+            _activeTouches.Remove(e.Id);
+            if (_activeTouches.Count < 2)
+            {
+                _oldFingerDistance = 0f;
+                _oldFingerAngle = 0f;
+            }
+            SyncPublicState(force: true);
+            RequestRender();
+            return;
+        }
 
         if (_isLongPressActive)
         {
@@ -2611,6 +2712,12 @@ public partial class TileImageView : ContentView, IDisposable
 
         _longPressCts?.Cancel();
         _tapCts?.Cancel();
+
+        if (_drawingOwnsTouch)
+        {
+            _drawingLayer?.OnCancel();
+            _drawingOwnsTouch = false;
+        }
 
         RequestRender();
     }

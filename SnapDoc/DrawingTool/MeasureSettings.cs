@@ -11,7 +11,7 @@ public class MeasureSettings
         NumberGroupSeparator = "'",
         NumberGroupSizes = [3]
     };
-
+    public float ViewScale { get; set; } = 1f;
     public bool IsMeasureActive { get; set; } = false;
 
     public float MeasureFactor

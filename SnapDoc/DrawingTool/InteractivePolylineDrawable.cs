@@ -63,7 +63,7 @@ public class InteractivePolylineDrawable
             {
                 Color = SKColors.DarkGray,
                 Style = SKPaintStyle.Stroke,
-                StrokeWidth = 2,
+                StrokeWidth = 2f * density * Measure.ViewScale,
                 IsAntialias = true
             };
 
@@ -282,7 +282,7 @@ public class InteractivePolylineDrawable
 
     private void DrawMeasurements(SKCanvas canvas)
     {
-        float textSize = Measure.MeasureTextSize * density;
+        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
 
         bool closed = IsClosed && Points.Count >= 3;

@@ -24,6 +24,8 @@ public class TextStyleDto
 
 public class DrawingFileDto
 {
+    public int Version { get; set; } = 2;
+    public string CoordinateSystem { get; set; } = "Plan";
     public BoundsDto? Bounds { get; set; }
     public DrawingStyleDto? Style { get; set; }
     public float InitialRotation { get; set; }

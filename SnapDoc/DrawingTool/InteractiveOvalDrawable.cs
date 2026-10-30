@@ -4,6 +4,7 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractiveOvalDrawable
 {
+    public MeasureSettings Measure { get; set; } = new();
     public bool HasContent => Width > 1f && Height > 1f;
     public float HandleRadius { get; set; } = 15f;
     public float PointRadius { get; set; } = 8f;
@@ -212,7 +213,7 @@ public class InteractiveOvalDrawable
         {
             Color = SKColors.DarkGray,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = 2,
+            StrokeWidth = 2f * density * Measure.ViewScale,
             IsAntialias = true
         };
 

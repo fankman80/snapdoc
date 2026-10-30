@@ -1,18 +1,16 @@
 ﻿using SkiaSharp;
-using SkiaSharp.Views.Maui;
-using SkiaSharp.Views.Maui.Controls;
+using SnapDoc.Controls;
 using SnapDoc.Services;
 using SnapDoc.ViewModels;
 
 namespace SnapDoc.DrawingTool;
 
-public partial class DrawingController(TransformViewModel transformVm) : IDisposable
+public partial class DrawingController(TransformViewModel transformVm) : IDisposable, IPlanDrawingLayer
 {
-    private SKCanvasView? canvasView;
+    public SKPoint? ActiveHandle { get; private set; }
     private int? activeIndex = null;
     private DateTime? lastClickTime;
     private SKPoint? lastClickPosition;
-    private readonly bool scaleHandlesWithTransform = true;
     private SKPoint? rectDragStart;
     private SKPoint? ovalDragStart;
     private SKPoint? arrowDragStart;
@@ -28,7 +26,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     private static readonly bool UseTouchLift = DeviceInfo.Platform != DevicePlatform.WinUI;
     private SKPoint touchLift = SKPoint.Empty;
     private bool isLiftActive = false;
-
     private bool IsHandleDrag() => DrawMode switch
     {
         DrawMode.Poly => activeIndex != null,
@@ -37,24 +34,109 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         DrawMode.Arrow => activeIndex != null && !isRotatingArrow,
         _ => false
     };
-
     private SKPoint ComputeLift()
     {
         float density = (float)Settings.DisplayDensity;
         float x = SettingsService.Instance.TouchLiftDp.X * density;
         float y = SettingsService.Instance.TouchLiftDp.Y * density;
 
-        // Bildschirm-Versatz in Canvas-Koordinaten umrechnen (ViewRotation rückgängig machen)
-        float a = (float)(-ViewRotation * Math.PI / 180.0);
-        float cos = MathF.Cos(a);
-        float sin = MathF.Sin(a);
+        float a = -viewRotationDeg * MathF.PI / 180f;
+        float cos = MathF.Cos(a), sin = MathF.Sin(a);
+        return new SKPoint((x * cos - y * sin) * viewScale,
+                           (x * sin + y * cos) * viewScale);
+    }
+    public bool IsActive { get; set; }
+    public event EventHandler? Invalidated;
+    private void Invalidate() => Invalidated?.Invoke(this, EventArgs.Empty);
+    private float viewScale = 1f;        // Plan-Pixel pro Bildschirm-Pixel
+    private float viewRotationDeg = 0f;
+    private bool pressConsumed;
 
-        return new SKPoint(x * cos - y * sin,
-                           x * sin + y * cos);
+    public void SetViewTransform(float scale, float rotationDeg)
+    {
+        if (scale <= 0.0001f)
+            return;
+
+        viewRotationDeg = rotationDeg;
+
+        float newViewScale = 1f / scale;
+
+        if (MathF.Abs(newViewScale - viewScale) < 1e-7f)
+            return;
+
+        viewScale = newViewScale;
+
+        ApplyHandleScale();
     }
 
+    private void ApplyHandleScale()
+    {
+        Measure.ViewScale = viewScale;
+
+        if (CombinedDrawable == null)
+            return;
+
+        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius * viewScale;
+
+        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius * viewScale;
+
+        CombinedDrawable.PolyDrawable.HandleRadius = handleRadius;
+        CombinedDrawable.PolyDrawable.PointRadius = pointRadius;
+
+        CombinedDrawable.RectDrawable.HandleRadius = handleRadius;
+        CombinedDrawable.RectDrawable.PointRadius = pointRadius;
+
+        CombinedDrawable.OvalDrawable.HandleRadius = handleRadius;
+        CombinedDrawable.OvalDrawable.PointRadius = pointRadius;
+
+        CombinedDrawable.ArrowDrawable.HandleRadius = handleRadius;
+        CombinedDrawable.ArrowDrawable.PointRadius = pointRadius;
+    }
+
+    public void Draw(SKCanvas canvas) => CombinedDrawable?.Draw(canvas);
+
+    public bool OnPressed(SKPoint p)
+    {
+        pressConsumed = false;
+        OnStartInteraction(p);
+        return pressConsumed || DrawMode switch
+        {
+            DrawMode.Free => true,
+            DrawMode.Poly => activeIndex != null,
+            DrawMode.Rect => activeIndex != null || rectDragStart.HasValue || isRotatingRectangle,
+            DrawMode.Oval => activeIndex != null || ovalDragStart.HasValue || isRotatingOval,
+            DrawMode.Arrow => activeIndex != null || arrowDragStart.HasValue || isRotatingArrow,
+            _ => false
+        };
+    }
+
+    public void OnMoved(SKPoint p) => OnDragInteraction(p);
+    public void OnReleased() => OnEndInteraction();
+
+    public void OnTap(SKPoint p)
+    {
+        if (DrawMode == DrawMode.Poly && CombinedDrawable?.PolyDrawable is { IsClosed: false } poly)
+        {
+            poly.Points.Add(p);
+            Invalidate();
+        }
+    }
+
+    public void OnCancel()
+    {
+        ActiveHandle = null;
+
+        OnEndInteraction();
+        // Halb aufgezogene Formen verwerfen, sonst blockiert IsDrawn ein neues Aufziehen
+        if (CombinedDrawable is { } d)
+        {
+            if (!d.RectDrawable.HasContent) d.RectDrawable.Reset();
+            if (!d.OvalDrawable.HasContent) d.OvalDrawable.Reset();
+            if (!d.ArrowDrawable.HasContent) d.ArrowDrawable.Reset();
+        }
+        Invalidate();
+    }
     public float InitialRotation = 0f;
-    public double ViewRotation { get => canvasView?.Rotation ?? 0; set { canvasView?.Rotation = value; }}
     public float MinX { get; private set; }
     public float MinY { get; private set; }
     public float MaxX { get; private set; }
@@ -64,7 +146,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public bool IsMeasureActive
     {
         get => Measure.IsMeasureActive;
-        set { Measure.IsMeasureActive = value; canvasView?.InvalidateSurface(); }
+        set { Measure.IsMeasureActive = value; Invalidate(); }
     }
 
     public float MeasureFactor
@@ -75,7 +157,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             if (MathF.Abs(Measure.MeasureFactor - value) < 1e-9f) return;
             Measure.MeasureFactor = value;
             if (Measure.IsMeasureActive)
-                canvasView?.InvalidateSurface();
+                Invalidate();
         }
     }
 
@@ -84,39 +166,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable == null) return;
         CombinedDrawable.PolyDrawable.Measure = Measure;
         CombinedDrawable.RectDrawable.Measure = Measure;
+        CombinedDrawable.OvalDrawable.Measure = Measure;
+        CombinedDrawable.ArrowDrawable.Measure = Measure;
     }
 
-    public SKCanvasView CreateCanvasView()
-    {
-        var view = new SKCanvasView
-        {
-            BackgroundColor = Colors.Transparent,
-            EnableTouchEvents = true,
-            HorizontalOptions = LayoutOptions.Fill,
-            VerticalOptions = LayoutOptions.Fill,
-        };
-
-        Attach(view);
-        return view;
-    }
-
-    public void Attach(SKCanvasView view)
-    {
-        Detach();
-
-        canvasView = view ?? throw new ArgumentNullException(nameof(view));
-        canvasView.PaintSurface += OnPaintSurface;
-        canvasView.Touch += OnTouch;
-    }
-
-    public void Detach()
-    {
-        if (canvasView == null) return;
-
-        canvasView.PaintSurface -= OnPaintSurface;
-        canvasView.Touch -= OnTouch;
-        canvasView = null;
-    }
+    public void Detach() => IsActive = false;
 
     public void InitializeDrawing(SKColor lineColor,
                                 SKColor fillColor,
@@ -127,16 +181,9 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                                 float hatchStrokeWitdh,
                                 float hatchStrokeSpace,
                                 float hatchRotation,
-                                bool scaleHandlesWithTransform = true,
                                 float rotationAngle = 0f,
                                 bool forceReset = false)
     {
-        float currentScale = (float)transformVm.Scale;
-        if (currentScale <= 0.0001f)
-            currentScale = 1.0f;
-
-        float safeHandleRadius = scaleHandlesWithTransform ? (float)SettingsService.Instance.PolyLineHandleTouchRadius / currentScale : (float)SettingsService.Instance.PolyLineHandleTouchRadius;
-        float safePointRadius = scaleHandlesWithTransform ? (float)SettingsService.Instance.PolyLineHandleRadius / currentScale : (float)SettingsService.Instance.PolyLineHandleRadius;
 
         if (forceReset || CombinedDrawable == null)
         {
@@ -162,8 +209,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         poly.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         poly.StartPointColor = SKColor.Parse(SettingsService.Instance.PolyLineStartHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         poly.LineThickness = lineThickness;
-        poly.HandleRadius = safeHandleRadius;
-        poly.PointRadius = safePointRadius;
         poly.IsHatchEffect = isHatchEffect;
         poly.HatchRotation = hatchRotation;
         poly.HatchStrokeWitdh = hatchStrokeWitdh;
@@ -177,8 +222,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         rect.TextColor = textColor;
         rect.LineThickness = lineThickness;
         rect.StrokeStyle = strokeStyle;
-        rect.HandleRadius = safeHandleRadius;
-        rect.PointRadius = safePointRadius;
         rect.AllowedAngleDeg = rotationAngle;
         rect.IsHatchEffect = isHatchEffect;
         rect.HatchRotation = hatchRotation;
@@ -193,8 +236,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         oval.TextColor = textColor;
         oval.LineThickness = lineThickness;
         oval.StrokeStyle = strokeStyle;
-        oval.HandleRadius = safeHandleRadius;
-        oval.PointRadius = safePointRadius;
         oval.AllowedAngleDeg = rotationAngle;
         oval.IsHatchEffect = isHatchEffect;
         oval.HatchRotation = hatchRotation;
@@ -208,50 +249,15 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         arrow.PointColor = SKColor.Parse(SettingsService.Instance.PolyLineHandleColor).WithAlpha(SettingsService.Instance.PolyLineHandleAlpha);
         arrow.LineThickness = lineThickness;
         arrow.StrokeStyle = strokeStyle;
-        arrow.HandleRadius = safeHandleRadius;
-        arrow.PointRadius = safePointRadius;
         arrow.AllowedAngleDeg = rotationAngle;
         arrow.IsHatchEffect = isHatchEffect;
         arrow.HatchRotation = hatchRotation;
         arrow.HatchStrokeWitdh = hatchStrokeWitdh;
         arrow.HatchStrokeSpace = hatchStrokeSpace;
 
+        ApplyHandleScale();
         ApplyMeasureSettings();
-        canvasView?.InvalidateSurface();
-    }
-
-    private void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
-    {
-        if (e.Info.Width <= 0 || e.Info.Height <= 0 || transformVm.Scale <= 0.0001) return;
-
-        var canvas = e.Surface.Canvas;
-        canvas.Clear(SKColors.Transparent);
-        CombinedDrawable?.Draw(canvas);
-    }
-
-    private void OnTouch(object? sender, SKTouchEventArgs e)
-    {
-        var p = e.Location;
-
-        switch (e.ActionType)
-        {
-            case SKTouchAction.Pressed: OnStartInteraction(p); break;
-            case SKTouchAction.Moved: OnDragInteraction(p); break;
-            case SKTouchAction.Released:
-            case SKTouchAction.Cancelled: OnEndInteraction(); break;
-        }
-
-        // Event nur als handled markieren, wenn Free-Modus oder Poly-Modus und Punkt aktiv
-        if (DrawMode == DrawMode.Free ||
-           (DrawMode == DrawMode.Poly && activeIndex != null) ||
-           (DrawMode == DrawMode.Rect && (activeIndex != null || rectDragStart.HasValue || isRotatingRectangle)) ||
-           (DrawMode == DrawMode.Oval && (activeIndex != null || ovalDragStart.HasValue || isRotatingOval)) ||
-           (DrawMode == DrawMode.Arrow && (activeIndex != null || arrowDragStart.HasValue || isRotatingArrow)))
-            e.Handled = true;
-        else
-            e.Handled = false;
-
-        canvasView?.InvalidateSurface();
+        Invalidate();
     }
 
     private void OnStartInteraction(SKPoint p)
@@ -264,43 +270,45 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         {
             var poly = CombinedDrawable.PolyDrawable;
             var now = DateTime.Now;
+
+            // Doppeltipp auf Punkt -> löschen
             if (lastClickTime.HasValue &&
                 (now - lastClickTime.Value).TotalMilliseconds <= SettingsService.Instance.DoubleClickThresholdMs &&
                 lastClickPosition.HasValue &&
-                Distance(p, lastClickPosition.Value) <= SettingsService.Instance.PolyLineHandleRadius)
+                Distance(p, lastClickPosition.Value) <= poly.HandleRadius)
             {
                 DeletePointAt(p);
                 lastClickTime = null;
                 lastClickPosition = null;
-                canvasView?.InvalidateSurface();
+                pressConsumed = true;
+                Invalidate();
                 return;
             }
-
             lastClickTime = now;
             lastClickPosition = p;
 
-            activeIndex = poly.FindPointIndex(p.X, p.Y);
-            if (activeIndex != null)
+            // Tipp auf Startpunkt -> schliessen
+            if (!poly.IsClosed && poly.Points.Count > 2 && Distance(p, poly.Points[0]) <= poly.HandleRadius)
             {
-                poly.IsResizing = true;   // ← neu
-                DisableViewTransforms();
+                poly.TryClosePolygon(p.X, p.Y);
+                pressConsumed = true;
+                Invalidate();
+                return;
             }
 
-            if (!poly.IsClosed)
-            {
-                if (poly.Points.Count > 2 && Distance(p, poly.Points[0]) <= poly.HandleRadius)
-                    poly.TryClosePolygon(p.X, p.Y);
-                else if (activeIndex == null)
-                    poly.Points.Add(p);
-            }
-            canvasView?.InvalidateSurface();
+            // Punkt greifen
+            activeIndex = poly.FindPointIndex(p.X, p.Y);
+            if (activeIndex != null)
+                poly.IsResizing = true;
+
+            Invalidate();
         }
         else if (DrawMode == DrawMode.Free)
         {
             var free = CombinedDrawable.FreeDrawable;
             free.StartStroke();
             free.AddPoint(p);
-            canvasView?.InvalidateSurface();
+            Invalidate();
             DisableViewTransforms();
         }
         else if (DrawMode == DrawMode.Rect)
@@ -329,7 +337,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                     DisableViewTransforms();
                 }
             }
-            canvasView?.InvalidateSurface();
+            Invalidate();
         }
         else if (DrawMode == DrawMode.Oval)
         {
@@ -356,7 +364,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                     DisableViewTransforms();
                 }
             }
-            canvasView?.InvalidateSurface();
+            Invalidate();
         }
         else if (DrawMode == DrawMode.Arrow)
         {
@@ -384,7 +392,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                     DisableViewTransforms();
                 }
             }
-            canvasView?.InvalidateSurface();
+            Invalidate();
         }
     }
 
@@ -401,8 +409,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 touchLift = ComputeLift();
                 isLiftActive = true;
             }
+
             h = new SKPoint(p.X + touchLift.X, p.Y + touchLift.Y);
         }
+
+        ActiveHandle = IsHandleDrag() ? h : null;
 
         if (DrawMode == DrawMode.Poly && activeIndex != null)
             CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = h;
@@ -447,11 +458,13 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                 arrow.SetFromDrag(arrowDragStart.Value, p);
         }
 
-        canvasView?.InvalidateSurface();
+        Invalidate();
     }
 
     private void OnEndInteraction()
     {
+        ActiveHandle = null;
+
         if (DrawMode == DrawMode.Poly)
         {
             if (CombinedDrawable?.PolyDrawable is { } poly)
@@ -502,7 +515,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         isLiftActive = false;
         EnableViewTransforms();
 
-        canvasView?.InvalidateSurface();
+        Invalidate();
     }
 
     private void EnableViewTransforms()
@@ -517,50 +530,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         transformVm.IsPanningEnabled = false;
         transformVm.IsPinchingEnabled = false;
         transformVm.IsRotatingEnabled = false;
-    }
-
-    public void ResizeHandles()
-    {
-        if (CombinedDrawable == null) return;
-
-        float currentScale = (float)transformVm.Scale;
-        if (currentScale <= 0.0001f)
-            currentScale = 1.0f;
-
-        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius;
-        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius;
-
-        if (scaleHandlesWithTransform)
-        {
-            handleRadius /= currentScale;
-            pointRadius /= currentScale;
-        }
-
-        if (CombinedDrawable.PolyDrawable is { } poly && DrawMode == DrawMode.Poly)
-        {
-            poly.HandleRadius = handleRadius;
-            poly.PointRadius = pointRadius;
-        }
-
-        if (CombinedDrawable.RectDrawable is { } rect && DrawMode == DrawMode.Rect)
-        {
-            rect.HandleRadius = handleRadius;
-            rect.PointRadius = pointRadius;
-        }
-
-        if (CombinedDrawable.OvalDrawable is { } oval && DrawMode == DrawMode.Oval)
-        {
-            oval.HandleRadius = handleRadius;
-            oval.PointRadius = pointRadius;
-        }
-
-        if (CombinedDrawable.ArrowDrawable is { } arrow && DrawMode == DrawMode.Arrow)
-        {
-            arrow.HandleRadius = handleRadius;
-            arrow.PointRadius = pointRadius;
-        }
-
-        canvasView?.InvalidateSurface();
     }
 
     private void DeletePointAt(SKPoint p)
@@ -656,7 +625,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             arrow.HatchStrokeSpace = hatchStrokeSpace;
         }
 
-        canvasView?.InvalidateSurface();
+        Invalidate();
     }
 
     private static float Distance(SKPoint a, SKPoint b)
@@ -693,153 +662,15 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public void Reset()
     {
         CombinedDrawable?.Reset();
-        canvasView?.InvalidateSurface();
-    }
-
-    private SKPoint GetRotationCenter()
-    {
-        if (canvasView == null)
-            return new SKPoint(0,0);
-
-        return new SKPoint(
-            canvasView.CanvasSize.Width / 2f,
-            canvasView.CanvasSize.Height / 2f
-        );
-    }
-
-    public SKRect? CalculateBoundingBox(float rotationDeg)
-    {
-        if (CombinedDrawable == null)
-            return null;
-
-        var allPoints = new List<SKPoint>();
-
-        if (CombinedDrawable.PolyDrawable.HasContent)
-            allPoints.AddRange(CombinedDrawable.PolyDrawable.Points);
-
-        if (CombinedDrawable.FreeDrawable.HasContent)
-            foreach (var stroke in CombinedDrawable.FreeDrawable.Points)
-                allPoints.AddRange(stroke);
-
-        if (CombinedDrawable.RectDrawable.HasContent)
-            allPoints.AddRange(CombinedDrawable.RectDrawable.Points);
-
-        if (CombinedDrawable.OvalDrawable.HasContent)
-            allPoints.AddRange(CombinedDrawable.OvalDrawable.GetBoundingCorners());
-
-        if (CombinedDrawable.ArrowDrawable.HasContent)
-            allPoints.AddRange(CombinedDrawable.ArrowDrawable.Points);
-
-        if (allPoints.Count == 0)
-            return null;
-
-        IEnumerable<SKPoint> points = allPoints;
-
-        if (Math.Abs(rotationDeg) > 0.001f)
-        {
-            var pivot = GetRotationCenter();
-
-            var matrix = SKMatrix.CreateRotationDegrees(
-                rotationDeg,
-                pivot.X,
-                pivot.Y);
-
-            points = allPoints.Select(p => matrix.MapPoint(p));
-        }
-
-        float minX = points.Min(p => p.X);
-        float maxX = points.Max(p => p.X);
-        float minY = points.Min(p => p.Y);
-        float maxY = points.Max(p => p.Y);
-        float cloudPadding = 0f;
-        float density = (float)Settings.DisplayDensity;
-
-        // Prüfen, ob das Polygon im Wolken-Modus ist
-        if (CombinedDrawable.PolyDrawable.HasContent && CombinedDrawable.PolyDrawable.IsCloud)
-            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.PolyDrawable.CloudRadius * density);
-
-        // Prüfen, ob das Rechteck im Wolken-Modus ist
-        if (CombinedDrawable.RectDrawable.HasContent && CombinedDrawable.RectDrawable.IsCloud)
-            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.RectDrawable.CloudRadius * density);
-
-        // Prüfen, ob das Oval im Wolken-Modus ist
-        if (CombinedDrawable.OvalDrawable.HasContent && CombinedDrawable.OvalDrawable.IsCloud)
-            cloudPadding = MathF.Max(cloudPadding, CombinedDrawable.OvalDrawable.CloudRadius * density);
-
-        return new SKRect(
-            minX - cloudPadding,
-            minY - cloudPadding,
-            maxX + cloudPadding,
-            maxY + cloudPadding
-        );
-    }
-
-    public void DrawWithoutHandles(SKCanvas canvas)
-    {
-        if (CombinedDrawable == null) return;
-
-        var poly = CombinedDrawable.PolyDrawable;
-        var rect = CombinedDrawable.RectDrawable;
-        var oval = CombinedDrawable.OvalDrawable;
-        var arrow = CombinedDrawable.ArrowDrawable;
-        bool polyOld = false;
-        bool rectOld = false;
-        bool ovalOld = false;
-        bool arrowOld = false;
-
-        if (poly != null)
-        {
-            polyOld = poly.DisplayHandles;
-            poly.DisplayHandles = false;
-        }
-
-        if (rect != null)
-        {
-            rectOld = rect.DisplayHandles;
-            rect.DisplayHandles = false;
-        }
-
-        if (oval != null)
-        {
-            ovalOld = oval.DisplayHandles;
-            oval.DisplayHandles = false;
-        }
-
-        arrow?.DisplayHandles = false;
-
-        CombinedDrawable.Draw(canvas);
-
-        poly?.DisplayHandles = polyOld;
-        rect?.DisplayHandles = rectOld;
-        oval?.DisplayHandles = ovalOld;
-        arrow?.DisplayHandles = arrowOld;
-    }
-
-    public void RenderFinal(SKCanvas canvas, float rotationDeg)
-    {
-        if (CombinedDrawable == null) return;
-
-        var pivot = GetRotationCenter();
-
-        canvas.Save();
-
-        if (Math.Abs(rotationDeg) > 0.001f)
-        {
-            canvas.Translate(pivot.X, pivot.Y);
-            canvas.RotateDegrees(rotationDeg);
-            canvas.Translate(-pivot.X, -pivot.Y);
-        }
-
-        DrawWithoutHandles(canvas);
-
-        canvas.Restore();
+        Invalidate();
     }
 
     public void SaveToFile(string path)
     {
-        if (CombinedDrawable == null) return;
+        if (CombinedDrawable == null)
+            return;
 
-        DrawingPersistenceService.Save(path, CombinedDrawable, InitialRotation);
+        DrawingPersistenceService.Save(path, CombinedDrawable, 0f);
     }
 
     public void LoadFromFile(string path, SKPoint position)
@@ -880,7 +711,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         HideAllHandles();
         UpdateHandleVisibility();
-        canvasView?.InvalidateSurface();
+        Invalidate();
     }
 
     private void HideAllHandles()
@@ -904,6 +735,81 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         CombinedDrawable.ArrowDrawable.DisplayHandles = (DrawMode == DrawMode.Arrow);
     }
 
+    public SKRect? CalculatePlanBoundingBox()
+    {
+        if (CombinedDrawable == null)
+            return null;
+
+        var points = new List<SKPoint>();
+
+        if (CombinedDrawable.PolyDrawable?.HasPoints == true)
+            points.AddRange(CombinedDrawable.PolyDrawable.Points);
+
+        if (CombinedDrawable.FreeDrawable?.HasContent == true)
+            points.AddRange(
+                CombinedDrawable.FreeDrawable.Points.SelectMany(stroke => stroke));
+
+        if (CombinedDrawable.RectDrawable?.HasContent == true)
+            points.AddRange(CombinedDrawable.RectDrawable.Points);
+
+        if (CombinedDrawable.OvalDrawable?.HasContent == true)
+            points.AddRange(CombinedDrawable.OvalDrawable.Points);
+
+        if (CombinedDrawable.ArrowDrawable?.HasContent == true)
+            points.AddRange(CombinedDrawable.ArrowDrawable.Points);
+
+        if (points.Count == 0)
+            return null;
+
+        float minX = points.Min(p => p.X);
+        float minY = points.Min(p => p.Y);
+        float maxX = points.Max(p => p.X);
+        float maxY = points.Max(p => p.Y);
+
+        return new SKRect(minX, minY, maxX, maxY);
+    }
+
+    public void RenderForExport(SKCanvas canvas)
+    {
+        if (CombinedDrawable == null)
+            return;
+
+        var poly = CombinedDrawable.PolyDrawable;
+        var rect = CombinedDrawable.RectDrawable;
+        var oval = CombinedDrawable.OvalDrawable;
+        var arrow = CombinedDrawable.ArrowDrawable;
+
+        bool polyHandles = poly.DisplayHandles;
+        bool rectHandles = rect.DisplayHandles;
+        bool ovalHandles = oval.DisplayHandles;
+        bool arrowHandles = arrow.DisplayHandles;
+
+        bool polyResizing = poly.IsResizing;
+        bool rectResizing = rect.IsResizing;
+
+        try
+        {
+            poly.DisplayHandles = false;
+            rect.DisplayHandles = false;
+            oval.DisplayHandles = false;
+            arrow.DisplayHandles = false;
+
+            poly.IsResizing = false;
+            rect.IsResizing = false;
+
+            CombinedDrawable.Draw(canvas);
+        }
+        finally
+        {
+            poly.DisplayHandles = polyHandles;
+            rect.DisplayHandles = rectHandles;
+            oval.DisplayHandles = ovalHandles;
+            arrow.DisplayHandles = arrowHandles;
+
+            poly.IsResizing = polyResizing;
+            rect.IsResizing = rectResizing;
+        }
+    }
 
     public void Dispose()
     {

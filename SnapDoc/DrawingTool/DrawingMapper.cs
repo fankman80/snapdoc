@@ -22,15 +22,15 @@ public static class DrawingMapper
 
         return new DrawingFileDto
         {
+            Version = 2,
+            CoordinateSystem = "Plan",
             Style = style,
-
             Bounds = new BoundsDto
             {
                 Width = bounds.Width,
                 Height = bounds.Height
             },
-
-            InitialRotation = initialRotation,
+            InitialRotation = 0f,
 
             // ---------------- POLY ----------------
             Poly = d.PolyDrawable?.Points.Count > 0
