@@ -31,6 +31,7 @@
                     MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                     MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
+                <!-- Lock Plan Rotation -->
                 <controls:Switch LabelText="{x:Static res:AppResources.planrotation_sperren}"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
                     IsToggled="{Binding IsPlanRotateLocked}"
@@ -42,6 +43,43 @@
                     SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
+                <!-- Plan List with Thumbnails -->
+                <controls:Switch LabelText="{x:Static res:AppResources.planliste_mit_vorschau}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    IsToggled="{Binding IsPlanListThumbnails}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BorderColorOff ="Transparent"
+                    KnobColorOn="White"
+                    KnobColorOff="White"
+                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <!-- Hide Inactive Plans -->
+                <controls:Switch LabelText="{x:Static res:AppResources.inaktive_plaene_ausblenden}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    IsToggled="{Binding IsHideInactivePlans}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BorderColorOff ="Transparent"
+                    KnobColorOn="White"
+                    KnobColorOff="White"
+                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <!-- Lock Pins -->
+                <controls:Switch LabelText="{x:Static res:AppResources.pin_automatisch_sperren}"
+                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                    IsToggled="{Binding IsPinAutoLock}"
+                    HorizontalOptions="Start"
+                    VerticalOptions="Center"
+                    BorderColorOff="Transparent"
+                    KnobColorOn="White"
+                    KnobColorOff="White"
+                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <!-- Show Lock Badges -->
                 <HorizontalStackLayout>
                     <controls:Switch LabelText="{x:Static res:AppResources.zeige_sperrsymbole}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -63,41 +101,9 @@
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
                         Clicked="LockSettingsClicked"/>
-                </HorizontalStackLayout>
-
-                <controls:Switch LabelText="{x:Static res:AppResources.planliste_mit_vorschau}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    IsToggled="{Binding IsPlanListThumbnails}"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    BorderColorOff ="Transparent"
-                    KnobColorOn="White"
-                    KnobColorOff="White"
-                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                <controls:Switch LabelText="{x:Static res:AppResources.inaktive_plaene_ausblenden}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    IsToggled="{Binding IsHideInactivePlans}"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    BorderColorOff ="Transparent"
-                    KnobColorOn="White"
-                    KnobColorOff="White"
-                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                <controls:Switch LabelText="{x:Static res:AppResources.pin_automatisch_sperren}"
-                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    IsToggled="{Binding IsPinAutoLock}"
-                    HorizontalOptions="Start"
-                    VerticalOptions="Center"
-                    BorderColorOff="Transparent"
-                    KnobColorOn="White"
-                    KnobColorOff="White"
-                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
+                </HorizontalStackLayout>                
+                
+                <!-- Gesture Helper Settings -->
                 <HorizontalStackLayout>
                     <controls:Switch LabelText="{x:Static res:AppResources.lupe_aktivieren}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -121,6 +127,7 @@
                         Clicked="GestureHelperSettingsClicked"/>
                 </HorizontalStackLayout>
 
+                <!-- Move Offset -->
                 <HorizontalStackLayout>
                     <controls:Switch LabelText="{x:Static res:AppResources.move_offset}"
                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
@@ -143,6 +150,7 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
                         Clicked="GestureHelperSettingsClicked"/>
                 </HorizontalStackLayout>
+                
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
                     <VerticalStackLayout Spacing="0"
                                          HorizontalOptions="Start"
