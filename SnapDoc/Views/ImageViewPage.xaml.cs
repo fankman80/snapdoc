@@ -726,8 +726,8 @@ public partial class ImageViewPage : IQueryAttributable
                     }
                     File.Copy(imgPath, origPath);
                 }
-
-                await SaveFotoWithOverlay(imgPath, imgPath);
+                
+                await SaveFotoWithOverlay(origPath, imgPath);
 
                 var bytes = File.ReadAllBytes(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
