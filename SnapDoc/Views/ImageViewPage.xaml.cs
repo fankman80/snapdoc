@@ -727,21 +727,24 @@ public partial class ImageViewPage : IQueryAttributable
                     File.Copy(imgPath, origPath);
                 }
                 
-                await SaveFotoWithOverlay(origPath, imgPath);
+                bool saved = await SaveFotoWithOverlay(origPath, imgPath);
 
-                var bytes = File.ReadAllBytes(imgPath);
+                if (!saved)
+                {
+                    await SnackbarExtensions.ShowSafeAsync("Das Bild mit der Zeichnung konnte nicht gespeichert werden.", includeDelay: true);
+                    return;
+                }
+
+                var bytes = await File.ReadAllBytesAsync(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
-
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
-
                 uploads.Add((origPath, $"{GlobalJson.Data.ImagePath}/originals"));
             }
 
             var foto = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource];
             foto.File = Path.GetFileName(imgPath);
             foto.Touch();
-
             SaveManager.NotifyDataChanged(uploads);
         }
 
@@ -762,40 +765,42 @@ public partial class ImageViewPage : IQueryAttributable
         isCleared = false;
     }
 
-    public async Task SaveFotoWithOverlay(string fotoPath, string outputPath)
+    private async Task<bool> SaveFotoWithOverlay(string fotoPath, string outputPath)
     {
+        if (!File.Exists(fotoPath))
+            return false;
+
         using var fotoStream = File.OpenRead(fotoPath);
         using var fotoBitmap = SKBitmap.Decode(fotoStream);
 
         if (fotoBitmap == null)
-            return;
+            return false;
 
         int originalWidth = fotoBitmap.Width;
         int originalHeight = fotoBitmap.Height;
+        float drawingWidth = DrawingView.CanvasSize.Width;
+        float drawingHeight = DrawingView.CanvasSize.Height;
 
-        var info = new SKImageInfo(
-            originalWidth,
-            originalHeight,
-            SKColorType.Rgba8888,
-            SKAlphaType.Premul);
+        if (drawingWidth <= 0 || drawingHeight <= 0)
+            return false;
 
+        var info = new SKImageInfo(originalWidth, originalHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
         using var surface = SKSurface.Create(info);
 
         if (surface == null)
-            return;
+            return false;
 
         var canvas = surface.Canvas;
+        canvas.Clear(SKColors.White);
 
-        // Originalfoto
-        canvas.DrawBitmap(fotoBitmap, new SKRect(0, 0, originalWidth, originalHeight), SKSamplingOptions.Default);
+        // Originalfoto zeichnen
+        canvas.DrawBitmap(fotoBitmap, new SKRect( 0, 0, originalWidth, originalHeight), SKSamplingOptions.Default);
 
+        // Drawing auf Originalfoto-Auflösung skalieren
         if (!drawingController.IsEmpty())
         {
-            float drawingWidth = (float)Math.Max(1, FotoContainer.Width);
-            float drawingHeight = (float)Math.Max(1, FotoContainer.Height);
             float scaleX = originalWidth / drawingWidth;
             float scaleY = originalHeight / drawingHeight;
-
             canvas.Save();
             canvas.Scale(scaleX, scaleY);
             drawingController.RenderForExport(canvas);
@@ -805,10 +810,20 @@ public partial class ImageViewPage : IQueryAttributable
         canvas.Flush();
 
         using var finalImage = surface.Snapshot();
-        using var data = finalImage.Encode(SKEncodedImageFormat.Jpeg, 90);
-        await using var output = File.Create(outputPath);
+        using var data = finalImage.Encode( SKEncodedImageFormat.Jpeg, 90);
 
-        data.SaveTo(output);
+        if (data == null)
+            return false;
+
+        // Erst jetzt Zieldatei ersetzen
+        await using (var output = new FileStream( outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
+        {
+            data.SaveTo(output);
+            await output.FlushAsync();
+        }
+
+        return File.Exists(outputPath) &&
+               new FileInfo(outputPath).Length > 0;
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
