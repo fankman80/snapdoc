@@ -770,60 +770,89 @@ public partial class ImageViewPage : IQueryAttributable
         if (!File.Exists(fotoPath))
             return false;
 
-        using var fotoStream = File.OpenRead(fotoPath);
-        using var fotoBitmap = SKBitmap.Decode(fotoStream);
+        string tempPath = outputPath + ".drawing.tmp";
 
-        if (fotoBitmap == null)
-            return false;
-
-        int originalWidth = fotoBitmap.Width;
-        int originalHeight = fotoBitmap.Height;
-        float drawingWidth = DrawingView.CanvasSize.Width;
-        float drawingHeight = DrawingView.CanvasSize.Height;
-
-        if (drawingWidth <= 0 || drawingHeight <= 0)
-            return false;
-
-        var info = new SKImageInfo(originalWidth, originalHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
-        using var surface = SKSurface.Create(info);
-
-        if (surface == null)
-            return false;
-
-        var canvas = surface.Canvas;
-        canvas.Clear(SKColors.White);
-
-        // Originalfoto zeichnen
-        canvas.DrawBitmap(fotoBitmap, new SKRect( 0, 0, originalWidth, originalHeight), SKSamplingOptions.Default);
-
-        // Drawing auf Originalfoto-Auflösung skalieren
-        if (!drawingController.IsEmpty())
+        try
         {
-            float scaleX = originalWidth / drawingWidth;
-            float scaleY = originalHeight / drawingHeight;
-            canvas.Save();
-            canvas.Scale(scaleX, scaleY);
-            drawingController.RenderForExport(canvas);
-            canvas.Restore();
+            using var fotoStream = File.OpenRead(fotoPath);
+            using var fotoBitmap = SKBitmap.Decode(fotoStream);
+
+            if (fotoBitmap == null)
+                return false;
+
+            int originalWidth = fotoBitmap.Width;
+            int originalHeight = fotoBitmap.Height;
+            float drawingWidth = DrawingView.CanvasSize.Width;
+            float drawingHeight = DrawingView.CanvasSize.Height;
+
+            if (drawingWidth <= 0f || drawingHeight <= 0f)
+                return false;
+
+            var info = new SKImageInfo(originalWidth, originalHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
+            using var surface = SKSurface.Create(info);
+
+            if (surface == null)
+                return false;
+
+            SKCanvas canvas = surface.Canvas;
+            canvas.Clear(SKColors.White);
+
+            canvas.DrawBitmap(fotoBitmap, new SKRect(0, 0, originalWidth, originalHeight), SKSamplingOptions.Default);
+
+            if (!drawingController.IsEmpty())
+            {
+                float scaleX = originalWidth / drawingWidth;
+                float scaleY = originalHeight / drawingHeight;
+                canvas.Save();
+                canvas.Scale(scaleX, scaleY);
+                drawingController.RenderForExport(canvas);
+                canvas.Restore();
+            }
+
+            canvas.Flush();
+
+            using var finalImage = surface.Snapshot();
+
+            SKEncodedImageFormat format = Path.GetExtension(outputPath).Equals(".png", StringComparison.OrdinalIgnoreCase)
+                ? SKEncodedImageFormat.Png
+                : SKEncodedImageFormat.Jpeg;
+
+            using var data = finalImage.Encode(format, 90);
+
+            if (data == null)
+                return false;
+
+            await using (var output = new FileStream(tempPath, FileMode.Create, FileAccess.Write, FileShare.None))
+            {
+                data.SaveTo(output);
+                await output.FlushAsync();
+            }
+
+            if (!File.Exists(tempPath) || new FileInfo(tempPath).Length == 0)
+                return false;
+    
+            File.Move(tempPath, outputPath, overwrite: true);
+            return File.Exists(outputPath) && new FileInfo(outputPath).Length > 0;
         }
-
-        canvas.Flush();
-
-        using var finalImage = surface.Snapshot();
-        using var data = finalImage.Encode( SKEncodedImageFormat.Jpeg, 90);
-
-        if (data == null)
-            return false;
-
-        // Erst jetzt Zieldatei ersetzen
-        await using (var output = new FileStream( outputPath, FileMode.Create, FileAccess.Write, FileShare.None))
+        catch (Exception ex)
         {
-            data.SaveTo(output);
-            await output.FlushAsync();
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Speichern des Foto-Overlays: {ex}");
+            return false;
         }
-
-        return File.Exists(outputPath) &&
-               new FileInfo(outputPath).Length > 0;
+        finally
+        {
+            if (File.Exists(tempPath))
+            {
+                try
+                {
+                    File.Delete(tempPath);
+                }
+                catch
+                {
+                    // Temporäre Datei beim nächsten Start bereinigen
+                }
+            }
+        }
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
