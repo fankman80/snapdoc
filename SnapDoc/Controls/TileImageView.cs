@@ -889,7 +889,11 @@ public partial class TileImageView : ContentView, IDisposable
         if (DrawingLayer?.IsActive == true)
         {
             DrawingLayer.SetViewTransform(_scale, _rotationDegrees);
-            DrawingLayer.Draw(canvas);
+
+            if (isPrimaryPass)
+                DrawingLayer.Draw(canvas);
+            else
+                DrawingLayer.DrawWithoutHandles(canvas);
         }
 
         canvas.Restore();

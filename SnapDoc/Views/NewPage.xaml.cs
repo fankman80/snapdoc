@@ -710,10 +710,17 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                     drawingController.Reset();
 
                 drawingController.InitializeDrawing(
-                    SelectedBorderColor.ToSKColor(), SelectedFillColor.ToSKColor(), SelectedTextColor.ToSKColor(),
-                    lineWidth, strokeStyle, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation,
-                    -(float)PlanImage.CurrentRotation,   // Rechteck bildschirmparallel im gedrehten Plan
-                    setDefaultMode);
+                    SelectedBorderColor.ToSKColor(),
+                    SelectedFillColor.ToSKColor(),
+                    SelectedTextColor.ToSKColor(),
+                    lineWidth,
+                    strokeStyle,
+                    isHatchEffect,
+                    hatchStrokeWitdh,
+                    hatchStrokeSpace,
+                    hatchRotation,
+                    rotationAngle: 0f,
+                    forceReset: setDefaultMode);
 
                 drawingController.InitialRotation = 0f;
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
@@ -950,7 +957,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController.IsActive = false;
         PlanImage.DrawingLayer = null;
         drawMode = DrawMode.None;
-        SetDrawMode(drawMode);
+        drawingController.DrawMode = DrawMode.None;
         OnPropertyChanged(nameof(IsMeasurePanelVisible));
         IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
@@ -1246,9 +1253,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             (float)(pinData.Pos.X * PlanImage.OriginalImageSize.Width),
             (float)(pinData.Pos.Y * PlanImage.OriginalImageSize.Height));
 
-        drawingController.LoadFromFile(
-            filePath,
-            targetCenter);
+        drawingController.LoadFromFile(filePath, targetCenter);
 
         // -----------------------------------------------------
         // Style wiederherstellen

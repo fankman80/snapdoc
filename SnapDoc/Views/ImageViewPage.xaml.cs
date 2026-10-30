@@ -509,6 +509,7 @@ public partial class ImageViewPage : IQueryAttributable
             hatchStrokeWitdh,
             hatchStrokeSpace,
             hatchRotation,
+            rotationAngle: 0f,
             forceReset: setDefaultMode);
 
         // Fotos haben keinen realen Massstab

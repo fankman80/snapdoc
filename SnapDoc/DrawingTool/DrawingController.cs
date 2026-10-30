@@ -94,6 +94,39 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void Draw(SKCanvas canvas) => CombinedDrawable?.Draw(canvas);
 
+    public void DrawWithoutHandles(SKCanvas canvas)
+    {
+        if (CombinedDrawable == null)
+            return;
+
+        var poly = CombinedDrawable.PolyDrawable;
+        var rect = CombinedDrawable.RectDrawable;
+        var oval = CombinedDrawable.OvalDrawable;
+        var arrow = CombinedDrawable.ArrowDrawable;
+
+        bool polyHandles = poly.DisplayHandles;
+        bool rectHandles = rect.DisplayHandles;
+        bool ovalHandles = oval.DisplayHandles;
+        bool arrowHandles = arrow.DisplayHandles;
+
+        try
+        {
+            poly.DisplayHandles = false;
+            rect.DisplayHandles = false;
+            oval.DisplayHandles = false;
+            arrow.DisplayHandles = false;
+
+            CombinedDrawable.Draw(canvas);
+        }
+        finally
+        {
+            poly.DisplayHandles = polyHandles;
+            rect.DisplayHandles = rectHandles;
+            oval.DisplayHandles = ovalHandles;
+            arrow.DisplayHandles = arrowHandles;
+        }
+    }
+
     public bool OnPressed(SKPoint p)
     {
         pressConsumed = false;
@@ -319,6 +352,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
             if (!rect.IsDrawn)
             {
+                rect.AllowedAngleDeg = 0f;
                 rectDragStart = p;
                 DisableViewTransforms();
             }
@@ -347,6 +381,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
             if (!oval.IsDrawn)
             {
+                oval.AllowedAngleDeg = 0f;
                 ovalDragStart = p;
                 DisableViewTransforms();
             }
@@ -374,6 +409,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
             if (!arrow.IsDrawn)
             {
+                arrow.AllowedAngleDeg = 0f;
                 arrowDragStart = p;
                 DisableViewTransforms();
             }
@@ -689,6 +725,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         // Wir laden das DTO und befüllen das CombinedDrawable
         var dto = DrawingPersistenceService.Load(path, CombinedDrawable, position, this);
         ApplyMeasureSettings();
+        ApplyHandleScale();
 
         if (dto != null)
         {
@@ -778,36 +815,18 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         var poly = CombinedDrawable.PolyDrawable;
         var rect = CombinedDrawable.RectDrawable;
-        var oval = CombinedDrawable.OvalDrawable;
-        var arrow = CombinedDrawable.ArrowDrawable;
-
-        bool polyHandles = poly.DisplayHandles;
-        bool rectHandles = rect.DisplayHandles;
-        bool ovalHandles = oval.DisplayHandles;
-        bool arrowHandles = arrow.DisplayHandles;
-
         bool polyResizing = poly.IsResizing;
         bool rectResizing = rect.IsResizing;
 
         try
         {
-            poly.DisplayHandles = false;
-            rect.DisplayHandles = false;
-            oval.DisplayHandles = false;
-            arrow.DisplayHandles = false;
-
             poly.IsResizing = false;
             rect.IsResizing = false;
 
-            CombinedDrawable.Draw(canvas);
+            DrawWithoutHandles(canvas);
         }
         finally
         {
-            poly.DisplayHandles = polyHandles;
-            rect.DisplayHandles = rectHandles;
-            oval.DisplayHandles = ovalHandles;
-            arrow.DisplayHandles = arrowHandles;
-
             poly.IsResizing = polyResizing;
             rect.IsResizing = rectResizing;
         }
