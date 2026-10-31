@@ -415,26 +415,28 @@ public partial class ExportReport
                                                         break;
 
                                                     case "${pin_priority}":
-                                                        if (currentPin.PinPriority != 0)
                                                         {
-                                                            string fillColor = SettingsService.Instance.PriorityItems[currentPin.PinPriority].Color;
-                                                            newTableCell.TableCellProperties ??= new TableCellProperties();
+                                                            int priorityIndex = currentPin.PinPriority;
+                                                            var priorityItem = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
 
-                                                            Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
-                                                            if (shading == null)
+                                                            if (priorityIndex != 0 && priorityItem != null)
                                                             {
-                                                                shading = new Shading();
-                                                                newTableCell.TableCellProperties.AppendChild(shading);
+                                                                string fillColor = priorityItem.Color;
+                                                                newTableCell.TableCellProperties ??= new TableCellProperties();
+                                                                Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
+
+                                                                if (shading == null)
+                                                                {
+                                                                    shading = new Shading();
+                                                                    newTableCell.TableCellProperties.AppendChild(shading);
+                                                                }
+
+                                                                shading.Fill = fillColor.Replace("#", "");
+                                                                shading.Val = ShadingPatternValues.Clear;
                                                             }
-
-                                                            shading.Fill = fillColor.Replace("#", "");
-                                                            shading.Val = ShadingPatternValues.Clear;
+                                                            AddText(priorityItem?.Key ?? "");
+                                                            break;
                                                         }
-
-                                                        var priorityIndex = currentPin.PinPriority;
-                                                        var prio_item = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
-                                                        AddText(prio_item?.Key ?? "");
-                                                        break;
 
                                                     case "${pin_geolocWGS84}":
                                                         if (currentPin.GeoLocation?.WGS84 != null)
