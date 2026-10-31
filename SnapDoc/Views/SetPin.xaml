@@ -230,6 +230,7 @@
                                 Padding="6,0"
                                 VerticalOptions="Center">
                             <controls:CustomRadioPicker x:Name="PriorityPicker"
+                                                        Placeholder="{x:Static res:AppResources.bitte_waehlen}"
                                                         BackgroundColor="Transparent"
                                                         BorderThickness="0"
                                                         ItemsSource="{Binding Pin.PinPriorities}"

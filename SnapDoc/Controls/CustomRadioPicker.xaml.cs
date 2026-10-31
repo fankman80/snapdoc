@@ -132,7 +132,9 @@ public partial class CustomRadioPicker : ContentView
 
     private void UpdateDisplay()
     {
-        DisplayLabel.Text = SelectedItem?.ToString() ?? Placeholder;
+        var text = SelectedItem?.ToString();
+
+        DisplayLabel.Text = string.IsNullOrWhiteSpace(text) ? Placeholder : text;
     }
 
     private async void OnClicked(object sender, EventArgs e)

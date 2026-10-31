@@ -748,11 +748,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (thisPlan == null) return;
 
         var text = MeasureFactorEntry.Text?.Trim().Replace(',', '.');
-        if (float.TryParse(text, System.Globalization.NumberStyles.Float,
-                           System.Globalization.CultureInfo.InvariantCulture, out var value))
-        {
+        if (float.TryParse(text, System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out var value))
             PlanMeasureFactor = value;
-        }
 
         // Anzeige auf gültigen Wert zurücksetzen und Tastatur schliessen
         MeasureFactorEntry.Text = PlanMeasureFactor.ToString(System.Globalization.CultureInfo.InvariantCulture);
@@ -851,10 +848,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         string newBaseName = $"custompin_{DateTime.Now.Ticks}";
         string pngFileName = newBaseName + ".png";
         string dataFileName = newBaseName + ".data";
-
         string pngPath = Path.Combine(customPinPath, pngFileName);
         string dataPath = Path.Combine(customPinPath, dataFileName);
-
         bool isOverwrite = false;
         string oldPngPath = null;
         string oldDataPath = null;
@@ -866,13 +861,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             isOverwrite = true;
             oldFileName = Path.GetFileName(oldPin.PinIcon);
             oldPngPath = Path.Combine(customPinPath, oldFileName);
-            oldDataPath = Path.Combine(
-                customPinPath,
-                Path.ChangeExtension(oldFileName, ".data"));
+            oldDataPath = Path.Combine(customPinPath, Path.ChangeExtension(oldFileName, ".data"));
         }
 
-        DrawingExportResult? export =
-            await SaveDrawingAsCroppedPngAsync(pngPath);
+        DrawingExportResult? export = await SaveDrawingAsCroppedPngAsync(pngPath);
 
         if (export == null)
         {
@@ -880,31 +872,19 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             return;
         }
 
-        /*
-         * Die .data-Datei speichert die Geometrie relativ zur Bounding-Box.
-         */
         drawingController.SaveToFile(dataPath);
 
         SaveManager.NotifyDataChanged(
         [
             (pngPath, GlobalJson.Data.CustomPinsPath),
-        (dataPath, GlobalJson.Data.CustomPinsPath)
+            (dataPath, GlobalJson.Data.CustomPinsPath)
         ]);
 
         SKRect planBounds = export.Value.PlanBounds;
-
-        double relativeX =
-            planBounds.MidX / PlanImage.OriginalImageSize.Width;
-
-        double relativeY =
-            planBounds.MidY / PlanImage.OriginalImageSize.Height;
-
-        Point relativePosition = new(
-            Math.Clamp(relativeX, 0d, 1d),
-            Math.Clamp(relativeY, 0d, 1d));
-
-        string displayText =
-            drawingController.CombinedDrawable?.RectDrawable?.Text ?? "";
+        double relativeX = planBounds.MidX / PlanImage.OriginalImageSize.Width;
+        double relativeY = planBounds.MidY / PlanImage.OriginalImageSize.Height;
+        Point relativePosition = new(Math.Clamp(relativeX, 0d, 1d), Math.Clamp(relativeY, 0d, 1d));
+        string displayText = drawingController.CombinedDrawable?.RectDrawable?.Text ?? "";
 
         await SetPin(
             relativePosition,
@@ -923,29 +903,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         {
             try
             {
-                if (!string.IsNullOrEmpty(oldPngPath) &&
-                    File.Exists(oldPngPath))
-                {
+                if (!string.IsNullOrEmpty(oldPngPath) && File.Exists(oldPngPath))
                     File.Delete(oldPngPath);
-                }
 
-                if (!string.IsNullOrEmpty(oldDataPath) &&
-                    File.Exists(oldDataPath))
-                {
+                if (!string.IsNullOrEmpty(oldDataPath) && File.Exists(oldDataPath))
                     File.Delete(oldDataPath);
-                }
 
-                _ = SaveManager.DeleteCloudFileAsync(
-                    $"{GlobalJson.Data.CustomPinsPath}/{oldFileName}");
-
-                _ = SaveManager.DeleteCloudFileAsync(
-                    $"{GlobalJson.Data.CustomPinsPath}/" +
-                    $"{Path.ChangeExtension(oldFileName, ".data")}");
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/{oldFileName}");
+                _ = SaveManager.DeleteCloudFileAsync($"{GlobalJson.Data.CustomPinsPath}/" + $"{Path.ChangeExtension(oldFileName, ".data")}");
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine(
-                    $"Löschfehler: {ex.Message}");
+                System.Diagnostics.Debug.WriteLine($"Löschfehler: {ex.Message}");
             }
         }
 
@@ -966,6 +935,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (_editingCustomPin != null && !pinList.Contains(_editingCustomPin))
             pinList.Add(_editingCustomPin);
+
         _editingCustomPin = null;
 
         PlanImage.InvalidateSurface();
@@ -975,19 +945,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         SKRect? bounds = drawingController.CalculatePlanBoundingBox();
 
-        if (bounds == null ||
-            bounds.Value.Width <= 0f ||
-            bounds.Value.Height <= 0f)
-        {
+        if (bounds == null || bounds.Value.Width <= 0f || bounds.Value.Height <= 0f)
             return null;
-        }
 
         // Die Zeichnung liegt in Plan-Koordinaten.
         // Mit dem aktuellen Zoom exportieren wir ungefähr in der
         // Auflösung, in welcher die Zeichnung momentan dargestellt wird.
-        float exportScale = Math.Max(
-            0.01f,
-            (float)PlanImage.CurrentScale);
+        float exportScale = Math.Max(0.01f, (float)PlanImage.CurrentScale);
 
         // Der Pin muss später wieder auf die ursprüngliche Grösse
         // im Plan zurückskaliert werden.
@@ -997,55 +961,30 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // Die 8 DIP werden zuerst zu Bildschirm-Pixeln
         // und danach zu Plan-Pixeln umgerechnet.
         float density = (float)Settings.DisplayDensity;
-
-        float paddingScreenPx = Math.Max(
-            8f * density,
-            lineWidth * density * 2f);
-
+        float paddingScreenPx = Math.Max(8f * density, lineWidth * density * 2f);
         float paddingPlan = paddingScreenPx / exportScale;
 
         SKRect crop = bounds.Value;
         crop.Inflate(paddingPlan, paddingPlan);
 
         // Grösse des zu erzeugenden PNG.
-        int pixelWidth = Math.Max(
-            1,
-            (int)MathF.Ceiling(crop.Width * exportScale));
-
-        int pixelHeight = Math.Max(
-            1,
-            (int)MathF.Ceiling(crop.Height * exportScale));
+        int pixelWidth = Math.Max(1, (int)MathF.Ceiling(crop.Width * exportScale));
+        int pixelHeight = Math.Max(1, (int)MathF.Ceiling(crop.Height * exportScale));
 
         // Sicherheit gegen extrem grosse PNG-Dateien.
         const int maxExportEdge = 8192;
-
-        int longestEdge = Math.Max(
-            pixelWidth,
-            pixelHeight);
+        int longestEdge = Math.Max(pixelWidth, pixelHeight);
 
         if (longestEdge > maxExportEdge)
         {
-            float reduce =
-                (float)maxExportEdge / longestEdge;
-
+            float reduce = (float)maxExportEdge / longestEdge;
             exportScale *= reduce;
             pinScale = 1f / exportScale;
-
-            pixelWidth = Math.Max(
-                1,
-                (int)MathF.Ceiling(crop.Width * exportScale));
-
-            pixelHeight = Math.Max(
-                1,
-                (int)MathF.Ceiling(crop.Height * exportScale));
+            pixelWidth = Math.Max(1, (int)MathF.Ceiling(crop.Width * exportScale));
+            pixelHeight = Math.Max(1, (int)MathF.Ceiling(crop.Height * exportScale));
         }
 
-        var info = new SKImageInfo(
-            pixelWidth,
-            pixelHeight,
-            SKColorType.Rgba8888,
-            SKAlphaType.Premul);
-
+        var info = new SKImageInfo(pixelWidth, pixelHeight, SKColorType.Rgba8888, SKAlphaType.Premul);
         using var surface = SKSurface.Create(info);
 
         if (surface == null)
@@ -1060,29 +999,18 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // BoundingBox nach links oben verschieben,
         // damit das PNG dort bei 0/0 beginnt.
-        canvas.Translate(
-            -crop.Left,
-            -crop.Top);
+        canvas.Translate(-crop.Left, -crop.Top);
 
         // Zeichnung ohne Handles rendern.
         drawingController.RenderForExport(canvas);
-
         canvas.Flush();
 
         using SKImage image = surface.Snapshot();
-
-        using SKData data = image.Encode(
-            SKEncodedImageFormat.Png,
-            100);
-
+        using SKData data = image.Encode(SKEncodedImageFormat.Png, 100);
         await using var stream = File.Create(filePath);
         data.SaveTo(stream);
 
-        return new DrawingExportResult(
-            crop,
-            pixelWidth,
-            pixelHeight,
-            pinScale);
+        return new DrawingExportResult(crop, pixelWidth, pixelHeight, pinScale);
     }
 
     private async void PenSettingsClicked(object sender, EventArgs e)
