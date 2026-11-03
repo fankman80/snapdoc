@@ -197,7 +197,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"imageview?imgSource={fileName}&planId={PlanId}&pinId={PinId}&gotoBtn=false");
     }
 
-    private async void OnDeleteClick(object sender, EventArgs e)
+    private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_pin_wirklich_loeschen);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
@@ -207,7 +207,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"///{PlanId}");
     }
 
-    private async void OnMoveClick(object sender, EventArgs e)
+    private async void OnMoveClick()
     {
         var popup = new PopupPlanSelector(PlanId);
         var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
@@ -559,12 +559,12 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private async void OnMenuMoveTapped(object sender, EventArgs e)
     {
         await HideMoreMenuAsync();
-        OnMoveClick(sender, e);
+        OnMoveClick();
     }
 
     private async void OnMenuDeleteTapped(object sender, EventArgs e)
     {
         await HideMoreMenuAsync();
-        OnDeleteClick(sender, e);
+        OnDeleteClick();
     }
 }

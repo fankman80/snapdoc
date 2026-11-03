@@ -36,11 +36,12 @@ public class PlanSelectorReturn(string planTarget, bool isPinCopy)
 }
 
 public class PlanEditReturn(
-    string nameEntry, string descEntry, bool allowExport,
+    string nameEntry, string descEntry, string measureUnit, bool allowExport,
     int planRotate, string planColor, bool? lockAction)
 {
     public string NameEntry { get; set; } = nameEntry;
     public string DescEntry { get; set; } = descEntry;
+    public string MeasureUnit { get; set; } = measureUnit;
     public bool AllowExport { get; set; } = allowExport;
     public int PlanRotate { get; set; } = planRotate;
     public string PlanColor { get; set; } = planColor;

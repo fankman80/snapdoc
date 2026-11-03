@@ -344,7 +344,8 @@ public partial class LoadPDFPages : ContentPage
                     IsGrayscale = false,
                     AllowExport = true,
                     PlanColor = "#00FFFFFF",
-                    MeasureFactor = 20
+                    MeasureFactor = 20,
+                    MeasureUnit = "m",
                 };
                 plan.Touch();
 

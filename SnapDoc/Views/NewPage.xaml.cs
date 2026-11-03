@@ -703,7 +703,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 drawingController.InitialRotation = 0f;
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
                 drawingController.Measure.MeasureTextSize = 16f;
-                drawingController.Measure.MeasureUnit = "m";
+                drawingController.Measure.MeasureUnit = thisPlan.MeasureUnit;
                 drawingController.IsMeasureActive = IsMeasureVisible;
 
                 drawingController.IsActive = true;
@@ -1463,10 +1463,11 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.InvalidateSurface();
     }
 
-    private async void OnEditClicked(object sender, EventArgs e)
+    private async void OnEditClicked()
     {
         var popup = new PopupPlanEdit(name: thisPlan.Name,
                                       desc: thisPlan.Description,
+                                      measureUnit: thisPlan.MeasureUnit,
                                       gray: thisPlan.IsGrayscale,
                                       export: thisPlan.AllowExport,
                                       planColor: thisPlan.PlanColor);
@@ -1475,10 +1476,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         switch (result?.Result.NameEntry)
         {
-            case "Delete":
-                OnDeleteClick();
-                break;
-
             case "Grayscale":
                 IsGrayscaleMode = thisPlan.IsGrayscale = !thisPlan.IsGrayscale;
                 thisPlan.Touch();
@@ -1491,6 +1488,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 Title = result.Result.NameEntry;
 
                 thisPlan.Description = result.Result.DescEntry;
+                thisPlan.MeasureUnit = result.Result.MeasureUnit;
                 thisPlan.AllowExport = result.Result.AllowExport;
                 thisPlan.PlanColor = result.Result.PlanColor;
 
@@ -1523,6 +1521,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async void OnDeleteClick()
     {
+        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
+        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+        if (result?.Result is not DualPopupResult.Ok) return;
+
         if (Shell.Current is not AppShell shell) return;
 
         await Shell.Current.GoToAsync("//homescreen");
@@ -1731,5 +1733,49 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             System.Diagnostics.Debug.WriteLine($"iOS keyboard hide failed: {ex.Message}");
         }
 #endif
+    }
+
+    private async void OnMoreClicked(object sender, EventArgs e)
+    {
+        if (MoreMenuOverlay.IsVisible)
+        {
+            await HideMoreMenuAsync();
+            return;
+        }
+
+        // Aufklappen von oben rechts
+        MoreMenu.AnchorX = 1;
+        MoreMenu.AnchorY = 0;
+        MoreMenu.Opacity = 0;
+        MoreMenu.Scale = 0.92;
+        MoreMenuOverlay.IsVisible = true;
+
+        await Task.WhenAll(
+            MoreMenu.FadeToAsync(1, 120, Easing.CubicOut),
+            MoreMenu.ScaleToAsync(1, 120, Easing.CubicOut));
+    }
+
+    private async Task HideMoreMenuAsync()
+    {
+        if (!MoreMenuOverlay.IsVisible)
+            return;
+
+        await MoreMenu.FadeToAsync(0, 90, Easing.CubicIn);
+        MoreMenuOverlay.IsVisible = false;
+    }
+
+    private async void OnMoreMenuDismiss(object sender, EventArgs e) =>
+        await HideMoreMenuAsync();
+
+    private async void OnSettingsTapped(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+        OnEditClicked();
+    }
+
+    private async void OnMenuDeleteTapped(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+        OnDeleteClick();
     }
 }

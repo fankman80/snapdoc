@@ -1305,4 +1305,10 @@
   <data name="hinweis_massstab_kalibrieren" xml:space="preserve">
     <value>Touchez le début et la fin d'une distance cotée sur le plan. Ajustez les points si nécessaire et confirmez avec ✓.</value>
   </data>
+  <data name="masseinheit" xml:space="preserve">
+    <value>Unité de mesure</value>
+  </data>
+  <data name="planeigenschaften" xml:space="preserve">
+    <value>Propriétés du plan</value>
+  </data>
 </root>

@@ -1888,6 +1888,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Masseinheit ähnelt.
+        /// </summary>
+        internal static string masseinheit {
+            get {
+                return ResourceManager.GetString("masseinheit", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Massstab ähnelt.
         /// </summary>
         internal static string massstab {
@@ -2505,6 +2514,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string planbezeichnung {
             get {
                 return ResourceManager.GetString("planbezeichnung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Planeigenschaften ähnelt.
+        /// </summary>
+        internal static string planeigenschaften {
+            get {
+                return ResourceManager.GetString("planeigenschaften", resourceCulture);
             }
         }
         

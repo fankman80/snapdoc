@@ -1305,4 +1305,10 @@
   <data name="hinweis_massstab_kalibrieren" xml:space="preserve">
     <value>Tippe auf Anfang und Ende einer bemassten Strecke im Plan. Punkte bei Bedarf verschieben und mit ✓ bestätigen.</value>
   </data>
+  <data name="masseinheit" xml:space="preserve">
+    <value>Masseinheit</value>
+  </data>
+  <data name="planeigenschaften" xml:space="preserve">
+    <value>Planeigenschaften</value>
+  </data>
 </root>

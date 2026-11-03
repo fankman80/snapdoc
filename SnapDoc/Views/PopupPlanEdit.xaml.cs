@@ -11,12 +11,13 @@ namespace SnapDoc.Views;
 public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChanged
 {
     private bool? lockAction = null;
-    public PopupPlanEdit(string name, string desc, bool gray, string planColor, bool export = true, string okText = null, string cancelText = null)
+    public PopupPlanEdit(string name, string desc, string measureUnit, bool gray, string planColor, bool export = true, string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;
         cancelButtonText.Text = cancelText ?? AppResources.abbrechen;
         name_entry.Text = name;
+        unit_entry.Text = measureUnit;
         desc_entry.Text = desc;
         allow_export.IsToggled = export;
         SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
@@ -31,7 +32,7 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
 
     private async void OnOkClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
+        try { await CloseAsync(new PlanEditReturn(name_entry.Text, desc_entry.Text, unit_entry.Text, allow_export.IsToggled, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
         catch (InvalidOperationException) { }
     }
 
@@ -41,19 +42,9 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         catch (InvalidOperationException) { }
     }
 
-    private async void OnDeleteClicked(object sender, EventArgs e)
-    {
-        var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
-        if (result?.Result is not DualPopupResult.Ok) return;
-
-        try { await CloseAsync(new PlanEditReturn("Delete", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
-        catch (InvalidOperationException) { }
-    }
-
     private async void OnGrayscaleClicked(object sender, EventArgs e)
     {
-        try { await CloseAsync(new PlanEditReturn("Grayscale", null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
+        try { await CloseAsync(new PlanEditReturn("Grayscale", null, null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
         catch (InvalidOperationException) { }
     }
 

@@ -23,6 +23,9 @@
             <controls:BorderedEditor
                 x:Name="desc_entry"
                 Placeholder="{x:Static res:AppResources.beschreibung}"/>
+            <controls:BorderedEditor
+                x:Name="unit_entry"
+                Placeholder="{x:Static res:AppResources.masseinheit}"/>
 
             <Grid>
                 <Border HeightRequest="44"
@@ -100,12 +103,6 @@
                     TextColor="{DynamicResource PrimaryDarkText}"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
                     Clicked="OnGrayscaleClicked" />
-            <Button Padding="0"
-                    Text="{x:Static res:AppResources.plan_loeschen}"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Delete}}"
-                    Clicked="OnDeleteClicked" />
             <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
