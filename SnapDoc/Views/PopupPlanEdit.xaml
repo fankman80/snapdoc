@@ -67,21 +67,20 @@
                         Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_left}}"
-                        Clicked="PlanRotateLeft"/>
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_right}}"
+                        Clicked="PlanRotateRight" />
                 <Button Grid.Column="2"
                         Padding="0"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_right}}"
-                        Clicked="PlanRotateRight" />
+                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Rotate_left}}"
+                        Clicked="PlanRotateLeft"/>
             </Grid>
 
             <Grid ColumnDefinitions="*,50,50">
                 <Label Grid.Column="0"
                        Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" 
                        VerticalTextAlignment="Center"/>
-
                 <Button Grid.Column="1"
                         Padding="0"                     
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
