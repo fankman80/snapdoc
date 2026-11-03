@@ -597,6 +597,8 @@ public static class SaveManager
             bool nameOrExportChanged = localPlan.Name != cloudPlan.Name ||
                                        localPlan.AllowExport != cloudPlan.AllowExport;
             bool detailsChanged = localPlan.Description != cloudPlan.Description ||
+                                  localPlan.MeasureUnit != cloudPlan.MeasureUnit ||
+                                  localPlan.MeasureFactor != cloudPlan.MeasureFactor ||
                                   localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
                                   localPlan.PlanColor != cloudPlan.PlanColor ||
                                   nameOrExportChanged;
@@ -609,6 +611,8 @@ public static class SaveManager
                 localPlan.Name = cloudPlan.Name;
                 localPlan.File = cloudPlan.File;
                 localPlan.Description = cloudPlan.Description;
+                localPlan.MeasureUnit = cloudPlan.MeasureUnit;
+                localPlan.MeasureFactor = cloudPlan.MeasureFactor;
                 localPlan.ImageSize = cloudPlan.ImageSize;
                 localPlan.IsGrayscale = cloudPlan.IsGrayscale;
                 localPlan.PlanColor = cloudPlan.PlanColor;
@@ -619,8 +623,13 @@ public static class SaveManager
 
                 if (detailsChanged && localPlan.IsLive())
                     WeakReferenceMessenger.Default.Send(
-                        new PlanDetailsChangedMessage((planId, cloudPlan.Name,
-                            cloudPlan.Description, cloudPlan.IsGrayscale, cloudPlan.PlanColor)));
+                        new PlanDetailsChangedMessage((planId,
+                                                       cloudPlan.Name,
+                                                       cloudPlan.Description,
+                                                       cloudPlan.MeasureUnit,
+                                                       cloudPlan.MeasureFactor,
+                                                       cloudPlan.IsGrayscale,
+                                                       cloudPlan.PlanColor)));
 
                 // Planname erscheint in der Galerie
                 if (nameOrExportChanged) _fotosChanged = true;

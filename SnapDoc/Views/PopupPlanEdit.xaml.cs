@@ -11,7 +11,7 @@ namespace SnapDoc.Views;
 public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChanged
 {
     private bool? lockAction = null;
-    public PopupPlanEdit(string name, string desc, string measureUnit, bool gray, string planColor, bool export = true, string okText = null, string cancelText = null)
+    public PopupPlanEdit(string name, string desc, string measureUnit, string planColor, bool export = true, string okText = null, string cancelText = null)
     {
         InitializeComponent();
         okButtonText.Text = okText ?? AppResources.ok;
@@ -21,11 +21,6 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
         desc_entry.Text = desc;
         allow_export.IsToggled = export;
         SelectedColor = String.IsNullOrEmpty(planColor) ? Colors.White : Color.FromArgb(planColor);
-
-        if (gray)
-            grayscaleButtonText.Text = AppResources.farben_hinzufuegen;
-        else
-            grayscaleButtonText.Text = AppResources.farben_entfernen;
 
         BindingContext = this;
     }
@@ -39,12 +34,6 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
     private async void OnCancelClicked(object sender, EventArgs e)
     {
         try { await CloseAsync(null); }
-        catch (InvalidOperationException) { }
-    }
-
-    private async void OnGrayscaleClicked(object sender, EventArgs e)
-    {
-        try { await CloseAsync(new PlanEditReturn("Grayscale", null, null, true, PlanRotate, SelectedColor.ToArgbHex(), lockAction)); }
         catch (InvalidOperationException) { }
     }
 

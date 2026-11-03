@@ -44,6 +44,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private Color selectedTextColor = new(0, 0, 0, 255);
     private bool isToolButtonsVisible = false;
     private bool isMeasureVisible = false;
+    private const float PdfPointFactor = 0.0254f / 72f;
     private bool isRulerActive;
     private MapPin _editingCustomPin;
     private readonly Dictionary<string, bool> _pendingLockChanges = [];
@@ -242,13 +243,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         WeakReferenceMessenger.Default.Register<PlanDetailsChangedMessage>(this, (r, m) =>
         {
-            var (updatedPlanId, newName, _, isGrayscale, _) = m.Value;
+            var (updatedPlanId, newName, _, measureUnit, measureFactor, isGrayscale, _) = m.Value;
             if (updatedPlanId != planId) return;
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Title = newName;
                 IsGrayscaleMode = isGrayscale;
+                UpdateGrayscaleMenuText();
+                drawingController.Measure.MeasureUnit = measureUnit;
+                drawingController.MeasureFactor = PdfPointFactor * measureFactor;
                 PlanImage.InvalidateSurface();
             });
         });
@@ -288,6 +292,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImageSource = planImagePath;
 
         IsGrayscaleMode = thisPlan.IsGrayscale;
+        UpdateGrayscaleMenuText();
 
         pinList.Clear();
 
@@ -719,7 +724,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         });
     }
 
-    private float GetCurrentMeasureFactor() => (float)(0.0254 / 72) * thisPlan.MeasureFactor;
+    private float GetCurrentMeasureFactor() => PdfPointFactor * thisPlan.MeasureFactor;
 
     private async void OnMeasureFactorConfirmed(object sender, EventArgs e)
     {
@@ -797,9 +802,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             !float.IsFinite(enteredLength) || enteredLength <= 0f)
             return false;
 
-        const float pdfPointFactor = 0.0254f / 72f;   // muss zu GetCurrentMeasureFactor() passen
-
-        planMeasureFactor = enteredLength / (rawPixelLength * pdfPointFactor);
+        planMeasureFactor = enteredLength / (rawPixelLength * PdfPointFactor);
 
         return float.IsFinite(planMeasureFactor) && planMeasureFactor > 0f;
     }
@@ -1468,95 +1471,97 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         var popup = new PopupPlanEdit(name: thisPlan.Name,
                                       desc: thisPlan.Description,
                                       measureUnit: thisPlan.MeasureUnit,
-                                      gray: thisPlan.IsGrayscale,
                                       export: thisPlan.AllowExport,
                                       planColor: thisPlan.PlanColor);
-        var result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions);
+        _isShowingPopup = true;
+        IPopupResult<PlanEditReturn> result;
+        try { result = await this.ShowPopupAsync<PlanEditReturn>(popup, Settings.PopupOptions); }
+        finally { _isShowingPopup = false; }
+        
         if (result?.Result == null) return;
 
-        switch (result?.Result.NameEntry)
+        string newName = result.Result.NameEntry?.Trim() ?? "";
+        var item = ProjectItem.Current.AllPlanItems.FirstOrDefault(i => i.PlanId == planId);
+        item?.Title = newName;
+        Title = newName;
+        thisPlan.Name = newName;
+        thisPlan.Description = result.Result.DescEntry;
+        thisPlan.MeasureUnit = result.Result.MeasureUnit;
+        thisPlan.AllowExport = result.Result.AllowExport;
+        thisPlan.PlanColor = result.Result.PlanColor;
+
+        drawingController.Measure.MeasureUnit = thisPlan.MeasureUnit;
+
+        thisPlan.Touch();
+
+        // Rotate Plan
+        if (result.Result.PlanRotate != 0)
         {
-            case "Grayscale":
-                IsGrayscaleMode = thisPlan.IsGrayscale = !thisPlan.IsGrayscale;
-                thisPlan.Touch();
-                // save data to file
-                SaveManager.NotifyDataChanged();
-                break;
-
-            default:
-                ProjectItem.Current.AllPlanItems.FirstOrDefault(i => i.PlanId == planId).Title = result.Result.NameEntry;
-                Title = result.Result.NameEntry;
-
-                thisPlan.Description = result.Result.DescEntry;
-                thisPlan.MeasureUnit = result.Result.MeasureUnit;
-                thisPlan.AllowExport = result.Result.AllowExport;
-                thisPlan.PlanColor = result.Result.PlanColor;
-
-                thisPlan.Touch();
-
-                // Rotate Plan
-                if (result.Result.PlanRotate != 0)
-                {
-                    await PlanRotate(result.Result.PlanRotate);
-                    ImageFit(null, null);
-                }
-
-                // Update lock action
-                if (result.Result.LockAction is bool lockAll)
-                {
-                    foreach (var p in pinList.Where(p => lockAll || !p.IsCustomPin)) p.IsLockPosition = lockAll;
-                    foreach (var p in SyncOps.LivePins(thisPlan).Where(p => lockAll || !p.Value.IsCustomPin))
-                    {
-                        p.Value.IsLockPosition = lockAll;
-                        p.Value.Touch();
-                    }
-                    PlanImage.InvalidateSurface();
-                }
-
-                // save data to file
-                SaveManager.NotifyDataChanged();
-                break;
+            await PlanRotate(result.Result.PlanRotate);
+            ImageFit(null, null);
         }
+
+        // Update lock action
+        if (result.Result.LockAction is bool lockAll)
+        {
+            foreach (var p in pinList.Where(p => lockAll || !p.IsCustomPin)) p.IsLockPosition = lockAll;
+            foreach (var p in SyncOps.LivePins(thisPlan).Where(p => lockAll || !p.Value.IsCustomPin))
+            {
+                p.Value.IsLockPosition = lockAll;
+                p.Value.Touch();
+            }
+        }
+
+        PlanImage.InvalidateSurface();
+
+        // save data to file
+        SaveManager.NotifyDataChanged();
     }
 
     private async void OnDeleteClick()
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_plan_wirklich_loeschen, okText: AppResources.loeschen, alert: true);
-        var result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+
+        _isShowingPopup = true;
+        IPopupResult<DualPopupResult> result;
+        try { result = await Shell.Current.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions); }
+        finally { _isShowingPopup = false; }
         if (result?.Result is not DualPopupResult.Ok) return;
 
-        if (Shell.Current is not AppShell shell) return;
+        // Lokal sichern, die Seite wird gleich entfernt
+        string id = planId;
 
-        await Shell.Current.GoToAsync("//homescreen");
+        // 1. Daten löschen (unabhängig von der Shell)
+        if (SyncOps.TryGetLivePlan(id, out var plan))
+        {
+            string planDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
+            DeleteIfExists(Path.Combine(planDir, plan.File));
+            DeleteIfExists(Path.Combine(planDir, "thumbnails", plan.File));
 
-        // Shell-Navigation entfernen
-        var shellContent = shell.FindByName<ShellContent>(planId);
-        if (shellContent?.Parent is ShellSection section)
-            section.Items.Remove(shellContent);
+            SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/{plan.File}");
+            SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
 
-        // Masterliste bereinigen
-        var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == planId);
+            TileCache.DeleteForPlanFile(plan.File);
+
+            SyncOps.DeletePlan(id);
+        }
+
+        // 2. Masterliste bereinigen
+        var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == id);
         if (masterItem != null)
             ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
-        if (!SyncOps.TryGetLivePlan(planId, out var plan)) return;
-
-        // JSON + Files loeschen
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, plan.File));
-        DeleteIfExists(Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath, "thumbnails", plan.File));
-
-        // Cloud-Dateien erst nach dem Tombstone-Upload entfernen
-        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/{plan.File}");
-        SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{plan.File}");
-
-        TileCache.DeleteForPlanFile(plan.File);
-
-        // Markiert Plan + alle Pins + Fotos, sendet PlanDeletedMessage
-        // und ruft NotifyDataChanged. Die manuelle PinDeletedMessage-Schleife
-        // und Plans.Remove entfallen dadurch.
-        SyncOps.DeletePlan(planId);
-
         ProjectItem.Current.ApplyFilterAndSorting();
+
+        // 3. UI: zuerst weg von dieser Seite, dann den Shell-Eintrag entfernen
+        if (Shell.Current is AppShell shell)
+        {
+            await shell.GoToAsync("//homescreen");
+
+            var shellContent = shell.FindByName<ShellContent>(id);
+            if (shellContent?.Parent is ShellSection section)
+                section.Items.Remove(shellContent);
+        }
     }
 
     private static void DeleteIfExists(string path)
@@ -1772,6 +1777,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         await HideMoreMenuAsync();
         OnEditClicked();
     }
+
+    private async void OnGrayscaleClicked(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+
+        IsGrayscaleMode = thisPlan.IsGrayscale = !thisPlan.IsGrayscale;
+        thisPlan.Touch();
+
+        UpdateGrayscaleMenuText();
+
+        // save data to file
+        SaveManager.NotifyDataChanged();
+    }
+
+    private void UpdateGrayscaleMenuText() => grayscaleButtonText.Text = IsGrayscaleMode ? AppResources.farben_hinzufuegen : AppResources.farben_entfernen;
 
     private async void OnMenuDeleteTapped(object sender, EventArgs e)
     {

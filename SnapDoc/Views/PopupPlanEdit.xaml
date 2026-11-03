@@ -77,32 +77,27 @@
                         Clicked="PlanRotateRight" />
             </Grid>
 
-            <Label Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" />
-            <Grid ColumnDefinitions="*,*">
-                <Button Grid.Column="0"
-                        Padding="0"
-                        Text="{x:Static res:AppResources.anheften}"                        
+            <Grid ColumnDefinitions="*,50,50">
+                <Label Grid.Column="0"
+                       Text="{x:Static res:AppResources.alle_pins_anheften_loesen}" 
+                       VerticalTextAlignment="Center"/>
+
+                <Button Grid.Column="1"
+                        Padding="0"                     
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.anheften}"
                         Clicked="OnLockedClicked" />
-                <Button Grid.Column="1"
+                <Button Grid.Column="2"
                         Padding="0"                        
-                        Text="{x:Static res:AppResources.loesen}" 
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Lock_open_right}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.loesen}"
                         Clicked="OnUnlockedClicked" />
             </Grid>
 
-            <Button x:Name="grayscaleButtonText"
-                    x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                    Padding="0"
-                    Text="{x:Static res:AppResources.farben_entfernen}"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Invert_colors}}"
-                    Clicked="OnGrayscaleClicked" />
             <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
