@@ -1263,4 +1263,46 @@
   <data name="versatz_y" xml:space="preserve">
     <value>Versatz Y</value>
   </data>
+  <data name="massstab_kalibrieren" xml:space="preserve">
+    <value>Massstab kalibrieren</value>
+  </data>
+  <data name="messung_abbrechen" xml:space="preserve">
+    <value>Messung abbrechen</value>
+  </data>
+  <data name="massstab_uebernehmen" xml:space="preserve">
+    <value>Massstab übernehmen</value>
+  </data>
+  <data name="bemassungs_skalierung" xml:space="preserve">
+    <value>Bemassungs-Skalierung</value>
+  </data>
+  <data name="effektive_laenge" xml:space="preserve">
+    <value>Effektive Länge</value>
+  </data>
+  <data name="aktueller_massstab_0" xml:space="preserve">
+    <value>Aktueller Massstab: 1:{0}</value>
+  </data>
+  <data name="gemessen_0" xml:space="preserve">
+    <value>Gemessen: {0}</value>
+  </data>
+  <data name="effektive_laenge_in_0_eingeben" xml:space="preserve">
+    <value>Effektive Länge gemäss Plan in {0} eingeben</value>
+  </data>
+  <data name="bitte_zuerst_distanz_messen" xml:space="preserve">
+    <value>Bitte zuerst eine bekannte Distanz auf dem Plan messen.</value>
+  </data>
+  <data name="ungueltige_laenge" xml:space="preserve">
+    <value>Ungültige Länge</value>
+  </data>
+  <data name="bitte_gueltige_laenge_eingeben" xml:space="preserve">
+    <value>Bitte eine gültige Länge grösser als 0 eingeben.</value>
+  </data>
+  <data name="kalibrierung_fehlgeschlagen" xml:space="preserve">
+    <value>Kalibrierung fehlgeschlagen</value>
+  </data>
+  <data name="kein_gueltiger_massstab" xml:space="preserve">
+    <value>Aus der Messung konnte kein gültiger Massstab berechnet werden.</value>
+  </data>
+  <data name="hinweis_massstab_kalibrieren" xml:space="preserve">
+    <value>Tippe auf Anfang und Ende einer bemassten Strecke im Plan. Punkte bei Bedarf verschieben und mit ✓ bestätigen.</value>
+  </data>
 </root>

@@ -766,8 +766,6 @@ public partial class TileImageView : ContentView, IDisposable
     // ---------------------------------------------------------------------------------
     private void OnPaintSurface(object sender, SKPaintGLSurfaceEventArgs e)
     {
-        _canvasView.GRContext?.ResetContext();
-
         var canvas = e.Surface.Canvas;
         canvas.ResetMatrix();
         canvas.Clear(_placeholderSKColor);

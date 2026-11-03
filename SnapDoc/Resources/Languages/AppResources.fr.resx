@@ -1263,4 +1263,46 @@
   <data name="versatz_y" xml:space="preserve">
     <value>Décalage Y</value>
   </data>
+  <data name="massstab_kalibrieren" xml:space="preserve">
+    <value>Étalonner l'échelle</value>
+  </data>
+  <data name="messung_abbrechen" xml:space="preserve">
+    <value>Annuler la mesure</value>
+  </data>
+  <data name="massstab_uebernehmen" xml:space="preserve">
+    <value>Appliquer l'échelle</value>
+  </data>
+  <data name="bemassungs_skalierung" xml:space="preserve">
+    <value>Mise à l'échelle des cotes</value>
+  </data>
+  <data name="effektive_laenge" xml:space="preserve">
+    <value>Longueur réelle</value>
+  </data>
+  <data name="aktueller_massstab_0" xml:space="preserve">
+    <value>Échelle actuelle : 1:{0}</value>
+  </data>
+  <data name="gemessen_0" xml:space="preserve">
+    <value>Mesuré : {0}</value>
+  </data>
+  <data name="effektive_laenge_in_0_eingeben" xml:space="preserve">
+    <value>Saisir la longueur réelle indiquée sur le plan en {0} :</value>
+  </data>
+  <data name="bitte_zuerst_distanz_messen" xml:space="preserve">
+    <value>Veuillez d'abord mesurer une distance connue sur le plan.</value>
+  </data>
+  <data name="ungueltige_laenge" xml:space="preserve">
+    <value>Longueur invalide</value>
+  </data>
+  <data name="bitte_gueltige_laenge_eingeben" xml:space="preserve">
+    <value>Veuillez saisir une longueur valide supérieure à 0.</value>
+  </data>
+  <data name="kalibrierung_fehlgeschlagen" xml:space="preserve">
+    <value>Échec de l'étalonnage</value>
+  </data>
+  <data name="kein_gueltiger_massstab" xml:space="preserve">
+    <value>Impossible de calculer une échelle valide à partir de la mesure.</value>
+  </data>
+  <data name="hinweis_massstab_kalibrieren" xml:space="preserve">
+    <value>Touchez le début et la fin d'une distance cotée sur le plan. Ajustez les points si nécessaire et confirmez avec ✓.</value>
+  </data>
 </root>

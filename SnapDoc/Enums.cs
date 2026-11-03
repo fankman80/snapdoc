@@ -7,7 +7,8 @@ namespace SnapDoc
         Poly,
         Rect,
         Oval,
-        Arrow
+        Arrow,
+        Ruler
     }
 
     public enum RectangleTextAlignment

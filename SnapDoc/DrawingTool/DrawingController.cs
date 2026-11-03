@@ -23,16 +23,25 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public CombinedDrawable? CombinedDrawable { get; private set; }
     public DrawingStyleDto? LoadedStyle { get; private set; }
     public DrawMode DrawMode { get; set; } = DrawMode.None;
+    public bool IsActive { get; set; }
+    public event EventHandler? Invalidated;
+    // Ruler-Drawing
+    public InteractiveRulerDrawable RulerDrawable { get; } = new();
+    public float RulerLength => RulerDrawable.Length;
+    public string RulerLengthText => RulerDrawable.LengthText;
+
     private SKPoint touchLift = SKPoint.Empty;
     private bool isLiftActive = false;
     private bool IsHandleDrag() => DrawMode switch
     {
         DrawMode.Poly => activeIndex != null,
+        DrawMode.Ruler => activeIndex != null,
         DrawMode.Rect => activeIndex != null && !isRotatingRectangle,
         DrawMode.Oval => activeIndex != null && !isRotatingOval,
         DrawMode.Arrow => activeIndex != null && !isRotatingArrow,
         _ => false
     };
+
     private SKPoint ComputeLift()
     {
         float density = (float)Settings.DisplayDensity;
@@ -44,8 +53,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         return new SKPoint((x * cos - y * sin) * viewScale,
                            (x * sin + y * cos) * viewScale);
     }
-    public bool IsActive { get; set; }
-    public event EventHandler? Invalidated;
+
+
     private void Invalidate() => Invalidated?.Invoke(this, EventArgs.Empty);
     private float viewScale = 1f;        // Plan-Pixel pro Bildschirm-Pixel
     private float viewRotationDeg = 0f;
@@ -72,12 +81,14 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     {
         Measure.ViewScale = viewScale;
 
+        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius * viewScale;
+        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius * viewScale;
+
+        RulerDrawable.HandleRadius = handleRadius;
+        RulerDrawable.PointRadius = pointRadius;
+
         if (CombinedDrawable == null)
             return;
-
-        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius * viewScale;
-
-        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius * viewScale;
 
         CombinedDrawable.PolyDrawable.HandleRadius = handleRadius;
         CombinedDrawable.PolyDrawable.PointRadius = pointRadius;
@@ -92,9 +103,28 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         CombinedDrawable.ArrowDrawable.PointRadius = pointRadius;
     }
 
-    public void Draw(SKCanvas canvas) => CombinedDrawable?.Draw(canvas);
+    public void Draw(SKCanvas canvas)
+    {
+        CombinedDrawable?.Draw(canvas);
+
+        if (DrawMode == DrawMode.Ruler)
+            RulerDrawable.Draw(canvas);
+    }
 
     public void DrawWithoutHandles(SKCanvas canvas)
+    {
+        DrawShapesWithoutHandles(canvas);
+
+        if (DrawMode == DrawMode.Ruler && RulerDrawable.HasPoints)
+        {
+            bool h = RulerDrawable.DisplayHandles;
+            RulerDrawable.DisplayHandles = false;
+            RulerDrawable.Draw(canvas);
+            RulerDrawable.DisplayHandles = h;
+        }
+    }
+
+    private void DrawShapesWithoutHandles(SKCanvas canvas)
     {
         if (CombinedDrawable == null)
             return;
@@ -131,10 +161,12 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     {
         pressConsumed = false;
         OnStartInteraction(p);
+
         return pressConsumed || DrawMode switch
         {
             DrawMode.Free => true,
             DrawMode.Poly => activeIndex != null,
+            DrawMode.Ruler => activeIndex != null,
             DrawMode.Rect => activeIndex != null || rectDragStart.HasValue || isRotatingRectangle,
             DrawMode.Oval => activeIndex != null || ovalDragStart.HasValue || isRotatingOval,
             DrawMode.Arrow => activeIndex != null || arrowDragStart.HasValue || isRotatingArrow,
@@ -147,10 +179,19 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void OnTap(SKPoint p)
     {
-        if (DrawMode == DrawMode.Poly && CombinedDrawable?.PolyDrawable is { IsClosed: false } poly)
+        if (DrawMode == DrawMode.Poly &&
+            CombinedDrawable?.PolyDrawable is { IsClosed: false } poly)
         {
             poly.Points.Add(p);
             Invalidate();
+        }
+        else if (DrawMode == DrawMode.Ruler)
+        {
+            if (RulerDrawable.Points.Count < 2)
+            {
+                RulerDrawable.Points.Add(p);
+                Invalidate();
+            }
         }
     }
 
@@ -195,7 +236,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void ApplyMeasureSettings()
     {
-        if (CombinedDrawable == null) return;
+        RulerDrawable.Measure = Measure;
+
+        if (CombinedDrawable == null)
+            return;
+
         CombinedDrawable.PolyDrawable.Measure = Measure;
         CombinedDrawable.RectDrawable.Measure = Measure;
         CombinedDrawable.OvalDrawable.Measure = Measure;
@@ -430,6 +475,15 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             }
             Invalidate();
         }
+        else if (DrawMode == DrawMode.Ruler)
+        {
+            activeIndex = RulerDrawable.FindPointIndex(p.X, p.Y);
+
+            if (activeIndex != null)
+                DisableViewTransforms();
+
+            Invalidate();
+        }
     }
 
     private void OnDragInteraction(SKPoint p)
@@ -454,6 +508,8 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         if (DrawMode == DrawMode.Poly && activeIndex != null)
             CombinedDrawable.PolyDrawable.Points[(int)activeIndex] = h;
+        else if (DrawMode == DrawMode.Ruler && activeIndex != null)
+            RulerDrawable.Points[(int)activeIndex] = h;
         else if (DrawMode == DrawMode.Free)
             CombinedDrawable.FreeDrawable.AddPoint(p);
         else if (DrawMode == DrawMode.Rect)
@@ -547,6 +603,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             activeIndex = null;
             isRotatingArrow = false;
             arrowDragStart = null;
+        }
+        else if (DrawMode == DrawMode.Ruler)
+        {
+            activeIndex = null;
         }
 
         isLiftActive = false;

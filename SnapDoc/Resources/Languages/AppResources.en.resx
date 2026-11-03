@@ -1263,4 +1263,46 @@
   <data name="versatz_y" xml:space="preserve">
     <value>Offset Y</value>
   </data>
+  <data name="massstab_kalibrieren" xml:space="preserve">
+    <value>Calibrate scale</value>
+  </data>
+  <data name="messung_abbrechen" xml:space="preserve">
+    <value>Cancel measurement</value>
+  </data>
+  <data name="massstab_uebernehmen" xml:space="preserve">
+    <value>Apply scale</value>
+  </data>
+  <data name="bemassungs_skalierung" xml:space="preserve">
+    <value>Dimension scaling</value>
+  </data>
+  <data name="effektive_laenge" xml:space="preserve">
+    <value>Actual length</value>
+  </data>
+  <data name="aktueller_massstab_0" xml:space="preserve">
+    <value>Current scale: 1:{0}</value>
+  </data>
+  <data name="gemessen_0" xml:space="preserve">
+    <value>Measured: {0}</value>
+  </data>
+  <data name="effektive_laenge_in_0_eingeben" xml:space="preserve">
+    <value>Enter the actual length as shown on the plan in {0}:</value>
+  </data>
+  <data name="bitte_zuerst_distanz_messen" xml:space="preserve">
+    <value>Please measure a known distance on the plan first.</value>
+  </data>
+  <data name="ungueltige_laenge" xml:space="preserve">
+    <value>Invalid length</value>
+  </data>
+  <data name="bitte_gueltige_laenge_eingeben" xml:space="preserve">
+    <value>Please enter a valid length greater than 0.</value>
+  </data>
+  <data name="kalibrierung_fehlgeschlagen" xml:space="preserve">
+    <value>Calibration failed</value>
+  </data>
+  <data name="kein_gueltiger_massstab" xml:space="preserve">
+    <value>No valid scale could be calculated from the measurement.</value>
+  </data>
+  <data name="hinweis_massstab_kalibrieren" xml:space="preserve">
+    <value>Tap the start and end of a dimensioned distance on the plan. Adjust the points if needed and confirm with ✓.</value>
+  </data>
 </root>

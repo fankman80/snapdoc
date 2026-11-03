@@ -88,6 +88,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Aktueller Massstab: 1:{0} ähnelt.
+        /// </summary>
+        internal static string aktueller_massstab_0 {
+            get {
+                return ResourceManager.GetString("aktueller_massstab_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die alle Icons ähnelt.
         /// </summary>
         internal static string alle_icons {
@@ -358,6 +367,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bemassungs-Skalierung ähnelt.
+        /// </summary>
+        internal static string bemassungs_skalierung {
+            get {
+                return ResourceManager.GetString("bemassungs_skalierung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Berechtigung fehlt ähnelt.
         /// </summary>
         internal static string berechtigung_fehlt {
@@ -538,6 +556,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte eine gültige Länge grösser als 0 eingeben. ähnelt.
+        /// </summary>
+        internal static string bitte_gueltige_laenge_eingeben {
+            get {
+                return ResourceManager.GetString("bitte_gueltige_laenge_eingeben", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Bitte einen Ordner oder eine JSON-Datei wählen ähnelt.
         /// </summary>
         internal static string bitte_ordner_oder_json_datei_waehlen {
@@ -588,6 +615,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string bitte_zuerst_anmelden {
             get {
                 return ResourceManager.GetString("bitte_zuerst_anmelden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Bitte zuerst eine bekannte Distanz auf dem Plan messen. ähnelt.
+        /// </summary>
+        internal static string bitte_zuerst_distanz_messen {
+            get {
+                return ResourceManager.GetString("bitte_zuerst_distanz_messen", resourceCulture);
             }
         }
         
@@ -795,6 +831,24 @@ namespace SnapDoc.Resources.Languages {
         internal static string dunkel {
             get {
                 return ResourceManager.GetString("dunkel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Effektive Länge ähnelt.
+        /// </summary>
+        internal static string effektive_laenge {
+            get {
+                return ResourceManager.GetString("effektive_laenge", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Effektive Länge gemäss Plan in {0} eingeben ähnelt.
+        /// </summary>
+        internal static string effektive_laenge_in_0_eingeben {
+            get {
+                return ResourceManager.GetString("effektive_laenge_in_0_eingeben", resourceCulture);
             }
         }
         
@@ -1222,6 +1276,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gemessen: {0} ähnelt.
+        /// </summary>
+        internal static string gemessen_0 {
+            get {
+                return ResourceManager.GetString("gemessen_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die GPS aktiv ähnelt.
         /// </summary>
         internal static string gps_aktiv {
@@ -1384,6 +1447,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Tippe auf Anfang und Ende einer bemassten Strecke im Plan. Punkte bei Bedarf verschieben und mit ✓ bestätigen. ähnelt.
+        /// </summary>
+        internal static string hinweis_massstab_kalibrieren {
+            get {
+                return ResourceManager.GetString("hinweis_massstab_kalibrieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Icon ändern ähnelt.
         /// </summary>
         internal static string icon_aendern {
@@ -1492,6 +1564,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kalibrierung fehlgeschlagen ähnelt.
+        /// </summary>
+        internal static string kalibrierung_fehlgeschlagen {
+            get {
+                return ResourceManager.GetString("kalibrierung_fehlgeschlagen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kamera ähnelt.
         /// </summary>
         internal static string kamera {
@@ -1542,6 +1623,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string kategorie {
             get {
                 return ResourceManager.GetString("kategorie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Aus der Messung konnte kein gültiger Massstab berechnet werden. ähnelt.
+        /// </summary>
+        internal static string kein_gueltiger_massstab {
+            get {
+                return ResourceManager.GetString("kein_gueltiger_massstab", resourceCulture);
             }
         }
         
@@ -1807,6 +1897,24 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Massstab kalibrieren ähnelt.
+        /// </summary>
+        internal static string massstab_kalibrieren {
+            get {
+                return ResourceManager.GetString("massstab_kalibrieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Massstab übernehmen ähnelt.
+        /// </summary>
+        internal static string massstab_uebernehmen {
+            get {
+                return ResourceManager.GetString("massstab_uebernehmen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Maximale Fotoabmessung ähnelt.
         /// </summary>
         internal static string maximale_fotoabmessung {
@@ -1821,6 +1929,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string maximale_planabmessung {
             get {
                 return ResourceManager.GetString("maximale_planabmessung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Messung abbrechen ähnelt.
+        /// </summary>
+        internal static string messung_abbrechen {
+            get {
+                return ResourceManager.GetString("messung_abbrechen", resourceCulture);
             }
         }
         
@@ -3153,6 +3270,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string unbekannter_nutzer {
             get {
                 return ResourceManager.GetString("unbekannter_nutzer", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ungültige Länge ähnelt.
+        /// </summary>
+        internal static string ungueltige_laenge {
+            get {
+                return ResourceManager.GetString("ungueltige_laenge", resourceCulture);
             }
         }
         

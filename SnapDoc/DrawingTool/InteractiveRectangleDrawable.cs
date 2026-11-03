@@ -26,12 +26,20 @@ public class InteractiveRectangleDrawable
     public float MaxTextSize { get; set; } = 200f;
     public RectangleTextAlignment TextAlignment { get; set; } = RectangleTextAlignment.Center;
     public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
-    public bool AutoSizeText { get; set; } = true;
-    public int TextPadding { get; set; } = 10;
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
+
+    // Eigenschaften für den Textmodus
+    private string? _layoutText;
+    private float _layoutW, _layoutH, _layoutSize;
+    private RectangleTextStyle _layoutStyle;
+    private int _layoutPad;
+    private bool _layoutAuto;
+    private List<string>? _layoutLines;
+    public bool AutoSizeText { get; set; } = true;
+    public int TextPadding { get; set; } = 10;
 
     // Eigenschaften für den Schraffurmodus
     public bool IsHatchEffect { get; set; } = false;
@@ -58,7 +66,7 @@ public class InteractiveRectangleDrawable
 
     public InteractiveRectangleDrawable()
     {
-        InteractiveRectangleDrawable.EnsureRotationHandleLoaded().Wait();
+        _ = EnsureRotationHandleLoaded();
     }
 
     public SKPoint[] Points
@@ -161,7 +169,7 @@ public class InteractiveRectangleDrawable
             var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
             var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
             var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-            using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
+            using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
 
             using var fillPaint = new SKPaint
             {
@@ -174,7 +182,7 @@ public class InteractiveRectangleDrawable
             canvas.Save();
             canvas.ClipPath(path, SKClipOperation.Intersect, true);
             var bounds = path.TightBounds;
-            bounds.Inflate(bounds.Width, bounds.Height);
+            bounds.Inflate(spacing, spacing);
             canvas.DrawRect(bounds, fillPaint);
             canvas.Restore();
 
@@ -428,47 +436,40 @@ public class InteractiveRectangleDrawable
     {
         if (string.IsNullOrWhiteSpace(Text)) return;
 
+        float maxW = Width / 100 * (100 - TextPadding);
+        float maxH = Height / 100 * (100 - TextPadding);
+
+        bool dirty = _layoutLines == null || _layoutText != Text ||
+                     _layoutW != Width || _layoutH != Height ||
+                     _layoutStyle != TextStyle || _layoutPad != TextPadding ||
+                     _layoutAuto != AutoSizeText ||
+                     (!AutoSizeText && _layoutSize != TextSize);
+
+        if (dirty)
+        {
+            TextSize = AutoSizeText ? CalculateAutoFontSize(Text, maxW, maxH) : TextSize;
+            using var f = new SKFont(TextStyle.ToTypeface(), TextSize);
+            _layoutLines = BreakTextIntoLines(Text, f, maxW);
+            (_layoutText, _layoutW, _layoutH, _layoutStyle, _layoutPad, _layoutAuto, _layoutSize)
+                = (Text, Width, Height, TextStyle, TextPadding, AutoSizeText, TextSize);
+        }
+
+        using var font = new SKFont(TextStyle.ToTypeface(), TextSize);
+        using var paint = new SKPaint { IsAntialias = true, Color = TextColor };
+
+        var lines = _layoutLines!;
+        var metrics = font.Metrics;
+        float lineHeight = metrics.Descent - metrics.Ascent;
+        float y = -(lines.Count * lineHeight) / 2f - metrics.Ascent;
+
         canvas.Save();
         canvas.Translate(Center.X, Center.Y);
         canvas.RotateDegrees(AllowedAngleDeg);
-
-        float maxTextWidth = Width / 100 * (100 - TextPadding);
-        float maxTextHeight = Height / 100 * (100 - TextPadding);
-
-        TextSize = AutoSizeText
-            ? CalculateAutoFontSize(Text, maxTextWidth, maxTextHeight)
-            : TextSize;
-
-        var font = new SKFont(TextStyle.ToTypeface())
-        {
-            Size = TextSize
-        };
-
-        var paint = new SKPaint
-        {
-            IsAntialias = true,
-            Color = TextColor,
-            IsStroke = false
-        };
-
-        var lines = BreakTextIntoLines(Text, font, maxTextWidth);
-
-        var metrics = font.Metrics;
-        float lineHeight = metrics.Descent - metrics.Ascent;
-        float totalHeight = lines.Count * lineHeight;
-        float y = -totalHeight / 2f - metrics.Ascent;
-
-        canvas.ClipRect(new SKRect(
-            -Width / 2f,
-            -Height / 2f,
-                Width / 2f,
-                Height / 2f
-        ));
+        canvas.ClipRect(new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f));
 
         foreach (var line in lines)
         {
-            float x = GetAlignedX(line, font);
-            canvas.DrawText(line, x, y, SKTextAlign.Left, font, paint);
+            canvas.DrawText(line, GetAlignedX(line, font), y, SKTextAlign.Left, font, paint);
             y += lineHeight;
         }
 
@@ -557,13 +558,8 @@ public class InteractiveRectangleDrawable
 
     private bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
     {
-        var font = new SKFont(TextStyle.ToTypeface())
-        {
-            Size = fontSize
-        };
-
+        using var font = new SKFont(TextStyle.ToTypeface(), fontSize);
         var lines = BreakTextIntoLines(text, font, maxWidth);
-
         var metrics = font.Metrics;
         float lineHeight = metrics.Descent - metrics.Ascent;
         float totalHeight = lines.Count * lineHeight;

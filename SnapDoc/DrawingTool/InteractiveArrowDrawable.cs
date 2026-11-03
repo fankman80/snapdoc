@@ -42,7 +42,7 @@ public class InteractiveArrowDrawable
     }
     public InteractiveArrowDrawable()
     {
-        InteractiveArrowDrawable.EnsureRotationHandleLoaded().Wait();
+        _ = EnsureRotationHandleLoaded();
     }
 
     public SKPoint[] BoundingPoints
@@ -53,7 +53,7 @@ public class InteractiveArrowDrawable
             float hh = Height / 2f;
             var local = new[] {
                 new SKPoint(-hw, -hh), new SKPoint(hw, -hh),
-                new SKPoint(hw, hh),   new SKPoint(-hw, hh)
+                new SKPoint(hw, hh), new SKPoint(-hw, hh)
             };
             return TransformPoints(local);
         }
@@ -199,7 +199,7 @@ public class InteractiveArrowDrawable
         var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
         var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
         var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-        using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
+        using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
 
         using var fillPaint = new SKPaint
         {
@@ -212,7 +212,7 @@ public class InteractiveArrowDrawable
         canvas.Save();
         canvas.ClipPath(path, SKClipOperation.Intersect, true);
         var bounds = path.TightBounds;
-        bounds.Inflate(bounds.Width, bounds.Height);
+        bounds.Inflate(spacing, spacing);
         canvas.DrawRect(bounds, fillPaint);
         canvas.Restore();
 

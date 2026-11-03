@@ -107,7 +107,7 @@ public class InteractivePolylineDrawable
         var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
         var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
         var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-        using var hatchEffect = SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix);
+        using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
 
         if (IsClosed)
         {
@@ -122,7 +122,7 @@ public class InteractivePolylineDrawable
             canvas.Save();
             canvas.ClipPath(path, SKClipOperation.Intersect, true);
             var bounds = path.TightBounds;
-            bounds.Inflate(bounds.Width, bounds.Height);
+            bounds.Inflate(spacing, spacing);
             canvas.DrawRect(bounds, fillPaint);
             canvas.Restore();
         }

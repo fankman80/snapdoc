@@ -101,14 +101,14 @@
 	</ItemGroup>
 
     <ItemGroup Condition="$(TargetFramework.Contains('-windows'))">
-        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.4" />
+        <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.6.5" />
         <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.28000.2957" />
         <PackageReference Include="Microsoft.Identity.Client.Broker" Version="4.92.0" />
     </ItemGroup>
 
 	<ItemGroup>
         <PackageReference Include="CommunityToolkit.Maui.Camera" Version="6.1.0" />
-		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.621" />
+		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.649" />
 		<PackageReference Include="CommunityToolkit.Maui" Version="15.0.1" />
 		<PackageReference Include="CommunityToolkit.Maui.Core" Version="15.0.1" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
