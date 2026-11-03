@@ -23,10 +23,6 @@
             <controls:BorderedEditor
                 x:Name="desc_entry"
                 Placeholder="{x:Static res:AppResources.beschreibung}"/>
-            <controls:BorderedEditor
-                x:Name="unit_entry"
-                Placeholder="{x:Static res:AppResources.masseinheit}"/>
-
             <Grid>
                 <Border HeightRequest="44"
                         StrokeThickness="0"
@@ -96,7 +92,15 @@
                         ToolTipProperties.Text="{x:Static res:AppResources.loesen}"
                         Clicked="OnUnlockedClicked" />
             </Grid>
-
+            
+            <Grid ColumnDefinitions="*,50,50" Padding="0,-8,0,0">
+                <Label Text="{x:Static res:AppResources.masseinheit}"
+                       VerticalTextAlignment="Center"/>
+                <controls:BorderedEditor
+                    Grid.Column="1" Grid.ColumnSpan="2"
+                    x:Name="unit_entry"/>
+            </Grid>
+            
             <Grid ColumnDefinitions="*,*">
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
