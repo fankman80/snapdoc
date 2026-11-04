@@ -12,7 +12,10 @@ public partial class LoadPDFPages : ContentPage
     IEnumerable<FileResult> resultList;
     private bool _isProcessing = false;
     private bool _isListView;
-
+    private const double TileSpacing = 4;
+    private int _span;
+    private int _firstVisibleIndex;
+    private readonly IDispatcherTimer _relayoutTimer;
     private static readonly FilePickerFileType CustomMediaFileType = new(
         new Dictionary<DevicePlatform, IEnumerable<string>>
         {
@@ -22,26 +25,35 @@ public partial class LoadPDFPages : ContentPage
             { DevicePlatform.MacCatalyst, new[] { "com.adobe.pdf", "public.jpeg", "public.png" } }
         });
 
-    public int DynamicSpan { get; set; } = 0;
-    public double TileHeight { get; set; } = 200;
+    public double TileHeight { get; private set; } = 200;
 
     public LoadPDFPages()
     {
         InitializeComponent();
         btnRows.Text = Settings.TableRowIcon;
+
+        // Resize entprellen (Windows feuert beim Ziehen dauernd)
+        _relayoutTimer = Dispatcher.CreateTimer();
+        _relayoutTimer.Interval = TimeSpan.FromMilliseconds(120);
+        _relayoutTimer.IsRepeating = false;
+        _relayoutTimer.Tick += (_, _) => UpdateSpan();
+
+        // Position merken, um sie nach dem Neuaufbau wiederherzustellen
+        fileListView.Scrolled += (_, e) => _firstVisibleIndex = e.FirstVisibleItemIndex;
     }
 
     protected override void OnAppearing()
     {
         base.OnAppearing();
-        SizeChanged += OnSizeChanged;
+        fileListView.SizeChanged += OnListSizeChanged;
         LoadPreviewPDFImages();
     }
 
     protected override void OnDisappearing()
     {
         base.OnDisappearing();
-        SizeChanged -= OnSizeChanged;
+        fileListView.SizeChanged -= OnListSizeChanged;
+        _relayoutTimer.Stop();
     }
 
     protected override bool OnBackButtonPressed() => true;
@@ -170,9 +182,8 @@ public partial class LoadPDFPages : ContentPage
                     fileIndex++;
                 }
             });
-
-            UpdateSpan();
             fileListView.ItemsSource = pdfImages;
+            UpdateSpan();
         }
         catch (Exception ex)
         {
@@ -265,9 +276,6 @@ public partial class LoadPDFPages : ContentPage
         }
     }
 
-    /// <summary>
-    /// Rendert nur die angehakten PDF-Seiten in voller Aufloesung (PdfFullViewDpi).
-    /// </summary>
     private async Task LoadPDFImages()
     {
         var itemsToProcess = fileListView.ItemsSource.Cast<PdfItem>()
@@ -395,29 +403,47 @@ public partial class LoadPDFPages : ContentPage
         }
     }
 
+    private void OnListSizeChanged(object sender, EventArgs e)
+    {
+        _relayoutTimer.Stop();
+        _relayoutTimer.Start();
+    }
+
     private void OnChangeRowsClicked(object sender, EventArgs e)
     {
         _isListView = !_isListView;
         btnRows.Text = _isListView ? Settings.TableGridIcon : Settings.TableRowIcon;
-        UpdateSpan();
+        UpdateSpan();   // sofort, nicht entprellt
     }
-
-    private void OnSizeChanged(object sender, EventArgs e) => UpdateSpan();
 
     private void UpdateSpan()
     {
-        if (Width <= 0) return;
+        double w = fileListView.Width;
+        if (w <= 0) return;
 
-        DynamicSpan = _isListView
+        int span = _isListView
             ? 1
             : Math.Max(SettingsService.Instance.GridViewMinColumns,
-                       (int)(Width / SettingsService.Instance.PlanPreviewSize));
+                       (int)(w / SettingsService.Instance.PlanPreviewSize));
 
-        const double spacing = 4;
-        double tileWidth = (Width - spacing * (DynamicSpan - 1)) / DynamicSpan;
-        TileHeight = Math.Floor(tileWidth / Math.Sqrt(2));
+        double tileWidth = (w - TileSpacing * (span - 1)) / span;
+        double tileHeight = Math.Floor(tileWidth / Math.Sqrt(2));
 
-        OnPropertyChanged(nameof(DynamicSpan));
-        OnPropertyChanged(nameof(TileHeight));
+        if (span == _span && Math.Abs(tileHeight - TileHeight) < 0.5)
+            return;
+
+        _span = span;
+        TileHeight = tileHeight;   // neue Zellen lesen den Wert beim Erzeugen
+
+        int keepIndex = _firstVisibleIndex;
+        var src = fileListView.ItemsSource;
+
+        fileListView.ItemsSource = null;
+        gridLayout.Span = span;
+        fileListView.ItemsSource = src;
+
+        if (src != null && keepIndex > 0)
+            Dispatcher.Dispatch(() =>
+                fileListView.ScrollTo(keepIndex, position: ScrollToPosition.Start, animate: false));
     }
 }

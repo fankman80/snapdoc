@@ -30,7 +30,7 @@
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
 	<key>CFBundleShortVersionString</key>
-	<string>2.6.1</string>
+	<string>2.7.0</string>
 	<key>NSCameraUsageDescription</key>
 	<string>SnapDoc benötigt Zugriff auf die Kamera, um Dokumente zu fotografieren und zu scannen.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
@@ -59,6 +59,6 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>104</string>
+	<string>1045</string>
 </dict>
 </plist>

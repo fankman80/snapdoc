@@ -60,12 +60,11 @@
             <CollectionView x:Name="fileListView"
                             Grid.Row="0"
                             SelectionMode="None"
-                            ItemSizingStrategy="MeasureFirstItem"
                             ItemsUpdatingScrollMode="KeepItemsInView">
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical"
-                                     x:DataType="views:LoadPDFPages"
-                                     Span="{Binding DynamicSpan, Source={x:Reference Name=ThisPage}}"
+                    <GridItemsLayout x:Name="gridLayout"
+                                     Orientation="Vertical"
+                                     Span="2"
                                      HorizontalItemSpacing="4"
                                      VerticalItemSpacing="4"/>
                 </CollectionView.ItemsLayout>
