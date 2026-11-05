@@ -28,204 +28,203 @@
         </HorizontalStackLayout>
     </Shell.TitleView>
 
-    <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
-        <Grid Margin="16">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-            </Grid.RowDefinitions>
+    <Grid Margin="16"
+          x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
 
-            <ScrollView Grid.Row="0">
-                <VerticalStackLayout>
-                    <Grid ColumnSpacing="0"
-                          ColumnDefinitions="*,Auto,Auto,Auto">
-                        <VerticalStackLayout Grid.Column="0">
-                            <Label Text="{x:Static res:AppResources.export_vorlage}"/>
-                            <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
-                                                        SelectedItem="{Binding SelectedTemplate}"/>
-                        </VerticalStackLayout>
-                        <Button Grid.Column="1"
-                                Padding="0"
-                                VerticalOptions="End"
-                                BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Help}}"
-                                ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"                                
-                                Clicked="OnHelpClicked"/>
-                        <Button Grid.Column="2"
-                                Padding="0"
-                                VerticalOptions="End"
-                                BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Note_add}}"
-                                ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"                                
-                                Clicked="OnAddDocument" />
-                        <Button Grid.Column="3"
-                                Padding="0"
-                                VerticalOptions="End"
-                                BackgroundColor="Transparent"
-                                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Delete}}"
-                                ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
-                                Clicked="OnDeleteDocument"/>
-                    </Grid>
-                    <VerticalStackLayout>
-                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
-                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                        IsToggled="{Binding IsPlanExport}"
-                                        HorizontalOptions="Start"
-                                        VerticalOptions="Center"
-                                        BorderColorOff ="Transparent"
-                                        KnobColorOn="White"
-                                        KnobColorOff="White"
-                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_positionsbilder}"
-                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                        IsToggled="{Binding IsPosImageExport}"
-                                        HorizontalOptions="Start"
-                                        VerticalOptions="Center"
-                                        BorderColorOff ="Transparent"
-                                        KnobColorOn="White"
-                                        KnobColorOff="White"
-                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_pin_icons}"
-                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                        IsToggled="{Binding IsPinIconExport}"
-                                        HorizontalOptions="Start"
-                                        VerticalOptions="Center"
-                                        BorderColorOff ="Transparent"
-                                        KnobColorOn="White"
-                                        KnobColorOff="White"
-                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_fotos}"
-                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                        IsToggled="{Binding IsImageExport}"
-                                        HorizontalOptions="Start"
-                                        VerticalOptions="Center"
-                                        BorderColorOff ="Transparent"
-                                        KnobColorOn="White"
-                                        KnobColorOff="White"
-                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                        <controls:Switch LabelText="{x:Static res:AppResources.exportiere_foto_overlays}"
-                                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                                        IsToggled="{Binding IsFotoOverlayExport}"
-                                        HorizontalOptions="Start"
-                                        VerticalOptions="Center"
-                                        BorderColorOff ="Transparent"
-                                        KnobColorOn="White"
-                                        KnobColorOff="White"
-                                        SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                                        SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+        <ScrollView Grid.Row="0">
+            <VerticalStackLayout>
+                <Grid ColumnSpacing="0"
+                        ColumnDefinitions="*,Auto,Auto,Auto">
+                    <VerticalStackLayout Grid.Column="0">
+                        <Label Text="{x:Static res:AppResources.export_vorlage}"/>
+                        <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
+                                                    SelectedItem="{Binding SelectedTemplate}"/>
                     </VerticalStackLayout>
+                    <Button Grid.Column="1"
+                            Padding="0"
+                            VerticalOptions="End"
+                            BackgroundColor="Transparent"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Help}}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"                                
+                            Clicked="OnHelpClicked"/>
+                    <Button Grid.Column="2"
+                            Padding="0"
+                            VerticalOptions="End"
+                            BackgroundColor="Transparent"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Note_add}}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"                                
+                            Clicked="OnAddDocument" />
+                    <Button Grid.Column="3"
+                            Padding="0"
+                            VerticalOptions="End"
+                            BackgroundColor="Transparent"
+                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Delete}}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
+                            Clicked="OnDeleteDocument"/>
+                </Grid>
+                <VerticalStackLayout>
+                    <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    IsToggled="{Binding IsPlanExport}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <controls:BorderedEntry
-                        Text="{Binding PinLabelPrefix}"
-                        Placeholder="{x:Static res:AppResources.pinbeschriftung}"/>
+                    <controls:Switch LabelText="{x:Static res:AppResources.exportiere_positionsbilder}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    IsToggled="{Binding IsPosImageExport}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <controls:RangeSlider
-                         LabelText="{x:Static res:AppResources.maximale_fotoabmessung}"
-                         IsVisible="{Binding IsImageExport}"
-                         IsRange="False"
-                         Minimum="100"
-                         Maximum="10000"
-                         Step="100"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0} px"
-                         LowerValue="{Binding MaxFotoExportSize}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <controls:Switch LabelText="{x:Static res:AppResources.exportiere_pin_icons}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    IsToggled="{Binding IsPinIconExport}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <controls:RangeSlider
-                         LabelText="{x:Static res:AppResources.maximale_planabmessung}"
-                         IsVisible="{Binding IsPlanExport}"
-                         IsRange="False"
-                         Minimum="100"
-                         Maximum="10000"
-                         Step="100"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0} px"
-                         LowerValue="{Binding MaxPlanExportSize}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <controls:Switch LabelText="{x:Static res:AppResources.exportiere_fotos}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    IsToggled="{Binding IsImageExport}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
 
-                    <controls:RangeSlider
-                         LabelText="{x:Static res:AppResources.groesse_pinbeschriftung}"
-                         IsRange="False"
-                         Minimum="1"
-                         Maximum="20"
-                         Step="0.1"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0:0.#} pt"
-                         LowerValue="{Binding PinLabelFontSize}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                    <controls:RangeSlider
-                         LabelText="{x:Static res:AppResources.pin_icon_breite_hoehe}"
-                         IsVisible="{Binding IsPinIconExport}"
-                         IsRange="False"
-                         Minimum="1"
-                         Maximum="20"
-                         Step="0.1"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0:0.#} mm"
-                         LowerValue="{Binding PinExportSize}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
-
-                    <controls:RangeSlider
-                         LabelText="{x:Static res:AppResources.positionsbilder_zuschnitt}"
-                         IsVisible="{Binding IsPosImageExport}"
-                         IsRange="False"
-                         Minimum="1"
-                         Maximum="100"
-                         Step="1"
-                         ValueFontSize="12"
-                         TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                         MinimumValueDisplayFormat="{}{0:0} pt"
-                         LowerValue="{Binding PinPosCropExportSize}"
-                         MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                         MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+                    <controls:Switch LabelText="{x:Static res:AppResources.exportiere_foto_overlays}"
+                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                    IsToggled="{Binding IsFotoOverlayExport}"
+                                    HorizontalOptions="Start"
+                                    VerticalOptions="Center"
+                                    BorderColorOff ="Transparent"
+                                    KnobColorOn="White"
+                                    KnobColorOff="White"
+                                    SwitchColorOn="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                                    SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                 </VerticalStackLayout>
-            </ScrollView>
 
-            <Grid Grid.Row="1"
-                  ColumnDefinitions="*,Auto,Auto,Auto">
-                <Button Grid.Column="1"
-                        IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn, x:DataType=services:SettingsService}"
-                        MinimumWidthRequest="100"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Cloud_upload}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.bericht_in_cloud_hochladen}"
-                        Clicked="OnCloudUploadClicked" />
-                <Button Grid.Column="2"
-                        MinimumWidthRequest="100"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Share}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.bericht_teilen}"
-                        Clicked="OnShareClicked" />
-                <Button Grid.Column="3"
-                        MinimumWidthRequest="100"
-                        Padding="0"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.bericht_lokal_speichern}"
-                        Clicked="OnSaveClicked" />
-            </Grid>
+                <controls:BorderedEntry
+                    Text="{Binding PinLabelPrefix}"
+                    Placeholder="{x:Static res:AppResources.pinbeschriftung}"/>
+
+                <controls:RangeSlider
+                        LabelText="{x:Static res:AppResources.maximale_fotoabmessung}"
+                        IsVisible="{Binding IsImageExport}"
+                        IsRange="False"
+                        Minimum="100"
+                        Maximum="10000"
+                        Step="100"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0} px"
+                        LowerValue="{Binding MaxFotoExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                        LabelText="{x:Static res:AppResources.maximale_planabmessung}"
+                        IsVisible="{Binding IsPlanExport}"
+                        IsRange="False"
+                        Minimum="100"
+                        Maximum="10000"
+                        Step="100"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0} px"
+                        LowerValue="{Binding MaxPlanExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                        LabelText="{x:Static res:AppResources.groesse_pinbeschriftung}"
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="20"
+                        Step="0.1"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0.#} pt"
+                        LowerValue="{Binding PinLabelFontSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                        LabelText="{x:Static res:AppResources.pin_icon_breite_hoehe}"
+                        IsVisible="{Binding IsPinIconExport}"
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="20"
+                        Step="0.1"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0.#} mm"
+                        LowerValue="{Binding PinExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+
+                <controls:RangeSlider
+                        LabelText="{x:Static res:AppResources.positionsbilder_zuschnitt}"
+                        IsVisible="{Binding IsPosImageExport}"
+                        IsRange="False"
+                        Minimum="1"
+                        Maximum="100"
+                        Step="1"
+                        ValueFontSize="12"
+                        TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                        MinimumValueDisplayFormat="{}{0:0} pt"
+                        LowerValue="{Binding PinPosCropExportSize}"
+                        MinimumTrackColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                        MaximumTrackColor="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <Grid Grid.Row="1"
+                ColumnDefinitions="*,Auto,Auto,Auto">
+            <Button Grid.Column="1"
+                    IsVisible="{Binding Source={x:Static services:SettingsService.Instance}, Path=IsCloudLoggedIn, x:DataType=services:SettingsService}"
+                    MinimumWidthRequest="100"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Cloud_upload}}"
+                    ToolTipProperties.Text="{x:Static res:AppResources.bericht_in_cloud_hochladen}"
+                    Clicked="OnCloudUploadClicked" />
+            <Button Grid.Column="2"
+                    MinimumWidthRequest="100"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Share}}"
+                    ToolTipProperties.Text="{x:Static res:AppResources.bericht_teilen}"
+                    Clicked="OnShareClicked" />
+            <Button Grid.Column="3"
+                    MinimumWidthRequest="100"
+                    Padding="0"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
+                    ToolTipProperties.Text="{x:Static res:AppResources.bericht_lokal_speichern}"
+                    Clicked="OnSaveClicked" />
         </Grid>
     </Grid>
 </ContentPage>
