@@ -1237,7 +1237,10 @@
     <value>Verschieben auf dem Plan verhindern</value>
   </data>
   <data name="kopieren_verschieben" xml:space="preserve">
-    <value>Kopieren / verschieben…</value>
+    <value>Kopieren / verschieben</value>
+  </data>
+  <data name="pin_kopieren_verschieben" xml:space="preserve">
+    <value>Pin kopieren oder verschieben</value>
   </data>
   <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
     <value>Verzeichnis nicht gefunden</value>
@@ -1310,5 +1313,8 @@
   </data>
   <data name="planeigenschaften" xml:space="preserve">
     <value>Planeigenschaften</value>
+  </data>
+  <data name="pin_fortfahren_frage" xml:space="preserve">
+    <value>Wie möchten Sie mit dem Pin "{0}" fortfahren?</value>
   </data>
 </root>

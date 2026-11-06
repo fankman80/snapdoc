@@ -1,5 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Views;
+using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 
@@ -8,6 +9,8 @@ namespace SnapDoc.Views;
 public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPropertyChanged
 {
     private readonly string PlanId;
+    public string PinId { get; }
+    public string FormattedPinQuestion => string.Format(AppResources.pin_fortfahren_frage, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
     private string selectedPlan;
     private int selectedRadioButtonIndex;
 
@@ -40,13 +43,14 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
     }
 
     public bool IsNotDuplicateAtLocation => selectedRadioButtonIndex == 0 || selectedRadioButtonIndex == 1;
-    public PopupPlanSelector(string planId)
+    public PopupPlanSelector(string planId, string pinId)
     {
-        InitializeComponent();
+        PlanId = planId;
+        PinId = pinId;
 
+        InitializeComponent();
         BindingContext = this;
 
-        PlanId = planId;
         selectedRadioButtonIndex = 0;
 
         LoadingPlans();

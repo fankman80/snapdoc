@@ -15,13 +15,34 @@
 
     <Grid Padding="6"
           WidthRequest="320"
-          RowDefinitions="Auto, *, Auto, Auto">
-        <StackLayout Grid.Row="0"
+          RowDefinitions="Auto, Auto, *, Auto, Auto">
+        <Grid Grid.Row="0"
+              ColumnDefinitions="Auto,*"
+              RowDefinitions="Auto,Auto">
+            <Label Grid.Column="0"
+                   Grid.Row="0"
+                   Grid.RowSpan="2"
+                   Padding="0"
+                   VerticalOptions="Start"
+                   Text="{x:Static local:MaterialIcons.Move_down}"
+                   FontFamily="MaterialOutlined"
+                   FontSize="36"
+                   TextColor="{DynamicResource Primary}"/>
+            <Label Grid.Column="1"
+                   Grid.Row="0"
+                   Text="{x:Static res:AppResources.pin_kopieren_verschieben}"
+                   FontAttributes="Bold"/>
+            <Label Grid.Column="1"
+                   Grid.Row="1"
+                   Text="{Binding FormattedPinQuestion}"
+                   FontSize="12"/>
+        </Grid>
+
+        <StackLayout x:Name="RadioButtonGroup"
+                     Grid.Row="1"
                      Spacing="0"
-                     x:Name="RadioButtonGroup"
                      RadioButtonGroup.GroupName="PlanOptionsGroup"
-                     RadioButtonGroup.SelectedValue="{Binding SelectedPlanOption}"                     
-                     Margin="2,0,0,0"
+                     RadioButtonGroup.SelectedValue="{Binding SelectedPlanOption}"                                          
                      HorizontalOptions="Start"
                      Orientation="Vertical">
             <RadioButton Content="{x:Static res:AppResources.auf_anderen_plan_kopieren}">
@@ -41,18 +62,18 @@
             </RadioButton>
         </StackLayout>
 
-        <Label Grid.Row="1"
+        <Label Grid.Row="2"
                Margin="0,10,0,0"
                IsVisible="{Binding IsNotDuplicateAtLocation}">
             <Label.FormattedText>
                 <FormattedString>
-                    <Span Text="{x:Static res:AppResources.ziel_auswaehlen}" />
+                    <Span Text="{x:Static res:AppResources.ziel_auswaehlen}" FontAttributes="Bold"/>
                     <Span Text=":" />
                 </FormattedString>
             </Label.FormattedText>
         </Label>
 
-        <ScrollView Grid.Row="2"
+        <ScrollView Grid.Row="3"
                     VerticalOptions="Start"
                     MaximumHeightRequest="800"
                     IsVisible="{Binding IsNotDuplicateAtLocation}">
@@ -68,9 +89,15 @@
                                 <TapGestureRecognizer Tapped="OnPlanTapped" CommandParameter="{Binding PlanRoute}" />
                             </Grid.GestureRecognizers>
 
-                            <Border Grid.Column="0" Grid.ColumnSpan="3"
-                                    BackgroundColor="{Binding PlanColor}"
+                            <Border Grid.Column="0" Grid.ColumnSpan="4"
+                                    BackgroundColor="{Binding PlanColor}"                                    
                                     StrokeThickness="0"/>
+
+                            <Label Grid.Column="0"
+                                   Text="{x:Static local:MaterialIcons.Space_dashboard}"
+                                   FontFamily="MaterialOutlined"
+                                   FontSize="22"
+                                   VerticalOptions="Center"/>
 
                             <Label Grid.Column="1"
                                    Text="{Binding Title}"
@@ -90,12 +117,12 @@
             </CollectionView>
         </ScrollView>
 
-        <Grid Grid.Row="3"
+        <Grid Grid.Row="4"
               ColumnDefinitions="*,*">
             <Button Grid.Column="0"
                     Text="{x:Static res:AppResources.abbrechen}"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
+                    BackgroundColor="Transparent"
+                    TextColor="{DynamicResource Primary}"
                     Clicked="OnCancelClicked" />
             <Button Grid.Column="1"
                     Text="{x:Static res:AppResources.ok}"

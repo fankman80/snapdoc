@@ -209,7 +209,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnMoveClick()
     {
-        var popup = new PopupPlanSelector(PlanId);
+        var popup = new PopupPlanSelector(PlanId, PinId);
         var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
         if (result.Result == null) return;
 

@@ -73,41 +73,40 @@
                 <Grid ColumnDefinitions="80,*" ColumnSpacing="8">
                     <!-- Pin-Icon mit Stift-Badge -->
                     <Grid Grid.Column="0"
-                              WidthRequest="74"
-                              HeightRequest="74">
+                          WidthRequest="74"
+                          HeightRequest="74">
                         <ImageButton Source="{Binding Pin.DisplayIconPath}"
-                                            CornerRadius="0"
-                                            BackgroundColor="Transparent"
-                                            Aspect="AspectFit"
-                                            ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
-                                            Clicked="OnPinSelectClick" />
+                                     CornerRadius="0"
+                                     BackgroundColor="Transparent"
+                                     Aspect="AspectFit"
+                                     ToolTipProperties.Text="{x:Static res:AppResources.icon_aendern}"
+                                     Clicked="OnPinSelectClick" />
                         <Border IsVisible="{Binding Pin.IsCustomPin, Converter={StaticResource InvertedBoolConverter}}"
-                                    WidthRequest="32"
-                                    HeightRequest="32"
-                                    StrokeShape="RoundRectangle 16"
-                                    StrokeThickness="0"
-                                    BackgroundColor="#66000000"
-                                    HorizontalOptions="End"
-                                    VerticalOptions="End"
-                                    Padding="0"
-                                    InputTransparent="True">
+                                WidthRequest="32"
+                                HeightRequest="32"
+                                StrokeShape="RoundRectangle 16"
+                                StrokeThickness="0"
+                                BackgroundColor="#66000000"
+                                HorizontalOptions="End"
+                                VerticalOptions="End"
+                                Padding="0"
+                                InputTransparent="True">
                             <Label Text="{x:Static local:MaterialIcons.Edit}"
-                                        FontFamily="MaterialOutlined"
-                                        FontSize="20"
-                                        TextColor="White"
-                                        HorizontalOptions="Center"
-                                        VerticalOptions="Center" />
+                                   FontFamily="MaterialOutlined"
+                                   FontSize="20"
+                                   TextColor="White"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
                         </Border>
                     </Grid>
 
                     <!-- Name (editierbar) -->
                     <controls:BorderedEditor Grid.Column="1"                                                
-                                                 VerticalOptions="Start"
-                                                 HeightRequest="80"
-                                                 Text="{Binding Pin.PinName}"
-                                                 Placeholder="{x:Static res:AppResources.bezeichnung}"/>
+                                             VerticalOptions="Start"
+                                             HeightRequest="80"
+                                             Text="{Binding Pin.PinName}"
+                                             Placeholder="{x:Static res:AppResources.bezeichnung}"/>
                 </Grid>
-
 
                 <!-- ═══ Fotos: "+" Galerie scrollt rechts daneben ═══ -->
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="4" HeightRequest="110">
@@ -158,7 +157,7 @@
                                         Opacity="{Binding DisplayOpacity}">
                                     <Grid>
                                         <Image Source="{Binding DisplayImage}"
-                                                Aspect="AspectFill">
+                                               Aspect="AspectFill">
                                             <Image.GestureRecognizers>
                                                 <TapGestureRecognizer Tapped="OnImageTapped" />
                                             </Image.GestureRecognizers>
@@ -304,7 +303,6 @@
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </Grid>
                 </Border>
-
             </VerticalStackLayout>
         </ScrollView>
 

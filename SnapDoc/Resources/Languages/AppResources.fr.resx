@@ -1237,7 +1237,10 @@
     <value>Empêcher le déplacement sur le plan</value>
   </data>
   <data name="kopieren_verschieben" xml:space="preserve">
-    <value>Copier / déplacer…</value>
+    <value>Copier / déplacer</value>
+  </data>
+  <data name="pin_kopieren_verschieben" xml:space="preserve">
+    <value>Pin copier ou déplacer</value>
   </data>
   <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
     <value>Dossier introuvable</value>
@@ -1310,5 +1313,8 @@
   </data>
   <data name="planeigenschaften" xml:space="preserve">
     <value>Propriétés du plan</value>
+  </data>
+  <data name="pin_fortfahren_frage" xml:space="preserve">
+    <value>Comment souhaitez-vous procéder avec le repère "{0}" ?</value>
   </data>
 </root>

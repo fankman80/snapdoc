@@ -1237,7 +1237,10 @@
     <value>Prevent moving on the plan</value>
   </data>
   <data name="kopieren_verschieben" xml:space="preserve">
-    <value>Copy / move…</value>
+    <value>Copy / move</value>
+  </data>
+  <data name="pin_kopieren_verschieben" xml:space="preserve">
+    <value>Pin copy or move</value>
   </data>
   <data name="verzeichnis_nicht_gefunden" xml:space="preserve">
     <value>Folder not found</value>
@@ -1310,5 +1313,8 @@
   </data>
   <data name="planeigenschaften" xml:space="preserve">
     <value>Plan properties</value>
+  </data>
+  <data name="pin_fortfahren_frage" xml:space="preserve">
+    <value>How would you like to proceed with pin "{0}"?</value>
   </data>
 </root>

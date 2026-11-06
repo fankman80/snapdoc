@@ -1780,7 +1780,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Kopieren / verschieben… ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kopieren / verschieben ähnelt.
         /// </summary>
         internal static string kopieren_verschieben {
             get {
@@ -2338,6 +2338,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wie möchten Sie mit dem Pin &quot;{0}&quot; fortfahren? ähnelt.
+        /// </summary>
+        internal static string pin_fortfahren_frage {
+            get {
+                return ResourceManager.GetString("pin_fortfahren_frage", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Pin-Icon (Breite + Höhe) ähnelt.
         /// </summary>
         internal static string pin_icon_breite_hoehe {
@@ -2361,6 +2370,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string pin_keine_infos {
             get {
                 return ResourceManager.GetString("pin_keine_infos", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pin kopieren oder verschieben ähnelt.
+        /// </summary>
+        internal static string pin_kopieren_verschieben {
+            get {
+                return ResourceManager.GetString("pin_kopieren_verschieben", resourceCulture);
             }
         }
         

@@ -37,7 +37,7 @@
                     Text="{x:Static res:AppResources.abbrechen}"
                     FontAttributes="Bold"
                     BackgroundColor="Transparent" 
-                    TextColor="{DynamicResource PrimaryDark}"
+                    TextColor="{DynamicResource Primary}"
                     Clicked="OnCancelClicked" />
         </Grid>
     </Grid>

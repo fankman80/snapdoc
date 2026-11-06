@@ -73,17 +73,15 @@ public class SelectedToGlyphConverter : IMultiValueConverter
     public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
     {
         if (values == null || values.Length < 2)
-            return MaterialIcons.Layers;
+            return MaterialIcons.Space_dashboard;
 
-        //bool isSelected = values[0] is bool b && b;
         string id = values[1] as string ?? string.Empty;
         string icon;
         if (id.Contains("webmap"))
             icon = MaterialIcons.Globe;
         else
-            icon = MaterialIcons.Layers;
+            icon = MaterialIcons.Space_dashboard;
 
-        //return isSelected ? MaterialIcons.Arrow_right : icon;
         return icon;
     }
 

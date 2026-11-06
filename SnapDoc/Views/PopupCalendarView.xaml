@@ -16,8 +16,8 @@
             <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Grid.Column="0"
                         Text="{x:Static res:AppResources.abbrechen}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource Primary}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="2"
                         Text="{x:Static res:AppResources.heute}"

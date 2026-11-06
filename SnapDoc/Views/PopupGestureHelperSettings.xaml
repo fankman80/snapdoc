@@ -61,8 +61,8 @@
                 <Button Grid.Column="0"
                         x:Name="cancelButtonText"
                         Text="{x:Static res:AppResources.abbrechen}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource Primary}"
                         Clicked="OnCancelClicked" />
                 <Button Grid.Column="1"
                         x:Name="okButtonText"
