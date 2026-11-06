@@ -10,7 +10,10 @@ public partial class PopupPlanSelector : Popup<PlanSelectorReturn>, INotifyPrope
 {
     private readonly string PlanId;
     public string PinId { get; }
-    public string FormattedPinQuestion => string.Format(AppResources.pin_fortfahren_frage, GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName);
+    public string FormattedPinQuestion =>
+        GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName == "" ?
+        string.Format(AppResources.pin_fortfahren_frage, "") :
+        string.Format(AppResources.pin_fortfahren_frage, $" «{GlobalJson.Data.Plans[PlanId].Pins[PinId].PinName}»");
     private string selectedPlan;
     private int selectedRadioButtonIndex;
 

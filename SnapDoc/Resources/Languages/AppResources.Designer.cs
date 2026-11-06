@@ -2338,7 +2338,7 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
-        ///   Sucht eine lokalisierte Zeichenfolge, die Wie möchten Sie mit dem Pin &quot;{0}&quot; fortfahren? ähnelt.
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wie möchten Sie mit dem Pin{0} fortfahren? ähnelt.
         /// </summary>
         internal static string pin_fortfahren_frage {
             get {

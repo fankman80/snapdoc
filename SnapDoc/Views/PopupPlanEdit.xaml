@@ -14,7 +14,6 @@
                x:Class="SnapDoc.Views.PopupPlanEdit">
 
     <Grid x:DataType="views:PopupPlanEdit"
-          Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <controls:BorderedEntry

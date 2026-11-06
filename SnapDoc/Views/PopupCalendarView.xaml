@@ -9,8 +9,7 @@
                x:TypeArguments="x:String"
                x:Class="SnapDoc.Views.PopupCalendarView">
 
-    <Grid Padding="6"
-          WidthRequest="320">
+    <Grid WidthRequest="320">
         <VerticalStackLayout>
             <controls:CalendarView x:Name="calendar" />
             <Grid ColumnDefinitions="Auto,*,Auto,Auto">

@@ -1315,6 +1315,6 @@
     <value>Propriétés du plan</value>
   </data>
   <data name="pin_fortfahren_frage" xml:space="preserve">
-    <value>Comment souhaitez-vous procéder avec le repère "{0}" ?</value>
+    <value>Comment souhaitez-vous procéder avec le repère{0} ?</value>
   </data>
 </root>

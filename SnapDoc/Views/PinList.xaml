@@ -54,6 +54,18 @@
                                    TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"/>
         </Border>
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
+            <controls:CustomRadioPicker x:Name="SortPicker"
+                                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
+                                        ControlPadding="6,0,10,0"
+                                        HeightRequest="38"
+                                        MinimumHeightRequest="38"
+                                        FontSize="11"
+                                        HorizontalOptions="Start"                                    
+                                        VerticalOptions="Center"
+                                        CornerRadius="4"
+                                        BorderColor="{DynamicResource Primary}"
+                                        ItemsSource="{Binding PinSortCrits}"
+                                        SelectedItem="{Binding PinSortCrit}"/>
             <Button x:Name="SortDirection"
                     ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
                     CornerRadius="4"
@@ -68,18 +80,6 @@
                     BorderWidth="1"
                     BackgroundColor="Transparent"
                     Clicked="OnSortDirectionClicked"/>
-            <controls:CustomRadioPicker x:Name="SortPicker"
-                                        x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-                                        ControlPadding="6,0,10,0"
-                                        HeightRequest="38"
-                                        MinimumHeightRequest="38"
-                                        FontSize="11"
-                                        HorizontalOptions="Start"                                    
-                                        VerticalOptions="Center"
-                                        CornerRadius="4"
-                                        BorderColor="{DynamicResource Primary}"
-                                        ItemsSource="{Binding PinSortCrits}"
-                                        SelectedItem="{Binding PinSortCrit}"/>
         </HorizontalStackLayout>
 
         <Grid Grid.Row="1">

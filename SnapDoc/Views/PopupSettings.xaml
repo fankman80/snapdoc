@@ -11,7 +11,6 @@
                x:Class="SnapDoc.Views.PopupSettings">
 
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-          Padding="6"
           WidthRequest="320"
           RowDefinitions="*, Auto">
         <ScrollView Grid.Row="0" VerticalOptions="Start" MaximumHeightRequest="800">

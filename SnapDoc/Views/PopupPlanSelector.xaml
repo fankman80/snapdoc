@@ -13,9 +13,8 @@
                x:Class="SnapDoc.Views.PopupPlanSelector"
                x:DataType="views:PopupPlanSelector">
 
-    <Grid Padding="6"
-          WidthRequest="320"
-          RowDefinitions="Auto, Auto, *, Auto, Auto">
+    <Grid WidthRequest="320"
+          RowDefinitions="Auto, Auto, Auto, *, Auto">
         <Grid Grid.Row="0"
               ColumnDefinitions="Auto,*"
               RowDefinitions="Auto,Auto">

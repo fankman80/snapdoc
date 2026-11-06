@@ -14,7 +14,6 @@
                x:Class="SnapDoc.Views.PopupIconEdit">
 
     <Grid x:DataType="views:PopupIconEdit"
-          Padding="6"
           WidthRequest="320"
           RowDefinitions="Auto,*,Auto">
         <Grid Grid.Row="0" ColumnDefinitions="Auto,*">

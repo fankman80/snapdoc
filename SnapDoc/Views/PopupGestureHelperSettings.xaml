@@ -14,7 +14,6 @@
 
     <Grid x:DataType="views:PopupGestureHelperSettings"
           BindingContext="{x:Reference ThisPopup}"
-          Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <controls:RangeSlider

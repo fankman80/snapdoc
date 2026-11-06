@@ -1315,6 +1315,6 @@
     <value>Planeigenschaften</value>
   </data>
   <data name="pin_fortfahren_frage" xml:space="preserve">
-    <value>Wie möchten Sie mit dem Pin "{0}" fortfahren?</value>
+    <value>Wie möchten Sie mit dem Pin{0} fortfahren?</value>
   </data>
 </root>

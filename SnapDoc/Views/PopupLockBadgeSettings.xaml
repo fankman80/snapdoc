@@ -12,7 +12,6 @@
                x:Class="SnapDoc.Views.PopupLockBadgeSettings">
 
     <Grid x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
-          Padding="6"
           WidthRequest="320">
         <VerticalStackLayout>
             <controls:RangeSlider

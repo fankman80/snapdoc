@@ -7,8 +7,7 @@
                HorizontalOptions="Center"
                x:Class="SnapDoc.Views.PopupAlert">
 
-    <Grid Padding="6"
-          WidthRequest="320">
+    <Grid WidthRequest="320">
         <VerticalStackLayout Spacing="8">
             <Label x:Name="titleHeader"
                    FontAttributes="Bold"
@@ -16,15 +15,13 @@
             <Line x:Name="headerLine" Stroke="{AppThemeBinding Light=LightSlateGray, Dark=LightGray}" X2="500" />
             <Label x:Name="titleText"
                    HorizontalOptions="Start"/>
-            <Grid ColumnDefinitions="*,Auto" Margin="0,8,0,0">
-                <Button Grid.Column="1"
-                        MinimumWidthRequest="100"
-                        x:Name="okButtonText"
-                        Text="{x:Static res:AppResources.ok}"
-                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        Clicked="OnOkClicked" />
-            </Grid>
+            <Button Grid.Column="1"
+                    MinimumWidthRequest="100"
+                    x:Name="okButtonText"
+                    Text="{x:Static res:AppResources.ok}"
+                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                    TextColor="{DynamicResource PrimaryDarkText}"
+                    Clicked="OnOkClicked" />            
         </VerticalStackLayout>
     </Grid>
 </toolkit:Popup>
