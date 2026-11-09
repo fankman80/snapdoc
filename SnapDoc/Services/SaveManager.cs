@@ -9,7 +9,6 @@ using SnapDoc.Models;
 using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Text.Json;
-using static SnapDoc.Helper;
 using static SnapDoc.Models.SyncStampExtensions;
 
 namespace SnapDoc.Services;
@@ -1787,7 +1786,7 @@ public static class SaveManager
                 else if (pin.IsCustomIcon && !string.IsNullOrEmpty(pin.PinIcon))
                 {
                     string localIcon = Path.Combine(Settings.DataDirectory, "customicons", pin.PinIcon);
-                    bool alreadyThere = File.Exists(localIcon) && IconLookup.Get(pin.PinIcon)?.FileName == pin.PinIcon;
+                    bool alreadyThere = File.Exists(localIcon) && Helper.IconLookup.Get(pin.PinIcon)?.FileName == pin.PinIcon;
                     if (alreadyThere) continue;
 
                     if (await EnsureCustomIconAvailableAsync(driveId, rootFolderId, pin.PinIcon))
@@ -1807,7 +1806,7 @@ public static class SaveManager
         string iconDir = Path.Combine(Settings.DataDirectory, "customicons");
         string localPngPath = Path.Combine(iconDir, iconFileName);
 
-        if (File.Exists(localPngPath) && IconLookup.Get(iconFileName)?.FileName == iconFileName)
+        if (File.Exists(localPngPath) && Helper.IconLookup.Get(iconFileName)?.FileName == iconFileName)
             return true;
 
         var project = ProjectItem.Current;
@@ -1846,10 +1845,10 @@ public static class SaveManager
                 isDefaultIcon: false);
 
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), newIconItem);
-            IconLookup.AddOrUpdate(newIconItem);
+            Helper.IconLookup.AddOrUpdate(newIconItem);
             Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out var iconCategories);
             SettingsService.Instance.IconCategories = iconCategories;
-            IconLookup.Initialize(Settings.IconData);
+            Helper.IconLookup.Initialize(Settings.IconData);
         }
         catch (Exception ex)
         {
@@ -2011,7 +2010,7 @@ public static class SaveManager
                 }
 
                 string localPng = Path.Combine(Settings.DataDirectory, "customicons", iconFileName);
-                var item = IconLookup.Get(iconFileName);
+                var item = Helper.IconLookup.Get(iconFileName);
 
                 if (!File.Exists(localPng) || item == null) continue;
 

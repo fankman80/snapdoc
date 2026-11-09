@@ -1,9 +1,9 @@
 #nullable disable
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using SnapDoc.Controls;
 using SnapDoc.DrawingTool;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
@@ -537,7 +537,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (!File.Exists(origPath))
         {
-            await SnackbarExtensions.ShowSafeAsync("Original nicht verfügbar – bitte online gehen.", includeDelay: true);
+            await this.DisplaySnackbar("Original nicht verfügbar – bitte online gehen.", actionButtonText: AppResources.ok);
             return;
         }
 
@@ -721,7 +721,7 @@ public partial class ImageViewPage : IQueryAttributable
                     if (hadOverlay)
                     {
                         // Sonst würde das bemalte Bild zum "Original"
-                        await SnackbarExtensions.ShowSafeAsync("Original nicht verfügbar – bitte online gehen.", includeDelay: true);
+                        await this.DisplaySnackbar("Original nicht verfügbar – bitte online gehen.", actionButtonText: AppResources.ok);
                         return; // Zeichenmodus bleibt offen, später erneut versuchen
                     }
                     File.Copy(imgPath, origPath);
@@ -731,7 +731,7 @@ public partial class ImageViewPage : IQueryAttributable
 
                 if (!saved)
                 {
-                    await SnackbarExtensions.ShowSafeAsync("Das Bild mit der Zeichnung konnte nicht gespeichert werden.", includeDelay: true);
+                    await this.DisplaySnackbar("Das Bild mit der Zeichnung konnte nicht gespeichert werden.", actionButtonText: AppResources.ok);
                     return;
                 }
 

@@ -1,11 +1,11 @@
 #nullable disable
-
 using BruTile.Predefined;
 using BruTile.Web;
 using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Maui.Alerts;
 using Mapsui;
 using Mapsui.Extensions;
 using Mapsui.Layers;
@@ -13,7 +13,6 @@ using Mapsui.Nts;
 using Mapsui.Nts.Extensions;
 using Mapsui.Projections;
 using Mapsui.Styles;
-using Mapsui.Tiling;
 using Mapsui.Tiling.Layers;
 using Mapsui.UI.Maui;
 using Mapsui.Widgets.BoxWidgets;
@@ -26,7 +25,6 @@ using SnapDoc.Services;
 using SnapDoc.ViewModels;
 using System.Diagnostics;
 using System.Globalization;
-using SnapDoc.Controls;
 using Color = Mapsui.Styles.Color;
 using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
@@ -218,8 +216,7 @@ public partial class MapView : IQueryAttributable
         _features.Clear();
 
         var pinLayer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
-        if (pinLayer != null)
-            pinLayer.Features = [];
+        pinLayer?.Features = [];
 
         string uri = SettingsService.Instance.MapIcons[SettingsService.Instance.MapIcon];
 
@@ -415,7 +412,7 @@ public partial class MapView : IQueryAttributable
 
     private static async Task ShowGpsDisabledMessageAsync()
     {
-        await SnackbarExtensions.ShowSafeAsync(AppResources.standortdienste_aktivieren_aufforderung);
+        _ = Snackbar.Make(AppResources.standortdienste_aktivieren_aufforderung).Show();
     }
 
     private async void KmlExportClicked(object sender, EventArgs e)
@@ -448,9 +445,9 @@ public partial class MapView : IQueryAttributable
         var fileSaveResult = await FileSaver.Default.SaveAsync(SettingsService.Instance.ProjectPath + ".kml", saveStream);
 
         if (fileSaveResult.IsSuccessful)
-            await SnackbarExtensions.ShowSafeAsync(AppResources.kml_gespeichert, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.kml_gespeichert, actionButtonText: AppResources.ok);
         else
-            await SnackbarExtensions.ShowSafeAsync(AppResources.kml_nicht_gespeichert, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.kml_nicht_gespeichert, actionButtonText: AppResources.ok);
 
         saveStream.Close();
 

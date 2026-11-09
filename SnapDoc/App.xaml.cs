@@ -1,6 +1,5 @@
 #nullable disable
 using SnapDoc.Services;
-using static SnapDoc.Helper;
 using SnapDoc.ViewModels;
 using System.Xml.Linq;
 
@@ -69,7 +68,7 @@ public partial class App : Application
         // Icon-Daten einlesen
         Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
-        IconLookup.Initialize(Settings.IconData);
+        Helper.IconLookup.Initialize(Settings.IconData);
 
         // lade Einstellungen
         SettingsService.Instance.LoadSettings();

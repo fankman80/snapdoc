@@ -4,7 +4,6 @@ using SkiaSharp;
 using SnapDoc.Items;
 using SnapDoc.Models;
 using SnapDoc.Services;
-using static SnapDoc.Helper;
 
 namespace SnapDoc;
 
@@ -147,7 +146,7 @@ public partial class PinItem : ModelItem<Pin>
                 // Default-Icon laden, falls das CustomIcon nicht existiert
                 return File.Exists(fullPath)
                     ? fullPath
-                    : IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
+                    : Helper.IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
             }
 
             return Model.IsCustomPin ? "shapes64.png" : PinIcon;
@@ -368,7 +367,7 @@ public class IconItem(
             // Default-Icon laden, falls das CustomIcon nicht existiert
             return File.Exists(fullPath)
                 ? fullPath
-                : IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
+                : Helper.IconLookup.Get(SettingsService.Instance.DefaultPinIcon).FileName;
         }
     }
 }

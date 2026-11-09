@@ -1,10 +1,9 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -28,7 +27,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
                 // Icon-Daten einlesen
                 Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
                 SettingsService.Instance.IconCategories = iconCategories;
-                IconLookup.Initialize(Settings.IconData);
+                Helper.IconLookup.Initialize(Settings.IconData);
             }
         }
     }
@@ -114,7 +113,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
             // Icon-Daten einlesen
             Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
             SettingsService.Instance.IconCategories = iconCategories;
-            IconLookup.Initialize(Settings.IconData);
+            Helper.IconLookup.Initialize(Settings.IconData);
         }
     }
 
@@ -124,7 +123,7 @@ public partial class PopupSettings : Popup, IQueryAttributable
         {
             int failed = await Task.Run(TileCache.ClearAll);
 
-            await SnackbarExtensions.ShowSafeAsync(AppResources.PlansCacheCleared, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.PlansCacheCleared, actionButtonText: AppResources.ok);
 
             if (failed > 0)
                 System.Diagnostics.Debug.WriteLine($"Tile-Cache: {failed} Ordner in Verwendung, übersprungen.");

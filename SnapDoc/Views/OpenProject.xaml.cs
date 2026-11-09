@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -507,7 +507,7 @@ public partial class OpenProject : ContentPage
 
         if (string.IsNullOrWhiteSpace(sanitizedName))
         {
-            await SnackbarExtensions.ShowSafeAsync(AppResources.invalid_project_name, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.invalid_project_name, actionButtonText: AppResources.ok);
             return;
         }
 
@@ -599,7 +599,7 @@ public partial class OpenProject : ContentPage
             // Sicherheitsprüfung: Manche Android-Provider liefern einen falschen MIME-Type
             if (!fileResult.FileName.EndsWith(".zip", StringComparison.OrdinalIgnoreCase))
             {
-                await SnackbarExtensions.ShowSafeAsync(AppResources.bitte_waehle_zip, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bitte_waehle_zip, actionButtonText: AppResources.ok);
                 return;
             }
 
@@ -634,7 +634,7 @@ public partial class OpenProject : ContentPage
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Import-Fehler: {ex.Message}");
-            await SnackbarExtensions.ShowSafeAsync(AppResources.datei_konnte_nicht_importiert_werden, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.datei_konnte_nicht_importiert_werden, actionButtonText: AppResources.ok);
         }
         finally
         {
@@ -951,7 +951,7 @@ public partial class OpenProject : ContentPage
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync($"Error: {ex.Message}", includeDelay: true);
+            await this.DisplaySnackbar($"Error: {ex.Message}", actionButtonText: AppResources.ok);
         }
         finally
         {
@@ -988,7 +988,7 @@ public partial class OpenProject : ContentPage
         {
             var saveResult = await FileSaver.Default.SaveAsync(zipName, saveStream);
             if (saveResult.IsSuccessful)
-                await SnackbarExtensions.ShowSafeAsync(AppResources.zip_wurde_exportiert, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.zip_wurde_exportiert, actionButtonText: AppResources.ok);
         }
         File.Delete(outputPath);
     }
@@ -999,7 +999,7 @@ public partial class OpenProject : ContentPage
     string directoryPath = Path.GetDirectoryName(item.FilePath);
     if (string.IsNullOrEmpty(directoryPath) || !Directory.Exists(directoryPath))
     {
-        await SnackbarExtensions.ShowSafeAsync(AppResources.verzeichnis_nicht_gefunden, includeDelay: true);
+        _ = Snackbar.Make(AppResources.verzeichnis_nicht_gefunden, actionButtonText: AppResources.ok).Show();
         return;
     }
 
@@ -1007,7 +1007,7 @@ public partial class OpenProject : ContentPage
     if (!ok)
         System.Diagnostics.Debug.WriteLine($"Ordner konnte nicht geöffnet werden: {directoryPath}");
 #else
-        await Task.CompletedTask;
+		await Task.CompletedTask;
 #endif
     }
 

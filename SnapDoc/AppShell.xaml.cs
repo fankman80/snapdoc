@@ -1,7 +1,6 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
-using SnapDoc.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
@@ -10,6 +9,7 @@ using SnapDoc.Views;
 using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
+using CommunityToolkit.Maui.Alerts;
 
 namespace SnapDoc;
 
@@ -412,7 +412,7 @@ public partial class AppShell : Shell
             // Polling nach erfolgreichem Login starten
             SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
 
-            await SnackbarExtensions.ShowSafeAsync($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", includeDelay: true);
+            await this.DisplaySnackbar($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", actionButtonText: AppResources.ok);
         }
         else if (userName != nameof(DualPopupResult.Cancel))
         {

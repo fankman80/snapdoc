@@ -1,7 +1,7 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 
@@ -92,14 +92,14 @@ public partial class ExportSettings : ContentPage
 
             // Ergebnis anzeigen
             if (isShared)
-                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_geteilt, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bericht_wurde_geteilt, actionButtonText: AppResources.ok);
             else
-                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_geteilt, actionButtonText: AppResources.ok);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen des Berichts: {ex}");
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_geteilt, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_geteilt, actionButtonText: AppResources.ok);
         }
         finally
         {
@@ -177,14 +177,14 @@ public partial class ExportSettings : ContentPage
             await Shell.Current.GoToAsync("..");
 
             if (isSaved)
-                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_gespeichert, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bericht_wurde_gespeichert, actionButtonText: AppResources.ok);
             else
-                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_gespeichert, actionButtonText: AppResources.ok);
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen des Berichts: {ex}");
-            await SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_gespeichert, includeDelay: true);
+            await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_gespeichert, actionButtonText: AppResources.ok);
         }
         finally
         {
@@ -248,12 +248,12 @@ public partial class ExportSettings : ContentPage
             {
                 System.Diagnostics.Debug.WriteLine($"Cloud-Upload fehlgeschlagen: {uploadError}");
                 await Shell.Current.GoToAsync("..");
-                _ = SnackbarExtensions.ShowSafeAsync(AppResources.bericht_wurde_nicht_hochgeladen, includeDelay: true);
+                await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_hochgeladen, actionButtonText: AppResources.ok);
                 return;
             }
 
             await Shell.Current.GoToAsync("..");
-            _ = SnackbarExtensions.ShowSafeAsync(string.Format(AppResources.bericht_wurde_hochgeladen, target.FolderName), includeDelay: true);
+            await this.DisplaySnackbar(string.Format(AppResources.bericht_wurde_hochgeladen, target.FolderName), actionButtonText: AppResources.ok);
         }
         finally
         {

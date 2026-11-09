@@ -8,7 +8,6 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;
 using System.Runtime.CompilerServices;
-using static SnapDoc.Helper;
 
 namespace SnapDoc.Views;
 
@@ -378,7 +377,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
             );
 
             Helper.UpdateIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), updatedItem);
-            IconLookup.AddOrUpdate(updatedItem);
+            Helper.IconLookup.AddOrUpdate(updatedItem);
             returnValue = file;
 
             if (updatedItem.IsCustomIcon)
@@ -404,7 +403,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
                 File.Delete(iconFile);
                 Helper.DeleteIconItem(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), file);
-                IconLookup.Remove(file);
+                Helper.IconLookup.Remove(file);
                 _ = SaveManager.DeleteCloudFileAsync($"{ProjectItem.Current.CustomIconsFolder}/{file}");
                 _ = SaveManager.DeleteCloudFileAsync($"{ProjectItem.Current.CustomIconsFolder}/{Path.ChangeExtension(file, ".json")}");
                 returnValue = "deleted";
@@ -413,7 +412,7 @@ public partial class PopupIconEdit : Popup<string>, INotifyPropertyChanged
 
         Settings.IconData = Helper.LoadIconItems(Path.Combine(Settings.TemplateDirectory, "IconData.xml"), out List<string> iconCategories);
         SettingsService.Instance.IconCategories = iconCategories;
-        IconLookup.Initialize(Settings.IconData);
+        Helper.IconLookup.Initialize(Settings.IconData);
 
         Cleanup();
 

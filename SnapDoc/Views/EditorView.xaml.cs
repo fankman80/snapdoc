@@ -2,11 +2,11 @@
 using SnapDoc.Services;
 using System.Text.Json;
 using SnapDoc.Resources.Languages;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 
 #if ANDROID
 using Android.Webkit;
-#elif IOS || MACCATALYST
+#elif IOS
 using WebKit;
 using Foundation;
 #endif
@@ -19,11 +19,8 @@ public partial class EditorView : ContentPage, IQueryAttributable
     private string _fileType = null;
     private string _stringTxt = null;
     private bool _isReadOnly = false;
-
-#if ANDROID || WINDOWS || IOS || MACCATALYST
     private string _jsonString = string.Empty;
     private bool _editorReady = false;
-#endif
 
     public EditorView()
     {
@@ -33,7 +30,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
         EditorWebView.HandlerChanged += OnWindowsHandlerChanged;
 #elif ANDROID
         EditorWebView.HandlerChanged += OnAndroidHandlerChanged;
-#elif IOS || MACCATALYST
+#elif IOS
         EditorWebView.HandlerChanged += OnIOSHandlerChanged;
 #endif
 
@@ -52,8 +49,6 @@ public partial class EditorView : ContentPage, IQueryAttributable
             if (value3 as string == "R")
                 _isReadOnly = true;
     }    
-
-    #region Handler Setup
 
 #if WINDOWS
     private async void OnWindowsHandlerChanged(object sender, EventArgs e)
@@ -118,8 +113,6 @@ public partial class EditorView : ContentPage, IQueryAttributable
     }
 #endif
 
-    #endregion
-
     private async void OnLoaded(object sender, EventArgs e)
     {
         if (!string.IsNullOrEmpty(_stringTxt))
@@ -157,7 +150,6 @@ public partial class EditorView : ContentPage, IQueryAttributable
         return htmlContent;
     }
 
-    #region JSON Helpers
     private static readonly JsonSerializerOptions JsSafeOptions = new()
     {
         WriteIndented = true,
@@ -204,7 +196,7 @@ public partial class EditorView : ContentPage, IQueryAttributable
 #elif WINDOWS
         if (EditorWebView.Handler?.PlatformView is Microsoft.UI.Xaml.Controls.WebView2 webview2)
             await webview2.ExecuteScriptAsync($"window.setJsonText({ToJsSafeJson(json)});");
-#elif IOS || MACCATALYST
+#elif IOS
         if (EditorWebView.Handler?.PlatformView is WKWebView wkWebView)
             await wkWebView.EvaluateJavaScriptAsync($"window.setJsonText({ToJsSafeJson(json)});");
 #endif
@@ -213,15 +205,12 @@ public partial class EditorView : ContentPage, IQueryAttributable
     {
         File.WriteAllText(_filePath, json);
 
-        await SnackbarExtensions.ShowSafeAsync(AppResources.einstellungen_gespeichert);
+        await this.DisplaySnackbar(AppResources.einstellungen_gespeichert);
 
         await Shell.Current.GoToAsync($"..?fileType={_fileType}");
     }
-    #endregion
 
 #if ANDROID
-    #region Android Bridge
-
     public class JsBridge(EditorView view) : Java.Lang.Object
     {
         private readonly WeakReference<EditorView> _weakRef = new(view);
@@ -253,12 +242,9 @@ public partial class EditorView : ContentPage, IQueryAttributable
                 view.EvaluateJavascript($"window.setJsonText({ToJsSafeJson(_editorView._jsonString)});", null);
         }
     }
-
-    #endregion
 #endif
 
-    #region iOS Setup
-#if IOS || MACCATALYST
+#if IOS
     private void OnIOSHandlerChanged(object sender, EventArgs e)
     {
         if (EditorWebView.Handler?.PlatformView is WKWebView wkWebView)
@@ -298,5 +284,4 @@ public partial class EditorView : ContentPage, IQueryAttributable
         }
     }
 #endif
-    #endregion
 }

@@ -1,7 +1,7 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Views;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Resources.Languages;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
@@ -65,13 +65,13 @@ public partial class PopupPlanEdit : Popup<PlanEditReturn>, INotifyPropertyChang
     private async void OnLockedClicked(object sender, EventArgs e)
     {
         lockAction = true;
-        await SnackbarExtensions.ShowSafeAsync(AppResources.alle_pins_angeheftet, includeDelay: true);
+        await this.DisplaySnackbar(AppResources.alle_pins_angeheftet, actionButtonText: AppResources.ok);
     }
 
     private async void OnUnlockedClicked(object sender, EventArgs e)
     {
         lockAction = false;
-        await SnackbarExtensions.ShowSafeAsync(AppResources.alle_pins_geloest, includeDelay: true);
+        await this.DisplaySnackbar(AppResources.alle_pins_geloest, actionButtonText: AppResources.ok);
     }
 
     private int _planRotate = 0;

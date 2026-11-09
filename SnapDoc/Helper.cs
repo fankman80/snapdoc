@@ -1,6 +1,6 @@
 ﻿﻿#nullable disable
 using SkiaSharp;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Globalization;
@@ -90,7 +90,7 @@ public class Helper
         }
         catch (Exception ex)
         {
-            _ = SnackbarExtensions.ShowSafeAsync($"Fehler in der Icon-Datenbank. {ex.Message}");
+			_ = Snackbar.Make($"Fehler in der Icon-Datenbank. {ex.Message}", actionButtonText: AppResources.ok).Show();
         }
 
         allCategories = [.. categories];

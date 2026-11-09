@@ -1,8 +1,8 @@
 ﻿#nullable disable
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
+using CommunityToolkit.Maui.Alerts;
 using SkiaSharp;
-using SnapDoc.Controls;
 using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -141,7 +141,7 @@ public partial class IconGallery : ContentPage, IQueryAttributable
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync($"{AppResources.fehler_bild_import}: {ex.Message}");
+            await this.DisplaySnackbar($"{AppResources.fehler_bild_import}: {ex.Message}");
         }
     }
 

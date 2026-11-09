@@ -1,6 +1,6 @@
 ﻿#nullable disable
 using SkiaSharp;
-using SnapDoc.Controls;
+using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
@@ -187,7 +187,7 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync($"{AppResources.fehler}: {ex.Message}", includeDelay: true);
+            await this.DisplaySnackbar($"{AppResources.fehler}: {ex.Message}", actionButtonText: AppResources.ok);
         }
         finally
         {
@@ -267,7 +267,7 @@ public partial class LoadPDFPages : ContentPage
         }
         catch (Exception ex)
         {
-            await SnackbarExtensions.ShowSafeAsync($"PDF-Error: {ex.Message}", includeDelay: true);
+            await this.DisplaySnackbar($"PDF-Error: {ex.Message}", actionButtonText: AppResources.ok);
         }
         finally
         {
