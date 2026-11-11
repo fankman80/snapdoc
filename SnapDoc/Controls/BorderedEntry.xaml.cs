@@ -65,25 +65,25 @@ public partial class BorderedEntry : ContentView
         };
     }
 
-    private void InnerEntry_Focused(object sender, FocusEventArgs e)
+    private void InnerEntry_Focused(object? sender, FocusEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         BorderCanvas.InvalidateSurface();
     }
 
-    private void InnerEntry_Unfocused(object sender, FocusEventArgs e)
+    private void InnerEntry_Unfocused(object? sender, FocusEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         BorderCanvas.InvalidateSurface();
     }
 
-    private void InnerEntry_TextChanged(object sender, TextChangedEventArgs e)
+    private void InnerEntry_TextChanged(object? sender, TextChangedEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         TextChanged?.Invoke(this, e);
     }
 
-    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var info = e.Info;
         var canvas = e.Surface.Canvas;
@@ -230,7 +230,7 @@ public partial class BorderedEntry : ContentView
         BorderCanvas?.InvalidateSurface();
     }
 
-    private void OnFrameTapped(object sender, TappedEventArgs e)
+    private void OnFrameTapped(object? sender, TappedEventArgs e)
     {
         if (!InnerEntry.IsFocused)
             InnerEntry.Focus();

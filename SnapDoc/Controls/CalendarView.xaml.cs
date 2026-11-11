@@ -42,19 +42,19 @@ public partial class CalendarView : ContentView
         }
     }
 
-    private void OnPreviousMonthClicked(object sender, EventArgs e)
+    private void OnPreviousMonthClicked(object? sender, EventArgs e)
     {
         _currentDate = _currentDate.AddMonths(-1);
         _viewModel.GenerateCalendar(_currentDate, SelectedDate);
     }
 
-    private void OnNextMonthClicked(object sender, EventArgs e)
+    private void OnNextMonthClicked(object? sender, EventArgs e)
     {
         _currentDate = _currentDate.AddMonths(1);
         _viewModel.GenerateCalendar(_currentDate, SelectedDate);
     }
 
-    private void OnDayTapped(object sender, TappedEventArgs e)
+    private void OnDayTapped(object? sender, TappedEventArgs e)
     {
         if (e.Parameter is CalendarDay selectedDay)
         {

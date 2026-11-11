@@ -1,12 +1,16 @@
 ﻿#nullable disable
 using CommunityToolkit.Mvvm.ComponentModel;
-using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using System.Collections.ObjectModel;
+using System.Reflection;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using SkiaSharp;
 
 namespace SnapDoc.Services;
+
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class PersistAttribute : Attribute { }
 
 public partial class SettingsService : ObservableObject
 {
@@ -16,9 +20,17 @@ public partial class SettingsService : ObservableObject
     public const string FlyoutHeaderDesc = "by Emch+Berger AG Bern";
     public const string FlyoutHeaderImageThumb = "banner_thumbnail.png";
     public const string DefaultJson = "snapdoc_data.json";
+
     private static readonly Lazy<SettingsService> _instance = new(() => new SettingsService());
     public static SettingsService Instance => _instance.Value;
+
     private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+
+    // Alle mit [Persist] markierten Properties (einmalig per Reflection ermittelt)
+    private static readonly PropertyInfo[] PersistedProperties =
+        [.. typeof(SettingsService)
+            .GetProperties(BindingFlags.Public | BindingFlags.Instance)
+            .Where(p => p.CanRead && p.CanWrite && p.IsDefined(typeof(PersistAttribute)))];
 
     // --- Theme Dictionaries ---
     private static readonly Dictionary<string, Dictionary<string, string>> ColorThemeMapping = new()
@@ -79,6 +91,7 @@ public partial class SettingsService : ObservableObject
         AppLanguages = [.. Settings.Languages.Values];
         AppCameraTools = [.. Settings.CameraTools];
         IconCategories = [AppResources.alle_icons];
+
         SelectedColorTheme = ColorThemes[0];
         SelectedAppTheme = AppThemes[0];
         IconSortCrit = IconSortCrits[0];
@@ -86,72 +99,15 @@ public partial class SettingsService : ObservableObject
         IconCategory = IconCategories[0];
     }
 
+    // =====================================================================
+    // Laufzeitwerte (werden NICHT gespeichert)
+    // =====================================================================
     public string ProjectPath { get; set; }
-
-    [ObservableProperty] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
-    [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
-    [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
-    [ObservableProperty] public partial int FlashMode { get; set; } = 2;
-    [ObservableProperty] public partial double CaptureRatio { get; set; } = 1.33;
     [ObservableProperty] public partial string AppVersion { get; set; } = AppInfo.VersionString;
     [ObservableProperty] public partial bool IsProjectLoaded { get; set; } = false;
     [ObservableProperty] public partial string LastPinId { get; set; }
     [ObservableProperty] public partial string FlyoutHeaderImage { get; set; } = "";
-    [ObservableProperty] public partial bool IconGalleryGridView { get; set; } = false;
-    [ObservableProperty] public partial bool PhotoGalleryGridView { get; set; } = false;
-    [ObservableProperty] public partial int FotoThumbSize { get; set; } = 150;
-    [ObservableProperty] public partial int FotoThumbQuality { get; set; } = 75;
-    [ObservableProperty] public partial int FotoQuality { get; set; } = 80;
-    [ObservableProperty] public partial int PlanQuality { get; set; } = 90;
-    [ObservableProperty] public partial int PlanPreviewSize { get; set; } = 150;
-    [ObservableProperty] public partial int PlanThumbSize { get; set; } = 1024;
-    [ObservableProperty] public partial int FotoPreviewSize { get; set; } = 150;
-    [ObservableProperty] public partial int IconPreviewSize { get; set; } = 64;
-    [ObservableProperty] public partial int GridViewMinColumns { get; set; } = 3;
-    [ObservableProperty] public partial double DefaultPinZoom { get; set; } = 4;
-    [ObservableProperty] public partial bool IsPlanRotateLocked { get; set; } = false;
-    [ObservableProperty] public partial bool IsShowLockBadges { get; set; } = true;
-    [ObservableProperty] public partial bool IsPlanListThumbnails { get; set; } = false;
-    [ObservableProperty] public partial bool IsHideInactivePlans { get; set; } = false;
-    [ObservableProperty] public partial bool IsPinAutoLock { get; set; } = false;
-    [ObservableProperty] public partial int PinMinScaleLimit { get; set; } = 60;
-    [ObservableProperty] public partial int PinMaxScaleLimit { get; set; } = 100;
-    [ObservableProperty] public partial int PdfFullViewDpi { get; set; } = 360;
-    [ObservableProperty] public partial int PdfThumbDpi { get; set; } = 72;
-    [ObservableProperty] public partial int MapIconSize { get; set; } = 85;
-    [ObservableProperty] public partial int MapIcon { get; set; } = 0;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial bool IsPinPlaceBtnManualHide { get; set; } = false;
-    [ObservableProperty] [NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial int PinPlaceMode { get; set; } = 0;
-    public bool IsButtonActuallyVisible => PinPlaceMode != 2 && !IsPinPlaceBtnManualHide;
-    [ObservableProperty] public partial double PinDuplicateOffset { get; set; } = 0.01;
-    [ObservableProperty] public partial string IconSortCrit { get; set; }
-    [ObservableProperty] public partial string PinSortCrit { get; set; }
-    [ObservableProperty] public partial string IconCategory { get; set; }
-    [ObservableProperty] public partial int ImageExportQuality { get; set; } = 80;
-    [ObservableProperty] public partial double PinLabelFontSize { get; set; } = 4;
-    [ObservableProperty] public partial string PinLabelPrefix { get; set; } = "Pos. ";
-    [ObservableProperty] public partial bool IsPlanExport { get; set; } = true;
-    [ObservableProperty] public partial bool IsPosImageExport { get; set; } = true;
-    [ObservableProperty] public partial bool IsImageExport { get; set; } = true;
-    [ObservableProperty] public partial bool IsPinIconExport { get; set; } = true;
-    [ObservableProperty] public partial bool IsFotoOverlayExport { get; set; } = true;
-    [ObservableProperty] public partial int MaxFotoExportSize { get; set; } = 1000;
-    [ObservableProperty] public partial int MaxPlanExportSize { get; set; } = 6000;
-    [ObservableProperty] public partial double PinExportSize { get; set; } = 4.0;
-    [ObservableProperty] public partial int PinPosCropExportSize { get; set; } = 30;
-    [ObservableProperty] public partial double GpsResponseTimeOut { get; set; } = 10;
-    [ObservableProperty] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
-    [ObservableProperty] public partial bool IsGpsActive { get; set; } = false;
-    [ObservableProperty] public partial string EditorTheme { get; set; } = "3024-night";
-    [ObservableProperty] public partial float PolyLineHandleRadius { get; set; } = 10f;
-    [ObservableProperty] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
-    [ObservableProperty] public partial SKPoint TouchLiftDp { get; set; } = new(-0f, -40f);
-    [ObservableProperty] public partial int DoubleClickThresholdMs { get; set; } = 300;
-    [ObservableProperty] public partial string PolyLineHandleColor { get; set; } = "#ffffff";
-    [ObservableProperty] public partial string PolyLineStartHandleColor { get; set; } = "#00FF00";
-    [ObservableProperty] public partial byte PolyLineHandleAlpha { get; set; } = 80;
-    [ObservableProperty] public partial Point CustomPinOffset { get; set; } = new(0,0);
-    [ObservableProperty] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
+    [ObservableProperty] public partial int FlashMode { get; set; } = 2;
     [ObservableProperty] public partial string SelectedTemplate { get; set; }
     [ObservableProperty] public partial ObservableCollection<string> Templates { get; set; } = [];
     [ObservableProperty] public partial List<string> ColorThemes { get; set; }
@@ -160,21 +116,85 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial List<string> AppCameraTools { get; set; }
     [ObservableProperty] public partial List<string> IconCategories { get; set; }
     [ObservableProperty] public partial List<string> MapIcons { get; set; } = Settings.MapIcons;
-    [ObservableProperty] public partial int MaxTileCache { get; set; } = 100;
-    [ObservableProperty] public partial int TileSize { get; set; } = 1024;
-    [ObservableProperty] public partial int MaxZoomLevel { get; set; } = 4;
-    [ObservableProperty] public partial bool ShowFpsCounter { get; set; } = false;
-    [ObservableProperty] public partial bool IsLoupeEnabled { get; set; } = true;
-    [ObservableProperty] public partial bool IsMoveOffsetEnabled { get; set; } = false;
-    [ObservableProperty] public partial float LoupeRadius { get; set; } = 80f;
-    [ObservableProperty] public partial float LoupeZoomFactor { get; set; } = 2.5f;
-    [ObservableProperty] public partial float LockIconOffset { get; set; } = -0.1f;
-    [ObservableProperty] public partial float LockIconSize { get; set; } = 30;
-    [ObservableProperty] public partial byte LockIconOpacity { get; set; } = 153;
-    [ObservableProperty] public partial int CloudPollingIntervall { get; set; } = 15;
-    [ObservableProperty] public partial int TombstoneKeepDays { get; set; } = 30;
-    [ObservableProperty] public partial int ParallelDownloads { get; set; } = 12;
-    [ObservableProperty] public partial int ParallelUploads { get; set; } = 12;
+    [ObservableProperty] public partial string SelectedAppLanguage { get; set; } = Settings.Languages.First().Value;
+    [ObservableProperty] public partial string SelectedCameraTool { get; set; } = Settings.CameraTools.First();
+    [ObservableProperty] public partial string IconSortCrit { get; set; }
+    [ObservableProperty] public partial string PinSortCrit { get; set; }
+    [ObservableProperty] public partial string IconCategory { get; set; }
+
+    // =====================================================================
+    // Gespeicherte Einstellungen  →  [Persist]
+    // Standardwert = Initialwert. Fehlt der Schlüssel in der Datei, wird er verwendet.
+    // =====================================================================
+    [ObservableProperty, Persist] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
+    [ObservableProperty, Persist] public partial double CaptureRatio { get; set; } = 1.33;
+    [ObservableProperty, Persist] public partial bool IconGalleryGridView { get; set; } = false;
+    [ObservableProperty, Persist] public partial bool PhotoGalleryGridView { get; set; } = false;
+    [ObservableProperty, Persist] public partial int FotoThumbSize { get; set; } = 150;
+    [ObservableProperty, Persist] public partial int FotoThumbQuality { get; set; } = 75;
+    [ObservableProperty, Persist] public partial int FotoQuality { get; set; } = 80;
+    [ObservableProperty, Persist] public partial int PlanQuality { get; set; } = 90;
+    [ObservableProperty, Persist] public partial int PlanPreviewSize { get; set; } = 150;
+    [ObservableProperty, Persist] public partial int PlanThumbSize { get; set; } = 1024;
+    [ObservableProperty, Persist] public partial int FotoPreviewSize { get; set; } = 150;
+    [ObservableProperty, Persist] public partial int IconPreviewSize { get; set; } = 64;
+    [ObservableProperty, Persist] public partial int GridViewMinColumns { get; set; } = 3;
+    [ObservableProperty, Persist] public partial double DefaultPinZoom { get; set; } = 4;
+    [ObservableProperty, Persist] public partial bool IsPlanRotateLocked { get; set; } = false;
+    [ObservableProperty, Persist] public partial bool IsShowLockBadges { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsPlanListThumbnails { get; set; } = false;
+    [ObservableProperty, Persist] public partial bool IsHideInactivePlans { get; set; } = false;
+    [ObservableProperty, Persist] public partial bool IsPinAutoLock { get; set; } = false;
+    [ObservableProperty, Persist] public partial int PinMinScaleLimit { get; set; } = 60;
+    [ObservableProperty, Persist] public partial int PinMaxScaleLimit { get; set; } = 100;
+    [ObservableProperty, Persist] public partial int PdfFullViewDpi { get; set; } = 360;
+    [ObservableProperty, Persist] public partial int PdfThumbDpi { get; set; } = 72;
+    [ObservableProperty, Persist] public partial int MapIconSize { get; set; } = 85;
+    [ObservableProperty, Persist] public partial int MapIcon { get; set; } = 0;
+    [ObservableProperty, Persist][NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial bool IsPinPlaceBtnManualHide { get; set; } = false;
+    [ObservableProperty, Persist][NotifyPropertyChangedFor(nameof(IsButtonActuallyVisible))] public partial int PinPlaceMode { get; set; } = 0;
+    public bool IsButtonActuallyVisible => PinPlaceMode != 2 && !IsPinPlaceBtnManualHide;
+    [ObservableProperty, Persist] public partial double PinDuplicateOffset { get; set; } = 0.01;
+    [ObservableProperty, Persist] public partial int ImageExportQuality { get; set; } = 80;
+    [ObservableProperty, Persist] public partial double PinLabelFontSize { get; set; } = 4;
+    [ObservableProperty, Persist] public partial string PinLabelPrefix { get; set; } = "Pos. ";
+    [ObservableProperty, Persist] public partial bool IsPlanExport { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsPosImageExport { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsImageExport { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsPinIconExport { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsFotoOverlayExport { get; set; } = true;
+    [ObservableProperty, Persist] public partial int MaxFotoExportSize { get; set; } = 1000;
+    [ObservableProperty, Persist] public partial int MaxPlanExportSize { get; set; } = 6000;
+    [ObservableProperty, Persist] public partial double PinExportSize { get; set; } = 4.0;
+    [ObservableProperty, Persist] public partial int PinPosCropExportSize { get; set; } = 30;
+    [ObservableProperty, Persist] public partial double GpsResponseTimeOut { get; set; } = 10;
+    [ObservableProperty, Persist] public partial float GpsMinTimeUpdate { get; set; } = 2.0f;
+    [ObservableProperty, Persist] public partial bool IsGpsActive { get; set; } = false;
+    [ObservableProperty, Persist] public partial string EditorTheme { get; set; } = "3024-night";
+    [ObservableProperty, Persist] public partial float PolyLineHandleRadius { get; set; } = 10f;
+    [ObservableProperty, Persist] public partial float PolyLineHandleTouchRadius { get; set; } = 20f;
+    [ObservableProperty, Persist] public partial SKPoint TouchLiftDp { get; set; } = new(-0f, -40f);
+    [ObservableProperty, Persist] public partial int DoubleClickThresholdMs { get; set; } = 300;
+    [ObservableProperty, Persist] public partial string PolyLineHandleColor { get; set; } = "#ffffff";
+    [ObservableProperty, Persist] public partial string PolyLineStartHandleColor { get; set; } = "#00FF00";
+    [ObservableProperty, Persist] public partial byte PolyLineHandleAlpha { get; set; } = 80;
+    [ObservableProperty, Persist] public partial Point CustomPinOffset { get; set; } = new(0, 0);
+    [ObservableProperty, Persist] public partial string DefaultPinIcon { get; set; } = "a_pin_red.png";
+    [ObservableProperty, Persist] public partial int MaxTileCache { get; set; } = 100;
+    [ObservableProperty, Persist] public partial int TileSize { get; set; } = 1024;
+    [ObservableProperty, Persist] public partial int MaxZoomLevel { get; set; } = 4;
+    [ObservableProperty, Persist] public partial bool ShowFpsCounter { get; set; } = false;
+    [ObservableProperty, Persist] public partial bool IsLoupeEnabled { get; set; } = true;
+    [ObservableProperty, Persist] public partial bool IsMoveOffsetEnabled { get; set; } = false;
+    [ObservableProperty, Persist] public partial float LoupeRadius { get; set; } = 80f;
+    [ObservableProperty, Persist] public partial float LoupeZoomFactor { get; set; } = 2.5f;
+    [ObservableProperty, Persist] public partial float LockIconOffset { get; set; } = -0.1f;
+    [ObservableProperty, Persist] public partial float LockIconSize { get; set; } = 30;
+    [ObservableProperty, Persist] public partial byte LockIconOpacity { get; set; } = 153;
+    [ObservableProperty, Persist] public partial int CloudPollingIntervall { get; set; } = 15;
+    [ObservableProperty, Persist] public partial int TombstoneKeepDays { get; set; } = 30;
+    [ObservableProperty, Persist] public partial int ParallelDownloads { get; set; } = 12;
+    [ObservableProperty, Persist] public partial int ParallelUploads { get; set; } = 12;
 
 #pragma warning disable CA1822
     public string GlobalCloudIcon
@@ -199,13 +219,16 @@ public partial class SettingsService : ObservableObject
         OnPropertyChanged(nameof(CurrentUserEmail));
     }
 
-    // Lists
-    [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
+    // --- Listen (Laufzeit, nicht gespeichert) ---
+    [ObservableProperty]
+    public partial List<string> IconSortCrits { get; set; } =
     [
         AppResources.nach_name,
         AppResources.nach_farbe
     ];
-    [ObservableProperty] public partial List<string> PinSortCrits { get; set; } =
+
+    [ObservableProperty]
+    public partial List<string> PinSortCrits { get; set; } =
     [
         AppResources.nach_plan,
         AppResources.nach_pin,
@@ -215,21 +238,27 @@ public partial class SettingsService : ObservableObject
         AppResources.nach_aufnahmedatum,
         AppResources.nach_prioritaet
     ];
-    [ObservableProperty] public partial List<PriorityItem> PriorityItems { get; set; } =
+
+    // --- Listen (gespeichert) ---
+    [ObservableProperty, Persist]
+    public partial List<PriorityItem> PriorityItems { get; set; } =
     [
         new() { Key = "", Color = null },
         new() { Key = AppResources.empfehlung, Color = "#92D050" },
         new() { Key = AppResources.wichtig, Color = "#FFC000" },
         new() { Key = AppResources.kritisch, Color = "#FF0000" }
     ];
-    [ObservableProperty] public partial List<string> ColorList { get; set; } =
+
+    [ObservableProperty, Persist]
+    public partial List<string> ColorList { get; set; } =
     [
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
 
     // --- Drawing-Style Templates ---
-    [ObservableProperty] public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
+    [ObservableProperty, Persist]
+    public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
     [
         new() {
             Text = "Fluchtweg",
@@ -340,89 +369,33 @@ public partial class SettingsService : ObservableObject
             ApplyAppThemeSafe(SelectedAppTheme);
     }
 
-    // --- Save & Load ---
+    // =====================================================================
+    // Save & Load
+    // =====================================================================
     public void SaveSettings()
     {
-        var settings = new SettingsModel
-        {
-            OsBaseScale = OsBaseScale,
-            PinMinScaleLimit = PinMinScaleLimit,
-            PinMaxScaleLimit = PinMaxScaleLimit,
-            MapIconSize = MapIconSize,
-            MapIcon = MapIcon,
-            PinPlaceMode = PinPlaceMode,
-            PinDuplicateOffset = PinDuplicateOffset,
-            IsPlanRotateLocked = IsPlanRotateLocked,
-            IsShowLockBadges = IsShowLockBadges,
-            IsPlanListThumbnails = IsPlanListThumbnails,
-            IsHideInactivePlans = IsHideInactivePlans,
-            IsPinAutoLock = IsPinAutoLock,
-            PdfFullViewDpi = PdfFullViewDpi,
-            PdfThumbDpi = PdfThumbDpi,
-            SelectedColorTheme = ColorThemes.IndexOf(SelectedColorTheme),
-            SelectedAppTheme = AppThemes.IndexOf(SelectedAppTheme),
-            SelectedAppLanguage = AppLanguages.IndexOf(SelectedAppLanguage),
-            SelectedCameraTool = AppCameraTools.IndexOf(SelectedCameraTool),
-            CaptureRatio = CaptureRatio,
-            IconSortCrit = IconSortCrits.IndexOf(IconSortCrit),
-            PinSortCrit = PinSortCrits.IndexOf(PinSortCrit),
-            IconCategory = IconCategories.IndexOf(IconCategory),
-            IsPlanExport = IsPlanExport,
-            IsPosImageExport = IsPosImageExport,
-            IsPinIconExport = IsPinIconExport,
-            IsImageExport = IsImageExport,
-            IsFotoOverlayExport = IsFotoOverlayExport,
-            MaxFotoExportSize = MaxFotoExportSize,
-            MaxPlanExportSize = MaxPlanExportSize,
-            PinLabelPrefix = PinLabelPrefix,
-            PinLabelFontSize = Math.Round(PinLabelFontSize, 1),
-            PinExportSize = Math.Round(PinExportSize, 1),
-            PinPosCropExportSize = PinPosCropExportSize,
-            IconGalleryGridView = IconGalleryGridView,
-            PhotoGalleryGridView = PhotoGalleryGridView,
-            FotoThumbSize = FotoThumbSize,
-            FotoThumbQuality = FotoThumbQuality,
-            FotoQuality = FotoQuality,
-            PlanQuality = PlanQuality,
-            PlanPreviewSize = PlanPreviewSize,
-            PlanThumbSize = PlanThumbSize,
-            FotoPreviewSize = FotoPreviewSize,
-            IconPreviewSize = IconPreviewSize,
-            GridViewMinColumns = GridViewMinColumns,
-            DefaultPinZoom = DefaultPinZoom,
-            GpsResponseTimeOut = GpsResponseTimeOut,
-            GpsMinTimeUpdate = GpsMinTimeUpdate,
-            IsGpsActive = IsGpsActive,
-            EditorTheme = EditorTheme,
-            PolyLineHandleRadius = PolyLineHandleRadius,
-            PolyLineHandleTouchRadius = PolyLineHandleTouchRadius,
-            TouchLiftDp = TouchLiftDp,
-            DoubleClickThresholdMs = DoubleClickThresholdMs,
-            PolyLineHandleColor = PolyLineHandleColor,
-            PolyLineStartHandleColor = PolyLineStartHandleColor,
-            PolyLineHandleAlpha = PolyLineHandleAlpha,
-            CustomPinOffset = CustomPinOffset,
-            DefaultPinIcon = DefaultPinIcon,
-            ColorList = ColorList,
-            PriorityItems = PriorityItems,
-            StyleTemplateItems = StyleTemplateItems,
-            MaxTileCache = MaxTileCache,
-            TileSize = TileSize,
-            IsLoupeEnabled = IsLoupeEnabled,
-            IsMoveOffsetEnabled = IsMoveOffsetEnabled,
-            MaxZoomLevel = MaxZoomLevel,
-            ShowFpsCounter = ShowFpsCounter,
-            LoupeRadius = LoupeRadius,
-            LoupeZoomFactor = LoupeZoomFactor,
-            LockIconOffset = LockIconOffset,
-            LockIconSize = LockIconSize,
-            LockIconOpacity = LockIconOpacity,
-            CloudPollingIntervall = CloudPollingIntervall,
-            TombstoneKeepDays = TombstoneKeepDays,
-            ParallelDownloads = ParallelDownloads,
-            ParallelUploads = ParallelUploads
-        };
-        File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), JsonSerializer.Serialize(settings, _jsonOptions));
+        var root = new JsonObject();
+
+        // Alle [Persist]-Properties automatisch
+        foreach (var p in PersistedProperties)
+            root[p.Name] = JsonSerializer.SerializeToNode(p.GetValue(this), p.PropertyType);
+
+        // Gerundete Werte (wie bisher)
+        root[nameof(PinLabelFontSize)] = Math.Round(PinLabelFontSize, 1);
+        root[nameof(PinExportSize)] = Math.Round(PinExportSize, 1);
+
+        // Auswahlwerte als Index (kompatibel zum bisherigen Dateiformat)
+        root[nameof(SelectedColorTheme)] = ColorThemes.IndexOf(SelectedColorTheme);
+        root[nameof(SelectedAppTheme)] = AppThemes.IndexOf(SelectedAppTheme);
+        root[nameof(SelectedAppLanguage)] = AppLanguages.IndexOf(SelectedAppLanguage);
+        root[nameof(SelectedCameraTool)] = AppCameraTools.IndexOf(SelectedCameraTool);
+        root[nameof(IconSortCrit)] = IconSortCrits.IndexOf(IconSortCrit);
+        root[nameof(PinSortCrit)] = PinSortCrits.IndexOf(PinSortCrit);
+        root[nameof(IconCategory)] = IconCategories.IndexOf(IconCategory);
+
+        File.WriteAllText(
+            Path.Combine(Settings.DataDirectory, SettingsFileName),
+            root.ToJsonString(_jsonOptions));
     }
 
     public void LoadSettings()
@@ -434,96 +407,43 @@ public partial class SettingsService : ObservableObject
         {
             var json = File.ReadAllText(filePath);
             if (string.IsNullOrWhiteSpace(json) || !json.TrimStart().StartsWith('{')) return;
+            if (JsonNode.Parse(json) is not JsonObject root) return;
 
-            var settings = JsonSerializer.Deserialize<SettingsModel>(json);
-            if (settings == null) return;
+            bool hasMissingKeys = false;
 
-            var defaultSettings = new SettingsService();
+            foreach (var p in PersistedProperties)
+            {
+                // Schlüssel fehlt (z. B. neue Einstellung nach Update)
+                // → Initialwert der Property bleibt und wird unten in die Datei geschrieben
+                if (!root.TryGetPropertyValue(p.Name, out var node) || node is null)
+                {
+                    hasMissingKeys = true;
+                    continue;
+                }
 
-            OsBaseScale = settings.OsBaseScale ?? defaultSettings.OsBaseScale;
-            PinMinScaleLimit = settings.PinMinScaleLimit ?? defaultSettings.PinMinScaleLimit;
-            PinMaxScaleLimit = settings.PinMaxScaleLimit ?? defaultSettings.PinMaxScaleLimit;
-            MapIconSize = settings.MapIconSize ?? defaultSettings.MapIconSize;
-            MapIcon = settings.MapIcon ?? defaultSettings.MapIcon;
-            PinPlaceMode = settings.PinPlaceMode ?? defaultSettings.PinPlaceMode;
-            PinDuplicateOffset = settings.PinDuplicateOffset ?? defaultSettings.PinDuplicateOffset;
-            IsPlanRotateLocked = settings.IsPlanRotateLocked ?? defaultSettings.IsPlanRotateLocked;
-            IsShowLockBadges = settings.IsShowLockBadges ?? defaultSettings.IsShowLockBadges;
-            IsPlanListThumbnails = settings.IsPlanListThumbnails ?? defaultSettings.IsPlanListThumbnails;
-            IsHideInactivePlans = settings.IsHideInactivePlans ?? defaultSettings.IsHideInactivePlans;
-            IsPinAutoLock = settings.IsPinAutoLock ?? defaultSettings.IsPinAutoLock;
-            PdfFullViewDpi = settings.PdfFullViewDpi ?? defaultSettings.PdfFullViewDpi;
-            PdfThumbDpi = settings.PdfThumbDpi ?? defaultSettings.PdfThumbDpi;
+                try
+                {
+                    p.SetValue(this, node.Deserialize(p.PropertyType, _jsonOptions));
+                }
+                catch (Exception ex)
+                {
+                    // Nicht lesbar (z. B. Typ geändert) → Initialwert bleibt
+                    hasMissingKeys = true;
+                    Console.WriteLine($"⚠ Einstellung '{p.Name}' ignoriert: {ex.Message}");
+                }
+            }
 
-            SelectedAppTheme = (settings.SelectedAppTheme.HasValue && settings.SelectedAppTheme >= 0 && settings.SelectedAppTheme < AppThemes.Count)
-                ? AppThemes[settings.SelectedAppTheme.Value] : defaultSettings.SelectedAppTheme;
+            SelectedAppTheme = PickByIndex(root, nameof(SelectedAppTheme), AppThemes, SelectedAppTheme);
+            SelectedColorTheme = PickByIndex(root, nameof(SelectedColorTheme), ColorThemes, SelectedColorTheme);
+            SelectedAppLanguage = PickByIndex(root, nameof(SelectedAppLanguage), AppLanguages, SelectedAppLanguage);
+            SelectedCameraTool = PickByIndex(root, nameof(SelectedCameraTool), AppCameraTools, SelectedCameraTool);
+            IconSortCrit = PickByIndex(root, nameof(IconSortCrit), IconSortCrits, IconSortCrit);
+            PinSortCrit = PickByIndex(root, nameof(PinSortCrit), PinSortCrits, PinSortCrit);
+            IconCategory = PickByIndex(root, nameof(IconCategory), IconCategories, IconCategory);
 
-            SelectedColorTheme = (settings.SelectedColorTheme.HasValue && settings.SelectedColorTheme >= 0 && settings.SelectedColorTheme < ColorThemes.Count)
-                ? ColorThemes[settings.SelectedColorTheme.Value] : defaultSettings.SelectedColorTheme;
-
-            SelectedAppLanguage = (settings.SelectedAppLanguage.HasValue && settings.SelectedAppLanguage >= 0 && settings.SelectedAppLanguage < AppLanguages.Count)
-                ? AppLanguages[settings.SelectedAppLanguage.Value] : defaultSettings.SelectedAppLanguage;
-
-            SelectedCameraTool = (settings.SelectedCameraTool.HasValue && settings.SelectedCameraTool >= 0 && settings.SelectedCameraTool < AppCameraTools.Count)
-                ? AppCameraTools[settings.SelectedCameraTool.Value] : defaultSettings.SelectedCameraTool;
-
-            IconCategory = (settings.IconCategory.HasValue && settings.IconCategory > 0 && settings.IconCategory < IconCategories.Count)
-                ? IconCategories[settings.IconCategory.Value] : defaultSettings.IconCategory;
-
-            IsPlanExport = settings.IsPlanExport ?? defaultSettings.IsPlanExport;
-            IsPosImageExport = settings.IsPosImageExport ?? defaultSettings.IsPosImageExport;
-            IsPinIconExport = settings.IsPinIconExport ?? defaultSettings.IsPinIconExport;
-            IsImageExport = settings.IsImageExport ?? defaultSettings.IsImageExport;
-            IsFotoOverlayExport = settings.IsFotoOverlayExport ?? defaultSettings.IsFotoOverlayExport;
-            MaxFotoExportSize = settings.MaxFotoExportSize ?? defaultSettings.MaxFotoExportSize;
-            MaxPlanExportSize = settings.MaxPlanExportSize ?? defaultSettings.MaxPlanExportSize;
-            PinLabelPrefix = !string.IsNullOrWhiteSpace(settings.PinLabelPrefix) ? settings.PinLabelPrefix : defaultSettings.PinLabelPrefix;
-            DefaultPinIcon = !string.IsNullOrWhiteSpace(settings.DefaultPinIcon) ? settings.DefaultPinIcon : defaultSettings.DefaultPinIcon;
-            EditorTheme = !string.IsNullOrWhiteSpace(settings.EditorTheme) ? settings.EditorTheme : defaultSettings.EditorTheme;
-            PolyLineHandleColor = !string.IsNullOrWhiteSpace(settings.PolyLineHandleColor) ? settings.PolyLineHandleColor : defaultSettings.PolyLineHandleColor;
-            PolyLineStartHandleColor = !string.IsNullOrWhiteSpace(settings.PolyLineStartHandleColor) ? settings.PolyLineStartHandleColor : defaultSettings.PolyLineStartHandleColor;
-            PinLabelFontSize = settings.PinLabelFontSize ?? defaultSettings.PinLabelFontSize;
-            PinExportSize = settings.PinExportSize ?? defaultSettings.PinExportSize;
-            PinPosCropExportSize = settings.PinPosCropExportSize ?? defaultSettings.PinPosCropExportSize;
-            IconGalleryGridView = settings.IconGalleryGridView ?? defaultSettings.IconGalleryGridView;
-            PhotoGalleryGridView = settings.PhotoGalleryGridView ?? defaultSettings.PhotoGalleryGridView;
-            FotoThumbSize = settings.FotoThumbSize ?? defaultSettings.FotoThumbSize;
-            FotoThumbQuality = settings.FotoThumbQuality ?? defaultSettings.FotoThumbQuality;
-            FotoQuality = settings.FotoQuality ?? defaultSettings.FotoQuality;
-            PlanQuality = settings.PlanQuality ?? defaultSettings.PlanQuality;
-            PlanPreviewSize = settings.PlanPreviewSize ?? defaultSettings.PlanPreviewSize;
-            PlanThumbSize = settings.PlanThumbSize ?? defaultSettings.PlanThumbSize;
-            FotoPreviewSize = settings.FotoPreviewSize ?? defaultSettings.FotoPreviewSize;
-            IconPreviewSize = settings.IconPreviewSize ?? defaultSettings.IconPreviewSize;
-            GridViewMinColumns = settings.GridViewMinColumns ?? defaultSettings.GridViewMinColumns;
-            DefaultPinZoom = settings.DefaultPinZoom ?? defaultSettings.DefaultPinZoom;
-            GpsResponseTimeOut = settings.GpsResponseTimeOut ?? defaultSettings.GpsResponseTimeOut;
-            GpsMinTimeUpdate = settings.GpsMinTimeUpdate ?? defaultSettings.GpsMinTimeUpdate;
-            IsGpsActive = settings.IsGpsActive ?? defaultSettings.IsGpsActive;
-            PolyLineHandleRadius = settings.PolyLineHandleRadius ?? defaultSettings.PolyLineHandleRadius;
-            PolyLineHandleTouchRadius = settings.PolyLineHandleTouchRadius ?? defaultSettings.PolyLineHandleTouchRadius;
-            TouchLiftDp = settings.TouchLiftDp ?? defaultSettings.TouchLiftDp;
-            DoubleClickThresholdMs = settings.DoubleClickThresholdMs ?? defaultSettings.DoubleClickThresholdMs;
-            PolyLineHandleAlpha = settings.PolyLineHandleAlpha ?? defaultSettings.PolyLineHandleAlpha;
-            CustomPinOffset = settings.CustomPinOffset ?? defaultSettings.CustomPinOffset;
-            ColorList = settings.ColorList?.Count > 0 ? settings.ColorList : [.. defaultSettings.ColorList];
-            PriorityItems = settings.PriorityItems?.Count > 0 ? settings.PriorityItems : [.. defaultSettings.PriorityItems];
-            StyleTemplateItems = settings.StyleTemplateItems?.Count > 0 ? settings.StyleTemplateItems : [.. defaultSettings.StyleTemplateItems];
-            MaxTileCache = settings.MaxTileCache ?? defaultSettings.MaxTileCache;
-            TileSize = settings.TileSize ?? defaultSettings.TileSize;
-            IsLoupeEnabled = settings.IsLoupeEnabled ?? defaultSettings.IsLoupeEnabled;
-            IsMoveOffsetEnabled = settings.IsMoveOffsetEnabled ?? defaultSettings.IsMoveOffsetEnabled;
-            MaxZoomLevel = settings.MaxZoomLevel ?? defaultSettings.MaxZoomLevel;
-            ShowFpsCounter = settings.ShowFpsCounter ?? defaultSettings.ShowFpsCounter;
-            LoupeRadius = settings.LoupeRadius ?? defaultSettings.LoupeRadius;
-            LoupeZoomFactor = settings.LoupeZoomFactor ?? defaultSettings.LoupeZoomFactor;
-            LockIconOffset = settings.LockIconOffset ?? defaultSettings.LockIconOffset;
-            LockIconSize = settings.LockIconSize ?? defaultSettings.LockIconSize;
-            LockIconOpacity = settings.LockIconOpacity ?? defaultSettings.LockIconOpacity;
-            CloudPollingIntervall = settings.CloudPollingIntervall ?? defaultSettings.CloudPollingIntervall;
-            TombstoneKeepDays = settings.TombstoneKeepDays ?? defaultSettings.TombstoneKeepDays;
-            ParallelDownloads = settings.ParallelDownloads ?? defaultSettings.ParallelDownloads;
-            ParallelUploads = settings.ParallelUploads ?? defaultSettings.ParallelUploads;
+            // Fehlende Schlüssel mit ihren Standardwerten in die Datei schreiben
+            if (hasMissingKeys)
+                SaveSettings();
         }
         catch (Exception ex)
         {
@@ -533,83 +453,30 @@ public partial class SettingsService : ObservableObject
 
     public void ResetSettingsToDefaults()
     {
-        // Einfach den Konstruktor einmal wieder aufrufen
-        var defaultSettings = new SettingsService();
-        OsBaseScale = defaultSettings.OsBaseScale;
-        PinMinScaleLimit = defaultSettings.PinMinScaleLimit;
-        PinMaxScaleLimit = defaultSettings.PinMaxScaleLimit;
-        MapIconSize = defaultSettings.MapIconSize;
-        MapIcon = defaultSettings.MapIcon;
-        PinPlaceMode = defaultSettings.PinPlaceMode;
-        PinDuplicateOffset = defaultSettings.PinDuplicateOffset;
-        IsPlanRotateLocked = defaultSettings.IsPlanRotateLocked;
-        IsShowLockBadges = defaultSettings.IsShowLockBadges;
-        IsPlanListThumbnails = defaultSettings.IsPlanListThumbnails;
-        IsHideInactivePlans = defaultSettings.IsHideInactivePlans;
-        IsPinAutoLock = defaultSettings.IsPinAutoLock;
-        PdfFullViewDpi = defaultSettings.PdfFullViewDpi;
-        PdfThumbDpi = defaultSettings.PdfThumbDpi;
-        SelectedColorTheme = defaultSettings.SelectedColorTheme;
-        SelectedAppTheme = defaultSettings.SelectedAppTheme;
-        SelectedAppLanguage = defaultSettings.SelectedAppLanguage;
-        SelectedCameraTool  = defaultSettings.SelectedCameraTool;
-        CaptureRatio = defaultSettings.CaptureRatio;
-        IconSortCrit = defaultSettings.IconSortCrit;
-        PinSortCrit = defaultSettings.PinSortCrit;
-        IconCategory = defaultSettings.IconCategory;
-        IsPlanExport = defaultSettings.IsPlanExport;
-        IsPosImageExport = defaultSettings.IsPosImageExport;
-        IsPinIconExport = defaultSettings.IsPinIconExport;
-        IsImageExport = defaultSettings.IsImageExport;
-        IsFotoOverlayExport = defaultSettings.IsFotoOverlayExport;
-        MaxFotoExportSize = defaultSettings.MaxFotoExportSize;
-        MaxPlanExportSize = defaultSettings.MaxPlanExportSize;
-        PinLabelPrefix = defaultSettings.PinLabelPrefix;
-        PinLabelFontSize = defaultSettings.PinLabelFontSize;
-        PinExportSize = defaultSettings.PinExportSize;
-        PinPosCropExportSize = defaultSettings.PinPosCropExportSize;
-        IconGalleryGridView = defaultSettings.IconGalleryGridView;
-        PhotoGalleryGridView = defaultSettings.PhotoGalleryGridView;
-        FotoThumbSize = defaultSettings.FotoThumbSize;
-        FotoThumbQuality = defaultSettings.FotoThumbQuality;
-        FotoQuality = defaultSettings.FotoQuality;
-        PlanQuality = defaultSettings.PlanQuality;
-        PlanPreviewSize = defaultSettings.PlanPreviewSize;
-        PlanThumbSize = defaultSettings.PlanThumbSize;
-        FotoPreviewSize = defaultSettings.FotoPreviewSize;
-        IconPreviewSize = defaultSettings.IconPreviewSize;
-        GridViewMinColumns = defaultSettings.GridViewMinColumns;
-        DefaultPinZoom = defaultSettings.DefaultPinZoom;
-        GpsResponseTimeOut = defaultSettings.GpsResponseTimeOut;
-        GpsMinTimeUpdate = defaultSettings.GpsMinTimeUpdate;
-        IsGpsActive = defaultSettings.IsGpsActive;
-        EditorTheme = defaultSettings.EditorTheme;
-        PolyLineHandleRadius = defaultSettings.PolyLineHandleRadius;
-        PolyLineHandleTouchRadius = defaultSettings.PolyLineHandleTouchRadius;
-        TouchLiftDp = defaultSettings.TouchLiftDp;
-        DoubleClickThresholdMs = defaultSettings.DoubleClickThresholdMs;
-        PolyLineHandleColor = defaultSettings.PolyLineHandleColor;
-        PolyLineStartHandleColor = defaultSettings.PolyLineStartHandleColor;
-        PolyLineHandleAlpha = defaultSettings.PolyLineHandleAlpha;
-        CustomPinOffset = defaultSettings.CustomPinOffset;
-        DefaultPinIcon = defaultSettings.DefaultPinIcon;
-        ColorList = [.. defaultSettings.ColorList];
-        PriorityItems = [.. defaultSettings.PriorityItems];
-        StyleTemplateItems = [.. defaultSettings.StyleTemplateItems];
-        MaxTileCache = defaultSettings.MaxTileCache;
-        TileSize = defaultSettings.TileSize;
-        IsLoupeEnabled = defaultSettings.IsLoupeEnabled;
-        IsMoveOffsetEnabled = defaultSettings.IsMoveOffsetEnabled;
-        MaxZoomLevel = defaultSettings.MaxZoomLevel;
-        ShowFpsCounter = defaultSettings.ShowFpsCounter;
-        LoupeRadius = defaultSettings.LoupeRadius;
-        LoupeZoomFactor = defaultSettings.LoupeZoomFactor;
-        LockIconOffset = defaultSettings.LockIconOffset;
-        LockIconSize = defaultSettings.LockIconSize;
-        LockIconOpacity = defaultSettings.LockIconOpacity;
-        CloudPollingIntervall = defaultSettings.CloudPollingIntervall;
-        TombstoneKeepDays = defaultSettings.TombstoneKeepDays;
-        ParallelDownloads = defaultSettings.ParallelDownloads;
-        ParallelUploads = defaultSettings.ParallelUploads;
+        // Frische Instanz enthält alle Initialwerte
+        var defaults = new SettingsService();
+
+        foreach (var p in PersistedProperties)
+            p.SetValue(this, p.GetValue(defaults));
+
+        SelectedColorTheme = defaults.SelectedColorTheme;
+        SelectedAppTheme = defaults.SelectedAppTheme;
+        SelectedAppLanguage = defaults.SelectedAppLanguage;
+        SelectedCameraTool = defaults.SelectedCameraTool;
+        IconSortCrit = defaults.IconSortCrit;
+        PinSortCrit = defaults.PinSortCrit;
+        IconCategory = defaults.IconCategory;
+    }
+
+    // =====================================================================
+    // Helpers
+    // =====================================================================
+    private static string PickByIndex(JsonObject root, string key, List<string> list, string fallback)
+    {
+        if (list is null || list.Count == 0) return fallback;
+
+        return root[key] is JsonValue v && v.TryGetValue<int>(out var i) && i >= 0 && i < list.Count
+            ? list[i]
+            : fallback;
     }
 }

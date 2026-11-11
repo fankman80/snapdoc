@@ -139,11 +139,15 @@ public partial class CameraPage : ContentPage
             if (isSwitch)
             {
                 await Task.Delay(300);
-                var startTask = cameraView.StartCameraPreview(CancellationToken.None);
-                if (await Task.WhenAny(startTask, Task.Delay(5000)) != startTask)
+                try
+                {
+                    await cameraView.StartCameraPreview(CancellationToken.None)
+                                    .WaitAsync(TimeSpan.FromSeconds(5));
+                }
+                catch (TimeoutException)
+                {
                     Debug.WriteLine("StartCameraPreview hat nach 5 s nicht zurückgekehrt.");
-                else
-                    await startTask;
+                }
             }
         }
         catch (Exception ex)
@@ -486,7 +490,7 @@ public partial class CameraPage : ContentPage
         }
     }
 
-    private void OnZoomSliderValueChanged(object sender, ValueChangedEventArgs e)
+    private void OnZoomSliderValueChanged(object? sender, ValueChangedEventArgs e)
     {
         if (_suppressZoomEvents || !_isZoomSupported) return;
 
@@ -515,7 +519,7 @@ public partial class CameraPage : ContentPage
     // Aufnahme
     // ------------------------------------------------------------------
 
-    private async void OnCaptureClicked(object sender, EventArgs e)
+    private async void OnCaptureClicked(object? sender, EventArgs e)
     {
         if (_isCapturing) return;
         _isCapturing = true;
@@ -816,7 +820,7 @@ public partial class CameraPage : ContentPage
     // UI-Aktionen
     // ------------------------------------------------------------------
 
-    private void OnFlashButtonClicked(object sender, EventArgs e)
+    private void OnFlashButtonClicked(object? sender, EventArgs e)
     {
         _currentFlashMode = _currentFlashMode switch
         {
@@ -845,7 +849,7 @@ public partial class CameraPage : ContentPage
     // ------------------------------------------------------------------
     // Taschenlampe
     // ------------------------------------------------------------------
-    private void OnTorchClicked(object sender, EventArgs e)
+    private void OnTorchClicked(object? sender, EventArgs e)
     {
         _isTorchOn = !_isTorchOn;
         ApplyTorch();
@@ -884,7 +888,7 @@ public partial class CameraPage : ContentPage
     /// <summary>
     /// Manuelle Auswahl gilt nur fuer die laufende Sitzung.
     /// </summary>
-    private void OnRatioClicked(object sender, EventArgs e)
+    private void OnRatioClicked(object? sender, EventArgs e)
     {
         if (sender is not Button btn || btn.CommandParameter is not double val) return;
 
@@ -906,7 +910,7 @@ public partial class CameraPage : ContentPage
         }
     }
 
-    private async void OnRetakeClicked(object sender, EventArgs e)
+    private async void OnRetakeClicked(object? sender, EventArgs e)
     {
         previewImage.Source = null;
 
@@ -920,15 +924,15 @@ public partial class CameraPage : ContentPage
         ApplyTorch();
     }
 
-    private async void OnConfirmClicked(object s, EventArgs e)
+    private async void OnConfirmClicked(object? s, EventArgs e)
     {
         CameraResultService.SetResult(!string.IsNullOrEmpty(_tempFilePath) ? new FileResult(_tempFilePath) : null);
         await Shell.Current.GoToAsync("..");
     }
 
-    private async void OnCloseClicked(object s, EventArgs e) => await Shell.Current.GoToAsync("..");
+    private async void OnCloseClicked(object? s, EventArgs e) => await Shell.Current.GoToAsync("..");
 
-    private async void OnSwitchCameraClicked(object sender, EventArgs e)
+    private async void OnSwitchCameraClicked(object? sender, EventArgs e)
     {
         if (_cameras.Count <= 1)
             return;
@@ -963,7 +967,7 @@ public partial class CameraPage : ContentPage
         flashButton.IsVisible = !isPreview && !_isRatioPickerExpanded;
     }
 
-    private void OnContainerTapped(object sender, EventArgs e)
+    private void OnContainerTapped(object? sender, EventArgs e)
     {
         if (_isRatioPickerExpanded)
         {

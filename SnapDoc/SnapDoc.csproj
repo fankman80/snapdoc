@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net10.0-android;net10.0-ios</TargetFrameworks>
-		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net10.0-windows10.0.26100.0</TargetFrameworks>
+		<TargetFrameworks>net11.0-android;net11.0-ios</TargetFrameworks>
+		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net11.0-windows10.0.26100.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
 		<ApplicationDisplayVersion>2.7.0</ApplicationDisplayVersion>
@@ -107,23 +107,23 @@
     </ItemGroup>
 
 	<ItemGroup>
-        <PackageReference Include="CommunityToolkit.Maui.Camera" Version="7.0.0" />
+        <PackageReference Include="CommunityToolkit.Maui.Camera" Version="8.0.0" />
 		<PackageReference Include="Codeuctivity.OpenXmlPowerTools" Version="10.0.649" />
-		<PackageReference Include="CommunityToolkit.Maui" Version="16.0.0" />
-		<PackageReference Include="CommunityToolkit.Maui.Core" Version="16.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui" Version="17.0.0" />
+		<PackageReference Include="CommunityToolkit.Maui.Core" Version="17.0.0" />
 		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
 		<PackageReference Include="DocumentFormat.OpenXml" Version="3.5.1" />
-		<PackageReference Include="Mapsui" Version="5.1.0" />
-		<PackageReference Include="Mapsui.Maui" Version="5.1.0" />
-		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="10.0.14" />
+		<PackageReference Include="Mapsui" Version="5.2.0-beta.1" />
+		<PackageReference Include="Mapsui.Maui" Version="5.2.0-beta.1" />
+		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="11.0.0" />
 		<PackageReference Include="Microsoft.Graph" Version="6.10.0" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.92.0" />
-		<PackageReference Include="Microsoft.Maui.Controls" Version="10.0.130" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="10.0.130" />
-		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="10.0.14" />
-		<PackageReference Include="Sentry.Maui" Version="6.12.1" />
+		<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.10" />
+		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="11.0.0-preview.5.26304.4" />
+		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
+		<PackageReference Include="Sentry.Maui" Version="7.0.0-rc.3" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
-		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.156.0-preview.1.26512.10" />
+		<PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="4.158.0-preview.1.26556.2" />
 	</ItemGroup>
 
 	<ItemGroup>

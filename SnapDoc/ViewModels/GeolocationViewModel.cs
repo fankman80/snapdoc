@@ -103,21 +103,16 @@ public partial class GeolocationViewModel : CommunityToolkit.Mvvm.ComponentModel
             var popup = new PopupDualResponse(AppResources.gps_system_einschalten_aufforderung, AppResources.gps_deaktiviert, AppResources.einstellungen_oeffnen, AppResources.abbrechen);
             var result = await Shell.Current.CurrentPage.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
 
-#if ANDROID
-            if (result.Result is DualPopupResult.Ok)
+            if (result?.Result is DualPopupResult.Ok)
             {
+#if ANDROID
                 var intent = new Android.Content.Intent(Android.Provider.Settings.ActionLocationSourceSettings);
                 intent.AddFlags(Android.Content.ActivityFlags.NewTask);
                 Android.App.Application.Context.StartActivity(intent);
-            }
 #elif IOS
-            if (result.Result == DualPopupResult.Ok)
-            {
-                var url = new Foundation.NSUrl(UIKit.UIApplication.OpenSettingsUrlString);
-                if (UIKit.UIApplication.SharedApplication.CanOpenUrl(url))
-                    UIKit.UIApplication.SharedApplication.OpenUrl(url, new Foundation.NSDictionary(), null);
-            }
+        AppInfo.Current.ShowSettingsUI();
 #endif
+            }
             return;
         }
 

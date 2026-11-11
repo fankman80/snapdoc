@@ -104,8 +104,8 @@
                     </Border>
                     <Label Grid.Column="0"
                            IsVisible="{Binding IsSelected}"
-                           Text="{x:Static local:MaterialIcons.Arrow_right}"
-                           FontFamily="MaterialOutlined"
+                           Text="|"
+                           FontAttributes="Bold"
                            FontSize="22"                            
                            HorizontalOptions="Center"
                            VerticalOptions="Center"

@@ -69,7 +69,7 @@ public partial class Switch : ContentView
             customSwitch.UpdateUI();
     }
 
-    private void OnTapped(object sender, TappedEventArgs e)
+    private void OnTapped(object? sender, TappedEventArgs e)
     {
         IsToggled = !IsToggled;
     }

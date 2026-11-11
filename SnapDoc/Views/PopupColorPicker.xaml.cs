@@ -28,12 +28,8 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
 
         this.SelectedColor = selectedColor;
 
-        ColorsList = new ObservableCollection<ColorBoxItem>(
-                    SettingsService.Instance.ColorList.Select(c => new ColorBoxItem
-                    { BackgroundColor = Color.FromRgba(c) }))
-                    {
-                        new() { BackgroundColor = selectedColor, IsAddButton = true }
-                    };
+        ColorsList = [with(SettingsService.Instance.ColorList.Select(c => new ColorBoxItem {BackgroundColor = Color.FromRgba(c) })),
+                      new() { BackgroundColor = selectedColor, IsAddButton = true }];
 
         // Prüfen, ob selectedColor in der Liste vorkommt
         var matchingItem = ColorsList
@@ -311,11 +307,9 @@ public partial class PopupColorPicker : Popup<ColorPickerReturn>, INotifyPropert
     private void UpdateSelectedColor_Work()
     {
         SelectedColor = Color.FromRgb(RedValue, GreenValue, BlueValue);
-        if (ColorsList?.Any() == true)
-        {
-            var lastItem = ColorsList.Last();
-            lastItem.BackgroundColor = SelectedColor;
-        }
+
+        if (ColorsList is { Count: > 0 } list)
+            list[^1].BackgroundColor = SelectedColor;
     }
 
     private void UpdateHSVFromRGB_Work()

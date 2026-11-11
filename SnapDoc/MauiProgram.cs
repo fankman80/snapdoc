@@ -50,13 +50,6 @@ public static class MauiProgram
 
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddTransient<HomeScreen>();
-        
-#if IOS || MACCATALYST
-        builder.ConfigureMauiHandlers(handlers =>
-        {
-            handlers.AddHandler<Microsoft.Maui.Controls.CollectionView, Microsoft.Maui.Controls.Handlers.Items.CollectionViewHandler>();
-        });
-#endif
 
         // Entfernt Entry Rahmen, Padding und blauer Strich
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("MyBorderlessCustomization", (handler, view) =>
@@ -66,7 +59,7 @@ public static class MauiProgram
 #if ANDROID
                 handler.PlatformView.Background = null;
                 handler.PlatformView.SetPadding(0, 0, 0, 0);
-#elif IOS || MACCATALYST
+#elif IOS
                 handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
 #elif WINDOWS
                 handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
@@ -87,7 +80,7 @@ public static class MauiProgram
                 handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
                 handler.PlatformView.Background = null;
                 handler.PlatformView.SetPadding(0, 0, 0, 0);
-#elif IOS || MACCATALYST
+#elif IOS
                 handler.PlatformView.BackgroundColor = UIKit.UIColor.Clear;
                 handler.PlatformView.Layer.BorderWidth = 0;
                 handler.PlatformView.TextContainerInset = UIKit.UIEdgeInsets.Zero; // Entfernt inneres Padding

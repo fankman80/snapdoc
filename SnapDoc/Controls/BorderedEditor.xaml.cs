@@ -57,25 +57,25 @@ public partial class BorderedEditor : ContentView
         };
     }
 
-    private void InnerEditor_Focused(object sender, FocusEventArgs e)
+    private void InnerEditor_Focused(object? sender, FocusEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         BorderCanvas.InvalidateSurface();
     }
 
-    private void InnerEditor_Unfocused(object sender, FocusEventArgs e)
+    private void InnerEditor_Unfocused(object? sender, FocusEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         BorderCanvas.InvalidateSurface();
     }
 
-    private void InnerEditor_TextChanged(object sender, TextChangedEventArgs e)
+    private void InnerEditor_TextChanged(object? sender, TextChangedEventArgs e)
     {
         UpdateFloatingLabelState(animate: true);
         TextChanged?.Invoke(this, e);
     }
 
-    private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
+    private void OnPaintSurface(object? sender, SKPaintSurfaceEventArgs e)
     {
         var info = e.Info;
         var canvas = e.Surface.Canvas;
@@ -208,7 +208,7 @@ public partial class BorderedEditor : ContentView
         });
     }
 
-    private void InnerEditor_SizeChanged(object sender, EventArgs e)
+    private void InnerEditor_SizeChanged(object? sender, EventArgs e)
     {
         this.InvalidateMeasure();
     }
@@ -244,7 +244,7 @@ public partial class BorderedEditor : ContentView
         });
     }
 
-    private void OnFrameTapped(object sender, TappedEventArgs e)
+    private void OnFrameTapped(object? sender, TappedEventArgs e)
     {
         if (!InnerEditor.IsFocused)
             InnerEditor.Focus();

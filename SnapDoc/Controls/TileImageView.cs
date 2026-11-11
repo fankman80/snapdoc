@@ -2059,7 +2059,7 @@ public partial class TileImageView : ContentView, IDisposable
         control.UpdateSortedPins();
 
         if (newValue is IEnumerable<MapPin> newPins)
-            _ = control.PreloadPinBitmapsAsync(newPins);
+            _ = control.PreloadPinBitmapsAsync([.. newPins]);
 
         if (control._pendingPinId != null && control.HasValidViewport)
             control.ZoomToPin(control._pendingPinId, control._pendingZoomFactor);
@@ -2072,7 +2072,7 @@ public partial class TileImageView : ContentView, IDisposable
         _pinsNeedSort = true;
 
         if (e.NewItems != null)
-            _ = PreloadPinBitmapsAsync(e.NewItems.OfType<MapPin>());
+            _ = PreloadPinBitmapsAsync([.. e.NewItems.OfType<MapPin>()]);
 
         if (_pendingPinId != null && HasValidViewport)
         {
@@ -2209,7 +2209,7 @@ public partial class TileImageView : ContentView, IDisposable
         _lastTouchPoint = touchPoint;
     }
 
-    private async Task PreloadPinBitmapsAsync(IEnumerable<MapPin> pins)
+    private async Task PreloadPinBitmapsAsync(List<MapPin> pins)
     {
         if (pins == null || _disposed) return;
 

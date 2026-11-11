@@ -1,3 +1,4 @@
+#nullable disable
 using CommunityToolkit.Maui.Views;
 
 namespace SnapDoc.Views;

@@ -78,7 +78,7 @@ public class SelectedToGlyphConverter : IMultiValueConverter
         string id = values[1] as string ?? string.Empty;
         string icon;
         if (id.Contains("webmap"))
-            icon = MaterialIcons.Globe;
+            icon = MaterialIcons.Public;
         else
             icon = MaterialIcons.Space_dashboard;
 

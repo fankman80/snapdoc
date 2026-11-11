@@ -839,33 +839,59 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable == null)
             return null;
 
-        var points = new List<SKPoint>();
+        float density = (float)Settings.DisplayDensity;
+        SKRect? result = null;
 
-        if (CombinedDrawable.PolyDrawable?.HasPoints == true)
-            points.AddRange(CombinedDrawable.PolyDrawable.Points);
+        // Fügt Punkte hinzu und erweitert die Box um "pad" in alle Richtungen
+        void Add(IEnumerable<SKPoint> pts, float pad)
+        {
+            bool any = false;
+            float minX = float.MaxValue, minY = float.MaxValue;
+            float maxX = float.MinValue, maxY = float.MinValue;
 
-        if (CombinedDrawable.FreeDrawable?.HasContent == true)
-            points.AddRange(
-                CombinedDrawable.FreeDrawable.Points.SelectMany(stroke => stroke));
+            foreach (var p in pts)
+            {
+                any = true;
+                if (p.X < minX) minX = p.X;
+                if (p.Y < minY) minY = p.Y;
+                if (p.X > maxX) maxX = p.X;
+                if (p.Y > maxY) maxY = p.Y;
+            }
+            if (!any) return;
 
-        if (CombinedDrawable.RectDrawable?.HasContent == true)
-            points.AddRange(CombinedDrawable.RectDrawable.Points);
+            var r = new SKRect(minX - pad, minY - pad, maxX + pad, maxY + pad);
+            result = result is { } cur ? SKRect.Union(cur, r) : r;
+        }
 
-        if (CombinedDrawable.OvalDrawable?.HasContent == true)
-            points.AddRange(CombinedDrawable.OvalDrawable.Points);
+        // Rand für Formen mit optionaler Wolkenkontur
+        float Pad(bool isCloud, float cloudRadius, float lineThickness)
+        {
+            float stroke = lineThickness * density / 2f;
+            return isCloud ? cloudRadius * density + stroke : stroke;
+        }
 
-        if (CombinedDrawable.ArrowDrawable?.HasContent == true)
-            points.AddRange(CombinedDrawable.ArrowDrawable.Points);
+        var poly = CombinedDrawable.PolyDrawable;
+        if (poly?.HasPoints == true)
+            Add(poly.Points, Pad(poly.IsCloud, poly.CloudRadius, poly.LineThickness));
 
-        if (points.Count == 0)
-            return null;
+        var free = CombinedDrawable.FreeDrawable;
+        if (free?.HasContent == true)
+            Add(free.Points.SelectMany(s => s), free.LineThickness * density / 2f);
 
-        float minX = points.Min(p => p.X);
-        float minY = points.Min(p => p.Y);
-        float maxX = points.Max(p => p.X);
-        float maxY = points.Max(p => p.Y);
+        var rect = CombinedDrawable.RectDrawable;
+        if (rect?.HasContent == true)
+            Add(rect.Points, Pad(rect.IsCloud, rect.CloudRadius, rect.LineThickness));
 
-        return new SKRect(minX, minY, maxX, maxY);
+        var oval = CombinedDrawable.OvalDrawable;
+        if (oval?.HasContent == true)
+            // Umschliessendes Rechteck statt der 4 Achsenpunkte (wichtig bei Rotation)
+            Add(oval.GetBoundingCorners(), Pad(oval.IsCloud, oval.CloudRadius, oval.LineThickness));
+
+        var arrow = CombinedDrawable.ArrowDrawable;
+        if (arrow?.HasContent == true)
+            Add(arrow.Points, arrow.LineThickness * density / 2f);
+
+        return result;
     }
 
     public void RenderForExport(SKCanvas canvas)

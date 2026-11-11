@@ -247,12 +247,13 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnItemSelected(object sender, SelectionChangedEventArgs e)
+    private async void OnItemSelected(object? sender, SelectionChangedEventArgs e)
     {
         if (e.CurrentSelection.Count == 0 || e.CurrentSelection[0] is not CloudItem selectedItem)
             return;
 
-        ((CollectionView)sender).SelectedItem = null;
+        if (sender is CollectionView cv)
+            cv.SelectedItem = null;
 
         // Ordner öffnen
         if (selectedItem.IsFolder)
@@ -338,7 +339,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnBreadcrumbTapped(object sender, TappedEventArgs e)
+    private async void OnBreadcrumbTapped(object? sender, TappedEventArgs e)
     {
         var tappedItem = e.Parameter as BreadcrumbItem ?? (sender as Element)?.BindingContext as BreadcrumbItem;
 
@@ -368,7 +369,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async void OnSelectFolderClicked(object sender, EventArgs e)
+    private async void OnSelectFolderClicked(object? sender, EventArgs e)
     {
         if (Breadcrumbs.Count == 0 || string.IsNullOrEmpty(_currentDriveId))
             return;
@@ -465,32 +466,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         return name;
     }
 
-    /// <summary>
-    /// Öffnet den Picker im Export-Modus und liefert Ordner + Dateiname zurück
-    /// (null = abgebrochen).
-    /// </summary>
-    public static async Task<CloudFolderSelection?> PickExportFolderAsync(string defaultFileName)
-    {
-        _folderPickTcs?.TrySetResult(null);
-
-        var tcs = new TaskCompletionSource<CloudFolderSelection?>(TaskCreationOptions.RunContinuationsAsynchronously);
-        _folderPickTcs = tcs;
-        _pendingExportFileName = defaultFileName ?? string.Empty;
-
-        try
-        {
-            await Shell.Current.GoToAsync($"cloudPickerPage?mode={CloudPickerMode.SelectExportFolder}");
-        }
-        catch (Exception ex)
-        {
-            System.Diagnostics.Debug.WriteLine($"CloudPicker konnte nicht geöffnet werden: {ex}");
-            _folderPickTcs = null;
-            return null;
-        }
-
-        return await tcs.Task;
-    }
-
     private async void ScrollBreadcrumbsToRight()
     {
         await Task.Delay(50);
@@ -515,20 +490,20 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     }
 
     /// <summary>
-    /// Öffnet den Picker im Export-Modus und liefert den gewählten Ordner zurück
+    /// Öffnet den Picker im Export-Modus und liefert Ordner + Dateiname zurück
     /// (null = abgebrochen).
     /// </summary>
-    public static async Task<CloudFolderSelection?> PickExportFolderAsync()
+    public static async Task<CloudFolderSelection?> PickExportFolderAsync(string? defaultFileName = null)
     {
         // Evtl. hängenden alten Aufruf sauber beenden
         _folderPickTcs?.TrySetResult(null);
 
         var tcs = new TaskCompletionSource<CloudFolderSelection?>(TaskCreationOptions.RunContinuationsAsynchronously);
         _folderPickTcs = tcs;
+        _pendingExportFileName = defaultFileName ?? string.Empty;
 
         try
         {
-            // Route an deine registrierte Shell-Route anpassen
             await Shell.Current.GoToAsync($"cloudPickerPage?mode={CloudPickerMode.SelectExportFolder}");
         }
         catch (Exception ex)

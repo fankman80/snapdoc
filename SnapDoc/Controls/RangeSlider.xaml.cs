@@ -122,7 +122,7 @@ public partial class RangeSlider : ContentView
         };
     }
 
-    private void OnPointerPressed(object sender, PointerEventArgs e)
+    private void OnPointerPressed(object? sender, PointerEventArgs e)
     {
         _wasPressedOnThisControl = true;
         _pannedDuringTouch = false;
@@ -147,7 +147,7 @@ public partial class RangeSlider : ContentView
         }
     }
 
-    private void OnPanUpdated(object sender, PanUpdatedEventArgs e)
+    private void OnPanUpdated(object? sender, PanUpdatedEventArgs e)
     {
         switch (e.StatusType)
         {
@@ -189,7 +189,7 @@ public partial class RangeSlider : ContentView
         }
     }
 
-    private void OnPointerReleased(object sender, PointerEventArgs e)
+    private void OnPointerReleased(object? sender, PointerEventArgs e)
     {
         if (_wasPressedOnThisControl && !_pannedDuringTouch && !_isScrollingTriggered)
         {
