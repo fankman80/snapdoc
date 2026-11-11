@@ -96,8 +96,7 @@
         </AbsoluteLayout>
 
         <!-- Pfeil links (Vorheriges Bild) -->
-        <Button x:Name="PrevImgBtn"
-                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=66, Glyph={x:Static local:MaterialIcons.Navigate_before}}"     
+        <Button x:Name="PrevImgBtn"  
                 BackgroundColor="#66000000"                
                 CornerRadius="0"
                 WidthRequest="50"
@@ -109,14 +108,19 @@
                 VerticalOptions="Center"
                 ZIndex="10000"
                 Clicked="OnPreviousImageClicked">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="MaterialOutlined"
+                                 Color="White"
+                                 Size="66"
+                                 Glyph="{x:Static local:MaterialIcons.Navigate_before}" />
+            </Button.ImageSource>
             <Button.Clip>
                 <RoundRectangleGeometry CornerRadius="0,24,0,24" Rect="0,0,50,120" />
             </Button.Clip>
         </Button>
 
         <!-- Pfeil rechts (Naechstes Bild) -->
-        <Button x:Name="NextImgBtn"
-                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color=White, Size=66, Glyph={x:Static local:MaterialIcons.Navigate_next}}"    
+        <Button x:Name="NextImgBtn"   
                 BackgroundColor="#66000000"
                 CornerRadius="0"
                 WidthRequest="50"
@@ -128,6 +132,12 @@
                 VerticalOptions="Center"
                 ZIndex="10000"
                 Clicked="OnNextImageClicked">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="MaterialOutlined"
+                                 Color="White"
+                                 Size="66"
+                                 Glyph="{x:Static local:MaterialIcons.Navigate_next}" />
+            </Button.ImageSource>
             <Button.Clip>
                 <RoundRectangleGeometry CornerRadius="24,0,24,0" Rect="0,0,50,120" />
             </Button.Clip>
@@ -139,7 +149,7 @@
                 ZIndex="10000"
                 VerticalOptions="End"
                 HorizontalOptions="Start"
-                Style="{StaticResource ToolButtonStyle}"
+                Style="{StaticResource ToolButtonStyleShadow}"
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
                 Clicked="DrawingClicked"/>
 
@@ -151,12 +161,12 @@
                              VerticalOptions="End"
                              ZIndex="10000">
             <Button Text="{x:Static local:MaterialIcons.Ink_eraser}" 
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                     Clicked="EraseClicked"/>
             <AbsoluteLayout>
                 <Button Text="{x:Static local:MaterialIcons.Palette}"
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                         Clicked="PenSettingsClicked"/>
                 <Border WidthRequest="18"
@@ -195,23 +205,23 @@
             <Button x:Name="AddTextBtn"
                     IsVisible="False"
                     Text="{x:Static local:MaterialIcons.Text_fields}"
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                     Clicked="TextClicked"/>
             <Button x:Name="AddCloudyBtn"
                     IsVisible="False"
                     Text="{x:Static local:MaterialIcons.Cloud_off}" 
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                     Clicked="CloudyClicked"/>
             <Button x:Name="ShapeBtn"
                     Text="{x:Static local:MaterialIcons.Activity_zone}"                  
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
                     Clicked="ShapeButtonClicked"/>
             <Button Text="{x:Static local:MaterialIcons.Check}"  
                     BackgroundColor="LimeGreen"
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
                     Clicked="CheckClicked"/>
         </VerticalStackLayout>

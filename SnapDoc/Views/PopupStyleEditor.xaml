@@ -199,9 +199,14 @@
                             Padding="0"
                             VerticalOptions="End"
                             BackgroundColor="Transparent"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Flip}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.schraffur_spiegeln}"
-                            Clicked="FlipRotationAngleClick"/>
+                            Clicked="FlipRotationAngleClick">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                             Glyph="{x:Static local:MaterialIcons.Flip}" />
+                        </Button.ImageSource>
+                    </Button>
                 </Grid>
                 <controls:RangeSlider
                      IsVisible="{Binding IsHatchEffect}"

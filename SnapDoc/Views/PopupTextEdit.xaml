@@ -20,13 +20,16 @@
             <HorizontalStackLayout Spacing="10">
                 <!-- LEFT -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_left}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Left}">
-
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource Primary}"
+                                         Glyph="{x:Static local:MaterialIcons.Format_align_left}" />
+                    </Button.ImageSource>
                     <Button.Triggers>
                         <DataTrigger
                             TargetType="Button"
@@ -39,13 +42,16 @@
 
                 <!-- CENTER -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_center}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Center}">
-
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource Primary}"
+                                         Glyph="{x:Static local:MaterialIcons.Format_align_center}" />
+                    </Button.ImageSource>
                     <Button.Triggers>
                         <DataTrigger
                             TargetType="Button"
@@ -58,13 +64,16 @@
 
                 <!-- RIGHT -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_align_right}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Right}">
-
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource Primary}"
+                                         Glyph="{x:Static local:MaterialIcons.Format_align_right}" />
+                    </Button.ImageSource>
                     <Button.Triggers>
                         <DataTrigger
                             TargetType="Button"
@@ -79,12 +88,16 @@
             <HorizontalStackLayout Spacing="10">
                 <!-- Bold -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_bold}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding ToggleTextStyleCommand}"
                     CommandParameter="{x:Static local:RectangleTextStyle.Bold}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource Primary}"
+                                         Glyph="{x:Static local:MaterialIcons.Format_bold}" />
+                    </Button.ImageSource>
                     <Button.Triggers>
                         <DataTrigger
                             TargetType="Button"
@@ -99,12 +112,16 @@
 
                 <!-- Italic -->
                 <Button
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Format_italic}}"
                     BorderWidth="2"
                     BackgroundColor="Transparent"
                     BorderColor="{AppThemeBinding Light=LightGray, Dark=Gray}"
                     Command="{Binding ToggleTextStyleCommand}"
                     CommandParameter="{x:Static local:RectangleTextStyle.Italic}">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource Primary}"
+                                         Glyph="{x:Static local:MaterialIcons.Format_italic}" />
+                    </Button.ImageSource>
                     <Button.Triggers>
                         <DataTrigger
                             TargetType="Button"

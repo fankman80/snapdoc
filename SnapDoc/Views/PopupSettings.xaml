@@ -97,9 +97,14 @@
                         MaximumHeightRequest="28"
                         MinimumHeightRequest="28"
                         BackgroundColor="Transparent"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
-                        Clicked="LockSettingsClicked"/>
+                        Clicked="LockSettingsClicked">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                             Glyph="{x:Static local:MaterialIcons.Settings}" />
+                        </Button.ImageSource>
+                    </Button>
                 </HorizontalStackLayout>                
                 
                 <!-- Gesture Helper Settings -->
@@ -121,9 +126,14 @@
                         MaximumHeightRequest="28"
                         MinimumHeightRequest="28"
                         BackgroundColor="Transparent"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
-                        Clicked="GestureHelperSettingsClicked"/>
+                        Clicked="GestureHelperSettingsClicked">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                             Glyph="{x:Static local:MaterialIcons.Settings}" />
+                        </Button.ImageSource>
+                    </Button>
                 </HorizontalStackLayout>
 
                 <!-- Move Offset -->
@@ -145,9 +155,14 @@
                         MaximumHeightRequest="28"
                         MinimumHeightRequest="28"
                         BackgroundColor="Transparent"
-                        ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Settings}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.eingabehilfe_einstellungen}"
-                        Clicked="GestureHelperSettingsClicked"/>
+                        Clicked="GestureHelperSettingsClicked">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                             Glyph="{x:Static local:MaterialIcons.Settings}" />
+                        </Button.ImageSource>
+                    </Button>
                 </HorizontalStackLayout>
                 
                 <controls:BorderedExpander HeaderText="{x:Static res:AppResources.modus_fuer_pinplatzierung}">
@@ -335,11 +350,16 @@
                                     Clicked="OpenPrgEditor"/>
                             <Button Grid.Column="1" Grid.Row="1"
                                     Padding="0"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{DynamicResource PrimaryDarkText}" 
                                     ToolTipProperties.Text="{x:Static res:AppResources.programmeinstellungen_zuruecksetzen}"
-                                    Clicked="ResetPrg"/>
+                                    Clicked="ResetPrg">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialOutlined"
+                                                     Color="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                                                     Glyph="{x:Static local:MaterialIcons.Reset_settings}" />
+                                </Button.ImageSource>
+                            </Button>
                             <Button Grid.Column="0" Grid.Row="2"
                                     Text="{x:Static res:AppResources.icondefinitionen}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
@@ -348,11 +368,16 @@
                                     Clicked="OpenIconEditor"/>
                             <Button Grid.Column="1" Grid.Row="2"
                                     Padding="0"
-                                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}, Glyph={x:Static local:MaterialIcons.Reset_settings}}"
                                     BackgroundColor="Red"
                                     TextColor="{DynamicResource PrimaryDarkText}"
                                     ToolTipProperties.Text="{x:Static res:AppResources.icondefinitionen_zuruecksetzen}"
-                                    Clicked="ResetIcon"/>
+                                    Clicked="ResetIcon">
+                                <Button.ImageSource>
+                                    <FontImageSource FontFamily="MaterialOutlined"
+                                                     Color="{AppThemeBinding Light={DynamicResource PrimaryDarkText}, Dark={DynamicResource PrimaryText}}"
+                                                     Glyph="{x:Static local:MaterialIcons.Reset_settings}" />
+                                </Button.ImageSource>
+                            </Button>
                             <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
                                     Text="{x:Static res:AppResources.tile_cache_loeschen}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"

@@ -106,7 +106,7 @@
                 <Button x:Name="LoadCustomPinBtn"                        
                         Text="{x:Static local:MaterialIcons.Draw}"  
                         IsVisible="False"
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         Margin="16,0,0,180"
                         ZIndex="10001"
                         HorizontalOptions="Start"
@@ -229,21 +229,21 @@
                 </Border.Shadow>
                 <HorizontalStackLayout Spacing="0"
                                        IsVisible="{Binding IsMeasureVisible, Source={x:Reference ThisPage}}">
-                    <Button Style="{StaticResource ToolButtonStyle}"
+                    <Button Style="{StaticResource ToolButtonStyleShadow}"
                             Text="{x:Static local:MaterialIcons.Design_services}"
                             BackgroundColor="Transparent"
                             Shadow="{x:Null}"
                             IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.massstab_kalibrieren}"
                             Clicked="OnMeasureAdjust"/>
-                    <Button Style="{StaticResource ToolButtonStyle}"
+                    <Button Style="{StaticResource ToolButtonStyleShadow}"
                             Text="{x:Static local:MaterialIcons.Close}"
                             BackgroundColor="Transparent"
                             Shadow="{x:Null}"
                             IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.messung_abbrechen}"
                             Clicked="OnMeasureCancel"/>
-                    <Button Style="{StaticResource ToolButtonStyle}"
+                    <Button Style="{StaticResource ToolButtonStyleShadow}"
                             Text="{x:Static local:MaterialIcons.Check}"
                             BackgroundColor="Transparent"
                             Shadow="{x:Null}"
@@ -284,7 +284,7 @@
                     ZIndex="10000"
                     Rotation="38"
                     Text="{x:Static local:MaterialIcons.Keep}"  
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     AbsoluteLayout.LayoutBounds="1, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     ToolTipProperties.Text="{x:Static res:AppResources.pin_setzen}"
@@ -294,7 +294,7 @@
                     Text="{x:Static local:MaterialIcons.Draw}"   
                     Margin="16,0,0,16"
                     ZIndex="10000"
-                    Style="{StaticResource ToolButtonStyle}"
+                    Style="{StaticResource ToolButtonStyleShadow}"
                     AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
                     AbsoluteLayout.LayoutFlags="PositionProportional"
                     ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
@@ -312,12 +312,12 @@
                 
                 <Button x:Name="AddEraserBtn"
                         Text="{x:Static local:MaterialIcons.Ink_eraser}"  
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
                         Clicked="EraseClicked"/>
                 <AbsoluteLayout x:Name="AddPaletteBtn">
                     <Button Text="{x:Static local:MaterialIcons.Palette}"  
-                            Style="{StaticResource ToolButtonStyle}"
+                            Style="{StaticResource ToolButtonStyleShadow}"
                             ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
                             Clicked="PenSettingsClicked"/>
                     <Border WidthRequest="18"
@@ -356,19 +356,19 @@
                 <Button x:Name="AddTextBtn"
                         IsVisible="False"
                         Text="{x:Static local:MaterialIcons.Text_fields}" 
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
                         Clicked="TextClicked"/>
                 <Button x:Name="AddCloudyBtn"
                         IsVisible="False"
                         Text="{x:Static local:MaterialIcons.Cloud_off}" 
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.wolkenumrandung_ein_ausschalten}"
                         Clicked="CloudyClicked"/>
                 <Grid x:Name="AddMeasureBtn"
                       IsVisible="True">
                     <Button Text="{x:Static local:MaterialIcons.Straighten}"
-                            Style="{StaticResource ToolButtonStyle}"        
+                            Style="{StaticResource ToolButtonStyleShadow}"        
                             ToolTipProperties.Text="{x:Static res:AppResources.bemassung_ein_ausschalten}"
                             Clicked="OnToggleMeasureClicked"/>
                     <BoxView InputTransparent="True"
@@ -392,12 +392,12 @@
                 </Grid>
                 <Button x:Name="AddShapeBtn"
                         Text="{x:Static local:MaterialIcons.Activity_zone}"                   
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
                         Clicked="ShapeButtonClicked"/>
                 <Button Text="{x:Static local:MaterialIcons.Check}"   
                         BackgroundColor="LimeGreen"
-                        Style="{StaticResource ToolButtonStyle}"
+                        Style="{StaticResource ToolButtonStyleShadow}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
                         Clicked="CheckClicked"/>                
             </VerticalStackLayout>

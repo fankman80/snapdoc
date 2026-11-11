@@ -67,7 +67,6 @@
                                         ItemsSource="{Binding PinSortCrits}"
                                         SelectedItem="{Binding PinSortCrit}"/>
             <Button x:Name="SortDirection"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
                     CornerRadius="4"
                     Padding="0"            
                     HeightRequest="38"
@@ -79,7 +78,13 @@
                     BorderColor="{DynamicResource Primary}"
                     BorderWidth="1"
                     BackgroundColor="Transparent"
-                    Clicked="OnSortDirectionClicked"/>
+                    Clicked="OnSortDirectionClicked">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined"
+                                     Color="{DynamicResource Primary}"
+                                     Glyph="{x:Static local:MaterialIcons.Sort}" />
+                </Button.ImageSource>
+            </Button>
         </HorizontalStackLayout>
 
         <Grid Grid.Row="1">

@@ -196,9 +196,14 @@
                             Margin="0,4,0,0"
                             VerticalOptions="Center"
                             BackgroundColor="Transparent"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Globe_location_pin}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
-                            Clicked="ZoomToWebPinClicked" />
+                            Clicked="ZoomToWebPinClicked">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                             Glyph="{x:Static local:MaterialIcons.Globe_location_pin}" />
+                        </Button.ImageSource>
+                    </Button>
                 </Grid>
 
                 <!-- ═══ Beschreibung ═══ -->
@@ -312,10 +317,16 @@
                 Text="{x:Static res:AppResources.speichern}"
                 BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                 TextColor="{DynamicResource PrimaryDarkText}"
-                ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=22, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
                 ContentLayout="Left,10"
-                Clicked="OnOkayClicked" />
-        
+                Clicked="OnOkayClicked">
+            <Button.ImageSource>
+                <FontImageSource FontFamily="MaterialOutlined"
+                                 Size="22"
+                                 Color="{DynamicResource PrimaryDarkText}"
+                                 Glyph="{x:Static local:MaterialIcons.Save}" />
+            </Button.ImageSource>
+        </Button>
+
         <!-- ═══ ⋮-Menü ═══ -->
         <Grid x:Name="MoreMenuOverlay"
               Grid.RowSpan="2"

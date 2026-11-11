@@ -200,8 +200,14 @@
                     BorderColor="{AppThemeBinding Light={DynamicResource Gray300}, Dark={DynamicResource Gray400}}"
                     BorderWidth="1"
                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Size=24, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Calendar_month}}"
-                    Clicked="CalendarClicked"/>
+                    Clicked="CalendarClicked">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Size="24"
+                                         Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                         Glyph="{x:Static local:MaterialIcons.Calendar_month}" />
+                    </Button.ImageSource>
+                </Button>
             </VerticalStackLayout>
         </ScrollView>
 

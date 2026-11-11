@@ -48,23 +48,38 @@
                             Padding="0"
                             VerticalOptions="End"
                             BackgroundColor="Transparent"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Help}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"                                
-                            Clicked="OnHelpClicked"/>
+                            Clicked="OnHelpClicked">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                             Glyph="{x:Static local:MaterialIcons.Help}" />
+                        </Button.ImageSource>
+                    </Button>
                     <Button Grid.Column="2"
                             Padding="0"
                             VerticalOptions="End"
                             BackgroundColor="Transparent"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Note_add}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"                                
-                            Clicked="OnAddDocument" />
+                            Clicked="OnAddDocument" >
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                             Glyph="{x:Static local:MaterialIcons.Note_add}" />
+                        </Button.ImageSource>
+                    </Button>
                     <Button Grid.Column="3"
                             Padding="0"
                             VerticalOptions="End"
                             BackgroundColor="Transparent"
-                            ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}, Glyph={x:Static local:MaterialIcons.Delete}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
-                            Clicked="OnDeleteDocument"/>
+                            Clicked="OnDeleteDocument">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
+                                             Glyph="{x:Static local:MaterialIcons.Delete}" />
+                        </Button.ImageSource>
+                    </Button>
                 </Grid>
                 <VerticalStackLayout>
                     <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
@@ -206,25 +221,40 @@
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Cloud_upload}}"
                     ToolTipProperties.Text="{x:Static res:AppResources.bericht_in_cloud_hochladen}"
-                    Clicked="OnCloudUploadClicked" />
+                    Clicked="OnCloudUploadClicked">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined"
+                                     Color="{DynamicResource PrimaryDarkText}"
+                                     Glyph="{x:Static local:MaterialIcons.Cloud_upload}" />
+                </Button.ImageSource>
+            </Button>
             <Button Grid.Column="2"
                     MinimumWidthRequest="100"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Share}}"
                     ToolTipProperties.Text="{x:Static res:AppResources.bericht_teilen}"
-                    Clicked="OnShareClicked" />
+                    Clicked="OnShareClicked">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined"
+                                     Color="{DynamicResource PrimaryDarkText}"
+                                     Glyph="{x:Static local:MaterialIcons.Share}" />
+                </Button.ImageSource>
+            </Button>
             <Button Grid.Column="3"
                     MinimumWidthRequest="100"
                     Padding="0"
                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                     TextColor="{DynamicResource PrimaryDarkText}"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource PrimaryDarkText}, Glyph={x:Static local:MaterialIcons.Save}}"
                     ToolTipProperties.Text="{x:Static res:AppResources.bericht_lokal_speichern}"
-                    Clicked="OnSaveClicked" />
+                    Clicked="OnSaveClicked">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined"
+                                     Color="{DynamicResource PrimaryDarkText}"
+                                     Glyph="{x:Static local:MaterialIcons.Save}" />
+                </Button.ImageSource>
+            </Button>
         </Grid>
     </Grid>
 </ContentPage>

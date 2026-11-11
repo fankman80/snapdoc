@@ -79,8 +79,13 @@
                              AutomationId="{Binding FileName}"
                              IsVisible="{Binding IsDefaultIcon}"
                              Padding="0"
-                             BackgroundColor="Transparent"
-                             ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}, Glyph={x:Static local:MaterialIcons.Bookmark_star}}"/>
+                             BackgroundColor="Transparent">
+                        <Button.ImageSource>
+                            <FontImageSource FontFamily="MaterialOutlined"
+                                             Color="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"
+                                             Glyph="{x:Static local:MaterialIcons.Bookmark_star}" />
+                        </Button.ImageSource>
+                    </Button>
                     <BoxView Grid.Column="3"
                              Margin="0,0,10,0"
                              HeightRequest="26"
@@ -129,7 +134,6 @@
                                     SelectedItem="{Binding IconCategory}" />
         <HorizontalStackLayout Grid.Row="0" HorizontalOptions="End">
             <Button x:Name="SortDirection"
-                    ImageSource="{FontImageSource FontFamily=MaterialOutlined, Color={DynamicResource Primary}, Glyph={x:Static local:MaterialIcons.Sort}}"
                     CornerRadius="4"
                     Padding="0"            
                     HeightRequest="38"
@@ -141,7 +145,13 @@
                     BorderColor="{DynamicResource Primary}"
                     BorderWidth="1"
                     BackgroundColor="Transparent"
-                    Clicked="OnSortDirectionClicked"/>
+                    Clicked="OnSortDirectionClicked">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined"
+                                     Color="{DynamicResource Primary}"
+                                     Glyph="{x:Static local:MaterialIcons.Sort}" />
+                </Button.ImageSource>
+            </Button>
             <controls:CustomRadioPicker x:Name="SortPicker"
                                         x:DataType="services:SettingsService" BindingContext="{x:Static services:SettingsService.Instance}"
                                         ControlPadding="6,0,10,0"
