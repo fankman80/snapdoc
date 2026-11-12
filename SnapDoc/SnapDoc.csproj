@@ -38,7 +38,10 @@
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<WindowsPackageType>None</WindowsPackageType>
 		<WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
-		<EnableWindowsTargeting>true</EnableWindowsTargeting>	
+		<EnableWindowsTargeting>true</EnableWindowsTargeting>
+
+		<!-- CV2 hat unter .NET 11 Probleme mit GridItemsLayout -->
+		<UseWindowsCollectionView2Handler>false</UseWindowsCollectionView2Handler>
 	</PropertyGroup>
 
 	<!-- Android: alle Konfigurationen -->
@@ -66,6 +69,10 @@
 		<!-- Debug-Symbole für Play Console (Crash-Analyse) -->
 		<AndroidGenerateDebugSymbols>true</AndroidGenerateDebugSymbols>
 		<AndroidStripNativeDebugSymbols>false</AndroidStripNativeDebugSymbols>
+	</PropertyGroup>
+
+	<PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+		<EnableMauiIncrementalHotReload>false</EnableMauiIncrementalHotReload>
 	</PropertyGroup>
 
 	<!-- General Release Flags -->
@@ -119,7 +126,6 @@
 		<PackageReference Include="Microsoft.Graph" Version="6.10.0" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.92.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.10" />
-		<PackageReference Include="Microsoft.Maui.Controls.Compatibility" Version="11.0.0-preview.5.26304.4" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />
 		<PackageReference Include="Sentry.Maui" Version="7.0.0-rc.3" />
 		<PackageReference Include="SharpKml.Core" Version="6.1.0" />
