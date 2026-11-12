@@ -19,20 +19,23 @@ jobs:
       - name: Install MAUI workload
         run: dotnet workload install maui
 
-      - name: Restore dependencies
-        run: dotnet restore SnapDoc.sln
+      - name: Restore Android
+        run: dotnet restore SnapDoc/SnapDoc.csproj -p:TargetFramework=net11.0-android
 
       - name: Decode and save keystore
         shell: pwsh
         env:
           ANDROID_KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
         run: |
-          [System.IO.File]::WriteAllBytes("SnapDoc/SnapDoc.keystore", [Convert]::FromBase64String($env:ANDROID_KEYSTORE_BASE64))
-      
+          [System.IO.File]::WriteAllBytes(
+            "SnapDoc/SnapDoc.keystore",
+            :FromBase64String($env:ANDROID_KEYSTORE_BASE64)
+          )
+
       - name: Build Android App (Release)
         shell: pwsh
         run: |
-          dotnet publish SnapDoc/SnapDoc.csproj -c Release -f net10.0-android `
+          dotnet publish SnapDoc/SnapDoc.csproj -c Release -f net11.0-android --no-restore `
             /p:AndroidKeyStore=true `
             /p:AndroidKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" `
             /p:AndroidKeyPassword="${{ secrets.ANDROID_KEY_PASSWORD }}" `
@@ -46,13 +49,13 @@ jobs:
         with:
           name: AndroidApp
           path: |
-            SnapDoc/bin/Release/net10.0-android/**/*.aab
+            SnapDoc/bin/Release/net11.0-android/**/*.aab
 
       - name: Upload to Google Play Console
         uses: r0adkll/upload-google-play@v1.1.5
         with:
           serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
           packageName: com.ebbe.snapdoc
-          releaseFiles: SnapDoc/bin/Release/net10.0-android/**/*-Signed.aab
+          releaseFiles: SnapDoc/bin/Release/net11.0-android/**/*-Signed.aab
           tracks: alpha
           status: completed
