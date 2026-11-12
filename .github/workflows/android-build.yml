@@ -38,7 +38,6 @@ jobs:
           dotnet publish SnapDoc/SnapDoc.csproj `
             -c Release `
             -f net11.0-android `
-            --no-restore `
             /p:AndroidKeyStore=true `
             /p:AndroidKeyAlias="${{ secrets.ANDROID_KEY_ALIAS }}" `
             /p:AndroidKeyPassword="${{ secrets.ANDROID_KEY_PASSWORD }}" `
