@@ -18,6 +18,11 @@ jobs:
         with:
           dotnet-version: '11.0.x'
 
+      - name: Setup Xcode 27.2
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '27.2'
+
       - name: Install MAUI iOS Workload
         run: |
           dotnet workload install maui-ios
