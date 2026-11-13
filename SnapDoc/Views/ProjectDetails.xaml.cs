@@ -7,8 +7,10 @@ using System.Globalization;
 
 namespace SnapDoc.Views;
 
+[QueryProperty(nameof(BackToHome), "backToHome")]
 public partial class ProjectDetails : ContentPage
 {
+    public bool BackToHome { get; set; }
     private const string DefaultTitleImage = "banner_thumbnail.png";
     private const uint MenuAnimationMs = 150;
     private const double MenuSlideOffset = 24;
@@ -18,6 +20,28 @@ public partial class ProjectDetails : ContentPage
     {
         InitializeComponent();
         BindingContext = ProjectItem.Current;
+
+        Shell.SetBackButtonBehavior(this, new BackButtonBehavior
+        {
+            Command = new Command(async () => await NavigateBackAsync())
+        });
+    }
+
+    protected override bool OnBackButtonPressed()
+    {
+        _ = NavigateBackAsync();
+        return true;
+    }
+
+    private async Task NavigateBackAsync()
+    {
+        if (BackToHome)
+        {
+            await Shell.Current.GoToAsync("//homescreen");
+            return;
+        }
+
+        await Shell.Current.GoToAsync("..");
     }
 
     protected override void OnAppearing()

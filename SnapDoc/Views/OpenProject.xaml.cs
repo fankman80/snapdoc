@@ -546,8 +546,6 @@ public partial class OpenProject : ContentPage
         ProjectItem.Current.Attach(GlobalJson.Data);
         SaveManager.NotifyDataChanged();
 
-        LoadJsonFiles();
-
         await NavigateToProjectDetailsAsync();
 
 #if ANDROID || IOS
@@ -1113,10 +1111,6 @@ public partial class OpenProject : ContentPage
 
     private static async Task NavigateToProjectDetailsAsync()
     {
-        // Absoluter Wechsel zum HomeScreen:
-        await Shell.Current.GoToAsync("//homescreen", false);
-
-        // ProjectDetails wird auf HomeScreen gelegt.
-        await Shell.Current.GoToAsync("project_details");
+        await Shell.Current.GoToAsync("project_details?backToHome=true");
     }
 }
