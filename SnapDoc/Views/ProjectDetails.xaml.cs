@@ -20,11 +20,6 @@ public partial class ProjectDetails : ContentPage
         BindingContext = ProjectItem.Current;
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        return true; // Back blockiert
-    }
-
     protected override void OnAppearing()
     {
         base.OnAppearing();
@@ -302,14 +297,5 @@ public partial class ProjectDetails : ContentPage
         if (string.IsNullOrEmpty(result?.Result)) return;
         if (DateTime.TryParseExact(result.Result, "dd.MM.yyyy", CultureInfo.InvariantCulture, DateTimeStyles.None, out var picked))
             ProjectItem.Current.CreationDate = picked;
-    }
-
-    private async void OnOkayClicked(object sender, EventArgs e)
-    {
-        await Shell.Current.GoToAsync("//homescreen");
-
-#if ANDROID || IOS
-        Shell.Current.FlyoutIsPresented = true;
-#endif
     }
 }

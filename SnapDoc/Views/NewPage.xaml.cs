@@ -88,8 +88,9 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     protected override bool OnBackButtonPressed()
     {
-        // Zurück-Taste ignorieren
-        return true;
+        if (MoreMenuOverlay.IsVisible) { _ = HideMoreMenuAsync(); return true; }
+
+        return base.OnBackButtonPressed();
     }
 
     protected async override void OnAppearing()

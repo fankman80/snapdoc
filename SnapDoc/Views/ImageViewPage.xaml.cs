@@ -745,7 +745,7 @@ public partial class ImageViewPage : IQueryAttributable
             var foto = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource];
             foto.File = Path.GetFileName(imgPath);
             foto.Touch();
-            SaveManager.NotifyDataChanged(uploads);
+            SaveManager.NotifyDataChanged([.. uploads]);
         }
 
         // Cleanup drawing canvas

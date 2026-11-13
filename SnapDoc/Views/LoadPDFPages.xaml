@@ -12,10 +12,6 @@
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.plaene_hinzufuegen}">
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>
-
     <Shell.TitleView>
         <Grid ColumnDefinitions="Auto,*,Auto"
               ColumnSpacing="0"

@@ -138,7 +138,7 @@ public class CapturePicture
                                 string thumbFilePath = Path.Combine(Settings.DataDirectory, thumbnailPath, filename);
                                 filesToSync.Add((thumbFilePath, GlobalJson.Data.ThumbnailPath));
                             }
-                            SaveManager.NotifyDataChanged(filesToSync);
+                            SaveManager.NotifyDataChanged([.. filesToSync]);
                         }
                     }
                     catch (Exception ex)

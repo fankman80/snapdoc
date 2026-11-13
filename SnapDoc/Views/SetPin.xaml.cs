@@ -54,11 +54,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     protected override bool OnBackButtonPressed()
     {
-        // Android-Zurück schliesst zuerst das Menü
-        if (MoreMenuOverlay.IsVisible)
-            _ = HideMoreMenuAsync();
+        if (MoreMenuOverlay.IsVisible) { _ = HideMoreMenuAsync(); return true; }
 
-        return true; // Back blockiert
+        return base.OnBackButtonPressed();
     }
 
     protected override void OnAppearing()
@@ -274,11 +272,11 @@ public partial class SetPin : ContentPage, IQueryAttributable
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
     }
 
-    private async void OnOkayClicked(object sender, EventArgs e)
+    private void OnExportSwitchToggled(object sender, ToggledEventArgs e)
     {
-        WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, Pin.IsLockPosition));
+        bool isChecked = e.Value;
 
-        await Shell.Current.GoToAsync("..");
+        WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, isChecked));
     }
 
     private void DeletePinData(string pinId)

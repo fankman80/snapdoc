@@ -136,12 +136,6 @@ public partial class MapView : IQueryAttributable
         });
     }
 
-    protected override bool OnBackButtonPressed()
-    {
-        // Zurück-Taste ignorieren
-        return true;
-    }
-
     protected async override void OnAppearing()
     {
         base.OnAppearing();

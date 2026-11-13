@@ -10,10 +10,6 @@
              x:Name="ThisPage"
              Title="{x:Static res:AppResources.projektverwaltung}">
 
-    <Shell.BackButtonBehavior>
-        <BackButtonBehavior IsVisible="False" />
-    </Shell.BackButtonBehavior>
-
     <Shell.TitleView>
         <Grid>
             <Label x:DataType="views:ProjectDetails"
@@ -28,7 +24,7 @@
 
     <Grid x:DataType="local:ProjectItem"
           BindingContext="{x:Static local:ProjectItem.Current}"
-          RowDefinitions="Auto,*,Auto"
+          RowDefinitions="Auto,*"
           RowSpacing="0">
 
         <!-- Headerbild: immer sichtbar, ohne eigenes Bild mit Platzhalter banner.jpg -->
@@ -206,18 +202,5 @@
                 </Button>
             </VerticalStackLayout>
         </ScrollView>
-
-        <Grid Grid.Row="2" 
-              Margin="16"
-              IsVisible="{OnIdiom Desktop=false, Default=true}"
-              Grid.ColumnDefinitions="*,Auto">
-            <Button Grid.Column="1"
-                    Padding="0"
-                    Text="{x:Static res:AppResources.ok}"
-                    MinimumWidthRequest="100"
-                    BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                    TextColor="{DynamicResource PrimaryDarkText}"
-                    Clicked="OnOkayClicked"/>
-        </Grid>
     </Grid>
 </ContentPage>

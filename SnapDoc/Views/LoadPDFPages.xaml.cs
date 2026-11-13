@@ -56,8 +56,6 @@ public partial class LoadPDFPages : ContentPage
         _relayoutTimer.Stop();
     }
 
-    protected override bool OnBackButtonPressed() => true;
-
     private async void LoadPreviewPDFImages()
     {
         if (_isProcessing) return;
@@ -257,7 +255,7 @@ public partial class LoadPDFPages : ContentPage
 
             await LoadPDFImages();
             var uploads = await ProcessFileOrganizationLogic();
-            SaveManager.NotifyDataChanged(uploads);
+            SaveManager.NotifyDataChanged([.. uploads]);
 
             if (Shell.Current is AppShell)
                 ProjectItem.Current.ApplyFilterAndSorting();

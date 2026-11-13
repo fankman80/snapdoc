@@ -127,7 +127,7 @@ public static class SaveManager
     public static void NotifyDataChanged(string localFilePath, string subFolder, int delayMilliseconds = 2000)
         => NotifyDataChanged([(localFilePath, subFolder)], delayMilliseconds);
 
-    public static void NotifyDataChanged(IEnumerable<(string LocalFilePath, string SubFolder)> files, int delayMilliseconds = 2000)
+    public static void NotifyDataChanged((string LocalFilePath, string SubFolder)[] files, int delayMilliseconds = 2000)
     {
         MarkLocalChange();
 

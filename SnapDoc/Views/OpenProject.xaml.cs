@@ -38,6 +38,7 @@ public partial class OpenProject : ContentPage
     {
         if (ItemSheetOverlay.IsVisible) { _ = CloseItemSheetAsync(); return true; }
         if (AddMenuOverlay.IsVisible) { _ = HideAddMenuAsync(); return true; }
+
         return base.OnBackButtonPressed();
     }
 

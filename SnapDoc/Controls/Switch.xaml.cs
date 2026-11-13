@@ -9,12 +9,13 @@ public partial class Switch : ContentView
         InitializeComponent();
         UpdateUI();
     }
+    public event EventHandler<ToggledEventArgs>? Toggled;
 
     #region BindableProperties
     public static readonly BindableProperty LabelTextProperty = BindableProperty.Create(nameof(LabelText), typeof(string), typeof(Switch), string.Empty, propertyChanged: OnLabelTextChanged);
     public static readonly BindableProperty TextColorProperty = BindableProperty.Create(nameof(TextColor), typeof(Color), typeof(Switch), Label.TextColorProperty.DefaultValue);
     public static readonly BindableProperty TextSizeProperty = BindableProperty.Create(nameof(TextSize), typeof(double),typeof(Switch), defaultValue: GetDefaultFontSize());
-    public static readonly BindableProperty IsToggledProperty = BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnAnyPropertyChanged);
+    public static readonly BindableProperty IsToggledProperty = BindableProperty.Create(nameof(IsToggled), typeof(bool), typeof(Switch), false, BindingMode.TwoWay, propertyChanged: OnIsToggledChanged);
     public static readonly BindableProperty SwitchWidthProperty = BindableProperty.Create(nameof(SwitchWidth), typeof(double), typeof(Switch), 44.0, propertyChanged: OnAnyPropertyChanged);
     public static readonly BindableProperty SwitchHeightProperty = BindableProperty.Create(nameof(SwitchHeight), typeof(double), typeof(Switch), 24.0, propertyChanged: OnAnyPropertyChanged);
     public static readonly BindableProperty KnobMarginProperty = BindableProperty.Create(nameof(KnobMargin), typeof(double), typeof(Switch), 3.0, propertyChanged: OnAnyPropertyChanged);
@@ -67,6 +68,19 @@ public partial class Switch : ContentView
     {
         if (bindable is Switch customSwitch)
             customSwitch.UpdateUI();
+    }
+
+    private static void OnIsToggledChanged(BindableObject bindable, object oldValue, object newValue)
+    {
+        if (bindable is Switch customSwitch)
+        {
+            customSwitch.UpdateUI();
+
+            if (newValue is bool isToggled)
+            {
+                customSwitch.Toggled?.Invoke(customSwitch, new ToggledEventArgs(isToggled));
+            }
+        }
     }
 
     private void OnTapped(object? sender, TappedEventArgs e)
