@@ -59,8 +59,11 @@ public partial class CustomRadioPicker : ContentView
 
     private static void OnItemsSourceChanged(BindableObject bindable, object oldValue, object newValue)
     {
-        if (bindable is CustomRadioPicker control)
-            control.SynchronizeFromItem();
+        if (bindable is not CustomRadioPicker control)
+            return;
+
+        control.SynchronizeFromIndex();
+        control.UpdateDisplay();
     }
 
     private static void OnSelectedItemChanged(BindableObject bindable, object oldValue, object newValue)
@@ -74,60 +77,83 @@ public partial class CustomRadioPicker : ContentView
 
     private void SynchronizeFromItem()
     {
-        if (_isSynchronizing) return;
+        if (_isSynchronizing)
+            return;
+
         _isSynchronizing = true;
 
-        if (ItemsSource == null || SelectedItem == null)
+        try
         {
-            SelectedIndex = -1;
-            _isSynchronizing = false;
-            return;
-        }
+            if (ItemsSource == null)
+                return;
 
-        int index = 0;
-        bool found = false;
-        foreach (var item in ItemsSource)
-        {
-            if (Equals(item, SelectedItem))
+            if (SelectedItem == null)
             {
-                SelectedIndex = index;
-                found = true;
-                break;
+                SelectedIndex = -1;
+                return;
             }
-            index++;
-        }
 
-        if (!found) SelectedIndex = -1;
-        _isSynchronizing = false;
+            int index = 0;
+
+            foreach (var item in ItemsSource)
+            {
+                if (Equals(item, SelectedItem))
+                {
+                    SelectedIndex = index;
+                    return;
+                }
+
+                index++;
+            }
+
+            SelectedIndex = -1;
+        }
+        finally
+        {
+            _isSynchronizing = false;
+        }
     }
 
     private void SynchronizeFromIndex()
     {
-        if (_isSynchronizing) return;
+        if (_isSynchronizing)
+            return;
+
         _isSynchronizing = true;
 
-        if (ItemsSource == null || SelectedIndex < 0)
+        try
         {
-            SelectedItem = null;
-            _isSynchronizing = false;
-            return;
-        }
-
-        int index = 0;
-        bool found = false;
-        foreach (var item in ItemsSource)
-        {
-            if (index == SelectedIndex)
+            if (ItemsSource == null)
             {
-                SelectedItem = item;
-                found = true;
-                break;
+                SelectedItem = null;
+                return;
             }
-            index++;
-        }
 
-        if (!found) SelectedItem = null;
-        _isSynchronizing = false;
+            if (SelectedIndex < 0)
+            {
+                SelectedItem = null;
+                return;
+            }
+
+            int index = 0;
+
+            foreach (var item in ItemsSource)
+            {
+                if (index == SelectedIndex)
+                {
+                    SelectedItem = item;
+                    return;
+                }
+
+                index++;
+            }
+
+            SelectedItem = null;
+        }
+        finally
+        {
+            _isSynchronizing = false;
+        }
     }
 
     private void UpdateDisplay()
@@ -159,7 +185,6 @@ public partial class CustomRadioPicker : ContentView
 
             if (popupResult?.Result is string selectedValue)
             {
-                int index = 0;
                 foreach (var item in ItemsSource)
                 {
                     if ((item?.ToString() ?? string.Empty) == selectedValue)
@@ -167,7 +192,6 @@ public partial class CustomRadioPicker : ContentView
                         SelectedItem = item;
                         break;
                     }
-                    index++;
                 }
             }
         }

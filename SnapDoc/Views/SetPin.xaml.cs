@@ -16,8 +16,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
     private string PlanId;
     private string PinId;
     private CancellationTokenSource _imageLoadingCts;
-
     private ObservableCollection<FotoItem> fotos = [];
+
     public ObservableCollection<FotoItem> Fotos
     {
         get => fotos;
@@ -32,6 +32,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     }
 
     private PinItem pin;
+
     public PinItem Pin
     {
         get => pin;
@@ -54,7 +55,11 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     protected override bool OnBackButtonPressed()
     {
-        if (MoreMenuOverlay.IsVisible) { _ = HideMoreMenuAsync(); return true; }
+        if (MoreMenuOverlay.IsVisible)
+        {
+            _ = HideMoreMenuAsync();
+            return true;
+        }
 
         return base.OnBackButtonPressed();
     }
@@ -81,6 +86,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         if (query.TryGetValue("planId", out object value1))
             PlanId = value1 as string;
+
         if (query.TryGetValue("pinId", out object value2))
             PinId = value2 as string;
 
@@ -90,12 +96,18 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void FotoLoader()
     {
-        // Laufende Ladevorgänge abbrechen
         _imageLoadingCts?.Cancel();
+        _imageLoadingCts?.Dispose();
         _imageLoadingCts = new CancellationTokenSource();
         var token = _imageLoadingCts.Token;
 
-        var fotoItems = SyncOps.LiveFotos(GlobalJson.Data.Plans[PlanId].Pins[PinId])
+        if (!SyncOps.TryGetLivePlan(PlanId, out var plan) || !SyncOps.TryGetLivePin(plan, PinId, out var currentPin))
+        {
+            Fotos = [];
+            return;
+        }
+
+        var fotoItems = SyncOps.LiveFotos(currentPin)
             .Select(kv => kv.Value)
             .Where(img => !string.IsNullOrWhiteSpace(img.File))
             .Select(img => new FotoItem
@@ -105,8 +117,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                     SettingsService.Instance.ProjectPath,
                     GlobalJson.Data.ThumbnailPath,
                     img.File),
-                OnPlanId = this.PlanId,
-                OnPinId = this.PinId,
+                OnPlanId = PlanId,
+                OnPinId = PinId,
                 AllowExport = img.AllowExport,
                 DateTime = img.DateTime
             }.Initialize())
@@ -114,31 +126,33 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         Fotos = fotoItems.ToObservableCollection();
 
-        // Startet das Nachladen und Generieren der Bild-Streams im Hintergrund
-        Task.Run(() => LoadImagesInBackgroundAsync(fotoItems, token), token);
+        _ = Task.Run(() => LoadImagesInBackgroundAsync(fotoItems, token), token);
     }
 
     private static async Task LoadImagesInBackgroundAsync(IEnumerable<FotoItem> itemsToLoad, CancellationToken token)
     {
         foreach (var item in itemsToLoad)
         {
-            if (token.IsCancellationRequested) break;
+            if (token.IsCancellationRequested)
+                break;
 
             try
             {
                 var fileName = Path.GetFileName(item.ImagePath);
 
-                // 1. Thumbnail nachladen (fuer schnelle UI-Anzeige)
+                // Thumbnail für die schnelle Anzeige nachladen.
                 if (!File.Exists(item.ImagePath))
                     await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: true);
 
-                if (token.IsCancellationRequested) break;
+                if (token.IsCancellationRequested)
+                    break;
 
                 if (File.Exists(item.ImagePath))
                 {
-                    var bytes = File.ReadAllBytes(item.ImagePath);
+                    var bytes = await File.ReadAllBytesAsync(item.ImagePath, token);
 
-                    if (token.IsCancellationRequested) break;
+                    if (token.IsCancellationRequested)
+                        break;
 
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
@@ -147,7 +161,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
                     });
                 }
 
-                // 2. Originalbild im Hintergrund nachladen (fuer Offline-Verfuegbarkeit)
+                // Originalbild für die Offline-Verfügbarkeit nachladen.
                 string originalImagePath = Path.Combine(
                     Settings.DataDirectory,
                     SettingsService.Instance.ProjectPath,
@@ -155,35 +169,56 @@ public partial class SetPin : ContentPage, IQueryAttributable
                     fileName);
 
                 if (!File.Exists(originalImagePath))
+                {
                     await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+                }
+            }
+            catch (OperationCanceledException)
+            {
+                break;
             }
             catch (Exception ex)
             {
                 System.Diagnostics.Debug.WriteLine($"LazyLoad Error: {ex.Message}");
             }
 
-            await Task.Delay(10, token);
+            try
+            {
+                await Task.Delay(10, token);
+            }
+            catch (OperationCanceledException)
+            {
+                break;
+            }
         }
     }
 
     private async void OnImageTapped(object sender, EventArgs e)
     {
-        if (sender is not Image tappedImage) return;
-        if (tappedImage.BindingContext is not FotoItem fotoItem) return;
+        if (sender is not Image tappedImage)
+            return;
+
+        if (tappedImage.BindingContext is not FotoItem fotoItem)
+            return;
 
         var fileName = Path.GetFileName(fotoItem.ImagePath);
         string expectedFullPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, fileName);
 
-        // Pruefen, ob das Originalbild bereits lokal existiert
         if (!File.Exists(expectedFullPath))
         {
-            // Blockierende Ladeanzeige (einfacher Fallback über den Page-Title, falls du keinen Loading-Popup hast)
-            string originalTitle = this.Title;
-            this.Title = "Lade Foto herunter...";
+            string originalTitle = Title;
+            Title = "Lade Foto herunter...";
 
-            bool success = await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+            bool success;
 
-            this.Title = originalTitle;
+            try
+            {
+                success = await SaveManager.DownloadMediaOnDemandAsync(fileName, isThumbnail: false);
+            }
+            finally
+            {
+                Title = originalTitle;
+            }
 
             if (!success)
             {
@@ -199,9 +234,12 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         var popup = new PopupDualResponse(AppResources.wollen_sie_diesen_pin_wirklich_loeschen);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
-        if (result?.Result is not DualPopupResult.Ok) return;
+
+        if (result?.Result is not DualPopupResult.Ok)
+            return;
 
         DeletePinData(PinId);
+
         await Shell.Current.GoToAsync($"///{PlanId}");
     }
 
@@ -209,33 +247,41 @@ public partial class SetPin : ContentPage, IQueryAttributable
     {
         var popup = new PopupPlanSelector(PlanId, PinId);
         var result = await this.ShowPopupAsync<PlanSelectorReturn>(popup, Settings.PopupOptions);
-        if (result.Result == null) return;
+
+        if (result?.Result == null)
+            return;
 
         await MoveOrCopyPinAsync(PinId, PlanId, result.Result.PlanTarget, result.Result.IsPinCopy);
     }
 
     private static async Task MoveOrCopyPinAsync(string pinId, string fromPlanId, string toPlanId, bool isCopy)
     {
-        if (!SyncOps.TryGetLivePlan(toPlanId, out var toPlan)) return;
-        if (!SyncOps.TryGetLivePlan(fromPlanId, out var fromPlan)) return;
-        if (!SyncOps.TryGetLivePin(fromPlan, pinId, out var originalPin)) return;
+        if (!SyncOps.TryGetLivePlan(toPlanId, out var toPlan))
+            return;
+
+        if (!SyncOps.TryGetLivePlan(fromPlanId, out var fromPlan))
+            return;
+
+        if (!SyncOps.TryGetLivePin(fromPlan, pinId, out var originalPin))
+            return;
 
         Pin clonedPin = DeepClone(originalPin);
 
-        // Kollisionsfreie ID – siehe Hinweis unten
+        if (clonedPin == null)
+            return;
+
         string newId = SyncClock.NewId();
 
         clonedPin.SelfId = newId;
         clonedPin.OnPlanId = toPlanId;
-        clonedPin.DeletedAt = null;          // Klon ist immer lebendig
+        clonedPin.DeletedAt = null;
         clonedPin.Touch();
 
         if (fromPlanId == toPlanId)
-            clonedPin.Pos = new Point(
-                clonedPin.Pos.X + SettingsService.Instance.PinDuplicateOffset, clonedPin.Pos.Y);
+            clonedPin.Pos = new Point(clonedPin.Pos.X + SettingsService.Instance.PinDuplicateOffset, clonedPin.Pos.Y);
 
         if (isCopy)
-            clonedPin.Fotos = [];            // statt Clear() – Fotos kann null sein
+            clonedPin.Fotos = [];
 
         toPlan.Pins ??= [];
         toPlan.Pins[newId] = clonedPin;
@@ -246,13 +292,12 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
         if (!isCopy)
         {
-            // Verschieben: Original als gelöscht markieren.
-            // Fotos gehören jetzt dem Klon, also NICHT die Dateien löschen.
             SyncOps.DeletePin(fromPlanId, pinId);
             fromPlan.PinCount = SyncOps.LivePinCount(fromPlan);
         }
 
         SaveManager.NotifyDataChanged();
+
         await Shell.Current.GoToAsync($"///{toPlanId}?pinMove={newId}");
     }
 
@@ -264,9 +309,9 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void OnPinSelectClick(object sender, EventArgs e)
     {
-        if (Pin.IsCustomPin) return;
+        if (Pin?.IsCustomPin != false)
+            return;
 
-        // save data to file
         SaveManager.NotifyDataChanged();
 
         await Shell.Current.GoToAsync($"icongallery?planId={PlanId}&pinId={PinId}");
@@ -274,51 +319,58 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private void OnExportSwitchToggled(object sender, ToggledEventArgs e)
     {
-        bool isChecked = e.Value;
-
-        WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, isChecked));
+        WeakReferenceMessenger.Default.Send(new PinPropertyChangedMessage(PinId, e.Value));
     }
 
     private void DeletePinData(string pinId)
     {
-        if (!SyncOps.TryGetLivePlan(PlanId, out var plan)) return;
-        if (!SyncOps.TryGetLivePin(plan, pinId, out var pinToDelete)) return;
+        if (!SyncOps.TryGetLivePlan(PlanId, out var plan))
+            return;
+
+        if (!SyncOps.TryGetLivePin(plan, pinId, out var pinToDelete))
+            return;
 
         string projectDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath);
 
-        // --- Fotos: lokal sofort weg, Cloud erst nach Tombstone-Upload ---
+        // Fotos lokal entfernen und für Cloud-Löschung vormerken.
         foreach (var foto in pinToDelete.Fotos?.Values ?? Enumerable.Empty<Foto>())
         {
             string fileName = foto.File;
-            if (string.IsNullOrEmpty(fileName)) continue;
+
+            if (string.IsNullOrEmpty(fileName))
+                continue;
 
             string imagePath = Path.Combine(projectDir, GlobalJson.Data.ImagePath, fileName);
-            if (File.Exists(imagePath)) File.Delete(imagePath);
+
+            if (File.Exists(imagePath))
+                File.Delete(imagePath);
 
             string thumbPath = Path.Combine(projectDir, GlobalJson.Data.ThumbnailPath, fileName);
-            if (File.Exists(thumbPath)) File.Delete(thumbPath);
 
-            // NICHT mehr direkt löschen: solange die Tombstone nicht in der
-            // Cloud liegt, kennt Gerät B den Pin als lebendig und würde
-            // das Bild nachladen wollen – ins Leere.
+            if (File.Exists(thumbPath))
+                File.Delete(thumbPath);
+
             SaveManager.QueueCloudDelete($"{GlobalJson.Data.ImagePath}/{fileName}");
             SaveManager.QueueCloudDelete($"{GlobalJson.Data.ThumbnailPath}/{fileName}");
         }
 
-        // --- CustomPin-Grafiken ---
+        // Grafiken eines benutzerdefinierten Pins entfernen.
         if (pinToDelete.IsCustomPin && !string.IsNullOrEmpty(pinToDelete.PinIcon))
         {
             string baseName = Path.GetFileNameWithoutExtension(pinToDelete.PinIcon);
-            foreach (var ext in new[] { ".png", ".data" })
+
+            foreach (var extension in new[] { ".png", ".data" })
             {
-                string file = baseName + ext;
-                string path = Path.Combine(projectDir, GlobalJson.Data.CustomPinsPath, file);
-                if (File.Exists(path)) File.Delete(path);
-                SaveManager.QueueCloudDelete($"{GlobalJson.Data.CustomPinsPath}/{file}");
+                string fileName = baseName + extension;
+                string path = Path.Combine(projectDir, GlobalJson.Data.CustomPinsPath, fileName);
+
+                if (File.Exists(path))
+                    File.Delete(path);
+
+                SaveManager.QueueCloudDelete($"{GlobalJson.Data.CustomPinsPath}/{fileName}");
             }
         }
 
-        // Tombstone setzen + PinCount + Save (sendet PinDeletedMessage)
         SyncOps.DeletePin(PlanId, pinId);
     }
 
@@ -329,7 +381,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
 
     private async void ZoomToWebPinClicked(object sender, EventArgs e)
     {
-        if (Pin.IsWebMapPin)
+        if (Pin?.IsWebMapPin == true)
             await Shell.Current.GoToAsync($"///{PlanId}?pinZoom={PinId}");
         else
             await Shell.Current.GoToAsync($"generalmapview?planId={PlanId}&pinZoom={PinId}");
@@ -340,10 +392,18 @@ public partial class SetPin : ContentPage, IQueryAttributable
         try
         {
             (FileResult path, Size imgSize) = await CapturePicture.Capture(
-                Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath),
-                Path.Combine(SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath));
+                    Path.Combine(
+                        SettingsService.Instance.ProjectPath,
+                        GlobalJson.Data.ImagePath),
+                    Path.Combine(
+                        SettingsService.Instance.ProjectPath,
+                        GlobalJson.Data.ThumbnailPath));
 
-            if (path == null) return;
+            if (path == null)
+                return;
+
+            if (!SyncOps.TryGetLivePlan(PlanId, out var plan) || !SyncOps.TryGetLivePin(plan, PinId, out var currentPin))
+                return;
 
             Foto newImageData = new()
             {
@@ -354,24 +414,26 @@ public partial class SetPin : ContentPage, IQueryAttributable
             };
 
             newImageData.Touch();
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[path.FileName] = newImageData;
-            GlobalJson.Data.Plans[PlanId].Pins[PinId].Touch();
 
-            string originalPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, path.FileName);
+            currentPin.Fotos ??= [];
+            currentPin.Fotos[path.FileName] = newImageData;
+            currentPin.Touch();
+
             string thumbPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, path.FileName);
 
             SaveManager.NotifyDataChanged();
 
             var newItem = new FotoItem
             {
-                ImagePath = thumbPath, // Verwende direkt thumbPath
-                OnPlanId = this.PlanId,
-                OnPinId = this.PinId,
+                ImagePath = thumbPath,
+                OnPlanId = PlanId,
+                OnPinId = PinId,
                 AllowExport = true,
-                DateTime = DateTime.Now
+                DateTime = newImageData.DateTime
             }.Initialize();
 
             Fotos.Add(newItem);
+
             ImageGallery.ScrollTo(newItem, position: ScrollToPosition.End, animate: true);
         }
         catch (Exception ex)
@@ -385,142 +447,245 @@ public partial class SetPin : ContentPage, IQueryAttributable
         if (sender is not CollectionView { ItemsSource: ObservableCollection<FotoItem> reorderedItems })
             return;
 
-        var pin = GlobalJson.Data.Plans[PlanId].Pins[PinId];
-        var currentFotos = pin.Fotos ?? [];
-        var newFotosDict = new Dictionary<string, Foto>();
+        if (!SyncOps.TryGetLivePlan(PlanId, out var plan) || !SyncOps.TryGetLivePin(plan, PinId, out var currentPin))
+            return;
 
-        // 1. Neue Reihenfolge der sichtbaren Fotos
-        foreach (var img in reorderedItems)
+        var currentFotos = currentPin.Fotos ?? [];
+        var newFotos = new Dictionary<string, Foto>();
+
+        // Sichtbare Fotos in der neuen Reihenfolge übernehmen.
+        foreach (var image in reorderedItems)
         {
-            var fileName = Path.GetFileName(img.ImagePath);
+            var fileName = Path.GetFileName(image.ImagePath);
+
             if (currentFotos.TryGetValue(fileName, out var existing))
             {
-                if (existing.AllowExport != img.AllowExport)
+                if (existing.AllowExport != image.AllowExport)
                 {
-                    existing.AllowExport = img.AllowExport;
+                    existing.AllowExport = image.AllowExport;
                     existing.Touch();
                 }
-                newFotosDict[fileName] = existing;
+
+                newFotos[fileName] = existing;
             }
             else
             {
                 var created = new Foto
                 {
                     File = fileName,
-                    AllowExport = img.AllowExport,
-                    DateTime = img.DateTime
+                    AllowExport = image.AllowExport,
+                    DateTime = image.DateTime
                 };
+
                 created.Touch();
-                newFotosDict[fileName] = created;
+                newFotos[fileName] = created;
             }
         }
 
-        // 2. Tombstones hinten anhängen – sonst gehen sie verloren und
-        //    die gelöschten Fotos kehren beim nächsten Sync zurück.
-        foreach (var kv in currentFotos)
-            if (kv.Value.IsDeleted() && !newFotosDict.ContainsKey(kv.Key))
-                newFotosDict[kv.Key] = kv.Value;
+        // Tombstones behalten, damit gelöschte Fotos nicht zurückkehren.
+        foreach (var entry in currentFotos)
+        {
+            if (entry.Value.IsDeleted() && !newFotos.ContainsKey(entry.Key))
+                newFotos[entry.Key] = entry.Value;
+        }
 
-        pin.Fotos = newFotosDict;
-        pin.Touch();
+        currentPin.Fotos = newFotos;
+        currentPin.Touch();
+
         SaveManager.NotifyDataChanged();
     }
 
     private void OnAllowExportClicked(object sender, EventArgs e)
     {
-        if (sender is Button { BindingContext: FotoItem item })
+        if (sender is not Button { BindingContext: FotoItem item })
+            return;
+
+        item.AllowExport = !item.AllowExport;
+
+        if (!SyncOps.TryGetLivePlan(PlanId, out var plan) || !SyncOps.TryGetLivePin(plan, PinId, out var currentPin))
+            return;
+
+        var fileName = Path.GetFileName(item.ImagePath);
+
+        if (currentPin.Fotos?.TryGetValue(fileName, out var foto) == true)
         {
-            item.AllowExport = !item.AllowExport;
-
-            var fileName = Path.GetFileName(item.ImagePath);
-            if (GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos.TryGetValue(fileName, out var foto))
-            {
-                foto.AllowExport = item.AllowExport;
-                foto.Touch();
-            }
-
-            // save data to file
-            SaveManager.NotifyDataChanged();
+            foto.AllowExport = item.AllowExport;
+            foto.Touch();
+            currentPin.Touch();
         }
+
+        SaveManager.NotifyDataChanged();
+    }
+
+    // =================================================================
+    // Prioritäten
+    // =================================================================
+
+    private void RefreshPriorities(string selectedKey = null)
+    {
+        if (Pin == null)
+            return;
+
+        Pin.RefreshPriorities();
+
+        if (selectedKey != null)
+            Pin.SelectPriority(selectedKey);
+    }
+
+    private static PriorityItem FindPriority(IEnumerable<PriorityItem> items, string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+            return null;
+
+        return items.FirstOrDefault(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase));
     }
 
     private async void OnPriorityEditClicked(object sender, EventArgs e)
     {
-        if (PriorityPicker.SelectedItem is not string oldKey)
-            return;
-
-        bool isCreatingNew = string.IsNullOrWhiteSpace(oldKey);
-        var popup = new PopupEntry(input: oldKey, desc: AppResources.text_bearbeiten);
+        string oldKey = PriorityPicker.SelectedItem as string;
+        var popup = new PopupEntry(input: oldKey ?? string.Empty, desc: AppResources.text_bearbeiten);
         var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
 
-        var items = SettingsService.Instance.PriorityItems;
-
-        if (isCreatingNew)
-        {
-            if (!string.IsNullOrWhiteSpace(result.Result))
-            {
-                var newItem = new PriorityItem { Key = result.Result, Color = null };
-                items.Add(newItem);
-                PriorityPicker.ItemsSource = null;
-                PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                PriorityPicker.SelectedItem = result.Result;
-            }
-        }
-        else
-        {
-            var priorityItem = items.FirstOrDefault(x => x.Key == oldKey);
-
-            if (priorityItem != null)
-            {
-                if (string.IsNullOrWhiteSpace(result.Result))
-                {
-                    items.Remove(priorityItem);
-                    PriorityPicker.ItemsSource = null;
-                    PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                    PriorityPicker.SelectedItem = null;
-                }
-                else
-                {
-                    priorityItem.Key = result.Result;
-                    PriorityPicker.ItemsSource = null;
-                    PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-                    PriorityPicker.SelectedItem = result.Result;
-                }
-            }
-        }
-
-        SettingsService.Instance.SaveSettings();
-    }
-
-    private async void OnPriorityColorClicked(object sender, EventArgs e)
-    {
-        if (PriorityPicker.SelectedItem is not string selectedKey)
+        if (result?.Result == null)
             return;
 
-        if (string.IsNullOrWhiteSpace(selectedKey))
-            return;
-
+        string newKey = result.Result.Trim();
         var items = SettingsService.Instance.PriorityItems;
-        var priorityItem = items.FirstOrDefault(x => x.Key == selectedKey);
+
+        // Es ist keine Priorität gewählt: neue Priorität erstellen.
+        if (string.IsNullOrWhiteSpace(oldKey))
+        {
+            if (string.IsNullOrWhiteSpace(newKey))
+                return;
+
+            var existingItem = FindPriority(items, newKey);
+
+            if (existingItem == null)
+            {
+                items.Add(new PriorityItem
+                {
+                    Key = newKey,
+                    Color = "#808080"
+                });
+            }
+            else
+            {
+                newKey = existingItem.Key;
+            }
+
+            SettingsService.Instance.SaveSettings();
+
+            RefreshPriorities(newKey);
+            SaveManager.NotifyDataChanged();
+
+            return;
+        }
+
+        var priorityItem = FindPriority(items, oldKey);
 
         if (priorityItem == null)
             return;
 
-        var currentHexColor = priorityItem.Color ?? "#FFFFFF";
-        var initialColor = Color.FromArgb(currentHexColor);
+        if (string.IsNullOrWhiteSpace(newKey))
+        {
+            items.Remove(priorityItem);
 
-        var popup = new PopupColorPicker(initialColor);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
-        if (result?.Result == null) return;
+            SettingsService.Instance.SaveSettings();
 
-        priorityItem.Color = result.Result.ColorHex;
-        PriorityPicker.ItemsSource = null;
-        PriorityPicker.ItemsSource = items.Select(x => x.Key).ToList();
-        PriorityPicker.SelectedItem = selectedKey;
+            Pin.RefreshPriorities();
+            Pin.SelectPriority(null);
+
+            SaveManager.NotifyDataChanged();
+
+            return;
+        }
+
+        // Doppelten Namen verhindern.
+        var duplicate = FindPriority(items, newKey);
+
+        if (duplicate != null && !ReferenceEquals(duplicate, priorityItem))
+        {
+            newKey = duplicate.Key;
+            items.Remove(priorityItem);
+        }
+        else
+        {
+            priorityItem.Key = newKey;
+        }
 
         SettingsService.Instance.SaveSettings();
+
+        RefreshPriorities(newKey);
+        SaveManager.NotifyDataChanged();
     }
+
+    private async void OnPriorityColorClicked(object sender, EventArgs e)
+    {
+        string selectedKey = PriorityPicker.SelectedItem as string;
+        var items = SettingsService.Instance.PriorityItems;
+
+        PriorityItem priorityItem;
+
+        if (string.IsNullOrWhiteSpace(selectedKey))
+        {
+            var entryPopup = new PopupEntry(input: string.Empty, desc: AppResources.text_bearbeiten);
+            var entryResult = await this.ShowPopupAsync<string>(entryPopup, Settings.PopupOptions);
+
+            if (entryResult?.Result == null)
+                return;
+
+            selectedKey = entryResult.Result.Trim();
+
+            if (string.IsNullOrWhiteSpace(selectedKey))
+                return;
+
+            priorityItem = FindPriority(items, selectedKey);
+
+            if (priorityItem == null)
+            {
+                priorityItem = new PriorityItem
+                {
+                    Key = selectedKey,
+                    Color = "#808080"
+                };
+
+                items.Add(priorityItem);
+
+                SettingsService.Instance.SaveSettings();
+            }
+            else
+            {
+                selectedKey = priorityItem.Key;
+            }
+
+            RefreshPriorities(selectedKey);
+            SaveManager.NotifyDataChanged();
+        }
+        else
+        {
+            priorityItem = FindPriority(items, selectedKey);
+
+            if (priorityItem == null)
+                return;
+        }
+
+        var initialColor = Color.FromArgb(string.IsNullOrWhiteSpace(priorityItem.Color) ? "#808080" : priorityItem.Color);
+        var popup = new PopupColorPicker(initialColor);
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+
+        if (result?.Result == null)
+            return;
+
+        priorityItem.Color = result.Result.ColorHex;
+
+        SettingsService.Instance.SaveSettings();
+
+        Pin.RefreshPriorityColor();
+    }
+
+    // =================================================================
+    // Mehr-Menü
+    // =================================================================
 
     private async void OnMoreClicked(object sender, EventArgs e)
     {
@@ -530,16 +695,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
             return;
         }
 
-        // Aufklappen von oben rechts
         MoreMenu.AnchorX = 1;
         MoreMenu.AnchorY = 0;
         MoreMenu.Opacity = 0;
         MoreMenu.Scale = 0.92;
+
         MoreMenuOverlay.IsVisible = true;
 
-        await Task.WhenAll(
-            MoreMenu.FadeToAsync(1, 120, Easing.CubicOut),
-            MoreMenu.ScaleToAsync(1, 120, Easing.CubicOut));
+        await Task.WhenAll(MoreMenu.FadeToAsync(1, 120, Easing.CubicOut), MoreMenu.ScaleToAsync( 1, 120, Easing.CubicOut));
     }
 
     private async Task HideMoreMenuAsync()
@@ -548,11 +711,14 @@ public partial class SetPin : ContentPage, IQueryAttributable
             return;
 
         await MoreMenu.FadeToAsync(0, 90, Easing.CubicIn);
+
         MoreMenuOverlay.IsVisible = false;
     }
 
-    private async void OnMoreMenuDismiss(object sender, EventArgs e) =>
+    private async void OnMoreMenuDismiss(object sender, EventArgs e)
+    {
         await HideMoreMenuAsync();
+    }
 
     private async void OnMenuMoveTapped(object sender, EventArgs e)
     {

@@ -236,17 +236,56 @@ public partial class PinItem : ModelItem<Pin>
         set => SetProperty(ref _priorityColor, value);
     }
 
-    public List<string> PinPriorities { get; } = [.. SettingsService.Instance.PriorityItems.Select(item => item.Key)];
+    private List<string> _pinPriorities =
+    [
+        .. SettingsService.Instance.PriorityItems.Select(item => item.Key)
+    ];
+
+    public List<string> PinPriorities
+    {
+        get => _pinPriorities;
+        private set => SetProperty(ref _pinPriorities, value);
+    }
 
     private void UpdatePriorityColor()
     {
         var items = SettingsService.Instance.PriorityItems;
 
-        PriorityColor = PinPriority > 0 && PinPriority < items.Count
-            ? Color.FromArgb(items[PinPriority].Color)
-            : Application.Current.RequestedTheme == AppTheme.Dark
-                ? (Color)Application.Current.Resources["PrimaryDarkText"]
-                : (Color)Application.Current.Resources["PrimaryText"];
+        PriorityColor =
+            PinPriority > 0 &&
+            PinPriority < items.Count &&
+            !string.IsNullOrWhiteSpace(items[PinPriority].Color)
+                ? Color.FromArgb(items[PinPriority].Color)
+                : Application.Current.RequestedTheme == AppTheme.Dark
+                    ? (Color)Application.Current.Resources["PrimaryDarkText"]
+                    : (Color)Application.Current.Resources["PrimaryText"];
+    }
+
+    public void RefreshPriorities()
+    {
+        PinPriorities =
+        [
+            .. SettingsService.Instance.PriorityItems.Select(item => item.Key)
+        ];
+    }
+
+    public void RefreshPriorityColor()
+    {
+        UpdatePriorityColor();
+    }
+
+    public void SelectPriority(string key)
+    {
+        if (string.IsNullOrWhiteSpace(key))
+        {
+            PinPriority = 0;
+            return;
+        }
+
+        int index = PinPriorities.IndexOf(key);
+
+        if (index >= 0)
+            PinPriority = index;
     }
 
     // --- Modelländerungen durchreichen ------------------------------
