@@ -1,19 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Shell xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-       xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-       xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-       xmlns:sys="clr-namespace:System;assembly=System.Runtime"       
-       xmlns:views="clr-namespace:SnapDoc.Views"
+<Shell xmlns:views="clr-namespace:SnapDoc.Views"
        xmlns:services="clr-namespace:SnapDoc.Services"
        xmlns:model="clr-namespace:SnapDoc.ViewModels"
        xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
        xmlns:local="clr-namespace:SnapDoc"
-       x:Class="SnapDoc.AppShell"
-       x:Name="AppShellRoot"
        Shell.BackgroundColor="{DynamicResource Primary}"
        Shell.ForegroundColor="{DynamicResource PrimaryDark}"
        Shell.FlyoutBehavior="{OnIdiom Desktop=Locked, Default=Flyout}"
-       FlyoutBackgroundColor="{OnIdiom Desktop=White, Default={AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}}">
+       FlyoutBackgroundColor="{OnIdiom Desktop=White, Default={AppThemeBinding Light={DynamicResource SecondaryBackgroundDark}, Dark={DynamicResource PrimaryBackgroundDark}}}"       
+       x:Class="SnapDoc.AppShell"
+       x:Name="AppShellRoot">
 
     <Shell.Resources>
         <ResourceDictionary>
