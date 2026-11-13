@@ -5,11 +5,8 @@ using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
-using static SnapDoc.Models.SyncStampExtensions;
-
-#if WINDOWS
 using System.Diagnostics;
-#endif
+using static SnapDoc.Models.SyncStampExtensions;
 
 namespace SnapDoc.Views;
 
@@ -165,7 +162,7 @@ public partial class OpenProject : ContentPage
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Fehler beim Einlesen der Projekte: {ex.Message}");
+                Debug.WriteLine($"Fehler beim Einlesen der Projekte: {ex.Message}");
             }
 
             return items
@@ -303,7 +300,7 @@ public partial class OpenProject : ContentPage
                             catch (Exception ex)
                             {
                                 // Token-/Netzwerkfehler: IDs NICHT anfassen, nur freigeben
-                                System.Diagnostics.Debug.WriteLine($"Cloud-Pruefung '{m.Item.FileName}' fehlgeschlagen: {ex.Message}");
+                                Debug.WriteLine($"Cloud-Pruefung '{m.Item.FileName}' fehlgeschlagen: {ex.Message}");
                                 MarkChecked(m.Item, false);
                             }
                         }
@@ -380,7 +377,7 @@ public partial class OpenProject : ContentPage
 
                         if (titleImageChanged)
                         {
-                            System.Diagnostics.Debug.WriteLine($"TitleImage geaendert: {item.FileName}: {localTitleImage} -> {remoteTitleImage}");
+                            Debug.WriteLine($"TitleImage geaendert: {item.FileName}: {localTitleImage} -> {remoteTitleImage}");
 
                             bool downloaded = await Helper.UpdateProjectTitleImageAsync(
                                     localData,
@@ -461,8 +458,7 @@ public partial class OpenProject : ContentPage
                     }
                     catch (Exception ex)
                     {
-                        System.Diagnostics.Debug.WriteLine(
-                            $"Cloud-Abgleich fuer '{item.FileName}' fehlgeschlagen: {ex}");
+                        Debug.WriteLine($"Cloud-Abgleich fuer '{item.FileName}' fehlgeschlagen: {ex}");
                     }
                 }
             }
@@ -472,7 +468,7 @@ public partial class OpenProject : ContentPage
             }
             catch (Exception ex)
             {
-                System.Diagnostics.Debug.WriteLine($"Cloud-Sync fehlgeschlagen: {ex}");
+                Debug.WriteLine($"Cloud-Sync fehlgeschlagen: {ex}");
             }
             finally
             {
@@ -634,7 +630,7 @@ public partial class OpenProject : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Import-Fehler: {ex.Message}");
+            Debug.WriteLine($"Import-Fehler: {ex.Message}");
             await this.DisplaySnackbar(AppResources.datei_konnte_nicht_importiert_werden, actionButtonText: AppResources.ok);
         }
         finally
@@ -728,7 +724,7 @@ public partial class OpenProject : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex}");
+            Debug.WriteLine($"Cloud Sync oder Lade-Fehler: {ex}");
 
             await MainThread.InvokeOnMainThreadAsync(async () =>
             {
@@ -821,7 +817,7 @@ public partial class OpenProject : ContentPage
             }
             catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                System.Diagnostics.Debug.WriteLine($"Remote-Index Versuch {attempt} fehlgeschlagen: {ex.Message}");
+                Debug.WriteLine($"Remote-Index Versuch {attempt} fehlgeschlagen: {ex.Message}");
             }
 
             if (attempt < maxAttempts)
@@ -1006,7 +1002,7 @@ public partial class OpenProject : ContentPage
 
     bool ok = await Windows.System.Launcher.LaunchFolderPathAsync(directoryPath);
     if (!ok)
-        System.Diagnostics.Debug.WriteLine($"Ordner konnte nicht geöffnet werden: {directoryPath}");
+        Debug.WriteLine($"Ordner konnte nicht geöffnet werden: {directoryPath}");
 #else
 		await Task.CompletedTask;
 #endif

@@ -83,6 +83,30 @@ public partial class LoadDataToView
     {
         ClearAllPlansFromShell();
         Project.Reset();
+        ClearNavigationStack();
+    }
+
+    public static void ClearNavigationStack()
+    {
+        MainThread.BeginInvokeOnMainThread(() =>
+        {
+            try
+            {
+                var navigation = Shell.Current?.Navigation;
+                if (navigation == null) return;
+
+                var stack = navigation.NavigationStack;
+                // Entfernt alle Seiten ausser der aktuellen Basis-Seite
+                for (int i = stack.Count - 2; i >= 0; i--)
+                {
+                    navigation.RemovePage(stack[i]);
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Fehler beim Leeren des Navigationsstacks: {ex.Message}");
+            }
+        });
     }
 
     public static void ClearAllPlansFromShell()
