@@ -17,10 +17,8 @@ public partial class AppShell : Shell
 {
     private const uint AddPlanAnimationMs = 120;
     private const double AddPlanRowHeight = 44;
-
     private readonly AuthService _authService = new();
     private static ProjectItem Project => ProjectItem.Current;
-
     private bool _isAddPlanMenuOpen;
     private INotifyCollectionChanged _observedPlanItems;
 
@@ -387,37 +385,52 @@ public partial class AppShell : Shell
 
     private async void OnGlobalCloudClicked(object sender, EventArgs e)
     {
-        if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
+        // Mehrfache Klicks während des Ladens verhindern
+        if (SettingsService.Instance.IsCloudLoading) return;
+
+        SettingsService.Instance.IsCloudLoading = true;
+        try
         {
-            var popup = new PopupDualResponse(AppResources.bereits_verbunden_abmelden, AppResources.abmelden);
-            var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
-            if (result?.Result is not DualPopupResult.Ok) return;
+            if (SaveManager.CurrentAuth != null && SaveManager.CurrentAuth.IsLoggedIn)
+            {
+                var popup = new PopupDualResponse(AppResources.bereits_verbunden_abmelden, AppResources.abmelden);
+                var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+                if (result?.Result is not DualPopupResult.Ok) return;
 
-            // Polling beim Abmelden stoppen
-            SaveManager.StopCloudPolling();
+                // Polling beim Abmelden stoppen
+                SaveManager.StopCloudPolling();
 
-            await _authService.LogoutAsync();
-            SaveManager.CurrentAuth = null;
-            SettingsService.Instance.RefreshCloudState();
-            return;
+                await _authService.LogoutAsync();
+                SaveManager.CurrentAuth = null;
+                SettingsService.Instance.RefreshCloudState();
+                return;
+            }
+
+            var (success, userName, userEmail) = await _authService.LoginAndFetchUserAsync();
+
+            if (success)
+            {
+                SaveManager.CurrentAuth = _authService;
+                SettingsService.Instance.RefreshCloudState();
+
+                // Polling nach erfolgreichem Login starten
+                SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
+
+                await this.DisplaySnackbar($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", actionButtonText: AppResources.ok);
+            }
+            else if (userName != nameof(DualPopupResult.Cancel))
+            {
+                string displayMessage = userName.Contains("GatewayTimeout") || userName.Contains("Timeout")
+                    ? "Die Microsoft-Cloud ist derzeit nicht erreichbar. Bitte versuchen Sie es später erneut."
+                    : $"{AppResources.login_fehlgeschlagen}:\n{userName}";
+
+                await this.ShowPopupAsync(new PopupAlert(displayMessage, AppResources.fehler), Settings.PopupOptions);
+            }
         }
-
-        var (success, userName, userEmail) = await _authService.LoginAndFetchUserAsync();
-
-        if (success)
+        finally
         {
-            SaveManager.CurrentAuth = _authService;
-            SettingsService.Instance.RefreshCloudState();
-
-            // Polling nach erfolgreichem Login starten
-            SaveManager.StartCloudPolling(SettingsService.Instance.CloudPollingIntervall);
-
-            await this.DisplaySnackbar($"{AppResources.eingeloggt_als}:\n{userName}\n{userEmail}", actionButtonText: AppResources.ok);
-        }
-        else if (userName != nameof(DualPopupResult.Cancel))
-        {
-            // Nur bei echten Fehlern, nicht beim Abbruch durch den Nutzer
-            await this.ShowPopupAsync(new PopupAlert($"{AppResources.login_fehlgeschlagen}:\n{userName}\n{userEmail}", AppResources.fehler), Settings.PopupOptions);
+            // Ladeindikator in jedem Fall wieder ausschalten
+            SettingsService.Instance.IsCloudLoading = false;
         }
     }
 }

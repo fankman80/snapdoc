@@ -447,16 +447,32 @@
                         BackgroundColor="Transparent"
                         Command="{Binding ToggleGPSCommand}"/>
 
-                <Button Grid.Row="1" Grid.Column="1"
-                        x:DataType="services:SettingsService"
-                        BindingContext="{x:Static services:SettingsService.Instance}"
-                        Padding="0"
-                        Text="{Binding GlobalCloudIcon}"
-                        FontFamily="MaterialOutlined"
-                        FontSize="26"                        
-                        TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        BackgroundColor="Transparent"                        
-                        Clicked="OnGlobalCloudClicked"/>
+                <!-- Cloud-Button mit Busy-Indikator -->
+                <Grid Grid.Row="1" Grid.Column="1" 
+                      VerticalOptions="Center" 
+                      HorizontalOptions="Center"
+                      x:DataType="services:SettingsService"
+                      BindingContext="{x:Static services:SettingsService.Instance}">
+
+                    <!-- Cloud-Button wird während des Ladens abgeblendet und verkleinert -->
+                    <Button Padding="0"
+                            Text="{Binding GlobalCloudIcon}"
+                            FontFamily="MaterialOutlined"
+                            FontSize="{Binding IsCloudLoading, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?20:26'}"                       
+                            TextColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                            BackgroundColor="Transparent"
+                            Opacity="{Binding IsCloudLoading, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x==true?0.3:1'}"
+                            Clicked="OnGlobalCloudClicked"/>
+
+                    <!-- Der Ladeindikator liegt exakt zentriert im Vordergrund -->
+                    <ActivityIndicator IsRunning="{Binding IsCloudLoading}"
+                                       IsVisible="{Binding IsCloudLoading}"
+                                       HeightRequest="28"
+                                       WidthRequest="28"
+                                       VerticalOptions="Center"
+                                       HorizontalOptions="Center"
+                                       Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"/>
+                </Grid>
 
                 <VerticalStackLayout Grid.Row="1" Grid.RowSpan="2" Grid.Column="2" Spacing="0" VerticalOptions="Center">
                     <Label Text="SnapDoc"

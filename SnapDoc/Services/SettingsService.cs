@@ -196,6 +196,19 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty, Persist] public partial int ParallelDownloads { get; set; } = 12;
     [ObservableProperty, Persist] public partial int ParallelUploads { get; set; } = 12;
 
+
+    private bool _isCloudLoading;
+    public bool IsCloudLoading
+    {
+        get => _isCloudLoading;
+        set
+        {
+            if (_isCloudLoading == value) return;
+            _isCloudLoading = value;
+            OnPropertyChanged();
+        }
+    }
+
 #pragma warning disable CA1822
     public string GlobalCloudIcon
     {
