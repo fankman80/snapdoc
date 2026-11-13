@@ -548,7 +548,7 @@ public partial class OpenProject : ContentPage
 
         LoadJsonFiles();
 
-        await Shell.Current.GoToAsync("project_details");
+        await NavigateToProjectDetailsAsync();
 
 #if ANDROID || IOS
         Shell.Current.FlyoutIsPresented = false;
@@ -717,10 +717,8 @@ public partial class OpenProject : ContentPage
                     SaveManager.NotifyDataChanged();
             }
 
-            // Overlay vor dem Shell-Seitenwechsel schliessen.
             await BusyService.HideAsync();
-
-            await Shell.Current.GoToAsync("project_details");
+            await NavigateToProjectDetailsAsync();
         }
         catch (Exception ex)
         {
@@ -1111,5 +1109,14 @@ public partial class OpenProject : ContentPage
             return;
 
         await CloseItemSheetAsync();
+    }
+
+    private static async Task NavigateToProjectDetailsAsync()
+    {
+        // Absoluter Wechsel zum HomeScreen:
+        await Shell.Current.GoToAsync("//homescreen", false);
+
+        // ProjectDetails wird auf HomeScreen gelegt.
+        await Shell.Current.GoToAsync("project_details");
     }
 }
