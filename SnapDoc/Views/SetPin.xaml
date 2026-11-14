@@ -230,7 +230,7 @@
                                                         BackgroundColor="Transparent"
                                                         BorderThickness="0"
                                                         ItemsSource="{Binding Pin.PinPriorities}"
-                                                        SelectedIndex="{Binding Pin.PinPriority, Mode=TwoWay}" />
+                                                        SelectedItem="{Binding Pin.PriorityKey, Mode=TwoWay}" />
                         </Border>
                         <Button Grid.Column="3"
                                 Padding="0"

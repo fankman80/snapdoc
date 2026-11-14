@@ -4,9 +4,9 @@
 		<TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net11.0-windows10.0.26100.0</TargetFrameworks>
 		<ApplicationTitle>SnapDoc</ApplicationTitle>
 		<ApplicationId>com.ebbe.snapdoc</ApplicationId>
-		<ApplicationDisplayVersion>2.7.1</ApplicationDisplayVersion>
-		<Version>2.7.1</Version>
-		<ApplicationVersion>1048</ApplicationVersion>
+		<ApplicationDisplayVersion>2.7.2</ApplicationDisplayVersion>
+		<Version>2.7.2</Version>
+		<ApplicationVersion>1049</ApplicationVersion>
 		<UseMaui>true</UseMaui>
 		<MauiEnableTizenTargeting>false</MauiEnableTizenTargeting>
 		<SingleProject>true</SingleProject>

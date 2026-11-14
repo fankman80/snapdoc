@@ -2,6 +2,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using SkiaSharp;
 using System.ComponentModel;
+using System.Text.Json.Serialization;
 
 namespace SnapDoc.Models;
 
@@ -69,6 +70,7 @@ public partial class JsonDataModel : SyncModel
     public string ThumbnailPath { get; set; }
     public string CustomPinsPath { get; set; }
     public Dictionary<string, Plan> Plans { get; set; }
+    public List<PriorityItem> PriorityItems { get; set; } = [];
 }
 
 // =====================================================================
@@ -115,7 +117,7 @@ public partial class Pin : SyncModel
     [ObservableProperty] public partial DateTime DateTime { get; set; }
     [ObservableProperty] public partial GeoLocData GeoLocation { get; set; }
     [ObservableProperty] public partial bool IsCustomIcon { get; set; }
-    [ObservableProperty] public partial int PinPriority { get; set; }
+    [ObservableProperty] public partial string PriorityKey { get; set; }
     [ObservableProperty] public partial string PinIcon { get; set; }
     [ObservableProperty] public partial bool IsCustomPin { get; set; }
     [ObservableProperty] public partial bool IsAllowExport { get; set; }
@@ -123,6 +125,10 @@ public partial class Pin : SyncModel
     [ObservableProperty] public partial bool IsLockRotate { get; set; }
     [ObservableProperty] public partial bool IsLockAutoScale { get; set; }
 
+    [JsonPropertyName("PinPriority")]
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+
+    public int? LegacyPinPriority { get; set; }
     private Point _pos;
     public Point Pos
     {

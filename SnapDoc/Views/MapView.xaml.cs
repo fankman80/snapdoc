@@ -127,7 +127,7 @@ public partial class MapView : IQueryAttributable
                     if (featureToRemove != null)
                     {
                         _features.Remove(featureToRemove);
-                        pinLayer.Features = [.. _features.Cast<IFeature>()];
+                        pinLayer.Features = (IFeature[])[.. _features];
                         pinLayer.DataHasChanged();
                         MapControl.RefreshGraphics();
                     }
@@ -189,7 +189,7 @@ public partial class MapView : IQueryAttributable
         var layer = map.Layers.OfType<MemoryLayer>().FirstOrDefault(l => l.Name == "Pins");
         if (layer != null)
         {
-            layer.Features = [.. _features.Cast<IFeature>()];
+            layer.Features = (IFeature[])[.. _features];
             layer.DataHasChanged();
             MapControl.RefreshGraphics();
         }
@@ -457,7 +457,7 @@ public partial class MapView : IQueryAttributable
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
         if (pinLayer == null) return;
 
-        var mapInfo = e.GetMapInfo([pinLayer]);
+        var mapInfo = e.GetMapInfo((ILayer[])[pinLayer]);
 
         if (mapInfo?.Feature is GeometryFeature feature)
         {
@@ -562,7 +562,7 @@ public partial class MapView : IQueryAttributable
         var pinLayer = map.Layers.FirstOrDefault(l => l.Name == "Pins");
         if (pinLayer == null) return;
 
-        var mapInfo = e.GetMapInfo([pinLayer]);
+        var mapInfo = e.GetMapInfo((ILayer[])[pinLayer]);
 
         if (mapInfo?.Feature is GeometryFeature feature && feature["PinId"] != null)
         {
@@ -740,7 +740,7 @@ public partial class MapView : IQueryAttributable
                 IsWebMapPin = true,
                 PinName = "",
                 PinDesc = "",
-                PinPriority = 0,
+                PriorityKey = string.Empty,
                 PinLocation = "",
                 PinIcon = SettingsService.Instance.DefaultPinIcon,
                 Fotos = [],

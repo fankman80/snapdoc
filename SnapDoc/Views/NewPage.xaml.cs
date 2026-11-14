@@ -576,7 +576,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             IsWebMapPin = false,
             PinName = _displayName,
             PinDesc = "",
-            PinPriority = 0,
+            PriorityKey = string.Empty,
             PinLocation = "",
             PinIcon = _newPin,
             Fotos = [],

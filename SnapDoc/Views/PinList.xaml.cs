@@ -112,6 +112,13 @@ public partial class PinList : ContentPage
             (pin.PinDesc?.Contains(searchText, StringComparison.OrdinalIgnoreCase) ?? false)
         );
 
+        var priorityOrder = PriorityService.PickerKeys();   // "" steht an Position 0
+        int PriorityRank(string key)
+        {
+            int i = priorityOrder.FindIndex(k => string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
+            return i < 0 ? int.MaxValue : i;   // unbekannte Keys ans Ende
+        }
+
         object keySelector(PinItem pin)
         {
             var crits = SettingsService.Instance.PinSortCrits;
@@ -121,7 +128,7 @@ public partial class PinList : ContentPage
             if (selectedCrit == crits[3]) return pin.PinName;
             if (selectedCrit == crits[4]) return pin.IsAllowExport;
             if (selectedCrit == crits[5]) return pin.Time;
-            if (selectedCrit == crits[6]) return pin.PinPriority;
+            if (selectedCrit == crits[6]) return PriorityRank(pin.PriorityKey);
             return pin.Time; // Default
         }
 

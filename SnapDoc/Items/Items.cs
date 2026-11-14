@@ -112,6 +112,18 @@ public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
 }
 
 // =====================================================================
+//  Prioritäten
+// =====================================================================
+public class PriorityItem
+{
+    public required string Key { get; set; }
+    public required string Color { get; set; }
+
+    // Für den Sync: bei gleichem Key gewinnt die neuere Farbe
+    public DateTimeOffset ModifiedAt { get; set; }
+}
+
+// =====================================================================
 //  Pins
 // =====================================================================
 
@@ -204,16 +216,6 @@ public partial class PinItem : ModelItem<Pin>
         set => SetModel(Model.IsLockPosition, value, v => Model.IsLockPosition = v);
     }
 
-    public int PinPriority
-    {
-        get => Model.PinPriority;
-        set
-        {
-            if (SetModel(Model.PinPriority, value, v => Model.PinPriority = v))
-                UpdatePriorityColor();
-        }
-    }
-
     // --- Lokaler UI-Zustand -----------------------------------------
     private bool _isCustomPin;
     public bool IsCustomPin
@@ -236,56 +238,67 @@ public partial class PinItem : ModelItem<Pin>
         set => SetProperty(ref _priorityColor, value);
     }
 
-    private List<string> _pinPriorities =
-    [
-        .. SettingsService.Instance.PriorityItems.Select(item => item.Key)
-    ];
+    // --- Priorität ---------------------------------------------------
+    public string PriorityKey
+    {
+        get => Model.PriorityKey ?? string.Empty;
+        set
+        {
+            // null kommt vom Picker, wenn sich die ItemsSource ändert -> ignorieren.
+            // Bewusst "keine Priorität" ist der leere Eintrag "" in der Liste.
+            if (value == null)
+                return;
 
+            if (string.Equals(Model.PriorityKey ?? string.Empty, value, StringComparison.Ordinal))
+                return;
+
+            if (SetModel(Model.PriorityKey, value, v => Model.PriorityKey = v))
+                UpdatePriorityColor();
+        }
+    }
+
+    private List<string> _pinPriorities;
     public List<string> PinPriorities
     {
-        get => _pinPriorities;
+        get => _pinPriorities ??= PriorityService.PickerKeys();
         private set => SetProperty(ref _pinPriorities, value);
     }
 
     private void UpdatePriorityColor()
     {
-        var items = SettingsService.Instance.PriorityItems;
+        string color = PriorityService.ColorOf(PriorityKey);
 
-        PriorityColor =
-            PinPriority > 0 &&
-            PinPriority < items.Count &&
-            !string.IsNullOrWhiteSpace(items[PinPriority].Color)
-                ? Color.FromArgb(items[PinPriority].Color)
-                : Application.Current.RequestedTheme == AppTheme.Dark
-                    ? (Color)Application.Current.Resources["PrimaryDarkText"]
-                    : (Color)Application.Current.Resources["PrimaryText"];
+        PriorityColor = color != null
+            ? Color.FromArgb(color)
+            : Application.Current.RequestedTheme == AppTheme.Dark
+                ? (Color)Application.Current.Resources["PrimaryDarkText"]
+                : (Color)Application.Current.Resources["PrimaryText"];
     }
 
     public void RefreshPriorities()
     {
-        PinPriorities =
-        [
-            .. SettingsService.Instance.PriorityItems.Select(item => item.Key)
-        ];
-    }
+        PinPriorities = PriorityService.PickerKeys();
 
-    public void RefreshPriorityColor()
-    {
+        // Picker nach dem Neuladen der Liste wieder auf den aktuellen Key setzen
+        Notify(nameof(PriorityKey));
         UpdatePriorityColor();
     }
+
+    public void RefreshPriorityColor() => UpdatePriorityColor();
 
     public void SelectPriority(string key)
     {
         if (string.IsNullOrWhiteSpace(key))
         {
-            PinPriority = 0;
+            PriorityKey = string.Empty;
             return;
         }
 
-        int index = PinPriorities.IndexOf(key);
+        string match = PinPriorities.FirstOrDefault(k =>
+            string.Equals(k, key, StringComparison.OrdinalIgnoreCase));
 
-        if (index >= 0)
-            PinPriority = index;
+        if (match != null)
+            PriorityKey = match;
     }
 
     // --- Modelländerungen durchreichen ------------------------------
@@ -317,11 +330,6 @@ public partial class PinItem : ModelItem<Pin>
                 Notify(nameof(IsAllowExport), nameof(DisplayOpacity));
                 break;
 
-            case nameof(Pin.PinPriority):
-                Notify(nameof(PinPriority));
-                MainThread.BeginInvokeOnMainThread(UpdatePriorityColor);
-                break;
-
             case nameof(Pin.IsCustomPin):
                 IsCustomPin = Model.IsCustomPin;
                 Notify(nameof(DisplayIconPath));
@@ -329,6 +337,11 @@ public partial class PinItem : ModelItem<Pin>
 
             case nameof(Pin.IsWebMapPin):
                 IsWebMapPin = Model.IsWebMapPin;
+                break;
+
+            case nameof(Pin.PriorityKey):
+                Notify(nameof(PriorityKey));
+                MainThread.BeginInvokeOnMainThread(UpdatePriorityColor);
                 break;
         }
     }
@@ -450,12 +463,6 @@ public partial class ColorBoxItem : ObservableObject
     [ObservableProperty] public partial bool IsSelected { get; set; }
 
     public bool IsAddButton { get; set; }
-}
-
-public class PriorityItem
-{
-    public required string Key { get; set; }
-    public required string Color { get; set; }
 }
 
 public class MapViewItem

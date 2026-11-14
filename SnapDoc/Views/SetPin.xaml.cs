@@ -521,166 +521,85 @@ public partial class SetPin : ContentPage, IQueryAttributable
     // Prioritäten
     // =================================================================
 
-    private void RefreshPriorities(string selectedKey = null)
+    private void ApplyPriorityChange(string selectKey)
     {
-        if (Pin == null)
-            return;
+        SettingsService.Instance.SaveSettings();   // lokale Liste
+        Pin?.RefreshPriorities();
 
-        Pin.RefreshPriorities();
+        if (selectKey != null)
+            Pin?.SelectPriority(selectKey);
 
-        if (selectedKey != null)
-            Pin.SelectPriority(selectedKey);
+        SaveManager.NotifyDataChanged();           // Projektdatei + Cloud
     }
 
-    private static PriorityItem FindPriority(IEnumerable<PriorityItem> items, string key)
+    private async Task<string> AskPriorityNameAsync(string current)
     {
-        if (string.IsNullOrWhiteSpace(key))
-            return null;
+        var popup = new PopupEntry(input: current ?? string.Empty, desc: AppResources.text_bearbeiten);
+        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
 
-        return items.FirstOrDefault(item => string.Equals(item.Key, key, StringComparison.OrdinalIgnoreCase));
+        return result?.Result?.Trim();             // null = abgebrochen
     }
 
     private async void OnPriorityEditClicked(object sender, EventArgs e)
     {
-        string oldKey = PriorityPicker.SelectedItem as string;
-        var popup = new PopupEntry(input: oldKey ?? string.Empty, desc: AppResources.text_bearbeiten);
-        var result = await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
+        if (Pin == null) return;
 
-        if (result?.Result == null)
-            return;
+        string oldKey = Pin.PriorityKey;
+        string newKey = await AskPriorityNameAsync(oldKey);
 
-        string newKey = result.Result.Trim();
-        var items = SettingsService.Instance.PriorityItems;
+        if (newKey == null) return;
 
-        // Es ist keine Priorität gewählt: neue Priorität erstellen.
-        if (string.IsNullOrWhiteSpace(oldKey))
+        // Keine Priorität gewählt -> neue erstellen
+        if (string.IsNullOrEmpty(oldKey))
         {
-            if (string.IsNullOrWhiteSpace(newKey))
-                return;
+            if (newKey.Length == 0) return;
 
-            var existingItem = FindPriority(items, newKey);
-
-            if (existingItem == null)
-            {
-                items.Add(new PriorityItem
-                {
-                    Key = newKey,
-                    Color = "#808080"
-                });
-            }
-            else
-            {
-                newKey = existingItem.Key;
-            }
-
-            SettingsService.Instance.SaveSettings();
-
-            RefreshPriorities(newKey);
-            SaveManager.NotifyDataChanged();
-
+            ApplyPriorityChange(PriorityService.AddOrGet(newKey).Key);
             return;
         }
 
-        var priorityItem = FindPriority(items, oldKey);
-
-        if (priorityItem == null)
-            return;
-
-        if (string.IsNullOrWhiteSpace(newKey))
+        // Leere Eingabe -> löschen
+        if (newKey.Length == 0)
         {
-            items.Remove(priorityItem);
-
-            SettingsService.Instance.SaveSettings();
-
-            Pin.RefreshPriorities();
-            Pin.SelectPriority(null);
-
-            SaveManager.NotifyDataChanged();
-
+            PriorityService.Delete(oldKey);
+            ApplyPriorityChange(string.Empty);
             return;
         }
 
-        // Doppelten Namen verhindern.
-        var duplicate = FindPriority(items, newKey);
+        if (newKey == oldKey) return;
 
-        if (duplicate != null && !ReferenceEquals(duplicate, priorityItem))
-        {
-            newKey = duplicate.Key;
-            items.Remove(priorityItem);
-        }
-        else
-        {
-            priorityItem.Key = newKey;
-        }
-
-        SettingsService.Instance.SaveSettings();
-
-        RefreshPriorities(newKey);
-        SaveManager.NotifyDataChanged();
+        ApplyPriorityChange(PriorityService.Rename(oldKey, newKey));
     }
 
     private async void OnPriorityColorClicked(object sender, EventArgs e)
     {
-        string selectedKey = PriorityPicker.SelectedItem as string;
-        var items = SettingsService.Instance.PriorityItems;
+        if (Pin == null) return;
 
-        PriorityItem priorityItem;
+        string key = Pin.PriorityKey;
 
-        if (string.IsNullOrWhiteSpace(selectedKey))
+        // Keine Priorität gewählt -> zuerst neue erstellen
+        if (string.IsNullOrEmpty(key))
         {
-            var entryPopup = new PopupEntry(input: string.Empty, desc: AppResources.text_bearbeiten);
-            var entryResult = await this.ShowPopupAsync<string>(entryPopup, Settings.PopupOptions);
+            string newKey = await AskPriorityNameAsync(null);
+            if (string.IsNullOrEmpty(newKey)) return;
 
-            if (entryResult?.Result == null)
-                return;
-
-            selectedKey = entryResult.Result.Trim();
-
-            if (string.IsNullOrWhiteSpace(selectedKey))
-                return;
-
-            priorityItem = FindPriority(items, selectedKey);
-
-            if (priorityItem == null)
-            {
-                priorityItem = new PriorityItem
-                {
-                    Key = selectedKey,
-                    Color = "#808080"
-                };
-
-                items.Add(priorityItem);
-
-                SettingsService.Instance.SaveSettings();
-            }
-            else
-            {
-                selectedKey = priorityItem.Key;
-            }
-
-            RefreshPriorities(selectedKey);
-            SaveManager.NotifyDataChanged();
-        }
-        else
-        {
-            priorityItem = FindPriority(items, selectedKey);
-
-            if (priorityItem == null)
-                return;
+            key = PriorityService.AddOrGet(newKey).Key;
+            ApplyPriorityChange(key);
         }
 
-        var initialColor = Color.FromArgb(string.IsNullOrWhiteSpace(priorityItem.Color) ? "#808080" : priorityItem.Color);
-        var popup = new PopupColorPicker(initialColor);
-        var result = await this.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        var initial = Color.FromArgb(PriorityService.ColorOf(key) ?? PriorityService.DefaultColor);
 
-        if (result?.Result == null)
-            return;
+        var result = await this.ShowPopupAsync<ColorPickerReturn>(
+            new PopupColorPicker(initial),
+            Settings.PopupOptions);
 
-        priorityItem.Color = result.Result.ColorHex;
+        if (result?.Result == null) return;
+
+        PriorityService.SetColor(key, result.Result.ColorHex);
 
         SettingsService.Instance.SaveSettings();
-
         Pin.RefreshPriorityColor();
+        SaveManager.NotifyDataChanged();
     }
 
     // =================================================================

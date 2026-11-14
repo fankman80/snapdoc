@@ -63,13 +63,13 @@ public static class SaveManager
         if (GlobalJson.Data == null) return;
 
         bool backfilled = BackfillStamps(GlobalJson.Data);
+        bool migrated = PriorityService.MigratePins(GlobalJson.Data);
 
-        // VOR dem Purge, sonst sind die Dateinamen der Tombstones weg
         PurgeLocalTombstoneFiles();
 
         bool purged = !SyncState.IsDirty && SyncOps.PurgeTombstones(GlobalJson.Data, SettingsService.Instance.TombstoneKeepDays);
 
-        if (backfilled || purged)
+        if (backfilled || purged || migrated)
             GlobalJson.SaveToFile();
     }
 
@@ -219,7 +219,9 @@ public static class SaveManager
 
         SyncState.Bind(filePath);
 
-        // 1. IMMER lokal speichern
+        if (PriorityService.IncludeLocalPriorities(GlobalJson.Data))
+            MarkLocalChange();
+
         SaveLocal(filePath);
         PurgeLocalTombstoneFiles();
 
@@ -356,6 +358,7 @@ public static class SaveManager
 
         // Cloud-Stand eines noch nicht migrierten Geraets angleichen
         BackfillStamps(cloudData);
+        PriorityService.MigratePins(cloudData);
 
         lock (_fileLock)
         {
@@ -439,7 +442,10 @@ public static class SaveManager
         {
             var externalData = GlobalJson.ReadFromFile(filePath);
             if (externalData != null)
+            {
+                PriorityService.MigratePins(externalData);
                 MergeModels(GlobalJson.Data, externalData);
+            }
         }
         catch (Exception ex)
         {
@@ -507,6 +513,8 @@ public static class SaveManager
                     new TitleImageChangedMessage(oldTitleImage, cloud.TitleImage));
             }
         }
+
+        PriorityService.Merge(local, cloud);
 
         if (cloud.Plans == null)
         {
@@ -719,7 +727,6 @@ public static class SaveManager
         target.IsCustomPin = source.IsCustomPin;
         target.IsCustomIcon = source.IsCustomIcon;
         target.Pos = source.Pos;
-        target.PinPriority = source.PinPriority;
         target.GeoLocation = source.GeoLocation;
         target.IsAllowExport = source.IsAllowExport;
         target.IsLockAutoScale = source.IsLockAutoScale;
@@ -738,6 +745,7 @@ public static class SaveManager
         target.DeletedAt = source.DeletedAt;
         target.ModifiedAt = source.ModifiedAt;
         target.ModifiedBy = source.ModifiedBy;
+        target.PriorityKey = source.PriorityKey;
     }
 
     private static void MergeFotos(Pin localPin, Pin cloudPin)

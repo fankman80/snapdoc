@@ -416,25 +416,23 @@ public partial class ExportReport
 
                                                     case "${pin_priority}":
                                                         {
-                                                            int priorityIndex = currentPin.PinPriority;
-                                                            var priorityItem = SettingsService.Instance.PriorityItems.ElementAtOrDefault(priorityIndex);
+                                                            string key = currentPin.PriorityKey ?? string.Empty;
+                                                            string fillColor = PriorityService.ColorOf(key);
 
-                                                            if (priorityIndex != 0 && priorityItem != null)
+                                                            if (!string.IsNullOrEmpty(key) && fillColor != null)
                                                             {
-                                                                string fillColor = priorityItem.Color;
                                                                 newTableCell.TableCellProperties ??= new TableCellProperties();
                                                                 Shading shading = newTableCell.TableCellProperties.GetFirstChild<Shading>();
-
                                                                 if (shading == null)
                                                                 {
                                                                     shading = new Shading();
                                                                     newTableCell.TableCellProperties.AppendChild(shading);
                                                                 }
-
                                                                 shading.Fill = fillColor.Replace("#", "");
                                                                 shading.Val = ShadingPatternValues.Clear;
                                                             }
-                                                            AddText(priorityItem?.Key ?? "");
+
+                                                            AddText(key);
                                                             break;
                                                         }
 
