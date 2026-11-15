@@ -375,7 +375,7 @@
                                                      Glyph="{x:Static local:MaterialIcons.Reset_settings}" />
                                 </Button.ImageSource>
                             </Button>
-                            <Button Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="2" 
+                            <Button Grid.Column="0" Grid.Row="3"
                                     Text="{x:Static res:AppResources.tile_cache_loeschen}"
                                     BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                                     TextColor="{DynamicResource PrimaryDarkText}"
