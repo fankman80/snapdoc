@@ -111,26 +111,21 @@
             </Grid>
 
             <!-- Bearbeitungsmodus: ✕ | Titel | Zurücksetzen | ✓ -->
-            <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+            <Grid ColumnDefinitions="*,Auto,Auto"
                   ColumnSpacing="8"
                   IsVisible="{Binding IsEditMode}"
                   VerticalOptions="Center">
-                <Button Grid.Column="0"
-                        Style="{StaticResource TitleIconButton}"
-                        Text="{x:Static local:MaterialIcons.Close}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.abbrechen}"
-                        Clicked="CancelClicked" />
-                <Label Grid.Column="1"
+                <Label Grid.Column="0"
                        Text="{Binding Title, Source={x:Reference ThisPage}}"
                        TextColor="{DynamicResource Primary}"
                        FontSize="18"
                        VerticalOptions="Center" />
-                <Button Grid.Column="2"
+                <Button Grid.Column="1"
                         Style="{StaticResource TitleIconButton}"
-                        Text="{x:Static local:MaterialIcons.Ink_eraser}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
-                        Clicked="EraseClicked" />
-                <Button Grid.Column="3"
+                        Text="{x:Static local:MaterialIcons.Close}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.abbrechen}"
+                        Clicked="CancelClicked" />                
+                <Button Grid.Column="2"
                         Style="{StaticResource TitleIconButton}"
                         Text="{x:Static local:MaterialIcons.Check}"
                         FontSize="28"
@@ -332,7 +327,6 @@
                     IsVisible="{Binding IsEditMode}">
             <Grid x:Name="ToolBarHost">
                 <HorizontalStackLayout Spacing="4" Padding="8,4,8,8" HorizontalOptions="Center">
-
                     <!-- Rechteck -->
                     <Border Style="{StaticResource ToolItem}">
                         <Border.Triggers>
@@ -415,6 +409,17 @@
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Gesture}" />
                             <Label Style="{StaticResource ToolText}" Text="Freihand" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Löschen -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="EraseClicked" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Ink_eraser}" />
+                            <Label Style="{StaticResource ToolText}" Text="Löschen" />
                         </VerticalStackLayout>
                     </Border>
                 </HorizontalStackLayout>

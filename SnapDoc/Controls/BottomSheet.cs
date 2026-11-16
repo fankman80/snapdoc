@@ -1,16 +1,9 @@
 #nullable disable
 namespace SnapDoc.Controls;
 
-/// <summary>
-/// Nicht-modales Bottom Sheet im Stil der Editor-Leisten:
-/// volle Breite, eckig, dunkel, feine Trennlinie oben.
-/// Wirkt wie eine nach oben aufgeklappte Erweiterung der Bottombar.
-/// </summary>
 [ContentProperty(nameof(SheetContent))]
 public partial class BottomSheet : ContentView
 {
-    #region Bindable Properties
-
     public static readonly BindableProperty SheetContentProperty = BindableProperty.Create(
         nameof(SheetContent), typeof(View), typeof(BottomSheet),
         propertyChanged: (b, _, n) => ((BottomSheet)b)._scroll.Content = (View)n);
@@ -44,26 +37,20 @@ public partial class BottomSheet : ContentView
         set => SetValue(TitleProperty, value);
     }
 
-    /// <summary>Hintergrund – gleiche Farbe wie die Bottombar verwenden.</summary>
     public Color SheetColor
     {
         get => (Color)GetValue(SheetColorProperty);
         set => SetValue(SheetColorProperty, value);
     }
 
-    /// <summary>Farbe der Trennlinie oben (wie zwischen den Leisten).</summary>
     public Color DividerColor
     {
         get => (Color)GetValue(DividerColorProperty);
         set => SetValue(DividerColorProperty, value);
     }
 
-    #endregion
-
-    /// <summary>Maximale Höhe relativ zur Höhe des Elternelements.</summary>
     public double MaxHeightRatio { get; set; } = 0.6;
 
-    /// <summary>Breite des Inhalts auf grossen Bildschirmen (Hintergrund bleibt volle Breite).</summary>
     public double MaxContentWidth { get; set; } = 640;
 
     public bool IsOpen { get; private set; }
@@ -77,7 +64,6 @@ public partial class BottomSheet : ContentView
     private VisualElement _parent;
     private double _dragY;
 
-    // Kurzer Weg + Einblenden: das Sheet gleitet nicht über die Leisten
     private const double SlideDistance = 48;
 
     public BottomSheet()
@@ -151,8 +137,6 @@ public partial class BottomSheet : ContentView
 
     private readonly Grid _content;
 
-    #region Öffnen / Schliessen
-
     public async Task OpenAsync()
     {
         if (IsOpen) return;
@@ -211,10 +195,6 @@ public partial class BottomSheet : ContentView
         }
     }
 
-    #endregion
-
-    #region Grösse
-
     protected override void OnParentSet()
     {
         base.OnParentSet();
@@ -240,6 +220,4 @@ public partial class BottomSheet : ContentView
             ? LayoutOptions.Center
             : LayoutOptions.Fill;
     }
-
-    #endregion
 }
