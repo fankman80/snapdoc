@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             x:Class="SnapDoc.Controls.PenEditorView"
+             x:DataType="controls:PenEditorView">
+
+    <ContentView.Resources>
+        <Style x:Key="SectionLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+        </Style>
+    </ContentView.Resources>
+
+    <VerticalStackLayout Spacing="10">
+
+        <!-- Stiftfarbe -->
+        <controls:ColorSwatchBar SelectedColor="{Binding LineColor}" DefaultAlpha="1" />
+
+        <!-- Strichbreite -->
+        <Label Text="{x:Static res:AppResources.linienbreite}" Style="{StaticResource SectionLabel}" />
+        <controls:WrapLayout x:Name="WidthPresets" Spacing="8" RowSpacing="8" />
+
+        <!-- Linienart -->
+        <Label Text="Linienart" Style="{StaticResource SectionLabel}" />
+        <controls:WrapLayout x:Name="PatternPresets" Spacing="8" RowSpacing="8" />
+        <controls:BorderedEntry Text="{Binding StrokeStyle}"
+                                TextColor="White"
+                                FontSize="{StaticResource AppFontSizeNormal}"
+                                Placeholder="Eigenes Muster, z. B. 12 4 2 4"
+                                TextChanged="OnStrokeTextChanged" />
+    </VerticalStackLayout>
+</ContentView>

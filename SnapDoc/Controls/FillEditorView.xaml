@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:local="clr-namespace:SnapDoc"
+             x:Class="SnapDoc.Controls.FillEditorView"
+             x:DataType="controls:FillEditorView">
+
+    <VerticalStackLayout Spacing="10">
+
+        <!-- Füllfarbe inkl. "keine Füllung" -->
+        <controls:ColorSwatchBar SelectedColor="{Binding FillColor}"
+                                 ShowNoneSwatch="True"
+                                 DefaultAlpha="0.5" />
+
+        <!-- Deckkraft -->
+        <controls:RangeSlider LabelText="Deckkraft"
+                              IsRealtime="True" IsRange="False"
+                              Minimum="0" Maximum="100" Step="5"
+                              ValueFontSize="12" TextColor="White"
+                              MinimumValueDisplayFormat="{}{0} %"
+                              LowerValue="{Binding FillOpacity}"
+                              MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                              MaximumTrackColor="Gray" />
+
+        <!-- Schraffur -->
+        <controls:Switch LabelText="{x:Static res:AppResources.hatchFill}"
+                         TextColor="White"
+                         IsToggled="{Binding IsHatchEffect}"
+                         HorizontalOptions="Start"
+                         BorderColorOff="Transparent"
+                         KnobColorOn="White"
+                         KnobColorOff="White"
+                         SwitchColorOn="{DynamicResource PrimaryDark}"
+                         SwitchColorOff="Gray" />
+
+        <VerticalStackLayout IsVisible="{Binding IsHatchEffect}" Spacing="4">
+            <Grid ColumnDefinitions="*,Auto">
+                <controls:RangeSlider Grid.Column="0"
+                                      LabelText="{x:Static res:AppResources.hatchAngle}"
+                                      IsRealtime="True" IsRange="False"
+                                      Minimum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?-90:0'}"
+                                      Maximum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?0:90'}"
+                                      Step="1"
+                                      ValueFontSize="12" TextColor="White"
+                                      MinimumValueDisplayFormat="{}{0}°"
+                                      LowerValue="{Binding HatchRotation}"
+                                      MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                                      MaximumTrackColor="Gray" />
+                <Button Grid.Column="1"
+                        Padding="0"
+                        VerticalOptions="End"
+                        BackgroundColor="Transparent"
+                        ToolTipProperties.Text="{x:Static res:AppResources.schraffur_spiegeln}"
+                        Clicked="FlipRotationAngleClick">
+                    <Button.ImageSource>
+                        <FontImageSource FontFamily="MaterialOutlined"
+                                         Color="{DynamicResource PrimaryDarkAccent}"
+                                         Glyph="{x:Static local:MaterialIcons.Flip}" />
+                    </Button.ImageSource>
+                </Button>
+            </Grid>
+            <controls:RangeSlider LabelText="{x:Static res:AppResources.HatchLineWidth}"
+                                  IsRealtime="True" IsRange="False"
+                                  Minimum="0" Maximum="20" Step="1"
+                                  ValueFontSize="12" TextColor="White"
+                                  MinimumValueDisplayFormat="{}{0} px"
+                                  LowerValue="{Binding HatchStrokeWitdh}"
+                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                                  MaximumTrackColor="Gray" />
+            <controls:RangeSlider LabelText="{x:Static res:AppResources.HatchSpacing}"
+                                  IsRealtime="True" IsRange="False"
+                                  Minimum="0" Maximum="20" Step="1"
+                                  ValueFontSize="12" TextColor="White"
+                                  MinimumValueDisplayFormat="{}{0} px"
+                                  LowerValue="{Binding HatchStrokeSpace}"
+                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                                  MaximumTrackColor="Gray" />
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentView>

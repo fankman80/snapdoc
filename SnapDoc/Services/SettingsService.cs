@@ -41,6 +41,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#00b0ca",
             ["PrimaryDarkAccent"] = "#00b0ca",
             ["Secondary"] = "#00b0ca",
+            ["PrimaryAlpha"] = "#3300b0ca",
         },
         ["Flower"] = new()
         {
@@ -48,6 +49,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#c37de8",
             ["PrimaryDarkAccent"] = "#c37de8",
             ["Secondary"] = "#9f4bcc",
+            ["PrimaryAlpha"] = "#339f4bcc",
         },
         ["Wine"] = new()
         {
@@ -55,6 +57,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#b8705c",
             ["PrimaryDarkAccent"] = "#b8705c",
             ["Secondary"] = "#9c4e38",
+            ["PrimaryAlpha"] = "#339c4e38",
         },
         ["Grass"] = new()
         {
@@ -62,6 +65,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#52c771",
             ["PrimaryDarkAccent"] = "#52c771",
             ["Secondary"] = "#32a852",
+            ["PrimaryAlpha"] = "#3332a852",
         },
         ["Fire"] = new()
         {
@@ -69,6 +73,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#ed9f64",
             ["PrimaryDarkAccent"] = "#ed9f64",
             ["Secondary"] = "#e07a2d",
+            ["PrimaryAlpha"] = "#33e07a2d",
         },
         ["Pink"] = new()
         {
@@ -76,6 +81,7 @@ public partial class SettingsService : ObservableObject
             ["PrimaryDark"] = "#f763e6",
             ["PrimaryDarkAccent"] = "#f763e6",
             ["Secondary"] = "#fc03df",
+            ["PrimaryAlpha"] = "#33fc03df",
         }
     };
 

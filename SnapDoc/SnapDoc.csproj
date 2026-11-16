@@ -210,6 +210,12 @@
 		<MauiXaml Update="Controls\CalendarView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Controls\FillEditorView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
+		<MauiXaml Update="Controls\PenEditorView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Resources\Styles\RadioButtonStyles.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
@@ -234,6 +240,9 @@
 		<MauiXaml Update="Views\PopupTextEdit.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupStyleEditor.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupPinView.xaml" Generator="MSBuild:Compile" />
+		<MauiXaml Update="Controls\TextEditView.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 	</ItemGroup>
 
 	<PropertyGroup>

@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             xmlns:local="clr-namespace:SnapDoc"
+             x:Class="SnapDoc.Controls.TextEditView">
+
+    <!-- Editor-Farben: immer dunkel, passend zu den Bearbeitungsleisten -->
+    <ContentView.Resources>
+        <Color x:Key="EdText">#E6E6E6</Color>
+        <Color x:Key="EdTrack">#555555</Color>
+        <Color x:Key="EdDivider">#444444</Color>
+        <Color x:Key="EdActiveBg">#1F4A52</Color>
+
+        <!-- Wie die Werkzeug-Buttons der Bottombar: aktiv = dunkles Türkis + Rahmen -->
+        <Style x:Key="FormatButton" TargetType="Button">
+            <Setter Property="WidthRequest" Value="44" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="BorderWidth" Value="1" />
+            <Setter Property="BorderColor" Value="Transparent" />
+            <Setter Property="Shadow" Value="{x:Null}" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+    </ContentView.Resources>
+
+    <VerticalStackLayout x:Name="Root" x:DataType="controls:TextEditView" Spacing="10">
+
+        <controls:BorderedEditor x:Name="TextInput"
+                                 TextColor="White"
+                                 Text="{Binding InputTxt}"
+                                 Placeholder="{x:Static res:AppResources.text_eingeben}" />
+
+        <!-- Ausrichtung | Fett/Kursiv -->
+        <HorizontalStackLayout Spacing="4">
+            <Button Style="{StaticResource FormatButton}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Left}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined" Color="{StaticResource EdText}"
+                                     Glyph="{x:Static local:MaterialIcons.Format_align_left}" />
+                </Button.ImageSource>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FontAlignment}"
+                                 Value="{x:Static local:RectangleTextAlignment.Left}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource EdActiveBg}" />
+                        <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Style="{StaticResource FormatButton}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Center}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined" Color="{StaticResource EdText}"
+                                     Glyph="{x:Static local:MaterialIcons.Format_align_center}" />
+                </Button.ImageSource>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FontAlignment}"
+                                 Value="{x:Static local:RectangleTextAlignment.Center}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource EdActiveBg}" />
+                        <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Style="{StaticResource FormatButton}"
+                    Command="{Binding SetAlignmentCommand}"
+                    CommandParameter="{x:Static local:RectangleTextAlignment.Right}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined" Color="{StaticResource EdText}"
+                                     Glyph="{x:Static local:MaterialIcons.Format_align_right}" />
+                </Button.ImageSource>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding FontAlignment}"
+                                 Value="{x:Static local:RectangleTextAlignment.Right}">
+                        <Setter Property="BackgroundColor" Value="{StaticResource EdActiveBg}" />
+                        <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+
+            <BoxView WidthRequest="1" HeightRequest="24" Margin="8,0"
+                     VerticalOptions="Center" Color="{StaticResource EdDivider}" />
+
+            <Button Style="{StaticResource FormatButton}"
+                    Command="{Binding ToggleTextStyleCommand}"
+                    CommandParameter="{x:Static local:RectangleTextStyle.Bold}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined" Color="{StaticResource EdText}"
+                                     Glyph="{x:Static local:MaterialIcons.Format_bold}" />
+                </Button.ImageSource>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsBold}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource EdActiveBg}" />
+                        <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+            <Button Style="{StaticResource FormatButton}"
+                    Command="{Binding ToggleTextStyleCommand}"
+                    CommandParameter="{x:Static local:RectangleTextStyle.Italic}">
+                <Button.ImageSource>
+                    <FontImageSource FontFamily="MaterialOutlined" Color="{StaticResource EdText}"
+                                     Glyph="{x:Static local:MaterialIcons.Format_italic}" />
+                </Button.ImageSource>
+                <Button.Triggers>
+                    <DataTrigger TargetType="Button" Binding="{Binding IsItalic}" Value="True">
+                        <Setter Property="BackgroundColor" Value="{StaticResource EdActiveBg}" />
+                        <Setter Property="BorderColor" Value="{DynamicResource Primary}" />
+                    </DataTrigger>
+                </Button.Triggers>
+            </Button>
+        </HorizontalStackLayout>
+
+        <controls:Switch LabelText="{x:Static res:AppResources.automatische_schriftgroesse}"
+                         TextColor="{StaticResource EdText}"
+                         HeightRequest="40"
+                         IsToggled="{Binding AutoSize}"
+                         HorizontalOptions="Start" VerticalOptions="Center"
+                         BorderColorOff="Transparent"
+                         KnobColorOn="White" KnobColorOff="White"
+                         SwitchColorOn="{DynamicResource Primary}"
+                         SwitchColorOff="{StaticResource EdTrack}" />
+
+        <controls:RangeSlider
+            IsVisible="{Binding AutoSize}"
+            LabelText="{x:Static res:AppResources.randabstand}"
+            IsRealtime="True" IsRange="False"
+            Minimum="0" Maximum="100" Step="1" ValueFontSize="12"
+            TextColor="{StaticResource EdText}"
+            MinimumValueDisplayFormat="{}{0} %"
+            LowerValue="{Binding TextPadding}"
+            MinimumTrackColor="{DynamicResource Primary}"
+            MaximumTrackColor="{StaticResource EdTrack}" />
+
+        <controls:RangeSlider
+            IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}"
+            LabelText="{x:Static res:AppResources.schriftgroesse}"
+            IsRealtime="True" IsRange="False"
+            Minimum="6" Maximum="180" Step="1" ValueFontSize="12"
+            TextColor="{StaticResource EdText}"
+            MinimumValueDisplayFormat="{}{0} pt"
+            LowerValue="{Binding FontSize}"
+            MinimumTrackColor="{DynamicResource Primary}"
+            MaximumTrackColor="{StaticResource EdTrack}" />
+    </VerticalStackLayout>
+</ContentView>

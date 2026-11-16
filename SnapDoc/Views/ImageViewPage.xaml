@@ -1,68 +1,151 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<ContentPage xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:skia="clr-namespace:SkiaSharp.Views.Maui.Controls;assembly=SkiaSharp.Views.Maui.Controls"
              xmlns:pc="clr-namespace:SnapDoc.ViewModels"
-             xmlns:views="clr-namespace:SnapDoc.Views" 
+             xmlns:views="clr-namespace:SnapDoc.Views"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
-			 BackgroundColor="DimGrey"
-             Shell.TitleColor="{DynamicResource PrimaryDark}"
+             BackgroundColor="DimGrey"
+             Shell.TitleColor="{DynamicResource Primary}"
              Shell.BackgroundColor="{DynamicResource SecondaryBackgroundDark}"
-			 x:Class="SnapDoc.Views.ImageViewPage"
+             x:Class="SnapDoc.Views.ImageViewPage"
+             x:DataType="views:ImageViewPage"
              x:Name="ThisPage">
 
+    <ContentPage.Resources>
+        <!-- Werkzeug in der unteren Leiste -->
+        <Style x:Key="ToolItem" TargetType="Border">
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="MinimumWidthRequest" Value="64" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="Stroke" Value="Transparent" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 14" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+        <Style x:Key="ToolIcon" TargetType="Label">
+            <Setter Property="FontFamily" Value="MaterialOutlined" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="ToolText" TargetType="Label">
+            <Setter Property="FontSize" Value="11" />
+            <Setter Property="TextColor" Value="#DDDDDD" />
+            <Setter Property="HorizontalOptions" Value="Center" />
+        </Style>
+        <!-- Chip in der Optionsleiste -->
+        <Style x:Key="OptionChip" TargetType="Border">
+            <Setter Property="Padding" Value="12,6" />
+            <Setter Property="HeightRequest" Value="36" />
+            <Setter Property="StrokeThickness" Value="1" />
+            <Setter Property="Stroke" Value="#55FFFFFF" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 18" />
+            <Setter Property="BackgroundColor" Value="Transparent" />
+        </Style>
+        <Style x:Key="ChipIcon" TargetType="Label">
+            <Setter Property="FontFamily" Value="MaterialOutlined" />
+            <Setter Property="FontSize" Value="18" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="ChipText" TargetType="Label">
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <Style x:Key="ChipColorDot" TargetType="Border">
+            <Setter Property="WidthRequest" Value="18" />
+            <Setter Property="HeightRequest" Value="18" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="Stroke" Value="White" />
+            <Setter Property="StrokeShape" Value="RoundRectangle 9" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+        <!-- Seitwärts scrollbare Leiste (auf Windows mit Scrollbalken) -->
+        <Style x:Key="BarScroll" TargetType="ScrollView">
+            <Setter Property="Orientation" Value="Horizontal" />
+            <Setter Property="HorizontalScrollBarVisibility" Value="{OnPlatform Default=Never, WinUI=Default}" />
+            <Setter Property="BackgroundColor" Value="{DynamicResource SecondaryBackgroundDark}" />
+        </Style>
+        <Style x:Key="TitleIconButton" TargetType="Button">
+            <Setter Property="FontFamily" Value="MaterialOutlined" />
+            <Setter Property="FontSize" Value="24" />
+            <Setter Property="Padding" Value="0" />
+            <Setter Property="TextColor" Value="{DynamicResource Primary}" />
+            <Setter Property="Background" Value="Transparent" />
+            <Setter Property="VerticalOptions" Value="Center" />
+        </Style>
+    </ContentPage.Resources>
+
+    <!-- ===================== TITLE BAR ===================== -->
     <Shell.TitleView>
-        <Grid ColumnDefinitions="*,Auto,Auto,Auto"
-              x:DataType="views:ImageViewPage"
-              ColumnSpacing="0"
-              VerticalOptions="Center">
-            <Label Grid.Column="0"
-                   Text="{Binding Title, Source={x:Reference ThisPage}}"
-                   TextColor="{DynamicResource PrimaryDark}"
-                   Background="Transparent"
-                   BackgroundColor="Transparent"
-                   FontSize="18"
-                   VerticalOptions="Center"
-                   HorizontalOptions="Start"/>
-            <Button Grid.Column="1"
-                    IsVisible="{Binding IsGotoPinBtnVisible}"
-                    Text="{x:Static local:MaterialIcons.Keep}"
-                    Rotation="38"
-                    FontSize="24"
-                    Padding="0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"
-                    Clicked="OnEditClicked"/>
-            <Button Grid.Column="2"
-                    Text="{x:Static local:MaterialIcons.Fit_screen}"
-                    FontSize="24"
-                    Padding="0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.foto_auf_fenstergroesse_zoomen}"
-                    Clicked="ImageFit"/>
-            <Button Grid.Column="3"
-                    Text="{x:Static local:MaterialIcons.Delete}"
-                    FontSize="24"
-                    Padding="0"
-                    TextColor="{DynamicResource PrimaryDark}"
-                    Background="Transparent"
-                    FontFamily="MaterialOutlined"
-                    VerticalOptions="Center"
-                    HorizontalOptions="End"
-                    ToolTipProperties.Text="{x:Static res:AppResources.foto_loeschen}"
-                    Clicked="OnDeleteButtonClicked"/>
+        <Grid>
+            <!-- Ansichtsmodus -->
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto"
+                  IsVisible="{Binding IsViewMode}"
+                  VerticalOptions="Center">
+                <Label Grid.Column="0"
+                       Text="{Binding Title, Source={x:Reference ThisPage}}"
+                       TextColor="{DynamicResource Primary}"
+                       FontSize="18"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="1"
+                        IsVisible="{Binding IsGotoPinBtnVisible}"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Keep}"
+                        Rotation="38"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"
+                        Clicked="OnEditClicked" />
+                <Button Grid.Column="2"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Fit_screen}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.foto_auf_fenstergroesse_zoomen}"
+                        Clicked="ImageFit" />
+                <Button Grid.Column="3"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Delete}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.foto_loeschen}"
+                        Clicked="OnDeleteButtonClicked" />
+            </Grid>
+
+            <!-- Bearbeitungsmodus: ✕ | Titel | Zurücksetzen | ✓ -->
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                  ColumnSpacing="8"
+                  IsVisible="{Binding IsEditMode}"
+                  VerticalOptions="Center">
+                <Button Grid.Column="0"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Close}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.abbrechen}"
+                        Clicked="CancelClicked" />
+                <Label Grid.Column="1"
+                       Text="{Binding Title, Source={x:Reference ThisPage}}"
+                       TextColor="{DynamicResource Primary}"
+                       FontSize="18"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="2"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Ink_eraser}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
+                        Clicked="EraseClicked" />
+                <Button Grid.Column="3"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Check}"
+                        FontSize="28"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
+                        Clicked="CheckClicked" />
+            </Grid>
         </Grid>
     </Shell.TitleView>
 
-    <Grid>
-        <AbsoluteLayout x:Name="GestureContainer"
+    <!-- ===================== CONTENT ===================== -->
+    <Grid RowDefinitions="*,Auto,Auto" RowSpacing="0">
+
+        <!-- Bild + Zeichenfläche -->
+        <AbsoluteLayout Grid.Row="0"
+                        x:Name="GestureContainer"
                         x:DataType="pc:TransformViewModel"
                         IsClippedToBounds="True">
             <AbsoluteLayout.GestureRecognizers>
@@ -70,7 +153,6 @@
                 <PinchGestureRecognizer PinchUpdated="OnPinchUpdated" />
                 <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnDoubleTapped" />
             </AbsoluteLayout.GestureRecognizers>
-
             <Grid x:Name="ImageDrawingCanvas"
                   AbsoluteLayout.LayoutBounds="0,0,-1,-1"
                   AbsoluteLayout.LayoutFlags="None"
@@ -79,37 +161,32 @@
                   TranslationY="{Binding TranslationY}"
                   AnchorX="{Binding AnchorX}"
                   AnchorY="{Binding AnchorY}">
-
-                <Image x:Name="FotoContainer"
-                       InputTransparent="True"/>
-
+                <Image x:Name="FotoContainer" InputTransparent="True" />
                 <skia:SKCanvasView x:Name="DrawingView"
                                    IsVisible="False"
                                    IgnorePixelScaling="False"
                                    EnableTouchEvents="True"
                                    BackgroundColor="Transparent"
                                    PaintSurface="OnDrawingPaintSurface"
-                                   Touch="OnDrawingTouch"/>
+                                   Touch="OnDrawingTouch" />
             </Grid>
         </AbsoluteLayout>
 
-        <!-- Pfeil links (Vorheriges Bild) -->
-        <Button x:Name="PrevImgBtn"  
-                BackgroundColor="#66000000"                
+        <!-- Vorheriges Bild -->
+        <Button Grid.Row="0"
+                x:Name="PrevImgBtn"
+                BackgroundColor="#66000000"
                 CornerRadius="0"
                 WidthRequest="50"
                 HeightRequest="120"
                 Opacity="0.75"
                 Padding="0"
-                Margin="0"
                 HorizontalOptions="Start"
                 VerticalOptions="Center"
                 ZIndex="10000"
                 Clicked="OnPreviousImageClicked">
             <Button.ImageSource>
-                <FontImageSource FontFamily="MaterialOutlined"
-                                 Color="White"
-                                 Size="66"
+                <FontImageSource FontFamily="MaterialOutlined" Color="White" Size="66"
                                  Glyph="{x:Static local:MaterialIcons.Navigate_before}" />
             </Button.ImageSource>
             <Button.Clip>
@@ -117,111 +194,285 @@
             </Button.Clip>
         </Button>
 
-        <!-- Pfeil rechts (Naechstes Bild) -->
-        <Button x:Name="NextImgBtn"   
+        <!-- Nächstes Bild -->
+        <Button Grid.Row="0"
+                x:Name="NextImgBtn"
                 BackgroundColor="#66000000"
                 CornerRadius="0"
                 WidthRequest="50"
                 HeightRequest="120"
                 Opacity="0.75"
                 Padding="0"
-                Margin="0"
                 HorizontalOptions="End"
                 VerticalOptions="Center"
                 ZIndex="10000"
                 Clicked="OnNextImageClicked">
             <Button.ImageSource>
-                <FontImageSource FontFamily="MaterialOutlined"
-                                 Color="White"
-                                 Size="66"
+                <FontImageSource FontFamily="MaterialOutlined" Color="White" Size="66"
                                  Glyph="{x:Static local:MaterialIcons.Navigate_next}" />
             </Button.ImageSource>
             <Button.Clip>
                 <RoundRectangleGeometry CornerRadius="24,0,24,0" Rect="0,0,50,120" />
             </Button.Clip>
         </Button>
-        
-        <Button x:Name="DrawBtn"
+
+        <!-- FAB: Bearbeiten starten -->
+        <Button Grid.Row="0"
+                x:Name="DrawBtn"
                 Text="{x:Static local:MaterialIcons.Draw}"
-                Margin="16,0,0,16"
+                Margin="0,0,16,16"
                 ZIndex="10000"
                 VerticalOptions="End"
-                HorizontalOptions="Start"
+                HorizontalOptions="End"
                 Style="{StaticResource ToolButtonStyleShadow}"
                 ToolTipProperties.Text="{x:Static res:AppResources.formen_zeichnen}"
-                Clicked="DrawingClicked"/>
+                Clicked="DrawingClicked" />
 
-        <VerticalStackLayout x:DataType="views:ImageViewPage"
-                             IsVisible="{Binding IsToolButtonsVisible}"
-                             Spacing="16"
-                             Margin="16"
-                             HorizontalOptions="Start"
-                             VerticalOptions="End"
-                             ZIndex="10000">
-            <Button Text="{x:Static local:MaterialIcons.Ink_eraser}" 
-                    Style="{StaticResource ToolButtonStyleShadow}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_loeschen}"
-                    Clicked="EraseClicked"/>
-            <AbsoluteLayout>
-                <Button Text="{x:Static local:MaterialIcons.Palette}"
-                        Style="{StaticResource ToolButtonStyleShadow}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}"
-                        Clicked="PenSettingsClicked"/>
-                <Border WidthRequest="18"
-                        HeightRequest="18"
-                        BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
-                        StrokeThickness="0"
-                        AbsoluteLayout.LayoutBounds="0, 0, AutoSize, AutoSize"
-                        AbsoluteLayout.LayoutFlags="PositionProportional">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="11"/>
-                    </Border.StrokeShape>
-                    <Border.Shadow>
-                        <Shadow Brush="Black" 
-                                Opacity="0.3" 
-                                Offset="3,3" 
-                                Radius="3"/>
-                    </Border.Shadow>
-                </Border>
-                <Border WidthRequest="18"
-                        HeightRequest="18"
-                        BackgroundColor="{Binding Source={x:Reference Name=ThisPage}, Path=SelectedFillColor, Converter={StaticResource ColorWithoutAlphaConverter}}"                              
-                        StrokeThickness="0"
-                        AbsoluteLayout.LayoutBounds="0, 1, AutoSize, AutoSize"
-                        AbsoluteLayout.LayoutFlags="PositionProportional">
-                    <Border.StrokeShape>
-                        <RoundRectangle CornerRadius="11"/>
-                    </Border.StrokeShape>
-                    <Border.Shadow>
-                        <Shadow Brush="Black" 
-                                Opacity="0.3" 
-                                Offset="3,3" 
-                                Radius="3"/>
-                    </Border.Shadow>
-                </Border>
-            </AbsoluteLayout>
-            <Button x:Name="AddTextBtn"
-                    IsVisible="False"
-                    Text="{x:Static local:MaterialIcons.Text_fields}"
-                    Style="{StaticResource ToolButtonStyleShadow}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
-                    Clicked="TextClicked"/>
-            <Button x:Name="AddCloudyBtn"
-                    IsVisible="False"
-                    Text="{x:Static local:MaterialIcons.Cloud_off}" 
-                    Style="{StaticResource ToolButtonStyleShadow}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}"
-                    Clicked="CloudyClicked"/>
-            <Button x:Name="ShapeBtn"
-                    Text="{x:Static local:MaterialIcons.Activity_zone}"                  
-                    Style="{StaticResource ToolButtonStyleShadow}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.form_waehlen}"
-                    Clicked="ShapeButtonClicked"/>
-            <Button Text="{x:Static local:MaterialIcons.Check}"  
-                    BackgroundColor="LimeGreen"
-                    Style="{StaticResource ToolButtonStyleShadow}"
-                    ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
-                    Clicked="CheckClicked"/>
-        </VerticalStackLayout>
+        <!-- ============ OPTIONSLEISTE ============ -->
+        <!-- Host-Grid: zentriert, solange alles Platz hat, sonst seitwärts scrollbar -->
+        <ScrollView Grid.Row="1"
+                    x:Name="OptionBarScroll"
+                    Style="{StaticResource BarScroll}"
+                    IsVisible="{Binding IsEditMode}">
+            <Grid x:Name="OptionBarHost">
+                <HorizontalStackLayout Spacing="8" Padding="12,8" HorizontalOptions="Center">
+
+                    <!-- Stift: Farbe, Strichbreite, Linienart -->
+                    <Border Style="{StaticResource OptionChip}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.farbe_und_stiftbreite_waehlen}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveSheet}" Value="Pen">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="PenClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Edit}" />
+                            <Border Style="{StaticResource ChipColorDot}"
+                                    BackgroundColor="{Binding SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}" />
+                            <Label Style="{StaticResource ChipText}" Text="Stift" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Füllung: Füllfarbe, Deckkraft, Schraffur -->
+                    <Border Style="{StaticResource OptionChip}"
+                            IsVisible="{Binding IsFillOptionVisible}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveSheet}" Value="Fill">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="FillClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Format_color_fill}" />
+                            <Border Style="{StaticResource ChipColorDot}"
+                                    BackgroundColor="{Binding SelectedFillColor}" />
+                            <Label Style="{StaticResource ChipText}" Text="Füllung" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Text im Rechteck/Kreis -->
+                    <Border Style="{StaticResource OptionChip}"
+                            IsVisible="{Binding IsTextOptionVisible}"
+                            ToolTipProperties.Text="{x:Static res:AppResources.textfeld_bearbeiten}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveSheet}" Value="Text">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="TextClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Text_fields}" />
+                            <Label Style="{StaticResource ChipText}" Text="Text" />
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Wolke: öffnet das Wolken-Sheet. Füllung = Wolke aktiv, Rand = Sheet offen -->
+                    <Border Style="{StaticResource OptionChip}"
+                            IsVisible="{Binding IsCloudOptionVisible}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding IsCloudActive}" Value="True">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                            </DataTrigger>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveSheet}" Value="Cloud">
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="CloudClicked" />
+                        </Border.GestureRecognizers>
+                        <HorizontalStackLayout Spacing="6">
+                            <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Cloud_off}">
+                                <Label.Triggers>
+                                    <DataTrigger TargetType="Label" Binding="{Binding IsCloudActive}" Value="True">
+                                        <Setter Property="Text" Value="{x:Static local:MaterialIcons.Cloud}" />
+                                    </DataTrigger>
+                                </Label.Triggers>
+                            </Label>
+                            <Label Style="{StaticResource ChipText}" Text="Wolke" />
+                        </HorizontalStackLayout>
+                    </Border>
+                </HorizontalStackLayout>
+            </Grid>
+        </ScrollView>
+
+        <!-- ============ WERKZEUGLEISTE ============ -->
+        <ScrollView Grid.Row="2"
+                    x:Name="ToolBarScroll"
+                    Style="{StaticResource BarScroll}"
+                    IsVisible="{Binding IsEditMode}">
+            <Grid x:Name="ToolBarHost">
+                <HorizontalStackLayout Spacing="4" Padding="8,4,8,8" HorizontalOptions="Center">
+
+                    <!-- Rechteck -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveTool}" Value="Rect">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectToolCommand}" CommandParameter="Rect" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Rectangle}" />
+                            <Label Style="{StaticResource ToolText}" Text="Rechteck" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Kreis -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveTool}" Value="Oval">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectToolCommand}" CommandParameter="Oval" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Circle}" />
+                            <Label Style="{StaticResource ToolText}" Text="Kreis" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Polygon -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveTool}" Value="Poly">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectToolCommand}" CommandParameter="Poly" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Polyline}" />
+                            <Label Style="{StaticResource ToolText}" Text="Polygon" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Pfeil -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveTool}" Value="Arrow">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectToolCommand}" CommandParameter="Arrow" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Rotation="90" Text="{x:Static local:MaterialIcons.Arrow_shape_up}" />
+                            <Label Style="{StaticResource ToolText}" Text="Pfeil" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <!-- Freihand -->
+                    <Border Style="{StaticResource ToolItem}">
+                        <Border.Triggers>
+                            <DataTrigger TargetType="Border" Binding="{Binding ActiveTool}" Value="Free">
+                                <Setter Property="BackgroundColor" Value="{DynamicResource PrimaryAlpha}" />
+                                <Setter Property="Stroke" Value="{DynamicResource Primary}" />
+                            </DataTrigger>
+                        </Border.Triggers>
+                        <Border.GestureRecognizers>
+                            <TapGestureRecognizer Command="{Binding SelectToolCommand}" CommandParameter="Free" />
+                        </Border.GestureRecognizers>
+                        <VerticalStackLayout Spacing="2">
+                            <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Gesture}" />
+                            <Label Style="{StaticResource ToolText}" Text="Freihand" />
+                        </VerticalStackLayout>
+                    </Border>
+                </HorizontalStackLayout>
+            </Grid>
+        </ScrollView>
+
+        <!-- ============ BOTTOM SHEETS ============ -->
+        <controls:BottomSheet x:Name="PenSheet" Grid.Row="0" Title="STIFT"
+                              SheetColor="{DynamicResource SecondaryBackgroundDark}">
+            <controls:PenEditorView x:Name="PenEditor" StyleChanged="OnPenChanged" />
+        </controls:BottomSheet>
+
+        <controls:BottomSheet x:Name="FillSheet" Grid.Row="0" Title="FÜLLUNG"
+                              SheetColor="{DynamicResource SecondaryBackgroundDark}">
+            <controls:FillEditorView x:Name="FillEditor" StyleChanged="OnFillChanged" />
+        </controls:BottomSheet>
+
+        <controls:BottomSheet x:Name="CloudSheet" Grid.Row="0" Title="WOLKE"
+                              SheetColor="{DynamicResource SecondaryBackgroundDark}">
+            <VerticalStackLayout Spacing="10">
+                <controls:Switch LabelText="Wolkenkontur"
+                                 TextColor="White"
+                                 IsToggled="{Binding IsCloudActive}"
+                                 HorizontalOptions="Start"
+                                 BorderColorOff="Transparent"
+                                 KnobColorOn="White"
+                                 KnobColorOff="White"
+                                 SwitchColorOn="{DynamicResource Primary}"
+                                 SwitchColorOff="Gray" />
+                <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_radius}"
+                                      IsEnabled="{Binding IsCloudActive}"
+                                      IsRealtime="True" IsRange="False"
+                                      Minimum="1" Maximum="100" Step="1"
+                                      ValueFontSize="12" TextColor="White"
+                                      MinimumValueDisplayFormat="{}{0} px"
+                                      LowerValue="{Binding CloudRadius}"
+                                      MinimumTrackColor="{DynamicResource PrimaryAccent}"
+                                      MaximumTrackColor="Gray" />
+                <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_ueberschneidung}"
+                                      IsEnabled="{Binding IsCloudActive}"
+                                      IsRealtime="True" IsRange="False"
+                                      Minimum="0" Maximum="60" Step="1"
+                                      ValueFontSize="12" TextColor="White"
+                                      MinimumValueDisplayFormat="{}{0}°"
+                                      LowerValue="{Binding CloudInciseDeg}"
+                                      MinimumTrackColor="{DynamicResource PrimaryAccent}"
+                                      MaximumTrackColor="Gray" />
+            </VerticalStackLayout>
+        </controls:BottomSheet>
+
+        <controls:BottomSheet x:Name="TextSheet" Grid.Row="0" Title="TEXT"
+                              SheetColor="{DynamicResource SecondaryBackgroundDark}">
+            <VerticalStackLayout Spacing="10">
+                <controls:ColorSwatchBar SelectedColor="{Binding SelectedTextColor}"
+                                         DefaultAlpha="1"
+                                         ColorChanged="OnTextColorChanged" />
+                <controls:TextEditView x:Name="TextEditor" TextChanged="OnTextEditChanged" />
+            </VerticalStackLayout>
+        </controls:BottomSheet>
     </Grid>
 </ContentPage>
