@@ -239,7 +239,7 @@ public partial class LoadPDFPages : ContentPage
     private void OnCancelClicked(object sender, EventArgs e)
     {
         ClearCache();
-        Shell.Current.GoToAsync("..");
+        await Shell.Current.GoToAsync("..");
     }
 
     private void OnPagesAddClicked(object sender, EventArgs e) => AddPdfImages();
@@ -261,7 +261,7 @@ public partial class LoadPDFPages : ContentPage
                 ProjectItem.Current.ApplyFilterAndSorting();
 
             await BusyService.HideAsync();
-            await Shell.Current.GoToAsync("project_details");
+            await Shell.Current.GoToAsync("project_details?backToHome=true");
         }
         catch (Exception ex)
         {
