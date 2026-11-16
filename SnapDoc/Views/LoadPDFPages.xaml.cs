@@ -236,7 +236,7 @@ public partial class LoadPDFPages : ContentPage
         return null;
     }
 
-    private void OnCancelClicked(object sender, EventArgs e)
+    private async void OnCancelClicked(object sender, EventArgs e)
     {
         ClearCache();
         await Shell.Current.GoToAsync("..");
