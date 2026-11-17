@@ -104,6 +104,7 @@ public class InteractivePolylineDrawable
 
         if (IsClosed)
         {
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
@@ -211,10 +212,12 @@ public class InteractivePolylineDrawable
 
         if (IsClosed)
         {
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = hatchEffect,
                 IsAntialias = true
             };
 
