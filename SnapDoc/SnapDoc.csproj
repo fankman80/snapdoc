@@ -213,6 +213,9 @@
 		<MauiXaml Update="Controls\CloudEditorView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Controls\DrawingToolbar.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Controls\FillEditorView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>

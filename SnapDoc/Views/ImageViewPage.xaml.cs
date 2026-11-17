@@ -1,10 +1,8 @@
 #nullable disable
 using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Mvvm.Input;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
-using SnapDoc.Controls;
 using SnapDoc.DrawingTool;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
@@ -19,7 +17,6 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId;
     public string PinIcon;
     public string ImgSource = null;
-
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private double minScale = 0.1;
@@ -36,38 +33,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
-    private DrawMode drawMode = DrawMode.None;
-    private bool isHatchEffect = false;
-    private float hatchStrokeWitdh = 2f;
-    private float hatchStrokeSpace = 8f;
-    private float hatchRotation = 45f;
-    private int lineWidth = 3;
-    private string strokeStyle = "";
     private bool drawingOwnsTouch;
-    private bool syncingCloud;
-    private float cloudRadius = 20;
-    private float cloudInciseDeg = 15;
-
-    private Color selectedBorderColor = new(0, 153, 0, 255);
-    public Color SelectedBorderColor
-    {
-        get => selectedBorderColor;
-        set { selectedBorderColor = value; OnPropertyChanged(); }
-    }
-
-    private Color selectedFillColor = new(202, 255, 150, 128);
-    public Color SelectedFillColor
-    {
-        get => selectedFillColor;
-        set { selectedFillColor = value; OnPropertyChanged(); }
-    }
-
-    private Color selectedTextColor = new(0, 0, 0, 255);
-    public Color SelectedTextColor
-    {
-        get => selectedTextColor;
-        set { selectedTextColor = value; OnPropertyChanged(); }
-    }
 
     private bool isGotoPinBtnVisible = false;
     public bool IsGotoPinBtnVisible
@@ -91,55 +57,6 @@ public partial class ImageViewPage : IQueryAttributable
     }
     public bool IsViewMode => !IsEditMode;
 
-    private string activeTool = "";
-    public string ActiveTool
-    {
-        get => activeTool;
-        set { if (activeTool != value) { activeTool = value; OnPropertyChanged(); } }
-    }
-
-    private string activeSheet = "";
-    public string ActiveSheet
-    {
-        get => activeSheet;
-        set { if (activeSheet != value) { activeSheet = value; OnPropertyChanged(); } }
-    }
-
-    private bool isFillOptionVisible;
-    public bool IsFillOptionVisible
-    {
-        get => isFillOptionVisible;
-        set { if (isFillOptionVisible != value) { isFillOptionVisible = value; OnPropertyChanged(); } }
-    }
-
-    private bool isTextOptionVisible;
-    public bool IsTextOptionVisible
-    {
-        get => isTextOptionVisible;
-        set { if (isTextOptionVisible != value) { isTextOptionVisible = value; OnPropertyChanged(); } }
-    }
-
-    private bool isCloudOptionVisible;
-    public bool IsCloudOptionVisible
-    {
-        get => isCloudOptionVisible;
-        set { if (isCloudOptionVisible != value) { isCloudOptionVisible = value; OnPropertyChanged(); } }
-    }
-
-    private bool isCloudActive;
-    public bool IsCloudActive
-    {
-        get => isCloudActive;
-        set
-        {
-            if (isCloudActive == value) return;
-            isCloudActive = value;
-            OnPropertyChanged();
-            if (!syncingCloud)
-                ApplyCloudToDrawable(value);
-        }
-    }
-
     public ImageViewPage()
     {
         InitializeComponent();
@@ -156,20 +73,16 @@ public partial class ImageViewPage : IQueryAttributable
         GestureContainer.SizeChanged += GestureContainer_SizeChanged;
 
         drawingController = new DrawingController(fotoContainer);
-        drawingController.Invalidated += (_, _) => { DrawingView?.InvalidateSurface(); };
+        drawingController.Invalidated += (_, _) => DrawingView?.InvalidateSurface();
 
-        // Chip-Markierung zurücksetzen, wenn ein Sheet per Wischen geschlossen wird
-        foreach (var sheet in AllSheets)
-            sheet.Closed += (_, _) => { if (!AllSheets.Any(s => s.IsOpen)) ActiveSheet = ""; };
-
-        // Leisten: zentriert, solange alles Platz hat – sonst seitwärts scrollbar
-        OptionBarScroll.SizeChanged += (_, _) => OptionBarHost.MinimumWidthRequest = OptionBarScroll.Width;
-        ToolBarScroll.SizeChanged += (_, _) => ToolBarHost.MinimumWidthRequest = ToolBarScroll.Width;
+        // Gemeinsame Zeichen-UI
+        DrawToolbar.Attach(drawingController);
+        DrawToolbar.RedrawRequested += (_, _) => DrawingView?.InvalidateSurface();
+        DrawToolbar.Erased += OnDrawingErased;
+        DrawToolbar.BarsHeightChanged += (_, h) => UpdateImageArea(h);
 
         SetupDesktopScrollWheel();
     }
-
-    private BottomSheet[] AllSheets => [PenSheet, FillSheet, CloudSheet, TextSheet];
 
     private async Task OnBackRequestedAsync()
     {
@@ -183,8 +96,7 @@ public partial class ImageViewPage : IQueryAttributable
 
     protected override bool OnBackButtonPressed()
     {
-        var open = AllSheets.FirstOrDefault(s => s.IsOpen);
-        if (open != null) { _ = open.CloseAsync(); return true; }
+        if (DrawToolbar.CloseOpenSheet()) return true;
         if (IsEditMode) { _ = CancelDrawingAsync(); return true; }
         return base.OnBackButtonPressed();
     }
@@ -197,6 +109,7 @@ public partial class ImageViewPage : IQueryAttributable
         if (query.TryGetValue("planId", out object value1)) PlanId = value1 as string;
         if (query.TryGetValue("pinId", out object value2)) PinId = value2 as string;
         if (query.TryGetValue("pinIcon", out object value3)) PinIcon = value3 as string;
+
         if (query.TryGetValue("imgSource", out object value4))
         {
             ImgSource ??= value4 as string;
@@ -220,7 +133,6 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 if (!File.Exists(imgPath) && ImgSource != "showTitle")
                     await SaveManager.DownloadMediaOnDemandAsync(ImgSource, isThumbnail: false);
-
                 if (File.Exists(imgPath))
                     await LoadImageAsync(imgPath, fit: false);
             });
@@ -258,7 +170,6 @@ public partial class ImageViewPage : IQueryAttributable
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
         if (FotoContainer.Width < 10 || FotoContainer.Height < 10) return;
-
         if (!hasFittedImage || needsImageFit)
         {
             hasFittedImage = true;
@@ -270,11 +181,14 @@ public partial class ImageViewPage : IQueryAttributable
     private void GestureContainer_SizeChanged(object sender, EventArgs e)
     {
         if (!hasFittedImage || GestureContainer.Width < 10 || GestureContainer.Height < 10) return;
-
         bool wasFitted = Math.Abs(fotoContainer.Scale - minScale) < 0.001;
         if (wasFitted)
             Dispatcher.Dispatch(() => ImageFit(null, null));
     }
+
+    /// <summary>Hält das Bild oberhalb der Leisten (früher erledigte das die Grid-Zeile).</summary>
+    private void UpdateImageArea(double barsHeight) =>
+        GestureContainer.Margin = new Thickness(0, 0, 0, IsEditMode ? barsHeight : 0);
 
     public void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
@@ -305,7 +219,6 @@ public partial class ImageViewPage : IQueryAttributable
                 fotoContainer.TranslationX += (centerX - focusX) * (scaleFactor - 1.0);
                 fotoContainer.TranslationY += (centerY - focusY) * (scaleFactor - 1.0);
                 fotoContainer.Scale = targetScale;
-
                 UpdateDrawingViewScale();
                 break;
 
@@ -323,7 +236,6 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
         if (!fotoContainer.IsPanningEnabled) return;
-
         bool isAtMinScale = fotoContainer.Scale <= minScale + 0.01;
 
         switch (e.StatusType)
@@ -409,7 +321,6 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer.TranslationX -= originX * (scaleRatio - 1);
         fotoContainer.TranslationY -= originY * (scaleRatio - 1);
         fotoContainer.Scale = targetScale;
-
         UpdateDrawingViewScale();
     }
 
@@ -424,19 +335,16 @@ public partial class ImageViewPage : IQueryAttributable
     {
         double areaW = GestureContainer.Width;
         double areaH = GestureContainer.Height;
-
         if (imgWidth <= 0 || imgHeight <= 0 || areaW <= 0 || areaH <= 0)
             return;
 
         var scale = Math.Min(areaW / imgWidth, areaH / imgHeight);
         minScale = scale;
-
         fotoContainer.AnchorX = 0.5;
         fotoContainer.AnchorY = 0.5;
         fotoContainer.Scale = scale;
         fotoContainer.TranslationX = (areaW - imgWidth) / 2;
         fotoContainer.TranslationY = (areaH - imgHeight) / 2;
-
         UpdateDrawingViewScale();
     }
 
@@ -453,7 +361,6 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 string file1 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                 if (File.Exists(file1)) File.Delete(file1);
-
                 string file2 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
                 if (File.Exists(file2)) File.Delete(file2);
 
@@ -491,12 +398,13 @@ public partial class ImageViewPage : IQueryAttributable
         await Shell.Current.GoToAsync("..");
     }
 
+    // ===================== Zeichnen =====================
+
     private async void DrawingClicked(object sender, EventArgs e) => await StartDrawing();
 
     private Task StartDrawing(bool setDefaultMode = true)
     {
         fotoContainer.IsPanningEnabled = false;
-
         if (setDefaultMode)
             drawingController.Reset();
 
@@ -505,88 +413,24 @@ public partial class ImageViewPage : IQueryAttributable
         IsEditMode = true;
         UpdateNavigationButtons();
 
-        drawingController.InitializeDrawing(
-            SelectedBorderColor.ToSKColor(),
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            lineWidth,
-            strokeStyle,
-            isHatchEffect,
-            hatchStrokeWitdh,
-            hatchStrokeSpace,
-            hatchRotation,
-            rotationAngle: 0f,
-            forceReset: setDefaultMode);
+        // Stil + Standardwerkzeug setzt jetzt die Toolbar
+        DrawToolbar.InitializeDrawing(setDefaultMode);
 
         // Fotos haben keinen realen Massstab
         drawingController.IsMeasureActive = false;
         drawingController.IsActive = true;
 
-        if (setDefaultMode)
-            SetDrawMode(DrawMode.Rect);
-
         UpdateDrawingViewScale();
         DrawingView.IsVisible = true;
         DrawingView.InvalidateSurface();
 
+        Dispatcher.Dispatch(() => UpdateImageArea(DrawToolbar.BarsHeight));
         return Task.CompletedTask;
     }
 
-    [RelayCommand] private void SelectTool(string key)
+    /// <summary>Foto-spezifischer Teil von "Löschen": Original ohne Overlay anzeigen.</summary>
+    private async void OnDrawingErased(object sender, EventArgs e)
     {
-        if (Enum.TryParse(key, out DrawMode mode))
-            SetDrawMode(mode);
-    }
-
-    private void SetDrawMode(DrawMode mode)
-    {
-        if (mode == DrawMode.None) return;
-
-        drawMode = mode;
-        drawingController.DrawMode = mode;
-        ActiveTool = mode.ToString();
-
-        IsFillOptionVisible = mode is DrawMode.Rect or DrawMode.Oval or DrawMode.Poly or DrawMode.Arrow;
-        IsTextOptionVisible = mode is DrawMode.Rect or DrawMode.Oval;
-        IsCloudOptionVisible = mode is DrawMode.Poly or DrawMode.Rect or DrawMode.Oval;
-
-        var combined = drawingController.CombinedDrawable;
-
-        // Zustand der Form übernehmen, ohne ihn zurückzuschreiben
-        syncingCloud = true;
-        IsCloudActive = mode switch
-        {
-            DrawMode.Rect => combined?.RectDrawable?.IsCloud ?? false,
-            DrawMode.Oval => combined?.OvalDrawable?.IsCloud ?? false,
-            DrawMode.Poly => combined?.PolyDrawable?.IsCloud ?? false,
-            _ => false
-        };
-        syncingCloud = false;
-
-        if (combined != null)
-        {
-            combined.PolyDrawable.DisplayHandles = mode == DrawMode.Poly;
-            combined.RectDrawable.DisplayHandles = mode == DrawMode.Rect;
-            combined.OvalDrawable.DisplayHandles = mode == DrawMode.Oval;
-            combined.ArrowDrawable.DisplayHandles = mode == DrawMode.Arrow;
-        }
-
-        DrawingView?.InvalidateSurface();
-
-        // Sheets schliessen, die zum neuen Werkzeug nicht passen
-        if (!IsFillOptionVisible && FillSheet.IsOpen) _ = FillSheet.CloseAsync();
-        if (!IsTextOptionVisible && TextSheet.IsOpen) _ = TextSheet.CloseAsync();
-        if (!IsCloudOptionVisible && CloudSheet.IsOpen)
-            _ = CloudSheet.CloseAsync();
-        else if (CloudSheet.IsOpen)
-            CloudEditor.Load(IsCloudActive, cloudRadius, cloudInciseDeg);
-    }
-
-    private async void EraseClicked(object sender, EventArgs e)
-    {
-        drawingController.Reset();
-        SetDrawMode(drawMode == DrawMode.None ? DrawMode.Rect : drawMode);
-
         if (!GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay)
             return;
 
@@ -607,165 +451,12 @@ public partial class ImageViewPage : IQueryAttributable
         FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
     }
 
-    private async Task ToggleSheetAsync(BottomSheet sheet, string key, Action load)
-    {
-        if (sheet.IsOpen)
-        {
-            await sheet.CloseAsync();
-            return;
-        }
-
-        await CloseSheetsAsync(except: sheet);
-        load?.Invoke();
-        ActiveSheet = key;
-        await sheet.OpenAsync();
-    }
-
-    private async Task CloseSheetsAsync(BottomSheet except = null)
-    {
-        foreach (var s in AllSheets)
-            if (s != except && s.IsOpen)
-                await s.CloseAsync();
-    }
-
-    private async void PenClicked(object sender, EventArgs e) => await ToggleSheetAsync(PenSheet, "Pen", () =>
-            PenEditor.Load(SelectedBorderColor, lineWidth, strokeStyle));
-
-    private async void FillClicked(object sender, EventArgs e) => await ToggleSheetAsync(FillSheet, "Fill", () =>
-            FillEditor.Load(SelectedFillColor, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation));
-
-    private async void CloudClicked(object sender, EventArgs e) => await ToggleSheetAsync(CloudSheet, "Cloud", () =>
-            CloudEditor.Load(IsCloudActive, cloudRadius, cloudInciseDeg));
-
-    private async void TextClicked(object sender, EventArgs e)
-    {
-        var combined = drawingController?.CombinedDrawable;
-        if (combined == null) return;
-        if (drawMode is not (DrawMode.Rect or DrawMode.Oval)) return;
-
-        await ToggleSheetAsync(TextSheet, "Text", () =>
-        {
-            if (drawMode == DrawMode.Rect)
-            {
-                var d = combined.RectDrawable;
-                TextEditor.Load(d.TextSize, d.TextAlignment, d.TextStyle, d.AutoSizeText, d.Text, d.TextPadding);
-            }
-            else
-            {
-                var d = combined.OvalDrawable;
-                TextEditor.Load(d.TextSize, d.TextAlignment, d.TextStyle, d.AutoSizeText, d.Text, d.TextPadding);
-            }
-        });
-
-        if (TextSheet.IsOpen)
-            TextEditor.FocusInput();
-    }
-
-    // Live: Stift-Sheet
-    private void OnPenChanged(object sender, EventArgs e)
-    {
-        var p = PenEditor;
-        SelectedBorderColor = p.LineColor;
-        lineWidth = p.LineWidth;
-        strokeStyle = p.StrokeStyle;
-        ApplyStyles();
-    }
-
-    // Live: Füllungs-Sheet
-    private void OnFillChanged(object sender, EventArgs e)
-    {
-        var f = FillEditor;
-        SelectedFillColor = f.FillColor;
-        isHatchEffect = f.IsHatchEffect;
-        hatchStrokeWitdh = f.HatchStrokeWitdh;
-        hatchStrokeSpace = f.HatchStrokeSpace;
-        hatchRotation = f.HatchRotation;
-        ApplyStyles();
-    }
-
-    // Live: Wolken-Sheet
-    private void OnCloudChanged(object sender, EventArgs e)
-    {
-        var c = CloudEditor;
-        IsCloudActive = c.IsCloudActive;   // schreibt über ApplyCloudToDrawable in die Form
-        cloudRadius = c.CloudRadius;
-        cloudInciseDeg = c.CloudInciseDeg;
-        ApplyStyles();
-    }
-
-    // Live: Textfarbe im Text-Sheet (SelectedTextColor ist bereits per Binding gesetzt)
-    private void OnTextColorChanged(object sender, EventArgs e) => ApplyStyles();
-
-    // Live: Textinhalt / Formatierung im Text-Sheet
-    private void OnTextEditChanged(object sender, EventArgs e)
-    {
-        var combined = drawingController?.CombinedDrawable;
-        if (combined == null) return;
-
-        var t = TextEditor;
-        if (drawMode == DrawMode.Rect)
-        {
-            var d = combined.RectDrawable;
-            d.Text = t.InputTxt;
-            d.TextSize = t.FontSize;
-            d.TextAlignment = t.FontAlignment;
-            d.TextStyle = t.TextStyle;
-            d.AutoSizeText = t.AutoSize;
-            d.TextPadding = t.TextPadding;
-        }
-        else if (drawMode == DrawMode.Oval)
-        {
-            var d = combined.OvalDrawable;
-            d.Text = t.InputTxt;
-            d.TextSize = t.FontSize;
-            d.TextAlignment = t.FontAlignment;
-            d.TextStyle = t.TextStyle;
-            d.AutoSizeText = t.AutoSize;
-            d.TextPadding = t.TextPadding;
-        }
-
-        DrawingView?.InvalidateSurface();
-    }
-
-    private void ApplyStyles()
-    {
-        drawingController?.UpdateDrawingStyles(
-            SelectedBorderColor.ToSKColor(),
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            lineWidth,
-            strokeStyle,
-            isHatchEffect,
-            hatchStrokeWitdh,
-            hatchStrokeSpace,
-            hatchRotation,
-            cloudRadius,
-            cloudInciseDeg);
-
-        DrawingView?.InvalidateSurface();
-    }
-
-    private void ApplyCloudToDrawable(bool isCloud)
-    {
-        var combined = drawingController?.CombinedDrawable;
-        if (combined == null) return;
-
-        switch (drawingController.DrawMode)
-        {
-            case DrawMode.Rect: combined.RectDrawable.IsCloud = isCloud; break;
-            case DrawMode.Oval: combined.OvalDrawable.IsCloud = isCloud; break;
-            case DrawMode.Poly: combined.PolyDrawable.IsCloud = isCloud; break;
-        }
-
-        DrawingView?.InvalidateSurface();
-    }
-
     private async void CancelClicked(object sender, EventArgs e) => await CancelDrawingAsync();
 
     private async Task CancelDrawingAsync()
     {
         drawingController.Reset();
-        await CloseSheetsAsync();
+        await DrawToolbar.CloseSheetsAsync();
 
         if (isCleared)
         {
@@ -776,7 +467,6 @@ public partial class ImageViewPage : IQueryAttributable
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             }
         }
-
         ExitDrawingMode();
     }
 
@@ -788,18 +478,19 @@ public partial class ImageViewPage : IQueryAttributable
         DrawingView.IsVisible = false;
         DrawingView.InvalidateSurface();
         drawingOwnsTouch = false;
-        drawMode = DrawMode.None;
-        ActiveTool = "";
-        ActiveSheet = "";
+
+        DrawToolbar.Reset();
+
         isCleared = false;
         IsEditMode = false;
+        UpdateImageArea(0);
         DrawBtn.IsVisible = canDraw;
         UpdateNavigationButtons();
     }
 
     private async void CheckClicked(object sender, EventArgs e)
     {
-        await CloseSheetsAsync();
+        await DrawToolbar.CloseSheetsAsync();
 
         if (!drawingController.IsEmpty() || isCleared)
         {
@@ -822,7 +513,6 @@ public partial class ImageViewPage : IQueryAttributable
                 var bytes = await File.ReadAllBytesAsync(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
                 await Thumbnail.Generate(imgPath, thumbPath);
-
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
 
                 // Original in der Cloud entfernen (wird nach dem JSON-Sync ausgefuehrt)
@@ -857,7 +547,6 @@ public partial class ImageViewPage : IQueryAttributable
                 var bytes = await File.ReadAllBytesAsync(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
                 await Thumbnail.Generate(imgPath, thumbPath);
-
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
                 uploads.Add((origPath, $"{GlobalJson.Data.ImagePath}/originals"));
             }
@@ -865,7 +554,6 @@ public partial class ImageViewPage : IQueryAttributable
             var foto = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource];
             foto.File = Path.GetFileName(imgPath);
             foto.Touch();
-
             SaveManager.NotifyDataChanged([.. uploads]);
         }
 
@@ -878,7 +566,6 @@ public partial class ImageViewPage : IQueryAttributable
             return false;
 
         string tempPath = outputPath + ".drawing.tmp";
-
         try
         {
             using var fotoStream = File.OpenRead(fotoPath);
@@ -888,7 +575,6 @@ public partial class ImageViewPage : IQueryAttributable
 
             int originalWidth = fotoBitmap.Width;
             int originalHeight = fotoBitmap.Height;
-
             float drawingWidth = DrawingView.CanvasSize.Width;
             float drawingHeight = DrawingView.CanvasSize.Height;
             if (drawingWidth <= 0f || drawingHeight <= 0f)
@@ -910,7 +596,6 @@ public partial class ImageViewPage : IQueryAttributable
                 drawingController.RenderForExport(canvas);
                 canvas.Restore();
             }
-
             canvas.Flush();
 
             using var finalImage = surface.Snapshot();
@@ -1008,6 +693,8 @@ public partial class ImageViewPage : IQueryAttributable
         DrawingView.InvalidateSurface();
     }
 
+    // ===================== Navigation =====================
+
     private void OnPreviousImageClicked(object sender, EventArgs e) => NavigateImage(-1);
     private void OnNextImageClicked(object sender, EventArgs e) => NavigateImage(1);
 
@@ -1019,7 +706,6 @@ public partial class ImageViewPage : IQueryAttributable
         try
         {
             isNavigating = true;
-
             var sortedFotos = GetSortedFotos();
             int currentIndex = FindCurrentIndex(sortedFotos);
             if (currentIndex == -1) return;
@@ -1028,7 +714,6 @@ public partial class ImageViewPage : IQueryAttributable
             if (newIndex < 0 || newIndex >= sortedFotos.Count) return;
 
             var target = sortedFotos[newIndex];
-
             FotoContainer.Opacity = 0;
             FotoContainer.Source = null;
 
@@ -1048,7 +733,6 @@ public partial class ImageViewPage : IQueryAttributable
                 await Task.Delay(20);
                 await FotoContainer.FadeToAsync(1, 100, Easing.CubicOut);
             }
-
             UpdateNavigationButtons();
         }
         finally
@@ -1068,7 +752,6 @@ public partial class ImageViewPage : IQueryAttributable
 
         var sortedFotos = GetSortedFotos();
         int currentIndex = FindCurrentIndex(sortedFotos);
-
         PrevImgBtn.IsVisible = currentIndex > 0;
         NextImgBtn.IsVisible = currentIndex >= 0 && currentIndex < sortedFotos.Count - 1;
     }

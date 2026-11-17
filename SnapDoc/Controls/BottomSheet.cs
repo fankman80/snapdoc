@@ -8,7 +8,7 @@ public partial class BottomSheet : ContentView
     private readonly Grid _sheet;
     private readonly BoxView _divider;
     private readonly ScrollView _scroll;
-    private VisualElement _parent;
+    private VisualElement _host;
     private double _dragY;
     private const double SlideDistance = 48;
     private readonly Grid _content;
@@ -118,13 +118,16 @@ public partial class BottomSheet : ContentView
         };
 
         Content = _sheet;
+
+        Loaded += (_, _) => AttachHost();
+        Unloaded += (_, _) => DetachHost();
     }
 
     public async Task OpenAsync()
     {
         if (IsOpen) return;
         IsOpen = true;
-
+        if (_host == null) AttachHost();
         UpdateSize();
         TranslationY = SlideDistance;
         Opacity = 0;
@@ -179,32 +182,51 @@ public partial class BottomSheet : ContentView
     protected override void OnParentSet()
     {
         base.OnParentSet();
-
-        _parent?.SizeChanged -= OnParentSizeChanged;
-        _parent = Parent as VisualElement;
-        _parent?.SizeChanged += OnParentSizeChanged;
+        AttachHost();
     }
 
-    private void OnParentSizeChanged(object sender, EventArgs e) => UpdateSize();
+    private void AttachHost()
+    {
+        Element e = Parent;
+        while (e != null && e is not Page)
+            e = e.Parent;
+
+        var host = (e as VisualElement) ?? Parent as VisualElement;
+        if (ReferenceEquals(host, _host)) return;
+
+        DetachHost();
+        _host = host;
+        if (_host != null)
+        {
+            _host.SizeChanged += OnHostSizeChanged;
+            UpdateSize();
+        }
+    }
+
+    private void DetachHost()
+    {
+        _host?.SizeChanged -= OnHostSizeChanged;
+        _host = null;
+    }
+
+    private void OnHostSizeChanged(object sender, EventArgs e) => UpdateSize();
 
     private void UpdateSize()
     {
-        if (_parent == null || _content == null || _header == null || _scroll == null) return;
-        if (_parent.Height <= 0 || _parent.Width <= 0) return;
+        if (_host == null || _content == null || _header == null || _scroll == null) return;
+        if (_host.Height <= 0 || _host.Width <= 0) return;
 
-        double maxSheet = _parent.Height * MaxHeightRatio;
+        double maxSheet = _host.Height * MaxHeightRatio;
         MaximumHeightRequest = maxSheet;
 
-        // Hintergrund volle Breite, Inhalt auf breiten Bildschirmen begrenzt
         _content.MaximumWidthRequest = MaxContentWidth;
-        _content.HorizontalOptions = _parent.Width > MaxContentWidth
+        _content.HorizontalOptions = _host.Width > MaxContentWidth
             ? LayoutOptions.Center
             : LayoutOptions.Fill;
 
         if (SheetContent == null) return;
 
-        // Höhe selbst bestimmen – ScrollView meldet unter Android sonst die volle Höhe
-        double width = Math.Min(_parent.Width, MaxContentWidth);
+        double width = Math.Min(_host.Width, MaxContentWidth);
         double innerWidth = width - _scroll.Padding.HorizontalThickness;
 
         double headerH = _header.Measure(width, double.PositiveInfinity).Height;
