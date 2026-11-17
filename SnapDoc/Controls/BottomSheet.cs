@@ -95,7 +95,7 @@ public partial class BottomSheet : ContentView
         pan.PanUpdated += OnPanUpdated;
         _header.GestureRecognizers.Add(pan);
 
-        _scroll = new ScrollView { Padding = new Thickness(20, 8, 20, 12) };
+        _scroll = new ScrollView { Padding = new Thickness(12, 8, 20, 12) };
 
         // Inhalt auf Tablet/Windows mittig begrenzen, Hintergrund bleibt volle Breite
         var content = new Grid

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              x:Class="SnapDoc.Controls.PenEditorView"
              x:DataType="controls:PenEditorView">
@@ -11,23 +13,38 @@
         </Style>
     </ContentView.Resources>
 
-    <VerticalStackLayout Spacing="10">
+    <VerticalStackLayout Spacing="6">
         <!-- Stiftfarbe -->
+        <Label Text="{x:Static res:AppResources.stiftfarbe}" Style="{StaticResource SectionLabel}" />
         <controls:ColorSwatchBar SelectedColor="{Binding LineColor}" DefaultAlpha="1" />
 
         <!-- Strichbreite -->
         <Label Text="{x:Static res:AppResources.linienbreite}" Style="{StaticResource SectionLabel}" />
-        <controls:WrapLayout x:Name="WidthPresets" Spacing="8" RowSpacing="8" />
+        <ScrollView x:Name="WidthScroll"
+                    Orientation="Horizontal"
+                    Margin="-20,0">
+            <HorizontalStackLayout x:Name="WidthPresets" Spacing="8"
+                                   Padding="{OnPlatform Default='20,2', WinUI='20,2,20,14'}" />
+        </ScrollView>
 
         <!-- Linienart (deaktiviert bei Linienbreite 0) -->
         <VerticalStackLayout x:Name="PatternSection" Spacing="10">
             <Label Text="{x:Static res:AppResources.linienart}" Style="{StaticResource SectionLabel}" />
-            <controls:WrapLayout x:Name="PatternPresets" Spacing="8" RowSpacing="8" />
-            <controls:BorderedEntry Text="{Binding StrokeStyle}"
-                                TextColor="White"
-                                FontSize="{StaticResource AppFontSizeNormal}"
-                                Placeholder="{x:Static res:AppResources.eigenes_muster_platzhalter}"
-                                TextChanged="OnStrokeTextChanged" />
+            <ScrollView x:Name="PatternScroll"
+                        Orientation="Horizontal"
+                        Margin="-20,0">
+                <HorizontalStackLayout x:Name="PatternPresets" Spacing="8"
+                                       Padding="{OnPlatform Default='20,2', WinUI='20,2,20,14'}" />
+            </ScrollView>
+
+            <!-- Eigenes Muster: nur bei Bedarf sichtbar -->
+            <controls:BorderedEntry x:Name="CustomPatternEntry"
+                                    IsVisible="False"
+                                    Text="{Binding StrokeStyle}"
+                                    TextColor="White"
+                                    FontSize="{StaticResource AppFontSizeNormal}"
+                                    Placeholder="{x:Static res:AppResources.eigenes_muster_platzhalter}"
+                                    TextChanged="OnStrokeTextChanged" />
         </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentView>

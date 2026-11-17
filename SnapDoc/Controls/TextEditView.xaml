@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Controls.TextEditView">
@@ -10,6 +12,11 @@
         <Color x:Key="EdTrack">#555555</Color>
         <Color x:Key="EdDivider">#444444</Color>
         <Color x:Key="EdActiveBg">#1F4A52</Color>
+
+        <Style x:Key="SectionLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+        </Style>
 
         <!-- Wie die Werkzeug-Buttons der Bottombar: aktiv = dunkles Türkis + Rahmen -->
         <Style x:Key="FormatButton" TargetType="Button">
@@ -22,10 +29,22 @@
             <Setter Property="Shadow" Value="{x:Null}" />
             <Setter Property="BackgroundColor" Value="Transparent" />
         </Style>
+
+        <!-- Gemeinsame Slider-Optik -->
+        <Style TargetType="controls:RangeSlider">
+            <Setter Property="IsRealtime" Value="True" />
+            <Setter Property="IsRange" Value="False" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="ValueFontSize" Value="12" />
+            <Setter Property="MinimumTrackColor" Value="{DynamicResource Primary}" />
+            <Setter Property="MaximumTrackColor" Value="{StaticResource EdTrack}" />
+        </Style>
     </ContentView.Resources>
 
-    <VerticalStackLayout x:Name="Root" x:DataType="controls:TextEditView" Spacing="10">
+    <VerticalStackLayout x:Name="Root" x:DataType="controls:TextEditView" Spacing="6">
 
+        <!-- Text -->
         <controls:BorderedEditor x:Name="TextInput"
                                  TextColor="White"
                                  Text="{Binding InputTxt}"
@@ -48,6 +67,7 @@
                     </DataTrigger>
                 </Button.Triggers>
             </Button>
+
             <Button Style="{StaticResource FormatButton}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Center}">
@@ -63,6 +83,7 @@
                     </DataTrigger>
                 </Button.Triggers>
             </Button>
+
             <Button Style="{StaticResource FormatButton}"
                     Command="{Binding SetAlignmentCommand}"
                     CommandParameter="{x:Static local:RectangleTextAlignment.Right}">
@@ -96,6 +117,7 @@
                     </DataTrigger>
                 </Button.Triggers>
             </Button>
+
             <Button Style="{StaticResource FormatButton}"
                     Command="{Binding ToggleTextStyleCommand}"
                     CommandParameter="{x:Static local:RectangleTextStyle.Italic}">
@@ -112,6 +134,7 @@
             </Button>
         </HorizontalStackLayout>
 
+        <!-- Automatische Schriftgrösse -->
         <controls:Switch LabelText="{x:Static res:AppResources.automatische_schriftgroesse}"
                          TextColor="{StaticResource EdText}"
                          HeightRequest="40"
@@ -122,28 +145,18 @@
                          SwitchColorOn="{DynamicResource Primary}"
                          SwitchColorOff="{StaticResource EdTrack}" />
 
-        <controls:RangeSlider
-            IsVisible="{Binding AutoSize}"
-            LabelText="{x:Static res:AppResources.randabstand}"
-            IsRealtime="True" IsRange="False"
-            Minimum="0" Maximum="100" Step="1"
-            TextColor="#9E9E9E"
-            FontSize="12"
-            ValueFontSize="12"
-            MinimumValueDisplayFormat="{}{0} %"
-            LowerValue="{Binding TextPadding}"
-            MinimumTrackColor="{DynamicResource Primary}"
-            MaximumTrackColor="{StaticResource EdTrack}" />
+        <!-- Randabstand (nur bei Auto) -->
+        <controls:RangeSlider IsVisible="{Binding AutoSize}"
+                              LabelText="{x:Static res:AppResources.randabstand}"
+                              Minimum="0" Maximum="100" Step="1"
+                              MinimumValueDisplayFormat="{}{0} %"
+                              LowerValue="{Binding TextPadding}" />
 
-        <controls:RangeSlider
-            IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}"
-            LabelText="{x:Static res:AppResources.schriftgroesse}"
-            IsRealtime="True" IsRange="False"
-            Minimum="6" Maximum="180" Step="1" ValueFontSize="12"
-            TextColor="{StaticResource EdText}"
-            MinimumValueDisplayFormat="{}{0} pt"
-            LowerValue="{Binding FontSize}"
-            MinimumTrackColor="{DynamicResource Primary}"
-            MaximumTrackColor="{StaticResource EdTrack}" />
+        <!-- Schriftgrösse (nur ohne Auto) -->
+        <controls:RangeSlider IsVisible="{Binding AutoSize, Converter={StaticResource InvertedBoolConverter}}"
+                              LabelText="{x:Static res:AppResources.schriftgroesse}"
+                              Minimum="6" Maximum="250" Step="1"
+                              MinimumValueDisplayFormat="{}{0} pt"
+                              LowerValue="{Binding FontSize}" />
     </VerticalStackLayout>
 </ContentView>

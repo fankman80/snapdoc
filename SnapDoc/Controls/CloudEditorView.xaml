@@ -6,8 +6,7 @@
              x:Class="SnapDoc.Controls.CloudEditorView"
              x:DataType="controls:CloudEditorView">
 
-    <VerticalStackLayout Spacing="10">
-
+    <VerticalStackLayout Spacing="6">
         <!-- Wolkenkontur an/aus -->
         <controls:Switch LabelText="{x:Static res:AppResources.wolkenkontur}"
                          TextColor="White"

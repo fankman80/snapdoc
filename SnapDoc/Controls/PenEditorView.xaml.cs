@@ -25,7 +25,7 @@ public partial class PenEditorView : ContentView
     private bool _loading;
     private readonly List<(Border Border, int Width)> _widthItems = [];
     private readonly List<(Border Border, string Pattern)> _patternItems = [];
-
+    private Border _customItem;
     private Color lineColor = Colors.Black;
     public Color LineColor
     {
@@ -89,6 +89,28 @@ public partial class PenEditorView : ContentView
         LineWidth = width;
         StrokeStyle = pattern;
         _loading = false;
+
+        // Feld nur zeigen, wenn ein eigenes Muster aktiv ist
+        var current = Normalize(StrokeStyle);
+        CustomPatternEntry.IsVisible = !_patternItems.Any(i => Normalize(i.Pattern) == current);
+
+        ScrollToSelection();
+    }
+
+    private void ScrollToSelection()
+    {
+        // Erst nach dem Layout-Durchlauf scrollen
+        Dispatcher.Dispatch(async () =>
+        {
+            var w = _widthItems.FirstOrDefault(i => i.Width == LineWidth).Border;
+            if (w != null)
+                await WidthScroll.ScrollToAsync(w, ScrollToPosition.Center, false);
+
+            var current = Normalize(StrokeStyle);
+            var p = _patternItems.FirstOrDefault(i => Normalize(i.Pattern) == current).Border ?? _customItem;
+            if (p != null)
+                await PatternScroll.ScrollToAsync(p, ScrollToPosition.Center, false);
+        });
     }
 
     private void Raise()
@@ -178,6 +200,29 @@ public partial class PenEditorView : ContentView
             _patternItems.Add((item, pattern));
             PatternPresets.Children.Add(item);
         }
+
+        _customItem = new Border
+        {
+            HeightRequest = 36,
+            Padding = new Thickness(14, 0),
+            StrokeShape = new RoundRectangle { CornerRadius = 18 },
+            StrokeThickness = 1.5,
+            Content = new Label
+            {
+                Text = "✎",
+                TextColor = Colors.White,
+                FontSize = 18,
+                VerticalOptions = LayoutOptions.Center
+            }
+        };
+        ToolTipProperties.SetText(_customItem, AppResources.eigenes_muster_platzhalter);
+        AddTap(_customItem, () =>
+        {
+            CustomPatternEntry.IsVisible = !CustomPatternEntry.IsVisible;
+            if (CustomPatternEntry.IsVisible)
+                CustomPatternEntry.Focus();
+        });
+        PatternPresets.Children.Add(_customItem);
         UpdatePatternSelection();
     }
 
@@ -190,8 +235,17 @@ public partial class PenEditorView : ContentView
     private void UpdatePatternSelection()
     {
         var current = Normalize(StrokeStyle);
+        bool anyPreset = false;
+
         foreach (var (border, p) in _patternItems)
-            Mark(border, Normalize(p) == current);
+        {
+            bool sel = Normalize(p) == current;
+            anyPreset |= sel;
+            Mark(border, sel);
+        }
+
+        if (_customItem != null)
+            Mark(_customItem, !anyPreset);
     }
 
     private static string Normalize(string s) => MultipleSpacesRegex().Replace((s ?? "").Trim(), " ");
@@ -199,7 +253,14 @@ public partial class PenEditorView : ContentView
     private static void Mark(Border border, bool selected)
     {
         border.Stroke = selected ? ColorSwatchBar.Accent : Color.FromArgb("#33FFFFFF");
-        border.BackgroundColor = selected ? Color.FromArgb("{DynamicResource PrimaryAlpha}") : Colors.Transparent;
+
+        if (selected)
+            border.SetDynamicResource(BackgroundColorProperty, "PrimaryAlpha");
+        else
+        {
+            border.RemoveDynamicResource(BackgroundColorProperty);
+            border.BackgroundColor = Colors.Transparent;
+        }
     }
 
     private static void AddTap(View view, Action action)

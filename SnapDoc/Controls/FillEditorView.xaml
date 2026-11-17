@@ -1,28 +1,41 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<ContentView xmlns:controls="clr-namespace:SnapDoc.Controls"
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
              xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
              xmlns:local="clr-namespace:SnapDoc"
              x:Class="SnapDoc.Controls.FillEditorView"
              x:DataType="controls:FillEditorView">
 
-    <VerticalStackLayout Spacing="10">
+    <ContentView.Resources>
+        <Style x:Key="SectionLabel" TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+        </Style>
 
+        <Style TargetType="controls:RangeSlider">
+            <Setter Property="IsRealtime" Value="True" />
+            <Setter Property="IsRange" Value="False" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="ValueFontSize" Value="12" />
+            <Setter Property="MinimumTrackColor" Value="{DynamicResource PrimaryDarkAccent}" />
+            <Setter Property="MaximumTrackColor" Value="Gray" />
+        </Style>
+    </ContentView.Resources>
+
+    <VerticalStackLayout Spacing="6">
         <!-- Füllfarbe inkl. "keine Füllung" -->
+        <Label Text="{x:Static res:AppResources.fuellfarbe}" Style="{StaticResource SectionLabel}" />
         <controls:ColorSwatchBar SelectedColor="{Binding FillColor}"
                                  ShowNoneSwatch="True"
                                  DefaultAlpha="0.5" />
 
         <!-- Deckkraft -->
         <controls:RangeSlider LabelText="{x:Static res:AppResources.deckkraft}"
-                              IsRealtime="True" IsRange="False"
                               Minimum="0" Maximum="100" Step="5"
-                              TextColor="#9E9E9E"
-                              FontSize="12"
-                              ValueFontSize="12"
                               MinimumValueDisplayFormat="{}{0} %"
-                              LowerValue="{Binding FillOpacity}"
-                              MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
-                              MaximumTrackColor="Gray" />
+                              LowerValue="{Binding FillOpacity}" />
 
         <!-- Schraffur -->
         <controls:Switch LabelText="{x:Static res:AppResources.hatchFill}"
@@ -36,20 +49,16 @@
                          SwitchColorOff="Gray" />
 
         <VerticalStackLayout IsVisible="{Binding IsHatchEffect}" Spacing="4">
-            <Grid ColumnDefinitions="*,Auto">
+
+            <!-- Winkel + Spiegeln -->
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="4">
                 <controls:RangeSlider Grid.Column="0"
                                       LabelText="{x:Static res:AppResources.hatchAngle}"
-                                      IsRealtime="True" IsRange="False"
                                       Minimum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?-90:0'}"
                                       Maximum="{Binding HatchRotation, Converter={StaticResource MathExpressionConverter}, ConverterParameter='x&lt;0?0:90'}"
                                       Step="1"
-                                      TextColor="#9E9E9E"
-                                      FontSize="12"
-                                      ValueFontSize="12"
                                       MinimumValueDisplayFormat="{}{0}°"
-                                      LowerValue="{Binding HatchRotation}"
-                                      MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
-                                      MaximumTrackColor="Gray" />
+                                      LowerValue="{Binding HatchRotation}" />
                 <Button Grid.Column="1"
                         Padding="0"
                         VerticalOptions="End"
@@ -63,26 +72,20 @@
                     </Button.ImageSource>
                 </Button>
             </Grid>
-            <controls:RangeSlider LabelText="{x:Static res:AppResources.HatchLineWidth}"
-                                  IsRealtime="True" IsRange="False"
-                                  Minimum="0" Maximum="20" Step="1"
-                                  TextColor="#9E9E9E"
-                                  FontSize="12"
-                                  ValueFontSize="12"
-                                  MinimumValueDisplayFormat="{}{0} px"
-                                  LowerValue="{Binding HatchStrokeWitdh}"
-                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
-                                  MaximumTrackColor="Gray" />
-            <controls:RangeSlider LabelText="{x:Static res:AppResources.HatchSpacing}"
-                                  IsRealtime="True" IsRange="False"
-                                  Minimum="0" Maximum="20" Step="1"
-                                  TextColor="#9E9E9E"
-                                  FontSize="12"
-                                  ValueFontSize="12"
-                                  MinimumValueDisplayFormat="{}{0} px"
-                                  LowerValue="{Binding HatchStrokeSpace}"
-                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
-                                  MaximumTrackColor="Gray" />
+
+            <!-- Linienbreite und Abstand nebeneinander -->
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                <controls:RangeSlider Grid.Column="0"
+                                      LabelText="{x:Static res:AppResources.HatchLineWidth}"
+                                      Minimum="0" Maximum="20" Step="1"
+                                      MinimumValueDisplayFormat="{}{0} px"
+                                      LowerValue="{Binding HatchStrokeWitdh}" />
+                <controls:RangeSlider Grid.Column="1"
+                                      LabelText="{x:Static res:AppResources.HatchSpacing}"
+                                      Minimum="0" Maximum="20" Step="1"
+                                      MinimumValueDisplayFormat="{}{0} px"
+                                      LowerValue="{Binding HatchStrokeSpace}" />
+            </Grid>
         </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentView>

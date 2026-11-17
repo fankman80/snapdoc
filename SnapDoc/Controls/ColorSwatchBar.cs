@@ -41,15 +41,34 @@ public partial class ColorSwatchBar : ContentView
             ? color
             : Color.FromArgb("#1BB0CE");
 
-    private readonly WrapLayout _row;
+    private readonly ScrollView _scroll;
+    private readonly HorizontalStackLayout _row;
     private readonly List<(Border Border, Color Color)> _swatches = [];
     private Border _noneSwatch;
     private Border _customSwatch;
 
     public ColorSwatchBar()
     {
-        _row = new WrapLayout { Spacing = 10, RowSpacing = 10, Padding = new Thickness(4) };
-        Content = _row;
+        _row = new HorizontalStackLayout
+        {
+            Spacing = 10,
+            // 20 = seitlicher Abstand des BottomSheets, 6 oben/unten für die Vergrösserung (Scale 1.12)
+            Padding = DeviceInfo.Platform == DevicePlatform.WinUI
+                ? new Thickness(20, 6, 20, 16)   // Platz für den Scrollbalken
+                : new Thickness(20, 6)
+        };
+
+        _scroll = new ScrollView
+        {
+            Orientation = ScrollOrientation.Horizontal,
+            HorizontalScrollBarVisibility = DeviceInfo.Platform == DevicePlatform.WinUI
+                ? ScrollBarVisibility.Default
+                : ScrollBarVisibility.Never,
+            Margin = new Thickness(-20, 0),   // randlos bis zum Bildschirmrand
+            Content = _row
+        };
+
+        Content = _scroll;
         Build();
     }
 
@@ -156,8 +175,23 @@ public partial class ColorSwatchBar : ContentView
         if (_noneSwatch != null)
             Mark(_noneSwatch, isNone);
 
-        // Eigene Farbe: hervorheben, wenn keine Palettenfarbe passt
         Mark(_customSwatch, !matched);
+
+        ScrollToSelected();
+    }
+
+    private void ScrollToSelected()
+    {
+        if (_scroll?.Handler == null) return;   // vor dem ersten Layout nichts tun
+
+        var c = SelectedColor ?? Colors.Black;
+        Border target = c.Alpha <= 0.001f && _noneSwatch != null
+            ? _noneSwatch
+            : _swatches.FirstOrDefault(s => SameRgb(s.Color, c)).Border ?? _customSwatch;
+
+        if (target != null)
+            Dispatcher.Dispatch(async () =>
+                await _scroll.ScrollToAsync(target, ScrollToPosition.MakeVisible, false));
     }
 
     private static void Mark(Border border, bool selected)
