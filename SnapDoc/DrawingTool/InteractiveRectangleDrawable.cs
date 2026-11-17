@@ -162,8 +162,8 @@ public class InteractiveRectangleDrawable
             var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
             var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
             var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-            using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
 
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
@@ -305,10 +305,12 @@ public class InteractiveRectangleDrawable
 
         if (FillColor.Alpha > 0)
         {
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = hatchEffect,
                 IsAntialias = true
             };
 
