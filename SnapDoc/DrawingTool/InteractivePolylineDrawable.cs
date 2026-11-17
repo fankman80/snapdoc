@@ -380,6 +380,21 @@ public class InteractivePolylineDrawable
         return sum > 0f;
     }
 
+    private SKPathEffect? CreateHatchEffect()
+    {
+        if (!IsHatchEffect)
+            return null;
+
+        float lineWidth = HatchStrokeWitdh * density;
+        float spacing = HatchStrokeSpace * density + lineWidth;
+
+        var scale = SKMatrix.CreateScale(spacing, spacing);
+        var rotation = SKMatrix.CreateRotationDegrees(HatchRotation);
+        var matrix = SKMatrix.Concat(scale, rotation);
+
+        return SKPathEffect.Create2DLine(lineWidth, matrix);
+    }
+    
     public void Reset()
     {
         IsClosed = false;
