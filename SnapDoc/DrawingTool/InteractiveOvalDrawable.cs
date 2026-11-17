@@ -158,8 +158,7 @@ public class InteractiveOvalDrawable
             var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
             var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
             var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-            using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
-
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
@@ -167,7 +166,7 @@ public class InteractiveOvalDrawable
                 PathEffect = hatchEffect,
                 IsAntialias = true
             };
-
+            
             canvas.Save();
             using var builder = new SKPathBuilder();
             builder.AddOval(ovalRect);
@@ -337,13 +336,15 @@ public class InteractiveOvalDrawable
         // Flaeche ausfüllen
         if (FillColor.Alpha > 0)
         {
+            using var hatchEffect = CreateHatchEffect();
             using var fillPaint = new SKPaint
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
+                PathEffect = hatchEffect,
                 IsAntialias = true
             };
-
+            
             using var fillBuilder = new SKPathBuilder();
             for (int i = 0; i < nodes.Count; i++)
             {
