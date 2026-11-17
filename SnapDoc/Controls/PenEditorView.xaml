@@ -12,7 +12,6 @@
     </ContentView.Resources>
 
     <VerticalStackLayout Spacing="10">
-
         <!-- Stiftfarbe -->
         <controls:ColorSwatchBar SelectedColor="{Binding LineColor}" DefaultAlpha="1" />
 
@@ -20,13 +19,15 @@
         <Label Text="{x:Static res:AppResources.linienbreite}" Style="{StaticResource SectionLabel}" />
         <controls:WrapLayout x:Name="WidthPresets" Spacing="8" RowSpacing="8" />
 
-        <!-- Linienart -->
-        <Label Text="Linienart" Style="{StaticResource SectionLabel}" />
-        <controls:WrapLayout x:Name="PatternPresets" Spacing="8" RowSpacing="8" />
-        <controls:BorderedEntry Text="{Binding StrokeStyle}"
+        <!-- Linienart (deaktiviert bei Linienbreite 0) -->
+        <VerticalStackLayout x:Name="PatternSection" Spacing="10">
+            <Label Text="{x:Static res:AppResources.linienart}" Style="{StaticResource SectionLabel}" />
+            <controls:WrapLayout x:Name="PatternPresets" Spacing="8" RowSpacing="8" />
+            <controls:BorderedEntry Text="{Binding StrokeStyle}"
                                 TextColor="White"
                                 FontSize="{StaticResource AppFontSizeNormal}"
-                                Placeholder="Eigenes Muster, z. B. 12 4 2 4"
+                                Placeholder="{x:Static res:AppResources.eigenes_muster_platzhalter}"
                                 TextChanged="OnStrokeTextChanged" />
+        </VerticalStackLayout>
     </VerticalStackLayout>
 </ContentView>

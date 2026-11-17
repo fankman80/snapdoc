@@ -4,18 +4,30 @@ namespace SnapDoc.Controls;
 [ContentProperty(nameof(SheetContent))]
 public partial class BottomSheet : ContentView
 {
-    public static readonly BindableProperty SheetContentProperty = BindableProperty.Create(
-        nameof(SheetContent), typeof(View), typeof(BottomSheet),
-        propertyChanged: (b, _, n) => ((BottomSheet)b)._scroll.Content = (View)n);
+    private readonly VerticalStackLayout _header;
+    private readonly Grid _sheet;
+    private readonly BoxView _divider;
+    private readonly ScrollView _scroll;
+    private VisualElement _parent;
+    private double _dragY;
+    private const double SlideDistance = 48;
+    private readonly Grid _content;
 
-    public static readonly BindableProperty TitleProperty = BindableProperty.Create(
-        nameof(Title), typeof(string), typeof(BottomSheet), string.Empty,
-        propertyChanged: (b, _, n) =>
+    public static readonly BindableProperty SheetContentProperty = BindableProperty.Create(
+        nameof(SheetContent), typeof(View), typeof(BottomSheet), propertyChanged: (b, o, n) =>
         {
             var s = (BottomSheet)b;
-            s._title.Text = (string)n;
-            s._title.IsVisible = !string.IsNullOrEmpty((string)n);
+            if (o is View oldView) oldView.MeasureInvalidated -= s.OnContentMeasureInvalidated;
+            s._scroll.Content = (View)n;
+            if (n is View newView) newView.MeasureInvalidated += s.OnContentMeasureInvalidated;
+            s.UpdateSize();
         });
+
+    private void OnContentMeasureInvalidated(object sender, EventArgs e)
+    {
+        if (IsOpen)
+            Dispatcher.Dispatch(UpdateSize);
+    }
 
     public static readonly BindableProperty SheetColorProperty = BindableProperty.Create(
         nameof(SheetColor), typeof(Color), typeof(BottomSheet), Color.FromArgb("#2B2B2B"),
@@ -31,12 +43,6 @@ public partial class BottomSheet : ContentView
         set => SetValue(SheetContentProperty, value);
     }
 
-    public string Title
-    {
-        get => (string)GetValue(TitleProperty);
-        set => SetValue(TitleProperty, value);
-    }
-
     public Color SheetColor
     {
         get => (Color)GetValue(SheetColorProperty);
@@ -50,21 +56,9 @@ public partial class BottomSheet : ContentView
     }
 
     public double MaxHeightRatio { get; set; } = 0.6;
-
     public double MaxContentWidth { get; set; } = 640;
-
     public bool IsOpen { get; private set; }
-
     public event EventHandler Closed;
-
-    private readonly Grid _sheet;
-    private readonly BoxView _divider;
-    private readonly Label _title;
-    private readonly ScrollView _scroll;
-    private VisualElement _parent;
-    private double _dragY;
-
-    private const double SlideDistance = 48;
 
     public BottomSheet()
     {
@@ -87,28 +81,19 @@ public partial class BottomSheet : ContentView
             CornerRadius = 2,
             Color = Color.FromArgb("#666666"),
             HorizontalOptions = LayoutOptions.Center,
-            Margin = new Thickness(0, 8, 0, 0)
+            Margin = new Thickness(0, 8, 0, 4)
         };
 
-        _title = new Label
-        {
-            FontSize = 12,
-            FontAttributes = FontAttributes.Bold,
-            TextColor = Color.FromArgb("#9E9E9E"),
-            Margin = new Thickness(0, 4, 0, 0),
-            IsVisible = false
-        };
-
-        var header = new VerticalStackLayout
+        _header = new VerticalStackLayout
         {
             BackgroundColor = Colors.Transparent, // Ziehen im ganzen Kopf
             Padding = new Thickness(20, 0, 20, 0),
-            Children = { handle, _title }
+            Children = { handle }
         };
 
         var pan = new PanGestureRecognizer();
         pan.PanUpdated += OnPanUpdated;
-        header.GestureRecognizers.Add(pan);
+        _header.GestureRecognizers.Add(pan);
 
         _scroll = new ScrollView { Padding = new Thickness(20, 8, 20, 12) };
 
@@ -119,10 +104,10 @@ public partial class BottomSheet : ContentView
             RowDefinitions =
             {
                 new RowDefinition(GridLength.Auto),
-                new RowDefinition(GridLength.Star)
+                new RowDefinition(GridLength.Auto)
             }
         };
-        content.Add(header, 0, 0);
+        content.Add(_header, 0, 0);
         content.Add(_scroll, 0, 1);
         _content = content;
 
@@ -135,8 +120,6 @@ public partial class BottomSheet : ContentView
         Content = _sheet;
     }
 
-    private readonly Grid _content;
-
     public async Task OpenAsync()
     {
         if (IsOpen) return;
@@ -147,9 +130,7 @@ public partial class BottomSheet : ContentView
         Opacity = 0;
         IsVisible = true;
 
-        await Task.WhenAll(
-            this.TranslateToAsync(0, 0, 200, Easing.CubicOut),
-            this.FadeToAsync(1, 150, Easing.CubicOut));
+        await Task.WhenAll(this.TranslateToAsync(0, 0, 200, Easing.CubicOut), this.FadeToAsync(1, 150, Easing.CubicOut));
     }
 
     public async Task CloseAsync()
@@ -200,9 +181,7 @@ public partial class BottomSheet : ContentView
         base.OnParentSet();
 
         _parent?.SizeChanged -= OnParentSizeChanged;
-
         _parent = Parent as VisualElement;
-
         _parent?.SizeChanged += OnParentSizeChanged;
     }
 
@@ -210,14 +189,28 @@ public partial class BottomSheet : ContentView
 
     private void UpdateSize()
     {
-        if (_parent == null || _parent.Height <= 0) return;
+        if (_parent == null || _content == null || _header == null || _scroll == null) return;
+        if (_parent.Height <= 0 || _parent.Width <= 0) return;
 
-        MaximumHeightRequest = _parent.Height * MaxHeightRatio;
+        double maxSheet = _parent.Height * MaxHeightRatio;
+        MaximumHeightRequest = maxSheet;
 
         // Hintergrund volle Breite, Inhalt auf breiten Bildschirmen begrenzt
         _content.MaximumWidthRequest = MaxContentWidth;
         _content.HorizontalOptions = _parent.Width > MaxContentWidth
             ? LayoutOptions.Center
             : LayoutOptions.Fill;
+
+        if (SheetContent == null) return;
+
+        // Höhe selbst bestimmen – ScrollView meldet unter Android sonst die volle Höhe
+        double width = Math.Min(_parent.Width, MaxContentWidth);
+        double innerWidth = width - _scroll.Padding.HorizontalThickness;
+
+        double headerH = _header.Measure(width, double.PositiveInfinity).Height;
+        double contentH = SheetContent.Measure(innerWidth, double.PositiveInfinity).Height
+                          + _scroll.Padding.VerticalThickness;
+
+        _scroll.HeightRequest = Math.Max(0, Math.Min(contentH, maxSheet - headerH));
     }
 }

@@ -886,7 +886,7 @@ public partial class OpenProject : ContentPage
 
         SheetUploadRow.IsVisible = showUpload;
 
-        // Linie nur, wenn über "Löschen" noch etwas steht
+        // Linie nur, wenn über "{x:Static res:AppResources.loeschen}" noch etwas steht
         SheetDivider.IsVisible = showZipExport || showOpenFolder || showUpload;
 
         // Zurücksetzen und unsichtbar einblenden, damit die Messung stimmt

@@ -1317,4 +1317,58 @@
   <data name="pin_fortfahren_frage" xml:space="preserve">
     <value>Wie möchten Sie mit dem Pin{0} fortfahren?</value>
   </data>
+	<data name="linienart" xml:space="preserve">
+    <value>Linienart</value>
+  </data>
+	<data name="eigenes_muster_platzhalter" xml:space="preserve">
+    <value>Eigenes Muster, z. B. 12 4 2 4</value>
+  </data>
+	<data name="durchgezogen" xml:space="preserve">
+    <value>Durchgezogen</value>
+  </data>
+	<data name="gestrichelt" xml:space="preserve">
+    <value>Gestrichelt</value>
+  </data>
+	<data name="gepunktet" xml:space="preserve">
+    <value>Gepunktet</value>
+  </data>
+	<data name="strichpunkt" xml:space="preserve">
+    <value>Strichpunkt</value>
+  </data>
+	<data name="keine_linie" xml:space="preserve">
+    <value>Keine Linie</value>
+  </data>
+	<data name="stift" xml:space="preserve">
+    <value>Stift</value>
+  </data>
+	<data name="fuellung" xml:space="preserve">
+    <value>Füllung</value>
+  </data>
+	<data name="text" xml:space="preserve">
+    <value>Text</value>
+  </data>
+	<data name="wolke" xml:space="preserve">
+    <value>Wolke</value>
+  </data>
+	<data name="wolkenkontur" xml:space="preserve">
+    <value>Wolkenkontur</value>
+  </data>
+	<data name="rechteck" xml:space="preserve">
+    <value>Rechteck</value>
+  </data>
+	<data name="kreis" xml:space="preserve">
+    <value>Kreis</value>
+  </data>
+	<data name="pfeil" xml:space="preserve">
+    <value>Pfeil</value>
+  </data>
+	<data name="freihand" xml:space="preserve">
+    <value>Freihand</value>
+  </data>
+	<data name="original_nicht_verfuegbar" xml:space="preserve">
+    <value>Original nicht verfügbar – bitte online gehen.</value>
+  </data>
+	<data name="zeichnung_konnte_nicht_gespeichert_werden" xml:space="preserve">
+    <value>Das Bild mit der Zeichnung konnte nicht gespeichert werden.</value>
+  </data>
 </root>

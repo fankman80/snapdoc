@@ -835,6 +835,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Durchgezogen ähnelt.
+        /// </summary>
+        internal static string durchgezogen {
+            get {
+                return ResourceManager.GetString("durchgezogen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Effektive Länge ähnelt.
         /// </summary>
         internal static string effektive_laenge {
@@ -858,6 +867,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string eigene_icons {
             get {
                 return ResourceManager.GetString("eigene_icons", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Eigenes Muster, z. B. 12 4 2 4 ähnelt.
+        /// </summary>
+        internal static string eigenes_muster_platzhalter {
+            get {
+                return ResourceManager.GetString("eigenes_muster_platzhalter", resourceCulture);
             }
         }
         
@@ -1258,6 +1276,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Freihand ähnelt.
+        /// </summary>
+        internal static string freihand {
+            get {
+                return ResourceManager.GetString("freihand", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Freihandlinie zeichnen ähnelt.
         /// </summary>
         internal static string freihandlinie_zeichnen {
@@ -1276,11 +1303,38 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Füllung ähnelt.
+        /// </summary>
+        internal static string fuellung {
+            get {
+                return ResourceManager.GetString("fuellung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Gemessen: {0} ähnelt.
         /// </summary>
         internal static string gemessen_0 {
             get {
                 return ResourceManager.GetString("gemessen_0", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gepunktet ähnelt.
+        /// </summary>
+        internal static string gepunktet {
+            get {
+                return ResourceManager.GetString("gepunktet", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Gestrichelt ähnelt.
+        /// </summary>
+        internal static string gestrichelt {
+            get {
+                return ResourceManager.GetString("gestrichelt", resourceCulture);
             }
         }
         
@@ -1645,6 +1699,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine Linie ähnelt.
+        /// </summary>
+        internal static string keine_linie {
+            get {
+                return ResourceManager.GetString("keine_linie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Keine PDF-Seiten hinzugefügt ähnelt.
         /// </summary>
         internal static string keine_pdf_seiten {
@@ -1789,6 +1852,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kreis ähnelt.
+        /// </summary>
+        internal static string kreis {
+            get {
+                return ResourceManager.GetString("kreis", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kreis zeichnen ähnelt.
         /// </summary>
         internal static string kreis_zeichnen {
@@ -1830,6 +1902,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string linie {
             get {
                 return ResourceManager.GetString("linie", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Linienart ähnelt.
+        /// </summary>
+        internal static string linienart {
+            get {
+                return ResourceManager.GetString("linienart", resourceCulture);
             }
         }
         
@@ -2194,6 +2275,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Original nicht verfügbar – bitte online gehen. ähnelt.
+        /// </summary>
+        internal static string original_nicht_verfuegbar {
+            get {
+                return ResourceManager.GetString("original_nicht_verfuegbar", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die OpenStreetMap ähnelt.
         /// </summary>
         internal static string osm_karte {
@@ -2244,6 +2334,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string pdf_wird_konvertiert {
             get {
                 return ResourceManager.GetString("pdf_wird_konvertiert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Pfeil ähnelt.
+        /// </summary>
+        internal static string pfeil {
+            get {
+                return ResourceManager.GetString("pfeil", resourceCulture);
             }
         }
         
@@ -2923,6 +3022,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Rechteck ähnelt.
+        /// </summary>
+        internal static string rechteck {
+            get {
+                return ResourceManager.GetString("rechteck", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Rechteck zeichnen ähnelt.
         /// </summary>
         internal static string rechteck_zeichnen {
@@ -3085,11 +3193,29 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Stift ähnelt.
+        /// </summary>
+        internal static string stift {
+            get {
+                return ResourceManager.GetString("stift", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Stiftfarbe ähnelt.
         /// </summary>
         internal static string stiftfarbe {
             get {
                 return ResourceManager.GetString("stiftfarbe", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Strichpunkt ähnelt.
+        /// </summary>
+        internal static string strichpunkt {
+            get {
+                return ResourceManager.GetString("strichpunkt", resourceCulture);
             }
         }
         
@@ -3162,6 +3288,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string templates_reset_success {
             get {
                 return ResourceManager.GetString("templates_reset_success", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Text ähnelt.
+        /// </summary>
+        internal static string text {
+            get {
+                return ResourceManager.GetString("text", resourceCulture);
             }
         }
         
@@ -3490,6 +3625,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wolke ähnelt.
+        /// </summary>
+        internal static string wolke {
+            get {
+                return ResourceManager.GetString("wolke", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Wolkenradius ähnelt.
         /// </summary>
         internal static string wolken_radius {
@@ -3504,6 +3648,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string wolken_ueberschneidung {
             get {
                 return ResourceManager.GetString("wolken_ueberschneidung", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Wolkenkontur ähnelt.
+        /// </summary>
+        internal static string wolkenkontur {
+            get {
+                return ResourceManager.GetString("wolkenkontur", resourceCulture);
             }
         }
         
@@ -3567,6 +3720,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string wollen_sie_projekt_als_zip_exportieren {
             get {
                 return ResourceManager.GetString("wollen_sie_projekt_als_zip_exportieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Das Bild mit der Zeichnung konnte nicht gespeichert werden. ähnelt.
+        /// </summary>
+        internal static string zeichnung_konnte_nicht_gespeichert_werden {
+            get {
+                return ResourceManager.GetString("zeichnung_konnte_nicht_gespeichert_werden", resourceCulture);
             }
         }
         

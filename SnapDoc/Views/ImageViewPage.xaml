@@ -248,7 +248,7 @@
                             <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Edit}" />
                             <Border Style="{StaticResource ChipColorDot}"
                                     BackgroundColor="{Binding SelectedBorderColor, Converter={StaticResource ColorWithoutAlphaConverter}}" />
-                            <Label Style="{StaticResource ChipText}" Text="Stift" />
+                            <Label Style="{StaticResource ChipText}" Text="{x:Static res:AppResources.stift}" />
                         </HorizontalStackLayout>
                     </Border>
 
@@ -268,7 +268,7 @@
                             <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Format_color_fill}" />
                             <Border Style="{StaticResource ChipColorDot}"
                                     BackgroundColor="{Binding SelectedFillColor}" />
-                            <Label Style="{StaticResource ChipText}" Text="Füllung" />
+                            <Label Style="{StaticResource ChipText}" Text="{x:Static res:AppResources.fuellung}" />
                         </HorizontalStackLayout>
                     </Border>
 
@@ -287,7 +287,7 @@
                         </Border.GestureRecognizers>
                         <HorizontalStackLayout Spacing="6">
                             <Label Style="{StaticResource ChipIcon}" Text="{x:Static local:MaterialIcons.Text_fields}" />
-                            <Label Style="{StaticResource ChipText}" Text="Text" />
+                            <Label Style="{StaticResource ChipText}" Text="{x:Static res:AppResources.text}" />
                         </HorizontalStackLayout>
                     </Border>
 
@@ -313,7 +313,7 @@
                                     </DataTrigger>
                                 </Label.Triggers>
                             </Label>
-                            <Label Style="{StaticResource ChipText}" Text="Wolke" />
+                            <Label Style="{StaticResource ChipText}" Text="{x:Static res:AppResources.wolke}" />
                         </HorizontalStackLayout>
                     </Border>
                 </HorizontalStackLayout>
@@ -340,7 +340,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Rectangle}" />
-                            <Label Style="{StaticResource ToolText}" Text="Rechteck" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.rechteck}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -357,7 +357,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Circle}" />
-                            <Label Style="{StaticResource ToolText}" Text="Kreis" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.kreis}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -374,7 +374,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Polyline}" />
-                            <Label Style="{StaticResource ToolText}" Text="Polygon" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.polygon}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -391,7 +391,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Rotation="90" Text="{x:Static local:MaterialIcons.Arrow_shape_up}" />
-                            <Label Style="{StaticResource ToolText}" Text="Pfeil" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.pfeil}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -408,7 +408,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Gesture}" />
-                            <Label Style="{StaticResource ToolText}" Text="Freihand" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.freihand}" />
                         </VerticalStackLayout>
                     </Border>
 
@@ -419,7 +419,7 @@
                         </Border.GestureRecognizers>
                         <VerticalStackLayout Spacing="2">
                             <Label Style="{StaticResource ToolIcon}" Text="{x:Static local:MaterialIcons.Ink_eraser}" />
-                            <Label Style="{StaticResource ToolText}" Text="Löschen" />
+                            <Label Style="{StaticResource ToolText}" Text="{x:Static res:AppResources.loeschen}" />
                         </VerticalStackLayout>
                     </Border>
                 </HorizontalStackLayout>
@@ -427,50 +427,22 @@
         </ScrollView>
 
         <!-- ============ BOTTOM SHEETS ============ -->
-        <controls:BottomSheet x:Name="PenSheet" Grid.Row="0" Title="STIFT"
+        <controls:BottomSheet x:Name="PenSheet" Grid.Row="0"
                               SheetColor="{DynamicResource SecondaryBackgroundDark}">
             <controls:PenEditorView x:Name="PenEditor" StyleChanged="OnPenChanged" />
         </controls:BottomSheet>
 
-        <controls:BottomSheet x:Name="FillSheet" Grid.Row="0" Title="FÜLLUNG"
+        <controls:BottomSheet x:Name="FillSheet" Grid.Row="0"
                               SheetColor="{DynamicResource SecondaryBackgroundDark}">
             <controls:FillEditorView x:Name="FillEditor" StyleChanged="OnFillChanged" />
         </controls:BottomSheet>
 
-        <controls:BottomSheet x:Name="CloudSheet" Grid.Row="0" Title="WOLKE"
-                              SheetColor="{DynamicResource SecondaryBackgroundDark}">
-            <VerticalStackLayout Spacing="10">
-                <controls:Switch LabelText="Wolkenkontur"
-                                 TextColor="White"
-                                 IsToggled="{Binding IsCloudActive}"
-                                 HorizontalOptions="Start"
-                                 BorderColorOff="Transparent"
-                                 KnobColorOn="White"
-                                 KnobColorOff="White"
-                                 SwitchColorOn="{DynamicResource Primary}"
-                                 SwitchColorOff="Gray" />
-                <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_radius}"
-                                      IsEnabled="{Binding IsCloudActive}"
-                                      IsRealtime="True" IsRange="False"
-                                      Minimum="1" Maximum="100" Step="1"
-                                      ValueFontSize="12" TextColor="White"
-                                      MinimumValueDisplayFormat="{}{0} px"
-                                      LowerValue="{Binding CloudRadius}"
-                                      MinimumTrackColor="{DynamicResource PrimaryAccent}"
-                                      MaximumTrackColor="Gray" />
-                <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_ueberschneidung}"
-                                      IsEnabled="{Binding IsCloudActive}"
-                                      IsRealtime="True" IsRange="False"
-                                      Minimum="0" Maximum="60" Step="1"
-                                      ValueFontSize="12" TextColor="White"
-                                      MinimumValueDisplayFormat="{}{0}°"
-                                      LowerValue="{Binding CloudInciseDeg}"
-                                      MinimumTrackColor="{DynamicResource PrimaryAccent}"
-                                      MaximumTrackColor="Gray" />
-            </VerticalStackLayout>
+        <controls:BottomSheet x:Name="CloudSheet" Grid.Row="0"
+                      SheetColor="{DynamicResource SecondaryBackgroundDark}">
+            <controls:CloudEditorView x:Name="CloudEditor" StyleChanged="OnCloudChanged" />
         </controls:BottomSheet>
 
-        <controls:BottomSheet x:Name="TextSheet" Grid.Row="0" Title="TEXT"
+        <controls:BottomSheet x:Name="TextSheet" Grid.Row="0"
                               SheetColor="{DynamicResource SecondaryBackgroundDark}">
             <VerticalStackLayout Spacing="10">
                 <controls:ColorSwatchBar SelectedColor="{Binding SelectedTextColor}"

@@ -45,6 +45,8 @@ public partial class ImageViewPage : IQueryAttributable
     private string strokeStyle = "";
     private bool drawingOwnsTouch;
     private bool syncingCloud;
+    private float cloudRadius = 20;
+    private float cloudInciseDeg = 15;
 
     private Color selectedBorderColor = new(0, 153, 0, 255);
     public Color SelectedBorderColor
@@ -136,20 +138,6 @@ public partial class ImageViewPage : IQueryAttributable
             if (!syncingCloud)
                 ApplyCloudToDrawable(value);
         }
-    }
-
-    private float cloudRadius = 20;
-    public float CloudRadius
-    {
-        get => cloudRadius;
-        set { if (cloudRadius != value) { cloudRadius = value; OnPropertyChanged(); ApplyStyles(); } }
-    }
-
-    private float cloudInciseDeg = 15;
-    public float CloudInciseDeg
-    {
-        get => cloudInciseDeg;
-        set { if (cloudInciseDeg != value) { cloudInciseDeg = value; OnPropertyChanged(); ApplyStyles(); } }
     }
 
     public ImageViewPage()
@@ -588,7 +576,10 @@ public partial class ImageViewPage : IQueryAttributable
         // Sheets schliessen, die zum neuen Werkzeug nicht passen
         if (!IsFillOptionVisible && FillSheet.IsOpen) _ = FillSheet.CloseAsync();
         if (!IsTextOptionVisible && TextSheet.IsOpen) _ = TextSheet.CloseAsync();
-        if (!IsCloudOptionVisible && CloudSheet.IsOpen) _ = CloudSheet.CloseAsync();
+        if (!IsCloudOptionVisible && CloudSheet.IsOpen)
+            _ = CloudSheet.CloseAsync();
+        else if (CloudSheet.IsOpen)
+            CloudEditor.Load(IsCloudActive, cloudRadius, cloudInciseDeg);
     }
 
     private async void EraseClicked(object sender, EventArgs e)
@@ -607,7 +598,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         if (!File.Exists(origPath))
         {
-            await this.DisplaySnackbar("Original nicht verfügbar – bitte online gehen.", actionButtonText: AppResources.ok);
+            await this.DisplaySnackbar(AppResources.original_nicht_verfuegbar, actionButtonText: AppResources.ok);
             return;
         }
 
@@ -643,7 +634,8 @@ public partial class ImageViewPage : IQueryAttributable
     private async void FillClicked(object sender, EventArgs e) => await ToggleSheetAsync(FillSheet, "Fill", () =>
             FillEditor.Load(SelectedFillColor, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation));
 
-    private async void CloudClicked(object sender, EventArgs e) => await ToggleSheetAsync(CloudSheet, "Cloud", null);
+    private async void CloudClicked(object sender, EventArgs e) => await ToggleSheetAsync(CloudSheet, "Cloud", () =>
+            CloudEditor.Load(IsCloudActive, cloudRadius, cloudInciseDeg));
 
     private async void TextClicked(object sender, EventArgs e)
     {
@@ -688,6 +680,16 @@ public partial class ImageViewPage : IQueryAttributable
         hatchStrokeWitdh = f.HatchStrokeWitdh;
         hatchStrokeSpace = f.HatchStrokeSpace;
         hatchRotation = f.HatchRotation;
+        ApplyStyles();
+    }
+
+    // Live: Wolken-Sheet
+    private void OnCloudChanged(object sender, EventArgs e)
+    {
+        var c = CloudEditor;
+        IsCloudActive = c.IsCloudActive;   // schreibt über ApplyCloudToDrawable in die Form
+        cloudRadius = c.CloudRadius;
+        cloudInciseDeg = c.CloudInciseDeg;
         ApplyStyles();
     }
 
@@ -839,7 +841,7 @@ public partial class ImageViewPage : IQueryAttributable
                     if (hadOverlay)
                     {
                         // Sonst würde das bemalte Bild zum "Original"
-                        await this.DisplaySnackbar("Original nicht verfügbar – bitte online gehen.", actionButtonText: AppResources.ok);
+                        await this.DisplaySnackbar(AppResources.original_nicht_verfuegbar, actionButtonText: AppResources.ok);
                         return; // Bearbeitungsmodus bleibt offen
                     }
                     File.Copy(imgPath, origPath);
@@ -848,7 +850,7 @@ public partial class ImageViewPage : IQueryAttributable
                 bool saved = await SaveFotoWithOverlay(origPath, imgPath);
                 if (!saved)
                 {
-                    await this.DisplaySnackbar("Das Bild mit der Zeichnung konnte nicht gespeichert werden.", actionButtonText: AppResources.ok);
+                    await this.DisplaySnackbar(AppResources.zeichnung_konnte_nicht_gespeichert_werden, actionButtonText: AppResources.ok);
                     return;
                 }
 

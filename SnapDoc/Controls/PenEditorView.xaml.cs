@@ -1,5 +1,6 @@
 #nullable disable
 using Microsoft.Maui.Controls.Shapes;
+using SnapDoc.Resources.Languages;
 using System.Text.RegularExpressions;
 
 namespace SnapDoc.Controls;
@@ -9,14 +10,14 @@ public partial class PenEditorView : ContentView
     [GeneratedRegex(@"\s+")]
     private static partial Regex MultipleSpacesRegex();
 
-    private static readonly int[] Widths = [1, 2, 3, 5, 8, 12, 16];
+    private static readonly int[] Widths = [0, 1, 2, 3, 5, 8, 12, 16];
 
     private static readonly (string Name, string Pattern)[] Patterns =
     [
-        ("Durchgezogen", ""),
-        ("Gestrichelt", "12 6"),
-        ("Gepunktet", "2 5"),
-        ("Strichpunkt", "12 4 2 4")
+        (AppResources.keine_linie, ""),
+        (AppResources.gestrichelt, "12 6"),
+        (AppResources.gepunktet, "2 5"),
+        (AppResources.strichpunkt, "12 4 2 4")
     ];
 
     public event EventHandler StyleChanged;
@@ -43,9 +44,17 @@ public partial class PenEditorView : ContentView
                 lineWidth = value;
                 OnPropertyChanged();
                 UpdateWidthSelection();
+                UpdatePatternEnabled();
                 Raise();
             }
         }
+    }
+
+    private void UpdatePatternEnabled()
+    {
+        if (PatternSection == null) return;   // Setter kann vor InitializeComponent laufen
+        PatternSection.IsEnabled = lineWidth > 0;
+        PatternSection.Opacity = lineWidth > 0 ? 1 : 0.4;
     }
 
     private string strokeStyle = "";
@@ -88,29 +97,46 @@ public partial class PenEditorView : ContentView
             StyleChanged?.Invoke(this, EventArgs.Empty);
     }
 
-    #region Presets
-
     private void BuildWidthPresets()
     {
         foreach (var w in Widths)
         {
-            double dot = Math.Clamp(w + 3, 5, 22);
-            var item = new Border
+            View inner;
+            if (w == 0)
             {
-                WidthRequest = 40,
-                HeightRequest = 40,
-                StrokeShape = new RoundRectangle { CornerRadius = 20 },
-                StrokeThickness = 1.5,
-                Content = new Ellipse
+                // "Keine Linie": Schrägstrich wie bei "keine Farbe"
+                inner = new BoxView
+                {
+                    Color = Color.FromArgb("#E53935"),
+                    WidthRequest = 2.5,
+                    HeightRequest = 26,
+                    Rotation = 45,
+                    HorizontalOptions = LayoutOptions.Center,
+                    VerticalOptions = LayoutOptions.Center
+                };
+            }
+            else
+            {
+                double dot = Math.Clamp(w + 3, 5, 22);
+                inner = new Ellipse
                 {
                     Fill = Colors.White,
                     WidthRequest = dot,
                     HeightRequest = dot,
                     HorizontalOptions = LayoutOptions.Center,
                     VerticalOptions = LayoutOptions.Center
-                }
+                };
+            }
+
+            var item = new Border
+            {
+                WidthRequest = 40,
+                HeightRequest = 40,
+                StrokeShape = new RoundRectangle { CornerRadius = 20 },
+                StrokeThickness = 1.5,
+                Content = inner
             };
-            ToolTipProperties.SetText(item, $"{w} px");
+            ToolTipProperties.SetText(item, w == 0 ? AppResources.keine_linie : $"{w} px");
             AddTap(item, () => LineWidth = w);
             _widthItems.Add((item, w));
             WidthPresets.Children.Add(item);
@@ -182,8 +208,6 @@ public partial class PenEditorView : ContentView
         tap.Tapped += (_, _) => action();
         view.GestureRecognizers.Add(tap);
     }
-
-    #endregion
 
     private void OnStrokeTextChanged(object sender, TextChangedEventArgs e)
     {

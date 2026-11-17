@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:controls="clr-namespace:SnapDoc.Controls"
+             xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+             x:Class="SnapDoc.Controls.CloudEditorView"
+             x:DataType="controls:CloudEditorView">
+
+    <VerticalStackLayout Spacing="10">
+
+        <!-- Wolkenkontur an/aus -->
+        <controls:Switch LabelText="{x:Static res:AppResources.wolkenkontur}"
+                         TextColor="White"
+                         IsToggled="{Binding IsCloudActive}"
+                         HorizontalOptions="Start"
+                         BorderColorOff="Transparent"
+                         KnobColorOn="White"
+                         KnobColorOff="White"
+                         SwitchColorOn="{DynamicResource Primary}"
+                         SwitchColorOff="Gray" />
+
+        <!-- Parameter (nur aktiv, wenn die Wolke eingeschaltet ist) -->
+        <VerticalStackLayout Spacing="4" IsEnabled="{Binding IsCloudActive}">
+            <VerticalStackLayout.Triggers>
+                <DataTrigger TargetType="VerticalStackLayout" Binding="{Binding IsCloudActive}" Value="False">
+                    <Setter Property="Opacity" Value="0.4" />
+                </DataTrigger>
+            </VerticalStackLayout.Triggers>
+
+            <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_radius}"
+                                  IsRealtime="True" IsRange="False"
+                                  Minimum="1" Maximum="100" Step="1"
+                                  TextColor="#9E9E9E"
+                                  FontSize="12"
+                                  ValueFontSize="12"
+                                  MinimumValueDisplayFormat="{}{0} px"
+                                  LowerValue="{Binding CloudRadius}"
+                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                                  MaximumTrackColor="Gray" />
+
+            <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_ueberschneidung}"
+                                  IsRealtime="True" IsRange="False"
+                                  Minimum="0" Maximum="60" Step="1"
+                                  TextColor="#9E9E9E"
+                                  FontSize="12"
+                                  ValueFontSize="12"
+                                  MinimumValueDisplayFormat="{}{0}°"
+                                  LowerValue="{Binding CloudInciseDeg}"
+                                  MinimumTrackColor="{DynamicResource PrimaryDarkAccent}"
+                                  MaximumTrackColor="Gray" />
+        </VerticalStackLayout>
+    </VerticalStackLayout>
+</ContentView>
