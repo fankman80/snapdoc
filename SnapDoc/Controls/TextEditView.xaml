@@ -41,7 +41,6 @@
     </ContentView.Resources>
 
     <VerticalStackLayout x:Name="Root" x:DataType="controls:TextEditView" Spacing="6">
-
         <!-- Text -->
         <controls:BorderedEditor x:Name="TextInput"
                                  TextColor="White"

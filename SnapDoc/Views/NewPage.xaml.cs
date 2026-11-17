@@ -1,5 +1,4 @@
 ﻿#nullable disable
-using CommunityToolkit.Maui;
 using CommunityToolkit.Maui.Core;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Mvvm.Messaging;
@@ -27,34 +26,39 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly GeolocationViewModel geoViewModel = GeolocationViewModel.Instance;
     private readonly System.Collections.ObjectModel.ObservableCollection<MapPin> pinList = [];
     private readonly DrawingController drawingController;
-    private DrawMode drawMode = DrawMode.None;
-    private bool isHatchEffect = false;
-    private float hatchStrokeWitdh = 2f;
-    private float hatchStrokeSpace = 8f;
-    private float hatchRotation = 45f;
-    private int lineWidth = 3;
-    private string strokeStyle = "";
-    private float cloudRadius = 20;
-    private float cloudInciseDeg = 15;
     private bool _isShowingPopup = false;
     private string planImageSource = "";
     private bool isGrayscaleMode;
-    private Color selectedBorderColor = new(0, 153, 0, 255);
-    private Color selectedFillColor = new(202, 255, 150, 128);
-    private Color selectedTextColor = new(0, 0, 0, 255);
     private bool isToolButtonsVisible = false;
     private bool isMeasureVisible = false;
+    private bool isMeasureToggleVisible;
     private const float PdfPointFactor = 0.0254f / 72f;
     private bool isRulerActive;
     private MapPin _editingCustomPin;
     private readonly Dictionary<string, bool> _pendingLockChanges = [];
     private readonly record struct DrawingExportResult(SKRect PlanBounds, int PixelWidth, int PixelHeight, float PinScale);
-    public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); }}
-    public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); }}
-    public Color SelectedBorderColor { get => selectedBorderColor; set { selectedBorderColor = value; OnPropertyChanged(); }}
-    public Color SelectedFillColor { get => selectedFillColor; set { selectedFillColor = value; OnPropertyChanged(); }}
-    public Color SelectedTextColor { get => selectedTextColor; set { selectedTextColor = value; OnPropertyChanged(); }}
-    public bool IsToolButtonsVisible { get => isToolButtonsVisible; set { isToolButtonsVisible = value; OnPropertyChanged(); }}
+    public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); } }
+    public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); } }
+
+    public bool IsToolButtonsVisible
+    {
+        get => isToolButtonsVisible;
+        set
+        {
+            isToolButtonsVisible = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsDrawToolbarVisible));
+        }
+    }
+
+    public bool IsDrawToolbarVisible => IsToolButtonsVisible && !IsRulerActive;
+
+    public bool IsMeasureToggleVisible
+    {
+        get => isMeasureToggleVisible;
+        set { if (isMeasureToggleVisible == value) return; isMeasureToggleVisible = value; OnPropertyChanged(); }
+    }
+
     public bool IsMeasureVisible
     {
         get => isMeasureVisible;
@@ -63,16 +67,23 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             if (isMeasureVisible == value) return;
             isMeasureVisible = value;
             OnPropertyChanged();
-
             if (value && drawingController.IsActive)
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
             drawingController.IsMeasureActive = value;
+            PlanImage?.InvalidateSurface();
         }
     }
+
     public bool IsRulerActive
     {
         get => isRulerActive;
-        set { if (isRulerActive == value) return; isRulerActive = value; OnPropertyChanged(); }
+        set
+        {
+            if (isRulerActive == value) return;
+            isRulerActive = value;
+            OnPropertyChanged();
+            OnPropertyChanged(nameof(IsDrawToolbarVisible));
+        }
     }
 
     public NewPage(string _planId)
@@ -80,16 +91,21 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         thisPlan = GlobalJson.Data.Plans[planId];
         drawingController = new DrawingController(new TransformViewModel());
-
         InitializeComponent();
+
+        // Gemeinsame Zeichen-UI
+        DrawToolbar.Attach(drawingController);
+        DrawToolbar.RedrawRequested += (_, _) => PlanImage.InvalidateSurface();
+        DrawToolbar.DrawModeChanged += OnToolbarDrawModeChanged;
 
         RegisterMessenger();
     }
 
     protected override bool OnBackButtonPressed()
     {
+        if (DrawToolbar.CloseOpenSheet()) return true;
         if (MoreMenuOverlay.IsVisible) { _ = HideMoreMenuAsync(); return true; }
-
+        if (IsToolButtonsVisible) { CancelDrawing(); return true; }
         return base.OnBackButtonPressed();
     }
 
@@ -146,6 +162,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (!_isShowingPopup)
             Cleanup();
+    }
+
+    private void OnToolbarDrawModeChanged(object sender, DrawMode mode)
+    {
+        IsRulerActive = mode == DrawMode.Ruler;
+        IsMeasureToggleVisible = mode is DrawMode.Rect or DrawMode.Poly;
     }
 
     private void RegisterMessenger()
@@ -676,43 +698,26 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
     private async Task StartDrawing(bool setDefaultMode = true)
     {
-        if (setDefaultMode)
-        {
-            AddShapeBtn.Text = MaterialIcons.Rectangle;
-            AddCloudyBtn.Text = MaterialIcons.Cloud_off;
-            SetDrawMode(DrawMode.Rect);
-        }
-
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
 
-        await MainThread.InvokeOnMainThreadAsync(async () =>
+        await MainThread.InvokeOnMainThreadAsync(() =>
         {
             try
             {
                 if (setDefaultMode)
                     drawingController.Reset();
 
-                drawingController.InitializeDrawing(
-                    SelectedBorderColor.ToSKColor(),
-                    SelectedFillColor.ToSKColor(),
-                    SelectedTextColor.ToSKColor(),
-                    lineWidth,
-                    strokeStyle,
-                    isHatchEffect,
-                    hatchStrokeWitdh,
-                    hatchStrokeSpace,
-                    hatchRotation,
-                    rotationAngle: 0f,
-                    forceReset: setDefaultMode);
+                // Stil + Standardwerkzeug (Rechteck) setzt die Toolbar
+                DrawToolbar.InitializeDrawing(setDefaultMode);
 
                 drawingController.InitialRotation = 0f;
                 drawingController.MeasureFactor = GetCurrentMeasureFactor();
                 drawingController.Measure.MeasureTextSize = 16f;
                 drawingController.Measure.MeasureUnit = thisPlan.MeasureUnit;
                 drawingController.IsMeasureActive = IsMeasureVisible;
-
                 drawingController.IsActive = true;
+
                 PlanImage.DrawingLayer = drawingController;
                 IsToolButtonsVisible = true;
             }
@@ -723,6 +728,27 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 IsToolButtonsVisible = false;
             }
         });
+    }
+
+    private async void OnMeasureAdjust(object sender, EventArgs e)
+    {
+        drawingController.RulerDrawable.Reset();
+        await DrawToolbar.CloseSheetsAsync();
+        DrawToolbar.SetDrawMode(DrawMode.Ruler);
+    }
+
+    private void OnMeasureCancel(object sender, EventArgs e)
+    {
+        drawingController.RulerDrawable.Reset();
+        DrawToolbar.SetDrawMode(DrawMode.Rect);
+    }
+
+    private void CancelDrawingClicked(object sender, EventArgs e) => CancelDrawing();
+
+    private void CancelDrawing()
+    {
+        drawingController.Reset();
+        Cleanup();   // stellt einen bearbeiteten Custom-Pin wieder her
     }
 
     private float GetCurrentMeasureFactor() => PdfPointFactor * thisPlan.MeasureFactor;
@@ -790,7 +816,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         drawingController.RulerDrawable.Reset();
 
         // Wieder zum Rechteck wechseln
-        SetDrawMode(DrawMode.Rect);
+        DrawToolbar.SetDrawMode(DrawMode.Rect);
 
         PlanImage.InvalidateSurface();
     }
@@ -808,98 +834,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         return float.IsFinite(planMeasureFactor) && planMeasureFactor > 0f;
     }
 
-    private void OnMeasureAdjust(object sender, EventArgs e)
-    {
-        drawingController.RulerDrawable.Reset();
-        SetDrawMode(DrawMode.Ruler);
-        PlanImage.InvalidateSurface();
-    }
-
-    private void OnMeasureCancel(object sender, EventArgs e)
-    {
-        drawingController.RulerDrawable.Reset();
-        SetDrawMode(DrawMode.Rect);
-    }
-
     private async void DrawingClicked(object sender, EventArgs e) => await StartDrawing();
-
-    private async void ShapeButtonClicked(object sender, EventArgs e)
-    {
-        var popup = new PopupShapeSelect();
-        var temporaryOptions = new PopupOptions
-        {
-            CanBeDismissedByTappingOutsideOfPopup = true,
-            Shape = Settings.PopupOptions.Shape
-        };
-
-        _isShowingPopup = true;
-        var result = await this.ShowPopupAsync<object>(popup, temporaryOptions);
-        _isShowingPopup = false;
-
-        if (result.WasDismissedByTappingOutsideOfPopup || result.Result is not int selectedShape) return;
-
-        var mode = selectedShape switch
-        {
-            0 => DrawMode.Rect,
-            1 => DrawMode.Oval,
-            2 => DrawMode.Poly,
-            3 => DrawMode.Arrow,
-            4 => DrawMode.Free,
-            _ => DrawMode.Rect
-        };
-
-        SetDrawMode(mode);
-
-        if (selectedShape == 5)
-            TextClicked(null, null);
-    }
-
-    private void SetDrawMode(DrawMode mode)
-    {
-        if (mode == DrawMode.None) return;
-
-        drawMode = mode;
-        drawingController.DrawMode = mode;
-        IsRulerActive = mode == DrawMode.Ruler;
-
-        AddEraserBtn.IsVisible = mode is not DrawMode.Ruler;
-        AddShapeBtn.IsVisible = mode is not DrawMode.Ruler;
-        AddPaletteBtn.IsVisible = mode is not DrawMode.Ruler;
-        AddTextBtn.IsVisible = mode is DrawMode.Rect or DrawMode.Oval;
-        AddCloudyBtn.IsVisible = mode is DrawMode.Poly or DrawMode.Rect or DrawMode.Oval;
-        AddMeasureBtn.IsVisible = mode is DrawMode.Rect or DrawMode.Poly;
-
-        var combined = drawingController.CombinedDrawable;
-
-        (AddShapeBtn.Text, bool isCloud) = mode switch
-        {
-            DrawMode.Rect => (MaterialIcons.Activity_zone, combined?.RectDrawable?.IsCloud ?? false),
-            DrawMode.Oval => (MaterialIcons.Circle, combined?.OvalDrawable?.IsCloud ?? false),
-            DrawMode.Poly => (MaterialIcons.Polyline, combined?.PolyDrawable?.IsCloud ?? false),
-            DrawMode.Arrow => (MaterialIcons.Arrow_shape_up, false),
-            DrawMode.Free => (MaterialIcons.Gesture, false),
-            _ => (AddShapeBtn.Text, false)
-        };
-
-        AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-
-        if (combined != null)
-        {
-            combined.PolyDrawable.DisplayHandles = mode == DrawMode.Poly;
-            combined.RectDrawable.DisplayHandles = mode == DrawMode.Rect;
-            combined.OvalDrawable.DisplayHandles = mode == DrawMode.Oval;
-            combined.ArrowDrawable.DisplayHandles = mode == DrawMode.Arrow;
-        }
-
-        drawingController.RulerDrawable.DisplayHandles = mode == DrawMode.Ruler;
-
-        PlanImage.InvalidateSurface();
-    }
-
-    private void EraseClicked(object sender, EventArgs e) => drawingController.Reset();
 
     private async void CheckClicked(object sender, EventArgs e)
     {
+        await DrawToolbar.CloseSheetsAsync();
+
         if (drawingController.IsEmpty())
         {
             Cleanup();
@@ -944,11 +884,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         drawingController.SaveToFile(dataPath);
 
-        SaveManager.NotifyDataChanged(
-        [
-            (pngPath, GlobalJson.Data.CustomPinsPath),
-            (dataPath, GlobalJson.Data.CustomPinsPath)
-        ]);
+        SaveManager.NotifyDataChanged([(pngPath, GlobalJson.Data.CustomPinsPath), (dataPath, GlobalJson.Data.CustomPinsPath)]);
 
         SKRect planBounds = export.Value.PlanBounds;
         double relativeX = planBounds.MidX / PlanImage.OriginalImageSize.Width;
@@ -961,7 +897,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             pngFileName,
             export.Value.PixelWidth,
             export.Value.PixelHeight,
-            new SKColor(SelectedBorderColor.ToUint()),
+            new SKColor(DrawToolbar.SelectedBorderColor.ToUint()),
             export.Value.PinScale,
             0,
             displayText,
@@ -995,10 +931,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         drawingController.IsActive = false;
         PlanImage.DrawingLayer = null;
-        drawMode = DrawMode.None;
         drawingController.DrawMode = DrawMode.None;
         drawingController.RulerDrawable.Reset();
+
+        DrawToolbar.Reset();
+        _ = DrawToolbar.CloseSheetsAsync();
+
         IsRulerActive = false;
+        IsMeasureToggleVisible = false;
         IsToolButtonsVisible = false;
         DrawBtn.IsVisible = true;
         SettingsService.Instance.IsPinPlaceBtnManualHide = false;
@@ -1006,7 +946,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         if (_editingCustomPin != null && !pinList.Contains(_editingCustomPin))
             pinList.Add(_editingCustomPin);
-
         _editingCustomPin = null;
 
         PlanImage.InvalidateSurface();
@@ -1019,20 +958,10 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (bounds == null || bounds.Value.Width <= 0f || bounds.Value.Height <= 0f)
             return null;
 
-        // Die Zeichnung liegt in Plan-Koordinaten.
-        // Mit dem aktuellen Zoom exportieren wir ungefähr in der
-        // Auflösung, in welcher die Zeichnung momentan dargestellt wird.
         float exportScale = Math.Max(0.01f, (float)PlanImage.CurrentScale);
-
-        // Der Pin muss später wieder auf die ursprüngliche Grösse
-        // im Plan zurückskaliert werden.
         float pinScale = 1f / exportScale;
-
-        // Etwas Rand um die Zeichnung.
-        // Die 8 DIP werden zuerst zu Bildschirm-Pixeln
-        // und danach zu Plan-Pixeln umgerechnet.
         float density = (float)Settings.DisplayDensity;
-        float paddingScreenPx = Math.Max(8f * density, lineWidth * density * 2f);
+        float paddingScreenPx = Math.Max(8f * density, DrawToolbar.LineWidth * density * 2f);
         float paddingPlan = paddingScreenPx / exportScale;
 
         SKRect crop = bounds.Value;
@@ -1064,12 +993,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SKCanvas canvas = surface.Canvas;
 
         canvas.Clear(SKColors.Transparent);
-
-        // Plan-Koordinaten auf die gewünschte PNG-Auflösung skalieren.
         canvas.Scale(exportScale);
-
-        // BoundingBox nach links oben verschieben,
-        // damit das PNG dort bei 0/0 beginnt.
         canvas.Translate(-crop.Left, -crop.Top);
 
         // Zeichnung ohne Handles rendern.
@@ -1082,124 +1006,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         data.SaveTo(stream);
 
         return new DrawingExportResult(crop, pixelWidth, pixelHeight, pinScale);
-    }
-
-    private async void PenSettingsClicked(object sender, EventArgs e)
-    {
-        bool isCloud = (AddCloudyBtn.Text == MaterialIcons.Cloud);
-        var popup = new PopupStyleEditor(lineWidth, SelectedBorderColor.ToArgbHex(), SelectedFillColor.ToArgbHex(), SelectedTextColor.ToArgbHex(), strokeStyle, isHatchEffect, hatchStrokeWitdh, hatchStrokeSpace, hatchRotation, cloudRadius, cloudInciseDeg, isCloud);
-
-        _isShowingPopup = true;
-        var result = await this.ShowPopupAsync<PopupStyleReturn>(popup, Settings.PopupOptions);
-        _isShowingPopup = false;
-
-        if (result.Result == null) return;
-
-        SelectedBorderColor = Color.FromArgb(result.Result.BorderColorHex);
-        SelectedFillColor = Color.FromArgb(result.Result.FillColorHex);
-        SelectedTextColor = Color.FromArgb(result.Result.TextColorHex);
-        lineWidth = result.Result.PenWidth;
-        strokeStyle = result.Result.StrokeStyle;
-        isHatchEffect = result.Result.IsHatchEffect;
-        hatchStrokeWitdh = result.Result.HatchStrokeWitdh;
-        hatchStrokeSpace = result.Result.HatchStrokeSpace;
-        hatchRotation = result.Result.HatchRotation;
-        cloudRadius = result.Result.CloudRadius;
-        cloudInciseDeg = result.Result.CloudInciseDeg;
-
-        drawingController?.UpdateDrawingStyles(
-            SelectedBorderColor.ToSKColor(),
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            lineWidth,
-            strokeStyle,
-            isHatchEffect,
-            hatchStrokeWitdh,
-            hatchStrokeSpace,
-            hatchRotation,
-            cloudRadius,
-            cloudInciseDeg
-        );
-    }
-
-    private async void TextClicked(object sender, EventArgs e)
-    {
-        if (drawingController?.CombinedDrawable == null) return;
-
-        var rectDrawable = drawingController.CombinedDrawable.RectDrawable;
-        var ovalDrawable = drawingController.CombinedDrawable.OvalDrawable;
-        string currentText;
-        float textSize;
-        bool autoSizeText;
-        int textPadding;
-        RectangleTextAlignment textAlignment;
-        RectangleTextStyle textStyle;
-
-        if (drawMode == DrawMode.Rect)
-        {
-            currentText = rectDrawable.Text;
-            textSize = rectDrawable.TextSize;
-            textAlignment = rectDrawable.TextAlignment;
-            textStyle = rectDrawable.TextStyle;
-            autoSizeText = rectDrawable.AutoSizeText;
-            textPadding = rectDrawable.TextPadding;
-        }
-        else if (drawMode == DrawMode.Oval)
-        {
-            currentText = ovalDrawable.Text;
-            textSize = ovalDrawable.TextSize;
-            textAlignment = ovalDrawable.TextAlignment;
-            textStyle = ovalDrawable.TextStyle;
-            autoSizeText = ovalDrawable.AutoSizeText;
-            textPadding = ovalDrawable.TextPadding;
-        }
-        else
-            return; // Kein unterstützter Modus für Textbearbeitung
-
-        var popup = new PopupTextEdit(textSize, textAlignment, textStyle, autoSizeText, currentText, textPadding, okText: AppResources.ok);
-        _isShowingPopup = true;
-        var result = await this.ShowPopupAsync<TextEditReturn>(popup, Settings.PopupOptions);
-        _isShowingPopup = false;
-
-        if (result?.Result == null) return;
-
-        if (drawMode == DrawMode.Rect)
-        {
-            rectDrawable.Text = result.Result.InputTxt;
-            rectDrawable.TextSize = result.Result.FontSize;
-            rectDrawable.TextAlignment = result.Result.Alignment;
-            rectDrawable.TextStyle = result.Result.Style;
-            rectDrawable.AutoSizeText = result.Result.AutoSize;
-            rectDrawable.TextPadding = result.Result.TextPadding;
-        }
-        else if (drawMode == DrawMode.Oval)
-        {
-            ovalDrawable.Text = result.Result.InputTxt;
-            ovalDrawable.TextSize = result.Result.FontSize;
-            ovalDrawable.TextAlignment = result.Result.Alignment;
-            ovalDrawable.TextStyle = result.Result.Style;
-            ovalDrawable.AutoSizeText = result.Result.AutoSize;
-            ovalDrawable.TextPadding = result.Result.TextPadding;
-        }
-
-        PlanImage.InvalidateSurface();
-    }
-
-    private void CloudyClicked(object sender, EventArgs e)
-    {
-        var combined = drawingController?.CombinedDrawable;
-        if (combined == null) return;
-
-        bool isCloud = drawingController.DrawMode switch
-        {
-            DrawMode.Rect => combined.RectDrawable.IsCloud = !combined.RectDrawable.IsCloud,
-            DrawMode.Oval => combined.OvalDrawable.IsCloud = !combined.OvalDrawable.IsCloud,
-            DrawMode.Poly => combined.PolyDrawable.IsCloud = !combined.PolyDrawable.IsCloud,
-            _ => false
-        };
-
-        AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-        PlanImage.InvalidateSurface();
     }
 
     private void OnToggleMeasureClicked(object sender, EventArgs e) => IsMeasureVisible = !IsMeasureVisible;
@@ -1233,8 +1039,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (!File.Exists(filePath))
             return;
 
-        // Optional:
-        // Auf ungefähr denselben Zoom gehen, mit dem der Pin erstellt wurde.
         ZoomToPin(tappedPin.Id, 1 / pinData.PinScale);
 
         _editingCustomPin = tappedPin;
@@ -1257,50 +1061,29 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // -----------------------------------------------------
         // Style wiederherstellen
         // -----------------------------------------------------
-
         var style = drawingController.LoadedStyle;
-
         if (style != null)
         {
-            SelectedBorderColor = SKColor.Parse(style.LineColor).ToMauiColor();
-            SelectedFillColor = SKColor.Parse(style.FillColor).ToMauiColor();
-
-            var textColor = SKColors.Black;
-            bool isCloud = false;
-
-            if (drawingController.CombinedDrawable != null)
+            var combined = drawingController.CombinedDrawable;
+            var textColor = drawingController.DrawMode switch
             {
-                if (drawingController.DrawMode == DrawMode.Rect)
-                {
-                    textColor = drawingController.CombinedDrawable.RectDrawable.TextColor;
-                    isCloud = drawingController.CombinedDrawable.RectDrawable.IsCloud;
-                }
-                else if (drawingController.DrawMode == DrawMode.Oval)
-                {
-                    textColor = drawingController.CombinedDrawable.OvalDrawable.TextColor;
-                    isCloud = drawingController.CombinedDrawable.OvalDrawable.IsCloud;
-                }
-                else if (drawingController.DrawMode == DrawMode.Poly)
-                {
-                    isCloud = drawingController.CombinedDrawable.PolyDrawable.IsCloud;
-                }
-            }
+                DrawMode.Rect => combined?.RectDrawable.TextColor ?? SKColors.Black,
+                DrawMode.Oval => combined?.OvalDrawable.TextColor ?? SKColors.Black,
+                _ => SKColors.Black
+            };
 
-            AddCloudyBtn.Text = isCloud ? MaterialIcons.Cloud : MaterialIcons.Cloud_off;
-            SelectedTextColor = textColor.ToMauiColor();
-            lineWidth = (int)style.LineThickness;
-            strokeStyle = style.StrokeStyle;
-            isHatchEffect = style.IsHatchEffect;
-            hatchStrokeWitdh = style.HatchStrokeWitdh;
-            hatchStrokeSpace = style.HatchStrokeSpace;
-            hatchRotation = style.HatchRotation;
+            DrawToolbar.LoadStyle(
+                SKColor.Parse(style.LineColor).ToMauiColor(),
+                SKColor.Parse(style.FillColor).ToMauiColor(),
+                textColor.ToMauiColor(),
+                (int)style.LineThickness, style.StrokeStyle,
+                style.IsHatchEffect, style.HatchStrokeWitdh, style.HatchStrokeSpace, style.HatchRotation);
         }
 
-        // Aktiven Zeichenmodus wiederherstellen.
+        // Werkzeug + Wolken-Zustand der geladenen Form übernehmen
         if (drawingController.DrawMode != DrawMode.None)
-            SetDrawMode(drawingController.DrawMode);
+            DrawToolbar.SetDrawMode(drawingController.DrawMode);
 
-        // Neu zeichnen.
         PlanImage.InvalidateSurface();
     }
 
@@ -1532,7 +1315,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         // Lokal sichern, die Seite wird gleich entfernt
         string id = planId;
 
-        // 1. Daten löschen (unabhängig von der Shell)
+        // Daten löschen (unabhängig von der Shell)
         if (SyncOps.TryGetLivePlan(id, out var plan))
         {
             string planDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
@@ -1547,14 +1330,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             SyncOps.DeletePlan(id);
         }
 
-        // 2. Masterliste bereinigen
+        // Masterliste bereinigen
         var masterItem = ProjectItem.Current.AllPlanItems.FirstOrDefault(p => p.PlanId == id);
         if (masterItem != null)
             ProjectItem.Current.AllPlanItems.Remove(masterItem);
 
         ProjectItem.Current.ApplyFilterAndSorting();
 
-        // 3. UI: zuerst weg von dieser Seite, dann den Shell-Eintrag entfernen
+        // UI: zuerst weg von dieser Seite, dann den Shell-Eintrag entfernen
         if (Shell.Current is AppShell shell)
         {
             await shell.GoToAsync("//homescreen");
@@ -1577,7 +1360,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         string planDir = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.PlanPath);
         string thumbDir = Path.Combine(planDir, "thumbnails");
-
         string oldFile = thisPlan.File;
         string imagePath = Path.Combine(planDir, oldFile);
         string thumbPath = Path.Combine(thumbDir, oldFile);
@@ -1587,8 +1369,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             await SaveManager.DownloadMediaOnDemandAsync(oldFile, GlobalJson.Data.PlanPath);
         if (!File.Exists(imagePath)) return;
 
-        // Eindeutiger Name pro Drehung: alte Kopien und Tile-Caches
-        // können nie mit dem neuen Bild verwechselt werden
         string newFile = $"{TileCache.GetPlanRootName(oldFile)}_r{DateTime.UtcNow.Ticks}{Path.GetExtension(oldFile)}";
         string outputPath = Path.Combine(planDir, newFile);
         string thumbOutputPath = Path.Combine(thumbDir, newFile);
@@ -1634,10 +1414,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         SaveManager.QueueCloudDelete($"{GlobalJson.Data.PlanPath}/thumbnails/{oldFile}");
 
         // Neue Dateien hochladen
-        SaveManager.NotifyDataChanged([
-            (outputPath, GlobalJson.Data.PlanPath),
-        (thumbOutputPath, $"{GlobalJson.Data.PlanPath}/thumbnails")
-        ]);
+        SaveManager.NotifyDataChanged([(outputPath, GlobalJson.Data.PlanPath), (thumbOutputPath, $"{GlobalJson.Data.PlanPath}/thumbnails")]);
     }
 
     private static void TryDelete(string path)
@@ -1646,10 +1423,6 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         catch (Exception ex) { System.Diagnostics.Debug.WriteLine($"Löschen fehlgeschlagen: {ex.Message}"); }
     }
 
-    /// <summary>
-    /// Erzeugt ein Plan-Vorschaubild mit maxEdge als längster Kante.
-    /// JPEG wird direkt verkleinert dekodiert, das spart bei großen Plänen viel Speicher.
-    /// </summary>
     private static void CreatePlanThumbnail(string sourcePath, string destPath, int maxEdge)
     {
         using var codec = SKCodec.Create(sourcePath);

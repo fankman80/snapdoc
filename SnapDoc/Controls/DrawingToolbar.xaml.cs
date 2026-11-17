@@ -285,9 +285,14 @@ public partial class DrawingToolbar : ContentView
             SelectedBorderColor.ToSKColor(),
             SelectedFillColor.ToSKColor(),
             SelectedTextColor.ToSKColor(),
-            LineWidth, StrokeStyle,
-            IsHatchEffect, HatchStrokeWitdh, HatchStrokeSpace, HatchRotation,
-            CloudRadius, CloudInciseDeg);
+            LineWidth,
+            StrokeStyle,
+            IsHatchEffect,
+            HatchStrokeWitdh,
+            HatchStrokeSpace,
+            HatchRotation,
+            CloudRadius,
+            CloudInciseDeg);
         Redraw();
     }
 
@@ -305,7 +310,20 @@ public partial class DrawingToolbar : ContentView
         Redraw();
     }
 
-    private void Redraw() => RedrawRequested?.Invoke(this, EventArgs.Empty);
+    private bool _redrawPending;
+    private void Redraw()
+    {
+        if (_redrawPending)
+            return;
+
+        _redrawPending = true;
+
+        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(16), () =>
+        {
+            _redrawPending = false;
+            RedrawRequested?.Invoke(this, EventArgs.Empty);
+        });
+    }
 
     private bool Set<T>(ref T field, T value, [CallerMemberName] string name = null)
     {

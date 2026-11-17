@@ -75,12 +75,12 @@
             <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                 <controls:RangeSlider Grid.Column="0"
                                       LabelText="{x:Static res:AppResources.HatchLineWidth}"
-                                      Minimum="0" Maximum="20" Step="1"
+                                      Minimum="0" Maximum="40" Step="1"
                                       MinimumValueDisplayFormat="{}{0} px"
                                       LowerValue="{Binding HatchStrokeWitdh}" />
                 <controls:RangeSlider Grid.Column="1"
                                       LabelText="{x:Static res:AppResources.HatchSpacing}"
-                                      Minimum="0" Maximum="20" Step="1"
+                                      Minimum="0" Maximum="40" Step="1"
                                       MinimumValueDisplayFormat="{}{0} px"
                                       LowerValue="{Binding HatchStrokeSpace}" />
             </Grid>

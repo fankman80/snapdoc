@@ -23,10 +23,24 @@ public partial class BottomSheet : ContentView
             s.UpdateSize();
         });
 
+    private CancellationTokenSource _resizeCts;
     private void OnContentMeasureInvalidated(object sender, EventArgs e)
     {
         if (IsOpen)
             Dispatcher.Dispatch(UpdateSize);
+
+        _resizeCts?.Cancel();
+        _resizeCts?.Dispose();
+
+        var cts = _resizeCts = new CancellationTokenSource();
+
+        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(80), () =>
+        {
+            if (cts.IsCancellationRequested || !IsOpen)
+                return;
+
+            UpdateSize();
+        });
     }
 
     public static readonly BindableProperty SheetColorProperty = BindableProperty.Create(
@@ -95,7 +109,7 @@ public partial class BottomSheet : ContentView
         pan.PanUpdated += OnPanUpdated;
         _header.GestureRecognizers.Add(pan);
 
-        _scroll = new ScrollView { Padding = new Thickness(12, 8, 20, 12) };
+        _scroll = new ScrollView { Padding = new Thickness(20, 8, 20, 12) };
 
         // Inhalt auf Tablet/Windows mittig begrenzen, Hintergrund bleibt volle Breite
         var content = new Grid
@@ -205,6 +219,9 @@ public partial class BottomSheet : ContentView
 
     private void DetachHost()
     {
+        _resizeCts?.Cancel();
+        _resizeCts?.Dispose();
+        _resizeCts = null;
         _host?.SizeChanged -= OnHostSizeChanged;
         _host = null;
     }
