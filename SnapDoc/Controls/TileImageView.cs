@@ -2691,12 +2691,18 @@ public partial class TileImageView : ContentView, IDisposable
             _fpsBackPaint = new SKPaint { Color = SKColors.Black.WithAlpha(120), IsAntialias = true };
         }
 
+        // GPU-Cache von Skia auslesen
+        int resCount = 0;
+        long resBytes = 0;
+        _canvasView.GRContext?.GetResourceCacheUsage(out resCount, out resBytes);
+
         string[] lines =
             [
                 $"{_fpsValue:0.0} FPS",
                 $"Zoom: {_displayZoom}",
                 $"Tiles: {_tileCache.Count + _permanentTiles.Count}",
-                $"Queue: {_tileQueue.Count}"
+                $"Queue: {_tileQueue.Count}",
+                $"GPU: {resBytes / 1048576} MB ({resCount})"
             ];
 
         float margin = 8f * density;

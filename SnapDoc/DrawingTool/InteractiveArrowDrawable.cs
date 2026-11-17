@@ -165,7 +165,7 @@ public class InteractiveArrowDrawable
         if (!HasContent) return;
 
         // Erstelle den Builder
-        var builder = new SKPathBuilder();
+        using var builder = new SKPathBuilder();
 
         // Pfeil-Geometrie berechnen (lokal)
         float hw = Width / 2f;
@@ -205,7 +205,7 @@ public class InteractiveArrowDrawable
         {
             Color = FillColor,
             Style = SKPaintStyle.Fill,
-            PathEffect = IsHatchEffect ? hatchEffect : null,
+            PathEffect = hatchEffect,
             IsAntialias = true
         };
 
@@ -218,14 +218,14 @@ public class InteractiveArrowDrawable
 
         if (LineThickness > 0)
         {
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
                 StrokeWidth = LineThickness * density,
                 IsStroke = true,
                 IsAntialias = true,
-                StrokeJoin = SKStrokeJoin.Miter,
-                PathEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness)
+                PathEffect = dashEffect
             };
             canvas.DrawPath(path, linePaint);
         }

@@ -283,26 +283,15 @@ public partial class RangeSlider : ContentView
 
     private void ExpandTouchLayer(bool expand)
     {
-        if (TouchLayer == null) return;
-
-        if (expand)
-        {
-            TouchLayer.Margin = new Thickness(-2000);
-            TouchLayer.ZIndex = 9999;
 #if ANDROID
-            var androidView = this.Handler?.PlatformView as Android.Views.View;
-            androidView?.Parent?.RequestDisallowInterceptTouchEvent(true);
+        var androidView = Handler?.PlatformView as Android.Views.View;
+        androidView?.Parent?.RequestDisallowInterceptTouchEvent(expand);
+#elif WINDOWS
+    // Nur falls unter Windows wirklich nötig – und dann moderat
+    if (TouchLayer == null) return;
+    TouchLayer.Margin = expand ? new Thickness(-200) : new Thickness(0);
+    TouchLayer.ZIndex = expand ? 9999 : 100;
 #endif
-        }
-        else
-        {
-            TouchLayer.Margin = new Thickness(0);
-            TouchLayer.ZIndex = 100;
-#if ANDROID
-            var androidView = this.Handler?.PlatformView as Android.Views.View;
-            androidView?.Parent?.RequestDisallowInterceptTouchEvent(false);
-#endif
-        }
     }
 
     private void UpdateVisualsDuringDrag(double xLower, double xUpper)

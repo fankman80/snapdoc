@@ -67,18 +67,11 @@ public class InteractivePolylineDrawable
                 IsAntialias = true
             };
 
+            using var pointPaint = new SKPaint { Style = SKPaintStyle.Fill, IsAntialias = true };
+
             for (int i = 0; i < Points.Count; i++)
             {
-                var color = (i == 0 && !IsClosed) ? StartPointColor : PointColor;
-
-                using var pointPaint = new SKPaint
-                {
-                    Color = color,
-                    Style = SKPaintStyle.Fill,
-                    IsStroke = false,
-                    IsAntialias = true
-                };
-
+                pointPaint.Color = (i == 0 && !IsClosed) ? StartPointColor : PointColor;
                 canvas.DrawCircle(Points[i], PointRadius * density, pointPaint);
                 canvas.DrawCircle(Points[i], PointRadius * density, handleStroke);
             }
@@ -87,7 +80,7 @@ public class InteractivePolylineDrawable
 
     private void DrawNormalPath(SKCanvas canvas)
     {
-        var builder = new SKPathBuilder();
+        using var builder = new SKPathBuilder();
 
         if (Points.Count > 0)
         {
@@ -115,7 +108,7 @@ public class InteractivePolylineDrawable
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
-                PathEffect = IsHatchEffect ? hatchEffect : null,
+                PathEffect = hatchEffect,
                 IsAntialias = true
             };
 
@@ -129,14 +122,14 @@ public class InteractivePolylineDrawable
 
         if (LineThickness > 0)
         {
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
                 StrokeWidth = LineThickness * density,
                 IsStroke = true,
                 IsAntialias = true,
-                StrokeJoin = SKStrokeJoin.Round,
-                PathEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness)
+                PathEffect = dashEffect
             };
             canvas.DrawPath(path, linePaint);
         }
@@ -225,7 +218,7 @@ public class InteractivePolylineDrawable
                 IsAntialias = true
             };
 
-            var fillBuilder = new SKPathBuilder();
+            using var fillBuilder = new SKPathBuilder();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
@@ -247,6 +240,10 @@ public class InteractivePolylineDrawable
 
         if (LineThickness > 0)
         {
+            using var dashEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                ? null
+                : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f);
+
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
@@ -254,12 +251,10 @@ public class InteractivePolylineDrawable
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round,
-                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                    ? null
-                    : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f)
+                PathEffect = dashEffect
             };
 
-            var outlineBuilder = new SKPathBuilder();
+            using var outlineBuilder = new SKPathBuilder();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];

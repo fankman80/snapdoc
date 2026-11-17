@@ -30,16 +30,9 @@ public class InteractiveRectangleDrawable
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
     private float _allowedAngleRad;
-
-    // Eigenschaften für den Textmodus
-    private string? _layoutText;
-    private float _layoutW, _layoutH, _layoutSize;
-    private RectangleTextStyle _layoutStyle;
-    private int _layoutPad;
-    private bool _layoutAuto;
-    private List<string>? _layoutLines;
     public bool AutoSizeText { get; set; } = true;
     public int TextPadding { get; set; } = 10;
+    private readonly ShapeTextRenderer _textRenderer = new();
 
     // Eigenschaften für den Schraffurmodus
     public bool IsHatchEffect { get; set; } = false;
@@ -156,7 +149,7 @@ public class InteractiveRectangleDrawable
         {
             var pts = Points;
 
-            var builder = new SKPathBuilder();
+            using var builder = new SKPathBuilder();
             builder.MoveTo(pts[0]);
             builder.LineTo(pts[1]);
             builder.LineTo(pts[2]);
@@ -175,7 +168,7 @@ public class InteractiveRectangleDrawable
             {
                 Color = FillColor,
                 Style = SKPaintStyle.Fill,
-                PathEffect = IsHatchEffect ? hatchEffect : null,
+                PathEffect = hatchEffect,
                 IsAntialias = true
             };
 
@@ -188,13 +181,14 @@ public class InteractiveRectangleDrawable
 
             if (LineThickness > 0)
             {
+                using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
                 using var linePaint = new SKPaint
                 {
                     Color = LineColor,
                     StrokeWidth = LineThickness * density,
                     IsStroke = true,
                     IsAntialias = true,
-                    PathEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness)
+                    PathEffect = dashEffect
                 };
                 canvas.DrawPath(path, linePaint);
             }
@@ -247,6 +241,13 @@ public class InteractiveRectangleDrawable
 
             canvas.DrawImage(_rotationHandleImage, destRect, sampling, paint);
         }
+    }
+
+    private void DrawMultilineText(SKCanvas canvas)
+    {
+        TextSize = _textRenderer.Draw(canvas, Text, Center, Width, Height, AllowedAngleDeg,
+                                      TextStyle, TextAlignment, TextPadding, AutoSizeText,
+                                      TextSize, MinTextSize, MaxTextSize, TextColor, density);
     }
 
     private void DrawCloudPath(SKCanvas canvas)
@@ -311,7 +312,7 @@ public class InteractiveRectangleDrawable
                 IsAntialias = true
             };
 
-            var fillBuilder = new SKPathBuilder();
+            using var fillBuilder = new SKPathBuilder();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
@@ -333,6 +334,10 @@ public class InteractiveRectangleDrawable
 
         if (LineThickness > 0)
         {
+            using var dashEffect = string.IsNullOrWhiteSpace(StrokeStyle)
+                ? null
+                : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f);
+
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
@@ -340,12 +345,10 @@ public class InteractiveRectangleDrawable
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round,
-                PathEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                    ? null
-                    : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f)
+                PathEffect = dashEffect
             };
 
-            var outlineBuilder = new SKPathBuilder();
+            using var outlineBuilder = new SKPathBuilder();
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
@@ -430,150 +433,6 @@ public class InteractiveRectangleDrawable
         }
 
         return sum > 0f;
-    }
-
-    private void DrawMultilineText(SKCanvas canvas)
-    {
-        if (string.IsNullOrWhiteSpace(Text)) return;
-
-        float maxW = Width / 100 * (100 - TextPadding);
-        float maxH = Height / 100 * (100 - TextPadding);
-
-        bool dirty = _layoutLines == null || _layoutText != Text ||
-                     _layoutW != Width || _layoutH != Height ||
-                     _layoutStyle != TextStyle || _layoutPad != TextPadding ||
-                     _layoutAuto != AutoSizeText ||
-                     (!AutoSizeText && _layoutSize != TextSize);
-
-        if (dirty)
-        {
-            TextSize = AutoSizeText ? CalculateAutoFontSize(Text, maxW, maxH) : TextSize;
-            using var f = new SKFont(TextStyle.ToTypeface(), TextSize);
-            _layoutLines = BreakTextIntoLines(Text, f, maxW);
-            (_layoutText, _layoutW, _layoutH, _layoutStyle, _layoutPad, _layoutAuto, _layoutSize)
-                = (Text, Width, Height, TextStyle, TextPadding, AutoSizeText, TextSize);
-        }
-
-        using var font = new SKFont(TextStyle.ToTypeface(), TextSize);
-        using var paint = new SKPaint { IsAntialias = true, Color = TextColor };
-
-        var lines = _layoutLines!;
-        var metrics = font.Metrics;
-        float lineHeight = metrics.Descent - metrics.Ascent;
-        float y = -(lines.Count * lineHeight) / 2f - metrics.Ascent;
-
-        canvas.Save();
-        canvas.Translate(Center.X, Center.Y);
-        canvas.RotateDegrees(AllowedAngleDeg);
-        canvas.ClipRect(new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f));
-
-        foreach (var line in lines)
-        {
-            canvas.DrawText(line, GetAlignedX(line, font), y, SKTextAlign.Left, font, paint);
-            y += lineHeight;
-        }
-
-        canvas.Restore();
-    }
-
-    private static List<string> BreakTextIntoLines(string text, SKFont font, float maxWidth)
-    {
-        var result = new List<string>();
-        var hardLines = text.Split(["\r\n", "\n", "\r"], StringSplitOptions.None);
-
-        foreach (var hardLine in hardLines)
-        {
-            if (string.IsNullOrEmpty(hardLine))
-            {
-                result.Add(string.Empty);
-                continue;
-            }
-
-            var words = hardLine.Split(' ', StringSplitOptions.RemoveEmptyEntries);
-            string line = "";
-
-            foreach (var word in words)
-            {
-                var test = string.IsNullOrEmpty(line) ? word : $"{line} {word}";
-
-                if (font.MeasureText(test) <= maxWidth)
-                {
-                    line = test;
-                }
-                else
-                {
-                    if (!string.IsNullOrEmpty(line))
-                        result.Add(line);
-
-                    line = word;
-                }
-            }
-
-            if (!string.IsNullOrEmpty(line))
-                result.Add(line);
-        }
-        return result;
-    }
-
-    float GetAlignedX(string line, SKFont font)
-    {
-        float lineWidth = font.MeasureText(line);
-
-        return TextAlignment switch
-        {
-            RectangleTextAlignment.Left =>
-                -Width / 2f + TextPadding * density,
-
-            RectangleTextAlignment.Right =>
-                Width / 2f - TextPadding * density - lineWidth,
-
-            _ => // Center
-                -lineWidth / 2f
-        };
-    }
-
-    private float CalculateAutoFontSize(string text, float maxWidth, float maxHeight)
-    {
-        float low = MinTextSize;
-        float high = MaxTextSize;
-        float best = low;
-
-        while (high - low > 0.5f)
-        {
-            float mid = (low + high) / 2f;
-
-            if (DoesTextFit(text, mid, maxWidth, maxHeight))
-            {
-                best = mid;
-                low = mid;
-            }
-            else
-            {
-                high = mid;
-            }
-        }
-
-        return best;
-    }
-
-    private bool DoesTextFit(string text, float fontSize, float maxWidth, float maxHeight)
-    {
-        using var font = new SKFont(TextStyle.ToTypeface(), fontSize);
-        var lines = BreakTextIntoLines(text, font, maxWidth);
-        var metrics = font.Metrics;
-        float lineHeight = metrics.Descent - metrics.Ascent;
-        float totalHeight = lines.Count * lineHeight;
-
-        if (totalHeight > maxHeight)
-            return false;
-
-        foreach (var line in lines)
-        {
-            if (font.MeasureText(line) > maxWidth)
-                return false;
-        }
-
-        return true;
     }
 
     public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;

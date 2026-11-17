@@ -25,19 +25,31 @@ public static class RectangleTextStyleExtensions
 
 public static class SkiaFontLoader
 {
-    static readonly Dictionary<string, SKTypeface> _cache = [];
+    private static readonly Dictionary<string, SKTypeface> _cache = [];
+    private static readonly Lock _lock = new();
 
     public static SKTypeface Load(string fileName)
     {
-        if (_cache.TryGetValue(fileName, out var tf))
+        lock (_lock)
+        {
+            if (_cache.TryGetValue(fileName, out var tf))
+                return tf;
+
+            try
+            {
+                using var stream = FileSystem.OpenAppPackageFileAsync(fileName)
+                                             .GetAwaiter()
+                                             .GetResult();
+                tf = SKTypeface.FromStream(stream) ?? SKTypeface.Default;
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"Font '{fileName}' nicht geladen: {ex.Message}");
+                tf = SKTypeface.Default;
+            }
+
+            _cache[fileName] = tf;
             return tf;
-
-        using var stream = FileSystem.OpenAppPackageFileAsync(fileName)
-                                     .GetAwaiter()
-                                     .GetResult();
-
-        tf = SKTypeface.FromStream(stream);
-        _cache[fileName] = tf;
-        return tf;
+        }
     }
 }
