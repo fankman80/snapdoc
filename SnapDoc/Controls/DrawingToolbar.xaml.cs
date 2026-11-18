@@ -89,7 +89,8 @@ public partial class DrawingToolbar : ContentView
     }
 
     public void LoadStyle(Color border, Color fill, Color text, int lineWidth, string strokeStyle,
-                          bool hatch, float hatchWidth, float hatchSpace, float hatchAngle)
+                      bool hatch, float hatchWidth, float hatchSpace, float hatchAngle,
+                      float? cloudRadius = null, float? cloudInciseDeg = null)
     {
         SelectedBorderColor = border;
         SelectedFillColor = fill;
@@ -100,6 +101,9 @@ public partial class DrawingToolbar : ContentView
         HatchStrokeWitdh = hatchWidth;
         HatchStrokeSpace = hatchSpace;
         HatchRotation = hatchAngle;
+
+        if (cloudRadius is float r) CloudRadius = r;
+        if (cloudInciseDeg is float i) CloudInciseDeg = i;
     }
 
     public void Reset()
