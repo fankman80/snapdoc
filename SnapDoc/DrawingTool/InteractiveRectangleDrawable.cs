@@ -157,27 +157,8 @@ public class InteractiveRectangleDrawable
             builder.Close();
 
             using var path = builder.Detach();
-            float hatchLineWidth = HatchStrokeWitdh * density;
-            float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
-            var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
-            var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
-            var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
 
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-
-            canvas.Save();
-            canvas.ClipPath(path, SKClipOperation.Intersect, true);
-            var bounds = path.TightBounds;
-            bounds.Inflate(spacing, spacing);
-            canvas.DrawRect(bounds, fillPaint);
-            canvas.Restore();
+            FillShape(canvas, path);
 
             if (LineThickness > 0)
             {
@@ -305,16 +286,8 @@ public class InteractiveRectangleDrawable
 
         if (FillColor.Alpha > 0)
         {
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-
             using var fillBuilder = new SKPathBuilder();
+
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
@@ -329,16 +302,14 @@ public class InteractiveRectangleDrawable
                 fillBuilder.ArcTo(rect, startDeg, sweepDeg, false);
             }
             fillBuilder.Close();
-
             using var fillPath = fillBuilder.Detach();
-            canvas.DrawPath(fillPath, fillPaint);
+
+            FillShape(canvas, fillPath);
         }
 
         if (LineThickness > 0)
         {
-            using var dashEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
 
             using var linePaint = new SKPaint
             {
@@ -487,20 +458,9 @@ public class InteractiveRectangleDrawable
         );
     }
 
-    private SKPathEffect? CreateHatchEffect()
-    {
-        if (!IsHatchEffect)
-            return null;
-
-        float lineWidth = HatchStrokeWitdh * density;
-        float spacing = HatchStrokeSpace * density + lineWidth;
-
-        var scale = SKMatrix.CreateScale(spacing, spacing);
-        var rotation = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var matrix = SKMatrix.Concat(scale, rotation);
-
-        return SKPathEffect.Create2DLine(lineWidth, matrix);
-    }
+    private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
+    ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
+        HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, density, angleOffset);
 
     public void Reset()
     {

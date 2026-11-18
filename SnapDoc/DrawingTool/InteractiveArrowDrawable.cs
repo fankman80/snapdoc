@@ -194,26 +194,8 @@ public class InteractiveArrowDrawable
         builder.Close();
 
         using var path = builder.Detach();
-        float hatchLineWidth = HatchStrokeWitdh * density;
-        float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
-        var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
-        var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-        using var hatchEffect = CreateHatchEffect();
-        using var fillPaint = new SKPaint
-        {
-            Color = FillColor,
-            Style = SKPaintStyle.Fill,
-            PathEffect = hatchEffect,
-            IsAntialias = true
-        };
 
-        canvas.Save();
-        canvas.ClipPath(path, SKClipOperation.Intersect, true);
-        var bounds = path.TightBounds;
-        bounds.Inflate(spacing, spacing);
-        canvas.DrawRect(bounds, fillPaint);
-        canvas.Restore();
+        FillShape(canvas, path);
 
         if (LineThickness > 0)
         {
@@ -353,20 +335,9 @@ public class InteractiveArrowDrawable
         );
     }
 
-    private SKPathEffect? CreateHatchEffect()
-    {
-        if (!IsHatchEffect)
-            return null;
-
-        float lineWidth = HatchStrokeWitdh * density;
-        float spacing = HatchStrokeSpace * density + lineWidth;
-
-        var scale = SKMatrix.CreateScale(spacing, spacing);
-        var rotation = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var matrix = SKMatrix.Concat(scale, rotation);
-
-        return SKPathEffect.Create2DLine(lineWidth, matrix);
-    }
+    private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
+    ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
+        HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, density, angleOffset);
 
     public void Reset()
     {

@@ -160,7 +160,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImage.CanvasLongPressed -= OnCanvasLongPressed;
         PlanImage.PinMoved -= OnPinMoved;
 
-        if (!_isShowingPopup)
+        if (!_isShowingPopup && !PopupTracker.IsShowing)
             Cleanup();
     }
 

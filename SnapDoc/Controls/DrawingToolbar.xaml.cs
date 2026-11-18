@@ -1,4 +1,6 @@
 #nullable disable
+using CommunityToolkit.Maui.Extensions;
+using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Input;
 using SkiaSharp.Views.Maui;
 using SnapDoc.DrawingTool;

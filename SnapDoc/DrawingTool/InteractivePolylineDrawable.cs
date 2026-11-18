@@ -95,30 +95,9 @@ public class InteractivePolylineDrawable
         }
 
         using var path = builder.Detach();
-        float hatchLineWidth = HatchStrokeWitdh * density;
-        float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
-        var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
-        var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
 
         if (IsClosed)
-        {
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-
-            canvas.Save();
-            canvas.ClipPath(path, SKClipOperation.Intersect, true);
-            var bounds = path.TightBounds;
-            bounds.Inflate(spacing, spacing);
-            canvas.DrawRect(bounds, fillPaint);
-            canvas.Restore();
-        }
+            FillShape(canvas, path);
 
         if (LineThickness > 0)
         {
@@ -211,40 +190,35 @@ public class InteractivePolylineDrawable
 
         if (IsClosed)
         {
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-
             using var fillBuilder = new SKPathBuilder();
+
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
+
                 float startDeg = (node.BeginAngle * 180f / MathF.PI) % 360f;
                 if (startDeg < 0) startDeg += 360f;
+
                 float endDeg = (node.EndAngle * 180f / MathF.PI) % 360f;
                 if (endDeg < 0) endDeg += 360f;
+
                 float sweepDeg = endDeg - startDeg;
                 if (sweepDeg < 0) sweepDeg += 360f;
 
-                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius, node.Center.X + radius, node.Center.Y + radius);
+                var rect = new SKRect(node.Center.X - radius, node.Center.Y - radius,
+                                      node.Center.X + radius, node.Center.Y + radius);
                 fillBuilder.ArcTo(rect, startDeg, sweepDeg, false);
             }
-            fillBuilder.Close();
 
+            fillBuilder.Close();
             using var fillPath = fillBuilder.Detach();
-            canvas.DrawPath(fillPath, fillPaint);
+
+            FillShape(canvas, fillPath);
         }
 
         if (LineThickness > 0)
         {
-            using var dashEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
 
             using var linePaint = new SKPaint
             {
@@ -382,21 +356,10 @@ public class InteractivePolylineDrawable
         return sum > 0f;
     }
 
-    private SKPathEffect? CreateHatchEffect()
-    {
-        if (!IsHatchEffect)
-            return null;
+    private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
+    ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
+        HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, density, angleOffset);
 
-        float lineWidth = HatchStrokeWitdh * density;
-        float spacing = HatchStrokeSpace * density + lineWidth;
-
-        var scale = SKMatrix.CreateScale(spacing, spacing);
-        var rotation = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var matrix = SKMatrix.Concat(scale, rotation);
-
-        return SKPathEffect.Create2DLine(lineWidth, matrix);
-    }
-    
     public void Reset()
     {
         IsClosed = false;

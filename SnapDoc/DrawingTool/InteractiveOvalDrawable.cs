@@ -153,29 +153,13 @@ public class InteractiveOvalDrawable
             canvas.RotateDegrees(AllowedAngleDeg);
 
             var ovalRect = new SKRect(-Width / 2f, -Height / 2f, Width / 2f, Height / 2f);
-            float hatchLineWidth = HatchStrokeWitdh * density;
-            float spacing = (HatchStrokeSpace * density) + hatchLineWidth;
-            var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
-            var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
-            var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-            
-            canvas.Save();
+
             using var builder = new SKPathBuilder();
             builder.AddOval(ovalRect);
             using var ovalPath = builder.Detach();
-            canvas.ClipPath(ovalPath, SKClipOperation.Intersect, true);
-            var bounds = ovalPath.TightBounds;
-            bounds.Inflate(spacing, spacing);
-            canvas.DrawRect(bounds, fillPaint);
-            canvas.Restore();
+
+            // Canvas ist gedreht → Schraffur zurückdrehen, damit sie wie beim Rechteck ausgerichtet bleibt
+            FillShape(canvas, ovalPath, -AllowedAngleDeg);
 
             if (LineThickness > 0)
             {
@@ -188,7 +172,8 @@ public class InteractiveOvalDrawable
                     IsAntialias = true,
                     PathEffect = dashEffect
                 };
-                canvas.DrawOval(ovalRect, linePaint);
+
+                canvas.DrawPath(ovalPath, linePaint);
             }
 
             canvas.Restore();
@@ -336,16 +321,8 @@ public class InteractiveOvalDrawable
         // Flaeche ausfüllen
         if (FillColor.Alpha > 0)
         {
-            using var hatchEffect = CreateHatchEffect();
-            using var fillPaint = new SKPaint
-            {
-                Color = FillColor,
-                Style = SKPaintStyle.Fill,
-                PathEffect = hatchEffect,
-                IsAntialias = true
-            };
-            
             using var fillBuilder = new SKPathBuilder();
+
             for (int i = 0; i < nodes.Count; i++)
             {
                 var node = nodes[i];
@@ -360,17 +337,15 @@ public class InteractiveOvalDrawable
                 fillBuilder.ArcTo(rect, startDeg, sweepDeg, false);
             }
             fillBuilder.Close();
-
             using var fillPath = fillBuilder.Detach();
-            canvas.DrawPath(fillPath, fillPaint);
+
+            FillShape(canvas, fillPath);
         }
 
         // Kontur zeichnen
         if (LineThickness > 0)
         {
-            using var dashEffect = string.IsNullOrWhiteSpace(StrokeStyle)
-                ? null
-                : SKPathEffect.CreateDash(Helper.ParseDashArray(StrokeStyle, density, LineThickness), 0f);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
 
             using var linePaint = new SKPaint
             {
@@ -560,21 +535,10 @@ public class InteractiveOvalDrawable
         return corners;
     }
 
-    private SKPathEffect? CreateHatchEffect()
-    {
-        if (!IsHatchEffect)
-            return null;
+    private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
+    ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
+        HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, density, angleOffset);
 
-        float lineWidth = HatchStrokeWitdh * density;
-        float spacing = HatchStrokeSpace * density + lineWidth;
-
-        var scale = SKMatrix.CreateScale(spacing, spacing);
-        var rotation = SKMatrix.CreateRotationDegrees(HatchRotation);
-        var matrix = SKMatrix.Concat(scale, rotation);
-
-        return SKPathEffect.Create2DLine(lineWidth, matrix);
-    }
-    
     public void Reset()
     {
         Width = 0;

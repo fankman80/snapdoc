@@ -1,5 +1,6 @@
 #nullable disable
 using CommunityToolkit.Maui.Extensions;
+using SnapDoc.Services;
 using SnapDoc.Views;
 
 namespace SnapDoc.Controls;
@@ -108,12 +109,14 @@ public partial class ColorSwatchBar : ContentView
         _customSwatch = CreateSwatch(Colors.Transparent);
         _customSwatch.Background = new LinearGradientBrush(
         [
-            new GradientStop(Color.FromArgb("#E53935"), 0f),
-            new GradientStop(Color.FromArgb("#FDD835"), 0.25f),
-            new GradientStop(Color.FromArgb("#43A047"), 0.5f),
-            new GradientStop(Color.FromArgb("#1E88E5"), 0.75f),
-            new GradientStop(Color.FromArgb("#8E24AA"), 1f)
-        ], new Point(0, 0), new Point(1, 1));
+            new GradientStop(Color.FromArgb("#FF0000"), 0.00f),   // Rot
+            new GradientStop(Color.FromArgb("#FF8000"), 0.17f),   // Orange
+            new GradientStop(Color.FromArgb("#FFE000"), 0.33f),   // Gelb
+            new GradientStop(Color.FromArgb("#00C040"), 0.50f),   // Grün
+            new GradientStop(Color.FromArgb("#00A0FF"), 0.67f),   // Hellblau
+            new GradientStop(Color.FromArgb("#2040FF"), 0.83f),   // Blau
+            new GradientStop(Color.FromArgb("#C000FF"), 1.00f)    // Violett
+        ], new Point(0, 0.5), new Point(1, 0.5));
         AddTap(_customSwatch, OpenCustomPicker);
         _row.Children.Add(_customSwatch);
 
@@ -151,11 +154,17 @@ public partial class ColorSwatchBar : ContentView
     private async void OpenCustomPicker()
     {
         var current = SelectedColor ?? Colors.Black;
-        var popup = new PopupColorPicker(current, fillOpacity: (byte)(current.Alpha * 255), fillOpacityVisibility: true);
-        var result = await Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions);
+        var popup = new PopupColorPicker(current,
+            fillOpacity: (byte)(current.Alpha * 255),
+            fillOpacityVisibility: true);
+
+        var result = await PopupTracker.RunAsync(() =>
+            Shell.Current.ShowPopupAsync<ColorPickerReturn>(popup, Settings.PopupOptions));
+
         if (result?.Result == null) return;
 
-        SelectedColor = Color.FromArgb(result.Result.ColorHex).WithAlpha(result.Result.FillOpacity / 255f);
+        SelectedColor = Color.FromArgb(result.Result.ColorHex)
+                             .WithAlpha(result.Result.FillOpacity / 255f);
         ColorChanged?.Invoke(this, EventArgs.Empty);
     }
 
