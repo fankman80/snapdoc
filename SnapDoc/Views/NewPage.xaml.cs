@@ -1065,11 +1065,16 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         if (style != null)
         {
             var combined = drawingController.CombinedDrawable;
-            var textColor = drawingController.DrawMode switch
+
+            var (textColor, cloudRadius, cloudIncise) = drawingController.DrawMode switch
             {
-                DrawMode.Rect => combined?.RectDrawable.TextColor ?? SKColors.Black,
-                DrawMode.Oval => combined?.OvalDrawable.TextColor ?? SKColors.Black,
-                _ => SKColors.Black
+                DrawMode.Rect when combined?.RectDrawable != null =>
+                    (combined.RectDrawable.TextColor, combined.RectDrawable.CloudRadius, combined.RectDrawable.CloudInciseDeg),
+                DrawMode.Oval when combined?.OvalDrawable != null =>
+                    (combined.OvalDrawable.TextColor, combined.OvalDrawable.CloudRadius, combined.OvalDrawable.CloudInciseDeg),
+                DrawMode.Poly when combined?.PolyDrawable != null =>
+                    (SKColors.Black, combined.PolyDrawable.CloudRadius, combined.PolyDrawable.CloudInciseDeg),
+                _ => (SKColors.Black, DrawToolbar.CloudRadius, DrawToolbar.CloudInciseDeg)
             };
 
             DrawToolbar.LoadStyle(
@@ -1077,13 +1082,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 SKColor.Parse(style.FillColor).ToMauiColor(),
                 textColor.ToMauiColor(),
                 (int)style.LineThickness, style.StrokeStyle,
-                style.IsHatchEffect, style.HatchStrokeWitdh, style.HatchStrokeSpace, style.HatchRotation);
+                style.IsHatchEffect, style.HatchStrokeWitdh, style.HatchStrokeSpace, style.HatchRotation,
+                cloudRadius, cloudIncise);
         }
 
         // Werkzeug + Wolken-Zustand der geladenen Form übernehmen
         if (drawingController.DrawMode != DrawMode.None)
             DrawToolbar.SetDrawMode(drawingController.DrawMode);
-
+            
         PlanImage.InvalidateSurface();
     }
 
