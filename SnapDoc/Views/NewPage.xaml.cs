@@ -1082,7 +1082,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
                 SKColor.Parse(style.FillColor).ToMauiColor(),
                 textColor.ToMauiColor(),
                 (int)style.LineThickness, style.StrokeStyle,
-                style.IsHatchEffect, style.HatchStrokeWitdh, style.HatchStrokeSpace, style.HatchRotation,
+                style.IsHatchEffect, style.HatchStrokeWidth, style.HatchStrokeSpace, style.HatchRotation,
                 cloudRadius, cloudIncise);
         }
 

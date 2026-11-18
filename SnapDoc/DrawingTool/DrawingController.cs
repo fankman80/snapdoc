@@ -25,7 +25,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
     public DrawMode DrawMode { get; set; } = DrawMode.None;
     public bool IsActive { get; set; }
     public event EventHandler? Invalidated;
-    // Ruler-Drawing
     public InteractiveRulerDrawable RulerDrawable { get; } = new();
     public float RulerLength => RulerDrawable.Length;
     public string RulerLengthText => RulerDrawable.LengthText;
@@ -249,17 +248,20 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     public void Detach() => IsActive = false;
 
-    public void InitializeDrawing(SKColor lineColor,
-                                SKColor fillColor,
-                                SKColor textColor,
-                                float lineThickness,
-                                string strokeStyle,
-                                bool isHatchEffect,
-                                float hatchStrokeWitdh,
-                                float hatchStrokeSpace,
-                                float hatchRotation,
-                                float rotationAngle = 0f,
-                                bool forceReset = false)
+    public void InitializeDrawing(
+                SKColor lineColor,
+                SKColor fillColor,
+                SKColor textColor,
+                float lineThickness,
+                string strokeStyle,
+                bool isHatchEffect,
+                float hatchStrokeWidth,
+                float hatchStrokeSpace,
+                float hatchRotation,
+                float cloudRadius,
+                float cloudInciseDeg,
+                float rotationAngle = 0f,
+                bool forceReset = false)
     {
 
         if (forceReset || CombinedDrawable == null)
@@ -288,8 +290,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         poly.LineThickness = lineThickness;
         poly.IsHatchEffect = isHatchEffect;
         poly.HatchRotation = hatchRotation;
-        poly.HatchStrokeWitdh = hatchStrokeWitdh;
+        poly.HatchStrokeWidth = hatchStrokeWidth;
         poly.HatchStrokeSpace = hatchStrokeSpace;
+        poly.CloudRadius = cloudRadius;
+        poly.CloudInciseDeg = cloudInciseDeg;
 
         // Rectangle
         var rect = CombinedDrawable.RectDrawable;
@@ -302,8 +306,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         rect.AllowedAngleDeg = rotationAngle;
         rect.IsHatchEffect = isHatchEffect;
         rect.HatchRotation = hatchRotation;
-        rect.HatchStrokeWitdh = hatchStrokeWitdh;
+        rect.HatchStrokeWidth = hatchStrokeWidth;
         rect.HatchStrokeSpace = hatchStrokeSpace;
+        rect.CloudRadius = cloudRadius;
+        rect.CloudInciseDeg = cloudInciseDeg;
 
         // Oval
         var oval = CombinedDrawable.OvalDrawable;
@@ -316,8 +322,10 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         oval.AllowedAngleDeg = rotationAngle;
         oval.IsHatchEffect = isHatchEffect;
         oval.HatchRotation = hatchRotation;
-        oval.HatchStrokeWitdh = hatchStrokeWitdh;
+        oval.HatchStrokeWidth = hatchStrokeWidth;
         oval.HatchStrokeSpace = hatchStrokeSpace;
+        oval.CloudRadius = cloudRadius;
+        oval.CloudInciseDeg = cloudInciseDeg;
 
         // Arrow
         var arrow = CombinedDrawable.ArrowDrawable;
@@ -329,7 +337,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         arrow.AllowedAngleDeg = rotationAngle;
         arrow.IsHatchEffect = isHatchEffect;
         arrow.HatchRotation = hatchRotation;
-        arrow.HatchStrokeWitdh = hatchStrokeWitdh;
+        arrow.HatchStrokeWidth = hatchStrokeWidth;
         arrow.HatchStrokeSpace = hatchStrokeSpace;
 
         ApplyHandleScale();
@@ -647,7 +655,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         }
     }
 
-    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle, bool isHatchEffect, float hatchStrokeWitdh, float hatchStrokeSpace, float hatchRotation, float cloudRadius, float cloudInciseDeg)
+    public void UpdateDrawingStyles(SKColor lineColor, SKColor fillColor, SKColor textColor, float lineWidth, string strokeStyle, bool isHatchEffect, float hatchStrokeWidth, float hatchStrokeSpace, float hatchRotation, float cloudRadius, float cloudInciseDeg)
     {
         if (CombinedDrawable == null) return;
 
@@ -671,7 +679,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             poly.CloudInciseDeg = cloudInciseDeg;
             poly.IsHatchEffect = isHatchEffect;
             poly.HatchRotation = hatchRotation;
-            poly.HatchStrokeWitdh = hatchStrokeWitdh;
+            poly.HatchStrokeWidth = hatchStrokeWidth;
             poly.HatchStrokeSpace = hatchStrokeSpace;
         }
 
@@ -688,7 +696,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             rect.CloudInciseDeg = cloudInciseDeg;
             rect.IsHatchEffect = isHatchEffect;
             rect.HatchRotation = hatchRotation;
-            rect.HatchStrokeWitdh = hatchStrokeWitdh;
+            rect.HatchStrokeWidth = hatchStrokeWidth;
             rect.HatchStrokeSpace = hatchStrokeSpace;
         }
 
@@ -705,7 +713,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             oval.CloudInciseDeg = cloudInciseDeg;
             oval.IsHatchEffect = isHatchEffect;
             oval.HatchRotation = hatchRotation;
-            oval.HatchStrokeWitdh = hatchStrokeWitdh;
+            oval.HatchStrokeWidth = hatchStrokeWidth;
             oval.HatchStrokeSpace = hatchStrokeSpace;
         }
 
@@ -719,7 +727,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             arrow.StrokeStyle = strokeStyle;
             arrow.IsHatchEffect = isHatchEffect;
             arrow.HatchRotation = hatchRotation;
-            arrow.HatchStrokeWitdh = hatchStrokeWitdh;
+            arrow.HatchStrokeWidth = hatchStrokeWidth;
             arrow.HatchStrokeSpace = hatchStrokeSpace;
         }
 

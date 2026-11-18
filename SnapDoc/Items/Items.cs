@@ -451,7 +451,7 @@ public class StylePickerItem
     public int LineWidth { get; set; }
     public string StrokeStyle { get; set; }
     public bool IsHatchEffect { get; set; } = false;
-    public float HatchStrokeWitdh { get; set; }
+    public float HatchStrokeWidth { get; set; }
     public float HatchStrokeSpace { get; set; }
     public float HatchRotation { get; set; }
     public double[] StrokeDashArray => Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();

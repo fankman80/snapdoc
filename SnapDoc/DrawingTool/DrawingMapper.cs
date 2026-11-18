@@ -13,7 +13,7 @@ public static class DrawingMapper
             LineThickness = d.PolyDrawable.LineThickness,
             StrokeStyle = d.PolyDrawable.StrokeStyle,
             IsHatchEffect = d.PolyDrawable.IsHatchEffect,
-            HatchStrokeWitdh = d.PolyDrawable.HatchStrokeWitdh,
+            HatchStrokeWidth = d.PolyDrawable.HatchStrokeWidth,
             HatchStrokeSpace = d.PolyDrawable.HatchStrokeSpace,
             HatchRotation = d.PolyDrawable.HatchRotation
         };
@@ -22,7 +22,7 @@ public static class DrawingMapper
 
         return new DrawingFileDto
         {
-            Version = 2,
+            Version = 3,
             CoordinateSystem = "Plan",
             Style = style,
             Bounds = new BoundsDto
@@ -38,6 +38,9 @@ public static class DrawingMapper
                 {
                     IsClosed = d.PolyDrawable.IsClosed,
                     IsCloud = d.PolyDrawable.IsCloud,
+                    CloudRadius = d.PolyDrawable.CloudRadius,
+                    CloudOverlap = d.PolyDrawable.CloudOverlap,
+                    CloudInciseDeg = d.PolyDrawable.CloudInciseDeg,
                     IsHatchEffect = d.PolyDrawable.IsHatchEffect,
                     Points = [.. d.PolyDrawable.Points
                     .Select(p => new PointDto(
@@ -66,6 +69,9 @@ public static class DrawingMapper
                     RotationDeg = NormalizeAngleDeg(d.RectDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.RectDrawable.Text,
                     IsCloud = d.RectDrawable.IsCloud,
+                    CloudRadius = d.RectDrawable.CloudRadius,
+                    CloudOverlap = d.RectDrawable.CloudOverlap,
+                    CloudInciseDeg = d.RectDrawable.CloudInciseDeg,
                     IsHatchEffect = d.RectDrawable.IsHatchEffect,
                     Points = [.. d.RectDrawable.Points
                         .Select(p => new PointDto(
@@ -90,6 +96,9 @@ public static class DrawingMapper
                     RotationDeg = NormalizeAngleDeg(d.OvalDrawable.AllowedAngleDeg - initialRotation),
                     Text = d.OvalDrawable.Text,
                     IsCloud = d.OvalDrawable.IsCloud,
+                    CloudRadius = d.OvalDrawable.CloudRadius,
+                    CloudOverlap = d.OvalDrawable.CloudOverlap,
+                    CloudInciseDeg = d.OvalDrawable.CloudInciseDeg,
                     IsHatchEffect = d.OvalDrawable.IsHatchEffect,
                     Points = [.. d.OvalDrawable.Points
                         .Select(p => new PointDto(
@@ -141,6 +150,9 @@ public static class DrawingMapper
             d.PolyDrawable.Reset();
             d.PolyDrawable.IsClosed = dto.Poly.IsClosed;
             d.PolyDrawable.IsCloud = dto.Poly.IsCloud;
+            d.PolyDrawable.CloudRadius = dto.Poly.CloudRadius;
+            d.PolyDrawable.CloudOverlap = dto.Poly.CloudOverlap;
+            d.PolyDrawable.CloudInciseDeg = dto.Poly.CloudInciseDeg;
             d.PolyDrawable.IsHatchEffect = dto.Poly.IsHatchEffect;
             d.PolyDrawable.Points.AddRange(
                 dto.Poly.Points.Select(p =>
@@ -171,6 +183,9 @@ public static class DrawingMapper
             r.Text = dto.Rect.Text ?? "";
             r.AllowedAngleDeg = dto.InitialRotation + dto.Rect.RotationDeg;
             r.IsCloud = dto.Rect.IsCloud;
+            r.CloudRadius = dto.Rect.CloudRadius;
+            r.CloudOverlap = dto.Rect.CloudOverlap;
+            r.CloudInciseDeg = dto.Rect.CloudInciseDeg;
             r.IsHatchEffect = dto.Rect.IsHatchEffect;
 
             if (dto.Rect.TextStyle != null)
@@ -204,6 +219,9 @@ public static class DrawingMapper
             o.Text = dto.Oval.Text ?? "";
             o.AllowedAngleDeg = dto.InitialRotation + dto.Oval.RotationDeg;
             o.IsCloud = dto.Oval.IsCloud;
+            o.CloudRadius = dto.Oval.CloudRadius;
+            o.CloudOverlap = dto.Oval.CloudOverlap;
+            o.CloudInciseDeg = dto.Oval.CloudInciseDeg;
             o.IsHatchEffect = dto.Oval.IsHatchEffect;
 
             if (dto.Oval.TextStyle != null)
@@ -313,7 +331,7 @@ public static class DrawingMapper
         d.PolyDrawable.LineThickness = s.LineThickness;
         d.PolyDrawable.StrokeStyle = s.StrokeStyle;
         d.PolyDrawable.IsHatchEffect = s.IsHatchEffect;
-        d.PolyDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.PolyDrawable.HatchStrokeWidth = s.HatchStrokeWidth;
         d.PolyDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
         d.PolyDrawable.HatchRotation = s.HatchRotation;
 
@@ -323,7 +341,7 @@ public static class DrawingMapper
         d.RectDrawable.LineThickness = s.LineThickness;
         d.RectDrawable.StrokeStyle = s.StrokeStyle;
         d.RectDrawable.IsHatchEffect = s.IsHatchEffect;
-        d.RectDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.RectDrawable.HatchStrokeWidth = s.HatchStrokeWidth;
         d.RectDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
         d.RectDrawable.HatchRotation = s.HatchRotation;
 
@@ -333,7 +351,7 @@ public static class DrawingMapper
         d.OvalDrawable.LineThickness = s.LineThickness;
         d.OvalDrawable.StrokeStyle = s.StrokeStyle;
         d.OvalDrawable.IsHatchEffect = s.IsHatchEffect;
-        d.OvalDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.OvalDrawable.HatchStrokeWidth = s.HatchStrokeWidth;
         d.OvalDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
         d.OvalDrawable.HatchRotation = s.HatchRotation;
 
@@ -343,7 +361,7 @@ public static class DrawingMapper
         d.ArrowDrawable.LineThickness = s.LineThickness;
         d.ArrowDrawable.StrokeStyle = s.StrokeStyle;
         d.ArrowDrawable.IsHatchEffect = s.IsHatchEffect;
-        d.ArrowDrawable.HatchStrokeWitdh = s.HatchStrokeWitdh;
+        d.ArrowDrawable.HatchStrokeWidth = s.HatchStrokeWidth;
         d.ArrowDrawable.HatchStrokeSpace = s.HatchStrokeSpace;
         d.ArrowDrawable.HatchRotation = s.HatchRotation;
     }

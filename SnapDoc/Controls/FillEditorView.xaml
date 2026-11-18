@@ -77,7 +77,7 @@
                                       LabelText="{x:Static res:AppResources.HatchLineWidth}"
                                       Minimum="0" Maximum="40" Step="1"
                                       MinimumValueDisplayFormat="{}{0} px"
-                                      LowerValue="{Binding HatchStrokeWitdh}" />
+                                      LowerValue="{Binding HatchStrokeWidth}" />
                 <controls:RangeSlider Grid.Column="1"
                                       LabelText="{x:Static res:AppResources.HatchSpacing}"
                                       Minimum="0" Maximum="40" Step="1"

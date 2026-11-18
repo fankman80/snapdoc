@@ -29,7 +29,7 @@ public partial class DrawingToolbar : ContentView
     public int LineWidth { get; private set; } = 3;
     public string StrokeStyle { get; private set; } = "";
     public bool IsHatchEffect { get; private set; }
-    public float HatchStrokeWitdh { get; private set; } = 2f;
+    public float HatchStrokeWidth { get; private set; } = 2f;
     public float HatchStrokeSpace { get; private set; } = 8f;
     public float HatchRotation { get; private set; } = 45f;
     public float CloudRadius { get; private set; } = 20f;
@@ -76,11 +76,17 @@ public partial class DrawingToolbar : ContentView
     public void InitializeDrawing(bool forceReset)
     {
         _controller.InitializeDrawing(
-            SelectedBorderColor.ToSKColor(),
-            SelectedFillColor.ToSKColor(),
-            SelectedTextColor.ToSKColor(),
-            LineWidth, StrokeStyle,
-            IsHatchEffect, HatchStrokeWitdh, HatchStrokeSpace, HatchRotation,
+            lineColor: SelectedBorderColor.ToSKColor(),
+            fillColor: SelectedFillColor.ToSKColor(),
+            textColor: SelectedTextColor.ToSKColor(),
+            lineThickness: LineWidth,
+            strokeStyle: StrokeStyle,
+            isHatchEffect: IsHatchEffect,
+            hatchStrokeWidth: HatchStrokeWidth,
+            hatchStrokeSpace: HatchStrokeSpace,
+            hatchRotation: HatchRotation,
+            cloudRadius: CloudRadius,
+            cloudInciseDeg: CloudInciseDeg,
             rotationAngle: 0f,
             forceReset: forceReset);
 
@@ -98,7 +104,7 @@ public partial class DrawingToolbar : ContentView
         LineWidth = lineWidth;
         StrokeStyle = strokeStyle ?? "";
         IsHatchEffect = hatch;
-        HatchStrokeWitdh = hatchWidth;
+        HatchStrokeWidth = hatchWidth;
         HatchStrokeSpace = hatchSpace;
         HatchRotation = hatchAngle;
 
@@ -206,7 +212,7 @@ public partial class DrawingToolbar : ContentView
 
     private async void FillClicked(object sender, EventArgs e) =>
         await ToggleSheetAsync(FillSheet, "Fill", () =>
-            FillEditor.Load(SelectedFillColor, IsHatchEffect, HatchStrokeWitdh, HatchStrokeSpace, HatchRotation));
+            FillEditor.Load(SelectedFillColor, IsHatchEffect, HatchStrokeWidth, HatchStrokeSpace, HatchRotation));
 
     private async void CloudClicked(object sender, EventArgs e) =>
         await ToggleSheetAsync(CloudSheet, "Cloud", () => CloudEditor.Load(IsCloudActive, CloudRadius, CloudInciseDeg));
@@ -247,7 +253,7 @@ public partial class DrawingToolbar : ContentView
         var f = FillEditor;
         SelectedFillColor = f.FillColor;
         IsHatchEffect = f.IsHatchEffect;
-        HatchStrokeWitdh = f.HatchStrokeWitdh;
+        HatchStrokeWidth = f.HatchStrokeWidth;
         HatchStrokeSpace = f.HatchStrokeSpace;
         HatchRotation = f.HatchRotation;
         ApplyStyles();
@@ -294,7 +300,7 @@ public partial class DrawingToolbar : ContentView
             LineWidth,
             StrokeStyle,
             IsHatchEffect,
-            HatchStrokeWitdh,
+            HatchStrokeWidth,
             HatchStrokeSpace,
             HatchRotation,
             CloudRadius,

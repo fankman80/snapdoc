@@ -40,11 +40,11 @@ public partial class FillEditorView : ContentView
         set { if (isHatchEffect != value) { isHatchEffect = value; OnPropertyChanged(); Raise(); } }
     }
 
-    private float hatchStrokeWitdh;
-    public float HatchStrokeWitdh
+    private float hatchStrokeWidth;
+    public float HatchStrokeWidth
     {
-        get => hatchStrokeWitdh;
-        set { if (hatchStrokeWitdh != value) { hatchStrokeWitdh = value; OnPropertyChanged(); Raise(); } }
+        get => hatchStrokeWidth;
+        set { if (hatchStrokeWidth != value) { hatchStrokeWidth = value; OnPropertyChanged(); Raise(); } }
     }
 
     private float hatchStrokeSpace;
@@ -72,7 +72,7 @@ public partial class FillEditorView : ContentView
         _loading = true;
         FillColor = color;
         IsHatchEffect = hatch;
-        HatchStrokeWitdh = hatchWidth;
+        HatchStrokeWidth = hatchWidth;
         HatchStrokeSpace = hatchSpace;
         HatchRotation = hatchAngle;
         _loading = false;

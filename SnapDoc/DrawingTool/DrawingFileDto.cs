@@ -7,7 +7,7 @@ public class DrawingStyleDto
     public float LineThickness { get; set; }
     public string StrokeStyle { get; set; } = "";
     public bool IsHatchEffect { get; set; }
-    public float HatchStrokeWitdh { get; set; }
+    public float HatchStrokeWidth { get; set; }
     public float HatchStrokeSpace { get; set; }
     public float HatchRotation { get; set; }
 }
@@ -24,7 +24,7 @@ public class TextStyleDto
 
 public class DrawingFileDto
 {
-    public int Version { get; set; } = 2;
+    public int Version { get; set; } = 3;
     public string CoordinateSystem { get; set; } = "Plan";
     public BoundsDto? Bounds { get; set; }
     public DrawingStyleDto? Style { get; set; }
@@ -48,6 +48,9 @@ public class PolyDto
     public List<PointDto> Points { get; set; } = [];
     public bool IsClosed { get; set; }
     public bool IsCloud { get; set; }
+    public float CloudRadius { get; set; } = 20f;
+    public float CloudOverlap { get; set; } = 0.8333f;
+    public float CloudInciseDeg { get; set; } = 15f;
     public bool IsHatchEffect { get; set; }
 }
 
@@ -63,6 +66,9 @@ public class RectDto
     public string? Text { get; set; }
     public TextStyleDto? TextStyle { get; set; }
     public bool IsCloud { get; set; }
+    public float CloudRadius { get; set; } = 20f;
+    public float CloudOverlap { get; set; } = 0.8333f;
+    public float CloudInciseDeg { get; set; } = 15f;
     public bool IsHatchEffect { get; set; }
 }
 
@@ -73,6 +79,9 @@ public class OvalDto
     public string? Text { get; set; }
     public TextStyleDto? TextStyle { get; set; }
     public bool IsCloud { get; set; }
+    public float CloudRadius { get; set; } = 20f;
+    public float CloudOverlap { get; set; } = 0.8333f;
+    public float CloudInciseDeg { get; set; } = 15f;
     public bool IsHatchEffect { get; set; }
 }
 

@@ -36,7 +36,7 @@ public class InteractiveRectangleDrawable
 
     // Eigenschaften für den Schraffurmodus
     public bool IsHatchEffect { get; set; } = false;
-    public float HatchStrokeWitdh { get; set; } = 2f;
+    public float HatchStrokeWidth { get; set; } = 2f;
     public float HatchStrokeSpace { get; set; } = 8f;
     public float HatchRotation { get; set; } = 45f;
 
@@ -460,7 +460,7 @@ public class InteractiveRectangleDrawable
 
     private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
     ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
-        HatchStrokeWitdh, HatchStrokeSpace, HatchRotation, density, angleOffset);
+        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, density, angleOffset);
 
     public void Reset()
     {

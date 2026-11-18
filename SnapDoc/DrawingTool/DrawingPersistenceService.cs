@@ -18,7 +18,7 @@ public static class DrawingPersistenceService
     public static DrawingFileDto Load(string path, CombinedDrawable drawable, SKPoint targetCenter, DrawingController controller)
     {
         var json = File.ReadAllText(path);
-        var dto = JsonSerializer.Deserialize<DrawingFileDto>(json);
+        var dto = JsonSerializer.Deserialize<DrawingFileDto>(json, GlobalJson.GetOptions());
 
         if (dto != null)
             DrawingMapper.FromDto(dto, drawable, targetCenter, controller);
