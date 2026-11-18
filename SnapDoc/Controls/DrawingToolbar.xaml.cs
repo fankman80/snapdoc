@@ -1,6 +1,4 @@
 #nullable disable
-using CommunityToolkit.Maui.Extensions;
-using CommunityToolkit.Maui.Views;
 using CommunityToolkit.Mvvm.Input;
 using SkiaSharp.Views.Maui;
 using SnapDoc.DrawingTool;
@@ -18,7 +16,7 @@ public partial class DrawingToolbar : ContentView
     private bool _syncingCloud;
     public void Attach(DrawingController controller) => _controller = controller;
     public double BarsHeight => Bars.Height > 0 ? Bars.Height : 0;
-    private BottomSheet[] AllSheets => [PenSheet, FillSheet, CloudSheet, TextSheet];
+    private BottomSheet[] AllSheets => [PenSheet, FillSheet, CloudSheet, TextSheet, TemplateSheet];
     public bool IsAnySheetOpen => AllSheets.Any(s => s.IsOpen);
     private Color selectedBorderColor = new(0, 153, 0, 255);
     public Color SelectedBorderColor { get => selectedBorderColor; set => Set(ref selectedBorderColor, value); }
@@ -194,6 +192,9 @@ public partial class DrawingToolbar : ContentView
         Erased?.Invoke(this, EventArgs.Empty);
     }
 
+    private async void TemplateClicked(object sender, EventArgs e) =>
+        await ToggleSheetAsync(TemplateSheet, "Template", () => TemplateEditor.Load(CreateCurrentTemplate()));
+
     private async Task ToggleSheetAsync(BottomSheet sheet, string key, Action load)
     {
         if (sheet.IsOpen)
@@ -306,6 +307,84 @@ public partial class DrawingToolbar : ContentView
             CloudRadius,
             CloudInciseDeg);
         Redraw();
+    }
+
+    private RectangleTextStyle GetCurrentTextStyle()
+    {
+        var combined = _controller?.CombinedDrawable;
+
+        if (combined == null)
+            return RectangleTextStyle.Normal;
+
+        return DrawMode switch
+        {
+            DrawMode.Rect => combined.RectDrawable.TextStyle,
+            DrawMode.Oval => combined.OvalDrawable.TextStyle,
+            _ => RectangleTextStyle.Normal
+        };
+    }
+
+    private StylePickerItem CreateCurrentTemplate()
+    {
+        return new StylePickerItem
+        {
+            BackgroundColor = SelectedFillColor.ToArgbHex(true),
+            BorderColor = SelectedBorderColor.ToArgbHex(true),
+            TextColor = SelectedTextColor.ToArgbHex(true),
+
+            LineWidth = LineWidth,
+            StrokeStyle = StrokeStyle,
+
+            IsHatchEffect = IsHatchEffect,
+            HatchStrokeWidth = HatchStrokeWidth,
+            HatchStrokeSpace = HatchStrokeSpace,
+            HatchRotation = HatchRotation,
+
+            IsCloud = IsCloudActive,
+            CloudRadius = CloudRadius,
+            CloudInciseDeg = CloudInciseDeg,
+
+            TextStyle = GetCurrentTextStyle()
+        };
+    }
+
+    private async void OnTemplateSelected(object _, StylePickerItem item)
+    {
+        SelectedBorderColor = Color.FromArgb(item.BorderColor);
+        SelectedFillColor = Color.FromArgb(item.BackgroundColor);
+        SelectedTextColor = Color.FromArgb(item.TextColor);
+
+        LineWidth = item.LineWidth;
+        StrokeStyle = item.StrokeStyle ?? "";
+
+        IsHatchEffect = item.IsHatchEffect;
+        HatchStrokeWidth = item.HatchStrokeWidth;
+        HatchStrokeSpace = item.HatchStrokeSpace;
+        HatchRotation = item.HatchRotation;
+
+        CloudRadius = item.CloudRadius;
+        CloudInciseDeg = item.CloudInciseDeg;
+
+        if (DrawMode is DrawMode.Rect or DrawMode.Oval or DrawMode.Poly)
+            IsCloudActive = item.IsCloud;
+
+        ApplyStyles();
+
+        // Textstil der Vorlage übernehmen
+        var combined = _controller?.CombinedDrawable;
+
+        if (combined != null)
+        {
+            if (DrawMode == DrawMode.Rect)
+                combined.RectDrawable.TextStyle = item.TextStyle;
+
+            else if (DrawMode == DrawMode.Oval)
+                combined.OvalDrawable.TextStyle = item.TextStyle;
+        }
+
+        Redraw();
+
+        await TemplateSheet.CloseAsync();
     }
 
     private void ApplyCloudToDrawable(bool isCloud)

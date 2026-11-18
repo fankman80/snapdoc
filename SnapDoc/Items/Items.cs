@@ -445,6 +445,7 @@ public class PdfItem
 public class StylePickerItem
 {
     public string Text { get; set; }
+    public RectangleTextStyle TextStyle { get; set; }
     public string BackgroundColor { get; set; }
     public string BorderColor { get; set; }
     public string TextColor { get; set; }
@@ -454,6 +455,9 @@ public class StylePickerItem
     public float HatchStrokeWidth { get; set; }
     public float HatchStrokeSpace { get; set; }
     public float HatchRotation { get; set; }
+    public bool IsCloud { get; set; }
+    public float CloudRadius { get; set; }
+    public float CloudInciseDeg { get; set; }
     public double[] StrokeDashArray => Helper.ParseDashArray(StrokeStyle)?.Select(f => (double)f).ToArray();
 }
 

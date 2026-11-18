@@ -222,6 +222,9 @@
 		<MauiXaml Update="Controls\PenEditorView.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Controls\StyleTemplateEditor.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Resources\Styles\RadioButtonStyles.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>

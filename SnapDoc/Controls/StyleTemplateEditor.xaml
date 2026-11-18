@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8" ?>
+
+<ContentView
+    xmlns:controls="clr-namespace:SnapDoc.Controls"
+    xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+    xmlns:local="clr-namespace:SnapDoc"
+    x:Class="SnapDoc.Controls.StyleTemplateEditor"
+    x:DataType="controls:StyleTemplateEditor">
+
+    <ContentView.Resources>
+
+        <Style x:Key="SectionLabel"
+               TargetType="Label">
+            <Setter Property="FontSize" Value="12" />
+            <Setter Property="TextColor" Value="#9E9E9E" />
+        </Style>
+
+    </ContentView.Resources>
+
+    <VerticalStackLayout Spacing="6">
+        <Grid ColumnDefinitions="*,Auto"
+              ColumnSpacing="6">
+            <controls:BorderedEntry
+                x:Name="NameEntry"
+                Grid.Column="0"
+                Placeholder="{x:Static res:AppResources.bezeichnung}"
+                TextColor="White"
+                FontSize="{StaticResource AppFontSizeNormal}"
+                VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Padding="0"
+                    Text="{x:Static local:MaterialIcons.Save}"
+                    FontFamily="MaterialOutlined"
+                    FontSize="24"
+                    TextColor="{DynamicResource Primary}"
+                    BackgroundColor="Transparent"
+                    VerticalOptions="Center"
+                    Clicked="OnAddClicked"/>
+        </Grid>
+
+        <!-- Trenner -->
+        <BoxView HeightRequest="1"
+                 Margin="0,4,0,0"
+                 Color="#3D3D3D" />
+
+        <!-- Vorlagen -->
+        <Label Text="{x:Static res:AppResources.vorlagen}"
+               Style="{StaticResource SectionLabel}" />
+
+        <VerticalStackLayout
+            x:Name="TemplateList"
+            Spacing="6"
+            Padding="0" />
+    </VerticalStackLayout>
+</ContentView>
