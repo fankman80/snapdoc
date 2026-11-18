@@ -100,7 +100,6 @@ public class InteractivePolylineDrawable
         var scaleMatrix = SKMatrix.CreateScale(spacing, spacing);
         var rotationMatrix = SKMatrix.CreateRotationDegrees(HatchRotation);
         var latticeMatrix = SKMatrix.Concat(scaleMatrix, rotationMatrix);
-        using var hatchEffect = IsHatchEffect ? SKPathEffect.Create2DLine(hatchLineWidth, latticeMatrix) : null;
 
         if (IsClosed)
         {
