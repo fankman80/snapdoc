@@ -27,8 +27,8 @@ public partial class DrawingToolbar : ContentView
     public int LineWidth { get; private set; } = 3;
     public string StrokeStyle { get; private set; } = "";
     public bool IsHatchEffect { get; private set; }
-    public float HatchStrokeWidth { get; private set; } = 2f;
-    public float HatchStrokeSpace { get; private set; } = 8f;
+    public float HatchStrokeWidth { get; private set; } = 5f;
+    public float HatchStrokeSpace { get; private set; } = 16f;
     public float HatchRotation { get; private set; } = 45f;
     public float CloudRadius { get; private set; } = 20f;
     public float CloudInciseDeg { get; private set; } = 15f;
