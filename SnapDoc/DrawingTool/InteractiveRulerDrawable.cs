@@ -53,9 +53,8 @@ public class InteractiveRulerDrawable
         if (Points.Count != 2)
             return;
 
-        float textSize = Measure.MeasureTextSize * StyleScale;
+        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
-
         painter.DrawSegment(canvas, Points[0], Points[1], Measure.FormatLength(RawLength));
     }
 
