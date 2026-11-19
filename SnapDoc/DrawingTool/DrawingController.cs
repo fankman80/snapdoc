@@ -847,7 +847,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         if (CombinedDrawable == null)
             return null;
 
-        float density = (float)Settings.DisplayDensity;
         SKRect? result = null;
 
         // Fügt Punkte hinzu und erweitert die Box um "pad" in alle Richtungen
@@ -874,8 +873,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         // Rand für Formen mit optionaler Wolkenkontur
         float Pad(bool isCloud, float cloudRadius, float lineThickness)
         {
-            float stroke = lineThickness * density / 2f;
-            return isCloud ? cloudRadius * density + stroke : stroke;
+            float stroke = lineThickness / 2f;
+
+            return isCloud
+                ? cloudRadius + stroke
+                : stroke;
         }
 
         var poly = CombinedDrawable.PolyDrawable;
@@ -884,7 +886,7 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         var free = CombinedDrawable.FreeDrawable;
         if (free?.HasContent == true)
-            Add(free.Points.SelectMany(s => s), free.LineThickness * density / 2f);
+            Add(free.Points.SelectMany(s => s), free.LineThickness / 2f);
 
         var rect = CombinedDrawable.RectDrawable;
         if (rect?.HasContent == true)
@@ -892,12 +894,11 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         var oval = CombinedDrawable.OvalDrawable;
         if (oval?.HasContent == true)
-            // Umschliessendes Rechteck statt der 4 Achsenpunkte (wichtig bei Rotation)
             Add(oval.GetBoundingCorners(), Pad(oval.IsCloud, oval.CloudRadius, oval.LineThickness));
 
         var arrow = CombinedDrawable.ArrowDrawable;
         if (arrow?.HasContent == true)
-            Add(arrow.Points, arrow.LineThickness * density / 2f);
+            Add(arrow.Points, arrow.LineThickness / 2f);
 
         return result;
     }

@@ -23,6 +23,7 @@ public class InteractiveArrowDrawable
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
+    public float StyleScale { get; set; } = 1f;
     private float _allowedAngleRad;
 
     // Eigenschaften für den Schraffurmodus
@@ -199,11 +200,11 @@ public class InteractiveArrowDrawable
 
         if (LineThickness > 0)
         {
-            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * density,
+                StrokeWidth = LineThickness * StyleScale,
                 IsStroke = true,
                 IsAntialias = true,
                 PathEffect = dashEffect
@@ -337,7 +338,7 @@ public class InteractiveArrowDrawable
 
     private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
     ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
-        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, density, angleOffset);
+        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, StyleScale, angleOffset);
 
     public void Reset()
     {

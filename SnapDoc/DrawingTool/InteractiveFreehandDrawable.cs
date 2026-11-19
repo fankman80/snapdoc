@@ -9,6 +9,7 @@ public class InteractiveFreehandDrawable
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public bool HasContent => Points.Any(stroke => stroke.Count > 1);
     private List<SKPoint>? _currentStroke;
+    public float StyleScale { get; set; } = 1f;
 
     public void StartStroke()
     {
@@ -31,7 +32,7 @@ public class InteractiveFreehandDrawable
         using var paint = new SKPaint
         {
             Color = LineColor,
-            StrokeWidth = LineThickness * (float)Settings.DisplayDensity,
+            StrokeWidth = LineThickness * StyleScale,
             IsStroke = true,
             StrokeCap = SKStrokeCap.Round,
             StrokeJoin = SKStrokeJoin.Round,

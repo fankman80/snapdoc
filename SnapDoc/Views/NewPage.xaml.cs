@@ -955,14 +955,12 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         SKRect? bounds = drawingController.CalculatePlanBoundingBox();
 
-        if (bounds == null || bounds.Value.Width <= 0f || bounds.Value.Height <= 0f)
-            return null;
+        if (bounds == null || bounds.Value.Width <= 0f || bounds.Value.Height <= 0f) return null;
 
         float exportScale = Math.Max(0.01f, (float)PlanImage.CurrentScale);
         float pinScale = 1f / exportScale;
-        float density = (float)Settings.DisplayDensity;
-        float paddingScreenPx = Math.Max(8f * density, DrawToolbar.LineWidth * density * 2f);
-        float paddingPlan = paddingScreenPx / exportScale;
+        const float exportPaddingPx = 4f;
+        float paddingPlan = exportPaddingPx / exportScale;
 
         SKRect crop = bounds.Value;
         crop.Inflate(paddingPlan, paddingPlan);

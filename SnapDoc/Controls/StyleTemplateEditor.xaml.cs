@@ -15,7 +15,8 @@ public partial class StyleTemplateEditor : ContentView
     public event EventHandler<StylePickerItem> TemplateSelected;
 
     private StylePickerItem _current;
-    private const float PreviewMargin = 4f;
+    private const float PreviewMarginDip = 4f;
+    private const float CheckerSizeDip = 6f;
 
     public StyleTemplateEditor()
     {
@@ -156,21 +157,22 @@ public partial class StyleTemplateEditor : ContentView
         if (w <= 0 || h <= 0)
             return;
 
-        DrawCheckerboard(canvas, w, h);
-
         float density = (float)Settings.DisplayDensity;
-        float strokeWidth = item.LineWidth * density;
-        float halfStroke = strokeWidth / 2f;
+        float previewMarginPx = PreviewMarginDip * density;
+        float halfStroke = item.LineWidth * density / 2f;
+
+        DrawCheckerboard(canvas, w, h, density);
 
         if (item.IsCloud)
         {
-            DrawCloudPreview(canvas, w, h, item, density, halfStroke);
+            DrawCloudPreview(canvas, w, h, item, density, halfStroke, previewMarginPx);
+
             return;
         }
 
-        var d = CreatePreviewDrawable(item);
+        var d = CreatePreviewDrawable(item, density);
 
-        float padding = halfStroke + PreviewMargin;
+        float padding = halfStroke + previewMarginPx;
 
         d.SetFromDrag(
             new SKPoint(padding, padding),
@@ -179,9 +181,9 @@ public partial class StyleTemplateEditor : ContentView
         d.Draw(canvas);
     }
 
-    private static void DrawCheckerboard(SKCanvas canvas, float width, float height)
+    private static void DrawCheckerboard(SKCanvas canvas, float width, float height, float density)
     {
-        const float size = 8f;
+        float size = CheckerSizeDip * density;
 
         using var lightPaint = new SKPaint
         {
@@ -217,14 +219,14 @@ public partial class StyleTemplateEditor : ContentView
         }
     }
 
-    private static void DrawCloudPreview(SKCanvas canvas, float width, float height, StylePickerItem item, float density, float halfStroke)
+    private static void DrawCloudPreview(SKCanvas canvas, float width, float height, StylePickerItem item, float density, float halfStroke, float previewMarginPx)
     {
-        var d = CreatePreviewDrawable(item);
+        var d = CreatePreviewDrawable(item, density);
 
         d.IsCloud = true;
         float radiusPx = height * 0.12f;
         d.CloudRadius = radiusPx / density;
-        float padding = radiusPx + halfStroke + PreviewMargin;
+        float padding = radiusPx + halfStroke + previewMarginPx;
 
         d.SetFromDrag(
             new SKPoint(padding, padding),
@@ -235,18 +237,15 @@ public partial class StyleTemplateEditor : ContentView
         d.Draw(canvas);
     }
 
-    private static InteractiveRectangleDrawable CreatePreviewDrawable(StylePickerItem item)
+    private static InteractiveRectangleDrawable CreatePreviewDrawable(StylePickerItem item, float density)
     {
         return new InteractiveRectangleDrawable
         {
-            FillColor =
-                Color.FromArgb(item.BackgroundColor).ToSKColor(),
+            StyleScale = density,
 
-            LineColor =
-                Color.FromArgb(item.BorderColor).ToSKColor(),
-
-            TextColor =
-                Color.FromArgb(item.TextColor).ToSKColor(),
+            FillColor = Color.FromArgb(item.BackgroundColor).ToSKColor(),
+            LineColor = Color.FromArgb(item.BorderColor).ToSKColor(),
+            TextColor = Color.FromArgb(item.TextColor).ToSKColor(),
 
             LineThickness = item.LineWidth,
             StrokeStyle = item.StrokeStyle ?? "",

@@ -32,6 +32,7 @@ public class InteractivePolylineDrawable
     public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
     private readonly float density = (float)Settings.DisplayDensity;
+    public float StyleScale { get; set; } = 1f;
 
     private class CloudNode
     {
@@ -101,11 +102,11 @@ public class InteractivePolylineDrawable
 
         if (LineThickness > 0)
         {
-            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * density,
+                StrokeWidth = LineThickness * StyleScale,
                 IsStroke = true,
                 IsAntialias = true,
                 PathEffect = dashEffect
@@ -116,7 +117,7 @@ public class InteractivePolylineDrawable
 
     private void DrawCloudPath(SKCanvas canvas)
     {
-        float radius = CloudRadius * density;
+        float radius = CloudRadius * StyleScale;
         float delta = 2f * radius * CloudOverlap;
 
         var workingPoints = new List<SKPoint>(Points);
@@ -218,12 +219,12 @@ public class InteractivePolylineDrawable
 
         if (LineThickness > 0)
         {
-            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
 
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * density,
+                StrokeWidth = LineThickness * StyleScale,
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round,
@@ -358,7 +359,7 @@ public class InteractivePolylineDrawable
 
     private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
     ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
-        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, density, angleOffset);
+        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, StyleScale, angleOffset);
 
     public void Reset()
     {

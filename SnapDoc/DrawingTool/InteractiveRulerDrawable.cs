@@ -5,6 +5,7 @@ namespace SnapDoc.DrawingTool;
 public class InteractiveRulerDrawable
 {
     private readonly float density = (float)Settings.DisplayDensity;
+    public float StyleScale { get; set; } = 1f;
     public MeasureSettings Measure { get; set; } = new();
     public List<SKPoint> Points { get; } = [];
     public float HandleRadius { get; set; } = 15f;
@@ -38,7 +39,7 @@ public class InteractiveRulerDrawable
         using var paint = new SKPaint
         {
             Color = SKColors.Red,
-            StrokeWidth = LineThickness * density * Measure.ViewScale,
+            StrokeWidth = LineThickness * StyleScale,
             Style = SKPaintStyle.Stroke,
             StrokeCap = SKStrokeCap.Round,
             IsAntialias = true
@@ -52,7 +53,7 @@ public class InteractiveRulerDrawable
         if (Points.Count != 2)
             return;
 
-        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
+        float textSize = Measure.MeasureTextSize * StyleScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
 
         painter.DrawSegment(canvas, Points[0], Points[1], Measure.FormatLength(RawLength));

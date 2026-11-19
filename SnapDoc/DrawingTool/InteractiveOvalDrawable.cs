@@ -28,6 +28,7 @@ public class InteractiveOvalDrawable
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
+    public float StyleScale { get; set; } = 1f;
     private float _allowedAngleRad;
     public bool AutoSizeText { get; set; } = true;
     public int TextPadding { get; set; } = 10;
@@ -163,11 +164,11 @@ public class InteractiveOvalDrawable
 
             if (LineThickness > 0)
             {
-                using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+                using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
                 using var linePaint = new SKPaint
                 {
                     Color = LineColor,
-                    StrokeWidth = LineThickness * density,
+                    StrokeWidth = LineThickness * StyleScale,
                     IsStroke = true,
                     IsAntialias = true,
                     PathEffect = dashEffect
@@ -230,14 +231,14 @@ public class InteractiveOvalDrawable
     {
         TextSize = _textRenderer.Draw(canvas, Text, Center, Width, Height, AllowedAngleDeg,
                                       TextStyle, TextAlignment, TextPadding, AutoSizeText,
-                                      TextSize, MinTextSize, MaxTextSize, TextColor, density);
+                                      TextSize, MinTextSize, MaxTextSize, TextColor, StyleScale);
     }
 
     private void DrawCloudPath(SKCanvas canvas)
     {
         float hw = Width / 2f;
         float hh = Height / 2f;
-        float radius = CloudRadius * density;
+        float radius = CloudRadius * StyleScale;
         float delta = 2f * radius * CloudOverlap;
 
         // Ramanujan-Approximation fuer den exakten Ellipsenumfang
@@ -345,12 +346,12 @@ public class InteractiveOvalDrawable
         // Kontur zeichnen
         if (LineThickness > 0)
         {
-            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
 
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * density,
+                StrokeWidth = LineThickness * StyleScale,
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round,
@@ -537,7 +538,7 @@ public class InteractiveOvalDrawable
 
     private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
     ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
-        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, density, angleOffset);
+        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, StyleScale, angleOffset);
 
     public void Reset()
     {

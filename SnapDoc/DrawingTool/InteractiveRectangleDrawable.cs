@@ -29,6 +29,7 @@ public class InteractiveRectangleDrawable
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
     private readonly float density = (float)Settings.DisplayDensity;
+    public float StyleScale { get; set; } = 1f;
     private float _allowedAngleRad;
     public bool AutoSizeText { get; set; } = true;
     public int TextPadding { get; set; } = 10;
@@ -162,11 +163,11 @@ public class InteractiveRectangleDrawable
 
             if (LineThickness > 0)
             {
-                using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+                using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
                 using var linePaint = new SKPaint
                 {
                     Color = LineColor,
-                    StrokeWidth = LineThickness * density,
+                    StrokeWidth = LineThickness * StyleScale,
                     IsStroke = true,
                     IsAntialias = true,
                     PathEffect = dashEffect
@@ -228,12 +229,12 @@ public class InteractiveRectangleDrawable
     {
         TextSize = _textRenderer.Draw(canvas, Text, Center, Width, Height, AllowedAngleDeg,
                                       TextStyle, TextAlignment, TextPadding, AutoSizeText,
-                                      TextSize, MinTextSize, MaxTextSize, TextColor, density);
+                                      TextSize, MinTextSize, MaxTextSize, TextColor, StyleScale);
     }
 
     private void DrawCloudPath(SKCanvas canvas)
     {
-        float radius = CloudRadius * density;
+        float radius = CloudRadius * StyleScale;
         float delta = 2f * radius * CloudOverlap;
 
         var workingPoints = new List<SKPoint>(Points);
@@ -309,12 +310,12 @@ public class InteractiveRectangleDrawable
 
         if (LineThickness > 0)
         {
-            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, density, LineThickness);
+            using var dashEffect = Helper.GetValidDashEffect(StrokeStyle, StyleScale, LineThickness);
 
             using var linePaint = new SKPaint
             {
                 Color = LineColor,
-                StrokeWidth = LineThickness * density,
+                StrokeWidth = LineThickness * StyleScale,
                 IsStroke = true,
                 IsAntialias = true,
                 StrokeJoin = SKStrokeJoin.Round,
@@ -460,7 +461,7 @@ public class InteractiveRectangleDrawable
 
     private void FillShape(SKCanvas canvas, SKPath path, float angleOffset = 0f) =>
     ShapeFill.Draw(canvas, path, FillColor, IsHatchEffect,
-        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, density, angleOffset);
+        HatchStrokeWidth, HatchStrokeSpace, HatchRotation, StyleScale, angleOffset);
 
     public void Reset()
     {
