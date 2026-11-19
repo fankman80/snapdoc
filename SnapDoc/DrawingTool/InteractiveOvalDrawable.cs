@@ -36,8 +36,8 @@ public class InteractiveOvalDrawable
 
     // Eigenschaften für den Schraffurmodus
     public bool IsHatchEffect { get; set; } = false;
-    public float HatchStrokeWidth { get; set; } = 2f;
-    public float HatchStrokeSpace { get; set; } = 8f;
+    public float HatchStrokeWidth { get; set; } = 5f;
+    public float HatchStrokeSpace { get; set; } = 16f;
     public float HatchRotation { get; set; } = 45f;
 
     // --- Eigenschaften fuer den Wolken-Modus ---
