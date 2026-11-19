@@ -91,6 +91,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         planId = _planId;
         thisPlan = GlobalJson.Data.Plans[planId];
         drawingController = new DrawingController(new TransformViewModel());
+        drawingController.SetStyleScale(1f);
+    
         InitializeComponent();
 
         // Gemeinsame Zeichen-UI
