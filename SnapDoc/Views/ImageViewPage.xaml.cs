@@ -34,7 +34,7 @@ public partial class ImageViewPage : IQueryAttributable
     // --- DrawingController ---
     private readonly DrawingController drawingController;
     private bool drawingOwnsTouch;
-
+    private const float PhotoDrawingStyleScale = 10f;
     private bool isGotoPinBtnVisible = false;
     public bool IsGotoPinBtnVisible
     {
@@ -73,6 +73,7 @@ public partial class ImageViewPage : IQueryAttributable
         GestureContainer.SizeChanged += GestureContainer_SizeChanged;
 
         drawingController = new DrawingController(fotoContainer);
+        drawingController.SetStyleScale(PhotoDrawingStyleScale);
         drawingController.Invalidated += (_, _) => DrawingView?.InvalidateSurface();
 
         // Gemeinsame Zeichen-UI
