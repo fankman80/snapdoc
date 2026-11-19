@@ -53,7 +53,6 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
                            (x * sin + y * cos) * viewScale);
     }
 
-
     private void Invalidate() => Invalidated?.Invoke(this, EventArgs.Empty);
     private float viewScale = 1f;        // Plan-Pixel pro Bildschirm-Pixel
     private float viewRotationDeg = 0f;
@@ -154,6 +153,25 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
             oval.DisplayHandles = ovalHandles;
             arrow.DisplayHandles = arrowHandles;
         }
+    }
+
+    public void SetStyleScale(float scale)
+    {
+        if (!float.IsFinite(scale) || scale <= 0f)
+            scale = 1f;
+
+        if (CombinedDrawable != null)
+        {
+            CombinedDrawable.RectDrawable.StyleScale = scale;
+            CombinedDrawable.OvalDrawable.StyleScale = scale;
+            CombinedDrawable.PolyDrawable.StyleScale = scale;
+            CombinedDrawable.ArrowDrawable.StyleScale = scale;
+            CombinedDrawable.FreeDrawable.StyleScale = scale;
+        }
+
+        RulerDrawable.StyleScale = scale;
+
+        Invalidate();
     }
 
     public bool OnPressed(SKPoint p)
