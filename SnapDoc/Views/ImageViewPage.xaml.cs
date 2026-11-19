@@ -406,15 +406,19 @@ public partial class ImageViewPage : IQueryAttributable
     private Task StartDrawing(bool setDefaultMode = true)
     {
         fotoContainer.IsPanningEnabled = false;
+
         if (setDefaultMode)
             drawingController.Reset();
+
+        // Fotos verwenden grössere Stilwerte als Planzeichnungen.
+        drawingController.SetStyleScale(PhotoDrawingStyleScale);
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
         IsEditMode = true;
+
         UpdateNavigationButtons();
 
-        // Stil + Standardwerkzeug setzt jetzt die Toolbar
         DrawToolbar.InitializeDrawing(setDefaultMode);
 
         // Fotos haben keinen realen Massstab
@@ -422,10 +426,12 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController.IsActive = true;
 
         UpdateDrawingViewScale();
+
         DrawingView.IsVisible = true;
         DrawingView.InvalidateSurface();
 
         Dispatcher.Dispatch(() => UpdateImageArea(DrawToolbar.BarsHeight));
+
         return Task.CompletedTask;
     }
 
