@@ -5,10 +5,6 @@ using System.Globalization;
 using SnapDoc.Views;
 using SnapDoc.Services;
 
-#if WINDOWS
-using Microsoft.Maui.LifecycleEvents;
-#endif
-
 #if ANDROID
 using Microsoft.Maui.Platform;
 #endif
@@ -51,7 +47,8 @@ public static class MauiProgram
         builder.Services.AddSingleton<AuthService>();
         builder.Services.AddTransient<HomeScreen>();
 
-        // Entfernt Entry Rahmen, Padding und blauer Strich
+        // Entfernt Entry-Rahmen, Padding und Unterstreichung
+        // und setzt die Cursorfarbe auf die Primary-Themefarbe
         Microsoft.Maui.Handlers.EntryHandler.Mapper.AppendToMapping("MyBorderlessCustomization", (handler, view) =>
         {
             if (view is BorderlessEntry)
@@ -59,14 +56,27 @@ public static class MauiProgram
 #if ANDROID
                 handler.PlatformView.Background = null;
                 handler.PlatformView.SetPadding(0, 0, 0, 0);
-#elif IOS
+
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Q)
+                {
+                    handler.PlatformView.TextCursorDrawable?
+                        .SetTint(GetPrimaryColor());
+                }
+#elif IOS    
                 handler.PlatformView.BorderStyle = UIKit.UITextBorderStyle.None;
+
 #elif WINDOWS
-                handler.PlatformView.BorderThickness = new Microsoft.UI.Xaml.Thickness(0);
-                handler.PlatformView.Resources["TextControlBorderThemeThicknessFocused"] = new Microsoft.UI.Xaml.Thickness(0);
-                handler.PlatformView.Padding = new Microsoft.UI.Xaml.Thickness(0);
-                handler.PlatformView.MinWidth = 0;
-                handler.PlatformView.MinHeight = 0;
+        handler.PlatformView.BorderThickness =
+            new Microsoft.UI.Xaml.Thickness(0);
+
+        handler.PlatformView.Resources["TextControlBorderThemeThicknessFocused"] =
+            new Microsoft.UI.Xaml.Thickness(0);
+
+        handler.PlatformView.Padding =
+            new Microsoft.UI.Xaml.Thickness(0);
+
+        handler.PlatformView.MinWidth = 0;
+        handler.PlatformView.MinHeight = 0;
 #endif
             }
         });
@@ -77,9 +87,18 @@ public static class MauiProgram
             if (view is BorderlessEditor)
             {
 #if ANDROID
-                handler.PlatformView.BackgroundTintList = Android.Content.Res.ColorStateList.ValueOf(Android.Graphics.Color.Transparent);
+                handler.PlatformView.BackgroundTintList =
+                    Android.Content.Res.ColorStateList.ValueOf(
+                        Android.Graphics.Color.Transparent);
+
                 handler.PlatformView.Background = null;
                 handler.PlatformView.SetPadding(0, 0, 0, 0);
+
+                if (Android.OS.Build.VERSION.SdkInt >= Android.OS.BuildVersionCodes.Q)
+                {
+                    handler.PlatformView.TextCursorDrawable?
+                        .SetTint(GetPrimaryColor());
+                }
 #elif IOS
                 handler.PlatformView.BackgroundColor = UIKit.UIColor.Clear;
                 handler.PlatformView.Layer.BorderWidth = 0;
@@ -145,7 +164,7 @@ public static class MauiProgram
 
     private static void SetLanguage()
     {
-        string iniPath = Path.Combine(Settings.DataDirectory, "appsettings.ini");
+        string iniPath = System.IO.Path.Combine(Settings.DataDirectory, "appsettings.ini");
         string lang = "system"; // Standardwert auf "system" ändern
 
         if (File.Exists(iniPath))
@@ -189,6 +208,20 @@ public static class MauiProgram
             }
         }
     }
+
+#if ANDROID
+    private static Android.Graphics.Color GetPrimaryColor()
+    {
+        if (Application.Current?.Resources.TryGetValue("Primary", out var value) == true &&
+            value is Microsoft.Maui.Graphics.Color color)
+        {
+            return color.ToPlatform();
+        }
+
+        // Fallback EBBE-Türkis
+        return Android.Graphics.Color.ParseColor("#1BB0CE");
+    }
+#endif
 }
 
 public partial class BorderlessEntry : Microsoft.Maui.Controls.Entry
