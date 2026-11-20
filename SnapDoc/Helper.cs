@@ -324,11 +324,8 @@ public class Helper
 
     public static class IconLookup
     {
-        private static readonly Dictionary<string, IconItem> _icons =
-            new(StringComparer.OrdinalIgnoreCase);
-
+        private static readonly Dictionary<string, IconItem> _icons = [with(StringComparer.OrdinalIgnoreCase)];
         private static readonly Lock _lock = new();
-
         private static IconItem _fallback;
 
         // Lädt die Icon-Liste komplett neu.
@@ -469,7 +466,7 @@ public class Helper
         data.SaveTo(outputStream);
     }
 
-    public static SKPathEffect? GetValidDashEffect(string strokeStyle, float styleScale, float lineThickness)
+    public static SKPathEffect GetValidDashEffect(string strokeStyle, float styleScale, float lineThickness)
     {
         if (string.IsNullOrWhiteSpace(strokeStyle))
             return null;

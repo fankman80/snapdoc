@@ -107,6 +107,13 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     {
         if (DrawToolbar.CloseOpenSheet()) return true;
         if (MoreMenuOverlay.IsVisible) { _ = HideMoreMenuAsync(); return true; }
+
+        if (IsRulerActive)
+        {
+            OnMeasureCancel(this, EventArgs.Empty);
+            return true;
+        }
+
         if (IsToolButtonsVisible) { CancelDrawing(); return true; }
         return base.OnBackButtonPressed();
     }

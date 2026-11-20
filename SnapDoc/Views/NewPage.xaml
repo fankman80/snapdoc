@@ -61,12 +61,21 @@
                   ColumnSpacing="8"
                   VerticalOptions="Center"
                   IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference ThisPage}}">
+
                 <Label Grid.Column="0"
                        Text="{Binding Title, Source={x:Reference ThisPage}}"
                        TextColor="{DynamicResource PrimaryDark}"
                        FontSize="18"
                        LineBreakMode="TailTruncation"
-                       VerticalOptions="Center"/>
+                       VerticalOptions="Center">
+                    <Label.Triggers>
+                        <DataTrigger TargetType="Label"
+                                     Binding="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
+                                     Value="True">
+                            <Setter Property="Text" Value="{x:Static res:AppResources.massstab_kalibrieren}" />
+                        </DataTrigger>
+                    </Label.Triggers>
+                </Label>
                 <Button Grid.Column="1"
                         Style="{StaticResource TitleIconButton}"
                         Text="{x:Static local:MaterialIcons.Straighten}"
@@ -81,17 +90,36 @@
                         </DataTrigger>
                     </Button.Triggers>
                 </Button>
+                
+                <!-- Zeichnen: abbrechen / speichern -->
                 <Button Grid.Column="2"
                         Style="{StaticResource TitleIconButton}"
                         Text="{x:Static local:MaterialIcons.Close}"
+                        IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.abbrechen}"
                         Clicked="CancelDrawingClicked"/>
                 <Button Grid.Column="3"
                         Style="{StaticResource TitleIconButton}"
                         Text="{x:Static local:MaterialIcons.Check}"
                         FontSize="28"
+                        IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
                         ToolTipProperties.Text="{x:Static res:AppResources.zeichnung_speichern}"
                         Clicked="CheckClicked"/>
+
+                <!-- Kalibrieren: abbrechen / übernehmen (gleiche Positionen) -->
+                <Button Grid.Column="2"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Close}"
+                        IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.messung_abbrechen}"
+                        Clicked="OnMeasureCancel"/>
+                <Button Grid.Column="3"
+                        Style="{StaticResource TitleIconButton}"
+                        Text="{x:Static local:MaterialIcons.Check}"
+                        FontSize="28"
+                        IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
+                        ToolTipProperties.Text="{x:Static res:AppResources.massstab_uebernehmen}"
+                        Clicked="OnMeasureFactorConfirmed"/>
             </Grid>
         </Grid>
     </Shell.TitleView>
@@ -251,8 +279,8 @@
                        ZIndex="10001"/>
             </Grid>
 
-            <!-- Massstab kalibrieren (oben rechts) -->
-            <Border IsVisible="{Binding IsToolButtonsVisible, Source={x:Reference ThisPage}}"
+            <!-- Massstab kalibrieren starten (oben rechts) -->
+            <Border IsVisible="{Binding IsDrawToolbarVisible, Source={x:Reference ThisPage}}"
                     ZIndex="1000000"
                     Margin="16"
                     Padding="0"
@@ -270,23 +298,8 @@
                             Text="{x:Static local:MaterialIcons.Design_services}"
                             BackgroundColor="Transparent"
                             Shadow="{x:Null}"
-                            IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}, Converter={StaticResource InvertedBoolConverter}}"
                             ToolTipProperties.Text="{x:Static res:AppResources.massstab_kalibrieren}"
                             Clicked="OnMeasureAdjust"/>
-                    <Button Style="{StaticResource ToolButtonStyleShadow}"
-                            Text="{x:Static local:MaterialIcons.Close}"
-                            BackgroundColor="Transparent"
-                            Shadow="{x:Null}"
-                            IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.messung_abbrechen}"
-                            Clicked="OnMeasureCancel"/>
-                    <Button Style="{StaticResource ToolButtonStyleShadow}"
-                            Text="{x:Static local:MaterialIcons.Check}"
-                            BackgroundColor="Transparent"
-                            Shadow="{x:Null}"
-                            IsVisible="{Binding IsRulerActive, Source={x:Reference ThisPage}}"
-                            ToolTipProperties.Text="{x:Static res:AppResources.massstab_uebernehmen}"
-                            Clicked="OnMeasureFactorConfirmed"/>
                 </HorizontalStackLayout>
             </Border>
 
