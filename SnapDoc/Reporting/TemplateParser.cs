@@ -16,17 +16,10 @@ public sealed class ArgumentSet(IReadOnlyDictionary<string, string> values)
     public bool TryGetFloat(string name, out float value)
     {
         value = 0;
-
-        return _values.TryGetValue(
-                   name,
-                   out string? text)
-               && float.TryParse(
-                   text,
-                   NumberStyles.Float,
-                   CultureInfo.InvariantCulture,
-                   out value);
+        return _values.TryGetValue(name, out string? text)
+               && float.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out value);
     }
-
+    
     public float GetFloat(string name, float fallback) => TryGetFloat(name, out float value) ? value : fallback;
 }
 
@@ -47,10 +40,7 @@ public sealed record PlaceholderToken(string Name, string? Qualifier, ArgumentSe
 /// </summary>
 internal static class ParagraphText
 {
-    internal sealed record Segment(
-        W.Text Text,
-        int Start,
-        int End);
+    internal sealed record Segment(W.Text Text, int Start, int End);
 
     /// <summary>
     /// Alle Text-Elemente des Absatzes.
@@ -71,12 +61,9 @@ internal static class ParagraphText
                 continue;
 
             string value = text.Text ?? string.Empty;
-
             segments.Add(new Segment(text, position, position + value.Length));
-
             position += value.Length;
         }
-
         return segments;
     }
 
