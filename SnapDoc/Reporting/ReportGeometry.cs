@@ -2,7 +2,6 @@
 
 namespace SnapDoc.Reporting;
 
-/// <summary>Reine Rechenfunktionen (1:1 aus dem bisherigen ExportReport übernommen).</summary>
 public static class ReportGeometry
 {
     public static long MmToEmu(double millimeters) => Convert.ToInt64(millimeters * 36000);
