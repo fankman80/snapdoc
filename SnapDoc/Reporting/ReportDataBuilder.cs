@@ -72,8 +72,11 @@ public static class ReportDataBuilder
             .Where(f => f.AllowExport && !f.File.Contains(MapImagePrefix, StringComparison.OrdinalIgnoreCase))
             .Select(f => new ExportFoto(
                 f.File,
-                new SizeF((float)f.ImageSize.Width, (float)f.ImageSize.Height),
-                f.HasOverlay))
+                new SizeF(
+                    (float)f.ImageSize.Width,
+                    (float)f.ImageSize.Height),
+                f.HasOverlay,
+                f.DateTime))
             .ToList();
 
         string priorityKey = pin.PriorityKey ?? string.Empty;
@@ -108,7 +111,8 @@ public static class ReportDataBuilder
             Size: new SizeF((float)pin.Size.Width, (float)pin.Size.Height),
             ColorHex: colorHex,
             MapImageFile: mapImage,
-            Photos: photos);
+            Photos: photos,
+            ModifiedAt: pin.ModifiedAt);
     }
 
     private static ExportOptions BuildOptions(JsonDataModel data, SettingsService s)

@@ -1,5 +1,4 @@
 #nullable enable
-using DocumentFormat.OpenXml;
 using System.Globalization;
 
 namespace SnapDoc.Reporting;
@@ -13,6 +12,7 @@ public static class DefaultPlaceholders
     private static readonly string[] TextArgs = ["prefix", "suffix", "fallback"];
     private static readonly string[] SizeArgs = ["width", "height"];
     private static readonly string[] DateArgs = ["prefix", "suffix", "fallback", "format", "culture"];
+    private static readonly string[] CountArgs = ["priority", "prefix", "suffix", "fallback"];
 
     public static PlaceholderRegistry Create(ExportSession session, WordImageRenderer images, WordPlanRenderer plans)
     {
@@ -25,17 +25,12 @@ public static class DefaultPlaceholders
         Text(r, "project_nr", ScopeKind.Project, c => c.Data.Project.ProjectNr);
         Text(r, "object_name", ScopeKind.Project, c => c.Data.Project.ObjectName);
         Text(r, "project_manager", ScopeKind.Project, c => c.Data.Project.ProjectManager);
-        Date(r, session, "creation_date", ScopeKind.Project, c => c.Data.Project.CreationDate, "D");
-
-        // Zeilenumbruch (alt). Neu genügt ein Umbruch im Wert bzw. in der Vorlage.
         Text(r, "linebreak", ScopeKind.Project, _ => "\n");
-
-        // Laufnummer innerhalb einer Wiederholung (1, 2, 3 …)
-        Text(r, "row_nr", ScopeKind.Project, c => c.Scope.RowNumber > 0 ? c.Scope.RowNumber.ToString() : null);
+        Text(r, "row_count", ScopeKind.Project, c => c.Scope.RowCount > 0 ? c.Scope.RowCount.ToString() : null);
 
         // ------------------------------------------------------------ Projekt (Bilder & Blöcke)
         r.Register(new PlaceholderDefinition("title_image", PlaceholderKind.Inline, ScopeKind.Project, SizeArgs, images.TitleImage));
-        r.Register(new PlaceholderDefinition("plan_indexes", PlaceholderKind.Text, ScopeKind.Project, [], plans.PlanIndexes));
+        r.Register(new PlaceholderDefinition("plan_indexes", PlaceholderKind.Text, ScopeKind.Project, Array.Empty<string>(), plans.PlanIndexes));
         r.Register(new PlaceholderDefinition("plan_images", PlaceholderKind.Block, ScopeKind.Project, SizeArgs, plans.PlanImages));
 
         // ------------------------------------------------------------ Plan
@@ -50,6 +45,35 @@ public static class DefaultPlaceholders
             Array.Empty<string>(),
             c => PlaceholderResult.FromElement(PinLabelFactory.CreateBoundNumber(session.StoreItemId, c.Scope.Pin!.Number, c.RunProperties))));
 
+        r.Register(new PlaceholderDefinition(
+            "pin_count",
+            PlaceholderKind.Text,
+            ScopeKind.Project,
+            CountArgs,
+            c => 
+            {
+                IEnumerable<ExportPin> pins;
+
+                if (c.Scope.Plan != null)
+                    pins = c.Scope.Plan.Pins;
+                else
+                    pins = c.Data.AllPins;
+
+                string? priority =
+                    c.Args.Get("priority");
+
+                if (!string.IsNullOrWhiteSpace(priority))
+                {
+                    pins = pins.Where(pin =>
+                        string.Equals(
+                            pin.PriorityKey,
+                            priority,
+                            StringComparison.OrdinalIgnoreCase));
+                }
+
+                return PlaceholderResult.FromText(
+                    pins.Count().ToString());
+        }));
 
         Text(r, "pin_planName", ScopeKind.Plan | ScopeKind.Pin, c => c.Scope.Plan!.Name);
         Text(r, "pin_name", ScopeKind.Pin, c => c.Scope.Pin!.Name);
@@ -57,6 +81,26 @@ public static class DefaultPlaceholders
         Text(r, "pin_location", ScopeKind.Pin, c => c.Scope.Pin!.Location);
         Text(r, "pin_geolocWGS84", ScopeKind.Pin, c => c.Scope.Pin!.Wgs84);
         Text(r, "pin_geolocCH1903", ScopeKind.Pin, c => c.Scope.Pin!.Ch1903);
+        Text(r, "photo_count", ScopeKind.Project, c =>
+            {
+                int count =
+                    c.Scope.Pin != null
+                        ? c.Scope.Pin.Photos.Count
+                        : c.Scope.Plan != null
+                            ? c.Scope.Plan.Pins.Sum(
+                                pin => pin.Photos.Count)
+                            : c.Data.AllPins.Sum(
+                                pin => pin.Photos.Count);
+
+                return count.ToString();
+            });
+        Text(r, "plan_count", ScopeKind.Project, c => c.Data.Plans.Count(plan => !plan.IsWebMap).ToString());
+        Text(r, "report_filename", ScopeKind.Project, _ => session.ReportFileName);
+        Text(r, "template_name", ScopeKind.Project, _ => session.TemplateName);
+        Text(r, "photo_filename", ScopeKind.Photo, c => Path.GetFileName( c.Scope.Photo!.File));
+        Text(r, "plan_filename", ScopeKind.Plan, c => Path.GetFileName( c.Scope.Plan!.File));
+        Text(r, "row_nr", ScopeKind.Project, c => c.Scope.RowNumber > 0 ? c.Scope.RowNumber.ToString() : null);
+        Text(r, "row_count", ScopeKind.Project, c => c.Scope.RowCount > 0 ? c.Scope.RowCount.ToString() : null);
 
         r.Register(new PlaceholderDefinition("pin_priority", PlaceholderKind.Text, ScopeKind.Pin, TextArgs,
             c =>
@@ -68,6 +112,14 @@ public static class DefaultPlaceholders
 
         Date(r, session, "pin_captureDate", ScopeKind.Pin, c => PinTime(c), "d");
         Date(r, session, "pin_captureTime", ScopeKind.Pin, c => PinTime(c), "t");
+        Date(r, session, "project_creationDate", ScopeKind.Project, c => c.Data.Project.CreationDate, "d");
+        Date(r, session, "export_date", ScopeKind.Project, _ => session.ExportedAt, "d");
+        Date(r, session, "export_time", ScopeKind.Project, _ => session.ExportedAt, "t");
+        Date(r, session, "pin_createdDate", ScopeKind.Pin, c => c.Scope.Pin!.CapturedAt, "d");
+        Date(r, session, "pin_modifiedDate", ScopeKind.Pin, c => c.Scope.Pin!.ModifiedAt.LocalDateTime, "d");
+        Date(r, session, "pin_modifiedTime", ScopeKind.Pin, c => c.Scope.Pin!.ModifiedAt.LocalDateTime, "t");
+        Date(r, session, "photo_captureDate", ScopeKind.Photo, c => c.Scope.Photo!.CapturedAt, "d");
+        Date(r, session, "photo_captureTime", ScopeKind.Photo, c => c.Scope.Photo!.CapturedAt, "t");
 
         r.Register(new PlaceholderDefinition("pin_posIcon", PlaceholderKind.Inline, ScopeKind.Pin,
             SizeArgs, images.PinIcon));
@@ -82,7 +134,7 @@ public static class DefaultPlaceholders
 
         // ------------------------------------------------------------ Wiederholung: ${repeat:<quelle>}
         r.Register(new PlaceholderDefinition("repeat", PlaceholderKind.Marker, ScopeKind.Project,
-            [], _ => PlaceholderResult.Empty));
+            Array.Empty<string>(), _ => PlaceholderResult.Empty));
 
         r.RegisterSource(new RepeatSourceDefinition("plans",
             Provides: ScopeKind.Plan, Requires: ScopeKind.Project, AllowedArguments: Array.Empty<string>(),

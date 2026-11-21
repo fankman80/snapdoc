@@ -26,18 +26,28 @@ public sealed class ExportSession
     private readonly List<ReportMessage> _messages = [];
     private uint _nextDrawingId;
     private int _nextShapeId = 1;
+    public string TemplatePath { get; }
+    public string OutputPath { get; }
+    public string TemplateName => Path.GetFileName(TemplatePath);
+    public string ReportFileName => Path.GetFileName(OutputPath);
+    public DateTime ExportedAt { get; }
 
-    public ExportSession(TemplateDocument template, ReportDataContext data, ExportAssetCache assets)
+    public ExportSession(TemplateDocument template, ReportDataContext data, ExportAssetCache assets, string templatePath, string outputPath)
     {
         Template = template;
         Data = data;
         Assets = assets;
 
+        TemplatePath = templatePath;
+        OutputPath = outputPath;
+        ExportedAt = DateTime.Now;
+
         uint maxId = template.Roots
-            .SelectMany(r => r.Descendants<WP.DocProperties>())
-            .Select(d => d.Id?.Value ?? 0u)
+            .SelectMany(root => root.Descendants<WP.DocProperties>())
+            .Select(properties => properties.Id?.Value ?? 0u)
             .DefaultIfEmpty(0u)
             .Max();
+
         _nextDrawingId = maxId + 1;
     }
 

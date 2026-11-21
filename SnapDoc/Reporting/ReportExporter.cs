@@ -31,7 +31,7 @@ public sealed class ReportExporter
 
             template = TemplateDocument.Open(templatePath);
 
-            var session = new ExportSession(template, data, assets);
+            var session = new ExportSession(template, data, assets, templatePath, outputPath);
             var images = new WordImageRenderer(session);
             var plans = new WordPlanRenderer(session, images);
             var registry = DefaultPlaceholders.Create(session, images, plans);

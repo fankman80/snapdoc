@@ -44,7 +44,11 @@ public sealed record ProjectInfo(
     string? TitleImageFile,
     SizeF TitleImageSize);
 
-public sealed record ExportFoto(string File, SizeF ImageSize, bool HasOverlay);
+public sealed record ExportFoto(
+    string File,
+    SizeF ImageSize,
+    bool HasOverlay,
+    DateTime CapturedAt);
 
 public sealed record ExportPin(
     int Number,
@@ -69,7 +73,8 @@ public sealed record ExportPin(
     SizeF Size,
     string ColorHex,
     string? MapImageFile,
-    IReadOnlyList<ExportFoto> Photos);
+    IReadOnlyList<ExportFoto> Photos,
+    DateTimeOffset ModifiedAt);
 
 public sealed record ExportPlan(
     string Key,
