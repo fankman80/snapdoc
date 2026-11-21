@@ -1,6 +1,4 @@
 #nullable enable
-using Microsoft.Maui.Graphics;
-
 namespace SnapDoc.Reporting;
 
 /// <summary>Welche Daten ein Platzhalter benötigt bzw. welche eine Wiederholungsquelle liefert.</summary>

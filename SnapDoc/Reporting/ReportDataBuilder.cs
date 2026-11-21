@@ -1,5 +1,4 @@
 #nullable enable
-using Microsoft.Maui.Graphics;
 using SnapDoc.Models;
 using SnapDoc.Services;
 

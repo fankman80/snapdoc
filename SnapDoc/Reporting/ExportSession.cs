@@ -10,15 +10,10 @@ public enum ReportMessageSeverity { Info, Warning, Error }
 
 public sealed record ReportMessage(ReportMessageSeverity Severity, string Text, string? Location = null)
 {
-    public override string ToString() =>
-        Location is null ? $"[{Severity}] {Text}" : $"[{Severity}] {Location}: {Text}";
+    public override string ToString() => Location is null ? $"[{Severity}] {Text}" : $"[{Severity}] {Location}: {Text}";
 }
 
-public sealed record ReportExportResult(
-    bool Success,
-    string? OutputPath,
-    IReadOnlyList<ReportMessage> Messages,
-    Exception? Exception = null);
+public sealed record ReportExportResult(bool Success, string? OutputPath, IReadOnlyList<ReportMessage> Messages, Exception? Exception = null);
 
 /// <summary>
 /// Zustand genau eines Exportvorgangs. Ersetzt die früheren statischen Felder
@@ -52,10 +47,7 @@ public sealed class ExportSession
     public ExportAssetCache Assets { get; }
     public string StoreItemId { get; private set; } = string.Empty;
     public IReadOnlyList<ReportMessage> Messages => _messages;
-
-    public void InitializePinStore() =>
-        StoreItemId = PinNumberStore.Write(Template.MainPart, Data);
-
+    public void InitializePinStore() => StoreItemId = PinNumberStore.Write(Template.MainPart, Data);
     public uint NextDrawingId() => _nextDrawingId++;
     public int NextShapeId() => _nextShapeId++;
 

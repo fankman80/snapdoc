@@ -17,12 +17,7 @@ public enum PlaceholderKind
 }
 
 /// <summary>Alles, was ein Resolver braucht, um einen Platzhalter zu füllen.</summary>
-public sealed record PlaceholderCall(
-    PlaceholderToken Token,
-    RenderScope Scope,
-    W.Paragraph Paragraph,
-    W.RunProperties? RunProperties,
-    ExportSession Session)
+public sealed record PlaceholderCall(PlaceholderToken Token, RenderScope Scope, W.Paragraph Paragraph, W.RunProperties? RunProperties, ExportSession Session)
 {
     public ArgumentSet Args => Token.Arguments;
     public ReportDataContext Data => Scope.Data;
@@ -64,32 +59,23 @@ public sealed class PlaceholderResult
     /// </summary>
     public string? CellFillHex { get; private init; }
 
-    public static PlaceholderResult FromText(
-        string? text,
-        string? cellFillHex = null) =>
-        new()
+    public static PlaceholderResult FromText(string? text, string? cellFillHex = null) => new()
         {
             Text = text ?? string.Empty,
             CellFillHex = cellFillHex
         };
 
-    public static PlaceholderResult FromElement(
-        OpenXmlElement element) =>
-        new()
+    public static PlaceholderResult FromElement(OpenXmlElement element) => new()
         {
             Elements = new OpenXmlElement[] { element }
         };
 
-    public static PlaceholderResult FromElements(
-        IEnumerable<OpenXmlElement> elements) =>
-        new()
+    public static PlaceholderResult FromElements(IEnumerable<OpenXmlElement> elements) => new()
         {
             Elements = elements.ToArray()
         };
 
-    public static PlaceholderResult FromBlocks(
-        IEnumerable<OpenXmlElement> blocks) =>
-        new()
+    public static PlaceholderResult FromBlocks(IEnumerable<OpenXmlElement> blocks) => new()
         {
             Elements = Array.Empty<OpenXmlElement>(),
             Blocks = blocks.ToArray()
@@ -119,13 +105,9 @@ public sealed class PlaceholderRegistry
 {
     private readonly Dictionary<string, PlaceholderDefinition> _placeholders = [with(StringComparer.OrdinalIgnoreCase)];
     private readonly Dictionary<string, RepeatSourceDefinition> _sources = [with(StringComparer.OrdinalIgnoreCase)];
-
     public void Register(PlaceholderDefinition definition) => _placeholders[definition.Name] = definition;
     public void RegisterSource(RepeatSourceDefinition definition) => _sources[definition.Name] = definition;
-
-    public bool TryGet(string name, out PlaceholderDefinition definition) =>
-        _placeholders.TryGetValue(name, out definition!);
-
+    public bool TryGet(string name, out PlaceholderDefinition definition) => _placeholders.TryGetValue(name, out definition!);
     public bool TryGetSource(string? name, out RepeatSourceDefinition source)
     {
         source = null!;

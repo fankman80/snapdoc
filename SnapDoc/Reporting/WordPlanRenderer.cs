@@ -1,6 +1,5 @@
 #nullable enable
 using DocumentFormat.OpenXml;
-using Microsoft.Maui.Graphics;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace SnapDoc.Reporting;

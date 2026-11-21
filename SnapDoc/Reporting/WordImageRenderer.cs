@@ -1,6 +1,5 @@
 #nullable enable
 using DocumentFormat.OpenXml;
-using Microsoft.Maui.Graphics;
 using A = DocumentFormat.OpenXml.Drawing;
 using PIC = DocumentFormat.OpenXml.Drawing.Pictures;
 using W = DocumentFormat.OpenXml.Wordprocessing;

@@ -13,6 +13,7 @@ public partial class ExportSettings : ContentPage
     private static readonly string[] iOSFileTypes = ["com.microsoft.word.doc", "org.openxmlformats.wordprocessingml.document"];
     private static readonly string[] AndroidFileTypes = ["application/msword", "application/vnd.openxmlformats-officedocument.wordprocessingml.document"];
     private static readonly string[] WinUIFileTypes = [".doc", ".docx"];
+    private static readonly ReportExporter ReportExporter = new();
     private bool _isCloudUploading;
 
     public ExportSettings()
@@ -370,12 +371,9 @@ public partial class ExportSettings : ContentPage
         await Shell.Current.GoToAsync($"xmleditor?string={stringTxt}&fileMode=R");
     }
 
-    private static async Task<ReportExportResult> CreateReportAsync(string templatePath, string outputPath)
+    private static Task<ReportExportResult> CreateReportAsync(string templatePath, string outputPath)
     {
-        return await Task.Run(
-            () => ExportReport.DocX(
-                templatePath,
-                outputPath));
+        return Task.Run(() => ReportExporter.ExportAsync(templatePath, outputPath));
     }
 
     private static string FormatExportMessages(ReportExportResult result)

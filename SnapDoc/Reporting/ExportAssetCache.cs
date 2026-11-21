@@ -11,9 +11,7 @@ public partial class ExportAssetCache(ExportOptions options) : IDisposable
 {
     private readonly ExportOptions _options = options;
     private HashSet<string> _known = [with(StringComparer.OrdinalIgnoreCase)];
-
     private sealed record WorkItem(string SourcePath, string TargetPath, int MaxDimension);
-
     public string RootDirectory { get; } = Path.Combine(Settings.CacheDirectory, "report_" + Guid.NewGuid().ToString("N"));
 
     // ---------------------------------------------------------------- Vorbereitung
@@ -150,8 +148,7 @@ public partial class ExportAssetCache(ExportOptions options) : IDisposable
         return _known.Contains(path) || File.Exists(path);
     }
 
-    public string ResolveTitleImage(ProjectInfo project) =>
-        Path.Combine(_options.ImageDirectory, project.TitleImageFile ?? string.Empty);
+    public string ResolveTitleImage(ProjectInfo project) => Path.Combine(_options.ImageDirectory, project.TitleImageFile ?? string.Empty);
 
     public string ResolvePlanImage(ExportPlan plan)
     {

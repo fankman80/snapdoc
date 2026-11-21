@@ -1,7 +1,6 @@
 #nullable enable
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.Packaging;
-using W = DocumentFormat.OpenXml.Wordprocessing;
 
 namespace SnapDoc.Reporting;
 
@@ -13,11 +12,9 @@ public partial class TemplateDocument : IDisposable
 {
     private readonly MemoryStream _stream;
     private bool _documentDisposed;
-
     public WordprocessingDocument Document { get; }
     public MainDocumentPart MainPart => Document.MainDocumentPart!;
     public IReadOnlyList<OpenXmlElement> Roots { get; }
-
     private TemplateDocument(MemoryStream stream, WordprocessingDocument document)
     {
         _stream = stream;

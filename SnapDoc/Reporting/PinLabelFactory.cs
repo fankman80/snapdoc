@@ -3,7 +3,6 @@ using System.Xml.Linq;
 using DocumentFormat.OpenXml;
 using DocumentFormat.OpenXml.CustomXmlDataProperties;
 using DocumentFormat.OpenXml.Packaging;
-using Microsoft.Maui.Graphics;
 using V = DocumentFormat.OpenXml.Vml;
 using W = DocumentFormat.OpenXml.Wordprocessing;
 
