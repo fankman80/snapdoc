@@ -1,7 +1,8 @@
 ﻿#nullable disable
+using CommunityToolkit.Maui.Alerts;
 using CommunityToolkit.Maui.Extensions;
 using CommunityToolkit.Maui.Storage;
-using CommunityToolkit.Maui.Alerts;
+using SnapDoc.Reporting;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 
@@ -58,12 +59,25 @@ public partial class ExportSettings : ContentPage
             // Bericht erstellen
             await BusyService.ShowAsync(AppResources.bericht_wird_geteilt);
 
-            await Task.Run(async () =>
+            DeleteTemporaryReport(outputPath);
+            ReportExportResult exportResult = await CreateReportAsync(templatePath, outputPath);
+
+            if (!exportResult.Success)
             {
-                await ExportReport.DocX(
-                    templatePath,
-                    outputPath);
-            });
+                DeleteTemporaryReport(outputPath);
+
+                await BusyService.HideAsync();
+                await ShowExportErrorAsync(exportResult);
+
+                return;
+            }
+
+            if (!File.Exists(outputPath))
+            {
+                await BusyService.HideAsync();
+                await ShowMissingExportFileAsync(outputPath);
+                return;
+            }
 
             // Ladeanzeige deaktivieren
             await BusyService.HideAsync();
@@ -108,7 +122,9 @@ public partial class ExportSettings : ContentPage
         }
     }
 
-    private async void OnSaveClicked(object sender, EventArgs e)
+    private async void OnSaveClicked(
+        object sender,
+        EventArgs e)
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
@@ -129,66 +145,72 @@ public partial class ExportSettings : ContentPage
 
         try
         {
-            // Bericht erstellen
             await BusyService.ShowAsync(AppResources.bericht_wird_gespeichert);
 
-            await Task.Run(async () =>
-            {
-                await ExportReport.DocX(
-                    templatePath,
-                    outputPath);
-            });
+            DeleteTemporaryReport(outputPath);
+            ReportExportResult exportResult = await CreateReportAsync(templatePath, outputPath);
 
-            // Ladeanzeige deaktivieren
             await BusyService.HideAsync();
 
-
-            // Datei speichern
-            bool isSaved = false;
-
-            if (File.Exists(outputPath))
+            if (!exportResult.Success)
             {
-                try
-                {
-                    using var saveStream = File.Open(
-                        outputPath,
-                        FileMode.Open);
+                DeleteTemporaryReport(outputPath);
 
-                    var fileSaveResult =
-                        await FileSaver.Default.SaveAsync(
-                            SettingsService.Instance.ProjectPath + ".docx",
-                            saveStream);
+                await BusyService.HideAsync();
+                await ShowExportErrorAsync(exportResult);
 
-                    isSaved = fileSaveResult.IsSuccessful;
-                }
-                catch (Exception ex)
-                {
-                    System.Diagnostics.Debug.WriteLine(
-                        $"Fehler beim Speichern: {ex}");
-                }
-                finally
-                {
-                    if (File.Exists(outputPath))
-                        File.Delete(outputPath);
-                }
+                return;
             }
 
+            if (!File.Exists(outputPath))
+            {
+                await ShowMissingExportFileAsync(outputPath);
+                return;
+            }
+
+            bool isSaved;
+
+            try
+            {
+                await using var saveStream = new FileStream(
+                    outputPath,
+                    FileMode.Open,
+                    FileAccess.Read,
+                    FileShare.Read);
+
+                var fileSaveResult = await FileSaver.Default.SaveAsync(SettingsService.Instance.ProjectPath + ".docx", saveStream);
+
+                isSaved = fileSaveResult.IsSuccessful;
+
+                if (!isSaved && fileSaveResult.Exception != null)
+                    System.Diagnostics.Debug.WriteLine($"FileSaver-Fehler: " + $"{fileSaveResult.Exception}");
+            }
+            finally
+            {
+                if (File.Exists(outputPath))
+                    File.Delete(outputPath);
+            }
 
             await Shell.Current.GoToAsync("..");
 
             if (isSaved)
+            {
                 await this.DisplaySnackbar(AppResources.bericht_wurde_gespeichert, actionButtonText: AppResources.ok);
+            }
             else
+            {
                 await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_gespeichert, actionButtonText: AppResources.ok);
+            }
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen des Berichts: {ex}");
-            await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_gespeichert, actionButtonText: AppResources.ok);
+            DeleteTemporaryReport(outputPath);
+
+            System.Diagnostics.Debug.WriteLine($"Fehler beim Erstellen oder Speichern des Berichts: {ex}");
+            await DisplayAlertAsync("Bericht konnte nicht gespeichert werden", $"{ex.GetType().Name}: {ex.Message}", AppResources.ok);
         }
         finally
         {
-            // Ladeanzeige deaktivieren
             await BusyService.HideAsync();
         }
     }
@@ -224,8 +246,15 @@ public partial class ExportSettings : ContentPage
             {
                 await BusyService.ShowAsync(AppResources.bericht_wird_hochgeladen);
 
-                // 2. Bericht erstellen
-                await Task.Run(async () => await ExportReport.DocX(templatePath, outputPath));
+                DeleteTemporaryReport(outputPath);
+                ReportExportResult exportResult = await CreateReportAsync(templatePath, outputPath);
+
+                if (!exportResult.Success)
+                {
+                    await BusyService.HideAsync();
+                    await ShowExportErrorAsync(exportResult);
+                    return;
+                }
 
                 // 3. Hochladen
                 uploadError = File.Exists(outputPath)
@@ -339,5 +368,92 @@ public partial class ExportSettings : ContentPage
         string stringTxt = await reader.ReadToEndAsync();
         
         await Shell.Current.GoToAsync($"xmleditor?string={stringTxt}&fileMode=R");
+    }
+
+    private static async Task<ReportExportResult> CreateReportAsync(string templatePath, string outputPath)
+    {
+        return await Task.Run(
+            () => ExportReport.DocX(
+                templatePath,
+                outputPath));
+    }
+
+    private static string FormatExportMessages(ReportExportResult result)
+    {
+        var relevantMessages = result.Messages
+            .Where(message =>
+                message.Severity is
+                    ReportMessageSeverity.Error or
+                    ReportMessageSeverity.Warning)
+            .OrderBy(message =>
+                message.Severity == ReportMessageSeverity.Error
+                    ? 0
+                    : 1)
+            .ToList();
+
+        if (relevantMessages.Count == 0)
+            return result.Exception?.Message ?? "Der Bericht konnte nicht erstellt werden.";
+
+        return string.Join(
+            Environment.NewLine + Environment.NewLine,
+            relevantMessages.Select(message =>
+            {
+                string severity = message.Severity switch
+                {
+                    ReportMessageSeverity.Error => "Fehler",
+                    ReportMessageSeverity.Warning => "Warnung",
+                    _ => "Hinweis"
+                };
+
+                return string.IsNullOrWhiteSpace(message.Location)
+                    ? $"{severity}: {message.Text}"
+                    : $"{severity} – {message.Location}:{Environment.NewLine}" +
+                      message.Text;
+            }));
+    }
+
+    private async Task ShowExportErrorAsync(ReportExportResult result)
+    {
+        string message = FormatExportMessages(result);
+
+        System.Diagnostics.Debug.WriteLine(
+            $"Report-Export fehlgeschlagen:{Environment.NewLine}{message}");
+
+        var popup = new PopupAlert(message);
+
+        await this.ShowPopupAsync<string>(
+            popup,
+            Settings.PopupOptions);
+    }
+
+    private static void DeleteTemporaryReport(string outputPath)
+    {
+        try
+        {
+            if (File.Exists(outputPath))
+                File.Delete(outputPath);
+        }
+        catch (Exception ex)
+        {
+            System.Diagnostics.Debug.WriteLine(
+                $"Temporäre Reportdatei konnte nicht gelöscht werden: {ex}");
+        }
+    }
+
+    private async Task ShowMissingExportFileAsync(string outputPath)
+    {
+        var result = new ReportExportResult(
+            Success: false,
+            OutputPath: null,
+            Messages: new ReportMessage[]
+            {
+            new(
+                ReportMessageSeverity.Error,
+                "Der Export wurde als erfolgreich gemeldet, " +
+                "die erzeugte DOCX-Datei wurde jedoch nicht gefunden.",
+                outputPath)
+            });
+
+        await ShowExportErrorAsync(result);
     }
 }
