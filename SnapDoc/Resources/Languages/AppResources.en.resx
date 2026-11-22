@@ -1317,58 +1317,78 @@
   <data name="pin_fortfahren_frage" xml:space="preserve">
     <value>How would you like to proceed with pin{0}?</value>
   </data>
-	<data name="linienart" xml:space="preserve">
+  <data name="linienart" xml:space="preserve">
     <value>Line style</value>
   </data>
-	<data name="eigenes_muster_platzhalter" xml:space="preserve">
+  <data name="eigenes_muster_platzhalter" xml:space="preserve">
     <value>Custom pattern, e.g. 12 4 2 4</value>
   </data>
-	<data name="durchgezogen" xml:space="preserve">
+  <data name="durchgezogen" xml:space="preserve">
     <value>Solid</value>
   </data>
-	<data name="gestrichelt" xml:space="preserve">
+  <data name="gestrichelt" xml:space="preserve">
     <value>Dashed</value>
   </data>
-	<data name="gepunktet" xml:space="preserve">
+  <data name="gepunktet" xml:space="preserve">
     <value>Dotted</value>
   </data>
-	<data name="strichpunkt" xml:space="preserve">
+  <data name="strichpunkt" xml:space="preserve">
     <value>Dash-dot</value>
   </data>
-	<data name="keine_linie" xml:space="preserve">
+  <data name="keine_linie" xml:space="preserve">
     <value>No line</value>
   </data>
-	<data name="stift" xml:space="preserve">
+  <data name="stift" xml:space="preserve">
     <value>Pen</value>
   </data>
-	<data name="fuellung" xml:space="preserve">
+  <data name="fuellung" xml:space="preserve">
     <value>Fill</value>
   </data>
-	<data name="text" xml:space="preserve">
+  <data name="text" xml:space="preserve">
     <value>Text</value>
   </data>
-	<data name="wolke" xml:space="preserve">
+  <data name="wolke" xml:space="preserve">
     <value>Cloud</value>
   </data>
-	<data name="wolkenkontur" xml:space="preserve">
+  <data name="wolkenkontur" xml:space="preserve">
     <value>Cloud outline</value>
   </data>
-	<data name="rechteck" xml:space="preserve">
+  <data name="rechteck" xml:space="preserve">
     <value>Rectangle</value>
   </data>
-	<data name="kreis" xml:space="preserve">
+  <data name="kreis" xml:space="preserve">
     <value>Circle</value>
   </data>
-	<data name="pfeil" xml:space="preserve">
+  <data name="pfeil" xml:space="preserve">
     <value>Arrow</value>
   </data>
-	<data name="freihand" xml:space="preserve">
+  <data name="freihand" xml:space="preserve">
     <value>Freehand</value>
   </data>
-	<data name="original_nicht_verfuegbar" xml:space="preserve">
+  <data name="original_nicht_verfuegbar" xml:space="preserve">
     <value>Original not available – please go online.</value>
   </data>
-	<data name="zeichnung_konnte_nicht_gespeichert_werden" xml:space="preserve">
+  <data name="zeichnung_konnte_nicht_gespeichert_werden" xml:space="preserve">
     <value>The image with the drawing could not be saved.</value>
+  </data>
+  <data name="template_already_exists" xml:space="preserve">
+    <value>A template named “{0}” already exists.
+
+Do you want to replace the existing template?</value>
+  </data>
+  <data name="ersetzen" xml:space="preserve">
+    <value>Replace</value>
+  </data>
+  <data name="vorlage_speichern" xml:space="preserve">
+    <value>Save template</value>
+  </data>
+  <data name="template_saved_successfully" xml:space="preserve">
+    <value>Template was saved.</value>
+  </data>
+  <data name="template_not_found" xml:space="preserve">
+    <value>Template was not found.</value>
+  </data>
+  <data name="template_save_failed" xml:space="preserve">
+    <value>Template could not be saved.</value>
   </data>
 </root>

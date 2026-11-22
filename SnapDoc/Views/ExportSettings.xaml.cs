@@ -313,12 +313,13 @@ public partial class ExportSettings : ContentPage
 
     private async void OnAddDocument(object sender, EventArgs e)
     {
-        var customFileType = new FilePickerFileType(new Dictionary<DevicePlatform, IEnumerable<string>>
-        {
-            { DevicePlatform.iOS, iOSFileTypes },          // Verwende das readonly Array für iOS
-            { DevicePlatform.Android, AndroidFileTypes },  // Verwende das readonly Array für Android
-            { DevicePlatform.WinUI, WinUIFileTypes }       // Verwende das readonly Array für WinUI
-        });
+        var customFileType = new FilePickerFileType(
+            new Dictionary<DevicePlatform, IEnumerable<string>>
+            {
+            { DevicePlatform.iOS, iOSFileTypes },
+            { DevicePlatform.Android, AndroidFileTypes },
+            { DevicePlatform.WinUI, WinUIFileTypes }
+            });
 
         var result = await FilePicker.Default.PickAsync(new PickOptions
         {
@@ -326,18 +327,58 @@ public partial class ExportSettings : ContentPage
             FileTypes = customFileType
         });
 
-        if (result != null)
-        {
-            var destinationPath = Path.Combine(Settings.TemplateDirectory, result.FileName);
-            using (var stream = await result.OpenReadAsync())
-            using (var fileStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write))
-            {
-                await stream.CopyToAsync(fileStream);
-            }
+        if (result == null)
+            return;
 
-            SettingsService.Instance.Templates.Add(result.FileName);
-            LoadDocuments();
-            SettingsService.Instance.SelectedTemplate = result.FileName;
+        var destinationPath = Path.Combine(Settings.TemplateDirectory, result.FileName);
+
+        // Vorlage existiert bereits
+        if (File.Exists(destinationPath))
+        {
+            var message = string.Format(AppResources.template_already_exists, result.FileName);
+            var popup = new PopupDualResponse(message, AppResources.ersetzen);
+            var popupResult = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
+
+            if (popupResult?.Result is not DualPopupResult.Ok)
+                return;
+        }
+
+        await using var sourceStream = await result.OpenReadAsync();
+        await using var destinationStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
+
+        await sourceStream.CopyToAsync(destinationStream);
+
+        LoadDocuments();
+
+        SettingsService.Instance.SelectedTemplate = result.FileName;
+    }
+
+    private async void OnSaveTemplateClicked(object sender, EventArgs e)
+    {
+        var selectedTemplate = SettingsService.Instance.SelectedTemplate;
+
+        if (string.IsNullOrWhiteSpace(selectedTemplate))
+            return;
+
+        var sourcePath = Path.Combine(Settings.TemplateDirectory, selectedTemplate);
+
+        if (!File.Exists(sourcePath))
+        {
+            await Toast.Make(AppResources.template_not_found).Show();
+            return;
+        }
+
+        try
+        {
+            await using var stream = File.OpenRead(sourcePath);
+            var result = await FileSaver.Default.SaveAsync(selectedTemplate, stream, CancellationToken.None);
+
+            if (result.IsSuccessful)
+                await Toast.Make(AppResources.template_saved_successfully).Show();
+        }
+        catch (Exception)
+        {
+            await Toast.Make(AppResources.template_save_failed).Show();
         }
     }
 
@@ -361,14 +402,23 @@ public partial class ExportSettings : ContentPage
 
     private async void OnHelpClicked(object sender, EventArgs e)
     {
-        using var stream = await FileSystem.OpenAppPackageFileAsync("export_placeholder.txt");
+        await using var source =
+            await FileSystem.OpenAppPackageFileAsync("report_help.pdf");
 
-        if (stream == null) return;
+        var filePath = Path.Combine(
+            FileSystem.CacheDirectory,
+            "report_help.pdf");
 
-        using var reader = new StreamReader(stream);
-        string stringTxt = await reader.ReadToEndAsync();
-        
-        await Shell.Current.GoToAsync($"xmleditor?string={stringTxt}&fileMode=R");
+        await using (var target = File.Create(filePath))
+        {
+            await source.CopyToAsync(target);
+        }
+
+        await Launcher.Default.OpenAsync(
+            new OpenFileRequest
+            {
+                File = new ReadOnlyFile(filePath)
+            });
     }
 
     private static Task<ReportExportResult> CreateReportAsync(string templatePath, string outputPath)

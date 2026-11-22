@@ -276,7 +276,7 @@ public partial class SettingsService : ObservableObject
     [
         new() {
             Text = "Fluchtweg",
-            TextStyle = 0,
+            TextStyle = RectangleTextStyle.Normal,
             BackgroundColor = "#7F90EE90",
             BorderColor = "#FF008000",
             TextColor = "#FF006400",
@@ -292,7 +292,7 @@ public partial class SettingsService : ObservableObject
         },
         new() {
             Text = "Textfeld",
-            TextStyle = 0,
+            TextStyle = RectangleTextStyle.Normal,
             BackgroundColor = "#FFFFFF",
             BorderColor = "#000000",
             TextColor = "#000000",
@@ -308,7 +308,7 @@ public partial class SettingsService : ObservableObject
         },
         new() {
             Text = "Hinweis",
-            TextStyle = 1,
+            TextStyle = RectangleTextStyle.Italic,
             BackgroundColor = "#66FFB6C1",
             BorderColor = "#FF0000",
             TextColor = "#8B0000",
@@ -324,7 +324,7 @@ public partial class SettingsService : ObservableObject
         },
         new() {
             Text = "Gefahr",
-            TextStyle = 0,
+            TextStyle = RectangleTextStyle.Normal,
             BackgroundColor = "#7FFFFFE0",
             BorderColor = "#DAA520",
             TextColor = "#B8860B",
@@ -340,7 +340,7 @@ public partial class SettingsService : ObservableObject
         },
         new() {
             Text = "Text",
-            TextStyle = 0,
+            TextStyle = RectangleTextStyle.Normal,
             BackgroundColor = "#7FFF4500",
             BorderColor = "#8B0000",
             TextColor = "#FFFFFF",
@@ -356,7 +356,7 @@ public partial class SettingsService : ObservableObject
         },
         new() {
             Text = "RWA",
-            TextStyle = 1,
+            TextStyle = RectangleTextStyle.Bold,
             BackgroundColor = "#FFFF00",
             BorderColor = "#000000",
             TextColor = "#000000",

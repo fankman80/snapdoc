@@ -31,53 +31,71 @@
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
-
         <ScrollView Grid.Row="0">
             <VerticalStackLayout>
-                <Grid ColumnSpacing="0"
-                        ColumnDefinitions="*,Auto,Auto,Auto">
-                    <VerticalStackLayout Grid.Column="0">
+                <VerticalStackLayout Spacing="4">
+                    <!-- Template-Auswahl -->
+                    <VerticalStackLayout>
                         <Label Text="{x:Static res:AppResources.export_vorlage}"/>
                         <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
-                                                    SelectedItem="{Binding SelectedTemplate}"/>
+                                                    SelectedItem="{Binding SelectedTemplate}"
+                                                    HorizontalOptions="Fill"/>
                     </VerticalStackLayout>
-                    <Button Grid.Column="1"
-                            Padding="0"
-                            VerticalOptions="End"
-                            BackgroundColor="Transparent"
-                            ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"                                
-                            Clicked="OnHelpClicked">
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="MaterialOutlined"
-                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                             Glyph="{x:Static local:MaterialIcons.Help}" />
-                        </Button.ImageSource>
-                    </Button>
-                    <Button Grid.Column="2"
-                            Padding="0"
-                            VerticalOptions="End"
-                            BackgroundColor="Transparent"
-                            ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"                                
-                            Clicked="OnAddDocument" >
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="MaterialOutlined"
-                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                             Glyph="{x:Static local:MaterialIcons.Note_add}" />
-                        </Button.ImageSource>
-                    </Button>
-                    <Button Grid.Column="3"
-                            Padding="0"
-                            VerticalOptions="End"
-                            BackgroundColor="Transparent"
-                            ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"                                
-                            Clicked="OnDeleteDocument">
-                        <Button.ImageSource>
-                            <FontImageSource FontFamily="MaterialOutlined"
-                                             Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
-                                             Glyph="{x:Static local:MaterialIcons.Delete}" />
-                        </Button.ImageSource>
-                    </Button>
-                </Grid>
+                    <!-- Template-Aktionen -->
+                    <HorizontalStackLayout HorizontalOptions="End" Spacing="0">
+                        <!-- Hilfe -->
+                        <Button Padding="0"
+                                BackgroundColor="Transparent"
+                                ToolTipProperties.Text="{x:Static res:AppResources.zeige_platzhalter_definitionen}"
+                                Clicked="OnHelpClicked">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialOutlined"
+                                                 Color="{AppThemeBinding Light={DynamicResource Primary},
+                                                 Dark={DynamicResource PrimaryDarkAccent}}"
+                                                 Glyph="{x:Static local:MaterialIcons.Help}" />
+                            </Button.ImageSource>
+                        </Button>
+
+                        <!-- Template hinzufügen -->
+                        <Button Padding="0"
+                                BackgroundColor="Transparent"
+                                ToolTipProperties.Text="{x:Static res:AppResources.neue_vorlage_hochladen}"
+                                Clicked="OnAddDocument">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialOutlined"
+                                                 Color="{AppThemeBinding Light={DynamicResource Primary},
+                                                 Dark={DynamicResource PrimaryDarkAccent}}"
+                                                 Glyph="{x:Static local:MaterialIcons.Note_add}" />
+                            </Button.ImageSource>
+                        </Button>
+
+                        <!-- Template lokal speichern -->
+                        <Button Padding="0"
+                                BackgroundColor="Transparent"
+                                ToolTipProperties.Text="{x:Static res:AppResources.vorlage_speichern}"
+                                Clicked="OnSaveTemplateClicked">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialOutlined"
+                                                 Color="{AppThemeBinding Light={DynamicResource Primary},
+                                                 Dark={DynamicResource PrimaryDarkAccent}}"
+                                                 Glyph="{x:Static local:MaterialIcons.File_save}" />
+                            </Button.ImageSource>
+                        </Button>
+                        
+                        <!-- Template löschen -->
+                        <Button Padding="0"
+                                BackgroundColor="Transparent"
+                                ToolTipProperties.Text="{x:Static res:AppResources.vorlage_loeschen}"
+                                Clicked="OnDeleteDocument">
+                            <Button.ImageSource>
+                                <FontImageSource FontFamily="MaterialOutlined"
+                                                 Color="{AppThemeBinding Light={DynamicResource Primary},
+                                                 Dark={DynamicResource PrimaryDarkAccent}}"
+                                                 Glyph="{x:Static local:MaterialIcons.Delete}" />
+                            </Button.ImageSource>
+                        </Button>
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
                 <VerticalStackLayout>
                     <controls:Switch LabelText="{x:Static res:AppResources.exportiere_plaene}"
                                     TextColor="{AppThemeBinding Light={DynamicResource PrimaryText}, Dark={DynamicResource PrimaryDarkText}}"

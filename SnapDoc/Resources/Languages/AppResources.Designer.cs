@@ -961,6 +961,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Ersetzen ähnelt.
+        /// </summary>
+        internal static string ersetzen {
+            get {
+                return ResourceManager.GetString("ersetzen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Erstellen ähnelt.
         /// </summary>
         internal static string erstellen {
@@ -3283,6 +3292,44 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Eine Vorlage mit dem Namen „{0}“ ist bereits vorhanden
+        ///
+        ///Möchten Sie die vorhandene Vorlage ersetzen? ähnelt.
+        /// </summary>
+        internal static string template_already_exists {
+            get {
+                return ResourceManager.GetString("template_already_exists", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vorlage wurde nicht gefunden. ähnelt.
+        /// </summary>
+        internal static string template_not_found {
+            get {
+                return ResourceManager.GetString("template_not_found", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vorlage konnte nicht gespeichert werden. ähnelt.
+        /// </summary>
+        internal static string template_save_failed {
+            get {
+                return ResourceManager.GetString("template_save_failed", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vorlage wurde gespeichert. ähnelt.
+        /// </summary>
+        internal static string template_saved_successfully {
+            get {
+                return ResourceManager.GetString("template_saved_successfully", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Die Templates wurden auf die Standardwerte zurückgesetzt. ähnelt.
         /// </summary>
         internal static string templates_reset_success {
@@ -3558,6 +3605,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string vorlage_loeschen {
             get {
                 return ResourceManager.GetString("vorlage_loeschen", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Vorlage speichern ähnelt.
+        /// </summary>
+        internal static string vorlage_speichern {
+            get {
+                return ResourceManager.GetString("vorlage_speichern", resourceCulture);
             }
         }
         
