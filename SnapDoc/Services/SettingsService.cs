@@ -127,11 +127,6 @@ public partial class SettingsService : ObservableObject
     [ObservableProperty] public partial string IconSortCrit { get; set; }
     [ObservableProperty] public partial string PinSortCrit { get; set; }
     [ObservableProperty] public partial string IconCategory { get; set; }
-
-    // =====================================================================
-    // Gespeicherte Einstellungen  →  [Persist]
-    // Standardwert = Initialwert. Fehlt der Schlüssel in der Datei, wird er verwendet.
-    // =====================================================================
     [ObservableProperty, Persist] public partial double OsBaseScale { get; set; } = Settings.OsBaseScale;
     [ObservableProperty, Persist] public partial double CaptureRatio { get; set; } = 1.33;
     [ObservableProperty, Persist] public partial bool IconGalleryGridView { get; set; } = false;
@@ -281,93 +276,99 @@ public partial class SettingsService : ObservableObject
     [
         new() {
             Text = "Fluchtweg",
+            TextStyle = 0,
             BackgroundColor = "#7F90EE90",
             BorderColor = "#FF008000",
             TextColor = "#FF006400",
             LineWidth = 3,
+            StrokeStyle = "",
             IsHatchEffect = false,
             HatchStrokeWidth = 3,
             HatchStrokeSpace = 10,
-            HatchRotation = 14,
+            HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = []
+            CloudInciseDeg = 15
         },
         new() {
             Text = "Textfeld",
+            TextStyle = 0,
             BackgroundColor = "#FFFFFF",
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
+            StrokeStyle = "",
             IsHatchEffect = false,
             HatchStrokeWidth = 3,
             HatchStrokeSpace = 10,
             HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = []
+            CloudInciseDeg = 15
         },
         new() {
             Text = "Hinweis",
+            TextStyle = 1,
             BackgroundColor = "#66FFB6C1",
             BorderColor = "#FF0000",
             TextColor = "#8B0000",
             LineWidth = 4,
+            StrokeStyle = "",
             IsHatchEffect = false,
             HatchStrokeWidth = 3,
             HatchStrokeSpace = 10,
             HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = []
+            CloudInciseDeg = 15
         },
         new() {
             Text = "Gefahr",
+            TextStyle = 0,
             BackgroundColor = "#7FFFFFE0",
             BorderColor = "#DAA520",
             TextColor = "#B8860B",
             LineWidth = 5,
+            StrokeStyle = "4 3",
             IsHatchEffect = false,
             HatchStrokeWidth = 3,
             HatchStrokeSpace = 10,
             HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = [4, 3]
+            CloudInciseDeg = 15
         },
         new() {
             Text = "Text",
+            TextStyle = 0,
             BackgroundColor = "#7FFF4500",
             BorderColor = "#8B0000",
             TextColor = "#FFFFFF",
             LineWidth = 0,
+            StrokeStyle = "",
             IsHatchEffect = false,
             HatchStrokeWidth = 10,
             HatchStrokeSpace = 10,
             HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = []
+            CloudInciseDeg = 15
         },
         new() {
             Text = "RWA",
+            TextStyle = 1,
             BackgroundColor = "#FFFF00",
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
+            StrokeStyle = "",
             IsHatchEffect = false,
             HatchStrokeWidth = 3,
             HatchStrokeSpace = 12,
             HatchRotation = 45,
             IsCloud = false,
             CloudRadius = 20,
-            CloudInciseDeg = 15,
-            StrokeDashArray = []
+            CloudInciseDeg = 15
         }
     ];
 
