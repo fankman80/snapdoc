@@ -285,7 +285,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#FF008000",
             TextColor = "#FF006400",
             LineWidth = 3,
-            StrokeStyle = ""
+            IsHatchEffect = false,
+            HatchStrokeWidth = 3,
+            HatchStrokeSpace = 10,
+            HatchRotation = 14,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = []
         },
         new() {
             Text = "Textfeld",
@@ -293,7 +300,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
-            StrokeStyle = ""
+            IsHatchEffect = false,
+            HatchStrokeWidth = 3,
+            HatchStrokeSpace = 10,
+            HatchRotation = 45,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = []
         },
         new() {
             Text = "Hinweis",
@@ -301,7 +315,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#FF0000",
             TextColor = "#8B0000",
             LineWidth = 4,
-            StrokeStyle = ""
+            IsHatchEffect = false,
+            HatchStrokeWidth = 3,
+            HatchStrokeSpace = 10,
+            HatchRotation = 45,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = []
         },
         new() {
             Text = "Gefahr",
@@ -309,7 +330,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#DAA520",
             TextColor = "#B8860B",
             LineWidth = 5,
-            StrokeStyle = "4 3"
+            IsHatchEffect = false,
+            HatchStrokeWidth = 3,
+            HatchStrokeSpace = 10,
+            HatchRotation = 45,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = [4, 3]
         },
         new() {
             Text = "Text",
@@ -317,7 +345,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#8B0000",
             TextColor = "#FFFFFF",
             LineWidth = 0,
-            StrokeStyle = ""
+            IsHatchEffect = false,
+            HatchStrokeWidth = 10,
+            HatchStrokeSpace = 10,
+            HatchRotation = 45,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = []
         },
         new() {
             Text = "RWA",
@@ -325,7 +360,14 @@ public partial class SettingsService : ObservableObject
             BorderColor = "#000000",
             TextColor = "#000000",
             LineWidth = 3,
-            StrokeStyle = ""
+            IsHatchEffect = false,
+            HatchStrokeWidth = 3,
+            HatchStrokeSpace = 12,
+            HatchRotation = 45,
+            IsCloud = false,
+            CloudRadius = 20,
+            CloudInciseDeg = 15,
+            StrokeDashArray = []
         }
     ];
 
