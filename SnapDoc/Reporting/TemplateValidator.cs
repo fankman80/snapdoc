@@ -101,16 +101,19 @@ public sealed class TemplateValidator(PlaceholderRegistry registry, TemplatePars
                 messages.Add(Warning($"„{token.Raw}“: {dim} muss eine Zahl ≥ 0 sein (in mm). Es wird der Standardwert verwendet.", location));
 
         string? format = token.Arguments.Get("format");
-        if (format != null && def.AllowedArguments.Contains("format") && !IsValidDateFormat(format))
+        if (format != null && def.ValueKind == PlaceholderValueKind.DateTime && !IsValidDateFormat(format))
             messages.Add(Warning($"„{token.Raw}“: Ungültiges Datumsformat „{format}“.", location));
 
         if ((def.RequiredScope & ~available) != ScopeKind.None)
         {
-            string need = (def.RequiredScope & ~available) switch
+            ScopeKind missingScope = def.RequiredScope & ~available;
+            string need = missingScope switch
             {
+                var s when s.HasFlag(ScopeKind.Priority) => "${repeat:priorities}",
                 var s when s.HasFlag(ScopeKind.Photo) => "${repeat:photos}",
                 var s when s.HasFlag(ScopeKind.Pin) => "${repeat:pins} oder ${repeat:photos}",
-                _ => "${repeat:plans}, ${repeat:pins} oder ${repeat:photos}"
+                var s when s.HasFlag(ScopeKind.Plan) => "${repeat:plans}, ${repeat:pins} oder ${repeat:photos}",
+                _ => "einer passenden Wiederholung"
             };
             messages.Add(Warning($"„{token.Raw}“ hat hier keine Datengrundlage. Er funktioniert nur in einer Tabellenzeile mit {need}.", location));
         }
@@ -134,16 +137,18 @@ public sealed class TemplateValidator(PlaceholderRegistry registry, TemplatePars
         catch (FormatException) { return false; }
     }
 
-    // ------------------------------------------------------------------ Kontext & Hilfen
-
     /// <summary>Welche Datenebenen sind an dieser Stelle verfügbar (abhängig von umgebenden Wiederholungszeilen)?</summary>
     private ScopeKind ProvidedScope(W.Paragraph paragraph)
     {
         var scope = ScopeKind.Project;
         foreach (var row in paragraph.Ancestors<W.TableRow>())
+        {
             foreach (var marker in parser.FindRepeatMarkers(row))
+            {
                 if (registry.TryGetSource(marker.Qualifier, out var source))
                     scope |= source.Provides;
+            }
+        }
         return scope;
     }
 

@@ -20,9 +20,7 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         }
     }
 
-    public void RenderParagraph(
-        W.Paragraph paragraph,
-        RenderScope scope)
+    public void RenderParagraph(W.Paragraph paragraph, RenderScope scope)
     {
         if (paragraph.Parent == null)
             return;
@@ -146,22 +144,10 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         if (result.Elements != null)
             return [.. result.Elements];
 
-        string? text = result.Text;
+        string? text = PlaceholderValueFormatter.Format(result.Value ?? result.Text, token.Arguments);
 
         if (string.IsNullOrEmpty(text))
-        {
-            text = token.Arguments.Get("fallback");
-        }
-        else
-        {
-            text =
-                token.Arguments.Get("prefix")
-                + text
-                + token.Arguments.Get("suffix");
-        }
-
-        if (string.IsNullOrEmpty(text))
-            return [];
+            return new List<OpenXmlElement>();
 
         string[] lines = text
             .Replace("\r\n", "\n")

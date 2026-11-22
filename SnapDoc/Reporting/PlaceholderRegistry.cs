@@ -16,6 +16,14 @@ public enum PlaceholderKind
     Marker
 }
 
+public enum PlaceholderValueKind
+{
+    Text,
+    Number,
+    DateTime,
+    Boolean
+}
+
 /// <summary>Alles, was ein Resolver braucht, um einen Platzhalter zu füllen.</summary>
 public sealed record PlaceholderCall(PlaceholderToken Token, RenderScope Scope, W.Paragraph Paragraph, W.RunProperties? RunProperties, ExportSession Session)
 {
@@ -34,6 +42,14 @@ public sealed record PlaceholderCall(PlaceholderToken Token, RenderScope Scope, 
 
 public sealed class PlaceholderResult
 {
+    public object? Value { get; private init; }
+
+    public static PlaceholderResult FromValue(object? value, string? cellFillHex = null) => new()
+    {
+        Value = value,
+        CellFillHex = cellFillHex
+    };
+
     public static readonly PlaceholderResult Empty = new()
     {
         Elements = Array.Empty<OpenXmlElement>()
@@ -53,33 +69,29 @@ public sealed class PlaceholderResult
         private init;
     } = Array.Empty<OpenXmlElement>();
 
-    /// <summary>
-    /// Hintergrundfarbe (RRGGBB) für die umgebende Tabellenzelle,
-    /// z. B. Priorität.
-    /// </summary>
     public string? CellFillHex { get; private init; }
 
     public static PlaceholderResult FromText(string? text, string? cellFillHex = null) => new()
-        {
-            Text = text ?? string.Empty,
-            CellFillHex = cellFillHex
-        };
+    {
+        Text = text ?? string.Empty,
+        CellFillHex = cellFillHex
+    };
 
     public static PlaceholderResult FromElement(OpenXmlElement element) => new()
-        {
-            Elements = new OpenXmlElement[] { element }
-        };
+    {
+        Elements = new OpenXmlElement[] { element }
+    };
 
     public static PlaceholderResult FromElements(IEnumerable<OpenXmlElement> elements) => new()
-        {
-            Elements = elements.ToArray()
-        };
+    {
+        Elements = elements.ToArray()
+    };
 
     public static PlaceholderResult FromBlocks(IEnumerable<OpenXmlElement> blocks) => new()
-        {
-            Elements = Array.Empty<OpenXmlElement>(),
-            Blocks = blocks.ToArray()
-        };
+    {
+        Elements = Array.Empty<OpenXmlElement>(),
+        Blocks = blocks.ToArray()
+    };
 }
 
 public sealed record PlaceholderDefinition(
@@ -87,7 +99,8 @@ public sealed record PlaceholderDefinition(
     PlaceholderKind Kind,
     ScopeKind RequiredScope,
     IReadOnlyList<string> AllowedArguments,
-    Func<PlaceholderCall, PlaceholderResult> Resolve);
+    Func<PlaceholderCall, PlaceholderResult> Resolve,
+    PlaceholderValueKind ValueKind = PlaceholderValueKind.Text);
 
 /// <summary>Definiert, worüber ${repeat:name} iteriert.</summary>
 public sealed record RepeatSourceDefinition(

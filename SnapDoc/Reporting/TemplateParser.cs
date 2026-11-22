@@ -21,6 +21,12 @@ public sealed class ArgumentSet(IReadOnlyDictionary<string, string> values)
     }
     
     public float GetFloat(string name, float fallback) => TryGetFloat(name, out float value) ? value : fallback;
+
+    public bool GetBool(string name, bool fallback = false)
+    {
+        string? value = Get(name);
+        return bool.TryParse(value, out bool result) ? result : fallback;
+    }
 }
 
 /// <summary>

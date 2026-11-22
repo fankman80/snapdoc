@@ -9,7 +9,8 @@ public enum ScopeKind
     Project = 1,
     Plan = 2,
     Pin = 4,
-    Photo = 8
+    Photo = 8,
+    Priority = 16
 }
 
 /// <summary>Unveränderlicher Schnappschuss aller Einstellungen, die der Export braucht.</summary>
@@ -42,13 +43,15 @@ public sealed record ProjectInfo(
     string ProjectManager,
     DateTime CreationDate,
     string? TitleImageFile,
-    SizeF TitleImageSize);
+    SizeF TitleImageSize,
+    DateTimeOffset ModifiedAt);
 
 public sealed record ExportFoto(
     string File,
     SizeF ImageSize,
     bool HasOverlay,
-    DateTime CapturedAt);
+    DateTime CapturedAt,
+    DateTimeOffset ModifiedAt);
 
 public sealed record ExportPin(
     int Number,
@@ -59,6 +62,12 @@ public sealed record ExportPin(
     string? PriorityColorHex,
     string? Wgs84,
     string? Ch1903,
+    double? Latitude,
+    double? Longitude,
+    double? Ch1903X,
+    double? Ch1903Y,
+    GeolocationAccuracy? GeoAccuracy,
+    DateTimeOffset? GeoTimestamp,
     DateTime CapturedAt,
     string IconFile,
     string IconCacheKey,
@@ -76,6 +85,11 @@ public sealed record ExportPin(
     IReadOnlyList<ExportFoto> Photos,
     DateTimeOffset ModifiedAt);
 
+public sealed record ExportPriority(
+    string Name,
+    string ColorHex,
+    int PinCount);
+
 public sealed record ExportPlan(
     string Key,
     string Name,
@@ -84,15 +98,18 @@ public sealed record ExportPlan(
     SizeF ImageSize,
     bool IsGrayscale,
     bool IsWebMap,
+    string MeasureUnit,
+    DateTimeOffset ModifiedAt,
     IReadOnlyList<ExportPin> Pins);
 
 /// <summary>Alle zu exportierenden Daten (bereits gefiltert nach AllowExport, fortlaufend nummeriert).</summary>
-public sealed class ReportDataContext(ProjectInfo project, ExportOptions options, IReadOnlyList<ExportPlan> plans)
+public sealed class ReportDataContext(ProjectInfo project, ExportOptions options, IReadOnlyList<ExportPlan> plans, IReadOnlyList<ExportPriority> priorities)
 {
     public ProjectInfo Project { get; } = project;
     public ExportOptions Options { get; } = options;
     public IReadOnlyList<ExportPlan> Plans { get; } = plans;
-    public IEnumerable<ExportPin> AllPins => Plans.SelectMany(p => p.Pins);
+    public IReadOnlyList<ExportPriority> Priorities { get; } = priorities;
+    public IEnumerable<ExportPin> AllPins => Plans.SelectMany(plan => plan.Pins);
 }
 
 /// <summary>Der aktuelle Datenkontext beim Rendern (Projekt → Plan → Pin → Foto).</summary>
@@ -101,6 +118,7 @@ public sealed record RenderScope(
     ExportPlan? Plan = null,
     ExportPin? Pin = null,
     ExportFoto? Photo = null,
+    ExportPriority? Priority = null,
     int RowNumber = 0,
     int RowCount = 0)
 {
@@ -110,7 +128,8 @@ public sealed record RenderScope(
         ScopeKind.Project
         | (Plan is null ? ScopeKind.None : ScopeKind.Plan)
         | (Pin is null ? ScopeKind.None : ScopeKind.Pin)
-        | (Photo is null ? ScopeKind.None : ScopeKind.Photo);
+        | (Photo is null ? ScopeKind.None : ScopeKind.Photo)
+        | (Priority is null ? ScopeKind.None : ScopeKind.Priority);
 
     public bool Satisfies(ScopeKind required) => (required & ~Provided) == ScopeKind.None;
 }
