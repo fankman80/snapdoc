@@ -36,11 +36,14 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         if (tokens.Count == 0)
             return;
 
+        bool containsOnlyPlaceholders = ContainsOnlyPlaceholders(originalText, tokens);
+
         // Jeder Run enthält danach höchstens ein Inhaltselement.
         SplitMultiContentRuns(paragraph);
 
         var blocks = new List<OpenXmlElement>();
         string? cellFill = null;
+        bool hadEmptyPlaceholder = false;
 
         // Von rechts nach links. Änderungen rechts verändern die Positionen
         // der links liegenden Platzhalter nicht.
@@ -75,16 +78,13 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
             if (result == null)
                 continue;
 
-            List<OpenXmlElement> elements = BuildElements(
-                result,
-                token,
-                runProperties);
+            List<OpenXmlElement> elements = BuildElements(result, token, runProperties);
 
-            ReplaceRange(
-                currentSegments,
-                token.Start,
-                token.End,
-                elements);
+            bool isEmptyReplacement = elements.Count == 0 && result.Blocks.Count == 0 && !token.Name.Equals("repeat", StringComparison.OrdinalIgnoreCase);
+
+            hadEmptyPlaceholder |= isEmptyReplacement;
+
+            ReplaceRange(currentSegments, token.Start, token.End, elements);
 
             if (result.Blocks.Count > 0)
                 blocks.InsertRange(0, result.Blocks);
@@ -92,11 +92,17 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
             cellFill ??= result.CellFillHex;
         }
 
+        if (hadEmptyPlaceholder && paragraph.Parent != null)
+            RemoveEmptyLines(paragraph);
+
         if (cellFill != null && paragraph.Parent != null)
             ApplyCellFill(paragraph, cellFill);
 
         if (blocks.Count > 0 && paragraph.Parent != null)
             InsertBlocksAfter(paragraph, blocks);
+
+        if (containsOnlyPlaceholders && paragraph.Parent != null && IsParagraphEmpty(paragraph))
+            RemoveEmptyParagraph(paragraph);
     }
 
     // ------------------------------------------------------------------ Auflösen
@@ -107,10 +113,7 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
 
         if (!registry.TryGet(token.Name, out var definition))
         {
-            session.Warn(
-                $"Unbekannter Platzhalter „{token.Raw}“ – bleibt unverändert.",
-                location);
-
+            session.Warn($"Unbekannter Platzhalter „{token.Raw}“ – bleibt unverändert.", location);
             return null;
         }
 
@@ -119,12 +122,7 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
 
         if (!scope.Satisfies(definition.RequiredScope))
         {
-            session.Warn(
-                $"„{token.Raw}“ hat an dieser Stelle keine Datengrundlage " +
-                "(ausserhalb einer passenden Wiederholungszeile) – " +
-                "bleibt unverändert.",
-                location);
-
+            session.Warn($"„{token.Raw}“ hat an dieser Stelle keine Datengrundlage " + "(ausserhalb einer passenden Wiederholungszeile) – " + "bleibt unverändert.", location);
             return null;
         }
 
@@ -157,21 +155,17 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         var run = new W.Run();
 
         if (runProperties != null)
-        {
-            run.RunProperties =
-                (W.RunProperties)runProperties.CloneNode(true);
-        }
+            run.RunProperties = (W.RunProperties)runProperties.CloneNode(true);
 
         for (int i = 0; i < lines.Length; i++)
         {
             if (i > 0)
                 run.Append(new W.Break());
 
-            run.Append(
-                new W.Text(lines[i])
-                {
-                    Space = SpaceProcessingModeValues.Preserve
-                });
+            run.Append(new W.Text(lines[i])
+            {
+                Space = SpaceProcessingModeValues.Preserve
+            });
         }
 
         return
@@ -203,28 +197,17 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         ParagraphText.Segment first = hit[0];
         ParagraphText.Segment last = hit[^1];
 
-        if (first.Text.Parent is not W.Run firstRun
-            || firstRun.Parent == null)
-        {
+        if (first.Text.Parent is not W.Run firstRun || firstRun.Parent == null)
             return;
-        }
 
-        if (last.Text.Parent is not W.Run lastRun
-            || lastRun.Parent == null)
-        {
+        if (last.Text.Parent is not W.Run lastRun || lastRun.Parent == null)
             return;
-        }
 
         int prefixLength = start - first.Start;
         int suffixStart = end - last.Start;
 
-        if (prefixLength < 0
-            || prefixLength > first.Text.Text.Length
-            || suffixStart < 0
-            || suffixStart > last.Text.Text.Length)
-        {
+        if (prefixLength < 0 || prefixLength > first.Text.Text.Length || suffixStart < 0 || suffixStart > last.Text.Text.Length)
             return;
-        }
 
         string prefix = first.Text.Text[..prefixLength];
         string suffix = last.Text.Text[suffixStart..];
@@ -247,14 +230,10 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
         else
         {
             // Alle vollständig vom Platzhalter belegten Zwischen-Runs entfernen.
-            foreach (ParagraphText.Segment middle in
-                     hit.Skip(1).Take(hit.Count - 2))
+            foreach (ParagraphText.Segment middle in hit.Skip(1).Take(hit.Count - 2))
             {
-                if (middle.Text.Parent is W.Run middleRun
-                    && middleRun.Parent != null)
-                {
+                if (middle.Text.Parent is W.Run middleRun && middleRun.Parent != null)
                     middleRun.Remove();
-                }
             }
 
             if (suffix.Length > 0)
@@ -383,5 +362,160 @@ public sealed class WordTextRenderer(ExportSession session, PlaceholderRegistry 
 
         if (canRemoveParagraph)
             paragraph.Remove();
+    }
+
+    private static bool ContainsOnlyPlaceholders(string originalText, IReadOnlyList<PlaceholderToken> tokens)
+    {
+        if (tokens.Count == 0)
+            return false;
+
+        string remainingText = originalText;
+
+        for (int i = tokens.Count - 1; i >= 0; i--)
+        {
+            PlaceholderToken token = tokens[i];
+            remainingText = remainingText.Remove(token.Start, token.Length);
+        }
+
+        return string.IsNullOrWhiteSpace(
+            remainingText);
+    }
+
+    private static bool IsParagraphEmpty(W.Paragraph paragraph)
+    {
+        if (!string.IsNullOrWhiteSpace(ParagraphText.GetText(paragraph)))
+            return false;
+
+        // Absatz enthält ein eingefügtes Bild.
+        if (paragraph.Descendants<W.Drawing>().Any())
+            return false;
+
+        // Legacy/VML-Bilder oder unsere Plan-Beschriftungen.
+        if (paragraph.Descendants<W.Picture>().Any())
+            return false;
+
+        // Content Control, beispielsweise pin_nr.
+        if (paragraph.Descendants<W.SdtRun>().Any())
+            return false;
+
+        return true;
+    }
+
+    private static void RemoveEmptyParagraph(W.Paragraph paragraph)
+    {
+        if (paragraph.Parent == null)
+            return;
+
+        if (paragraph.Parent is W.TableCell cell)
+        {
+            if (cell.Elements<W.Paragraph>().Count() > 1)
+                paragraph.Remove();
+
+            return;
+        }
+        paragraph.Remove();
+    }
+
+    private static void RemoveEmptyLines(W.Paragraph paragraph)
+    {
+        if (paragraph.Parent == null)
+            return;
+
+        List<W.Run> runs = [.. paragraph
+            .Descendants<W.Run>()
+            .Where(run => ReferenceEquals(run.Ancestors<W.Paragraph>().FirstOrDefault(), paragraph))];
+
+        if (runs.Count == 0)
+            return;
+
+        bool currentLineHasContent = false;
+
+        foreach (W.Run run in runs)
+        {
+            if (run.Parent == null)
+                continue;
+
+            if (RunHasVisibleContent(run))
+                currentLineHasContent = true;
+
+            W.Break? lineBreak = run.Elements<W.Break>().FirstOrDefault();
+
+            if (lineBreak == null)
+                continue;
+
+            if (!IsTextLineBreak(lineBreak))
+            {
+                // Seiten- und Spaltenumbrüche beibehalten.
+                currentLineHasContent = false;
+                continue;
+            }
+
+            bool hasContentAfterBreak = HasVisibleContentAfter(runs, run);
+            bool removeBreak = !currentLineHasContent || !hasContentAfterBreak;
+
+            if (removeBreak)
+            {
+                bool runContainsOnlyBreak = run.ChildElements.All(element => element is W.RunProperties or W.Break);
+
+                if (runContainsOnlyBreak)
+                    run.Remove();
+                else
+                    lineBreak.Remove();
+
+                continue;
+            }
+            currentLineHasContent = false;
+        }
+    }
+
+    private static bool IsTextLineBreak(W.Break lineBreak)
+    {
+        return lineBreak.Type == null || lineBreak.Type.Value == W.BreakValues.TextWrapping;
+    }
+
+    private static bool RunHasVisibleContent(W.Run run)
+    {
+        if (run.Elements<W.Text>().Any(text =>!string.IsNullOrWhiteSpace(text.Text)))
+            return true;
+
+        if (run.Descendants<W.Drawing>().Any())
+            return true;
+
+        if (run.Descendants<W.Picture>().Any())
+            return true;
+
+        if (run.Elements<W.TabChar>().Any())
+            return true;
+
+        return false;
+    }
+
+    private static bool HasVisibleContentAfter(IReadOnlyList<W.Run> runs, W.Run currentRun)
+    {
+        int currentIndex = -1;
+
+        for (int i = 0; i < runs.Count; i++)
+        {
+            if (ReferenceEquals(runs[i], currentRun))
+            {
+                currentIndex = i;
+                break;
+            }
+        }
+
+        if (currentIndex < 0)
+            return false;
+
+        for (int i = currentIndex + 1; i < runs.Count; i++)
+        {
+            W.Run run = runs[i];
+
+            if (run.Parent == null)
+                continue;
+
+            if (RunHasVisibleContent(run))
+                return true;
+        }
+        return false;
     }
 }

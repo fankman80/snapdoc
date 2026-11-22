@@ -26,7 +26,7 @@
 
             <controls:RangeSlider LabelText="{x:Static res:AppResources.wolken_radius}"
                                   IsRealtime="True" IsRange="False"
-                                  Minimum="1" Maximum="100" Step="1"
+                                  Minimum="4" Maximum="100" Step="1"
                                   TextColor="#9E9E9E"
                                   FontSize="12"
                                   ValueFontSize="12"
