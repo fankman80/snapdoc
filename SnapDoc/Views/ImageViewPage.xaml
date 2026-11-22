@@ -104,7 +104,7 @@
                 <Image x:Name="FotoContainer" InputTransparent="True" />
                 <skia:SKCanvasView x:Name="DrawingView"
                                    IsVisible="False"
-                                   IgnorePixelScaling="True"
+                                   IgnorePixelScaling="False"
                                    EnableTouchEvents="True"
                                    BackgroundColor="Transparent"
                                    PaintSurface="OnDrawingPaintSurface"
