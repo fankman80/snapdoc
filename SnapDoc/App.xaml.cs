@@ -53,9 +53,13 @@ public partial class App : Application
             }
         }
 
-        string ebbePath = Path.Combine(Settings.TemplateDirectory, "template_ebbe.docx");
+        string ebbePath = Path.Combine(Settings.TemplateDirectory, "ebbe_template.docx");
         if (!File.Exists(ebbePath))
-            copyTasks.Add(SafeCopy("template_ebbe.docx", ebbePath));
+            copyTasks.Add(SafeCopy("ebbe_template.docx", ebbePath));
+
+        string samplePath = Path.Combine(Settings.TemplateDirectory, "sample_template.docx");
+        if (!File.Exists(samplePath))
+            copyTasks.Add(SafeCopy("sample_template.docx", samplePath));
 
         string iconPath = Path.Combine(Settings.TemplateDirectory, "IconData.xml");
         if (!File.Exists(iconPath))
