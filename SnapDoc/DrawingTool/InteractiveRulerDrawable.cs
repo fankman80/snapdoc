@@ -4,7 +4,6 @@ namespace SnapDoc.DrawingTool;
 
 public class InteractiveRulerDrawable
 {
-    private readonly float density = (float)Settings.DisplayDensity;
     public float StyleScale { get; set; } = 1f;
     public MeasureSettings Measure { get; set; } = new();
     public List<SKPoint> Points { get; } = [];
@@ -53,7 +52,7 @@ public class InteractiveRulerDrawable
         if (Points.Count != 2)
             return;
 
-        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
+        float textSize = Measure.MeasureTextSize * Measure.ViewScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
         painter.DrawSegment(canvas, Points[0], Points[1], Measure.FormatLength(RawLength));
     }
@@ -64,7 +63,7 @@ public class InteractiveRulerDrawable
         {
             Color = SKColors.DarkGray,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = 2f * density * Measure.ViewScale,
+            StrokeWidth = 2f * Measure.ViewScale,
             IsAntialias = true
         };
 
@@ -77,8 +76,8 @@ public class InteractiveRulerDrawable
 
         foreach (var point in Points)
         {
-            canvas.DrawCircle(point, PointRadius * density, pointPaint);
-            canvas.DrawCircle(point, PointRadius * density, handleStroke);
+            canvas.DrawCircle(point, PointRadius, pointPaint);
+            canvas.DrawCircle(point, PointRadius, handleStroke);
         }
     }
 
@@ -89,7 +88,7 @@ public class InteractiveRulerDrawable
             float dx = Points[i].X - x;
             float dy = Points[i].Y - y;
 
-            if (MathF.Sqrt(dx * dx + dy * dy) <= HandleRadius * density)
+            if (MathF.Sqrt(dx * dx + dy * dy) <= HandleRadius)
                 return i;
         }
 

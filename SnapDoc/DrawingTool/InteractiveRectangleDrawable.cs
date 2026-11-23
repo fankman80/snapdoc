@@ -28,7 +28,6 @@ public class InteractiveRectangleDrawable
     public RectangleTextStyle TextStyle { get; set; } = RectangleTextStyle.Normal;
     private static SKImage? _rotationHandleImage;
     private static bool _isLoading;
-    private readonly float density = (float)Settings.DisplayDensity;
     public float StyleScale { get; set; } = 1f;
     private float _allowedAngleRad;
     public bool AutoSizeText { get; set; } = true;
@@ -120,7 +119,7 @@ public class InteractiveRectangleDrawable
     {
         get
         {
-            float handleDistance = PointRadius * density * 3;
+            float handleDistance = PointRadius * 3;
             float yLocal = -Height / 2f - handleDistance;
 
             float cos = MathF.Cos(AllowedAngleRad);
@@ -197,21 +196,21 @@ public class InteractiveRectangleDrawable
         {
             Color = SKColors.DarkGray,
             Style = SKPaintStyle.Stroke,
-            StrokeWidth = 2f * density * Measure.ViewScale,
+            StrokeWidth = 2f * Measure.ViewScale,
             IsAntialias = true
         };
 
         foreach (var p in Points)
         {
-            canvas.DrawCircle(p, PointRadius * density, handlePaint);
-            canvas.DrawCircle(p, PointRadius * density, handleStroke);
+            canvas.DrawCircle(p, PointRadius, handlePaint);
+            canvas.DrawCircle(p, PointRadius, handleStroke);
         }
 
         if (_rotationHandleImage != null)
         {
             using var paint = new SKPaint { IsAntialias = true };
 
-            float size = PointRadius * density * 4;
+            float size = PointRadius * 4;
             var destRect = new SKRect(
                 RotationHandle.X - size / 2f,
                 RotationHandle.Y - size / 2f,
@@ -345,7 +344,7 @@ public class InteractiveRectangleDrawable
 
     private void DrawMeasurements(SKCanvas canvas)
     {
-        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
+        float textSize = Measure.MeasureTextSize * Measure.ViewScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
 
         // Während des Aufziehens: nur Kantenmasse
@@ -409,7 +408,7 @@ public class InteractiveRectangleDrawable
         return sum > 0f;
     }
 
-    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius * density;
+    public bool IsOverRotationHandle(SKPoint p) => SKPoint.Distance(p, RotationHandle) <= HandleRadius;
 
     public void SetRotationFromPoint(SKPoint p)
     {
@@ -425,7 +424,7 @@ public class InteractiveRectangleDrawable
 
         for (int i = 0; i < pts.Length; i++)
         {
-            if (SKPoint.Distance(p, pts[i]) <= HandleRadius * density)
+            if (SKPoint.Distance(p, pts[i]) <= HandleRadius)
                 return i;
         }
 

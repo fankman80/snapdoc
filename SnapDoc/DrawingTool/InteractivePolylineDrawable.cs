@@ -31,7 +31,6 @@ public class InteractivePolylineDrawable
     public SKColor LineColor { get; set; } = SKColors.DarkGreen;
     public SKColor PointColor { get; set; } = SKColors.White.WithAlpha(160);
     public SKColor StartPointColor { get; set; } = SKColors.Green;
-    private readonly float density = (float)Settings.DisplayDensity;
     public float StyleScale { get; set; } = 1f;
 
     private class CloudNode
@@ -64,7 +63,7 @@ public class InteractivePolylineDrawable
             {
                 Color = SKColors.DarkGray,
                 Style = SKPaintStyle.Stroke,
-                StrokeWidth = 2f * density * Measure.ViewScale,
+                StrokeWidth = 2f * Measure.ViewScale,
                 IsAntialias = true
             };
 
@@ -73,8 +72,8 @@ public class InteractivePolylineDrawable
             for (int i = 0; i < Points.Count; i++)
             {
                 pointPaint.Color = (i == 0 && !IsClosed) ? StartPointColor : PointColor;
-                canvas.DrawCircle(Points[i], PointRadius * density, pointPaint);
-                canvas.DrawCircle(Points[i], PointRadius * density, handleStroke);
+                canvas.DrawCircle(Points[i], PointRadius, pointPaint);
+                canvas.DrawCircle(Points[i], PointRadius, handleStroke);
             }
         }
     }
@@ -254,7 +253,7 @@ public class InteractivePolylineDrawable
 
     private void DrawMeasurements(SKCanvas canvas)
     {
-        float textSize = Measure.MeasureTextSize * density * Measure.ViewScale;
+        float textSize = Measure.MeasureTextSize * Measure.ViewScale;
         using var painter = new MeasureLabelPainter(textSize, Measure.MeasureTextColor, Measure.MeasureBackgroundColor);
 
         bool closed = IsClosed && Points.Count >= 3;
@@ -287,7 +286,7 @@ public class InteractivePolylineDrawable
         else if (Points.Count >= 3)
         {
             var last = Points[^1];
-            float offset = PointRadius * density + painter.LabelHeight;
+            float offset = PointRadius + painter.LabelHeight;
             painter.Draw(canvas, "L = " + Measure.FormatLength(total),
                          new SKPoint(last.X, last.Y - offset), 0f);
         }
@@ -316,7 +315,7 @@ public class InteractivePolylineDrawable
         {
             var dx = Points[i].X - x;
             var dy = Points[i].Y - y;
-            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * density)
+            if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius)
                 return i;
         }
         return null;
@@ -331,7 +330,7 @@ public class InteractivePolylineDrawable
         var dx = start.X - x;
         var dy = start.Y - y;
 
-        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius * density)
+        if (Math.Sqrt(dx * dx + dy * dy) <= HandleRadius)
         {
             IsClosed = true;
             return true;
