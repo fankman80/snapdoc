@@ -69,7 +69,6 @@ public partial class ExportSettings : ContentPage
 
                 await BusyService.HideAsync();
                 await ShowExportErrorAsync(exportResult);
-
                 return;
             }
 
@@ -392,7 +391,7 @@ public partial class ExportSettings : ContentPage
 
     private async void OnHelpClicked(object sender, EventArgs e)
     {
-        await using var source = await FileSystem.OpenAppPackageFileAsync("report_help.pdf");
+        await using var source = await FileSystem.OpenAppPackageFileAsync("report_template_help.pdf");
         var filePath = Path.Combine(FileSystem.CacheDirectory, "report_template_help.pdf");
         await using (var target = File.Create(filePath))
         {
