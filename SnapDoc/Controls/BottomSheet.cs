@@ -26,19 +26,14 @@ public partial class BottomSheet : ContentView
     private CancellationTokenSource _resizeCts;
     private void OnContentMeasureInvalidated(object sender, EventArgs e)
     {
-        if (IsOpen)
-            Dispatcher.Dispatch(UpdateSize);
-
         _resizeCts?.Cancel();
         _resizeCts?.Dispose();
-
         var cts = _resizeCts = new CancellationTokenSource();
 
         Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(80), () =>
         {
             if (cts.IsCancellationRequested || !IsOpen)
                 return;
-
             UpdateSize();
         });
     }
@@ -250,6 +245,8 @@ public partial class BottomSheet : ContentView
         double contentH = SheetContent.Measure(innerWidth, double.PositiveInfinity).Height
                           + _scroll.Padding.VerticalThickness;
 
-        _scroll.HeightRequest = Math.Max(0, Math.Min(contentH, maxSheet - headerH));
+        double newHeight = Math.Max(0, Math.Min(contentH, maxSheet - headerH));
+        if (Math.Abs(_scroll.HeightRequest - newHeight) >= 1)
+            _scroll.HeightRequest = newHeight;
     }
 }

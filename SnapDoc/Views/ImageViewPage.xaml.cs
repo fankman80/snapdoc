@@ -30,6 +30,7 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly TransformViewModel fotoContainer;
     private readonly BackButtonBehavior backBehavior;
     private const double MaxDisplayEdge = 2048;
+    private bool drawingRedrawPending;
 
     // --- DrawingController ---
     private readonly DrawingController drawingController;
@@ -75,11 +76,11 @@ public partial class ImageViewPage : IQueryAttributable
         drawingController = new DrawingController(fotoContainer);
         drawingController.SetStyleScale(PhotoDrawingStyleScale);
         drawingController.SetHandleBaseScale(1f);
-        drawingController.Invalidated += (_, _) => DrawingView?.InvalidateSurface();
+        drawingController.Invalidated += (_, _) => RequestDrawingRedraw();
 
         // Gemeinsame Zeichen-UI
         DrawToolbar.Attach(drawingController);
-        DrawToolbar.RedrawRequested += (_, _) => DrawingView?.InvalidateSurface();
+        DrawToolbar.RedrawRequested += (_, _) => RequestDrawingRedraw();
         DrawToolbar.Erased += OnDrawingErased;
         DrawToolbar.BarsHeightChanged += (_, h) => UpdateImageArea(h);
 
@@ -180,17 +181,34 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    private double lastGestureWidth, lastGestureHeight;
+
     private void GestureContainer_SizeChanged(object sender, EventArgs e)
     {
-        if (!hasFittedImage || GestureContainer.Width < 10 || GestureContainer.Height < 10) return;
+        if (!hasFittedImage || GestureContainer.Width < 10 || GestureContainer.Height < 10)
+            return;
+
+        if (Math.Abs(GestureContainer.Width - lastGestureWidth) < 1 &&
+            Math.Abs(GestureContainer.Height - lastGestureHeight) < 1)
+            return;
+
+        lastGestureWidth = GestureContainer.Width;
+        lastGestureHeight = GestureContainer.Height;
+
         bool wasFitted = Math.Abs(fotoContainer.Scale - minScale) < 0.001;
         if (wasFitted)
             Dispatcher.Dispatch(() => ImageFit(null, null));
     }
 
-    /// <summary>Hält das Bild oberhalb der Leisten (früher erledigte das die Grid-Zeile).</summary>
-    private void UpdateImageArea(double barsHeight) =>
-        GestureContainer.Margin = new Thickness(0, 0, 0, IsEditMode ? barsHeight : 0);
+    private void UpdateImageArea(double barsHeight)
+    {
+        double bottom = IsEditMode ? Math.Round(barsHeight) : 0;
+
+        if (Math.Abs(GestureContainer.Margin.Bottom - bottom) < 1)
+            return;   // nichts geändert → kein Layout
+
+        GestureContainer.Margin = new Thickness(0, 0, 0, bottom);
+    }
 
     public void OnPinchUpdated(object sender, PinchGestureUpdatedEventArgs e)
     {
@@ -795,5 +813,18 @@ public partial class ImageViewPage : IQueryAttributable
     {
         var f = Math.Min(1.0, MaxDisplayEdge / Math.Max(w, h));
         return (Math.Round(w * f), Math.Round(h * f));
+    }
+
+    private void RequestDrawingRedraw()
+    {
+        if (drawingRedrawPending)
+            return;
+
+        drawingRedrawPending = true;
+        Dispatcher.DispatchDelayed(TimeSpan.FromMilliseconds(16), () =>
+        {
+            drawingRedrawPending = false;
+            DrawingView?.InvalidateSurface();
+        });
     }
 }
