@@ -41,22 +41,22 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
         _ => false
     };
 
-    private SKPoint ComputeLift()
-    {
-        float density = (float)Settings.DisplayDensity;
-        float x = SettingsService.Instance.TouchLiftDp.X * density;
-        float y = SettingsService.Instance.TouchLiftDp.Y * density;
-
-        float a = -viewRotationDeg * MathF.PI / 180f;
-        float cos = MathF.Cos(a), sin = MathF.Sin(a);
-        return new SKPoint((x * cos - y * sin) * viewScale,
-                           (x * sin + y * cos) * viewScale);
-    }
-
     private void Invalidate() => Invalidated?.Invoke(this, EventArgs.Empty);
     private float viewScale = 1f;        // Plan-Pixel pro Bildschirm-Pixel
     private float viewRotationDeg = 0f;
     private bool pressConsumed;
+    private float handleBaseScale = 1f;
+    public void SetHandleBaseScale(float scale)
+    {
+        if (!float.IsFinite(scale) || scale <= 0f)
+            scale = 1f;
+
+        if (MathF.Abs(handleBaseScale - scale) < 0.0001f)
+            return;
+
+        handleBaseScale = scale;
+        ApplyHandleScale();
+    }
 
     public void SetViewTransform(float scale, float rotationDeg)
     {
@@ -77,10 +77,12 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
     private void ApplyHandleScale()
     {
-        Measure.ViewScale = viewScale;
+        float uiScale = viewScale * handleBaseScale;
 
-        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius * viewScale;
-        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius * viewScale;
+        Measure.ViewScale = uiScale;
+
+        float handleRadius = (float)SettingsService.Instance.PolyLineHandleTouchRadius * uiScale;
+        float pointRadius = (float)SettingsService.Instance.PolyLineHandleRadius * uiScale;
 
         RulerDrawable.HandleRadius = handleRadius;
         RulerDrawable.PointRadius = pointRadius;
@@ -90,15 +92,22 @@ public partial class DrawingController(TransformViewModel transformVm) : IDispos
 
         CombinedDrawable.PolyDrawable.HandleRadius = handleRadius;
         CombinedDrawable.PolyDrawable.PointRadius = pointRadius;
-
         CombinedDrawable.RectDrawable.HandleRadius = handleRadius;
         CombinedDrawable.RectDrawable.PointRadius = pointRadius;
-
         CombinedDrawable.OvalDrawable.HandleRadius = handleRadius;
         CombinedDrawable.OvalDrawable.PointRadius = pointRadius;
-
         CombinedDrawable.ArrowDrawable.HandleRadius = handleRadius;
         CombinedDrawable.ArrowDrawable.PointRadius = pointRadius;
+    }
+
+    private SKPoint ComputeLift()
+    {
+        float x = SettingsService.Instance.TouchLiftDp.X * handleBaseScale;
+        float y = SettingsService.Instance.TouchLiftDp.Y * handleBaseScale;
+        float a = -viewRotationDeg * MathF.PI / 180f;
+        float cos = MathF.Cos(a), sin = MathF.Sin(a);
+
+        return new SKPoint((x * cos - y * sin) * viewScale, (x * sin + y * cos) * viewScale);
     }
 
     public void Draw(SKCanvas canvas)

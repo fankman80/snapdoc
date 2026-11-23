@@ -74,6 +74,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         drawingController = new DrawingController(fotoContainer);
         drawingController.SetStyleScale(PhotoDrawingStyleScale);
+        drawingController.SetHandleBaseScale(1f);
         drawingController.Invalidated += (_, _) => DrawingView?.InvalidateSurface();
 
         // Gemeinsame Zeichen-UI
