@@ -93,6 +93,7 @@
                 <TapGestureRecognizer NumberOfTapsRequired="2" Tapped="OnDoubleTapped" />
             </AbsoluteLayout.GestureRecognizers>
 
+            <!-- Nur das Foto wird per View-Transformation gezoomt -->
             <Grid x:Name="ImageDrawingCanvas"
                   AbsoluteLayout.LayoutBounds="0,0,-1,-1"
                   AbsoluteLayout.LayoutFlags="None"
@@ -102,14 +103,19 @@
                   AnchorX="{Binding AnchorX}"
                   AnchorY="{Binding AnchorY}">
                 <Image x:Name="FotoContainer" InputTransparent="True" />
-                <skia:SKCanvasView x:Name="DrawingView"
-                                   IsVisible="False"
-                                   IgnorePixelScaling="True"
-                                   EnableTouchEvents="True"
-                                   BackgroundColor="Transparent"
-                                   PaintSurface="OnDrawingPaintSurface"
-                                   Touch="OnDrawingTouch" />
             </Grid>
+
+            <!-- Zeichenfläche: Bildschirmgrösse, NICHT transformiert.
+                 Zoom/Verschiebung kommen als Matrix im PaintSurface (wie NewPage/TileImageView). -->
+            <skia:SKCanvasView x:Name="DrawingView"
+                               AbsoluteLayout.LayoutBounds="0,0,1,1"
+                               AbsoluteLayout.LayoutFlags="All"
+                               IsVisible="False"
+                               IgnorePixelScaling="True"
+                               EnableTouchEvents="True"
+                               BackgroundColor="Transparent"
+                               PaintSurface="OnDrawingPaintSurface"
+                               Touch="OnDrawingTouch" />
         </AbsoluteLayout>
 
         <!-- Vorheriges Bild -->
@@ -167,8 +173,8 @@
 
         <!-- Gemeinsame Zeichen-UI: belegt nur den unteren Bereich -->
         <controls:DrawingToolbar x:Name="DrawToolbar"
-                         IsVisible="{Binding IsEditMode}"
-                         VerticalOptions="End"
-                         ZIndex="20000" />
+                                 IsVisible="{Binding IsEditMode}"
+                                 VerticalOptions="End"
+                                 ZIndex="20000" />
     </Grid>
 </ContentPage>

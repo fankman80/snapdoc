@@ -17,6 +17,7 @@ public partial class ImageViewPage : IQueryAttributable
     public string PinId;
     public string PinIcon;
     public string ImgSource = null;
+
     private bool isCleared = false;
     private bool hasFittedImage = false;
     private double minScale = 0.1;
@@ -36,6 +37,7 @@ public partial class ImageViewPage : IQueryAttributable
     private readonly DrawingController drawingController;
     private bool drawingOwnsTouch;
     private const float PhotoDrawingStyleScale = 10f;
+
     private bool isGotoPinBtnVisible = false;
     public bool IsGotoPinBtnVisible
     {
@@ -56,6 +58,7 @@ public partial class ImageViewPage : IQueryAttributable
             OnPropertyChanged(nameof(IsViewMode));
         }
     }
+
     public bool IsViewMode => !IsEditMode;
 
     public ImageViewPage()
@@ -69,6 +72,13 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer = new TransformViewModel();
         ImageDrawingCanvas.BindingContext = fotoContainer;
         GestureContainer.BindingContext = fotoContainer;
+
+        // Die Zeichenfläche ist nicht mehr transformiert → bei Zoom/Pan selbst neu zeichnen
+        fotoContainer.PropertyChanged += (_, _) =>
+        {
+            if (drawingController?.IsActive == true)
+                RequestDrawingRedraw();
+        };
 
         FotoContainer.SizeChanged += ImageViewContainer_SizeChanged;
         GestureContainer.SizeChanged += GestureContainer_SizeChanged;
@@ -117,6 +127,7 @@ public partial class ImageViewPage : IQueryAttributable
         {
             ImgSource ??= value4 as string;
             string imgPath;
+
             if (ImgSource == "showTitle")
             {
                 imgPath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, GlobalJson.Data.TitleImage);
@@ -136,6 +147,7 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 if (!File.Exists(imgPath) && ImgSource != "showTitle")
                     await SaveManager.DownloadMediaOnDemandAsync(ImgSource, isThumbnail: false);
+
                 if (File.Exists(imgPath))
                     await LoadImageAsync(imgPath, fit: false);
             });
@@ -155,6 +167,7 @@ public partial class ImageViewPage : IQueryAttributable
     private async Task LoadImageAsync(string imgPath, bool fit)
     {
         var bytes = await File.ReadAllBytesAsync(imgPath);
+
         using (var ms = new MemoryStream(bytes))
         using (var codec = SKCodec.Create(ms))
         {
@@ -163,16 +176,19 @@ public partial class ImageViewPage : IQueryAttributable
                 var (w, h) = ClampSize(codec.Info.Width, codec.Info.Height);
                 FotoContainer.WidthRequest = w;
                 FotoContainer.HeightRequest = h;
+
                 if (fit)
                     FitImageToDimensions(w, h);
             }
         }
+
         FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
     }
 
     private void ImageViewContainer_SizeChanged(object sender, EventArgs e)
     {
         if (FotoContainer.Width < 10 || FotoContainer.Height < 10) return;
+
         if (!hasFittedImage || needsImageFit)
         {
             hasFittedImage = true;
@@ -203,7 +219,6 @@ public partial class ImageViewPage : IQueryAttributable
     private void UpdateImageArea(double barsHeight)
     {
         double bottom = IsEditMode ? Math.Round(barsHeight) : 0;
-
         if (Math.Abs(GestureContainer.Margin.Bottom - bottom) < 1)
             return;   // nichts geändert → kein Layout
 
@@ -239,6 +254,7 @@ public partial class ImageViewPage : IQueryAttributable
                 fotoContainer.TranslationX += (centerX - focusX) * (scaleFactor - 1.0);
                 fotoContainer.TranslationY += (centerY - focusY) * (scaleFactor - 1.0);
                 fotoContainer.Scale = targetScale;
+
                 UpdateDrawingViewScale();
                 break;
 
@@ -247,6 +263,7 @@ public partial class ImageViewPage : IQueryAttributable
                 isPanningActive = false;
                 // Im Zeichenmodus bleibt Panning deaktiviert
                 fotoContainer.IsPanningEnabled = !IsEditMode;
+
                 if (fotoContainer.Scale < minScale - 0.001)
                     ImageFit(null, null);
                 break;
@@ -256,6 +273,7 @@ public partial class ImageViewPage : IQueryAttributable
     public void OnPanUpdated(object sender, PanUpdatedEventArgs e)
     {
         if (!fotoContainer.IsPanningEnabled) return;
+
         bool isAtMinScale = fotoContainer.Scale <= minScale + 0.01;
 
         switch (e.StatusType)
@@ -269,6 +287,7 @@ public partial class ImageViewPage : IQueryAttributable
 
             case GestureStatus.Running:
                 if (!isPanningActive) return;
+
                 if (isAtMinScale)
                     totalPanX = e.TotalX;
                 else
@@ -288,6 +307,7 @@ public partial class ImageViewPage : IQueryAttributable
                     else if (totalPanX > threshold)
                         NavigateImage(-1);
                 }
+
                 isPanningActive = false;
                 totalPanX = 0;
                 break;
@@ -327,20 +347,23 @@ public partial class ImageViewPage : IQueryAttributable
             zoomFactor = scrollDelta > 0 ? 1.15 : 0.85;
 
         double targetScale = fotoContainer.Scale * zoomFactor;
+
         if (targetScale <= minScale + 0.01)
         {
             ImageFit(null, null);
             return;
         }
-        targetScale = Math.Min(targetScale, minScale * 15.0);
 
+        targetScale = Math.Min(targetScale, minScale * 15.0);
         double scaleRatio = targetScale / fotoContainer.Scale;
+
         double originX = mousePos.X - (fotoContainer.TranslationX + FotoContainer.Width / 2);
         double originY = mousePos.Y - (fotoContainer.TranslationY + FotoContainer.Height / 2);
 
         fotoContainer.TranslationX -= originX * (scaleRatio - 1);
         fotoContainer.TranslationY -= originY * (scaleRatio - 1);
         fotoContainer.Scale = targetScale;
+
         UpdateDrawingViewScale();
     }
 
@@ -360,11 +383,13 @@ public partial class ImageViewPage : IQueryAttributable
 
         var scale = Math.Min(areaW / imgWidth, areaH / imgHeight);
         minScale = scale;
+
         fotoContainer.AnchorX = 0.5;
         fotoContainer.AnchorY = 0.5;
         fotoContainer.Scale = scale;
         fotoContainer.TranslationX = (areaW - imgWidth) / 2;
         fotoContainer.TranslationY = (areaH - imgHeight) / 2;
+
         UpdateDrawingViewScale();
     }
 
@@ -381,6 +406,7 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 string file1 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ThumbnailPath, oldTitleImage);
                 if (File.Exists(file1)) File.Delete(file1);
+
                 string file2 = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, GlobalJson.Data.ImagePath, oldTitleImage);
                 if (File.Exists(file2)) File.Delete(file2);
 
@@ -429,28 +455,23 @@ public partial class ImageViewPage : IQueryAttributable
         if (setDefaultMode)
             drawingController.Reset();
 
-        // Fotos verwenden grössere Stilwerte als Planzeichnungen.
         drawingController.SetStyleScale(PhotoDrawingStyleScale);
 
         SettingsService.Instance.IsPinPlaceBtnManualHide = true;
         DrawBtn.IsVisible = false;
         IsEditMode = true;
-
         UpdateNavigationButtons();
 
         DrawToolbar.InitializeDrawing(setDefaultMode);
 
-        // Fotos haben keinen realen Massstab
         drawingController.IsMeasureActive = false;
         drawingController.IsActive = true;
 
         UpdateDrawingViewScale();
-
         DrawingView.IsVisible = true;
         DrawingView.InvalidateSurface();
 
         Dispatcher.Dispatch(() => UpdateImageArea(DrawToolbar.BarsHeight));
-
         return Task.CompletedTask;
     }
 
@@ -493,6 +514,7 @@ public partial class ImageViewPage : IQueryAttributable
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
             }
         }
+
         ExitDrawingMode();
     }
 
@@ -501,15 +523,18 @@ public partial class ImageViewPage : IQueryAttributable
         fotoContainer.IsPanningEnabled = true;
         drawingController.IsActive = false;
         drawingController.OnCancel();
+
         DrawingView.IsVisible = false;
         DrawingView.InvalidateSurface();
         drawingOwnsTouch = false;
+        activeTouches.Clear();
+        tapCandidate = false;
 
         DrawToolbar.Reset();
-
         isCleared = false;
         IsEditMode = false;
         UpdateImageArea(0);
+
         DrawBtn.IsVisible = canDraw;
         UpdateNavigationButtons();
     }
@@ -534,19 +559,20 @@ public partial class ImageViewPage : IQueryAttributable
             {
                 if (File.Exists(imgPath))
                     File.Delete(imgPath);
+
                 File.Move(origPath, imgPath);
 
                 var bytes = await File.ReadAllBytesAsync(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = false;
-
-                // Original in der Cloud entfernen (wird nach dem JSON-Sync ausgefuehrt)
                 SaveManager.QueueCloudDelete($"{GlobalJson.Data.ImagePath}/originals/{ImgSource}");
             }
             else
             {
                 Directory.CreateDirectory(Path.GetDirectoryName(origPath)!);
+
                 bool hadOverlay = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay;
 
                 if (!File.Exists(origPath) && hadOverlay)
@@ -556,9 +582,8 @@ public partial class ImageViewPage : IQueryAttributable
                 {
                     if (hadOverlay)
                     {
-                        // Sonst würde das bemalte Bild zum "Original"
                         await this.DisplaySnackbar(AppResources.original_nicht_verfuegbar, actionButtonText: AppResources.ok);
-                        return; // Bearbeitungsmodus bleibt offen
+                        return;
                     }
                     File.Copy(imgPath, origPath);
                 }
@@ -572,14 +597,17 @@ public partial class ImageViewPage : IQueryAttributable
 
                 var bytes = await File.ReadAllBytesAsync(imgPath);
                 FotoContainer.Source = ImageSource.FromStream(() => new MemoryStream(bytes));
+
                 await Thumbnail.Generate(imgPath, thumbPath);
                 GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource].HasOverlay = true;
+
                 uploads.Add((origPath, $"{GlobalJson.Data.ImagePath}/originals"));
             }
 
             var foto = GlobalJson.Data.Plans[PlanId].Pins[PinId].Fotos[ImgSource];
             foto.File = Path.GetFileName(imgPath);
             foto.Touch();
+
             SaveManager.NotifyDataChanged([.. uploads]);
         }
 
@@ -592,6 +620,7 @@ public partial class ImageViewPage : IQueryAttributable
             return false;
 
         string tempPath = outputPath + ".drawing.tmp";
+
         try
         {
             using var fotoStream = File.OpenRead(fotoPath);
@@ -601,8 +630,10 @@ public partial class ImageViewPage : IQueryAttributable
 
             int originalWidth = fotoBitmap.Width;
             int originalHeight = fotoBitmap.Height;
-            float drawingWidth = DrawingView.CanvasSize.Width;
-            float drawingHeight = DrawingView.CanvasSize.Height;
+
+            var imgSize = ImageSizeDp;
+            float drawingWidth = imgSize.Width;
+            float drawingHeight = imgSize.Height;
             if (drawingWidth <= 0f || drawingHeight <= 0f)
                 return false;
 
@@ -622,6 +653,7 @@ public partial class ImageViewPage : IQueryAttributable
                 drawingController.RenderForExport(canvas);
                 canvas.Restore();
             }
+
             canvas.Flush();
 
             using var finalImage = surface.Snapshot();
@@ -660,50 +692,223 @@ public partial class ImageViewPage : IQueryAttributable
         }
     }
 
+    // ---------- Bild ↔ Bildschirm ----------
+
+    /// <summary>Angezeigte Fotogrösse in dp (= Koordinatensystem der Zeichnung).</summary>
+    private SKSize ImageSizeDp => new(
+        (float)(FotoContainer.WidthRequest > 0 ? FotoContainer.WidthRequest : FotoContainer.Width),
+        (float)(FotoContainer.HeightRequest > 0 ? FotoContainer.HeightRequest : FotoContainer.Height));
+
+    /// <summary>
+    /// Bildet die View-Transformation von ImageDrawingCanvas nach
+    /// (Anchor → Scale → Translation), damit die Zeichnung exakt über dem Foto liegt.
+    /// </summary>
+    private SKMatrix GetImageToScreenMatrix()
+    {
+        var size = ImageSizeDp;
+        float s = (float)fotoContainer.Scale;
+        if (!float.IsFinite(s) || s <= 0f) s = 1f;
+
+        float ax = size.Width * (float)fotoContainer.AnchorX;
+        float ay = size.Height * (float)fotoContainer.AnchorY;
+        float tx = (float)fotoContainer.TranslationX;
+        float ty = (float)fotoContainer.TranslationY;
+        if (!float.IsFinite(ax)) ax = 0f;
+        if (!float.IsFinite(ay)) ay = 0f;
+        if (!float.IsFinite(tx)) tx = 0f;
+        if (!float.IsFinite(ty)) ty = 0f;
+
+        return SKMatrix.CreateTranslation(-ax, -ay)
+            .PostConcat(SKMatrix.CreateScale(s, s))
+            .PostConcat(SKMatrix.CreateTranslation(ax + tx, ay + ty));
+    }
+
+    private SKPoint ScreenToImage(SKPoint p) =>
+        GetImageToScreenMatrix().TryInvert(out var inv) ? inv.MapPoint(p) : p;
+
     private void OnDrawingPaintSurface(object sender, SKPaintSurfaceEventArgs e)
     {
-        e.Surface.Canvas.Clear(SKColors.Transparent);
+        var canvas = e.Surface.Canvas;
+        canvas.Clear(SKColors.Transparent);
+
         if (!drawingController.IsActive)
             return;
-        drawingController.Draw(e.Surface.Canvas);
+
+        var size = ImageSizeDp;
+        if (size.Width <= 0f || size.Height <= 0f)
+            return;
+
+        canvas.Save();
+        canvas.Concat(GetImageToScreenMatrix());   // Concat statt SetMatrix: Density-Skalierung bleibt erhalten
+        canvas.ClipRect(new SKRect(0, 0, size.Width, size.Height));
+        drawingController.Draw(canvas);
+        canvas.Restore();
     }
+
+    // ---------- Touch im Zeichenmodus: Zeichnen, Pan und Pinch in einem Handler ----------
+
+    private readonly Dictionary<long, SKPoint> activeTouches = [];
+    private bool tapCandidate;
+    private SKPoint tapStart;
+    private SKPoint panLast;
+    private float pinchLastDist;
+    private SKPoint pinchLastCenter;
+    private const float TapSlop = 8f;   // dp: darunter gilt es als Tipp, nicht als Pan
 
     private void OnDrawingTouch(object sender, SKTouchEventArgs e)
     {
         if (!drawingController.IsActive)
             return;
 
+        var p = e.Location;   // Bildschirm-dp (IgnorePixelScaling)
+
         switch (e.ActionType)
         {
             case SKTouchAction.Pressed:
-                drawingOwnsTouch = drawingController.OnPressed(e.Location);
-                e.Handled = drawingOwnsTouch;
-                break;
+                activeTouches[e.Id] = p;
 
-            case SKTouchAction.Moved:
-                if (drawingOwnsTouch)
+                if (activeTouches.Count == 1)
                 {
-                    drawingController.OnMoved(e.Location);
-                    e.Handled = true;
+                    drawingOwnsTouch = drawingController.OnPressed(ScreenToImage(p));
+                    if (!drawingOwnsTouch)
+                    {
+                        tapCandidate = true;
+                        tapStart = p;
+                        panLast = p;
+                    }
                 }
-                break;
-
-            case SKTouchAction.Released:
-                if (drawingOwnsTouch)
+                else if (!drawingOwnsTouch)
                 {
-                    drawingController.OnReleased();
-                    drawingOwnsTouch = false;
+                    // Zweiter Finger → Pinch
+                    tapCandidate = false;
+                    StartPinch();
                 }
-                else
-                    drawingController.OnTap(e.Location);
                 e.Handled = true;
                 break;
 
+            case SKTouchAction.Moved:
+                if (!activeTouches.ContainsKey(e.Id))
+                    break;   // z. B. Maus-Hover unter Windows
+
+                activeTouches[e.Id] = p;
+
+                if (drawingOwnsTouch)
+                    drawingController.OnMoved(ScreenToImage(p));
+                else if (activeTouches.Count >= 2)
+                    UpdatePinch();
+                else
+                {
+                    if (tapCandidate && SKPoint.Distance(p, tapStart) > TapSlop)
+                        tapCandidate = false;
+
+                    if (!tapCandidate)
+                        PanBy(p.X - panLast.X, p.Y - panLast.Y);
+
+                    panLast = p;
+                }
+                e.Handled = true;
+                break;
+
+            case SKTouchAction.Released:
             case SKTouchAction.Cancelled:
-                drawingController.OnCancel();
-                drawingOwnsTouch = false;
+                bool wasKnown = activeTouches.Remove(e.Id);
+
+                if (drawingOwnsTouch)
+                {
+                    if (e.ActionType == SKTouchAction.Released)
+                        drawingController.OnReleased();
+                    else
+                        drawingController.OnCancel();
+                    drawingOwnsTouch = false;
+                }
+                else if (wasKnown && e.ActionType == SKTouchAction.Released &&
+                         tapCandidate && activeTouches.Count == 0)
+                {
+                    drawingController.OnTap(ScreenToImage(p));
+                }
+
+                if (activeTouches.Count == 1)
+                {
+                    // Nach dem Pinch mit dem verbleibenden Finger weiter pannen
+                    panLast = activeTouches.Values.First();
+                    tapCandidate = false;
+                }
+                else if (activeTouches.Count >= 2)
+                    StartPinch();
+
+                if (activeTouches.Count == 0)
+                {
+                    tapCandidate = false;
+                    if (fotoContainer.Scale < minScale - 0.001)
+                        ImageFit(null, null);
+                }
+                e.Handled = true;
                 break;
         }
+    }
+
+    private (SKPoint A, SKPoint B) FirstTwoTouches()
+    {
+        using var it = activeTouches.Values.GetEnumerator();
+        it.MoveNext(); var a = it.Current;
+        it.MoveNext(); var b = it.Current;
+        return (a, b);
+    }
+
+    private void StartPinch()
+    {
+        var (a, b) = FirstTwoTouches();
+        pinchLastDist = SKPoint.Distance(a, b);
+        pinchLastCenter = new SKPoint((a.X + b.X) / 2f, (a.Y + b.Y) / 2f);
+    }
+
+    private void UpdatePinch()
+    {
+        var (a, b) = FirstTwoTouches();
+        float dist = SKPoint.Distance(a, b);
+        var center = new SKPoint((a.X + b.X) / 2f, (a.Y + b.Y) / 2f);
+
+        // Mitverschieben mit beiden Fingern
+        PanBy(center.X - pinchLastCenter.X, center.Y - pinchLastCenter.Y);
+
+        if (pinchLastDist > 1f && dist > 1f)
+            ZoomAt(center, dist / pinchLastDist);
+
+        pinchLastDist = dist;
+        pinchLastCenter = center;
+    }
+
+    private void PanBy(float dx, float dy)
+    {
+        if (!float.IsFinite(dx) || !float.IsFinite(dy))
+            return;
+
+        fotoContainer.TranslationX += dx;
+        fotoContainer.TranslationY += dy;
+    }
+
+    /// <summary>Zoomt so, dass der Bildschirmpunkt <paramref name="c"/> fix bleibt.</summary>
+    private void ZoomAt(SKPoint c, float factor)
+    {
+        if (!float.IsFinite(factor) || factor <= 0f)
+            return;
+
+        double s = fotoContainer.Scale;
+        double target = Math.Clamp(s * factor, minScale * 0.5, minScale * 15.0);
+        if (Math.Abs(target - s) < 1e-6)
+            return;
+
+        var size = ImageSizeDp;
+        double ax = size.Width * fotoContainer.AnchorX;
+        double ay = size.Height * fotoContainer.AnchorY;
+        double ratio = target / s;
+
+        // Bildschirm = (Bild - a) * s + a + t  →  t' = c - a - (c - a - t) * s'/s
+        fotoContainer.TranslationX = c.X - ax - (c.X - ax - fotoContainer.TranslationX) * ratio;
+        fotoContainer.TranslationY = c.Y - ay - (c.Y - ay - fotoContainer.TranslationY) * ratio;
+        fotoContainer.Scale = target;
+
+        UpdateDrawingViewScale();
     }
 
     private void UpdateDrawingViewScale()
@@ -716,7 +921,7 @@ public partial class ImageViewPage : IQueryAttributable
             scale = 1f;
 
         drawingController.SetViewTransform(scale, 0f);
-        DrawingView.InvalidateSurface();
+        RequestDrawingRedraw();
     }
 
     // ===================== Navigation =====================
@@ -732,6 +937,7 @@ public partial class ImageViewPage : IQueryAttributable
         try
         {
             isNavigating = true;
+
             var sortedFotos = GetSortedFotos();
             int currentIndex = FindCurrentIndex(sortedFotos);
             if (currentIndex == -1) return;
@@ -740,6 +946,7 @@ public partial class ImageViewPage : IQueryAttributable
             if (newIndex < 0 || newIndex >= sortedFotos.Count) return;
 
             var target = sortedFotos[newIndex];
+
             FotoContainer.Opacity = 0;
             FotoContainer.Source = null;
 
@@ -759,6 +966,7 @@ public partial class ImageViewPage : IQueryAttributable
                 await Task.Delay(20);
                 await FotoContainer.FadeToAsync(1, 100, Easing.CubicOut);
             }
+
             UpdateNavigationButtons();
         }
         finally
@@ -778,6 +986,7 @@ public partial class ImageViewPage : IQueryAttributable
 
         var sortedFotos = GetSortedFotos();
         int currentIndex = FindCurrentIndex(sortedFotos);
+
         PrevImgBtn.IsVisible = currentIndex > 0;
         NextImgBtn.IsVisible = currentIndex >= 0 && currentIndex < sortedFotos.Count - 1;
     }
@@ -791,6 +1000,7 @@ public partial class ImageViewPage : IQueryAttributable
         int index = sortedFotos.FindIndex(f => f.PlanId == PlanId && f.PinId == PinId && SameFile(f.FotoKey));
         if (index == -1)
             index = sortedFotos.FindIndex(f => SameFile(f.FotoKey));
+
         return index;
     }
 
