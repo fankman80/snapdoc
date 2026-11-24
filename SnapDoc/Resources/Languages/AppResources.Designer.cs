@@ -1753,6 +1753,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Keine Vorlage vorhanden ähnelt.
+        /// </summary>
+        internal static string keine_vorlagen_vorhanden {
+            get {
+                return ResourceManager.GetString("keine_vorlagen_vorhanden", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Klicken, um die Vermessung zu starten ähnelt.
         /// </summary>
         internal static string klicken_start_vermessung {

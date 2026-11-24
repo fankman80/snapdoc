@@ -2,6 +2,7 @@
 using CommunityToolkit.Maui.Extensions;
 using SnapDoc.Resources.Languages;
 using System.Collections;
+using System.Collections.Specialized;
 
 namespace SnapDoc.Controls;
 
@@ -19,7 +20,8 @@ public partial class CustomRadioPicker : ContentView
     public static readonly BindableProperty BorderThicknessProperty = BindableProperty.Create(nameof(BorderThickness), typeof(double), typeof(CustomRadioPicker), 1.0);
     public static readonly BindableProperty FontSizeProperty = BindableProperty.Create(nameof(FontSize), typeof(double), typeof(Label), Label.FontSizeProperty.DefaultValue);
     public static readonly BindableProperty CornerRadiusProperty = BindableProperty.Create(nameof(CornerRadius), typeof(CornerRadius), typeof(CustomRadioPicker), new CornerRadius(8.0));
-
+    public static readonly BindableProperty EmptyTextProperty = BindableProperty.Create(nameof(EmptyText), typeof(string), typeof(CustomRadioPicker), null, propertyChanged: OnControlStateChanged);
+  
     public IEnumerable ItemsSource { get => (IEnumerable)GetValue(ItemsSourceProperty); set => SetValue(ItemsSourceProperty, value); }
     public object SelectedItem { get => GetValue(SelectedItemProperty); set => SetValue(SelectedItemProperty, value); }
     public int SelectedIndex { get => (int)GetValue(SelectedIndexProperty); set => SetValue(SelectedIndexProperty, value); }
@@ -31,13 +33,18 @@ public partial class CustomRadioPicker : ContentView
     public double BorderThickness { get => (double)GetValue(BorderThicknessProperty); set => SetValue(BorderThicknessProperty, value); }
     public double FontSize { get => (double)GetValue(FontSizeProperty); set => SetValue(FontSizeProperty, value); }
     public CornerRadius CornerRadius { get => (CornerRadius)GetValue(CornerRadiusProperty); set => SetValue(CornerRadiusProperty, value); }
+    public string EmptyText { get => (string)GetValue(EmptyTextProperty); set => SetValue(EmptyTextProperty, value); }
     public Thickness ControlPadding { get => (Thickness)GetValue(ControlPaddingProperty); set => SetValue(ControlPaddingProperty, value); }
     private bool _isSynchronizing = false;
     public event EventHandler<EventArgs> SelectedIndexChanged;
 
+    private INotifyCollectionChanged _observedCollection;
+
     public CustomRadioPicker()
     {
         InitializeComponent();
+        Loaded += (_, _) => AttachCollection(ItemsSource as INotifyCollectionChanged);
+        Unloaded += (_, _) => AttachCollection(null);
         UpdateDisplay();
     }
 
@@ -62,7 +69,10 @@ public partial class CustomRadioPicker : ContentView
         if (bindable is not CustomRadioPicker control)
             return;
 
-        control.SynchronizeFromIndex();
+        if (control.IsLoaded)
+            control.AttachCollection(newValue as INotifyCollectionChanged);
+
+        control.SynchronizeFromItem();
         control.UpdateDisplay();
     }
 
@@ -73,6 +83,29 @@ public partial class CustomRadioPicker : ContentView
             control.SynchronizeFromItem();
             control.UpdateDisplay();
         }
+    }
+
+    private void AttachCollection(INotifyCollectionChanged collection)
+    {
+        if (ReferenceEquals(_observedCollection, collection))
+            return;
+
+        _observedCollection?.CollectionChanged -= OnCollectionChanged;
+
+        _observedCollection = collection;
+
+        _observedCollection?.CollectionChanged += OnCollectionChanged;
+
+        // Änderungen nachholen, die während Unloaded passiert sind
+        SynchronizeFromItem();
+        UpdateDisplay();
+    }
+
+    private void OnCollectionChanged(object sender, NotifyCollectionChangedEventArgs e)
+    {
+        // Nur Index und Anzeige anpassen, SelectedItem nicht verändern
+        SynchronizeFromItem();
+        UpdateDisplay();
     }
 
     private void SynchronizeFromItem()
@@ -158,14 +191,23 @@ public partial class CustomRadioPicker : ContentView
 
     private void UpdateDisplay()
     {
-        var text = SelectedItem?.ToString();
+        if (!HasItems())
+        {
+            DisplayLabel.Text = EmptyText ?? Placeholder;
+            Opacity = 0.5;
+            return;
+        }
 
+        Opacity = 1.0;
+
+        var text = SelectedIndex >= 0 ? SelectedItem?.ToString() : null;
         DisplayLabel.Text = string.IsNullOrWhiteSpace(text) ? Placeholder : text;
     }
 
     private async void OnClicked(object sender, EventArgs e)
     {
-        if (ItemsSource == null) return;
+        if (!HasItems())
+            return; // Kein leeres Popup öffnen
 
         var items = new List<string>();
         foreach (var item in ItemsSource)
@@ -195,5 +237,15 @@ public partial class CustomRadioPicker : ContentView
                 }
             }
         }
+    }
+
+    private bool HasItems()
+    {
+        if (ItemsSource == null)
+            return false;
+
+        var enumerator = ItemsSource.GetEnumerator();
+        try { return enumerator.MoveNext(); }
+        finally { (enumerator as IDisposable)?.Dispose(); }
     }
 }

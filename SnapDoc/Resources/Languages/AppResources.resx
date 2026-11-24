@@ -1391,4 +1391,7 @@ Möchten Sie die vorhandene Vorlage ersetzen?</value>
   <data name="template_save_failed" xml:space="preserve">
     <value>Vorlage konnte nicht gespeichert werden.</value>
   </data>
+  <data name="keine_vorlagen_vorhanden" xml:space="preserve">
+    <value>Keine Vorlage vorhanden</value>
+  </data>
 </root>

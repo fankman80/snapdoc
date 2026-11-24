@@ -38,6 +38,7 @@
                     <VerticalStackLayout>
                         <Label Text="{x:Static res:AppResources.export_vorlage}"/>
                         <controls:CustomRadioPicker ItemsSource="{Binding Templates}"
+                                                    EmptyText="{x:Static res:AppResources.keine_vorlagen_vorhanden}"
                                                     SelectedItem="{Binding SelectedTemplate}"
                                                     HorizontalOptions="Fill"/>
                     </VerticalStackLayout>

@@ -123,7 +123,7 @@
 		<PackageReference Include="Mapsui" Version="5.2.0" />
 		<PackageReference Include="Mapsui.Maui" Version="5.2.0" />
 		<PackageReference Include="Microsoft.Extensions.Configuration.UserSecrets" Version="11.0.0" />
-		<PackageReference Include="Microsoft.Graph" Version="6.10.0" />
+		<PackageReference Include="Microsoft.Graph" Version="6.11.1" />
 		<PackageReference Include="Microsoft.Identity.Client" Version="4.92.0" />
 		<PackageReference Include="Microsoft.Maui.Controls" Version="11.0.10" />
 		<PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="11.0.0" />

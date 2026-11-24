@@ -1391,4 +1391,7 @@ Voulez-vous remplacer le modèle existant ?</value>
   <data name="template_save_failed" xml:space="preserve">
     <value>Le modèle n’a pas pu être enregistré.</value>
   </data>
+  <data name="keine_vorlagen_vorhanden" xml:space="preserve">
+    <value>Aucun modèle disponible</value>
+  </data>
 </root>

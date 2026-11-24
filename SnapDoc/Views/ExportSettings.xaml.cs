@@ -25,8 +25,7 @@ public partial class ExportSettings : ContentPage
     {
         base.OnAppearing();
         LoadDocuments();
-        if (String.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate) && SettingsService.Instance.Templates.Count > 0)
-            SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.First();
+        EnsureValidTemplateSelection();
     }
 
     protected override void OnDisappearing()
@@ -34,6 +33,14 @@ public partial class ExportSettings : ContentPage
         base.OnDisappearing();
 
         SettingsService.Instance.SaveSettings();
+    }
+
+    private static void EnsureValidTemplateSelection()
+    {
+        var settings = SettingsService.Instance;
+
+        if (string.IsNullOrEmpty(settings.SelectedTemplate) || !settings.Templates.Contains(settings.SelectedTemplate))
+            settings.SelectedTemplate = settings.Templates.FirstOrDefault();
     }
 
     private async void OnShareClicked(object sender, EventArgs e)
@@ -375,18 +382,25 @@ public partial class ExportSettings : ContentPage
 
     private async void OnDeleteDocument(object sender, EventArgs e)
     {
+        var selectedTemplate = SettingsService.Instance.SelectedTemplate;
+        if (string.IsNullOrEmpty(selectedTemplate))
+            return;
+
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
-        if (result?.Result is not DualPopupResult.Ok) return;
-        if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
-        {
-            var filePath = Path.Combine(Settings.TemplateDirectory, SettingsService.Instance.SelectedTemplate);
-            if (File.Exists(filePath))
-            {
-                File.Delete(filePath);
-                SettingsService.Instance.Templates.Remove(SettingsService.Instance.SelectedTemplate);
-            }
-        }
+        if (result?.Result is not DualPopupResult.Ok)
+            return;
+
+        var filePath = Path.Combine(Settings.TemplateDirectory, selectedTemplate);
+        if (File.Exists(filePath))
+            File.Delete(filePath);
+
+        // Immer aus der Liste entfernen, auch wenn die Datei schon weg war
+        SettingsService.Instance.Templates.Remove(selectedTemplate);
+
+        // Auswahl auf die nächste Vorlage setzen oder leeren
+        SettingsService.Instance.SelectedTemplate = SettingsService.Instance.Templates.FirstOrDefault();
+        SettingsService.Instance.SaveSettings();
     }
 
     private async void OnHelpClicked(object sender, EventArgs e)
@@ -461,8 +475,7 @@ public partial class ExportSettings : ContentPage
         }
         catch (Exception ex)
         {
-            System.Diagnostics.Debug.WriteLine(
-                $"Temporäre Reportdatei konnte nicht gelöscht werden: {ex}");
+            System.Diagnostics.Debug.WriteLine($"Temporäre Reportdatei konnte nicht gelöscht werden: {ex}");
         }
     }
 
