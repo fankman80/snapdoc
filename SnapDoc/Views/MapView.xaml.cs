@@ -458,76 +458,98 @@ public partial class MapView : IQueryAttributable
         if (pinLayer == null) return;
 
         var mapInfo = e.GetMapInfo((ILayer[])[pinLayer]);
+        if (mapInfo?.Feature is not GeometryFeature feature) return;
 
-        if (mapInfo?.Feature is GeometryFeature feature)
+        var pinId = feature["PinId"].ToString();
+        var planId = feature["PlanId"].ToString();
+
+        var popup = new PopupPinView(planId, pinId);
+        PopupOptions popupOptions = new()
         {
-            var pinId = feature["PinId"].ToString();
-            var planId = feature["PlanId"].ToString();
+            CanBeDismissedByTappingOutsideOfPopup = true,
+            Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = new CornerRadius(8), StrokeThickness = 0 }
+        };
+        var result = await this.ShowPopupAsync<string>(popup, popupOptions);
 
-            var popup = new PopupPinView(planId, pinId);
-            PopupOptions popupOptions = new()
-            { CanBeDismissedByTappingOutsideOfPopup = true, Shape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = new CornerRadius(8), StrokeThickness = 0 } };
+        if (result.Result == "edit")
+            LoadPins();
+        else if (result.Result == "export")
+            await ExportPinMapImageAsync(planId, pinId, feature.Geometry.Centroid);
+    }
 
-            var result = await this.ShowPopupAsync<string>(popup, popupOptions);
+    private async Task ExportPinMapImageAsync(string planId, string pinId, NetTopologySuite.Geometries.Geometry center)
+    {
+        var imageSize = new Size(2000, 2000);
+        byte[] imageBytes;
 
-            if (result.Result == "edit")
-                LoadPins();
-
-            if (result.Result == "export")
-            {
-                var imageSize = new Size(2000, 2000);
-                var imageBytes = await ExportMapAsImageAsync(imageSize, feature.Geometry.Centroid);
-
-                if (imageBytes == null || imageBytes.Length == 0) return;
-
-                string filename = $"MAP_IMG_{SyncClock.NewId()}.jpg";
-                var project = ProjectItem.Current;
-                string folderPath = Path.Combine(project.ProjectDirectory, project.ImageFolder);
-                string thumbFolderPath = Path.Combine(project.ProjectDirectory, project.ThumbnailFolder);
-                string filepath = Path.Combine(folderPath, filename);
-                string thumbPath = Path.Combine(thumbFolderPath, filename);
-
-                // Suche in den Fotos nach dem MAP_IMG
-                var currentPin = GlobalJson.Data.Plans[planId].Pins[pinId];
-
-                var mapImage = SyncOps.LiveFotos(currentPin)
-                    .Select(kv => kv.Value)
-                    .FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
-
-                if (mapImage != null)
-                {
-                    try { File.Delete(Path.Combine(folderPath, mapImage.File)); } catch { }
-                    try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); } catch { }
-
-                    SaveManager.QueueCloudDelete($"{project.ImageFolder}/{mapImage.File}");
-                    SaveManager.QueueCloudDelete($"{project.ThumbnailFolder}/{mapImage.File}");
-
-                    // Tombstone statt Remove
-                    SyncOps.DeleteFoto(planId, pinId, Path.GetFileName(mapImage.File));
-                }
-
-                await File.WriteAllBytesAsync(filepath, imageBytes);
-                await Thumbnail.Generate(filepath, thumbPath);
-
-                Foto newImageData = new()
-                {
-                    AllowExport = true,
-                    File = filename,
-                    DateTime = DateTime.Now,
-                    ImageSize = imageSize
-                };
-
-                newImageData.Touch();
-                currentPin.Fotos[filename] = newImageData;
-                currentPin.Touch();
-
-                // JSON + beide Bilddateien fuer den Cloud-Sync registrieren
-                SaveManager.NotifyDataChanged(
-                [
-                    (filepath, project.ImageFolder), (thumbPath, project.ThumbnailFolder)
-                ]);
-            }
+        try
+        {
+            await BusyService.ShowAsync(AppResources.kartenausschnitt_wird_erstellt);
+            imageBytes = await ExportMapAsImageAsync(imageSize, center);
         }
+        finally
+        {
+            await BusyService.HideAsync();
+        }
+
+        if (imageBytes == null || imageBytes.Length == 0)
+        {
+            await this.DisplaySnackbar(AppResources.kartenausschnitt_fehler, actionButtonText: AppResources.ok);
+            return;
+        }
+
+        // Vorschau anzeigen – Antippen ausserhalb / Abbrechen => false
+        var previewPopup = new PopupMapPreview(imageBytes);
+        var previewResult = await this.ShowPopupAsync<bool>(previewPopup, Settings.PopupOptions);
+        if (previewResult?.Result != true) return;
+
+        await SaveMapImageAsync(planId, pinId, imageBytes, imageSize);
+    }
+
+    private static async Task SaveMapImageAsync(string planId, string pinId, byte[] imageBytes, Size imageSize)
+    {
+        string filename = $"MAP_IMG_{SyncClock.NewId()}.jpg";
+        var project = ProjectItem.Current;
+        string folderPath = Path.Combine(project.ProjectDirectory, project.ImageFolder);
+        string thumbFolderPath = Path.Combine(project.ProjectDirectory, project.ThumbnailFolder);
+        string filepath = Path.Combine(folderPath, filename);
+        string thumbPath = Path.Combine(thumbFolderPath, filename);
+
+        // Bestehendes MAP_IMG ersetzen
+        var currentPin = GlobalJson.Data.Plans[planId].Pins[pinId];
+        var mapImage = SyncOps.LiveFotos(currentPin)
+            .Select(kv => kv.Value)
+            .FirstOrDefault(f => f.File.Contains("MAP_IMG_", StringComparison.OrdinalIgnoreCase));
+
+        if (mapImage != null)
+        {
+            try { File.Delete(Path.Combine(folderPath, mapImage.File)); } catch { }
+            try { File.Delete(Path.Combine(thumbFolderPath, mapImage.File)); } catch { }
+            SaveManager.QueueCloudDelete($"{project.ImageFolder}/{mapImage.File}");
+            SaveManager.QueueCloudDelete($"{project.ThumbnailFolder}/{mapImage.File}");
+            // Tombstone statt Remove
+            SyncOps.DeleteFoto(planId, pinId, Path.GetFileName(mapImage.File));
+        }
+
+        await File.WriteAllBytesAsync(filepath, imageBytes);
+        await Thumbnail.Generate(filepath, thumbPath);
+
+        Foto newImageData = new()
+        {
+            AllowExport = true,
+            File = filename,
+            DateTime = DateTime.Now,
+            ImageSize = imageSize
+        };
+        newImageData.Touch();
+        currentPin.Fotos[filename] = newImageData;
+        currentPin.Touch();
+
+        // JSON + beide Bilddateien für den Cloud-Sync registrieren
+        SaveManager.NotifyDataChanged(
+        [
+            (filepath, project.ImageFolder), (thumbPath, project.ThumbnailFolder)
+        ]);
     }
 
     private void OnPressed(object sender, MapEventArgs e)

@@ -1,59 +1,37 @@
 <?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
+               x:Class="SnapDoc.Views.PopupAlert"
+               BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground}, Dark={DynamicResource PrimaryBackgroundDark}}"
+               HorizontalOptions="Center"
+               VerticalOptions="Center">
 
-<toolkit:Popup
-    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
-    xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
-    x:Class="SnapDoc.Views.PopupAlert"
-    BackgroundColor="{AppThemeBinding Light={DynamicResource PrimaryBackground},
-                                      Dark={DynamicResource PrimaryBackgroundDark}}"
-    HorizontalOptions="Center"
-    VerticalOptions="Center">
-
-    <Grid
-        WidthRequest="340"
-        MaximumHeightRequest="600"
-        RowDefinitions="Auto,Auto,*,Auto"
-        RowSpacing="8"
-        Padding="12">
-
-        <Label
-            Grid.Row="0"
-            x:Name="titleHeader"
-            FontAttributes="Bold"
-            HorizontalOptions="Start" />
-
-        <Line
-            Grid.Row="1"
-            x:Name="headerLine"
-            Stroke="{AppThemeBinding Light=LightSlateGray,
-                                     Dark=LightGray}"
-            X2="316" />
-
-        <ScrollView
-            Grid.Row="2"
-            VerticalScrollBarVisibility="Default">
-
-            <Label
-                x:Name="titleText"
-                HorizontalOptions="Fill"
-                VerticalOptions="Start"
-                LineBreakMode="WordWrap" />
-
+    <Grid WidthRequest="320"
+          MaximumHeightRequest="600"
+          RowDefinitions="Auto,Auto,*,Auto"
+          RowSpacing="8">
+        <Label Grid.Row="0"
+               x:Name="titleHeader"
+               FontAttributes="Bold"
+               HorizontalOptions="Start" />
+        <Line Grid.Row="1"
+              x:Name="headerLine"
+              Stroke="{AppThemeBinding Light=LightSlateGray, Dark=LightGray}"
+              X2="316" />
+        <ScrollView Grid.Row="2"
+                    VerticalScrollBarVisibility="Default">
+            <Label x:Name="titleText"
+                   HorizontalOptions="Fill"
+                   VerticalOptions="Start"
+                   LineBreakMode="WordWrap" />
         </ScrollView>
 
-        <Button
-            Grid.Row="3"
-            x:Name="okButtonText"
-            MinimumWidthRequest="100"
-            HorizontalOptions="Fill"
-            Text="{x:Static res:AppResources.ok}"
-            BackgroundColor="{AppThemeBinding Light={DynamicResource Primary},
-                                              Dark={DynamicResource PrimaryDark}}"
-            TextColor="{DynamicResource PrimaryDarkText}"
-            Clicked="OnOkClicked" />
-
+        <Button Grid.Row="3"
+                x:Name="okButtonText"
+                MinimumWidthRequest="100"
+                HorizontalOptions="Fill"
+                Text="{x:Static res:AppResources.ok}"
+                BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                TextColor="{DynamicResource PrimaryDarkText}"
+                Clicked="OnOkClicked" />
     </Grid>
-
 </toolkit:Popup>

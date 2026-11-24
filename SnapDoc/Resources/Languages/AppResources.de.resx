@@ -1394,4 +1394,16 @@ Möchten Sie die vorhandene Vorlage ersetzen?</value>
   <data name="keine_vorlagen_vorhanden" xml:space="preserve">
     <value>Keine Vorlage vorhanden</value>
   </data>
+  <data name="kartenausschnitt_vorschau" xml:space="preserve">
+    <value>Kartenausschnitt übernehmen?</value>
+  </data>
+  <data name="kartenausschnitt_wird_erstellt" xml:space="preserve">
+    <value>Kartenausschnitt wird erstellt…</value>
+  </data>
+  <data name="kartenausschnitt_fehler" xml:space="preserve">
+    <value>Kartenausschnitt konnte nicht erstellt werden.</value>
+  </data>
+  <data name="uebernehmen" xml:space="preserve">
+    <value>Übernehmen</value>
+  </data>
 </root>

@@ -241,6 +241,9 @@
 		<MauiXaml Update="Views\PopupLockBadgeSettings.xaml">
 		  <Generator>MSBuild:Compile</Generator>
 		</MauiXaml>
+		<MauiXaml Update="Views\PopupMapPreview.xaml">
+		  <Generator>MSBuild:Compile</Generator>
+		</MauiXaml>
 		<MauiXaml Update="Views\PopupRadioPicker.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupShapeSelect.xaml" Generator="MSBuild:Compile" />
 		<MauiXaml Update="Views\PopupGestureHelperSettings.xaml">

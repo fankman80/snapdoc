@@ -1663,11 +1663,38 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt konnte nicht erstellt werden. ähnelt.
+        /// </summary>
+        internal static string kartenausschnitt_fehler {
+            get {
+                return ResourceManager.GetString("kartenausschnitt_fehler", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt speichern ähnelt.
         /// </summary>
         internal static string kartenausschnitt_speichern {
             get {
                 return ResourceManager.GetString("kartenausschnitt_speichern", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt übernehmen? ähnelt.
+        /// </summary>
+        internal static string kartenausschnitt_vorschau {
+            get {
+                return ResourceManager.GetString("kartenausschnitt_vorschau", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Kartenausschnitt wird erstellt… ähnelt.
+        /// </summary>
+        internal static string kartenausschnitt_wird_erstellt {
+            get {
+                return ResourceManager.GetString("kartenausschnitt_wird_erstellt", resourceCulture);
             }
         }
         
@@ -3488,6 +3515,15 @@ namespace SnapDoc.Resources.Languages {
         internal static string ueberlappung_sperrsymbol {
             get {
                 return ResourceManager.GetString("ueberlappung_sperrsymbol", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Übernehmen ähnelt.
+        /// </summary>
+        internal static string uebernehmen {
+            get {
+                return ResourceManager.GetString("uebernehmen", resourceCulture);
             }
         }
         

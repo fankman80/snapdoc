@@ -1394,4 +1394,16 @@ Do you want to replace the existing template?</value>
   <data name="keine_vorlagen_vorhanden" xml:space="preserve">
     <value>No template available</value>
   </data>
+  <data name="kartenausschnitt_vorschau" xml:space="preserve">
+    <value>Use this map section?</value>
+  </data>
+  <data name="kartenausschnitt_wird_erstellt" xml:space="preserve">
+    <value>Creating map section…</value>
+  </data>
+  <data name="kartenausschnitt_fehler" xml:space="preserve">
+    <value>Map section could not be created.</value>
+  </data>
+  <data name="uebernehmen" xml:space="preserve">
+    <value>Accept</value>
+  </data>
 </root>

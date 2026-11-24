@@ -61,24 +61,35 @@
                         Padding="0"
                         HeightRequest="36"
                         MinimumHeightRequest="36"
-                        Text="{x:Static local:MaterialIcons.Add_photo_alternate}"
+                        Text="{x:Static local:MaterialIcons.Screenshot_region}"
                         FontSize="26"
                         FontFamily="MaterialOutlined"
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
                         TextColor="{DynamicResource PrimaryDarkText}"
                         ToolTipProperties.Text="{x:Static res:AppResources.kartenausschnitt_speichern}"
                         Clicked="OnExportClicked" />
-                <Button Grid.Column="2"
+                <Border Grid.Column="2"
                         Padding="0"
                         HeightRequest="36"
                         MinimumHeightRequest="36"
-                        Text="{x:Static local:MaterialIcons.Pinboard}"
-                        FontSize="26"
-                        FontFamily="MaterialOutlined"                        
                         BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
-                        TextColor="{DynamicResource PrimaryDarkText}"
-                        ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}"
-                        Clicked="OnGoToClicked" />
+                        StrokeThickness="0"
+                        Stroke="Transparent"
+                        StrokeShape="RoundRectangle 8"
+                        ToolTipProperties.Text="{x:Static res:AppResources.zu_pin_wechseln}">
+                    <Label Text="{x:Static local:MaterialIcons.Keep}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Rotation="38"
+                           FontSize="26"
+                           FontFamily="MaterialOutlined"                        
+                           BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                           TextColor="{DynamicResource PrimaryDarkText}">
+                    </Label>
+                    <Border.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnGoToClicked"/>
+                    </Border.GestureRecognizers>
+                </Border>
             </Grid>
         </VerticalStackLayout>
     </Grid>
