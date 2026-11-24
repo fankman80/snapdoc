@@ -69,7 +69,6 @@ public partial class ExportSettings : ContentPage
 
                 await BusyService.HideAsync();
                 await ShowExportErrorAsync(exportResult);
-
                 return;
             }
 
@@ -123,9 +122,7 @@ public partial class ExportSettings : ContentPage
         }
     }
 
-    private async void OnSaveClicked(
-        object sender,
-        EventArgs e)
+    private async void OnSaveClicked(object sender, EventArgs e)
     {
         if (string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
@@ -159,7 +156,6 @@ public partial class ExportSettings : ContentPage
 
                 await BusyService.HideAsync();
                 await ShowExportErrorAsync(exportResult);
-
                 return;
             }
 
@@ -195,13 +191,9 @@ public partial class ExportSettings : ContentPage
             await Shell.Current.GoToAsync("..");
 
             if (isSaved)
-            {
                 await this.DisplaySnackbar(AppResources.bericht_wurde_gespeichert, actionButtonText: AppResources.ok);
-            }
             else
-            {
                 await this.DisplaySnackbar(AppResources.bericht_wurde_nicht_gespeichert, actionButtonText: AppResources.ok);
-            }
         }
         catch (Exception ex)
         {
@@ -345,7 +337,6 @@ public partial class ExportSettings : ContentPage
 
         await using var sourceStream = await result.OpenReadAsync();
         await using var destinationStream = new FileStream(destinationPath, FileMode.Create, FileAccess.Write);
-
         await sourceStream.CopyToAsync(destinationStream);
 
         LoadDocuments();
@@ -387,11 +378,9 @@ public partial class ExportSettings : ContentPage
         var popup = new PopupDualResponse(AppResources.wollen_sie_diese_vorlage_wirklich_loeschen);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
         if (result?.Result is not DualPopupResult.Ok) return;
-
         if (!string.IsNullOrEmpty(SettingsService.Instance.SelectedTemplate))
         {
             var filePath = Path.Combine(Settings.TemplateDirectory, SettingsService.Instance.SelectedTemplate);
-
             if (File.Exists(filePath))
             {
                 File.Delete(filePath);
@@ -402,13 +391,8 @@ public partial class ExportSettings : ContentPage
 
     private async void OnHelpClicked(object sender, EventArgs e)
     {
-        await using var source =
-            await FileSystem.OpenAppPackageFileAsync("report_help.pdf");
-
-        var filePath = Path.Combine(
-            FileSystem.CacheDirectory,
-            "report_help.pdf");
-
+        await using var source = await FileSystem.OpenAppPackageFileAsync("report_template_help.pdf");
+        var filePath = Path.Combine(FileSystem.CacheDirectory, "report_template_help.pdf");
         await using (var target = File.Create(filePath))
         {
             await source.CopyToAsync(target);
@@ -463,15 +447,9 @@ public partial class ExportSettings : ContentPage
     private async Task ShowExportErrorAsync(ReportExportResult result)
     {
         string message = FormatExportMessages(result);
-
-        System.Diagnostics.Debug.WriteLine(
-            $"Report-Export fehlgeschlagen:{Environment.NewLine}{message}");
-
+        System.Diagnostics.Debug.WriteLine($"Report-Export fehlgeschlagen:{Environment.NewLine}{message}");
         var popup = new PopupAlert(message);
-
-        await this.ShowPopupAsync<string>(
-            popup,
-            Settings.PopupOptions);
+        await this.ShowPopupAsync<string>(popup, Settings.PopupOptions);
     }
 
     private static void DeleteTemporaryReport(string outputPath)
@@ -501,7 +479,6 @@ public partial class ExportSettings : ContentPage
                 "die erzeugte DOCX-Datei wurde jedoch nicht gefunden.",
                 outputPath)
             });
-
         await ShowExportErrorAsync(result);
     }
 }
