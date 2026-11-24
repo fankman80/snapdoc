@@ -1,34 +1,31 @@
 <?xml version="1.0" encoding="utf-8" ?>
-<toolkit:Popup xmlns:lang="clr-namespace:SnapDoc.Resources.Languages"
+<toolkit:Popup xmlns:res="clr-namespace:SnapDoc.Resources.Languages"
                x:Class="SnapDoc.Views.PopupMapPreview"
                x:TypeArguments="x:Boolean">
 
-    <Grid RowDefinitions="Auto,Auto,Auto"
-          RowSpacing="16"
-          WidthRequest="320">
-
-        <Label Grid.Row="0"
-               Text="{x:Static lang:AppResources.kartenausschnitt_vorschau}"/>
-
-        <Border Grid.Row="1"
-                StrokeThickness="0"
-                StrokeShape="RoundRectangle 8"
-                HeightRequest="300"
-                WidthRequest="300"
-                HorizontalOptions="Center">
-            <Image x:Name="PreviewImage"
-                   Aspect="AspectFit" />
-        </Border>
-
-        <HorizontalStackLayout Grid.Row="2"
-                               Spacing="8"
-                               HorizontalOptions="End">
-            <Button Text="{x:Static lang:AppResources.abbrechen}"
-                    Clicked="OnRejectClicked"
-                    BackgroundColor="Transparent"
-                    TextColor="{StaticResource Primary}" />
-            <Button Text="{x:Static lang:AppResources.uebernehmen}"
-                    Clicked="OnAcceptClicked" />
-        </HorizontalStackLayout>
+    <Grid WidthRequest="320">
+        <VerticalStackLayout Spacing="8">
+            <Label Text="{x:Static res:AppResources.kartenausschnitt_vorschau}"/>
+            <Border StrokeThickness="0"
+                    StrokeShape="RoundRectangle 8"
+                    HeightRequest="300"
+                    WidthRequest="300"
+                    HorizontalOptions="Center">
+                <Image x:Name="PreviewImage"
+                       Aspect="AspectFit" />
+            </Border>
+            <Grid ColumnDefinitions="*,*" Margin="0,8,0,0">
+                <Button Grid.Column="0"
+                        Text="{x:Static res:AppResources.abbrechen}"
+                        BackgroundColor="Transparent"
+                        TextColor="{DynamicResource Primary}"
+                        Clicked="OnRejectClicked"/>
+                <Button Grid.Column="1"
+                        Text="{x:Static res:AppResources.uebernehmen}"
+                        BackgroundColor="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDark}}"
+                        TextColor="{DynamicResource PrimaryDarkText}"
+                        Clicked="OnAcceptClicked" />
+            </Grid>
+        </VerticalStackLayout>
     </Grid>
 </toolkit:Popup>

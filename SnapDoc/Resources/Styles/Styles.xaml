@@ -1,10 +1,7 @@
 ﻿<?xml version="1.0" encoding="UTF-8" ?>
 <?xaml-comp compile="true" ?>
-<ResourceDictionary 
-    xmlns="http://schemas.microsoft.com/dotnet/maui/global"
-    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-    xmlns:vm="clr-namespace:SnapDoc.ViewModels"
-    xmlns:controls="clr-namespace:SnapDoc.Controls">
+<ResourceDictionary xmlns:vm="clr-namespace:SnapDoc.ViewModels"
+                    xmlns:controls="clr-namespace:SnapDoc.Controls">
 
     <x:String x:Key="AppFontFamily">OpenSansRegular</x:String>
     <x:Double x:Key="AppFontSizeNormal">14</x:Double>
