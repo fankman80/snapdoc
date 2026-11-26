@@ -56,7 +56,7 @@
                                         HeightRequest="38"
                                         MinimumHeightRequest="38"
                                         FontSize="11"
-                                        HorizontalOptions="Start"                                    
+                                        HorizontalOptions="Start"
                                         VerticalOptions="Center"
                                         CornerRadius="4"
                                         BorderColor="{DynamicResource Primary}"
@@ -64,7 +64,7 @@
                                         SelectedItem="{Binding PinSortCrit}"/>
             <Button x:Name="SortDirection"
                     CornerRadius="4"
-                    Padding="0"            
+                    Padding="0"
                     HeightRequest="38"
                     WidthRequest="38"
                     MinimumHeightRequest="38"
@@ -88,8 +88,9 @@
                             ItemsSource="{Binding DisplayPins}"
                             SelectionMode="None"
                             ItemsUpdatingScrollMode="KeepItemsInView">
+                <!-- LinearItemsLayout statt GridItemsLayout: unter Windows erhalten sonst alle Karten dieselbe Höhe -->
                 <CollectionView.ItemsLayout>
-                    <GridItemsLayout Orientation="Vertical" VerticalItemSpacing="6" Span="1"/>
+                    <LinearItemsLayout Orientation="Vertical" ItemSpacing="6"/>
                 </CollectionView.ItemsLayout>
                 <CollectionView.ItemTemplate>
                     <DataTemplate x:DataType="local:PinItem">
@@ -101,11 +102,11 @@
                                 <TapGestureRecognizer Tapped="OnEditClicked" />
                             </Border.GestureRecognizers>
                             <Grid ColumnDefinitions="60,*,44,44"
-                                  RowDefinitions="Auto, Auto, Auto,*, Auto"
+                                  RowDefinitions="Auto,Auto,Auto,*"
                                   RowSpacing="0" ColumnSpacing="0">
                                 <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
                                        Margin="8,4,0,0"
-                                       FontAttributes="Bold"                                       
+                                       FontAttributes="Bold"
                                        FontSize="12"
                                        Text="{Binding PlanDisplay}"
                                        MaxLines="1"
@@ -123,56 +124,83 @@
                                          HeightRequest="1"
                                          Margin="10,0,10,0"/>
 
-                                <Label Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
-                                       MaxLines="3"
-                                       LineBreakMode="TailTruncation"
-                                       FontSize="12"
-                                       Margin="8,4,10,4"
-                                       Text="{Binding PinDesc}"/>
+                                <!-- Inhalt: Icon links, rechts Beschreibung / Name / Datum, Badge unten rechts -->
+                                <Grid Grid.Column="0" Grid.Row="3" Grid.ColumnSpan="4"
+                                      ColumnDefinitions="56,*,Auto"
+                                      RowDefinitions="Auto,Auto,*"
+                                      VerticalOptions="Fill"
+                                      ColumnSpacing="8"
+                                      RowSpacing="2"
+                                      Margin="4,6,10,6">
 
-                                <HorizontalStackLayout Grid.Column="0" Grid.Row="4" Spacing="4" Margin="8,0,0,6">
-                                    <Label Text="{x:Static local:MaterialIcons.Schedule}"
-                                           FontFamily="MaterialOutlined"
-                                           FontSize="18"/>
-                                    <Label Text="{Binding Time, StringFormat='{0:dd.MM.yy | HH:mm}'}"
-                                           VerticalTextAlignment="Center"
-                                           FontSize="11"/>
-                                    <Label IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
-                                           Text="{x:Static local:MaterialIcons.Person}"
-                                           FontFamily="MaterialOutlined"
-                                           FontSize="18"/>
-                                    <Label IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
-                                           Text="{Binding CreatedBy}"
-                                           VerticalTextAlignment="Center"
-                                           FontSize="11"/>
-                                </HorizontalStackLayout>
+                                    <!-- Icon: über alle Textzeilen, vertikal zentriert -->
+                                    <Image Grid.Column="0" Grid.Row="0" Grid.RowSpan="3"
+                                           WidthRequest="44"
+                                           HeightRequest="44"
+                                           VerticalOptions="Start"
+                                           HorizontalOptions="Center"
+                                           ClassId="{Binding SelfId}"
+                                           AutomationId="{Binding OnPlanId}"
+                                           Source="{Binding DisplayIconPath}"
+                                           Aspect="AspectFit">
+                                        <Image.GestureRecognizers>
+                                            <TapGestureRecognizer Tapped="OnPinIconClicked"/>
+                                        </Image.GestureRecognizers>
+                                    </Image>
 
-                                <Border Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="4"
-                                        IsVisible="{Binding PriorityKey, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
-                                        Margin="0,0,10,6"
-                                        Padding="6,2,6,2"
-                                        HorizontalOptions="End"
-                                        VerticalOptions="End"
-                                        StrokeThickness="0"
-                                        BackgroundColor="{Binding PriorityColor}"
-                                        StrokeShape="RoundRectangle 10">
-                                    <Label Text="{Binding PriorityKey}"
-                                           FontSize="11"
-                                           TextColor="{Binding PriorityColor, Converter={StaticResource ColorToColorForTextConverter}}"/>
-                                </Border>
+                                    <!-- 1. Beschreibung: max. 3 Zeilen, ausgeblendet wenn leer -->
+                                    <Label Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
+                                           IsVisible="{Binding PinDesc, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                           Text="{Binding PinDesc}"
+                                           FontSize="12"
+                                           MaxLines="3"
+                                           LineBreakMode="TailTruncation"
+                                           Margin="0,0,0,2"/>
 
-                                <Image Grid.Column="0" Grid.Row="3" Grid.RowSpan="2"
-                                       x:DataType="local:PinItem"
-                                       VerticalOptions="Start"
-                                       Margin="8"
-                                       ClassId="{Binding SelfId}"
-                                       AutomationId="{Binding OnPlanId}"
-                                       Source="{Binding DisplayIconPath}"
-                                       Aspect="AspectFit">
-                                    <Image.GestureRecognizers>
-                                        <TapGestureRecognizer Tapped="OnPinIconClicked"/>
-                                    </Image.GestureRecognizers>
-                                </Image>
+                                    <!-- 2. Ersteller: ausgeblendet wenn leer -->
+                                    <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
+                                                           Spacing="4"
+                                                           IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                                           VerticalOptions="End">
+                                        <Label Text="{x:Static local:MaterialIcons.Person}"
+                                               FontFamily="MaterialOutlined"
+                                               FontSize="14"
+                                               VerticalTextAlignment="Center"/>
+                                        <Label Text="{Binding CreatedBy}"
+                                               FontSize="11"
+                                               MaxLines="1"
+                                               LineBreakMode="TailTruncation"
+                                               VerticalTextAlignment="Center"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- 3. Datum / Zeit: unterste Zeile, an den unteren Rand gedrückt -->
+                                    <HorizontalStackLayout Grid.Column="1" Grid.Row="2"
+                                                           Spacing="4"
+                                                           VerticalOptions="End">
+                                        <Label Text="{x:Static local:MaterialIcons.Schedule}"
+                                               FontFamily="MaterialOutlined"
+                                               FontSize="14"
+                                               VerticalTextAlignment="Center"/>
+                                        <Label Text="{Binding Time, StringFormat='{0: dd.MM.yyyy | HH:mm}'}"
+                                               FontSize="11"
+                                               VerticalTextAlignment="Center"/>
+                                    </HorizontalStackLayout>
+
+                                    <!-- Badge: immer unten rechts, ausgeblendet wenn "" -->
+                                    <Border Grid.Column="2" Grid.Row="2"
+                                            IsVisible="{Binding PriorityKey, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                            Padding="6,2,6,2"
+                                            HorizontalOptions="End"
+                                            VerticalOptions="End"
+                                            StrokeThickness="0"
+                                            BackgroundColor="{Binding PriorityColor}"
+                                            StrokeShape="RoundRectangle 10">
+                                        <Label Text="{Binding PriorityKey}"
+                                               FontSize="11"
+                                               MaxLines="1"
+                                               TextColor="{Binding PriorityColor, Converter={StaticResource ColorToColorForTextConverter}}"/>
+                                    </Border>
+                                </Grid>
 
                                 <Button Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
                                         IsVisible="{Binding IsWebMapPin}"
