@@ -81,6 +81,7 @@ public partial class Plan : SyncModel
     [ObservableProperty] public partial string Name { get; set; }
     [ObservableProperty] public partial string Description { get; set; }
     [ObservableProperty] public partial bool IsGrayscale { get; set; }
+    [ObservableProperty] public partial bool IsInvertColor { get; set; }
     [ObservableProperty] public partial bool AllowExport { get; set; }
     [ObservableProperty] public partial string PlanColor { get; set; }
     [ObservableProperty] public partial int PinCount { get; set; }

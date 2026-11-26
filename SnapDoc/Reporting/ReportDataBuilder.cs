@@ -43,6 +43,7 @@ public static class ReportDataBuilder
                 File: plan.File ?? string.Empty,
                 ImageSize: new SizeF((float)plan.ImageSize.Width, (float)plan.ImageSize.Height),
                 IsGrayscale: plan.IsGrayscale,
+                IsInvertColor: plan.IsInvertColor,
                 IsWebMap: planEntry.Key.Contains("webmap", StringComparison.OrdinalIgnoreCase),
                 MeasureUnit: plan.MeasureUnit ?? string.Empty,
                 ModifiedAt: plan.ModifiedAt,

@@ -29,6 +29,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private bool _isShowingPopup = false;
     private string planImageSource = "";
     private bool isGrayscaleMode;
+    private bool isInvertColorMode;
     private bool isToolButtonsVisible = false;
     private bool isMeasureVisible = false;
     private bool isMeasureToggleVisible;
@@ -39,6 +40,8 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
     private readonly record struct DrawingExportResult(SKRect PlanBounds, int PixelWidth, int PixelHeight, float PinScale);
     public string PlanImageSource { get => planImageSource; set { planImageSource = value; OnPropertyChanged(); } }
     public bool IsGrayscaleMode { get => isGrayscaleMode; set { isGrayscaleMode = value; OnPropertyChanged(); } }
+    public bool IsInvertColorMode { get => isInvertColorMode; set { isInvertColorMode = value; OnPropertyChanged(); } }
+
 
     public bool IsToolButtonsVisible
     {
@@ -276,13 +279,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         WeakReferenceMessenger.Default.Register<PlanDetailsChangedMessage>(this, (r, m) =>
         {
-            var (updatedPlanId, newName, _, measureUnit, measureFactor, isGrayscale, _) = m.Value;
+            var (updatedPlanId, newName, _, measureUnit, measureFactor, isGrayscale, isInvertColor, _) = m.Value;
             if (updatedPlanId != planId) return;
 
             MainThread.BeginInvokeOnMainThread(() =>
             {
                 Title = newName;
                 IsGrayscaleMode = isGrayscale;
+                IsInvertColorMode = isInvertColor;
                 UpdateGrayscaleMenuText();
                 drawingController.Measure.MeasureUnit = measureUnit;
                 drawingController.MeasureFactor = PdfPointFactor * measureFactor;
@@ -325,6 +329,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
         PlanImageSource = planImagePath;
 
         IsGrayscaleMode = thisPlan.IsGrayscale;
+        IsInvertColorMode = thisPlan.IsInvertColor;
         UpdateGrayscaleMenuText();
 
         pinList.Clear();
@@ -1577,6 +1582,14 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
 
         // save data to file
         SaveManager.NotifyDataChanged();
+    }
+
+    private async void OnInvertColorClicked(object sender, EventArgs e)
+    {
+        await HideMoreMenuAsync();
+
+        IsInvertColorMode = thisPlan.IsInvertColor = !thisPlan.IsInvertColor;
+        thisPlan.Touch();
     }
 
     private void UpdateGrayscaleMenuText() => grayscaleButtonText.Text = IsGrayscaleMode ? AppResources.farben_hinzufuegen : AppResources.farben_entfernen;

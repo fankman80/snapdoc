@@ -133,6 +133,7 @@
                                     IsShowLockBadges="{Binding IsShowLockBadges, Source={x:Static services:SettingsService.Instance}, x:DataType=services:SettingsService}"
                                     SourceImagePath="{Binding PlanImageSource, Source={x:Reference Name=ThisPage}}"
                                     IsGrayscaleEnabled="{Binding IsGrayscaleMode, Source={x:Reference Name=ThisPage}}"
+                                    IsInvertColorEnabled="{Binding IsInvertColorMode, Source={x:Reference Name=ThisPage}}"
                                     PlaceholderColor="DimGrey"
                                     AbsoluteLayout.LayoutBounds="0, 0, 1, 1"
                                     AbsoluteLayout.LayoutFlags="All"/>
@@ -430,12 +431,28 @@
                                FontSize="18"
                                VerticalTextAlignment="Center"
                                FontFamily="MaterialOutlined"
-                               Text="{x:Static local:MaterialIcons.Invert_colors}" />
+                               Text="{x:Static local:MaterialIcons.Filter_b_and_w}" />
                         <Label x:Name="grayscaleButtonText"
                                Grid.Column="1"
                                FontSize="12"
                                VerticalTextAlignment="Center"
                                Text="{x:Static res:AppResources.farben_entfernen}" />
+                    </Grid>
+                    <!-- Farben invertieren -->
+                    <Grid ColumnDefinitions="Auto,Auto">
+                        <Grid.GestureRecognizers>
+                            <TapGestureRecognizer Tapped="OnInvertColorClicked" />
+                        </Grid.GestureRecognizers>
+                        <Label Grid.Column="0"
+                               FontSize="18"
+                               VerticalTextAlignment="Center"
+                               FontFamily="MaterialOutlined"
+                               Text="{x:Static local:MaterialIcons.Invert_colors}" />
+                        <Label x:Name="invertColorButtonText"
+                               Grid.Column="1"
+                               FontSize="12"
+                               VerticalTextAlignment="Center"
+                               Text="Farben invertieren" />
                     </Grid>
                     <BoxView HeightRequest="1"
                              Margin="0"

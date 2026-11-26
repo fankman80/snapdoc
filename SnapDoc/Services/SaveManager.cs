@@ -607,6 +607,7 @@ public static class SaveManager
                                   localPlan.MeasureUnit != cloudPlan.MeasureUnit ||
                                   localPlan.MeasureFactor != cloudPlan.MeasureFactor ||
                                   localPlan.IsGrayscale != cloudPlan.IsGrayscale ||
+                                  localPlan.IsInvertColor != cloudPlan.IsInvertColor ||
                                   localPlan.PlanColor != cloudPlan.PlanColor ||
                                   nameOrExportChanged;
 
@@ -622,6 +623,7 @@ public static class SaveManager
                 localPlan.MeasureFactor = cloudPlan.MeasureFactor;
                 localPlan.ImageSize = cloudPlan.ImageSize;
                 localPlan.IsGrayscale = cloudPlan.IsGrayscale;
+                localPlan.IsInvertColor = cloudPlan.IsInvertColor;
                 localPlan.PlanColor = cloudPlan.PlanColor;
                 localPlan.AllowExport = cloudPlan.AllowExport;
                 localPlan.DeletedAt = cloudPlan.DeletedAt;
@@ -636,6 +638,7 @@ public static class SaveManager
                                                        cloudPlan.MeasureUnit,
                                                        cloudPlan.MeasureFactor,
                                                        cloudPlan.IsGrayscale,
+                                                       cloudPlan.IsInvertColor,
                                                        cloudPlan.PlanColor)));
 
                 // Planname erscheint in der Galerie

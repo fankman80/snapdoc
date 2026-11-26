@@ -97,6 +97,7 @@ public sealed record ExportPlan(
     string File,
     SizeF ImageSize,
     bool IsGrayscale,
+    bool IsInvertColor,
     bool IsWebMap,
     string MeasureUnit,
     DateTimeOffset ModifiedAt,

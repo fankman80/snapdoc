@@ -166,6 +166,28 @@ public partial class TileImageView : ContentView, IDisposable
         ])
     };
 
+    private static readonly SKPaint InvertPaint = new()
+    {
+        ColorFilter = SKColorFilter.CreateColorMatrix(
+        [
+            -1,  0,  0, 0, 1,
+             0, -1,  0, 0, 1,
+             0,  0, -1, 0, 1,
+             0,  0,  0, 1, 0
+        ])
+    };
+
+    private static readonly SKPaint InvertedGrayscalePaint = new()
+    {
+        ColorFilter = SKColorFilter.CreateColorMatrix(
+    [
+        -0.2126f, -0.7152f, -0.0722f, 0, 1,
+        -0.2126f, -0.7152f, -0.0722f, 0, 1,
+        -0.2126f, -0.7152f, -0.0722f, 0, 1,
+         0,        0,        0,       1, 0
+    ])
+    };
+
     private readonly SKPaint _loupeBorderPaint = new()
     {
         Style = SKPaintStyle.Stroke,
@@ -250,6 +272,10 @@ public partial class TileImageView : ContentView, IDisposable
         BindableProperty.Create(nameof(IsGrayscaleEnabled), typeof(bool), typeof(TileImageView), false,
             propertyChanged: (bindable, oldValue, newValue) => ((TileImageView)bindable).RequestRender());
 
+    public static readonly BindableProperty IsInvertColorEnabledProperty =
+    BindableProperty.Create(nameof(IsInvertColorEnabled), typeof(bool), typeof(TileImageView), false,
+        propertyChanged: (bindable, oldValue, newValue) => ((TileImageView)bindable).RequestRender());
+
     public static readonly BindableProperty CurrentRotationProperty =
         BindableProperty.Create(nameof(CurrentRotation), typeof(float), typeof(TileImageView), 0f,
             defaultBindingMode: BindingMode.TwoWay, propertyChanged: OnCurrentRotationChanged);
@@ -324,6 +350,7 @@ public partial class TileImageView : ContentView, IDisposable
     public bool IsRotationLocked { get => (bool)GetValue(IsRotationLockedProperty); set => SetValue(IsRotationLockedProperty, value); }
     public PinCreationMode PinCreationMode { get => (PinCreationMode)GetValue(PinCreationModeProperty); set => SetValue(PinCreationModeProperty, value); }
     public bool IsGrayscaleEnabled { get => (bool)GetValue(IsGrayscaleEnabledProperty); set => SetValue(IsGrayscaleEnabledProperty, value); }
+    public bool IsInvertColorEnabled { get => (bool)GetValue(IsInvertColorEnabledProperty); set => SetValue(IsInvertColorEnabledProperty, value); }
 
     public event EventHandler<MapPin> PinTapped;
     public event EventHandler<MapPin> PinMoved;
@@ -817,7 +844,13 @@ public partial class TileImageView : ContentView, IDisposable
 
         int maxZoom = _pyramidMaxZoom;
         int tileSize = _pyramidTileSize;
-        var paint = IsGrayscaleEnabled ? GrayscalePaint : null;
+        var paint = (IsGrayscaleEnabled, IsInvertColorEnabled) switch
+        {
+            (true, true) => InvertedGrayscalePaint,
+            (true, false) => GrayscalePaint,
+            (false, true) => InvertPaint,
+            _ => null
+        };
 
         canvas.Save();
         canvas.Translate(_panX, _panY);
@@ -866,10 +899,17 @@ public partial class TileImageView : ContentView, IDisposable
             EnsureTileCacheCapacity(baseZoom, desiredZoom, maxZoom, tileSize, imageSize, view);
 
         int guaranteed = Math.Min(_baseFallbackLevel, Math.Min(baseZoom, maxAvailableZoom));
+
+        // Nur die echte Bildfläche zeichnen – aufgefüllte Kachelränder ausblenden
+        int clipSave = canvas.Save();
+        canvas.ClipRect(new SKRect(0, 0, imageSize.Width, imageSize.Height));
+
         if (guaranteed < baseZoom)
             DrawTileLayer(canvas, guaranteed, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: false);
 
         DrawTileLayer(canvas, baseZoom, maxZoom, tileSize, imageSize, view, paint, effScale, allowFallback: true);
+
+        canvas.RestoreToCount(clipSave);
 
         if (desiredZoom != baseZoom)
         {

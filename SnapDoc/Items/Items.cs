@@ -87,6 +87,12 @@ public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
         set => SetModel(Model.IsGrayscale, value, v => Model.IsGrayscale = v);
     }
 
+    public bool IsInvertColor
+    {
+        get => Model.IsInvertColor;
+        set => SetModel(Model.IsInvertColor, value, v => Model.IsInvertColor = v);
+    }
+
     public int PinCount
     {
         get => Model.PinCount;
@@ -103,6 +109,7 @@ public partial class PlanItem(Plan plan) : ModelItem<Plan>(plan)
             case nameof(Plan.PlanColor): Notify(nameof(PlanColor)); break;
             case nameof(Plan.PinCount): Notify(nameof(PinCount)); break;
             case nameof(Plan.IsGrayscale): Notify(nameof(IsGrayscale)); break;
+            case nameof(Plan.IsInvertColor): Notify(nameof(IsInvertColor)); break;
 
             case nameof(Plan.AllowExport):
                 Notify(nameof(AllowExport), nameof(DisplayOpacity));

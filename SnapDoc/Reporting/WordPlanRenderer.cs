@@ -62,8 +62,7 @@ public sealed class WordPlanRenderer(ExportSession session, WordImageRenderer im
             else
             {
                 SizeF scaledPlan = ReportGeometry.ScaleToFit(plan.ImageSize, exportSize);
-                imageRun.Append(images.CreateDrawing(anchorParagraph, planPath, scaledPlan, new PointF(0, 0), 0,
-                    anchored: true, crop: null, grayscale: plan.IsGrayscale));
+                imageRun.Append(images.CreateDrawing(anchorParagraph, planPath, scaledPlan, new PointF(0, 0), 0, anchored: true, crop: null, grayscale: plan.IsGrayscale));
 
                 foreach (var pin in plan.Pins)
                     AppendPin(imageRun, anchorParagraph, plan, pin, scaledPlan);
