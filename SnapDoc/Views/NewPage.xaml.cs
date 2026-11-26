@@ -615,6 +615,7 @@ public partial class NewPage : IQueryAttributable, INotifyPropertyChanged
             PinDesc = "",
             PriorityKey = string.Empty,
             PinLocation = "",
+            CreatedBy = SettingsService.Instance.CurrentUserName,
             PinIcon = _newPin,
             Fotos = [],
             OnPlanId = planId,

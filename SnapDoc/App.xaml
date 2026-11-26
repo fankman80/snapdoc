@@ -22,6 +22,7 @@
             <toolkit:MathExpressionConverter x:Key="MathExpressionConverter"/>
             <toolkit:ColorToColorForTextConverter x:Key="ColorToColorForTextConverter"/>
             <toolkit:InvertedBoolConverter x:Key="InvertedBoolConverter"/>
+            <toolkit:IsStringNotNullOrEmptyConverter x:Key="IsStringNotNullOrEmptyConverter" />
 
             <Style TargetType="StackLayout">
                 <Setter Property="Spacing"

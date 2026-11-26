@@ -301,9 +301,25 @@
                                          SwitchColorOff="{AppThemeBinding Light=LightGray, Dark=Gray}"/>
                     </Grid>
                 </Border>
+                <HorizontalStackLayout Spacing="6">
+                    <Label Text="{x:Static local:MaterialIcons.Schedule}"
+                           FontFamily="MaterialOutlined"
+                           FontSize="20"/>
+                    <Label Text="{Binding Pin.Time, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"
+                           VerticalTextAlignment="Center"
+                           FontSize="12"/>
+                </HorizontalStackLayout>
+                <HorizontalStackLayout Spacing="6"
+                                       IsVisible="{Binding Pin.CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}">
+                    <Label Text="{x:Static local:MaterialIcons.Person}"
+                           FontFamily="MaterialOutlined"
+                           FontSize="20"/>
+                    <Label Text="{Binding Pin.CreatedBy}"
+                           VerticalTextAlignment="Center"
+                           FontSize="12"/>
+                </HorizontalStackLayout>
             </VerticalStackLayout>
         </ScrollView>
-
         <!-- ═══ ⋮-Menü ═══ -->
         <Grid x:Name="MoreMenuOverlay"
               Grid.RowSpan="2"

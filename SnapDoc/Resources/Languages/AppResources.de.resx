@@ -1406,4 +1406,7 @@ Möchten Sie die vorhandene Vorlage ersetzen?</value>
   <data name="uebernehmen" xml:space="preserve">
     <value>Übernehmen</value>
   </data>
+  <data name="farben_invertieren" xml:space="preserve">
+    <value>Farben invertieren</value>
+  </data>
 </root>

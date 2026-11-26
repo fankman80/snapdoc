@@ -744,6 +744,7 @@ public static class SaveManager
         target.SelfId = source.SelfId;
         target.PinScale = source.PinScale;
         target.PinLocation = source.PinLocation;
+        target.CreatedBy = source.CreatedBy;
         target.PinRotation = source.PinRotation;
         target.DeletedAt = source.DeletedAt;
         target.ModifiedAt = source.ModifiedAt;

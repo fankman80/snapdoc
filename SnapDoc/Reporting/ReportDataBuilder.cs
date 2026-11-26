@@ -101,6 +101,7 @@ public static class ReportDataBuilder
             Name: pin.PinName ?? string.Empty,
             Description: pin.PinDesc ?? string.Empty,
             Location: pin.PinLocation ?? string.Empty,
+            CreatedBy: pin.CreatedBy ?? string.Empty,
             PriorityKey: priorityKey,
             PriorityColorHex: priorityColor?.Replace("#", ""),
             Wgs84: pin.GeoLocation?.WGS84?.ToString(),

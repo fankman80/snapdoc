@@ -58,6 +58,7 @@ public sealed record ExportPin(
     string Name,
     string Description,
     string Location,
+    string CreatedBy,
     string PriorityKey,
     string? PriorityColorHex,
     string? Wgs84,

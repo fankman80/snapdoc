@@ -1406,4 +1406,7 @@ Do you want to replace the existing template?</value>
   <data name="uebernehmen" xml:space="preserve">
     <value>Accept</value>
   </data>
+  <data name="farben_invertieren" xml:space="preserve">
+    <value>Invert colors</value>
+  </data>
 </root>

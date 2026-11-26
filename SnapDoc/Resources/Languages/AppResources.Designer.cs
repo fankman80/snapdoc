@@ -1114,6 +1114,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die Farben invertieren ähnelt.
+        /// </summary>
+        internal static string farben_invertieren {
+            get {
+                return ResourceManager.GetString("farben_invertieren", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die Farbschema ähnelt.
         /// </summary>
         internal static string farbschema {

@@ -32,6 +32,7 @@ public static class DefaultPlaceholders
         Text(r, "pin_name", ScopeKind.Pin, c => c.Scope.Pin!.Name);
         Text(r, "pin_desc", ScopeKind.Pin, c => c.Scope.Pin!.Description);
         Text(r, "pin_location", ScopeKind.Pin, c => c.Scope.Pin!.Location);
+        Text(r, "pin_createdBy", ScopeKind.Pin, c => c.Scope.Pin!.CreatedBy);
         Text(r, "pin_geolocWGS84", ScopeKind.Pin, c => c.Scope.Pin!.Wgs84);
         Text(r, "pin_geolocCH1903", ScopeKind.Pin, c => c.Scope.Pin!.Ch1903);
         Text(r, "plan_count", ScopeKind.Project, c => c.Data.Plans.Count(plan => !plan.IsWebMap).ToString());

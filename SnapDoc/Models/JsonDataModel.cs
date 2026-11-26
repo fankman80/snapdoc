@@ -114,6 +114,7 @@ public partial class Pin : SyncModel
     [ObservableProperty] public partial string PinName { get; set; }
     [ObservableProperty] public partial string PinDesc { get; set; }
     [ObservableProperty] public partial string PinLocation { get; set; }
+    [ObservableProperty] public partial string CreatedBy { get; set; }
     [ObservableProperty] public partial string OnPlanId { get; set; }
     [ObservableProperty] public partial DateTime DateTime { get; set; }
     [ObservableProperty] public partial GeoLocData GeoLocation { get; set; }

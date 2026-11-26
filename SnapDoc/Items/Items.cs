@@ -204,6 +204,12 @@ public partial class PinItem : ModelItem<Pin>
         get => Model.PinLocation;
         set => SetModel(Model.PinLocation, value, v => Model.PinLocation = v, [nameof(PlanDisplay)]);
     }
+ 
+    public string CreatedBy
+    {
+        get => Model.CreatedBy;
+        set => SetModel(Model.CreatedBy, value, v => Model.CreatedBy = v, [nameof(PlanDisplay)]);
+    }
 
     public string PinIcon
     {
@@ -323,6 +329,10 @@ public partial class PinItem : ModelItem<Pin>
 
             case nameof(Pin.PinLocation):
                 Notify(nameof(PinLocation), nameof(PlanDisplay));
+                break;
+
+            case nameof(Pin.CreatedBy):
+                Notify(nameof(CreatedBy), nameof(PlanDisplay));
                 break;
 
             case nameof(Pin.PinIcon):

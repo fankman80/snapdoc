@@ -764,6 +764,7 @@ public partial class MapView : IQueryAttributable
                 PinDesc = "",
                 PriorityKey = string.Empty,
                 PinLocation = "",
+                CreatedBy = SettingsService.Instance.CurrentUserName,
                 PinIcon = SettingsService.Instance.DefaultPinIcon,
                 Fotos = [],
                 OnPlanId = planId,
