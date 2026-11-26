@@ -57,8 +57,9 @@
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
                             <HorizontalStackLayout Spacing="6">
                                 <Label Text="{x:Static local:MaterialIcons.Space_dashboard}"
+                                       VerticalTextAlignment="Center"
                                        FontFamily="MaterialOutlined"
-                                       FontSize="20"/>
+                                       FontSize="16"/>
                                 <Label Text="{Binding PlanDisplay}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"
@@ -66,16 +67,18 @@
                             </HorizontalStackLayout>
                             <HorizontalStackLayout Spacing="6">
                                 <Label Text="{x:Static local:MaterialIcons.Calendar_month}"
+                                       VerticalTextAlignment="Center"
                                        FontFamily="MaterialOutlined"
-                                       FontSize="20"/>
+                                       FontSize="16"/>
                                 <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"/>
                             </HorizontalStackLayout>
                             <HorizontalStackLayout Spacing="6">
                                 <Label Text="{x:Static local:MaterialIcons.Schedule}"
+                                       VerticalTextAlignment="Center"
                                        FontFamily="MaterialOutlined"
-                                       FontSize="20"/>
+                                       FontSize="16"/>
                                 <Label Text="{Binding DateTime, StringFormat='{}{0:HH:mm}'}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"/>
