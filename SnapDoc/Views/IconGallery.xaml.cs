@@ -8,6 +8,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
 using System.Windows.Input;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 

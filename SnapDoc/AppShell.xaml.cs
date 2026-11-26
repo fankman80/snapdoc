@@ -10,6 +10,7 @@ using System.Collections.ObjectModel;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using CommunityToolkit.Maui.Alerts;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc;
 

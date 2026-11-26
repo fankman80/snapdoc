@@ -11,7 +11,7 @@ using System.Net.Http.Headers;
 using System.Text.Json;
 using static SnapDoc.Models.SyncStampExtensions;
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
 public static class SaveManager
 {

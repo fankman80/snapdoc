@@ -100,49 +100,71 @@
                             <Border.GestureRecognizers>
                                 <TapGestureRecognizer Tapped="OnEditClicked" />
                             </Border.GestureRecognizers>
-                            <Grid ColumnDefinitions="16,Auto,*,50,50"
-                                  RowDefinitions="Auto, Auto, Auto, Auto"
+                            <Grid ColumnDefinitions="60,*,44,44"
+                                  RowDefinitions="Auto, Auto, Auto,*, Auto"
                                   RowSpacing="0" ColumnSpacing="0">
-                                <Border Grid.Column="0" Grid.Row="0" Grid.RowSpan="4"
-                                        Margin="4"
-                                        WidthRequest="8"
-                                        StrokeThickness="0"
-                                        BackgroundColor="{Binding PriorityColor}"
-                                        StrokeShape="RoundRectangle 4" />
-
-                                <Label Grid.Column="1" Grid.Row="0" Grid.ColumnSpan="2"
-                                       Margin="6,4,0,0"
+                                <Label Grid.Column="0" Grid.Row="0" Grid.ColumnSpan="2"
+                                       Margin="8,4,0,0"
+                                       FontAttributes="Bold"                                       
                                        FontSize="12"
                                        Text="{Binding PlanDisplay}"
                                        MaxLines="1"
                                        LineBreakMode="TailTruncation"/>
 
-                                <Label Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"
-                                       Margin="6,0,0,0"
-                                       FontAttributes="Bold"
+                                <Label Grid.Column="0" Grid.Row="1" Grid.ColumnSpan="2"
+                                       Margin="8,0,0,0"
                                        FontSize="12"
                                        Text="{Binding PinName}"
                                        MaxLines="1"
                                        LineBreakMode="TailTruncation"/>
 
-                                <BoxView Grid.Column="1" Grid.Row="2" Grid.ColumnSpan="4"
+                                <BoxView Grid.Column="0" Grid.Row="2" Grid.ColumnSpan="4"
                                          Color="{AppThemeBinding Light={DynamicResource Primary}, Dark={DynamicResource PrimaryDarkAccent}}"
                                          HeightRequest="1"
-                                         Margin="0,0,10,0"/>
+                                         Margin="10,0,10,0"/>
 
-                                <Label Grid.Column="2" Grid.Row="3" Grid.ColumnSpan="3"
-                                       HeightRequest="64"
+                                <Label Grid.Column="1" Grid.Row="3" Grid.ColumnSpan="3"
                                        MaxLines="3"
                                        LineBreakMode="TailTruncation"
                                        FontSize="12"
-                                       Margin="6,4,10,4"
+                                       Margin="8,4,10,4"
                                        Text="{Binding PinDesc}"/>
 
-                                <Image Grid.Column="1" Grid.Row="3"
+                                <HorizontalStackLayout Grid.Column="0" Grid.Row="4" Spacing="4" Margin="8,0,0,6">
+                                    <Label Text="{x:Static local:MaterialIcons.Schedule}"
+                                           FontFamily="MaterialOutlined"
+                                           FontSize="18"/>
+                                    <Label Text="{Binding Time, StringFormat='{0:dd.MM.yy | HH:mm}'}"
+                                           VerticalTextAlignment="Center"
+                                           FontSize="11"/>
+                                    <Label IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                           Text="{x:Static local:MaterialIcons.Person}"
+                                           FontFamily="MaterialOutlined"
+                                           FontSize="18"/>
+                                    <Label IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                           Text="{Binding CreatedBy}"
+                                           VerticalTextAlignment="Center"
+                                           FontSize="11"/>
+                                </HorizontalStackLayout>
+
+                                <Border Grid.Column="0" Grid.Row="4" Grid.ColumnSpan="4"
+                                        IsVisible="{Binding PriorityKey, Converter={StaticResource IsStringNotNullOrEmptyConverter}}"
+                                        Margin="0,0,10,6"
+                                        Padding="6,2,6,2"
+                                        HorizontalOptions="End"
+                                        VerticalOptions="End"
+                                        StrokeThickness="0"
+                                        BackgroundColor="{Binding PriorityColor}"
+                                        StrokeShape="RoundRectangle 10">
+                                    <Label Text="{Binding PriorityKey}"
+                                           FontSize="11"
+                                           TextColor="{Binding PriorityColor, Converter={StaticResource ColorToColorForTextConverter}}"/>
+                                </Border>
+
+                                <Image Grid.Column="0" Grid.Row="3" Grid.RowSpan="2"
                                        x:DataType="local:PinItem"
-                                       WidthRequest="52"
-                                       HeightRequest="52"
-                                       Margin="6"
+                                       VerticalOptions="Start"
+                                       Margin="8"
                                        ClassId="{Binding SelfId}"
                                        AutomationId="{Binding OnPlanId}"
                                        Source="{Binding DisplayIconPath}"
@@ -152,7 +174,7 @@
                                     </Image.GestureRecognizers>
                                 </Image>
 
-                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                <Button Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
                                         IsVisible="{Binding IsWebMapPin}"
                                         Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         ClassId="{Binding SelfId}"
@@ -165,7 +187,7 @@
                                         ToolTipProperties.Text="{x:Static res:AppResources.pin_auf_karte_anzeigen}"
                                         Clicked="OnPinClicked"/>
 
-                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
+                                <Button Grid.Column="2" Grid.Row="0" Grid.RowSpan="2"
                                         IsVisible="{Binding IsWebMapPin, Converter={StaticResource InvertedBoolConverter}}"
                                         Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         ClassId="{Binding SelfId}"
@@ -178,7 +200,7 @@
                                         ToolTipProperties.Text="{x:Static res:AppResources.auf_pin_zentrieren}"
                                         Clicked="OnPinClicked"/>
 
-                                <Button Grid.Column="4" Grid.Row="0" Grid.RowSpan="2"
+                                <Button Grid.Column="3" Grid.Row="0" Grid.RowSpan="2"
                                         Padding="{OnPlatform Default=0, WinUI=0, iOS=4, Android=0}"
                                         Text="{Binding IsAllowExport, Converter={StaticResource ExportToGlyphConverter}}"
                                         FontSize="30"

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using SkiaSharp;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Services;
 

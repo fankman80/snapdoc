@@ -1,6 +1,6 @@
 ﻿using System.Text.Json;
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
 public static class CustomIconSync
 {

@@ -1,6 +1,6 @@
 ﻿using SnapDoc.Models;
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
 public static class SyncClock
 {

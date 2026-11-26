@@ -3,6 +3,7 @@ using CommunityToolkit.Maui.Extensions;
 using SkiaSharp;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 using System.Globalization;
 
 namespace SnapDoc.Views;

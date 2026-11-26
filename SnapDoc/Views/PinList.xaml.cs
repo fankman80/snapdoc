@@ -4,6 +4,7 @@ using SnapDoc.Messages;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Collections.ObjectModel;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 

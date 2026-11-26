@@ -55,9 +55,31 @@
                                Aspect="AspectFill">
                         </Image>
                         <VerticalStackLayout Grid.Column="1" VerticalOptions="Center" Spacing="2">
-                            <Label Text="{Binding PlanDisplay}" LineBreakMode="TailTruncation" FontSize="12" FontAttributes="Bold"/>
-                            <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}" FontSize="12"/>
-                            <controls:LocalizedLabel ResourceKey="zeit" Value="{Binding DateTime}" ValueFormat='{}: {0:HH:mm}' FontSize="12"/>
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{x:Static local:MaterialIcons.Space_dashboard}"
+                                       FontFamily="MaterialOutlined"
+                                       FontSize="20"/>
+                                <Label Text="{Binding PlanDisplay}"
+                                       VerticalTextAlignment="Center"
+                                       FontSize="12"
+                                       FontAttributes="Bold"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{x:Static local:MaterialIcons.Calendar_month}"
+                                       FontFamily="MaterialOutlined"
+                                       FontSize="20"/>
+                                <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"
+                                       VerticalTextAlignment="Center"
+                                       FontSize="12"/>
+                            </HorizontalStackLayout>
+                            <HorizontalStackLayout Spacing="6">
+                                <Label Text="{x:Static local:MaterialIcons.Schedule}"
+                                       FontFamily="MaterialOutlined"
+                                       FontSize="20"/>
+                                <Label Text="{Binding DateTime, StringFormat='{}{0:HH:mm}'}"
+                                       VerticalTextAlignment="Center"
+                                       FontSize="12"/>
+                            </HorizontalStackLayout>
                         </VerticalStackLayout>
                         <HorizontalStackLayout Grid.Column="2" Spacing="0">
                             <Button Text="{x:Static local:MaterialIcons.Keep}"

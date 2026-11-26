@@ -30,6 +30,7 @@ using Font = Mapsui.Styles.Font;
 using Map = Mapsui.Map;
 using Point = NetTopologySuite.Geometries.Point;
 using Size = Microsoft.Maui.Graphics.Size;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 

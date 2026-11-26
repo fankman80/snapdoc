@@ -5,6 +5,7 @@ using CommunityToolkit.Maui.Storage;
 using SnapDoc.Reporting;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 

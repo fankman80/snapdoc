@@ -1,6 +1,6 @@
 using System.Text.Json;
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
 /// <summary>
 /// Persistenter Sync-Zustand pro Projekt (Datei ".snapdoc_sync" im Projektordner).
@@ -129,7 +129,7 @@ internal static class SyncState
 
     // === Cloud-Loeschungen =========================================
 
-    public static void AddDelete(string relativeCloudPath) => AddDeletes([relativeCloudPath]);
+    public static void AddDelete(string relativeCloudPath) => AddDeletes((string[])[relativeCloudPath]);
 
     public static void AddDeletes(IEnumerable<string> relativeCloudPaths)
     {

@@ -1,6 +1,7 @@
 #nullable enable
 using SnapDoc.Models;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Reporting;
 
@@ -154,9 +155,9 @@ public static class ReportDataBuilder
             CustomPinsRelativePath: Path.Combine(s.ProjectPath, data.CustomPinsPath));
     }
 
-    private static IReadOnlyList<ExportPriority> BuildPriorities(SettingsService settings, IReadOnlyList<ExportPlan> plans)
+    private static List<ExportPriority> BuildPriorities(SettingsService settings, IReadOnlyList<ExportPlan> plans)
     {
-        List<ExportPin> pins = plans.SelectMany(plan => plan.Pins).ToList();
+        List<ExportPin> pins = [.. plans.SelectMany(plan => plan.Pins)];
 
         var priorities = new List<ExportPriority>();
 

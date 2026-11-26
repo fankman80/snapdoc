@@ -1,20 +1,14 @@
 ﻿using Microsoft.Identity.Client;
 using Microsoft.Kiota.Abstractions.Authentication;
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
-public class MsalAccessTokenProvider : IAccessTokenProvider
+public class MsalAccessTokenProvider(IPublicClientApplication pca, string[] scopes) : IAccessTokenProvider
 {
-    private readonly IPublicClientApplication _pca;
-    private readonly string[] _scopes;
+    private readonly IPublicClientApplication _pca = pca;
+    private readonly string[] _scopes = scopes;
 
     public AllowedHostsValidator AllowedHostsValidator { get; } = new AllowedHostsValidator();
-
-    public MsalAccessTokenProvider(IPublicClientApplication pca, string[] scopes)
-    {
-        _pca = pca;
-        _scopes = scopes;
-    }
 
     public async Task<string> GetAuthorizationTokenAsync(
         Uri uri,
@@ -22,13 +16,7 @@ public class MsalAccessTokenProvider : IAccessTokenProvider
         CancellationToken cancellationToken = default)
     {
         var accounts = await _pca.GetAccountsAsync();
-        var account = accounts.FirstOrDefault();
-
-        if (account == null)
-        {
-            throw new InvalidOperationException("Kein gespeichertes Konto verfuegbar.");
-        }
-
+        var account = accounts.FirstOrDefault() ?? throw new InvalidOperationException("Kein gespeichertes Konto verfuegbar.");
         try
         {
             // Versucht das Token im Hintergrund aus dem Cache zu laden oder stumm zu erneuern

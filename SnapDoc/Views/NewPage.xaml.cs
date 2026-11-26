@@ -10,6 +10,7 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 using SnapDoc.ViewModels;
 using System.ComponentModel;
 

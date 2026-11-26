@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Alerts;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 

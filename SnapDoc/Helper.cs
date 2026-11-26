@@ -8,6 +8,7 @@ using System.IO.Compression;
 using System.Text.Json;
 using System.Xml.Linq;
 using SnapDoc.Models;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc;
 

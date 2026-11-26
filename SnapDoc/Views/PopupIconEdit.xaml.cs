@@ -4,6 +4,7 @@ using CommunityToolkit.Maui.Views;
 using SkiaSharp;
 using SkiaSharp.Views.Maui;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;

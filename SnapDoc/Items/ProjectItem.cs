@@ -6,6 +6,7 @@ using SnapDoc.Messages;
 using SnapDoc.Models;
 using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Globalization;

@@ -7,7 +7,7 @@ using SnapDoc.Resources.Languages;
 using Microsoft.Identity.Client.Broker;
 #endif
 
-namespace SnapDoc.Services;
+namespace SnapDoc.Services.Cloud;
 
 public class AuthService
 {

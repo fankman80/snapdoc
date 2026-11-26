@@ -3,7 +3,7 @@ using CommunityToolkit.Maui.Storage;
 using SkiaSharp.Views.Maui.Controls.Hosting;
 using System.Globalization;
 using SnapDoc.Views;
-using SnapDoc.Services;
+using SnapDoc.Services.Cloud;
 
 #if ANDROID
 using Microsoft.Maui.Platform;

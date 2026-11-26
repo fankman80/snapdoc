@@ -7,6 +7,7 @@ using SnapDoc.Resources.Languages;
 using SnapDoc.Services;
 using System.Diagnostics;
 using static SnapDoc.Models.SyncStampExtensions;
+using SnapDoc.Services.Cloud;
 
 namespace SnapDoc.Views;
 
