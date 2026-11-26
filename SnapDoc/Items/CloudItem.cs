@@ -8,6 +8,7 @@ public partial class CloudItem : ObservableObject
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
     public bool IsFolder { get; set; }
+    public string DriveId { get; set; } = string.Empty;
     public bool IsBackNavigation => Id == "..";
     public bool ShowChevron => IsFolder && !IsBackNavigation;
     public DateTimeOffset? LastModified { get; set; }

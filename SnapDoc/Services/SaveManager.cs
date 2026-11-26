@@ -31,11 +31,8 @@ public static class SaveManager
     private static readonly ConcurrentDictionary<string, byte> _verifiedCloudIcons = new(StringComparer.OrdinalIgnoreCase);
     private static volatile bool _missingFilesPending;
     private static readonly ConcurrentQueue<string> _stalePlanFiles = new();
-
-    // Merge-Nebenwirkungen: veraltete Bilddateien + UI-Hinweis fuer Fotolisten
     private static readonly ConcurrentQueue<(string File, bool DropOriginal)> _staleMedia = new();
     private static volatile bool _fotosChanged;
-
     public static string? TargetFolderId { get; set; }
     public static AuthService? CurrentAuth { get; set; }
 
@@ -1220,34 +1217,24 @@ public static class SaveManager
     //  Cloud-Projekte anlegen / verknuepfen
     // ===============================================================
 
-    public static async Task<bool> SyncWithExistingFolderAsync(string parentFolderId)
+    public static async Task<bool> SyncWithExistingFolderAsync(string driveId, string parentFolderId)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn) return false;
-
+        if (string.IsNullOrEmpty(driveId) || string.IsNullOrEmpty(parentFolderId)) return false;
         try
         {
             TargetFolderId = parentFolderId;
-
-            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
-            if (myDrive?.Id == null) return false;
-
-            string driveId = myDrive.Id;
-
             await EnsureProjectSubfoldersAsync(CurrentAuth, driveId, TargetFolderId);
-
             if (GlobalJson.Data != null)
             {
                 GlobalJson.Data.CloudDriveId = driveId;
                 GlobalJson.Data.CloudFolderId = TargetFolderId;
             }
-
             MarkLocalChange();
             await SaveWithSyncCheckAsync();
-
             string? localProjectDir = Path.GetDirectoryName(GlobalJson.GetFilePath());
             if (!string.IsNullOrEmpty(localProjectDir))
                 await UploadDirectoryRecursiveAsync(driveId, TargetFolderId, localProjectDir);
-
             return true;
         }
         catch (Exception ex)
@@ -1257,37 +1244,31 @@ public static class SaveManager
         }
     }
 
-    public static async Task<(bool IsSuccess, string? DriveId, string? FolderId)> CreateAndSyncNewCloudProjectAsync(string parentFolderId)
+    public static async Task<(bool IsSuccess, string? DriveId, string? FolderId)> CreateAndSyncNewCloudProjectAsync(string driveId, string parentFolderId)
     {
         if (CurrentAuth?.GraphClient == null || !CurrentAuth.IsLoggedIn)
             return (false, null, null);
-
+        if (string.IsNullOrEmpty(driveId) || string.IsNullOrEmpty(parentFolderId))
+            return (false, null, null);
         try
         {
-            var myDrive = await CurrentAuth.GraphClient.Me.Drive.GetAsync();
-            if (myDrive?.Id == null)
-                return (false, null, null);
-
             string localFilePath = GlobalJson.GetFilePath();
             string? localProjectDir = Path.GetDirectoryName(localFilePath);
-
             string projectName = !string.IsNullOrWhiteSpace(GlobalJson.Data?.Object_name)
                 ? GlobalJson.Data.Object_name
                 : (!string.IsNullOrEmpty(localProjectDir) ? Path.GetFileName(localProjectDir) : "Projekt");
-
             string cloudFolderName = $"{DateTime.Now:yyMMdd}_{SanitizeName(projectName)}";
 
-            var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, myDrive.Id, parentFolderId, cloudFolderName);
+            var projectFolder = await GetOrCreateFolderAsync(CurrentAuth, driveId, parentFolderId, cloudFolderName);
             if (projectFolder?.Id == null)
                 return (false, null, null);
 
             TargetFolderId = projectFolder.Id;
-
-            await EnsureProjectSubfoldersAsync(CurrentAuth, myDrive.Id, TargetFolderId);
+            await EnsureProjectSubfoldersAsync(CurrentAuth, driveId, TargetFolderId);
 
             if (GlobalJson.Data != null)
             {
-                GlobalJson.Data.CloudDriveId = myDrive.Id;
+                GlobalJson.Data.CloudDriveId = driveId;
                 GlobalJson.Data.CloudFolderId = TargetFolderId;
                 GlobalJson.SaveToFile();
             }
@@ -1296,9 +1277,9 @@ public static class SaveManager
             await SaveWithSyncCheckAsync();
 
             if (!string.IsNullOrEmpty(localProjectDir))
-                await UploadDirectoryRecursiveAsync(myDrive.Id, TargetFolderId, localProjectDir);
+                await UploadDirectoryRecursiveAsync(driveId, TargetFolderId, localProjectDir);
 
-            return (true, myDrive.Id, TargetFolderId);
+            return (true, driveId, TargetFolderId);
         }
         catch (Exception ex)
         {

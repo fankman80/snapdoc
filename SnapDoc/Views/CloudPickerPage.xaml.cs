@@ -13,15 +13,23 @@ namespace SnapDoc.Views;
 [QueryProperty(nameof(ModeParam), "mode")]
 public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 {
-    private string _currentDriveId = string.Empty;
     private CloudPickerMode _mode = CloudPickerMode.SelectFolder;
     private bool _isInitialized;
+    private bool _isNavigating;
     private static TaskCompletionSource<CloudFolderSelection?>? _folderPickTcs;
     private CloudFolderSelection? _pickedFolder;
     private static readonly SemaphoreSlim _objectNameLookupGate = new(4);
     public bool ShowEmptyState => IsJsonMode && IsListEmpty;
+
     private static string _pendingExportFileName = string.Empty;
     private string _exportFileName = string.Empty;
+
+    /// <summary>
+    /// Drive des aktuell angezeigten Ordners. Kann das eigene OneDrive sein oder –
+    /// nach Oeffnen eines geteilten Ordners – das Drive einer anderen Person / SharePoint.
+    /// </summary>
+    private string CurrentDriveId => Breadcrumbs.LastOrDefault()?.DriveId ?? string.Empty;
+
     public string ExportFileName
     {
         get => _exportFileName;
@@ -48,7 +56,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 OnPropertyChanged(nameof(IsExportMode));
                 OnPropertyChanged(nameof(IsFolderSelection));
                 OnPropertyChanged(nameof(HeaderSubtitle));
-                OnPropertyChanged(nameof(ActionButtonText));
                 OnPropertyChanged(nameof(ActionButtonText));
                 OnPropertyChanged(nameof(ShowEmptyState));
             }
@@ -107,19 +114,17 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             return;
         try
         {
+            // Einstiegspunkt bleibt das eigene OneDrive. Geteilte Ordner erscheinen
+            // darin als Verknuepfung ("Zu Meine Dateien hinzufuegen").
             var myDrive = await SaveManager.CurrentAuth.GraphClient.Me.Drive.GetAsync();
             if (myDrive != null && !string.IsNullOrEmpty(myDrive.Id))
             {
-                _currentDriveId = myDrive.Id;
-
                 string rootName = !string.IsNullOrWhiteSpace(myDrive.Name)
                     ? myDrive.Name
                     : "Cloud";
-
                 Breadcrumbs.Clear();
-                Breadcrumbs.Add(new BreadcrumbItem { Id = "root", Name = rootName, IsLast = true });
-
-                await LoadFolderContentAsync("root");
+                Breadcrumbs.Add(new BreadcrumbItem { DriveId = myDrive.Id, Id = "root", Name = rootName, IsLast = true });
+                await LoadFolderContentAsync(myDrive.Id, "root");
             }
         }
         catch (Exception ex)
@@ -128,29 +133,35 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
     }
 
-    private async Task LoadFolderContentAsync(string folderId)
+    private async Task<bool> LoadFolderContentAsync(string driveId, string folderId)
     {
         if (SaveManager.CurrentAuth?.GraphClient == null)
-            return;
-
+            return false;
         try
         {
             var children = await SaveManager.CurrentAuth.GraphClient
-                .Drives[_currentDriveId]
+                .Drives[driveId]
                 .Items[folderId]
                 .Children
                 .GetAsync(config =>
                 {
-                    config.QueryParameters.Select = ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference"];
+                    config.QueryParameters.Select =
+                        ["id", "name", "folder", "file", "lastModifiedDateTime", "parentReference", "remoteItem"];
                 });
 
             CloudItems.Clear();
-
             if (children?.Value != null)
             {
                 foreach (var item in children.Value)
                 {
-                    bool isFolder = item.Folder != null;
+                    // Geteilter Ordner als Verknuepfung: zeigt auf das Drive einer anderen Person.
+                    // item.Folder ist hier null, die echten Daten stehen in RemoteItem.
+                    var remote = item.RemoteItem;
+                    bool isShortcut = remote?.Folder != null
+                                      && !string.IsNullOrEmpty(remote.Id)
+                                      && !string.IsNullOrEmpty(remote.ParentReference?.DriveId);
+
+                    bool isFolder = item.Folder != null || isShortcut;
                     bool isFile = item.File != null;
                     bool isJson = isFile && item.Name?.EndsWith(".json", StringComparison.OrdinalIgnoreCase) == true;
 
@@ -160,7 +171,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
                     var cloudItem = new CloudItem
                     {
-                        Id = item.Id ?? string.Empty,
+                        Id = isShortcut ? remote!.Id! : item.Id ?? string.Empty,
+                        DriveId = isShortcut ? remote!.ParentReference!.DriveId! : driveId,
                         Name = item.Name ?? "Unbekannt",
                         IsFolder = isFolder,
                         LastModified = item.LastModifiedDateTime
@@ -171,12 +183,11 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                     {
                         cloudItem.RemoteProject = new RemoteProjectDto
                         {
-                            DriveId = item.ParentReference?.DriveId ?? _currentDriveId,
+                            DriveId = item.ParentReference?.DriveId ?? driveId,
                             FolderId = item.ParentReference?.Id ?? folderId,
                             FileName = item.Name ?? string.Empty,
                             LastModified = item.LastModifiedDateTime ?? DateTimeOffset.MinValue
                         };
-
                         // Objektbezeichnung im Hintergrund nachladen
                         _ = ResolveObjectNameAsync(cloudItem);
                     }
@@ -187,10 +198,12 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 
             OnPropertyChanged(nameof(IsListEmpty));
             OnPropertyChanged(nameof(ShowEmptyState));
+            return true;
         }
         catch (Exception ex)
         {
             await this.ShowPopupAsync(new PopupAlert($"{AppResources.ordnerinhalt_konnte_nicht_geladen_werden}: {ex.Message}", AppResources.fehler), Settings.PopupOptions);
+            return false;
         }
     }
 
@@ -202,12 +215,9 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private static async Task ResolveObjectNameAsync(CloudItem cloudItem)
     {
         var project = cloudItem.RemoteProject;
-
         if (project == null || SaveManager.CurrentAuth?.GraphClient == null)
             return;
-
         await _objectNameLookupGate.WaitAsync();
-
         try
         {
             await using var stream = await SaveManager.CurrentAuth.GraphClient
@@ -216,20 +226,15 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 .ItemWithPath(project.FileName)
                 .Content
                 .GetAsync();
-
             if (stream == null)
                 return;
-
             using var document = await JsonDocument.ParseAsync(stream);
-
             if (document.RootElement.TryGetProperty("Object_name", out var property))
             {
                 string? objectName = property.GetString();
-
                 if (!string.IsNullOrWhiteSpace(objectName))
                 {
                     project.ObjectName = objectName;
-
                     MainThread.BeginInvokeOnMainThread(() =>
                     {
                         cloudItem.ObjectName = objectName;
@@ -251,32 +256,38 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         if (e.CurrentSelection.Count == 0 || e.CurrentSelection[0] is not CloudItem selectedItem)
             return;
-
         if (sender is CollectionView cv)
             cv.SelectedItem = null;
 
-        // Ordner öffnen
+        // Ordner öffnen (auch geteilte Ordner – dann wechselt das Drive)
         if (selectedItem.IsFolder)
         {
+            if (_isNavigating)
+                return;
+            _isNavigating = true;
             try
             {
                 await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
 
-                // Breadcrumb aktualisieren
+                if (!await LoadFolderContentAsync(selectedItem.DriveId, selectedItem.Id))
+                    return; // Breadcrumbs bleiben unverändert
+
                 if (Breadcrumbs.Count > 0)
                     Breadcrumbs.Last().IsLast = false;
-
-                Breadcrumbs.Add(new BreadcrumbItem { Id = selectedItem.Id, Name = selectedItem.Name, IsLast = true });
-
+                Breadcrumbs.Add(new BreadcrumbItem
+                {
+                    DriveId = selectedItem.DriveId,
+                    Id = selectedItem.Id,
+                    Name = selectedItem.Name,
+                    IsLast = true
+                });
                 ScrollBreadcrumbsToRight();
-
-                await LoadFolderContentAsync(selectedItem.Id);
             }
             finally
             {
                 await BusyService.HideAsync();
+                _isNavigating = false;
             }
-
             return;
         }
 
@@ -290,12 +301,8 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         // Nur im JSON-Modus können Dateien ausgewählt werden
         if (!IsJsonMode)
             return;
-
-        // JSON-Datei?
         if (!selectedItem.Name.EndsWith(".json", StringComparison.OrdinalIgnoreCase))
             return;
-
-        // RemoteProjectDto vorhanden?
         if (selectedItem.RemoteProject == null)
         {
             await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
@@ -303,8 +310,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         }
 
         var project = selectedItem.RemoteProject;
-
-        // Bestätigung - bevorzugt die Objektbezeichnung aus der JSON, sonst Fallback auf Dateinamen
         string projectName = project.DisplayName;
         var popup = new PopupDualResponse(string.Format(AppResources.projekt_wirklich_herunterladen, projectName), AppResources.info);
         var result = await this.ShowPopupAsync<DualPopupResult>(popup, Settings.PopupOptions);
@@ -313,27 +318,21 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         try
         {
             await BusyService.ShowAsync(AppResources.projekt_wird_heruntergeladen);
-
             bool success = await SaveManager.DownloadRemoteProjectAsync(project);
-
+            await BusyService.HideAsync();
             if (success)
             {
-                await BusyService.HideAsync();
                 await this.ShowPopupAsync(new PopupAlert(AppResources.projekt_erfolgreich_heruntergeladen, AppResources.info), Settings.PopupOptions);
-
-                // Picker verlassen
                 await Navigation.PopAsync();
             }
             else
             {
-                await BusyService.HideAsync();
                 await this.ShowPopupAsync(new PopupAlert(AppResources.fehler_beim_herunterladen_des_projekts, AppResources.fehler), Settings.PopupOptions);
             }
         }
         catch (Exception ex)
         {
             System.Diagnostics.Debug.WriteLine($"Fehler beim Herunterladen des Projekts: {ex}");
-
             await BusyService.HideAsync();
             await this.ShowPopupAsync(new PopupAlert(ex.Message, AppResources.fehler), Settings.PopupOptions);
         }
@@ -342,37 +341,40 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     private async void OnBreadcrumbTapped(object? sender, TappedEventArgs e)
     {
         var tappedItem = e.Parameter as BreadcrumbItem ?? (sender as Element)?.BindingContext as BreadcrumbItem;
-
-        if (tappedItem == null) return;
-
-        if (tappedItem.IsLast) return;
+        if (tappedItem == null || tappedItem.IsLast || _isNavigating)
+            return;
 
         int targetIndex = Breadcrumbs.IndexOf(tappedItem);
-        if (targetIndex == -1) return;
+        if (targetIndex == -1)
+            return;
 
-        while (Breadcrumbs.Count > targetIndex + 1)
-        {
-            Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
-        }
-        Breadcrumbs.Last().IsLast = true;
-
+        _isNavigating = true;
         try
         {
             await BusyService.ShowAsync(AppResources.verzeichnis_wird_geladen);
-            await LoadFolderContentAsync(tappedItem.Id);
 
+            if (!await LoadFolderContentAsync(tappedItem.DriveId, tappedItem.Id))
+                return;
+
+            while (Breadcrumbs.Count > targetIndex + 1)
+                Breadcrumbs.RemoveAt(Breadcrumbs.Count - 1);
+            Breadcrumbs.Last().IsLast = true;
             ScrollBreadcrumbsToRight();
         }
         finally
         {
             await BusyService.HideAsync();
+            _isNavigating = false;
         }
     }
 
+
     private async void OnSelectFolderClicked(object? sender, EventArgs e)
     {
-        if (Breadcrumbs.Count == 0 || string.IsNullOrEmpty(_currentDriveId))
+        if (Breadcrumbs.Count == 0 || string.IsNullOrEmpty(CurrentDriveId))
             return;
+
+        var current = Breadcrumbs.Last();
 
         // Export-Modus: nur Ordner zurückgeben, Upload macht ExportSettings
         if (IsExportMode)
@@ -383,8 +385,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 await this.ShowPopupAsync(new PopupAlert(AppResources.ungueltiger_dateiname, AppResources.fehler), Settings.PopupOptions);
                 return;
             }
-
-            // Überschreiben bestätigen, wenn die Datei im Ordner schon existiert
             bool exists = CloudItems.Any(i => !i.IsFolder && string.Equals(i.Name, fileName, StringComparison.OrdinalIgnoreCase));
             if (exists)
             {
@@ -393,9 +393,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
                 if (result?.Result is not DualPopupResult.Ok)
                     return;
             }
-
-            var current = Breadcrumbs.Last();
-            _pickedFolder = new CloudFolderSelection(_currentDriveId, current.Id, current.Name, fileName);
+            _pickedFolder = new CloudFolderSelection(current.DriveId, current.Id, current.Name, fileName);
             await Navigation.PopAsync();
             CompleteFolderPick();
             return;
@@ -404,32 +402,15 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         if (!IsFolderMode)
             return;
 
-        string currentFolderId = Breadcrumbs.Last().Id;
-
-        // Nur isSuccess wird ganz am Ende der Methode noch benötigt
         bool isSuccess = false;
-
         try
         {
             await BusyService.ShowAsync(AppResources.projekt_wird_hochgeladen);
-
-            // Die Methode gibt die Werte direkt in die neu erstellten Variablen success, driveId und folderId
-            var (success, driveId, folderId) = await SaveManager.CreateAndSyncNewCloudProjectAsync(currentFolderId);
-
-            // Den Status für die spätere Navigation speichern
+            var (success, driveId, folderId) =
+                await SaveManager.CreateAndSyncNewCloudProjectAsync(current.DriveId, current.Id);
             isSuccess = success;
-
-            if (isSuccess && !string.IsNullOrEmpty(folderId))
-            {
-                // 1. Lokale Daten im RAM aktualisieren (direkte Nutzung der Tuple-Variablen)
-                GlobalJson.Data.CloudDriveId = driveId;
-                GlobalJson.Data.CloudFolderId = folderId;
-
-                // 2. Lokale JSON direkt speichern
-                string json = System.Text.Json.JsonSerializer.Serialize(GlobalJson.Data, GlobalJson.GetOptions());
-                string filePath = Path.Combine(Settings.DataDirectory, SettingsService.Instance.ProjectPath, SettingsService.DefaultJson);
-                File.WriteAllText(filePath, json);
-            }
+            // CloudDriveId/CloudFolderId setzt und speichert CreateAndSyncNewCloudProjectAsync bereits
+            // (GlobalJson.SaveToFile). Das fruehere manuelle File.WriteAllText ist daher entfallen.
         }
         catch (Exception ex)
         {
@@ -454,33 +435,25 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
         string name = input?.Trim() ?? string.Empty;
         if (name.Length == 0)
             return null;
-
-        // In OneDrive/SharePoint nicht erlaubte Zeichen
         char[] invalid = ['"', '*', ':', '<', '>', '?', '/', '\\', '|'];
         if (name.IndexOfAny(invalid) >= 0 || name.EndsWith('.'))
             return null;
-
         if (!name.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
             name += ".docx";
-
         return name;
     }
 
     private async void ScrollBreadcrumbsToRight()
     {
         await Task.Delay(50);
-
         MainThread.BeginInvokeOnMainThread(async () =>
         {
             try
             {
                 double contentWidth = BreadcrumbScrollView.ContentSize.Width;
                 double viewportWidth = BreadcrumbScrollView.Width;
-
                 if (contentWidth > viewportWidth)
-                {
                     await BreadcrumbScrollView.ScrollToAsync(contentWidth - viewportWidth, 0, true);
-                }
             }
             catch
             {
@@ -495,13 +468,10 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     /// </summary>
     public static async Task<CloudFolderSelection?> PickExportFolderAsync(string? defaultFileName = null)
     {
-        // Evtl. hängenden alten Aufruf sauber beenden
         _folderPickTcs?.TrySetResult(null);
-
         var tcs = new TaskCompletionSource<CloudFolderSelection?>(TaskCreationOptions.RunContinuationsAsynchronously);
         _folderPickTcs = tcs;
         _pendingExportFileName = defaultFileName ?? string.Empty;
-
         try
         {
             await Shell.Current.GoToAsync($"cloudPickerPage?mode={CloudPickerMode.SelectExportFolder}");
@@ -512,7 +482,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
             _folderPickTcs = null;
             return null;
         }
-
         return await tcs.Task;
     }
 
@@ -520,7 +489,6 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     {
         if (!IsExportMode)
             return;
-
         var tcs = _folderPickTcs;
         _folderPickTcs = null;
         tcs?.TrySetResult(_pickedFolder);
@@ -529,13 +497,12 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
     protected override void OnNavigatedFrom(NavigatedFromEventArgs args)
     {
         base.OnNavigatedFrom(args);
-
-        // Nur wenn die Seite wirklich entfernt wurde (nicht bei Popups/BusyService)
         if (!Navigation.NavigationStack.Contains(this))
             CompleteFolderPick();
     }
 
     public new event PropertyChangedEventHandler? PropertyChanged;
+
     protected new void OnPropertyChanged([CallerMemberName] string? propertyName = null)
     {
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName ?? string.Empty));
@@ -545,6 +512,7 @@ public partial class CloudPickerPage : ContentPage, INotifyPropertyChanged
 public partial class BreadcrumbItem : INotifyPropertyChanged
 {
     private bool _isLast;
+    public string DriveId { get; set; } = string.Empty;
     public string Id { get; set; } = string.Empty;
     public string Name { get; set; } = string.Empty;
 
