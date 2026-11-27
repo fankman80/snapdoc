@@ -121,6 +121,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 OnPlanId = PlanId,
                 OnPinId = PinId,
                 AllowExport = img.AllowExport,
+                CreatedBy = img.CreatedBy ?? string.Empty,
                 DateTime = img.DateTime
             }.Initialize())
             .ToList();
@@ -411,7 +412,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 AllowExport = true,
                 File = path.FileName,
                 DateTime = DateTime.Now,
-                ImageSize = imgSize
+                ImageSize = imgSize,
+                CreatedBy = SettingsService.Instance.CurrentUserName ?? string.Empty
             };
 
             newImageData.Touch();
@@ -430,6 +432,7 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 OnPlanId = PlanId,
                 OnPinId = PinId,
                 AllowExport = true,
+                CreatedBy = newImageData.CreatedBy,
                 DateTime = newImageData.DateTime
             }.Initialize();
 
@@ -475,7 +478,8 @@ public partial class SetPin : ContentPage, IQueryAttributable
                 {
                     File = fileName,
                     AllowExport = image.AllowExport,
-                    DateTime = image.DateTime
+                    DateTime = image.DateTime,
+                    CreatedBy = image.CreatedBy ?? string.Empty
                 };
 
                 created.Touch();

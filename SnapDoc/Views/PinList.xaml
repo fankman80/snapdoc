@@ -154,8 +154,7 @@
                                            Text="{Binding PinDesc}"
                                            FontSize="12"
                                            MaxLines="3"
-                                           LineBreakMode="TailTruncation"
-                                           Margin="0,0,0,2"/>
+                                           LineBreakMode="TailTruncation"/>
 
                                     <!-- 2. Ersteller: ausgeblendet wenn leer -->
                                     <HorizontalStackLayout Grid.Column="1" Grid.Row="1" Grid.ColumnSpan="2"

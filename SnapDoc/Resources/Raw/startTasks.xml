@@ -1,4 +1,9 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <Commands>
 	<Command Type = "" Target = "" />
+    <Command Type = "Delete" Target = "templates/template_ebbe.docx" />
+	<Command Type = "Delete" Target = "templates/ebbe_template.docx" />
+	<Command Type = "Delete" Target = "templates/sample_template.docx" />
+    <Command Type = "Copy" Target = "templates/template_ebbe.docx" />
+	<Command Type = "Copy" Target = "templates/sample_template.docx" />
 </Commands>

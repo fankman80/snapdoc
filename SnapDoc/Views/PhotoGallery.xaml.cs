@@ -95,6 +95,7 @@ public partial class FotoGalleryView : ContentPage
                                                 GlobalJson.Data.ThumbnailPath, file),
                         DateTime = foto.DateTime,
                         AllowExport = foto.AllowExport,
+                        CreatedBy = foto.CreatedBy ?? string.Empty,
                         OnPlanId = planId,
                         OnPinId = pinId,
                         FotoKey = fotoKey

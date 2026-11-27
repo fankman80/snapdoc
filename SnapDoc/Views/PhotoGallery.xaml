@@ -66,20 +66,19 @@
                                        FontAttributes="Bold"/>
                             </HorizontalStackLayout>
                             <HorizontalStackLayout Spacing="6">
-                                <Label Text="{x:Static local:MaterialIcons.Calendar_month}"
-                                       VerticalTextAlignment="Center"
+                                <Label Text="{x:Static local:MaterialIcons.Schedule}"
                                        FontFamily="MaterialOutlined"
                                        FontSize="16"/>
-                                <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy}'}"
+                                <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"/>
                             </HorizontalStackLayout>
-                            <HorizontalStackLayout Spacing="6">
-                                <Label Text="{x:Static local:MaterialIcons.Schedule}"
-                                       VerticalTextAlignment="Center"
+                            <HorizontalStackLayout Spacing="6"
+                                       IsVisible="{Binding CreatedBy, Converter={StaticResource IsStringNotNullOrEmptyConverter}}">
+                                <Label Text="{x:Static local:MaterialIcons.Person}"
                                        FontFamily="MaterialOutlined"
                                        FontSize="16"/>
-                                <Label Text="{Binding DateTime, StringFormat='{}{0:HH:mm}'}"
+                                <Label Text="{Binding CreatedBy}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"/>
                             </HorizontalStackLayout>

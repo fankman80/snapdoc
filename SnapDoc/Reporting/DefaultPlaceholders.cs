@@ -39,6 +39,7 @@ public static class DefaultPlaceholders
         Text(r, "report_filename", ScopeKind.Project, _ => session.ReportFileName);
         Text(r, "template_name", ScopeKind.Project, _ => session.TemplateName);
         Text(r, "photo_filename", ScopeKind.Photo, c => Path.GetFileName( c.Scope.Photo!.File));
+        Text(r, "photo_createdBy", ScopeKind.Photo, c => c.Scope.Photo!.CreatedBy);
         Text(r, "plan_filename", ScopeKind.Plan, c => Path.GetFileName( c.Scope.Plan!.File));
         Text(r, "row_nr", ScopeKind.Project, c => c.Scope.RowNumber > 0 ? c.Scope.RowNumber.ToString() : null);
         Text(r, "row_count", ScopeKind.Project, c => c.Scope.RowCount > 0 ? c.Scope.RowCount.ToString() : null);
@@ -63,7 +64,7 @@ public static class DefaultPlaceholders
         r.Register(new PlaceholderDefinition("plan_images", PlaceholderKind.Block, ScopeKind.Project, SizeArgs, plans.PlanImages));
         r.Register(new PlaceholderDefinition("pin_posIcon", PlaceholderKind.Inline, ScopeKind.Pin, SizeArgs, images.PinIcon));
         r.Register(new PlaceholderDefinition("pin_posImage", PlaceholderKind.Inline, ScopeKind.Plan | ScopeKind.Pin, SizeArgs, images.PinPositionImage));
-        r.Register(new PlaceholderDefinition("pin_fotoList", PlaceholderKind.Inline, ScopeKind.Pin, SizeArgs, images.PinPhotoList));
+        r.Register(new PlaceholderDefinition("pin_photoList", PlaceholderKind.Inline, ScopeKind.Pin, SizeArgs, images.PinPhotoList));
         r.Register(new PlaceholderDefinition("photo_image", PlaceholderKind.Inline, ScopeKind.Photo, SizeArgs, images.Photo));
         r.Register(new PlaceholderDefinition("repeat", PlaceholderKind.Marker, ScopeKind.Project, Array.Empty<string>(), _ => PlaceholderResult.Empty));
         r.Register(new PlaceholderDefinition("pin_nr", PlaceholderKind.Inline, ScopeKind.Pin, Array.Empty<string>(), c => 

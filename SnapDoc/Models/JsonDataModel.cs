@@ -23,15 +23,6 @@ public abstract partial class SyncModel : ObservableObject, ISyncStamped
 
         this.Touch();
     }
-
-    protected bool SetPlain<T>(ref T field, T value)
-    {
-        if (EqualityComparer<T>.Default.Equals(field, value))
-            return false;
-        field = value;
-        this.Touch();
-        return true;
-    }
 }
 
 // =====================================================================
@@ -50,21 +41,9 @@ public partial class JsonDataModel : SyncModel
     [ObservableProperty] public partial string Project_manager { get; set; }
     [ObservableProperty] public partial string TitleImage { get; set; }
     [ObservableProperty] public partial string CustomIconsPath { get; set; }
+    [ObservableProperty] public partial DateTime Creation_date { get; set; }
+    [ObservableProperty] public partial Size TitleImageSize { get; set; }
 
-    private DateTime _creation_date;
-    public DateTime Creation_date
-    {
-        get => _creation_date;
-        set => SetPlain(ref _creation_date, value);
-    }
-
-    private Size _titleImageSize;
-    public Size TitleImageSize
-    {
-        get => _titleImageSize;
-        set => SetPlain(ref _titleImageSize, value);
-    }
-    
     public string PlanPath { get; set; }
     public string ImagePath { get; set; }
     public string ThumbnailPath { get; set; }
@@ -87,20 +66,8 @@ public partial class Plan : SyncModel
     [ObservableProperty] public partial int PinCount { get; set; }
     [ObservableProperty] public partial string MeasureUnit { get; set; }
     [ObservableProperty] public partial float MeasureFactor { get; set; }
-
-    private string _file;
-    public string File
-    {
-        get => _file;
-        set => SetPlain(ref _file, value);
-    }
-
-    private Size _imageSize;
-    public Size ImageSize
-    {
-        get => _imageSize;
-        set => SetPlain(ref _imageSize, value);
-    }
+    [ObservableProperty] public partial string File { get; set; }
+    [ObservableProperty] public partial Size ImageSize { get; set; }
 
     public Dictionary<string, Pin> Pins { get; set; } = [];
     protected override bool IsDerived(string propertyName) => propertyName == nameof(PinCount);
@@ -126,60 +93,18 @@ public partial class Pin : SyncModel
     [ObservableProperty] public partial bool IsLockPosition { get; set; }
     [ObservableProperty] public partial bool IsLockRotate { get; set; }
     [ObservableProperty] public partial bool IsLockAutoScale { get; set; }
+    [ObservableProperty] public partial Point Pos { get; set; }
+    [ObservableProperty] public partial Point Anchor { get; set; }
+    [ObservableProperty] public partial Size Size { get; set; }
+    [ObservableProperty] public partial double PinScale { get; set; }
+    [ObservableProperty] public partial double PinRotation { get; set; }
+    [ObservableProperty] public partial SKColor PinColor { get; set; }
+    [ObservableProperty] public partial bool IsWebMapPin { get; set; }
 
     [JsonPropertyName("PinPriority")]
     [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
 
     public int? LegacyPinPriority { get; set; }
-    private Point _pos;
-    public Point Pos
-    {
-        get => _pos;
-        set => SetPlain(ref _pos, value);
-    }
-
-    private Point _anchor;
-    public Point Anchor
-    {
-        get => _anchor;
-        set => SetPlain(ref _anchor, value);
-    }
-
-    private Size _size;
-    public Size Size
-    {
-        get => _size;
-        set => SetPlain(ref _size, value);
-    }
-
-    private double _pinScale;
-    public double PinScale
-    {
-        get => _pinScale;
-        set => SetPlain(ref _pinScale, value);
-    }
-
-    private double _pinRotation;
-    public double PinRotation
-    {
-        get => _pinRotation;
-        set => SetPlain(ref _pinRotation, value);
-    }
-
-    private SKColor _pinColor;
-    public SKColor PinColor
-    {
-        get => _pinColor;
-        set => SetPlain(ref _pinColor, value);
-    }
-
-    private bool _isWebMapPin;
-    public bool IsWebMapPin
-    {
-        get => _isWebMapPin;
-        set => SetPlain(ref _isWebMapPin, value);
-    }
-
     public string SelfId { get; set; }
     public Dictionary<string, Foto> Fotos { get; set; } = [];
 }
@@ -190,34 +115,11 @@ public partial class Pin : SyncModel
 public partial class Foto : SyncModel
 {
     [ObservableProperty] public partial bool AllowExport { get; set; }
-
-    private string _file;
-    public string File
-    {
-        get => _file;
-        set => SetPlain(ref _file, value);
-    }
-
-    private bool _hasOverlay;
-    public bool HasOverlay
-    {
-        get => _hasOverlay;
-        set => SetPlain(ref _hasOverlay, value);
-    }
-
-    private DateTime _dateTime;
-    public DateTime DateTime
-    {
-        get => _dateTime;
-        set => SetPlain(ref _dateTime, value);
-    }
-
-    private Size _imageSize;
-    public Size ImageSize
-    {
-        get => _imageSize;
-        set => SetPlain(ref _imageSize, value);
-    }
+    [ObservableProperty] public partial string CreatedBy { get; set; }
+    [ObservableProperty] public partial string File { get; set; }
+    [ObservableProperty] public partial bool HasOverlay { get; set; }
+    [ObservableProperty] public partial DateTime DateTime { get; set; }
+    [ObservableProperty] public partial Size ImageSize { get; set; }
 }
 
 // =====================================================================

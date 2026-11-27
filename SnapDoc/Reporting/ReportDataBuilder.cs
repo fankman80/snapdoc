@@ -84,6 +84,7 @@ public static class ReportDataBuilder
                         (float)photo.ImageSize.Width,
                         (float)photo.ImageSize.Height),
                     HasOverlay: photo.HasOverlay,
+                    CreatedBy: photo.CreatedBy ?? string.Empty,
                     CapturedAt: photo.DateTime,
                     ModifiedAt: photo.ModifiedAt))
             .ToList();

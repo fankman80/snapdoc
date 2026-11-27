@@ -204,11 +204,11 @@ public partial class PinItem : ModelItem<Pin>
         get => Model.PinLocation;
         set => SetModel(Model.PinLocation, value, v => Model.PinLocation = v, [nameof(PlanDisplay)]);
     }
- 
+
     public string CreatedBy
     {
         get => Model.CreatedBy;
-        set => SetModel(Model.CreatedBy, value, v => Model.CreatedBy = v, [nameof(PlanDisplay)]);
+        set => SetModel(Model.CreatedBy, value, v => Model.CreatedBy = v);
     }
 
     public string PinIcon
@@ -331,9 +331,7 @@ public partial class PinItem : ModelItem<Pin>
                 Notify(nameof(PinLocation), nameof(PlanDisplay));
                 break;
 
-            case nameof(Pin.CreatedBy):
-                Notify(nameof(CreatedBy), nameof(PlanDisplay));
-                break;
+            case nameof(Pin.CreatedBy): Notify(nameof(CreatedBy)); break;
 
             case nameof(Pin.PinIcon):
                 Notify(nameof(PinIcon), nameof(DisplayIconPath));
@@ -380,6 +378,7 @@ public partial class FotoItem : ObservableObject
     public DateTime DateTime { get; set; }
     public string OnPlanId { get; set; }
     public string OnPinId { get; set; }
+    public string CreatedBy { get; set; }
     public double DisplayOpacity => AllowExport ? 1.0 : 0.3;
     public string PlanDisplay =>
         GlobalJson.Data?.Plans != null && GlobalJson.Data.Plans.TryGetValue(OnPlanId, out var plan)

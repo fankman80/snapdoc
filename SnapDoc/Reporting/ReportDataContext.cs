@@ -50,6 +50,7 @@ public sealed record ExportFoto(
     string File,
     SizeF ImageSize,
     bool HasOverlay,
+    string CreatedBy,
     DateTime CapturedAt,
     DateTimeOffset ModifiedAt);
 

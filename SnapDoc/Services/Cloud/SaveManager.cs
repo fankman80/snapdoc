@@ -796,6 +796,7 @@ public static class SaveManager
                 localFoto.File = cloudFoto.File;
                 localFoto.HasOverlay = cloudFoto.HasOverlay;
                 localFoto.DateTime = cloudFoto.DateTime;
+                localFoto.CreatedBy = cloudFoto.CreatedBy;
                 localFoto.ImageSize = cloudFoto.ImageSize;
                 localFoto.DeletedAt = cloudFoto.DeletedAt;
                 localFoto.ModifiedAt = cloudFoto.ModifiedAt;

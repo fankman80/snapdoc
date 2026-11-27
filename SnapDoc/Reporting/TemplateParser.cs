@@ -86,7 +86,7 @@ internal static class ParagraphText
 ///
 /// ${pin_name}
 /// ${pin_location|fallback=Keine Angabe}
-/// ${pin_fotoList|width=40|height=80}
+/// ${pin_photoList|width=40|height=80}
 /// ${pin_captureDate|format=dd.MM.yyyy}
 /// ${creation_date|format=dddd, dd. MMMM yyyy|culture=de-CH}
 /// ${repeat:pins}
