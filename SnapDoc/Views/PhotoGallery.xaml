@@ -69,7 +69,7 @@
                                 <Label Text="{x:Static local:MaterialIcons.Schedule}"
                                        FontFamily="MaterialOutlined"
                                        FontSize="16"/>
-                                <Label Text="{Binding DateTime, StringFormat='{0:dddd dd.MM.yyyy | HH:mm}'}"
+                                <Label Text="{Binding DateTime, StringFormat='{0:dd.MM.yyyy | HH:mm}'}"
                                        VerticalTextAlignment="Center"
                                        FontSize="12"/>
                             </HorizontalStackLayout>

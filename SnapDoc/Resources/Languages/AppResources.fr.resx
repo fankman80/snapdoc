@@ -1409,4 +1409,7 @@ Voulez-vous remplacer le modèle existant ?</value>
   <data name="farben_invertieren" xml:space="preserve">
     <value>Inverser les couleurs</value>
   </data>
+  <data name="nach_ersteller" xml:space="preserve">
+    <value>par créateur</value>
+  </data>
 </root>

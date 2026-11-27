@@ -2131,6 +2131,15 @@ namespace SnapDoc.Resources.Languages {
         }
         
         /// <summary>
+        ///   Sucht eine lokalisierte Zeichenfolge, die nach Ersteller ähnelt.
+        /// </summary>
+        internal static string nach_ersteller {
+            get {
+                return ResourceManager.GetString("nach_ersteller", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Sucht eine lokalisierte Zeichenfolge, die nach Farbe ähnelt.
         /// </summary>
         internal static string nach_farbe {

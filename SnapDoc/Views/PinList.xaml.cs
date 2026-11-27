@@ -130,6 +130,7 @@ public partial class PinList : ContentPage
             if (selectedCrit == crits[4]) return pin.IsAllowExport;
             if (selectedCrit == crits[5]) return pin.Time;
             if (selectedCrit == crits[6]) return PriorityRank(pin.PriorityKey);
+            if (selectedCrit == crits[7]) return pin.CreatedBy;
             return pin.Time; // Default
         }
 

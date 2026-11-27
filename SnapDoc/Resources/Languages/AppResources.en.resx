@@ -1409,4 +1409,7 @@ Do you want to replace the existing template?</value>
   <data name="farben_invertieren" xml:space="preserve">
     <value>Invert colors</value>
   </data>
+  <data name="nach_ersteller" xml:space="preserve">
+    <value>by creator</value>
+  </data>
 </root>

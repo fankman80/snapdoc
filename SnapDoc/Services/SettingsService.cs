@@ -21,13 +21,10 @@ public partial class SettingsService : ObservableObject
     public const string FlyoutHeaderDesc = "by Emch+Berger AG Bern";
     public const string FlyoutHeaderImageThumb = "banner_thumbnail.png";
     public const string DefaultJson = "snapdoc_data.json";
-
     private static readonly Lazy<SettingsService> _instance = new(() => new SettingsService());
     public static SettingsService Instance => _instance.Value;
-
     private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
 
-    // Alle mit [Persist] markierten Properties (einmalig per Reflection ermittelt)
     private static readonly PropertyInfo[] PersistedProperties =
         [.. typeof(SettingsService)
             .GetProperties(BindingFlags.Public | BindingFlags.Instance)
@@ -235,15 +232,13 @@ public partial class SettingsService : ObservableObject
     }
 
     // --- Listen (Laufzeit, nicht gespeichert) ---
-    [ObservableProperty]
-    public partial List<string> IconSortCrits { get; set; } =
+    [ObservableProperty] public partial List<string> IconSortCrits { get; set; } =
     [
         AppResources.nach_name,
         AppResources.nach_farbe
     ];
 
-    [ObservableProperty]
-    public partial List<string> PinSortCrits { get; set; } =
+    [ObservableProperty] public partial List<string> PinSortCrits { get; set; } =
     [
         AppResources.nach_plan,
         AppResources.nach_pin,
@@ -251,12 +246,12 @@ public partial class SettingsService : ObservableObject
         AppResources.nach_bezeichnung,
         AppResources.nach_aktiv_inaktiv,
         AppResources.nach_aufnahmedatum,
-        AppResources.nach_prioritaet
+        AppResources.nach_prioritaet,
+        AppResources.nach_ersteller
     ];
 
     // --- Listen (gespeichert) ---
-    [ObservableProperty, Persist]
-    public partial List<PriorityItem> PriorityItems { get; set; } =
+    [ObservableProperty, Persist] public partial List<PriorityItem> PriorityItems { get; set; } =
     [
         new() { Key = "", Color = null },
         new() { Key = AppResources.empfehlung, Color = "#92D050" },
@@ -264,16 +259,14 @@ public partial class SettingsService : ObservableObject
         new() { Key = AppResources.kritisch, Color = "#FF0000" }
     ];
 
-    [ObservableProperty, Persist]
-    public partial List<string> ColorList { get; set; } =
+    [ObservableProperty, Persist] public partial List<string> ColorList { get; set; } =
     [
         "#009900","#CAFE96","#000000","#7F00FF","#0365DD","#7FBFFF","#7D5F00","#DF7100","#FFBF00",
         "#C565E3","#FABAFC","#79F3F3","#0032CC","#FF0000","#FFFF00","#DFDFDF"
     ];
 
     // --- Drawing-Style Templates ---
-    [ObservableProperty, Persist]
-    public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
+    [ObservableProperty, Persist] public partial List<StylePickerItem> StyleTemplateItems { get; set; } =
     [
         new() {
             Text = "Fluchtweg",
@@ -456,9 +449,7 @@ public partial class SettingsService : ObservableObject
         root[nameof(PinSortCrit)] = PinSortCrits.IndexOf(PinSortCrit);
         root[nameof(IconCategory)] = IconCategories.IndexOf(IconCategory);
 
-        File.WriteAllText(
-            Path.Combine(Settings.DataDirectory, SettingsFileName),
-            root.ToJsonString(_jsonOptions));
+        File.WriteAllText(Path.Combine(Settings.DataDirectory, SettingsFileName), root.ToJsonString(_jsonOptions));
     }
 
     public void LoadSettings()
@@ -477,7 +468,6 @@ public partial class SettingsService : ObservableObject
             foreach (var p in PersistedProperties)
             {
                 // Schlüssel fehlt (z. B. neue Einstellung nach Update)
-                // → Initialwert der Property bleibt und wird unten in die Datei geschrieben
                 if (!root.TryGetPropertyValue(p.Name, out var node) || node is null)
                 {
                     hasMissingKeys = true;
